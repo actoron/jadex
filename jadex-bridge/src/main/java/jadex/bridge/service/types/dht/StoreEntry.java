@@ -8,7 +8,7 @@ import jadex.commons.Tuple3;
 public class StoreEntry
 {
 
-	private Tuple3<IID, String, String> content;
+	private Tuple3<IID, String, Object> content;
 	
 	/**
 	 * Constructor.
@@ -16,9 +16,9 @@ public class StoreEntry
 	 * @param hash
 	 * @param value
 	 */
-	public StoreEntry(IID hash, String key, String value)
+	public StoreEntry(IID hash, String key, Object value)
 	{
-		content = new Tuple3<IID, String, String>(hash, key, value);
+		content = new Tuple3<IID, String, Object>(hash, key, value);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class StoreEntry
 	 * 
 	 * @return
 	 */
-	public String getValue()
+	public Object getValue()
 	{
 		return content.getThirdEntity();
 	}
@@ -55,7 +55,7 @@ public class StoreEntry
 	 * Get Content for serialization.
 	 * @return content
 	 */
-	public Tuple3<IID, String, String> getContent()
+	public Tuple3<IID, String, Object> getContent()
 	{
 		return content;
 	}
@@ -64,7 +64,7 @@ public class StoreEntry
 	 * Set content for serialization.
 	 * @param content
 	 */
-	public void setContent(Tuple3<IID, String, String> content)
+	public void setContent(Tuple3<IID, String, Object> content)
 	{
 		this.content = content;
 	}

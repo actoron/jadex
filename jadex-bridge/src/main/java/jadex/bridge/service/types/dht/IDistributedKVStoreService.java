@@ -20,7 +20,7 @@ public interface IDistributedKVStoreService
 	 * @param value The Value.
 	 * @return The ID of the node this key was saved in.
 	 */
-	public IFuture<IID> publish(String key, String value);
+	public IFuture<IID> publish(String key, Object value);
 	
 	/**
 	 * Lookup a key and return the responsible Node ID.
@@ -36,7 +36,7 @@ public interface IDistributedKVStoreService
 	 * @param key Requested key.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<String> lookup(String key);
+	public IFuture<Object> lookup(String key);
 	
 	/**
 	 * Lookup a key in the ring and return the saved value, if any.
@@ -45,7 +45,7 @@ public interface IDistributedKVStoreService
 	 * @param idHash The hashed key to find the corresponding node.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<String> lookup(String key, IID idHash);
+	public IFuture<Object> lookup(String key, IID idHash);
 
 	/**
 	 * Set the local ringNode.
@@ -70,7 +70,7 @@ public interface IDistributedKVStoreService
 	 * @param value The value
 	 * @return the ID of the local node.
 	 */
-	public IFuture<IID> storeLocal(String key, String value);
+	public IFuture<IID> storeLocal(String key, Object value);
 	
 	/**
 	 * Returns all keys stored in this node.

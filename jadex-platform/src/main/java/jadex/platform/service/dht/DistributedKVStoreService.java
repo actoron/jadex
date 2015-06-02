@@ -90,7 +90,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @param value The Value.
 	 * @return The ID of the node this key was saved in.
 	 */
-	public IFuture<IID> publish(final String key, final String value)
+	public IFuture<IID> publish(final String key, final Object value)
 	{
 		final Future<IID> ret = new Future<IID>();
 		
@@ -133,7 +133,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @param value The value
 	 * @return the ID of the local node.
 	 */
-	public IFuture<IID> storeLocal(String key, String value) {
+	public IFuture<IID> storeLocal(String key, Object value) {
 		IID hash = ID.get(key);
 		return storeLocal(hash, key, value);
 	}
@@ -146,7 +146,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @param value The value
 	 * @return the ID of the local node.
 	 */
-	protected IFuture<IID> storeLocal(IID hash, String key, String value) {
+	protected IFuture<IID> storeLocal(IID hash, String key, Object value) {
 		StoreEntry entry = new StoreEntry(hash, key, value);
 		
 		if (!isResponsibleFor(hash)) {
@@ -188,7 +188,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @param key Requested key.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<String> lookup(String key) {
+	public IFuture<Object> lookup(String key) {
 		return lookup(key, ID.get(key));
 	}
 
@@ -199,9 +199,9 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @param idHash The hashed key to find the corresponding node.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<String> lookup(final String key, final IID idHash)
+	public IFuture<Object> lookup(final String key, final IID idHash)
 	{
-		final Future<String> ret = new Future<String>();
+		final Future<Object> ret = new Future<Object>();
 		final IExecutionFeature execFeature = agent.getComponentFeature(IExecutionFeature.class);
 		ring.findSuccessor(idHash).addResultListener(new DefaultResultListener<IFinger>()
 		{
@@ -212,13 +212,13 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 				logger.log(Level.INFO, myId + ": retrieving key: " +key+" (hash: " + idHash + ") from successor: " + result.getNodeId());
 				final IComponentIdentifier providerId = result.getSid().getProviderId();
 				final IID nodeId = result.getNodeId();
-				execFeature.scheduleStep(new IComponentStep<String>()
+				execFeature.scheduleStep(new IComponentStep<Object>()
 				{
 
 					@Override
-					public IFuture<String> execute(IInternalAccess ia)
+					public IFuture<Object> execute(IInternalAccess ia)
 					{
-						final Future<String> ret = new Future<String>();
+						final Future<Object> ret = new Future<Object>();
 //						if (providerId.equals(myCid)) {
 						if(nodeId.equals(myId))
 						{
@@ -250,12 +250,12 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 								@Override
 								public void resultAvailable(IDistributedKVStoreService result)
 								{
-									IFuture<String> string = result.lookup(key, idHash);
-									string.addResultListener(new DefaultResultListener<String>()
+									IFuture<Object> value = result.lookup(key, idHash);
+									value.addResultListener(new DefaultResultListener<Object>()
 									{
 
 										@Override
-										public void resultAvailable(String result)
+										public void resultAvailable(Object result)
 										{
 											ret.setResult(result);
 										}
@@ -265,11 +265,11 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 						}
 						return ret;
 					}
-				}).addResultListener(new DefaultResultListener<String>()
+				}).addResultListener(new DefaultResultListener<Object>()
 				{
 
 					@Override
-					public void resultAvailable(String result)
+					public void resultAvailable(Object result)
 					{
 						ret.setResult(result);
 					}
