@@ -1,6 +1,7 @@
 package jadex.bridge.sensor.service;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.sensor.time.TimedProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;

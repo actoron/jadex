@@ -10,6 +10,7 @@ import jadex.bridge.sensor.memory.MaxMemoryProperty;
 import jadex.bridge.sensor.memory.MaxPermGenMemoryProperty;
 import jadex.bridge.sensor.memory.UsedMemoryProperty;
 import jadex.bridge.sensor.memory.UsedPermGenMemoryProperty;
+import jadex.bridge.sensor.time.ComponentUptimeProperty;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
@@ -28,7 +29,8 @@ import jadex.micro.annotation.Properties;
 	@NFProperty(UsedMemoryProperty.class),
 	@NFProperty(MaxPermGenMemoryProperty.class),
 	@NFProperty(UsedPermGenMemoryProperty.class),
-	@NFProperty(LoadedClassesProperty.class)
+	@NFProperty(LoadedClassesProperty.class),
+	@NFProperty(ComponentUptimeProperty.class)
 })
 @Properties(@NameValue(name="system", value="true"))
 public class SystemSensorAgent

@@ -52,6 +52,19 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *  Creates a meta info.
 	 *  
 	 *  @param name Name of the property.
+	 */
+	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic)
+	{
+		this.name = name;
+		this.type = type;
+		this.unit = unit;
+		this.dynamic = dynamic;
+	}
+	
+	/**
+	 *  Creates a meta info.
+	 *  
+	 *  @param name Name of the property.
 	 *  @param type Type of the property.
 	 *  @param unit Unit of the property.
 	 *  @param dynamic Flag if the property is dynamic.

@@ -128,7 +128,7 @@ public class NFPropertyProperties extends PropertiesPanel
 					{
 //						IFuture<Object> fut = ((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyValue(propmi.getName(), u);
 //						fut.addResultListener(lis);
-						SNFPropertyProvider.getNFPropertyValue(ea, propmi.getName()).addResultListener(lis);
+						SNFPropertyProvider.getNFPropertyValue(ea, propmi.getName(), u).addResultListener(lis);
 					}
 				}
 			}

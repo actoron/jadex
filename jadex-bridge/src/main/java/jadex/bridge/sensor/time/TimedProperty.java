@@ -1,4 +1,4 @@
-package jadex.bridge.sensor.service;
+package jadex.bridge.sensor.time;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;

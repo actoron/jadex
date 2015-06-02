@@ -55,6 +55,8 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	 */
 	public IFuture<T> getValue(U unit)
 	{
+		if(getMetaInfo().isDynamic() && getMetaInfo().getUpdateRate()==0)
+			setValue(measureValue());
 		T ret = value;
 		if(unit instanceof IConvertableUnit)
 			ret = ((IConvertableUnit<T>)unit).convert(ret);
