@@ -45,9 +45,9 @@ public interface IParameterElement extends IElement
 	 */
 	public boolean hasParameterSet(String name);
 
-//	/**
-//	 *  Get the element type (i.e. the name declared in the ADF).
-//	 *  @return The element type.
-//	 */
-//	public String	getType();
+	/**
+	 *  Get the element type (i.e. the name declared in the ADF).
+	 *  @return The element type.
+	 */
+	public String	getType();
 }

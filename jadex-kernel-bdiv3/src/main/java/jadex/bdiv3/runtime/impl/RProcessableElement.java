@@ -49,7 +49,7 @@ public abstract class RProcessableElement extends RParameterElement
 	 */
 	public RProcessableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent, Map<String, Object> vals)
 	{
-		super(modelelement, agent, vals);
+		super(modelelement, agent, vals, agent.getFetcher());
 		this.pojoelement = pojoelement;
 		this.state = State.INITIAL;
 	}

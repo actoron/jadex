@@ -84,6 +84,26 @@ public class MElement
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the local name for an element, i.e. without capability prefix, if any.
+	 *  @return The local element name.
+	 */
+	public String getElementName()
+	{
+		String ret = null;
+		
+		if(name!=null)
+		{
+			int idx = name.lastIndexOf(CAPABILITY_SEPARATOR);
+			if(idx!=-1)
+			{
+				ret = name.substring(idx+1);
+			}
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Get the hashcode.

@@ -35,7 +35,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		this.mt = mt;
 		
 		// Must be done after msg has been assigned :-(
-		super.initParameters(null);
+		super.initParameters(null, agent.getFetcher());
 	}
 	
 	/**
@@ -224,7 +224,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public RParam(MParameter modelelement, String name, IInternalAccess agent)
 		{
-			super(modelelement, name, agent);
+			super(modelelement, name, agent, agent.getFetcher());
 		}
 		
 		/**
@@ -269,7 +269,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public RParamSet(MParameter modelelement, String name, IInternalAccess agent)
 		{
-			super(modelelement, name, agent);
+			super(modelelement, name, agent, agent.getFetcher());
 		}
 		
 		/**

@@ -1,6 +1,5 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -11,6 +10,7 @@ import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
@@ -40,24 +40,16 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	/**
 	 *  Create a new parameter element.
 	 */
-	public RParameterElement(MParameterElement melement, IInternalAccess agent)
-	{
-		this(melement, agent, null);
-	}
-	
-	/**
-	 *  Create a new parameter element.
-	 */
-	public RParameterElement(MParameterElement melement, IInternalAccess agent, Map<String, Object> vals)
+	public RParameterElement(MParameterElement melement, IInternalAccess agent, Map<String, Object> vals, IValueFetcher fetcher)
 	{
 		super(melement, agent);
-		initParameters(vals);
+		initParameters(vals, fetcher);
 	}
 	
 	/**
 	 *  Create the parameters from model spec.
 	 */
-	public void initParameters(Map<String, Object> vals)
+	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher)
 	{
 		List<MParameter> mparams = ((MParameterElement)getModelElement()).getParameters();
 		if(mparams!=null)
@@ -72,7 +64,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 					}
 					else
 					{
-						addParameter(createParameter(mparam, getAgent()));
+						addParameter(createParameter(mparam, getAgent(), fetcher));
 					}
 				}
 				else
@@ -83,7 +75,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 					}
 					else
 					{
-						addParameterSet(createParameterSet(mparam, getAgent()));
+						addParameterSet(createParameterSet(mparam, getAgent(), fetcher));
 					}
 					
 				}
@@ -94,9 +86,9 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	/**
 	 * 
 	 */
-	public IParameter createParameter(MParameter modelelement, IInternalAccess agent)
+	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, IValueFetcher fetcher)
 	{
-		return new RParameter(modelelement, modelelement.getName(), agent);
+		return new RParameter(modelelement, modelelement.getName(), agent, fetcher);
 	}
 	
 	/**
@@ -110,9 +102,9 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	/**
 	 * 
 	 */
-	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent)
+	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, IValueFetcher fetcher)
 	{
-		return new RParameterSet(modelelement, modelelement.getName(), agent);
+		return new RParameterSet(modelelement, modelelement.getName(), agent, fetcher);
 	}
 	
 	/**
@@ -250,13 +242,13 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameter(MParameter modelelement, String name, IInternalAccess agent)
+		public RParameter(MParameter modelelement, String name, IInternalAccess agent, IValueFetcher fetcher)
 		{
 			super(modelelement, agent);
 			this.name = name!=null?name: modelelement.getName();
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+name, (MParameter)getModelElement());
 			if(modelelement!=null)
-				setValue(modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
+				setValue(modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher));
 		}
 		
 		/**
@@ -331,7 +323,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent)
+		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent, IValueFetcher fetcher)
 		{
 			super(modelelement, agent);
 			this.name = name!=null?name: modelelement.getName();
@@ -341,7 +333,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 			{
 				if(modelelement.getDefaultValue()!=null)
 				{
-					tmpvalues = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+					tmpvalues = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher);
 				}
 				else 
 				{
@@ -350,7 +342,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 					{
 						for(UnparsedExpression uexp: modelelement.getDefaultValues())
 						{
-							Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+							Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher);
 							tmpvalues.add(fact);
 						}
 					}
@@ -477,12 +469,12 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		}
 	}
 	
-//	/**
-//	 *  Get the element type (i.e. the name declared in the ADF).
-//	 *  @return The element type.
-//	 */
-//	public String getType()
-//	{
-//		
-//	}
+	/**
+	 *  Get the element type (i.e. the name declared in the ADF).
+	 *  @return The element type.
+	 */
+	public String getType()
+	{
+		return getModelElement().getElementName();
+	}
 }

@@ -17,6 +17,9 @@ public class MPlanParameter	extends MParameter
 	/** The message event mappings. */
 	List<String>	messageeventmappings;
 	
+	/** The internal event mappings. */
+	List<String>	internaleventmappings;
+	
 	//-------- methods --------
 	
 	/**
@@ -73,5 +76,33 @@ public class MPlanParameter	extends MParameter
 			messageeventmappings	= new ArrayList<String>();
 		}
 		messageeventmappings.add(mapping);
+	}
+	
+	/**
+	 *  Get the internal event mappings.
+	 */
+	public List<String>	getInternalEventMappings()
+	{
+		return internaleventmappings;
+	}
+	
+	/**
+	 *  Set the internal event mappings.
+	 */
+	public void	setInternalEventMappings(List<String> internaleventmappings)
+	{
+		this.internaleventmappings	= internaleventmappings;
+	}
+	
+	/**
+	 *  Add a internal event mapping.
+	 */
+	public void	addInternalEventMapping(String mapping)
+	{
+		if(internaleventmappings==null)
+		{
+			internaleventmappings	= new ArrayList<String>();
+		}
+		internaleventmappings.add(mapping);
 	}
 }
