@@ -1,10 +1,10 @@
 package jadex.bdi.testcases.events;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  Handle internal events sent by initial event test.
@@ -23,7 +23,7 @@ public class EventHandlerPlan extends Plan
 			}
 			else if(!getWaitqueue().isEmpty())
 			{
-				tr.setFailed("Received too much events: "+SUtil.arrayToString(getWaitqueue().getElements()));
+				tr.setFailed("Received too much events: "+SUtil.arrayToString(getWaitqueue()));
 			}
 		}
 		catch(TimeoutException e)

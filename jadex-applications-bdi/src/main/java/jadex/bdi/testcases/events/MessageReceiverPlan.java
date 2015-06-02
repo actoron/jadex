@@ -1,11 +1,11 @@
 package jadex.bdi.testcases.events;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  Receives messages sent by initial event test.
@@ -24,7 +24,7 @@ public class MessageReceiverPlan extends Plan
 			}
 			else if(!getWaitqueue().isEmpty())
 			{
-				tr.setReason("Received too much events: "+SUtil.arrayToString(getWaitqueue().getElements()));
+				tr.setReason("Received too much events: "+SUtil.arrayToString(getWaitqueue()));
 			}
 		}
 		catch(TimeoutException e)

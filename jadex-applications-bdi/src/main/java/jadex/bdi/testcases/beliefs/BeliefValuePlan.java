@@ -32,7 +32,7 @@ public class BeliefValuePlan extends Plan
 	public void body()
 	{
 		TestReport tr = new TestReport("#1", "Test belief default values.");
-		Map	check	= new HashMap();
+		Map<String, Object>	check = new HashMap<String, Object>();
 		check.put("timeout", Long.valueOf(20000));
 		check.put("abel", "agent_initial_bel");
 		check.put("bbel", "capability_initial_bel");
@@ -42,7 +42,7 @@ public class BeliefValuePlan extends Plan
 		for(int i=0; ok && i<args.length; i++)
 		{
 			ok	= SUtil.equals(
-				SJavaParser.getParsedValue(args[i], getScope().getAgentModel().getAllImports(), getInterpreter().getFetcher(), getScope().getClassLoader()),
+				SJavaParser.getParsedValue(args[i], getScope().getAgentModel().getAllImports(), getAgent().getFetcher(), getScope().getClassLoader()),
 				check.get(args[i].getName()));
 		}
 		if(ok)

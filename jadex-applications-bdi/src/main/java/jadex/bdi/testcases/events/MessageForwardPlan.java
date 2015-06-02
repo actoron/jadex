@@ -1,8 +1,8 @@
 package jadex.bdi.testcases.events;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.fipa.SFipa;
 
 import java.util.List;

@@ -1,22 +1,19 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IBeliefListener;
-import jadex.bdi.runtime.IBeliefSetListener;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.IInternalEventListener;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.IMessageEventListener;
-import jadex.bdi.runtime.IPlanListener;
+import jadex.bdiv3.runtime.IBeliefListener;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.IPlanListener;
+import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
+import jadex.bdiv3x.runtime.IInternalEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.rules.eca.ChangeInfo;
 
 import java.util.logging.Logger;
 
@@ -39,15 +36,16 @@ public class CallbackPlan extends Plan
 		final Logger	logger	= getLogger();
 		
 		final TestReport tr1 = new TestReport("#1", "Test if belief changes can be observed in a listener.");
-		getBeliefbase().getBelief("bel").addBeliefListener(new IBeliefListener()
+		getBeliefbase().getBelief("bel").addBeliefListener(new BeliefAdapter<Object>()
 		{
-			public void beliefChanged(AgentEvent ae)
+			public void beliefChanged(ChangeInfo<Object> info)
 			{
-				logger.info("belief changed: "+ae);
+				logger.info("belief changed: "+info);
 				getBeliefbase().getBelief("bel").removeBeliefListener(this);
 				tr1.setSucceeded(true);
 			}
 		});
+			
 		getBeliefbase().getBelief("bel").setFact(Integer.valueOf(1));
 		waitFor(200);
 		if(!tr1.isSucceeded())
@@ -55,23 +53,23 @@ public class CallbackPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr1);
 		
 		final TestReport tr2 = new TestReport("#2", "Test if belief set added can be observed in a listener.");
-		getBeliefbase().getBeliefSet("belset").addBeliefSetListener(new IBeliefSetListener()
+		getBeliefbase().getBeliefSet("belset").addBeliefSetListener(new BeliefAdapter<Object>()
 		{
-			public void factAdded(AgentEvent ae)
+			public void factAdded(ChangeInfo<Object> info)
 			{
-				logger.info("fact added: "+ae);
+				logger.info("fact added: "+info);
 				getBeliefbase().getBeliefSet("belset").removeBeliefSetListener(this);
 				tr2.setSucceeded(true);
 			}
 			
-			public void factRemoved(AgentEvent ae)
+			public void factRemoved(ChangeInfo<Object> info)
 			{
-				logger.info("fact removed: "+ae);
+				logger.info("fact removed: "+info);
 			}
 			
-			public void factChanged(AgentEvent ae)
+			public void factChanged(ChangeInfo<Object> info)
 			{
-				logger.info("fact changed: "+ae);			
+				logger.info("fact changed: "+info);			
 			}
 		});
 		getBeliefbase().getBeliefSet("belset").addFact(Integer.valueOf(1));
@@ -82,23 +80,23 @@ public class CallbackPlan extends Plan
 		
 		// todo: rename to #3
 		final TestReport tr2b = new TestReport("#2b", "Test if belief set removed can be observed in a listener.");
-		getBeliefbase().getBeliefSet("belset").addBeliefSetListener(new IBeliefSetListener()
+		getBeliefbase().getBeliefSet("belset").addBeliefSetListener(new BeliefAdapter<Object>()
 		{
-			public void factAdded(AgentEvent ae)
+			public void factAdded(ChangeInfo<Object> info)
 			{
-				logger.info("fact added: "+ae);
+				logger.info("fact added: "+info);
 			}
 			
-			public void factRemoved(AgentEvent ae)
+			public void factRemoved(ChangeInfo<Object> info)
 			{
-				logger.info("fact removed: "+ae);
+				logger.info("fact removed: "+info);
 				getBeliefbase().getBeliefSet("belset").removeBeliefSetListener(this);
 				tr2b.setSucceeded(true);
 			}
 			
-			public void factChanged(AgentEvent ae)
+			public void factChanged(ChangeInfo<Object> info)
 			{
-				logger.info("fact changed: "+ae);			
+				logger.info("fact changed: "+info);			
 			}
 		});
 		getBeliefbase().getBeliefSet("belset").removeFact(Integer.valueOf(1));
