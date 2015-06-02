@@ -15,6 +15,8 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
 import jadex.rules.eca.ChangeInfo;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -130,11 +132,16 @@ public class ClassPlanBody extends AbstractPlanBody
 			}
 			catch(RuntimeException e)
 			{
+				StringWriter	sw	= new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				ia.getLogger().warning("Plan '"+this+"' threw exception: "+sw);
 				throw e;
 			}
 			catch(Exception e)
 			{
-	//			e.printStackTrace();
+				StringWriter	sw	= new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				ia.getLogger().warning("Plan '"+this+"' threw exception: "+sw);
 				throw new RuntimeException(e);
 			}
 		}

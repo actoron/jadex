@@ -4,25 +4,29 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
+import jadex.bdiv3.runtime.impl.IInternalPlan;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IElement;
+import jadex.bdiv3x.runtime.IParameter;
+import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-import java.util.ArrayList;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -82,13 +86,85 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		if(cands!=null && !cands.isEmpty())
 		{
 			element.setState(RProcessableElement.State.CANDIDATESSELECTED);
-			for(Object cand: cands)
+			for(final Object cand: cands)
 			{
 				if(cand instanceof MPlanInfo)
 				{
 					MPlanInfo mplaninfo = (MPlanInfo)cand;
-					RPlan rplan = RPlan.createRPlan(mplaninfo.getMPlan(), cand, element, ia, mplaninfo.getBinding());
-					RPlan.executePlan(rplan, ia);
+					try
+					{
+						RPlan rplan = RPlan.createRPlan(mplaninfo.getMPlan(), cand, element, ia, mplaninfo.getBinding());
+						RPlan.executePlan(rplan, ia);
+					}
+					catch(final Exception e)
+					{
+						StringWriter	sw	= new StringWriter();
+						e.printStackTrace(new PrintWriter(sw));
+						ia.getLogger().warning("Plan '"+cand+"' threw exception: "+sw);
+						
+						element.planFinished(ia, new IInternalPlan()
+						{
+							public MElement getModelElement()
+							{
+								return null;
+							}
+							
+							public boolean hasParameterSet(String name)
+							{
+								return false;
+							}
+							
+							public boolean hasParameter(String name)
+							{
+								return false;
+							}
+							
+							public String getType()
+							{
+								return null;
+							}
+							
+							public IParameter[] getParameters()
+							{
+								return null;
+							}
+							
+							public IParameterSet[] getParameterSets()
+							{
+								return null;
+							}
+							
+							public IParameterSet getParameterSet(String name)
+							{
+								return null;
+							}
+							
+							public IParameter getParameter(String name)
+							{
+								return null;
+							}
+							
+							public boolean isPassed()
+							{
+								return false;
+							}
+							
+							public boolean isFailed()
+							{
+								return true;
+							}
+							
+							public Exception getException()
+							{
+								return e;
+							}
+							
+							public Object getCandidate()
+							{
+								return cand;
+							}
+						});
+					}
 					ret.setResult(null);
 				}
 				// direct subgoal for goal

@@ -7,6 +7,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  *  Abstract base class for plan body implementations.
  *   
@@ -237,6 +240,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 		catch(Exception e)
 		{
 //			e.printStackTrace();
+			StringWriter	sw	= new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			ia.getLogger().warning("Plan '"+getBody()+"' threw exception: "+sw);
 			ret.setException(e);
 		}
 		catch(BodyAborted ba)

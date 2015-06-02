@@ -91,14 +91,14 @@ public class MElement
 	 */
 	public String getElementName()
 	{
-		String ret = null;
+		String ret = name;
 		
-		if(name!=null)
+		if(ret!=null)
 		{
-			int idx = name.lastIndexOf(CAPABILITY_SEPARATOR);
+			int idx = ret.lastIndexOf(CAPABILITY_SEPARATOR);
 			if(idx!=-1)
 			{
-				ret = name.substring(idx+1);
+				ret = ret.substring(idx+1);
 			}
 		}
 		
