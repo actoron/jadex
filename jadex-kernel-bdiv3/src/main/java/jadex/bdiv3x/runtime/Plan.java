@@ -12,9 +12,11 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
@@ -31,9 +33,11 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.rules.eca.ChangeInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -177,7 +181,7 @@ public abstract class Plan
 			
 	//		rplan.addResumeCommand(rescom);
 			
-			return ret.get();
+			return ret.get(timeout);
 		}
 	}
 	
@@ -233,7 +237,7 @@ public abstract class Plan
 			
 	//		rplan.addResumeCommand(rescom);
 			
-			return ret.get();
+			return ret.get(timeout);
 		}
 	}
 	
@@ -661,4 +665,104 @@ public abstract class Plan
 	{
 		return rplan.getWaitqueue();
 	}
+	
+	/**
+	 *  Wait for a fact change of a belief.
+	 */
+	public void waitForFactChanged(String belname)
+	{
+		waitForFactChanged(belname, -1);
+	}
+	
+	/**
+	 *  Wait for a fact change of a belief.
+	 */
+	public void waitForFactChanged(String belname, long timeout)
+	{
+		final Future<Void> ret = new Future<Void>();
+		IBDIAgentFeature bdif = agent.getComponentFeature(IBDIAgentFeature.class);
+		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+		{
+			public void beliefChanged(ChangeInfo<Object> info)
+			{
+				ret.setResultIfUndone(null);
+			}
+		};
+		bdif.addBeliefListener(belname, lis);
+		try
+		{
+			ret.get(timeout);
+		}
+		finally
+		{
+			bdif.removeBeliefListener(belname, lis);
+		}
+	}
+	
+	/**
+	 *  Wait for a fact added.
+	 */
+	public Object waitForFactAdded(String belname)
+	{
+		return waitForFactAdded(belname, -1);
+	}
+	
+	/**
+	 *  Wait for a fact added.
+	 */
+	public Object waitForFactAdded(String belname, long timeout)
+	{
+		final Future<Object> ret = new Future<Object>();
+		IBDIAgentFeature bdif = agent.getComponentFeature(IBDIAgentFeature.class);
+		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+		{
+			public void factAdded(ChangeInfo<Object> info)
+			{
+				ret.setResultIfUndone(info.getValue());
+			}
+		};
+		bdif.addBeliefListener(belname, lis);
+		try
+		{
+			return ret.get(timeout);
+		}
+		finally
+		{
+			bdif.removeBeliefListener(belname, lis);
+		}
+	}
+	
+	/**
+	 *  Wait for a fact added.
+	 */
+	public Object waitForFactRemoved(String belname)
+	{
+		return waitForFactRemoved(belname, -1);
+	}
+	
+	/**
+	 *  Wait for a fact added.
+	 */
+	public Object waitForFactRemoved(String belname, long timeout)
+	{
+		final Future<Void> ret = new Future<Void>();
+		IBDIAgentFeature bdif = agent.getComponentFeature(IBDIAgentFeature.class);
+		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+		{
+			public void factRemoved(ChangeInfo<Object> info)
+			{
+				ret.setResultIfUndone(null);
+			}
+		};
+		bdif.addBeliefListener(belname, lis);
+		try
+		{
+			return ret.get(timeout);
+		}
+		finally
+		{
+			bdif.removeBeliefListener(belname, lis);
+		}
+	}
+	 
 }

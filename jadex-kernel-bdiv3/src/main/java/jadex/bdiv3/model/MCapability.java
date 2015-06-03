@@ -41,6 +41,9 @@ public class MCapability extends MElement
 	/** The internal events. */
 	protected List<MInternalEvent> ievents;
 	
+	/** The element references. */
+	protected List<MElementRef> elementrefs;
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -581,4 +584,33 @@ public class MCapability extends MElement
 		
 		return ret;
 	}
+
+	/**
+	 *  Get the elementrefs.
+	 *  @return The elementrefs
+	 */
+	public List<MElementRef> getElementRefs()
+	{
+		return elementrefs;
+	}
+
+	/**
+	 *  The elementrefs to set.
+	 *  @param elementrefs The elementrefs to set
+	 */
+	public void setElementRefs(List<MElementRef> elementrefs)
+	{
+		this.elementrefs = elementrefs;
+	}
+	
+	/**
+	 *  Add an element ref.
+	 */
+	public void addElementRef(MElementRef ref)
+	{
+		if(elementrefs==null)
+			elementrefs = new ArrayList<MElementRef>();
+		elementrefs.add(ref);
+	}
+	
 }

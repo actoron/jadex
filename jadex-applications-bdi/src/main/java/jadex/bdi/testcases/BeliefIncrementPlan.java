@@ -22,12 +22,45 @@ public class BeliefIncrementPlan extends Plan
 	/** The change rate. */
 	protected long rate;
 
-	//-------- constructors --------
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan instance.
+//	 */
+//	public BeliefIncrementPlan()
+//	{
+//		//System.out.println("Created: " + this);
+//		getLogger().info("Created: " + this);
+//		
+//		this.beliefname = (String)getParameter("beliefname").getValue();
+//		if(beliefname==null)
+//			throw new RuntimeException("Beliefname must not null: "+beliefname);
+//		
+//		if(hasParameter("value"))
+//		{
+//			values	= new Number[]{(Number)getParameter("value").getValue()};
+//		}
+//		else if(hasParameterSet("values"))
+//		{
+//			values	= (Number[])getParameterSet("values").getValues();
+//		}
+//		else
+//		{
+//			values	= new Number[]{Integer.valueOf(1)};
+//		}
+//
+//		if(hasParameter("rate"))
+//		{
+//			rate	= ((Number)getParameter("rate").getValue()).longValue();
+//		}
+//	}
+
+	//-------- methods --------
 
 	/**
-	 *  Create a new plan instance.
+	 *  The plan body.
 	 */
-	public BeliefIncrementPlan()
+	public void body()
 	{
 		//System.out.println("Created: " + this);
 		getLogger().info("Created: " + this);
@@ -53,15 +86,7 @@ public class BeliefIncrementPlan extends Plan
 		{
 			rate	= ((Number)getParameter("rate").getValue()).longValue();
 		}
-	}
-
-	//-------- methods --------
-
-	/**
-	 *  The plan body.
-	 */
-	public void body()
-	{
+		
 		int cnt = 0;
 		do
 		{

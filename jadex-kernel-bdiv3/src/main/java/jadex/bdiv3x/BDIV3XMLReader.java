@@ -8,6 +8,7 @@ import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.model.MElementRef;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
@@ -340,7 +341,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
 				if(object instanceof MBelief || object instanceof MGoal || object instanceof MPlan || object instanceof MMessageEvent || object instanceof MInternalEvent 
-					|| object instanceof MCapabilityReference
+					|| object instanceof MCapabilityReference || object instanceof MElementRef
 					|| (object instanceof UnparsedExpression && pathname[pathname.length-1].getLocalPart().equals("expression"))) // hack for bdi expressions
 				{
 					parent	= ((BDIV3XModel)parent).getCapability();
@@ -394,8 +395,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},  
 				new SubobjectInfo[]{
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefref")}), new AccessInfo(new QName(uri, "beliefref"), "belief")),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefsetref")}), new AccessInfo(new QName(uri, "beliefsetref"), "belief")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefref")}), new AccessInfo(new QName(uri, "beliefref"), "elementRef")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefsetref")}), new AccessInfo(new QName(uri, "beliefsetref"), "elementRef")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "belief")}), new AccessInfo(new QName(uri, "belief"), "belief")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefset")}), new AccessInfo(new QName(uri, "beliefset"), "belief")),
 		
@@ -483,8 +484,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}), null));//, new OAVObjectReaderHandler()));	
 		
 		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(OAVBDIMetaModel.beliefreference_type),
-//			null, null, new OAVObjectReaderHandler()));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MElementRef.class),
+			null, null));
 //		
 //		TypeInfo ti_belset = new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(OAVBDIMetaModel.beliefset_type, tepost), 
 //			new MappingInfo(null, new AttributeInfo[]{
@@ -621,6 +622,21 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					}
 					mtrig.addGoalMatchExpression(ref, (UnparsedExpression)object);	// Todo: support match expression on other elements as allowed in schema 
 				}
+				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factadded")))
+				{
+					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
+					mtrig.addFactAdded((String)object);
+				}
+				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factremoved")))
+				{
+					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
+					mtrig.addFactRemoved((String)object);
+				}
+				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factchanged")))
+				{
+					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
+					mtrig.addFactChangeds((String)object);
+				}
 				else
 				{
 					context.getTopStackElement().getReaderHandler().linkObject(object, parent, linkinfo, pathname, context);
@@ -641,6 +657,23 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "messageevent")}), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "goal")}), null));
 
+		IBeanObjectCreator boc = new IBeanObjectCreator()
+		{
+			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
+			{
+				return rawattributes.get("ref");
+			}
+		};
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factadded")), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factremoved")), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factchanged")), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factremoved")), new ObjectInfo(boc), null, null));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factchanged")), new ObjectInfo(boc), null, null));
+		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internalevent")), new ObjectInfo(MInternalEvent.class),
 			null, null));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internaleventref")), new ObjectInfo(OAVBDIMetaModel.internaleventreference_type),
