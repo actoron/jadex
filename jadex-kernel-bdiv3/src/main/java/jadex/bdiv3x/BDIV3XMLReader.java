@@ -450,7 +450,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("argument", "exported"))
+				new AttributeInfo(new AccessInfo("argument", "exported")),
+				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
 			}), null));
@@ -472,7 +473,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("argument", "exported"))
+				new AttributeInfo(new AccessInfo("argument", "exported")),
+				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
 			}, new SubobjectInfo[]{
 				// because there is only MBelief the facts expression is stored as default fact
 				// and multiple facts are added to a list
@@ -795,7 +797,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
 				new AttributeInfo(new AccessInfo("updaterate", "updateRate")),
-				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
+				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "bindingoptions"), "bindingOptions"))

@@ -1,7 +1,9 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameterElement;
+import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
@@ -58,7 +60,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 			{
 				if(!mparam.isMulti(agent.getClassLoader()))
 				{
-					if(vals!=null && vals.containsKey(mparam.getName()))
+					if(vals!=null && vals.containsKey(mparam.getName()) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
 					{
 						addParameter(createParameter(mparam, getAgent(), vals.get(mparam.getName())));
 					}
@@ -69,7 +71,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 				}
 				else
 				{
-					if(vals!=null && vals.containsKey(mparam.getName()))
+					if(vals!=null && vals.containsKey(mparam.getName()) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
 					{
 						addParameterSet(createParameterSet(mparam, getAgent(), (Object[])vals.get(mparam.getName())));
 					}
@@ -289,7 +291,16 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public Object	getValue()
 		{
-			return value;
+			Object ret = value;
+			EvaluationMode eva = ((MParameter)getModelElement()).getEvaluationMode();
+			UnparsedExpression uexp = ((MParameter)getModelElement()).getDefaultValue();
+			// In case of push the last evaluated value is returned
+			if(uexp!=null && MParameter.EvaluationMode.PULL.equals(eva))
+			{
+				ret = SJavaParser.parseExpression(((MBelief)getModelElement()).getDefaultFact(), 
+					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+			}
+			return ret;
 		}
 	}
 

@@ -12,6 +12,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
@@ -852,7 +853,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 	
 	/**
-	 *  Method that is called automatically when a belief 
+	 *  Method that is called automatically when a parameter 
 	 *  is written as array access.
 	 */
 	// todo: allow init writes in constructor also for arrays
@@ -886,22 +887,24 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
 
-		// Test if array store is really a belief store instruction by
-		// looking up the current belief value and comparing it with the
+		// Test if array store is really a parameter store instruction by
+		// looking up the current parameter value and comparing it with the
 		// array that is written
 		
-		boolean isparamwrite = false;
+		boolean isparamwrite = true;//false;
 		
+		// todo: support other types of parameter elements.
 		MGoal mgoal = ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getGoal(agentobj.getClass().getName());
-		if(mgoal!=null)
-		{
-			MParameter mparam = mgoal.getParameter(fieldname);
-			if(mparam!=null)
-			{
-				Object curval = mparam.getValue(agentobj, agent.getClassLoader());
-				isparamwrite = curval==array;
-			}
-		}
+		// This code does not work for parameters because the parameterelement object is unknown :-(
+//		if(mgoal!=null)
+//		{
+//			MParameter mparam = mgoal.getParameter(fieldname);
+//			if(mparam!=null)
+//			{
+//				Object curval = mparam.getValue(agentobj, agent.getClassLoader());
+//				isparamwrite = curval==array;
+//			}
+//		}
 		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 //			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
 		
@@ -919,14 +922,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		else if(byte.class.equals(ct))
 		{
-//				val = new Byte(((Integer)val).byteValue());
 			val = Byte.valueOf(((Integer)val).byteValue());
 		}
 		Array.set(array, index, val);
 		
 		if(isparamwrite)
 		{
-			
 			if(!SUtil.equals(val, oldval))
 			{
 				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), new ChangeInfo<Object>(val, oldval, Integer.valueOf(index)));
@@ -2052,27 +2053,27 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			}
 //		}
 			
-	/**
-	 *  Create belief events from a belief name.
-	 *  For normal beliefs 
-	 *  beliefchanged.belname and factchanged.belname 
-	 *  and for multi beliefs additionally
-	 *  factadded.belname and factremoved 
-	 *  are created.
-	 */
-	public static void addBeliefEvents(IInternalAccess ia, List<EventType> events, String belname)
-	{
-		events.add(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
-		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
-		
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		MBelief mbel = ((MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
-		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
-		{
-			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
-			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
-		}
-	}
+//	/**
+//	 *  Create belief events from a belief name.
+//	 *  For normal beliefs 
+//	 *  beliefchanged.belname and factchanged.belname 
+//	 *  and for multi beliefs additionally
+//	 *  factadded.belname and factremoved 
+//	 *  are created.
+//	 */
+//	public static void addBeliefEvents(IInternalAccess ia, List<EventType> events, String belname)
+//	{
+//		events.add(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
+//		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
+//		
+////		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//		MBelief mbel = ((MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
+//		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
+//		{
+//			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+//			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+//		}
+//	}
 		
 	/**
 	 *  Create goal events for a goal name. creates
@@ -2111,6 +2112,67 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		
 		return events;
+	}
+	
+	/**
+	 *  Create belief events from a belief name.
+	 *  For normal beliefs 
+	 *  beliefchanged.belname and factchanged.belname 
+	 *  and for multi beliefs additionally
+	 *  factadded.belname and factremoved 
+	 *  are created.
+	 */
+	public static void addBeliefEvents(IInternalAccess ia, List<EventType> events, String belname)
+	{
+		addBeliefEvents((MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
+			.getCapability().getModelElement(), events, belname, ia.getClassLoader());
+	}
+	
+	/**
+	 *  Create belief events from a belief name.
+	 *  For normal beliefs 
+	 *  beliefchanged.belname and factchanged.belname 
+	 *  and for multi beliefs additionally
+	 *  factadded.belname and factremoved 
+	 *  are created.
+	 */
+	public static void addBeliefEvents(MCapability mcapa, List<EventType> events, String belname, ClassLoader cl)
+	{
+		belname = belname.replace(".", "/");
+		MBelief mbel = mcapa.getBelief(belname);
+		if(mbel==null)
+			throw new RuntimeException("No such belief: "+belname);
+		
+		events.add(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
+		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
+		
+		if(mbel.isMulti(cl))
+		{
+			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+		}
+	}
+	
+	/**
+	 *  Create parameter events from a belief name.
+	 */
+//	public static void addParameterEvents(MParameterElement mpelem, MCapability mcapa, List<EventType> events, String paramname, String elemname, ClassLoader cl)
+	public static void addParameterEvents(MParameterElement mpelem, MCapability mcapa, List<EventType> events, String paramname, ClassLoader cl)
+	{
+		MParameter mparam = mpelem.getParameter(paramname);
+		String elemname = mpelem.getName();
+		
+		if(mparam==null)
+			throw new RuntimeException("No such parameter "+paramname+" in "+elemname);
+		
+		events.add(new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, paramname})); // the whole value was changed
+		events.add(new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, paramname})); // property change of a value
+		
+		if(mparam.isMulti(cl))
+		{
+			events.add(new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, paramname}));
+			events.add(new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, paramname}));
+		}
 	}
 		
 	/**
@@ -2371,6 +2433,22 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public static IBDIAgentFeature	getBDIAgentFeature(IInternalAccess agent)
 	{
 		return agent.getComponentFeature(IBDIAgentFeature.class);
+	}
+	
+	/**
+	 *  Get the mcapa.
+	 */
+	public static MCapability getMCapability(IInternalAccess agent)
+	{
+		return ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement());
+	}
+	
+	/**
+	 *  Get the rcapa.
+	 */
+	public static RCapability getCapability(IInternalAccess agent)
+	{
+		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 	}
 	
 //	/**

@@ -1171,6 +1171,20 @@ public class SReflect
 	 *  @throws IllegalArgumentException when argument is not
 	 * 		one of (Iterator, Enumeration, Collection, Map, Array).
 	 */
+	public static <T> Iterable<T> getIterable(Object collection)
+	{
+		return new IterableIteratorWrapper<T>((Iterator<T>)getIterator(collection));
+	}
+	
+	/**
+	 *  Get an iterator for an arbitrary collection object.
+	 *  Supports iterators, enumerations, java.util.Collections,
+	 *  java.util.Maps, arrays. Null is converted to empty iterator.
+	 *  @param collection	The collection object.
+	 *  @return An iterator over the collection.
+	 *  @throws IllegalArgumentException when argument is not
+	 * 		one of (Iterator, Enumeration, Collection, Map, Array).
+	 */
 	public static <T> Iterator<T>	getIterator(Object collection)
 	{
 		if(collection==null)

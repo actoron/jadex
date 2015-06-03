@@ -10,15 +10,15 @@ import java.util.Date;
  */
 public class EvaluationmodesPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new countdown plan.
-	 */
-	public EvaluationmodesPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new countdown plan.
+//	 */
+//	public EvaluationmodesPlan()
+//	{
+//		getLogger().info("Created: "+this);
+//	}
 
 	//-------- methods --------
 

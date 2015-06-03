@@ -156,8 +156,7 @@ public class RExpressionBase extends RElement implements IExpressionbase
 		 */
 		public IParsedExpression getParsedExpression()
 		{
-			return (IParsedExpression)(uexp.getParsed()==null? SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), 
-				agent.getClassLoader()): uexp.getParsed());
+			return SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader());
 		}
 	}
 }

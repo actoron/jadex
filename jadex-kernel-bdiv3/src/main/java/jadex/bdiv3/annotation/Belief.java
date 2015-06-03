@@ -18,7 +18,7 @@ public @interface Belief
 	public Class<?> implementation() default Object.class;
 
 	/**
-	 *  A dynamic belief reevaluated on every access.
+	 *  A dynamic belief reevaluated on every access. 
 	 */
 	public boolean dynamic() default false;
 	
