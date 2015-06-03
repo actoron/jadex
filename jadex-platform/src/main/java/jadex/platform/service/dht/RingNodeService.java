@@ -119,11 +119,11 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	@ServiceStart
 	public void onStart()
 	{
-		System.out.println("Ringservice started");
 		if(this.myId != null)
 		{
 			return;
 		}
+//		System.out.println("Ringservice started");
 		init(ID.get(agent.getComponentIdentifier()));
 
 		agent.getExternalAccess().scheduleStep(searchStep);
@@ -141,18 +141,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			
 //			log("Searching for other nodes, because state != JOINED");
 			
-			ITerminableIntermediateFuture<IRingNodeService> requiredServices = SServiceProvider.getServices(agent, IRingNodeService.class, RequiredServiceInfo.SCOPE_GLOBAL, new IAsyncFilter<IRingNodeService>() {
-
-				@Override
-				public IFuture<Boolean> filter(IRingNodeService obj)
-				{
-					return new Future<Boolean>(overlayId.equals(obj.getOverlayId()));
-				}
-				
-			});
-			
-//			IRequiredServicesFeature componentFeature = agent.getComponentFeature(IRequiredServicesFeature.class);
-//			ITerminableIntermediateFuture<Object> requiredServices = componentFeature.getRequiredServices("ringnodes");
+			ITerminableIntermediateFuture<IRingNodeService> requiredServices = SServiceProvider.getServices(agent, IRingNodeService.class, RequiredServiceInfo.SCOPE_GLOBAL, new OverlayIdFilter(overlayId));
 			
 			requiredServices.addResultListener(new IntermediateDefaultResultListener<IRingNodeService>()
 			{
@@ -161,6 +150,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 				@Override
 				public void intermediateResultAvailable(IRingNodeService result)
 				{
+//					System.out.println("Found ringnode to join: " + result);
 					IRingNodeService other = (IRingNodeService)result;
 					if (!found && state != State.JOINED) {
 						if (!other.getId().get().equals(myId)) {
@@ -996,5 +986,18 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		return overlayId + " - Ringnode (" + myId + ")";
 	}
 	
+	private final class OverlayIdFilter implements IAsyncFilter<IRingNodeService>
+	{
+		private String	overlayId;
+		public OverlayIdFilter(String overlayId)
+		{
+			this.overlayId = overlayId;
+		}
+		@Override
+		public IFuture<Boolean> filter(IRingNodeService obj)
+		{
+			return new Future<Boolean>(overlayId.equals(obj.getOverlayId()));
+		}
+	}
 	
 }
