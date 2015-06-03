@@ -21,6 +21,7 @@ import jadex.javaparser.SJavaParser;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -314,6 +315,9 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		
 		/** The value. */
 		protected List<Object> values;
+		
+		/** The fetcher. */
+		protected IValueFetcher fetcher;
 
 		/**
 		 *  Create a new parameter.
@@ -338,20 +342,31 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		{
 			super(modelelement, agent);
 			this.name = name!=null?name: modelelement.getName();
+			this.fetcher = fetcher;
 			
-			List<Object> tmpvalues;
-			if(modelelement!=null)
+			setValues(new ListWrapper<Object>(evaluateValues(), getAgent(), ChangeEvent.VALUEADDED+"."+getName(), 
+				ChangeEvent.VALUEREMOVED+"."+getName(), ChangeEvent.VALUECHANGED+"."+getName(), getModelElement()));
+		}
+
+		/**
+		 *  Evaluate the default values.
+		 */
+		protected List<Object> evaluateValues()
+		{
+			MParameter mparam = (MParameter)getModelElement();
+			List<Object> tmpvalues = new ArrayList<Object>();
+			if(mparam!=null)
 			{
-				if(modelelement.getDefaultValue()!=null)
+				if(mparam.getDefaultValue()!=null)
 				{
-					tmpvalues = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher);
+					tmpvalues = (List<Object>)SJavaParser.parseExpression(mparam.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher);
 				}
 				else 
 				{
 					tmpvalues = new ArrayList<Object>();
-					if(modelelement.getDefaultValues()!=null)
+					if(mparam.getDefaultValues()!=null)
 					{
-						for(UnparsedExpression uexp: modelelement.getDefaultValues())
+						for(UnparsedExpression uexp: mparam.getDefaultValues())
 						{
 							Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher);
 							tmpvalues.add(fact);
@@ -359,15 +374,9 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 					}
 				}
 			}
-			else
-			{
-				tmpvalues = new ArrayList<Object>();
-			}
-			
-			setValues(new ListWrapper<Object>(tmpvalues, getAgent(), ChangeEvent.VALUEADDED+"."+getName(), 
-				ChangeEvent.VALUEREMOVED+"."+getName(), ChangeEvent.VALUECHANGED+"."+getName(), getModelElement()));
+			return tmpvalues;
 		}
-
+		
 		/**
 		 *  Get the name.
 		 *  @return The name
@@ -476,7 +485,8 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		protected List<Object> internalGetValues()
 		{
-			return values;
+			// In case of push the last saved/evaluated value is returned
+			return MParameter.EvaluationMode.PULL.equals(((MParameter)getModelElement()).getEvaluationMode())? evaluateValues(): values;
 		}
 	}
 	
