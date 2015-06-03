@@ -244,7 +244,21 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		TypeInfo ti_achievegoalref = new TypeInfo(new XMLInfo(new QName(uri, "achievegoalref")), new ObjectInfo(MGoal.class),
 			null, null);
 		
-		TypeInfo ti_querygoal = new TypeInfo(new XMLInfo(new QName(uri, "querygoal")), new ObjectInfo(MGoal.class),
+		TypeInfo ti_querygoal = new TypeInfo(new XMLInfo(new QName(uri, "querygoal")), new ObjectInfo(MGoal.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				// create the implicit target condition
+				MGoal mgoal = (MGoal)object;
+//				mgoal.addCondition(MGoal.CONDITION_TARGET, null);
+				return object;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
 				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))

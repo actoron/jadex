@@ -11,6 +11,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameter.Direction;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -1393,7 +1394,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 *  When two goals are the same this does not mean
 	 *  the objects are equal() in the Java sense!
 	 */
-	public boolean	isSame(IGoal goal)
+	public boolean isSame(IGoal goal)
 	{
 		// Goals are only the same when they are of same type.
 		boolean	same	= getModelElement().equals(goal.getModelElement());
@@ -1429,5 +1430,43 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		}
 
 		return same;
+	}
+	
+	/**
+	 *  Test if a querygoal is finished.
+	 *  It is finished when all out parameters/sets are filled with a value.
+	 */
+	public static boolean isQueryGoalFinished(RGoal goal)
+	{
+		boolean ret = true;
+		
+		for(IParameter param: goal.getParameters())
+		{
+			Direction dir = ((MParameter)param.getModelElement()).getDirection();
+			if(MParameter.Direction.OUT.equals(dir) || MParameter.Direction.INOUT.equals(dir))
+			{
+				Object val = param.getValue();
+				ret = val!=null;
+				if(!ret)
+					break;
+			}
+		}
+		
+		if(ret)
+		{
+			for(IParameterSet paramset: goal.getParameterSets())
+			{
+				Direction dir = ((MParameter)paramset.getModelElement()).getDirection();
+				if(MParameter.Direction.OUT.equals(dir) || MParameter.Direction.INOUT.equals(dir))
+				{
+					Object[] vals = paramset.getValues();
+					ret = vals.length>0;
+					if(!ret)
+						break;
+				}
+			}
+		}
+		
+		return ret;
 	}
 }
