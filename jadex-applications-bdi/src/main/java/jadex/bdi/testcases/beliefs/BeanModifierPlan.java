@@ -9,16 +9,16 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class BeanModifierPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public BeanModifierPlan()
-	{
-		getLogger().fine("Created: "+this);
-		//System.out.println("Created: "+this);
-	}
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public BeanModifierPlan()
+//	{
+//		getLogger().fine("Created: "+this);
+//		//System.out.println("Created: "+this);
+//	}
 
 	//-------- methods --------
 

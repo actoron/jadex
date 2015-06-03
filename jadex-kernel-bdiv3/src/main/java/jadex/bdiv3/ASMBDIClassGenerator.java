@@ -662,7 +662,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				if(tododyn.remove(name))
 				{
 					MBelief mbel = model.getCapability().getBelief(name);
-					mbel.getEvents().addAll(evs);
+					mbel.getBeliefEvents().addAll(evs);
 					
 					MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
 						+SUtil.firstToUpperCase(name), Type.getMethodDescriptor(Type.VOID_TYPE), null, null);

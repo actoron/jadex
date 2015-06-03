@@ -187,7 +187,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			List<MBelief> mbels = model.getCapability().getBeliefs();
 			for(MBelief mbel : mbels)
 			{
-				Collection<String> evs = mbel.getEvents();
+				Collection<String> evs = mbel.getBeliefEvents();
 				Collection<EventType> rawevs = mbel.getRawEvents();
 				if((evs!=null && !evs.isEmpty()) || (rawevs!=null && !rawevs.isEmpty()) || mbel.isDynamic())
 				{

@@ -15,14 +15,18 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3x.runtime.IParameter;
+import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -269,25 +273,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		
 		for(final MBelief mbel: beliefs)
 		{
-			List<EventType> events = new ArrayList<EventType>();
+			List<EventType> events = mbel.getAllEvents(component);
 			
-			Collection<String> evs = mbel.getEvents();
-			if(evs!=null && !evs.isEmpty())
-			{
-				for(String ev: evs)
-				{
-					BDIAgentFeature.addBeliefEvents(component, events, ev);
-				}
-			}
-			
-			Collection<EventType> rawevents = mbel.getRawEvents();
-			if(rawevents!=null)
-			{
-				Collection<EventType> revs = mbel.getRawEvents();
-				if(revs!=null)
-					events.addAll(revs);
-			}
-		
 			// Automatic reevaluation if belief depends on other beliefs
 			if(!events.isEmpty())
 			{
@@ -409,10 +396,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 											// reevaluate the belief on change events
 											Object value = SJavaParser.parseExpression(mbel.getDefaultFact(), 
 												component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
-											// save the value
+											// save the value 
+											// change event is automatically thrown
 											mbel.setValue(component, value);
-											// throw change event
-											BDIAgentFeature.createChangeEvent(value, oldval, null, component, mbel.getName());
 											oldval = value;
 										}
 									}
@@ -439,6 +425,129 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				};
 				// Evaluate at time 0, updaterate*1, updaterate*2, ...
 				to.timeEventOccurred(cs.getTime());
+			}
+		}
+		
+		// Observe dynamic parameters of goals
+		// todo: other parameter elements?!
+		List<MGoal> mgoals = bdimodel.getCapability().getGoals();
+		
+		for(final MGoal mgoal: mgoals)
+		{
+			List<MParameter> mparams = mgoal.getParameters();
+			
+			if(mparams!=null)
+			{
+				for(final MParameter mparam: mparams)
+				{
+					List<EventType> events = mparam.getAllEvents(component);
+				
+					// Automatic reevaluation if belief depends on other beliefs
+					if(!events.isEmpty())
+					{
+						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_"+mparam.getName()+"_parameter_update", 
+							ICondition.TRUE_CONDITION, new IAction<Void>()
+						{
+							// todo: oldval
+	//						Object oldval = null;
+							
+							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+							{
+								System.out.println("parameter update: "+event);
+								
+								RCapability capa = BDIAgentFeature.getCapability(component);
+								if(capa.getGoals()!=null)
+								{
+									for(RGoal goal: capa.getGoals(mgoal))
+									{
+										if(!mparam.isMulti(component.getClassLoader()))
+										{
+											IParameter param = goal.getParameter(mparam.getName());
+											// reevaluate the belief on change events
+											Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
+												component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+											// save the value, automatically throws change event
+											param.setValue(value);
+										}
+										else
+										{
+											IParameterSet paramset = goal.getParameterSet(mparam.getName());
+											// reevaluate the belief on change events
+											Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
+												component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+											// save the value, automatically throws change event
+											if(SReflect.isIterable(value))
+											{
+												paramset.removeValues();
+												for(Object val: SReflect.getIterable(value))
+												{
+													paramset.addValue(val);
+												}
+											}
+										}
+									}
+								}
+								
+								return IFuture.DONE;
+							}
+						});
+						rule.setEvents(events);
+						rulesystem.getRulebase().addRule(rule);
+					}
+					
+					if(mparam.getUpdaterateValue(component)>0)
+					{
+						final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						ITimedObject to = new ITimedObject()
+						{
+							ITimedObject self = this;
+	//						Object oldval = null;
+							
+							public void timeEventOccurred(long currenttime)
+							{
+								try
+								{
+									component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											try
+											{
+												System.out.println("parameter updaterate: "+mparam.getUpdaterateValue(component));
+												
+												RCapability capa = BDIAgentFeature.getCapability(component);
+												if(capa.getGoals()!=null)
+												{
+													for(RGoal goal: capa.getGoals(mgoal))
+													{
+														IParameter param = goal.getParameter(mparam.getName());
+														// reevaluate the belief on change events
+														Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
+															component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+														// save the value, automatically throws change event
+														param.setValue(value);
+													}
+												}
+											}
+											catch(Exception e)
+											{
+												e.printStackTrace();
+											}
+											
+											cs.createTimer(mparam.getUpdaterateValue(component), self);
+											return IFuture.DONE;
+										}
+									});
+								}
+								catch(ComponentTerminatedException cte)
+								{
+								}
+							}
+						};
+						// Evaluate at time 0, updaterate*1, updaterate*2, ...
+						to.timeEventOccurred(cs.getTime());
+					}
+				}
 			}
 		}
 		
@@ -1147,10 +1256,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 						{
 							UnparsedExpression uexp = mcond.getExpression();
-							if(uexp.getParsed()==null)
-								SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
-							IParsedExpression exp = (IParsedExpression)uexp.getParsed();
-							Boolean ret = (Boolean)exp.getValue(component.getFetcher());
+							Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
 							return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 						}
 					}, createplan);

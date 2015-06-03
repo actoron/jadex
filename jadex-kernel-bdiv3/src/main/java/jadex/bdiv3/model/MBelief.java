@@ -13,6 +13,7 @@ import jadex.commons.FieldInfo;
 import jadex.commons.IterableIteratorWrapper;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.EventType;
 
 import java.lang.reflect.Field;
@@ -41,8 +42,8 @@ public class MBelief extends MElement
 	/** The collection implementation class. */
 	protected String impl;
 	
-	/** The dynamic flag. */
-	protected boolean dynamic;
+//	/** The dynamic flag. */
+//	protected boolean dynamic;
 	
 	/** The update rate. */
 	protected long	updaterate;
@@ -51,10 +52,13 @@ public class MBelief extends MElement
 	protected Boolean multi;
 	
 	/** The events this belief depends on. */
-	protected Collection<String> events;
+	protected Collection<String> beliefevents;
 	
 	/** The raw events. */
 	protected Collection<EventType> rawevents;
+	
+	/** Cached aggregated events. */
+	protected List<EventType> allevents;
 
 	//-------- additional xml properties --------
 	
@@ -83,29 +87,31 @@ public class MBelief extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] events, Collection<EventType> rawevents)
+	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] beliefevents, Collection<EventType> rawevents)
 	{
 		super(target!=null? target.getName(): null);
 		this.ftarget = target;
 		this.impl = impl;
-		this.dynamic = dynamic;
+		if(dynamic)
+			this.evaluationmode = MParameter.EvaluationMode.PULL;
+//		this.dynamic = dynamic;
 		this.updaterate	= updaterate;
-		this.events = new HashSet<String>();
-		if(events!=null)
+		this.beliefevents = new HashSet<String>();
+		if(beliefevents!=null)
 		{
-			// Is dynamic when events are given
-			if(events.length>0)
-				dynamic = true;
-			for(String ev: events)
+			for(String ev: beliefevents)
 			{
-				this.events.add(ev);
+				this.beliefevents.add(ev);
 			}
 		}
 		this.rawevents = rawevents;
 		
+		if(this.beliefevents.size()>0 || (this.rawevents!=null && this.rawevents.size()>0))
+			this.evaluationmode = MParameter.EvaluationMode.PUSH;
+		
 //		System.out.println("bel: "+(target!=null?target.getName():"")+" "+dynamic);
 	}
-
+	
 	/**
 	 *  Create a new belief.
 	 */
@@ -187,41 +193,22 @@ public class MBelief extends MElement
 	}
 	
 	/**
-	 *  Get the events.
-	 *  @return The events.
-	 */
-	public Collection<String> getEvents()
-	{
-		return events;
-	}
-
-	/**
-	 *  Set the events.
-	 *  @param events The events to set.
-	 */
-	public void setEvents(Collection<String> events)
-	{
-		this.events.clear();
-		this.events.addAll(events);
-	}
-	
-	/**
 	 *  Get the dynamic.
 	 *  @return The dynamic.
 	 */
 	public boolean isDynamic()
 	{
-		return dynamic;
+		return !evaluationmode.equals(MParameter.EvaluationMode.STATIC);
 	}
 
-	/**
-	 *  Set the dynamic.
-	 *  @param dynamic The dynamic to set.
-	 */
-	public void setDynamic(boolean dynamic)
-	{
-		this.dynamic = dynamic;
-	}
+//	/**
+//	 *  Set the dynamic.
+//	 *  @param dynamic The dynamic to set.
+//	 */
+//	public void setDynamic(boolean dynamic)
+//	{
+//		this.dynamic = dynamic;
+//	}
 	
 	/**
 	 *  Get the exported flag.
@@ -421,6 +408,7 @@ public class MBelief extends MElement
 	
 	/**
 	 *  Set the value of the belief.
+	 *  @return True, if field was set.
 	 */
 	public boolean setValue(IInternalAccess agent, final Object value)
 	{
@@ -442,7 +430,7 @@ public class MBelief extends MElement
 				rbelset.removeFacts();
 				if(value!=null)
 				{
-					for(Object val: new IterableIteratorWrapper<Object>(SReflect.getIterator(value)))
+					for(Object val: SReflect.getIterable(value))
 					{
 						rbelset.addFact(val);
 					}
@@ -466,7 +454,7 @@ public class MBelief extends MElement
 		boolean field	= false;
 		if(ftarget!=null)
 		{
-			field	= true;
+			field = true;
 			try
 			{
 				Field f = ftarget.getField(cl);
@@ -575,29 +563,33 @@ public class MBelief extends MElement
 	}
 
 	/**
-	 *  Get the rawevents.
-	 *  @return The rawevents.
-	 */
-	public Collection<EventType> getRawEvents()
-	{
-		return rawevents;
-	}
-
-	/**
-	 *  Set the rawevents.
-	 *  @param rawevents The rawevents to set.
-	 */
-	public void setRawEvents(Set<EventType> rawevents)
-	{
-		this.rawevents = rawevents;
-	}
-	
-	/**
 	 *  Get the value.
 	 *  @return The value
 	 */
 	public UnparsedExpression getDefaultFact()
 	{
+		// The default value must not null, when a basic type is declared.
+		// Hence a new default value is created.
+		if(fact==null && facts==null && getClazz()!=null && clazz!=null)
+		{
+			if(clazz.getTypeName()=="boolean")
+				fact = new UnparsedExpression(null, "false");
+			else if(clazz.getTypeName()=="byte")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="char")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="short")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="double")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="float")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="long")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="int")
+				fact = new UnparsedExpression(null, "0");
+		}
+		
 		return fact;
 	}
 
@@ -647,5 +639,67 @@ public class MBelief extends MElement
 	public void setEvaluationMode(EvaluationMode evaluationmode)
 	{
 		this.evaluationmode = evaluationmode;
+	}
+	
+	/**
+	 *  Get the rawevents.
+	 *  @return The rawevents.
+	 */
+	public Collection<EventType> getRawEvents()
+	{
+		return rawevents;
+	}
+
+	/**
+	 *  Set the rawevents.
+	 *  @param rawevents The rawevents to set.
+	 */
+	public void setRawEvents(Set<EventType> rawevents)
+	{
+		this.rawevents = rawevents;
+	}
+	
+	/**
+	 *  Get the events.
+	 *  @return The events.
+	 */
+	public Collection<String> getBeliefEvents()
+	{
+		return beliefevents;
+	}
+
+	/**
+	 *  Set the events.
+	 *  @param events The events to set.
+	 */
+	public void setBeliefEvents(Collection<String> events)
+	{
+		this.beliefevents.clear();
+		this.beliefevents.addAll(events);
+	}
+	
+	/**
+	 *  Get all events that this belief depends on.
+	 */
+	public List<EventType> getAllEvents(IInternalAccess agent)
+	{
+		if(allevents==null)
+		{
+			allevents = new ArrayList<EventType>();
+			
+			Collection<String> evs = getBeliefEvents();
+			if(evs!=null && !evs.isEmpty())
+			{
+				for(String ev: evs)
+				{
+					BDIAgentFeature.addBeliefEvents(agent, allevents, ev);
+				}
+			}
+			
+			Collection<EventType> rawevents = getRawEvents();
+			if(rawevents!=null)
+				allevents.addAll(rawevents);
+		}
+		return allevents;
 	}
 }

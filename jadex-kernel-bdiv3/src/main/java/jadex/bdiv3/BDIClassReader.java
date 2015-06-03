@@ -295,7 +295,7 @@ public class BDIClassReader extends MicroClassReader
 //					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
 //					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
 //				}
-				List<String> events = convertEvents(name, bel.getEvents(), bdimodel);
+				List<String> events = convertEvents(name, bel.getBeliefEvents(), bdimodel);
 				
 				MBelief	bel2;
 				if(bel.getField()!=null)
@@ -1126,7 +1126,7 @@ public class BDIClassReader extends MicroClassReader
 				List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(c, cl), cl);
 				for(String ev: evs)
 				{
-					addBeliefEvents(model.getCapability(), events, ev, cl);
+					BDIAgentFeature.addBeliefEvents(model.getCapability(), events, ev, cl);
 				}
 				for(RawEvent rawev: rawevs)
 				{
@@ -1134,7 +1134,7 @@ public class BDIClassReader extends MicroClassReader
 				}
 				for(String pev: paramevs)
 				{
-					addParameterEvents(mgoal, model.getCapability(), events, pev, gcl.getName(), cl);
+					BDIAgentFeature.addParameterEvents(mgoal, model.getCapability(), events, pev, cl);
 				}
 				MCondition cond = new MCondition("creation_"+c.toString(), events);
 				cond.setConstructorTarget(new ConstructorInfo(c));
@@ -1195,7 +1195,7 @@ public class BDIClassReader extends MicroClassReader
 		List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(m, cl), cl);
 		for(String ev: evs)
 		{
-			addBeliefEvents(model.getCapability(), events, ev, cl);
+			BDIAgentFeature.addBeliefEvents(model.getCapability(), events, ev, cl);
 		}
 		for(RawEvent rawev: rawevs)
 		{
@@ -1203,7 +1203,7 @@ public class BDIClassReader extends MicroClassReader
 		}
 		for(String pev: paramevs)
 		{
-			addParameterEvents(mgoal, model.getCapability(), events, pev, mgoal.getName(), cl);
+			BDIAgentFeature.addParameterEvents(mgoal, model.getCapability(), events, pev, cl);
 		}
 		MCondition cond = new MCondition(condtype+"_"+m.toString(), events);
 		cond.setMethodTarget(new MethodInfo(m));
@@ -1229,7 +1229,7 @@ public class BDIClassReader extends MicroClassReader
 						String type = ev.type();
 						if(type.length()==0)
 						{
-							addBeliefEvents(capa, events, name, cl);
+							BDIAgentFeature.addBeliefEvents(capa, events, name, cl);
 						}
 						else
 						{
@@ -1242,54 +1242,50 @@ public class BDIClassReader extends MicroClassReader
 		return events;
 	}
 	
-	/**
-	 *  Create belief events from a belief name.
-	 *  For normal beliefs 
-	 *  beliefchanged.belname and factchanged.belname 
-	 *  and for multi beliefs additionally
-	 *  factadded.belname and factremoved 
-	 *  are created.
-	 */
-	public static void addBeliefEvents(MCapability mcapa, List<EventType> events, String belname, ClassLoader cl)
-	{
-		belname = belname.replace(".", "/");
-		MBelief mbel = mcapa.getBelief(belname);
-		if(mbel==null)
-		{
-			throw new RuntimeException("No such belief: "+belname);
-		}
-		
-		events.add(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
-		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
-		
-		if(mbel.isMulti(cl))
-		{
-			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
-			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
-		}
-	}
-	
-	/**
-	 *  Create parameter events from a belief name.
-	 */
-	public static void addParameterEvents(MGoal mgoal, MCapability mcapa, List<EventType> events, String paramname, String elemname, ClassLoader cl)
-	{
-		MParameter mparam = mgoal.getParameter(paramname);
-		
-		if(mparam==null)
-		{
-			throw new RuntimeException("No such parameter "+paramname+" in "+elemname);
-		}
-		
-		events.add(new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, paramname})); // the whole value was changed
-		events.add(new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, paramname})); // property change of a value
-		
-		if(mparam.isMulti(cl))
-		{
-			events.add(new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, paramname}));
-			events.add(new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, paramname}));
-		}
-	}
+//	/**
+//	 *  Create belief events from a belief name.
+//	 *  For normal beliefs 
+//	 *  beliefchanged.belname and factchanged.belname 
+//	 *  and for multi beliefs additionally
+//	 *  factadded.belname and factremoved 
+//	 *  are created.
+//	 */
+//	public static void addBeliefEvents(MCapability mcapa, List<EventType> events, String belname, ClassLoader cl)
+//	{
+//		belname = belname.replace(".", "/");
+//		MBelief mbel = mcapa.getBelief(belname);
+//		if(mbel==null)
+//			throw new RuntimeException("No such belief: "+belname);
+//		
+//		events.add(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
+//		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
+//		
+//		if(mbel.isMulti(cl))
+//		{
+//			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+//			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+//		}
+//	}
+//	
+//	/**
+//	 *  Create parameter events from a belief name.
+//	 */
+//	public static void addParameterEvents(MGoal mgoal, MCapability mcapa, List<EventType> events, String paramname, String elemname, ClassLoader cl)
+//	{
+//		MParameter mparam = mgoal.getParameter(paramname);
+//		
+//		if(mparam==null)
+//			throw new RuntimeException("No such parameter "+paramname+" in "+elemname);
+//		
+//		events.add(new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, paramname})); // the whole value was changed
+//		events.add(new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, paramname})); // property change of a value
+//		
+//		if(mparam.isMulti(cl))
+//		{
+//			events.add(new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, paramname}));
+//			events.add(new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, paramname}));
+//		}
+//	}
 	
 	/**
 	 * Get the mirco agent class.

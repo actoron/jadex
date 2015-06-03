@@ -378,12 +378,12 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 			if(!topthread.hasParameterValue(cv.getName()))	// Don't overwrite arguments.
 			{
 				Object	value	= null;
-				UnparsedExpression	exp	= cv.getValue(getComponent().getConfiguration());
+				UnparsedExpression exp	= cv.getValue(getComponent().getConfiguration());
 				if(exp!=null)
 				{
 					try
 					{
-						IParsedExpression parsed = (IParsedExpression) exp.getParsed();
+						IParsedExpression parsed = (IParsedExpression)exp.getParsed();
 						value = parsed != null? parsed.getValue(getComponent().getFetcher()) : null;
 					}
 					catch(RuntimeException e)

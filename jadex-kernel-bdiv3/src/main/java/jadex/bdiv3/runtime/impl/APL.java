@@ -373,10 +373,7 @@ public class APL
 			UnparsedExpression uexp = mplan.getTrigger().getGoalMatchExpression((MGoal)rgoal.getModelElement());
 			if(uexp!=null)
 			{
-				if(uexp.getParsed()==null)
-					SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader());
-				IParsedExpression exp = (IParsedExpression)uexp.getParsed();
-				Object val = exp.getValue(fetcher);
+				Object val = SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(fetcher);
 				if(val instanceof Boolean)
 				{
 					valid	= ((Boolean)val).booleanValue();

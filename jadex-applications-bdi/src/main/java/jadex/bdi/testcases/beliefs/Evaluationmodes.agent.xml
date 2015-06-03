@@ -4,7 +4,7 @@
 
 	Test evaluation modes.<br>
 	date1: evaluate static.<br>
-	date2: evaluate dynamic.
+	date2: evaluate pull (evaluated on demand).
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

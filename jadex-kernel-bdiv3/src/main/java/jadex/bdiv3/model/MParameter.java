@@ -9,11 +9,13 @@ import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.javaparser.SJavaParser;
+import jadex.rules.eca.EventType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +142,15 @@ public class MParameter extends MElement
 	/** The update rate. */
 	protected UnparsedExpression updaterate;
 	
+	/** The events this belief depends on. */
+	protected Collection<String> beliefevents;
+	
+	/** The raw events. */
+	protected Collection<EventType> rawevents;
+	
+	/** Cached aggregated events. */
+	protected List<EventType> allevents;
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -184,18 +195,20 @@ public class MParameter extends MElement
 		return ftarget!=null;
 	}
 	
+//	/**
+//	 *  Get the value of the belief.
+//	 */
+//	public Object getValue(IInternalAccess agent)
+//	{
+//		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
+//			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
+//		return getValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), agent.getClassLoader());
+//	}
+//
 	/**
 	 *  Get the value of the belief.
-	 */
-	public Object getValue(IInternalAccess agent)
-	{
-		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
-			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		return getValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), agent.getClassLoader());
-	}
-
-	/**
-	 *  Get the value of the belief.
+	 *  @param object The rparameterelement (such as goal).
+	 *  @param cl The classloader.
 	 */
 	public Object getValue(Object object, ClassLoader cl)
 	{
@@ -244,6 +257,9 @@ public class MParameter extends MElement
 
 	/**
 	 *  Set the value of the belief.
+	 *  @param object The rparameterelement (such as goal).
+	 *  @param value The value.
+	 *  @param cl The classloader.
 	 */
 	public boolean setValue(Object object, Object value, ClassLoader cl)
 	{
@@ -456,6 +472,28 @@ public class MParameter extends MElement
 	 */
 	public UnparsedExpression getDefaultValue()
 	{
+		// The default value must not null, when a basic type is declared.
+		// Hence a new default value is created.
+		if(value==null && values==null && getClazz()!=null && clazz!=null)
+		{
+			if(clazz.getTypeName()=="boolean")
+				value = new UnparsedExpression(null, "false");
+			else if(clazz.getTypeName()=="byte")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="char")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="short")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="double")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="float")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="long")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="int")
+				value = new UnparsedExpression(null, "0");
+		}
+		
 		return value;
 	}
 
@@ -558,5 +596,80 @@ public class MParameter extends MElement
 	public void setUpdateRate(UnparsedExpression updaterate)
 	{
 		this.updaterate = updaterate;
+	}
+	
+	/**
+	 *  Get/Evaluate the updaterate value.
+	 *  @param agent The agent.
+	 *  @return The update rate.
+	 */
+	public long getUpdaterateValue(IInternalAccess agent)
+	{
+		long ret = -1;
+		if(updaterate!=null)
+			ret = ((Long)SJavaParser.parseExpression(updaterate, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher())).longValue();
+		return ret;
+	}
+	
+	/**
+	 *  Get the rawevents.
+	 *  @return The rawevents.
+	 */
+	public Collection<EventType> getRawEvents()
+	{
+		return rawevents;
+	}
+
+	/**
+	 *  Set the rawevents.
+	 *  @param rawevents The rawevents to set.
+	 */
+	public void setRawEvents(Set<EventType> rawevents)
+	{
+		this.rawevents = rawevents;
+	}
+	
+	/**
+	 *  Get the events.
+	 *  @return The events.
+	 */
+	public Collection<String> getBeliefEvents()
+	{
+		return beliefevents;
+	}
+
+	/**
+	 *  Set the events.
+	 *  @param events The events to set.
+	 */
+	public void setBeliefEvents(Collection<String> events)
+	{
+		this.beliefevents.clear();
+		this.beliefevents.addAll(events);
+	}
+	
+	/**
+	 *  Get all events that this belief depends on.
+	 */
+	public List<EventType> getAllEvents(IInternalAccess agent)
+	{
+		if(allevents==null)
+		{
+			allevents = new ArrayList<EventType>();
+			
+			Collection<String> evs = getBeliefEvents();
+			if(evs!=null && !evs.isEmpty())
+			{
+				for(String ev: evs)
+				{
+					BDIAgentFeature.addBeliefEvents(agent, allevents, ev);
+				}
+			}
+			
+			Collection<EventType> rawevents = getRawEvents();
+			if(rawevents!=null)
+				allevents.addAll(rawevents);
+		}
+		return allevents;
 	}
 }

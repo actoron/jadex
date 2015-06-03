@@ -399,10 +399,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public Object getFact()
 		{
 			Object ret = value;
-			EvaluationMode eva = ((MBelief)getModelElement()).getEvaluationMode();
-			UnparsedExpression uexp = ((MBelief)getModelElement()).getDefaultFact();
 			// In case of push the last evaluated value is returned
-			if(uexp!=null && MParameter.EvaluationMode.PULL.equals(eva))
+			if(((MBelief)getModelElement()).getDefaultFact()!=null && MParameter.EvaluationMode.PULL.equals(((MBelief)getModelElement()).getEvaluationMode()))
 			{
 				ret = SJavaParser.parseExpression(((MBelief)getModelElement()).getDefaultFact(), 
 					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
@@ -492,10 +490,20 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			super(modelelement, agent);
 			
 			String name = getModelElement().getName();
+			this.facts = new ListWrapper<Object>(evaluateValues(), agent, ChangeEvent.FACTADDED+"."+name, 
+				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, getModelElement());
+		}
+		
+		/**
+		 *  Evaluate the default values.
+		 */
+		protected List<Object> evaluateValues()
+		{
+			MBelief mbel = (MBelief)getModelElement();
 			List<Object> tmpfacts = new ArrayList<Object>();
-			if(modelelement.getDefaultFact()!=null)
+			if(mbel.getDefaultFact()!=null)
 			{
-				Object tmp = SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+				Object tmp = SJavaParser.parseExpression(mbel.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
 				Iterator<?>	it	= SReflect.getIterator(tmp);
 				while(it.hasNext())
 				{
@@ -504,18 +512,16 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			}
 			else 
 			{
-				if(modelelement.getDefaultFacts()!=null)
+				if(mbel.getDefaultFacts()!=null)
 				{
-					for(UnparsedExpression uexp: modelelement.getDefaultFacts())
+					for(UnparsedExpression uexp: mbel.getDefaultFacts())
 					{
 						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
 						tmpfacts.add(fact);
 					}
 				}
 			}
-			
-			this.facts = new ListWrapper<Object>(tmpfacts, agent, ChangeEvent.FACTADDED+"."+name, 
-				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, getModelElement());
+			return tmpfacts;
 		}
 
 		/**
@@ -533,7 +539,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public void addFact(Object fact)
 		{
-			facts.add(fact);
+			internalGetValues().add(fact);
 		}
 
 		/**
@@ -542,7 +548,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public void removeFact(Object fact)
 		{
-			facts.remove(fact);
+			internalGetValues().remove(fact);
 		}
 
 		/**
@@ -564,8 +570,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public void removeFacts()
 		{
-			if(facts!=null)
-				facts.clear();
+			internalGetValues().clear();
 		}
 
 		/**
@@ -575,6 +580,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public Object getFact(Object oldval)
 		{
 			Object ret = null;
+			List<Object> facts = internalGetValues();
 			if(facts!=null)
 			{
 				for(Object fact: facts)
@@ -593,7 +599,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public boolean containsFact(Object fact)
 		{
-			return facts.contains(fact);
+			return internalGetValues().contains(fact);
 		}
 
 		/**
@@ -603,6 +609,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public Object[]	getFacts()
 		{
 			Object ret;
+			
+			List<Object> facts = internalGetValues();
 			
 			Class<?> type = ((MBelief)getModelElement()).getType(getAgent().getClassLoader());
 			int size = facts==null? 0: facts.size();
@@ -628,7 +636,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public int size()
 		{
-			return facts==null? 0: facts.size();
+			return internalGetValues().size();
 		}
 		
 		/**
@@ -676,6 +684,15 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
 			bdif.removeBeliefListener(getName(), listener);
+		}
+		
+		/**
+		 * 
+		 */
+		protected List<Object> internalGetValues()
+		{
+			// In case of push the last saved/evaluated value is returned
+			return MParameter.EvaluationMode.PULL.equals(((MBelief)getModelElement()).getEvaluationMode())? evaluateValues(): facts;
 		}
 	}
 }

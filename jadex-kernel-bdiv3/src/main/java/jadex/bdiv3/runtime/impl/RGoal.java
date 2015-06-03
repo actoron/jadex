@@ -1165,15 +1165,13 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 							UnparsedExpression uexp = uexps.get(mother.getName());
 							if(uexp!=null && uexp.getValue()!=null && uexp.getValue().length()>0)
 							{
-								if(uexp.getParsed()==null)
-									SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader());
-								IParsedExpression pe = (IParsedExpression)uexp.getParsed();
 								SimpleValueFetcher fet = new SimpleValueFetcher(agent.getFetcher());
 								fet.setValue("$goal", this);
 								fet.setValue("$ref", other);
+								
 								try
 								{
-									ret = ((Boolean)pe.getValue(fet)).booleanValue();
+									ret = ((Boolean)SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(fet)).booleanValue();
 								}
 								catch(Exception e)
 								{
