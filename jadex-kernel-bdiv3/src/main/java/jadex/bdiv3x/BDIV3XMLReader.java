@@ -10,6 +10,7 @@ import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MElementRef;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInitialParameterElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
@@ -982,23 +983,18 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new XMLInfo(new QName(uri, "facts")), new AccessInfo("facts", "value"))
 			}), null));	// Todo: multiple <fact> entries
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialinternalevent")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialmessageevent")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endgoal")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endplan")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endinternalevent")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endmessageevent")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
+		MappingInfo	ipemapping	= new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ref", "name")),
+			new AttributeInfo(new AccessInfo("cref", "name"))
+		});
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialinternalevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialmessageevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endgoal")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endplan")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endinternalevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endmessageevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
 		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialgoal"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
 //			null, null, new OAVObjectReaderHandler()));
