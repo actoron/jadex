@@ -263,6 +263,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		{
 			super(modelelement, agent);
 			this.name = name!=null?name: modelelement.getName();
+			// RParameterElement.this.getName()
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+getName(), (MParameter)getModelElement());
 			setValue(value);
 		}
@@ -282,8 +283,9 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void setValue(Object value)
 		{
-			publisher.entryChanged(this.value, value, -1);
+			Object oldvalue = value;
 			this.value = value;
+			publisher.entryChanged(oldvalue, value, -1);
 		}
 
 		/**

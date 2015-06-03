@@ -1,6 +1,5 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;

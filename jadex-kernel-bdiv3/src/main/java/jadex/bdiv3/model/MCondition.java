@@ -1,5 +1,6 @@
 package jadex.bdiv3.model;
 
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
@@ -40,6 +41,15 @@ public class MCondition extends MElement
 	 */
 	public MCondition()
 	{
+	}
+	
+	/**
+	 *	Create a new mcondition. 
+	 */
+	public MCondition(UnparsedExpression exp)
+	{
+		super(exp.getName());
+		this.expression = exp;
 	}
 	
 	/**
@@ -99,89 +109,92 @@ public class MCondition extends MElement
 	/**
 	 *  Init the event, when loaded from xml.
 	 */
-	public void	initEvents(MElement pe)
+	public void	initEvents(MElement owner)
 	{
-		if(expression!=null && expression.getParsed() instanceof ExpressionNode)
-		{
-			Set<String>	done	= new HashSet<String>();
-			ParameterNode[]	params	= ((ExpressionNode)expression.getParsed()).getUnboundParameterNodes();
-			for(ParameterNode param: params)
-			{
-				if("$beliefbase".equals(param.getText()))
-				{
-					Node parent	= param.jjtGetParent();
-					if(parent instanceof ReflectNode)
-					{
-						ReflectNode	ref	= (ReflectNode)parent;
-						if(ref.getType()==ReflectNode.FIELD)
-						{
-							// Todo: differentiate between beliefs/sets
-							addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
-							addEvent(new EventType(ChangeEvent.FACTCHANGED, ref.getText()));
-							addEvent(new EventType(ChangeEvent.FACTADDED, ref.getText()));
-							addEvent(new EventType(ChangeEvent.FACTREMOVED, ref.getText()));
-						}
-						
-						else if(ref.getType()==ReflectNode.METHOD)
-						{
-							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
-							if("getBelief".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
-							{
-								String	name	= (String)arg.getConstantValue();
-								addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
-								addEvent(new EventType(ChangeEvent.FACTCHANGED, name));
-							}
-							else if("getBeliefSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
-							{
-								String	name	= (String)arg.getConstantValue();
-								addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
-								addEvent(new EventType(ChangeEvent.FACTCHANGED, name));
-								addEvent(new EventType(ChangeEvent.FACTADDED, name));
-								addEvent(new EventType(ChangeEvent.FACTREMOVED, name));
-							}
-						}
-					}
-				}
-				
-				else if("$goal".equals(param.getText()) || "$plan".equals(param.getText()))
-				{
-					Node parent	= param.jjtGetParent();
-					if(parent instanceof ReflectNode)
-					{
-						ReflectNode	ref	= (ReflectNode)parent;
-						if(ref.getType()==ReflectNode.FIELD && !done.contains(ref.getText()))
-						{
-							// Todo: differentiate between parameters/sets
-							addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, pe.getName(), ref.getText()));
-							addEvent(new EventType(ChangeEvent.VALUECHANGED, pe.getName(), ref.getText()));
-							addEvent(new EventType(ChangeEvent.VALUEADDED, pe.getName(), ref.getText()));
-							addEvent(new EventType(ChangeEvent.VALUEREMOVED, pe.getName(), ref.getText()));
-						}
-						
-						else if(ref.getType()==ReflectNode.METHOD)
-						{
-							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
-							if("getParameter".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
-							{
-								String	name	= (String)arg.getConstantValue();
-								addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, pe.getName(), name));
-								addEvent(new EventType(ChangeEvent.VALUECHANGED, pe.getName(), name));
-							}
-							else if("getParameterSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
-							{
-								String	name	= (String)arg.getConstantValue();
-								addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, pe.getName(), name));
-								addEvent(new EventType(ChangeEvent.VALUECHANGED, pe.getName(), name));
-								addEvent(new EventType(ChangeEvent.VALUEADDED, pe.getName(), name));
-								addEvent(new EventType(ChangeEvent.VALUEREMOVED, pe.getName(), name));
-							}
-						}
-					}
-				}
-			}
-		}
-
+		if(events==null)
+			events = new ArrayList<EventType>();
+		BDIAgentFeature.addExpressionEvents(expression, events, owner);
 	}
+//		if(expression!=null && expression.getParsed() instanceof ExpressionNode)
+//		{
+//			Set<String>	done	= new HashSet<String>();
+//			ParameterNode[]	params	= ((ExpressionNode)expression.getParsed()).getUnboundParameterNodes();
+//			for(ParameterNode param: params)
+//			{
+//				if("$beliefbase".equals(param.getText()))
+//				{
+//					Node parent	= param.jjtGetParent();
+//					if(parent instanceof ReflectNode)
+//					{
+//						ReflectNode	ref	= (ReflectNode)parent;
+//						if(ref.getType()==ReflectNode.FIELD)
+//						{
+//							// Todo: differentiate between beliefs/sets
+//							addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+//							addEvent(new EventType(ChangeEvent.FACTCHANGED, ref.getText()));
+//							addEvent(new EventType(ChangeEvent.FACTADDED, ref.getText()));
+//							addEvent(new EventType(ChangeEvent.FACTREMOVED, ref.getText()));
+//						}
+//						
+//						else if(ref.getType()==ReflectNode.METHOD)
+//						{
+//							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+//							if("getBelief".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+//							{
+//								String	name	= (String)arg.getConstantValue();
+//								addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+//								addEvent(new EventType(ChangeEvent.FACTCHANGED, name));
+//							}
+//							else if("getBeliefSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+//							{
+//								String	name	= (String)arg.getConstantValue();
+//								addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+//								addEvent(new EventType(ChangeEvent.FACTCHANGED, name));
+//								addEvent(new EventType(ChangeEvent.FACTADDED, name));
+//								addEvent(new EventType(ChangeEvent.FACTREMOVED, name));
+//							}
+//						}
+//					}
+//				}
+//				
+//				else if("$goal".equals(param.getText()) || "$plan".equals(param.getText()))
+//				{
+//					Node parent	= param.jjtGetParent();
+//					if(parent instanceof ReflectNode)
+//					{
+//						ReflectNode	ref	= (ReflectNode)parent;
+//						if(ref.getType()==ReflectNode.FIELD && !done.contains(ref.getText()))
+//						{
+//							// Todo: differentiate between parameters/sets
+//							addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), ref.getText()));
+//							addEvent(new EventType(ChangeEvent.VALUECHANGED, owner.getName(), ref.getText()));
+//							addEvent(new EventType(ChangeEvent.VALUEADDED, owner.getName(), ref.getText()));
+//							addEvent(new EventType(ChangeEvent.VALUEREMOVED, owner.getName(), ref.getText()));
+//						}
+//						
+//						else if(ref.getType()==ReflectNode.METHOD)
+//						{
+//							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+//							if("getParameter".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+//							{
+//								String	name	= (String)arg.getConstantValue();
+//								addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), name));
+//								addEvent(new EventType(ChangeEvent.VALUECHANGED, owner.getName(), name));
+//							}
+//							else if("getParameterSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+//							{
+//								String	name	= (String)arg.getConstantValue();
+//								addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), name));
+//								addEvent(new EventType(ChangeEvent.VALUECHANGED, owner.getName(), name));
+//								addEvent(new EventType(ChangeEvent.VALUEADDED, owner.getName(), name));
+//								addEvent(new EventType(ChangeEvent.VALUEREMOVED, owner.getName(), name));
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 	/**
 	 *  The events to set.

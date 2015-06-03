@@ -520,6 +520,8 @@ public class RuleSystem
 //		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
 //			&& event.getType().getType(1).indexOf("Ambu")!=-1)
 //			System.out.println("add event: "+event);
+		if(event.getType().getType(0).indexOf("factadded")!=-1 && event.getType().getType(1).indexOf("wastebins")!=-1)
+			System.out.println("add event: "+event);
 
 		pcman.addEvent(event);
 	}

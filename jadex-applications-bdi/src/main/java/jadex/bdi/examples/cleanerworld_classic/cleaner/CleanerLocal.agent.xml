@@ -64,7 +64,7 @@
 
 		<!-- The current cleaner location. -->
 		<belief name="my_location"  class="Location">
-			<fact>new Location(0.2, 0.2)</fact>
+			<fact>new Location(0.5, 0.5)</fact>
 		</belief>
 
 		<!-- The speed. -->

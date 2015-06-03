@@ -16,6 +16,7 @@ import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -441,112 +442,117 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			{
 				for(final MParameter mparam: mparams)
 				{
-					List<EventType> events = mparam.getAllEvents(component);
-				
-					// Automatic reevaluation if belief depends on other beliefs
-					if(!events.isEmpty())
+					if(mparam.getEvaluationMode().equals(EvaluationMode.PUSH))
 					{
-						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_"+mparam.getName()+"_parameter_update", 
-							ICondition.TRUE_CONDITION, new IAction<Void>()
+						List<EventType> events = mparam.getAllEvents(component);
+						
+						BDIAgentFeature.addExpressionEvents(mparam.getDefaultValue(), events, mgoal);
+					
+						// Automatic reevaluation if belief depends on other beliefs
+						if(!events.isEmpty())
 						{
-							// todo: oldval
-	//						Object oldval = null;
-							
-							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+							Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_"+mparam.getName()+"_parameter_update", 
+								ICondition.TRUE_CONDITION, new IAction<Void>()
 							{
-								System.out.println("parameter update: "+event);
+								// todo: oldval
+		//						Object oldval = null;
 								
-								RCapability capa = BDIAgentFeature.getCapability(component);
-								if(capa.getGoals()!=null)
+								public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 								{
-									for(RGoal goal: capa.getGoals(mgoal))
+//									System.out.println("parameter update: "+event);
+									
+									RCapability capa = BDIAgentFeature.getCapability(component);
+									if(capa.getGoals()!=null)
 									{
-										if(!mparam.isMulti(component.getClassLoader()))
+										for(RGoal goal: capa.getGoals(mgoal))
 										{
-											IParameter param = goal.getParameter(mparam.getName());
-											// reevaluate the belief on change events
-											Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-												component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
-											// save the value, automatically throws change event
-											param.setValue(value);
-										}
-										else
-										{
-											IParameterSet paramset = goal.getParameterSet(mparam.getName());
-											// reevaluate the belief on change events
-											Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-												component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
-											// save the value, automatically throws change event
-											if(SReflect.isIterable(value))
+											if(!mparam.isMulti(component.getClassLoader()))
 											{
-												paramset.removeValues();
-												for(Object val: SReflect.getIterable(value))
+												IParameter param = goal.getParameter(mparam.getName());
+												// reevaluate the belief on change events
+												Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
+													component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+												// save the value, automatically throws change event
+												param.setValue(value);
+											}
+											else
+											{
+												IParameterSet paramset = goal.getParameterSet(mparam.getName());
+												// reevaluate the belief on change events
+												Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
+													component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+												// save the value, automatically throws change event
+												if(SReflect.isIterable(value))
 												{
-													paramset.addValue(val);
+													paramset.removeValues();
+													for(Object val: SReflect.getIterable(value))
+													{
+														paramset.addValue(val);
+													}
 												}
 											}
 										}
 									}
+									
+									return IFuture.DONE;
 								}
-								
-								return IFuture.DONE;
-							}
-						});
-						rule.setEvents(events);
-						rulesystem.getRulebase().addRule(rule);
-					}
-					
-					if(mparam.getUpdaterateValue(component)>0)
-					{
-						final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-						ITimedObject to = new ITimedObject()
+							});
+							rule.setEvents(events);
+							rulesystem.getRulebase().addRule(rule);
+						}
+						
+						if(mparam.getUpdaterateValue(component)>0)
 						{
-							ITimedObject self = this;
-	//						Object oldval = null;
-							
-							public void timeEventOccurred(long currenttime)
+							final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+							ITimedObject to = new ITimedObject()
 							{
-								try
+								ITimedObject self = this;
+		//						Object oldval = null;
+								
+								public void timeEventOccurred(long currenttime)
 								{
-									component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									try
 									{
-										public IFuture<Void> execute(IInternalAccess ia)
+										component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 										{
-											try
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												System.out.println("parameter updaterate: "+mparam.getUpdaterateValue(component));
-												
-												RCapability capa = BDIAgentFeature.getCapability(component);
-												if(capa.getGoals()!=null)
+												try
 												{
-													for(RGoal goal: capa.getGoals(mgoal))
+													System.out.println("parameter updaterate: "+mparam.getUpdaterateValue(component));
+													
+													RCapability capa = BDIAgentFeature.getCapability(component);
+													if(capa.getGoals()!=null)
 													{
-														IParameter param = goal.getParameter(mparam.getName());
-														// reevaluate the belief on change events
-														Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-															component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
-														// save the value, automatically throws change event
-														param.setValue(value);
+														for(RGoal goal: capa.getGoals(mgoal))
+														{
+															IParameter param = goal.getParameter(mparam.getName());
+															// reevaluate the belief on change events
+															Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
+																component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+															// save the value, automatically throws change event
+															param.setValue(value);
+														}
 													}
 												}
+												catch(Exception e)
+												{
+													e.printStackTrace();
+												}
+												
+												cs.createTimer(mparam.getUpdaterateValue(component), self);
+												return IFuture.DONE;
 											}
-											catch(Exception e)
-											{
-												e.printStackTrace();
-											}
-											
-											cs.createTimer(mparam.getUpdaterateValue(component), self);
-											return IFuture.DONE;
-										}
-									});
+										});
+									}
+									catch(ComponentTerminatedException cte)
+									{
+									}
 								}
-								catch(ComponentTerminatedException cte)
-								{
-								}
-							}
-						};
-						// Evaluate at time 0, updaterate*1, updaterate*2, ...
-						to.timeEventOccurred(cs.getTime());
+							};
+							// Evaluate at time 0, updaterate*1, updaterate*2, ...
+							to.timeEventOccurred(cs.getTime());
+						}
 					}
 				}
 			}

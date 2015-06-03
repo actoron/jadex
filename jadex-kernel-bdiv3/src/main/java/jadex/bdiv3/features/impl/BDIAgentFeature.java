@@ -45,6 +45,7 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -62,6 +63,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.javaccimpl.ExpressionNode;
+import jadex.javaparser.javaccimpl.Node;
+import jadex.javaparser.javaccimpl.ParameterNode;
+import jadex.javaparser.javaccimpl.ReflectNode;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.rules.eca.ChangeInfo;
@@ -2168,11 +2173,106 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		events.add(new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, paramname})); // the whole value was changed
 		events.add(new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, paramname})); // property change of a value
 		
-		if(mparam.isMulti(cl))
+		if(cl==null || mparam.isMulti(cl))
 		{
 			events.add(new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, paramname}));
 			events.add(new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, paramname}));
 		}
+	}
+	
+	/**
+	 *  Init the event, when loaded from xml.
+	 */
+	public static void addExpressionEvents(UnparsedExpression expression, List<EventType> events, MElement owner)
+	{
+		if(expression!=null)// && expression.getParsed() instanceof ExpressionNode)
+		{
+			Set<String>	done	= new HashSet<String>();
+			ParameterNode[]	params	= ((ExpressionNode)expression.getParsed()).getUnboundParameterNodes();
+			for(ParameterNode param: params)
+			{
+				if("$beliefbase".equals(param.getText()))
+				{
+					Node parent	= param.jjtGetParent();
+					if(parent instanceof ReflectNode)
+					{
+						ReflectNode	ref	= (ReflectNode)parent;
+						if(ref.getType()==ReflectNode.FIELD)
+						{
+							// Todo: differentiate between beliefs/sets
+							addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.FACTCHANGED, ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.FACTADDED, ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.FACTREMOVED, ref.getText()));
+						}
+						
+						else if(ref.getType()==ReflectNode.METHOD)
+						{
+							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+							if("getBelief".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(events, new EventType(ChangeEvent.FACTCHANGED, name));
+							}
+							else if("getBeliefSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(events, new EventType(ChangeEvent.FACTCHANGED, name));
+								addEvent(events, new EventType(ChangeEvent.FACTADDED, name));
+								addEvent(events, new EventType(ChangeEvent.FACTREMOVED, name));
+							}
+						}
+					}
+				}
+				
+				else if("$goal".equals(param.getText()) || "$plan".equals(param.getText()))
+				{
+					Node parent	= param.jjtGetParent();
+					if(parent instanceof ReflectNode)
+					{
+						ReflectNode	ref	= (ReflectNode)parent;
+						if(ref.getType()==ReflectNode.FIELD && !done.contains(ref.getText()))
+						{
+							// Todo: differentiate between parameters/sets
+							addEvent(events, new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.VALUECHANGED, owner.getName(), ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.VALUEADDED, owner.getName(), ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.VALUEREMOVED, owner.getName(), ref.getText()));
+						}
+						
+						else if(ref.getType()==ReflectNode.METHOD)
+						{
+							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+							if("getParameter".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), name));
+								addEvent(events, new EventType(ChangeEvent.VALUECHANGED, owner.getName(), name));
+							}
+							else if("getParameterSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), name));
+								addEvent(events, new EventType(ChangeEvent.VALUECHANGED, owner.getName(), name));
+								addEvent(events, new EventType(ChangeEvent.VALUEADDED, owner.getName(), name));
+								addEvent(events, new EventType(ChangeEvent.VALUEREMOVED, owner.getName(), name));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected static void addEvent(List<EventType> events, EventType event)
+	{
+		if(!events.contains(event))
+			events.add(event);
 	}
 		
 	/**

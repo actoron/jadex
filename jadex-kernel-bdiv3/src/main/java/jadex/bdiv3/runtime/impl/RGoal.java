@@ -1450,6 +1450,11 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			}
 		}
 		
+//		if(ret)
+//			System.out.println("query finished: "+goal);
+		
+		System.out.println("querygoal: "+ret+" "+goal);
+		
 		return ret;
 	}
 }
