@@ -568,6 +568,28 @@ public class MBelief extends MElement
 	 */
 	public UnparsedExpression getDefaultFact()
 	{
+		// The default value must not null, when a basic type is declared.
+		// Hence a new default value is created.
+		if(fact==null && facts==null && getClazz()!=null && clazz!=null)
+		{
+			if(clazz.getTypeName()=="boolean")
+				fact = new UnparsedExpression(null, "false");
+			else if(clazz.getTypeName()=="byte")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="char")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="short")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="double")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="float")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="long")
+				fact = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="int")
+				fact = new UnparsedExpression(null, "0");
+		}
+		
 		return fact;
 	}
 

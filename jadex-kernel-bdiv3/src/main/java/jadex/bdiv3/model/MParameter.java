@@ -472,6 +472,28 @@ public class MParameter extends MElement
 	 */
 	public UnparsedExpression getDefaultValue()
 	{
+		// The default value must not null, when a basic type is declared.
+		// Hence a new default value is created.
+		if(value==null && values==null && getClazz()!=null && clazz!=null)
+		{
+			if(clazz.getTypeName()=="boolean")
+				value = new UnparsedExpression(null, "false");
+			else if(clazz.getTypeName()=="byte")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="char")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="short")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="double")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="float")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="long")
+				value = new UnparsedExpression(null, "0");
+			else if(clazz.getTypeName()=="int")
+				value = new UnparsedExpression(null, "0");
+		}
+		
 		return value;
 	}
 
