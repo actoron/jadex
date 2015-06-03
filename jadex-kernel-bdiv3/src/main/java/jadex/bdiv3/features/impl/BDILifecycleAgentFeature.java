@@ -23,7 +23,6 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
-import jadex.bdiv3x.runtime.RBeliefbase.RBelief;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -243,7 +242,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							throw new RuntimeException("Could not create initial goal: "+uexp);
 						}
 						
-						RGoal rgoal = new RGoal(component, mgoal, goal, (RPlan)null, null);
+						RGoal rgoal = new RGoal(component, mgoal, goal, null);
 						RGoal.adoptGoal(rgoal, component);
 					}
 				}
@@ -640,14 +639,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								{
 									for(Map<String, Object> binding: bindings)
 									{
-										RGoal rgoal = new RGoal(component, mgoal, null, (RPlan)null, binding);
+										RGoal rgoal = new RGoal(component, mgoal, null, binding);
 										bdif.dispatchTopLevelGoal(rgoal);
 									}
 								}
 								// No binding: generate one candidate.
 								else
 								{
-									RGoal rgoal = new RGoal(component, mgoal, null, (RPlan)null, null);
+									RGoal rgoal = new RGoal(component, mgoal, null, null);
 									bdif.dispatchTopLevelGoal(rgoal);
 								}
 								

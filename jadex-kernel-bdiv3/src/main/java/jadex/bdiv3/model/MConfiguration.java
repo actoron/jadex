@@ -9,11 +9,8 @@ import java.util.List;
  *  BDI configuration. The name is used to connect
  *  it to the existing component configuration.
  */
-public class MConfiguration
+public class MConfiguration	extends MElement
 {
-	/** The configuration name. */
-	protected String name;
-	
 	/** The initial beliefs. */
 	protected List<UnparsedExpression> initialbeliefs;
 
@@ -35,25 +32,7 @@ public class MConfiguration
 	 */
 	public MConfiguration(String name)
 	{
-		this.name = name;
-	}
-
-	/**
-	 *  Get the name.
-	 *  @return The name.
-	 */
-	public String getName()
-	{
-		return name;
-	}
-
-	/**
-	 *  Set the name.
-	 *  @param name The name to set.
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
+		super(name);
 	}
 
 	/**

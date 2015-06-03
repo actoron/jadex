@@ -30,7 +30,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bdiv3x.runtime.RBeliefbase;
-import jadex.bdiv3x.runtime.RExpressionBase;
+import jadex.bdiv3x.runtime.RExpressionbase;
 import jadex.bdiv3x.runtime.RGoalbase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -122,7 +122,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		getCapability().setBeliefbase(bb);
 		bb.init();
 		
-		RExpressionBase eb = new RExpressionBase(getComponent());
+		RExpressionbase eb = new RExpressionbase(getComponent());
 		getCapability().setExpressionbase(eb);
 		
 		RGoalbase gb = new RGoalbase(getComponent());
@@ -805,7 +805,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
 			if(mgoal==null)
 				throw new RuntimeException("Unknown goal type: "+goal);
-			rgoal = new RGoal(getComponent(), mgoal, goal, (RPlan)null, null);
+			rgoal = new RGoal(getComponent(), mgoal, goal, null);
 		}
 		rgoal.addListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{

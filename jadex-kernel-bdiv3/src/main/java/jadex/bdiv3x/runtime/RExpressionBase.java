@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * 
  */
-public class RExpressionBase extends RElement implements IExpressionbase
+public class RExpressionbase extends RElement implements IExpressionbase
 {
 	/** The expressions. */
 	protected Map<String, IExpression> expressions;
@@ -26,7 +26,7 @@ public class RExpressionBase extends RElement implements IExpressionbase
 	/**
 	 *  Create a new beliefbase.
 	 */
-	public RExpressionBase(IInternalAccess agent)
+	public RExpressionbase(IInternalAccess agent)
 	{
 		super(null, agent);
 	}

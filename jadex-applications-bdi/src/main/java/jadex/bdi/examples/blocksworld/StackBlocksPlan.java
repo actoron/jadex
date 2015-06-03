@@ -1,6 +1,6 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
 
@@ -77,10 +77,10 @@ public class StackBlocksPlan	extends Plan
 		if(!quiet)
 			System.out.println("Moving '"+block+"' to '"+target+"'");
 
-		// This operation has to be performed atomic,
-		// because it fires bean changes on several affected blocks. 
-		startAtomic();
+//		// This operation has to be performed atomic,
+//		// because it fires bean changes on several affected blocks. 
+//		startAtomic();
 		block.stackOn(target);
-		endAtomic();
+//		endAtomic();
 	}
 }

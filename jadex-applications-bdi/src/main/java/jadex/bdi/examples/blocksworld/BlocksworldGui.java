@@ -1,8 +1,12 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.CapabilityWrapper;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.BDIAgentFeature;
+import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -91,7 +95,7 @@ public class BlocksworldGui	extends JFrame
 			@Classname("start")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 				final Block[] blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
 				final Table table = (Table)bia.getBeliefbase().getBelief("table").getFact();
 				final Object md = bia.getBeliefbase().getBelief("mode").getFact();
@@ -184,7 +188,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("clear")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 										final Block[]	blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
 										SwingUtilities.invokeLater(new Runnable()
 										{
@@ -224,7 +228,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("configure")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 										IGoal achieve = bia.getGoalbase().createGoal("configure");
 										achieve.getParameter("configuration").setValue(newtable);
 										// Hack!!! Blocks must be in state directly.
@@ -287,7 +291,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("createBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 										Table table = (Table)bia.getBeliefbase().getBelief("table").getFact();
 										final Block block = new Block(showcol.getBackground(), table);
 										bia.getBeliefbase().getBeliefSet("blocks").addFact(block);
@@ -350,7 +354,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("deleteBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 										bia.getBeliefbase().getBeliefSet("blocks").removeFact(block);
 										clear.doClick();
 										return IFuture.DONE;
@@ -385,7 +389,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("mode")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 										bia.getBeliefbase().getBelief("mode").setFact(sel);
 										return IFuture.DONE;
 									}
@@ -402,7 +406,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("step")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 										IInternalEvent ie = bia.getEventbase().createInternalEvent("step");
 										bia.getEventbase().dispatchInternalEvent(ie);
 										return IFuture.DONE;
@@ -482,21 +486,7 @@ public class BlocksworldGui	extends JFrame
 							@Classname("disp")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//								bia.addComponentListener(new TerminationAdapter()
-//								{
-//									public void componentTerminated()
-//									{
-//										SwingUtilities.invokeLater(new Runnable()
-//										{
-//											public void run()
-//											{
-//												BlocksworldGui.this.dispose();
-//											}
-//										});
-//									}
-//								});
-								bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+								ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 									.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 								{
 									public void intermediateResultAvailable(IMonitoringEvent result)
