@@ -83,7 +83,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		this.parentplan = parentplan;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
-//		System.out.println("created: "+mgoal.getName()+" parent: "+parentplan);
+//		if(mgoal.getName().indexOf("cleanup")!=-1)
+//			System.out.println("created: "+mgoal.getName()+" parent: "+parentplan+" "+vals);
 	}
 	
 	/**
@@ -302,6 +303,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		{
 //			if(getModelElement().getName().indexOf("vision")==-1)
 //				System.out.println("sgmndsdgbjk");
+//			if(getModelElement().getName().indexOf("cleanup")!=-1)
+//				System.out.println("fini: "+this+" "+getParameter("waste").getValue());
 			setLifecycleState(ia, GoalLifecycleState.DROPPING);
 		}
 		
@@ -1453,7 +1456,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //		if(ret)
 //			System.out.println("query finished: "+goal);
 		
-		System.out.println("querygoal: "+ret+" "+goal);
+//		System.out.println("querygoal check: "+ret+" "+goal);
 		
 		return ret;
 	}

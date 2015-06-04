@@ -993,7 +993,10 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										{
 											if(result.booleanValue())
 											{
-												goal.targetConditionTriggered(component, event, rule, context);
+												if(!goal.isFinished())
+												{
+													goal.targetConditionTriggered(component, event, rule, context);
+												}
 											}
 										}
 										
@@ -1006,7 +1009,10 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								{
 									if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 									{
-										goal.targetConditionTriggered(component, event, rule, context);
+										if(!goal.isFinished())
+										{
+											goal.targetConditionTriggered(component, event, rule, context);
+										}
 									}
 								}
 							}
@@ -1631,7 +1637,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		}
 		else
 		{
-			System.out.println("Suspend condition does not evaluate to boolean: "+uexp.getValue());
+			System.out.println("Condition does not evaluate to boolean: "+uexp.getValue());
 		}
 		
 		return ret;

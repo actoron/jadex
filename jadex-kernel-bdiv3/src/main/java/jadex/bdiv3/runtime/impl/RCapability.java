@@ -179,6 +179,9 @@ public class RCapability extends RElement
 		
 		if(goals.contains(goal))
 			throw new RuntimeException("Goal already contained: "+goal);
+	
+//		if(goal.getModelElement().getName().indexOf("cleanup")!=-1)
+//			System.out.println("adopted goal:"+goal+" "+goal.getParameter("waste").getValue());
 		
 		goals.add(goal);
 

@@ -48,11 +48,13 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple2;
+import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -94,6 +96,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	
 	/** The bdi state. */
 	protected RCapability capa;
+	
+	/** The event adders. */
+//	protected Map<EventType, IResultCommand<IFuture<Void>, PropertyChangeEvent>> eventadders 
+//		= new HashMap<EventType, IResultCommand<IFuture<Void>,PropertyChangeEvent>>();
 	
 //	/** Is the agent inited and allowed to execute rules? */
 //	protected boolean	inited;
@@ -1680,4 +1686,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //	{
 //		throw new UnsupportedOperationException();
 //	}
+	
+	/**
+	 *  Get the event type.
+	 *  @return The event adder.
+	 */
+	public Map<EventType, IResultCommand<IFuture<Void>, PropertyChangeEvent>> getEventAdders()
+	{
+		throw new UnsupportedOperationException();
+//		return eventadders;
+	}
 }
