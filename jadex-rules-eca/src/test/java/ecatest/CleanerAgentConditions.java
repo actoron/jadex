@@ -53,7 +53,7 @@ public class CleanerAgentConditions
 			rs.processAllEvents();
 		}
 		
-		rs.unobserveObject(cac);
+		rs.unobserveObject(cac, null);
 	}
 	
 //	@MaintainGoal
