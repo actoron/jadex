@@ -121,7 +121,7 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 				{
 					if(eventadder!=null)
 					{
-						Object pcl = mypcls.get(eventadder);
+						Object pcl = mypcls.remove(eventadder);
 						removePCL(object, pcl);
 					}
 					else
@@ -130,7 +130,10 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 						{
 							removePCL(object, pcl);
 						}
+						mypcls.clear();
 					}
+					if(mypcls.size()==0)
+						pcls.remove(object);
 				}
 			}
 		}
