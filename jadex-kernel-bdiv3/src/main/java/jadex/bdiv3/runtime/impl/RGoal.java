@@ -398,7 +398,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("dropping achievecleanup");
 			
-//			if(getId().indexOf("GetVisionAction")==-1)
+//			if(getId().indexOf("cleanup")!=-1)
 //				System.out.println("dropping: "+getId());
 			
 //			System.out.println("dropping: "+getId());

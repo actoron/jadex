@@ -927,10 +927,10 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 											{
 												if(result.booleanValue())
 												{
-	//													if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-	//														System.out.println("Goal made option: "+goal);
+	//												if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+	//												System.out.println("Goal made option: "+goal);
 													goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
-	//													setState(ia, PROCESSABLEELEMENT_INITIAL);
+	//												setState(ia, PROCESSABLEELEMENT_INITIAL);
 												}
 											}
 											
@@ -1358,6 +1358,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	//							&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
 							if(!other.isInhibitedBy(goal) && other.inhibits(goal, component))
 							{
+//								if(goal.getModelElement().getName().indexOf("achievecleanup")!=-1)
+//									System.out.println("inhibit");
 								goal.addInhibitor(other, component);
 							}
 						}
@@ -1409,6 +1411,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	//									if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
 										if(!goal.isInhibitedBy(other) && goal.inhibits(other, component))
 										{
+//											if(other.getModelElement().getName().indexOf("achievecleanup")!=-1)
+//												System.out.println("inh achieve");
 											other.addInhibitor(goal, component);
 										}
 									}
