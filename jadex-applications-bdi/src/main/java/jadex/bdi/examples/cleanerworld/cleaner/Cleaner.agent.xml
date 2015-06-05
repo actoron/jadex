@@ -108,9 +108,9 @@
 		<!-- Observe the battery state. -->
 		<maintaingoal name="maintainbatteryloaded">
 			<deliberation>
-				<inhibits ref="performlookforwaste" inhibit="when_in_process"/>
-				<inhibits ref="achievecleanup" inhibit="when_in_process"/>
-				<inhibits ref="performpatrol" inhibit="when_in_process"/>
+				<inhibits ref="performlookforwaste"/>
+				<inhibits ref="achievecleanup"/>
+				<inhibits ref="performpatrol"/>
 			</deliberation>
  			<maintaincondition language="jcl">
  				$beliefbase.my_chargestate > 0.2
@@ -123,33 +123,27 @@
 		<!-- Clean up some waste. -->
 		<achievegoal name="achievecleanup" retry="true" exclude="never">
 			<parameter name="waste" class="ISpaceObject">
-				<value>$waste</value>
+				<bindingoptions>$beliefbase.wastes</bindingoptions>
 			</parameter>
 			<unique/>
 			<creationcondition language="jcl">
-				ISpaceObject $waste &amp;&amp; $waste.getType().equals("waste")
-				&amp;&amp; $waste.position!=null
+				true
 			</creationcondition>
 			<contextcondition language="jcl">
 				$beliefbase.daytime
  			</contextcondition>
 			<dropcondition language="jcl">
-				// $beliefbase.myself.waste==null &amp;&amp;
-				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
-				
-				$beliefbase.myself.waste==null &amp;&amp;
-				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
+				$beliefbase.carriedwaste==null &amp;&amp;
+					!$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
  			</dropcondition>
 			<!-- <deliberation cardinality="1"> -->
 			<deliberation>
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup" language="jcl">
-					($goal.waste==$beliefbase.myself.waste || 
-					$ref.waste!=$beliefbase.myself.waste &amp;&amp;
-					$goal.waste.position!=null &amp;&amp;	// Hack!!! should not be required?
-					$ref.waste.position!=null &amp;&amp;	// Hack!!! should not be required?
-					$beliefbase.my_location.getDistance((IVector2)$goal.waste.position)
-						.less($beliefbase.my_location.getDistance((IVector2)$ref.waste.position)))
+					$goal.waste.equals($beliefbase.carriedwaste) || 
+					(!$ref.waste.equals($beliefbase.carriedwaste) &amp;&amp;
+					$beliefbase.my_location.getDistance($goal.waste.getLocation())
+					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation()))
 				</inhibits>
 			</deliberation>
 			<!-- <targetcondition>
@@ -187,12 +181,7 @@
 			
 			<!-- The goal has failed when the aimed wastebin is full. -->
 			<dropcondition language="jcl">
-				//$goal.wastebin.full
 				$goal.wastebin.wastes >= $goal.wastebin.capacity 
-				
-				// ?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
-				// ?wastebin = (Wastebin (isFull() true)) 
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
 		</achievegoal>
 
@@ -210,16 +199,11 @@
 			is as near as possible to the agent. -->
 		<querygoal name="querywastebin" exclude="never">
 			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
-				<value language="jcl" variable="$wastebin">
-					// ISpaceObject $wastebin &amp;&amp; $wastebin.getType().equals("wastebin") &amp;&amp; !$wastebin.full
-					// &amp;&amp;
-					// !(ISpaceObject $wastebin2 &amp;&amp; $wastebin2.getType().equals("wastebin") &amp;&amp; !$wastebin2.full
-					// 						  &amp;&amp; MoveTask.isGreater($beliefbase.my_location, (IVector2)$wastebin.position, (IVector2)$wastebin2.position))
-					
-					ISpaceObject $wastebin &amp;&amp; $wastebin.getType().equals("wastebin") &amp;&amp; $wastebin.capacity > $wastebin.wastes
-					&amp;&amp;
-					!(ISpaceObject $wastebin2 &amp;&amp; $wastebin2.getType().equals("wastebin") &amp;&amp; $wastebin2.capacity > $wastebin2.wastes
-											  &amp;&amp; MoveTask.isGreater($beliefbase.my_location, (IVector2)$wastebin.position, (IVector2)$wastebin2.position))
+				<value language="jcl">
+					select one ISpaceObject $wastebin
+					from $beliefbase.wastebins
+					where !$wastebin.full
+					order by $beliefbase.my_location.getDistance($wastebin.location)
 				</value>
 			</parameter>
 		</querygoal>
@@ -227,11 +211,10 @@
 		<!-- Find the nearest charging station. -->
 		<querygoal name="querychargingstation" exclude="never">
 			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
-				<value language="jcl" variable="$chargingstation">
-					ISpaceObject $chargingstation &amp;&amp; $chargingstation.getType().equals("chargingstation")
-					&amp;&amp;
-					!(ISpaceObject $chargingstation2 &amp;&amp; $chargingstation2.getType().equals("chargingstation")
-													 &amp;&amp; MoveTask.isGreater($beliefbase.my_location, (IVector2)$chargingstation.position, (IVector2)$chargingstation2.position))
+				<value language="jcl">
+					select one ISpaceObject $station
+					from $beliefbase.chargingstations
+					order by $beliefbase.my_location.getDistance($station.location)
 				</value>
 			</parameter>
 		</querygoal>

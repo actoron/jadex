@@ -100,6 +100,14 @@ public abstract class Plan
 	}
 	
 	/**
+	 *  Wait for next tick.
+	 */
+	public void	waitForTick()
+	{
+		agent.getComponentFeature(IExecutionFeature.class).waitForTick().get();
+	}
+	
+	/**
 	 *  Create a goal from a template goal.
 	 *  To be processed, the goal has to be dispatched as subgoal
 	 *  or adopted as top-level goal.
@@ -765,4 +773,11 @@ public abstract class Plan
 		}
 	}
 	 
+	/**
+	 *  Get the plan interface.
+	 */
+	public IPlan getPlanElement()
+	{
+		return rplan;
+	}
 }

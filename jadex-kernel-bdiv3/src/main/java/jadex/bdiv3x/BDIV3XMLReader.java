@@ -233,8 +233,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 			}), new LinkingInfo(condlinker));
-		TypeInfo ti_performgoalref = new TypeInfo(new XMLInfo(new QName(uri, "performgoalref")), new ObjectInfo(MGoal.class),
-			null, null);
+		
 		
 		TypeInfo ti_achievegoal = new TypeInfo(new XMLInfo(new QName(uri, "achievegoal")), new ObjectInfo(MGoal.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -244,9 +243,6 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 			}), new LinkingInfo(condlinker));
 			
-		TypeInfo ti_achievegoalref = new TypeInfo(new XMLInfo(new QName(uri, "achievegoalref")), new ObjectInfo(MGoal.class),
-			null, null);
-		
 		TypeInfo ti_querygoal = new TypeInfo(new XMLInfo(new QName(uri, "querygoal")), new ObjectInfo(MGoal.class, new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
@@ -281,8 +277,6 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 			}), new LinkingInfo(condlinker));
-		TypeInfo ti_querygoalref = new TypeInfo(new XMLInfo(new QName(uri, "querygoalref")), new ObjectInfo(MGoal.class),
-			null, null);
 		
 		TypeInfo ti_maintaingoal = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoal")), new ObjectInfo(MGoal.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -291,8 +285,6 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 			}), new LinkingInfo(condlinker));
-		TypeInfo ti_maintaingoalref = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MGoal.class),
-			null, null);
 		
 		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(MGoal.class, new GoalMetaProc(true)),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -302,22 +294,21 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 				new SubobjectInfo(new AccessInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}, "triggerGoal"))
 			}), new LinkingInfo(condlinker));
-		TypeInfo ti_metagoalref = new TypeInfo(new XMLInfo(new QName(uri, "metagoalref")), new ObjectInfo(MGoal.class),
-			null, null);
 		
 		// reset to not create MTrigger for metagoal goal triggers (are added as trigger goals)
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), null)); 
 		
 		typeinfos.add(ti_performgoal);
-		typeinfos.add(ti_performgoalref);
 		typeinfos.add(ti_achievegoal);
-		typeinfos.add(ti_achievegoalref);
 		typeinfos.add(ti_querygoal);
-		typeinfos.add(ti_querygoalref);
 		typeinfos.add(ti_maintaingoal);
-		typeinfos.add(ti_maintaingoalref);
 		typeinfos.add(ti_metagoal);
-		typeinfos.add(ti_metagoalref);
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "performgoalref")), new ObjectInfo(MElementRef.class), null, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "achievegoalref")), new ObjectInfo(MElementRef.class), null, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "querygoalref")), new ObjectInfo(MElementRef.class), null, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MElementRef.class), null, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "metagoalgoalref")), new ObjectInfo(MElementRef.class), null, null));
 		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "creationcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
 //			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text)));
@@ -435,11 +426,12 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "querygoal")}), new AccessInfo(new QName(uri, "querygoal"), "goal"), null, false, ti_querygoal.getObjectInfo()),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "maintaingoal")}), new AccessInfo(new QName(uri, "maintaingoal"), "goal"), null, false, ti_maintaingoal.getObjectInfo()),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "metagoal")}), new AccessInfo(new QName(uri, "metagoal"), "goal"), null, false, ti_metagoal.getObjectInfo()),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "performgoalref")}), new AccessInfo(new QName(uri, "performgoalref"), "goal"), null, false, ti_performgoalref.getObjectInfo()),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "achievegoalref")}), new AccessInfo(new QName(uri, "achievegoalref"), "goal"), null, false, ti_achievegoalref.getObjectInfo()),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "querygoalref")}), new AccessInfo(new QName(uri, "querygoalref"), "goal"), null, false, ti_querygoalref.getObjectInfo()),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "maintaingoalref")}), new AccessInfo(new QName(uri, "maintaingoalref"), "goal"), null, false, ti_maintaingoalref.getObjectInfo()),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "metagoalref")}), new AccessInfo(new QName(uri, "metagoalref"), "goal"), null, false, ti_metagoalref.getObjectInfo()),
+					
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "performgoalref")}), new AccessInfo(new QName(uri, "performgoalref"), "elementRef")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "achievegoalref")}), new AccessInfo(new QName(uri, "achievegoalref"), "elementRef")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "querygoalref")}), new AccessInfo(new QName(uri, "querygoalref"), "elementRef")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "maintaingoalref")}), new AccessInfo(new QName(uri, "maintaingoalref"), "elementRef")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goals"), new QName(uri, "metagoalref")}), new AccessInfo(new QName(uri, "metagoalref"), "elementRef")),
 		
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "plans"), new QName(uri, "plan")}), new AccessInfo(new QName(uri, "plan"), "plan")),
 		

@@ -1,8 +1,10 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -66,23 +68,26 @@ class CleanerPanel extends JPanel
 					@Classname("copy")
 					public IFuture<DrawData> execute(IInternalAccess ia)
 					{
-						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						// Hack, as long as we do not have a specific XML feature interface
+						IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+						RCapability capa = bdif.getCapability();
+						
 						DrawData	drawdata	= new DrawData();
-						drawdata.daytime = ((Boolean)bia.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
-						drawdata.visited_positions = (MapPoint[])bia.getBeliefbase().getBeliefSet("visited_positions").getFacts();
-						drawdata.max_quantity = ((MapPoint)((IExpression)bia.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
-						drawdata.xcnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
-						drawdata.ycnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
-						drawdata.cleaners = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("cleaners").getFacts();
-						drawdata.chargingstations = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("chargingstations").getFacts();
-						drawdata.wastebins = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("wastebins").getFacts();
-						drawdata.wastes = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("wastes").getFacts();
-						drawdata.my_vision = ((Double)bia.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
-						drawdata.my_chargestate = ((Double)bia.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-						drawdata.myself = (ISpaceObject)bia.getBeliefbase().getBelief("myself").getFact();
+						drawdata.daytime = ((Boolean)capa.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
+						drawdata.visited_positions = (MapPoint[])capa.getBeliefbase().getBeliefSet("visited_positions").getFacts();
+						drawdata.max_quantity = ((MapPoint)((IExpression)capa.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
+						drawdata.xcnt = ((Integer[])capa.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
+						drawdata.ycnt = ((Integer[])capa.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
+						drawdata.cleaners = (ISpaceObject[])capa.getBeliefbase().getBeliefSet("cleaners").getFacts();
+						drawdata.chargingstations = (ISpaceObject[])capa.getBeliefbase().getBeliefSet("chargingstations").getFacts();
+						drawdata.wastebins = (ISpaceObject[])capa.getBeliefbase().getBeliefSet("wastebins").getFacts();
+						drawdata.wastes = (ISpaceObject[])capa.getBeliefbase().getBeliefSet("wastes").getFacts();
+						drawdata.my_vision = ((Double)capa.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
+						drawdata.my_chargestate = ((Double)capa.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
+						drawdata.myself = (ISpaceObject)capa.getBeliefbase().getBelief("myself").getFact();
 						drawdata.my_location = (IVector2)drawdata.myself.getProperty("position");
 						drawdata.my_waste = drawdata.myself.getProperty("waste")!=null;
-						IGoal[] goals = (IGoal[])bia.getGoalbase().getGoals("achievemoveto");
+						IGoal[] goals = (IGoal[])capa.getGoalbase().getGoals("achievemoveto");
 						drawdata.dests = new IVector2[goals.length];
 						for(int i=0; i<goals.length; i++)
 						{

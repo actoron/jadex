@@ -424,6 +424,30 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		return ret;
 	}
 	
+	/**
+	 *  Wait for the next tick.
+	 *  @param time The time.
+	 */
+	public IFuture<Void> waitForTick()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		final ITimer[] ts = new ITimer[1];
+		ts[0] = cs.createTickTimer(new ITimedObject()
+		{
+			public void timeEventOccurred(final long currenttime)
+			{
+				ret.setResult(null);
+			}
+		});
+		if(timers==null)
+			timers	= new ArrayList<ITimer>();
+		timers.add(ts[0]);
+		
+		return ret;
+	}
+	
 	// todo:?
 //	/**
 //	 *  Wait for some time and execute a component step afterwards.

@@ -1,6 +1,8 @@
 package jadex.bdi.examples.garbagecollector;
 
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -54,12 +56,12 @@ public class GoPlanEnv extends Plan
 
 //			System.out.println("Wants to go: "+dir+" "+mypos+" "+target);
 			
-			Map params = new HashMap();
+			Map<String, Object> params = new HashMap<String, Object>();
 			params.put(GoAction.DIRECTION, dir);
 			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentDescription()).getId());
-			SyncResultListener srl	= new SyncResultListener();
-			env.performSpaceAction("go", params, srl); 
-			srl.waitForResult();
+			Future<Void> fut = new Future<Void>();
+			env.performSpaceAction("go", params, new DelegationResultListener<Void>(fut));
+			fut.get();
 		}
 	}
 }

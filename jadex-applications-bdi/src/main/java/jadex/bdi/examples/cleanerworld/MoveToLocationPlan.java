@@ -1,7 +1,9 @@
 package jadex.bdi.examples.cleanerworld;
 
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -24,16 +26,16 @@ public class MoveToLocationPlan extends Plan
 		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		IVector2 dest = (IVector2)getParameter("location").getValue();
 		
-		SyncResultListener	res	= new SyncResultListener();
-		Map props = new HashMap();
+		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		Object	taskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
-		space.addTaskListener(taskid, myself.getId(), res);
+		Future<Void> fut = new Future<Void>();
+		space.addTaskListener(taskid, myself.getId(), new DelegationResultListener<Void>(fut));
 		
 		try
 		{
-			res.waitForResult();
+			fut.get();
 		}
 		catch(Exception e)
 		{

@@ -1,7 +1,10 @@
 package jadex.bdi.examples.cleanerworld.truck;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -39,9 +42,11 @@ public class EmptyPlan extends Plan
 			
 			Map params = new HashMap();
 			params.put(ISpaceAction.OBJECT_ID, wastebins[i]);
-			SyncResultListener srl	= new SyncResultListener();
-			env.performSpaceAction("empty_wastebin", params, srl);
-			srl.waitForResult();
+//			SyncResultListener srl	= new SyncResultListener();
+			Future<Void> fut = new Future<Void>();
+			env.performSpaceAction("empty_wastebin", params, new DelegationResultListener<Void>(fut));
+			fut.get();
+//			srl.waitForResult();
 			
 //			System.out.println("Reached: "+loci[i]+" "+this);
 		}
