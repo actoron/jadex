@@ -1,6 +1,6 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
 
@@ -34,19 +34,6 @@ public class StackBlocksPlan	extends Plan
 	/** The quiet flag (do not printout messages). */
 	protected boolean	quiet;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public StackBlocksPlan()
-	{
-		this.block	= (Block)getParameter("block").getValue();
-		this.target	= (Block)getParameter("target").getValue();
-		this.mode	= (String)getBeliefbase().getBelief("mode").getFact();
-		this.quiet	= ((Boolean)getBeliefbase().getBelief("quiet").getFact()).booleanValue();
-	}
-
 	//-------- methods --------
 
 	/**
@@ -54,6 +41,11 @@ public class StackBlocksPlan	extends Plan
 	 */
 	public void body()
 	{
+		this.block	= (Block)getParameter("block").getValue();
+		this.target	= (Block)getParameter("target").getValue();
+		this.mode	= (String)getBeliefbase().getBelief("mode").getFact();
+		this.quiet	= ((Boolean)getBeliefbase().getBelief("quiet").getFact()).booleanValue();
+		
 		// Clear blocks.
 		IGoal clear = createGoal("clear");
 		clear.getParameter("block").setValue(block);
@@ -77,10 +69,10 @@ public class StackBlocksPlan	extends Plan
 		if(!quiet)
 			System.out.println("Moving '"+block+"' to '"+target+"'");
 
-		// This operation has to be performed atomic,
-		// because it fires bean changes on several affected blocks. 
-		startAtomic();
+//		// This operation has to be performed atomic,
+//		// because it fires bean changes on several affected blocks. 
+//		startAtomic();
 		block.stackOn(target);
-		endAtomic();
+//		endAtomic();
 	}
 }

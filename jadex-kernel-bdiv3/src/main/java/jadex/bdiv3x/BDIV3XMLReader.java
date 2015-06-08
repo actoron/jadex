@@ -11,6 +11,7 @@ import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MElementRef;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInitialParameterElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
@@ -22,7 +23,6 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3x.runtime.IParameter;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
@@ -990,56 +990,35 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new XMLInfo(new QName(uri, "facts")), new AccessInfo("facts", "value"))
 			}), null));	// Todo: multiple <fact> entries
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialinternalevent")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialmessageevent")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
+		MappingInfo	ipemapping	= new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ref", "name")),
+			new AttributeInfo(new AccessInfo("cref", "name"))
+		});
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialinternalevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialmessageevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endgoal")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endplan")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endinternalevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endmessageevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endgoal")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endplan")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endinternalevent")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endmessageevent")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
-		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialgoal"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialgoal"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type),
-//			new MappingInfo(ti_paramset), null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialplan"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialplan"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type),
-//			new MappingInfo(ti_paramset), null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialinternalevent"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialinternalevent"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type),
-//			new MappingInfo(ti_paramset)));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialmessageevent"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialmessageevent"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type),
-//			new MappingInfo(ti_paramset), null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endgoal"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endgoal"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type),
-//			new MappingInfo(ti_paramset), null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endplan"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endplan"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type),
-//			new MappingInfo(ti_paramset), null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endinternalevent"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endinternalevent"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type),
-//			new MappingInfo(ti_paramset), null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endmessageevent"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endmessageevent"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type),
-//			new MappingInfo(ti_paramset), null, new OAVObjectReaderHandler()));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialgoal"), new QName(uri, "parameter")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialgoal"), new QName(uri, "parameterset")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialplan"), new QName(uri, "parameter")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialplan"), new QName(uri, "parameterset")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialinternalevent"), new QName(uri, "parameter")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialinternalevent"), new QName(uri, "parameterset")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialmessageevent"), new QName(uri, "parameter")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialmessageevent"), new QName(uri, "parameterset")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endgoal"), new QName(uri, "parameter")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endgoal"), new QName(uri, "parameterset")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endplan"), new QName(uri, "parameter")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endplan"), new QName(uri, "parameterset")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endinternalevent"), new QName(uri, "parameter")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endinternalevent"), new QName(uri, "parameterset")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endmessageevent"), new QName(uri, "parameter")}), new ObjectInfo(null)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endmessageevent"), new QName(uri, "parameterset")}), new ObjectInfo(null)));
 		
 		return typeinfos;
 	}

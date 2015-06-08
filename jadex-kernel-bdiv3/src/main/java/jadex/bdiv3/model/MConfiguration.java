@@ -9,19 +9,16 @@ import java.util.List;
  *  BDI configuration. The name is used to connect
  *  it to the existing component configuration.
  */
-public class MConfiguration
+public class MConfiguration	extends MElement
 {
-	/** The configuration name. */
-	protected String name;
-	
 	/** The initial beliefs. */
 	protected List<UnparsedExpression> initialbeliefs;
 
 	/** The initial goals. */
-	protected List<UnparsedExpression> initialgoals;
+	protected List<MInitialParameterElement> initialgoals;
 
 	/** The initial plans. */
-	protected List<UnparsedExpression> initialplans;
+	protected List<MInitialParameterElement> initialplans;
 
 	/**
 	 *	Bean Constructor. 
@@ -35,32 +32,14 @@ public class MConfiguration
 	 */
 	public MConfiguration(String name)
 	{
-		this.name = name;
-	}
-
-	/**
-	 *  Get the name.
-	 *  @return The name.
-	 */
-	public String getName()
-	{
-		return name;
-	}
-
-	/**
-	 *  Set the name.
-	 *  @param name The name to set.
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
+		super(name);
 	}
 
 	/**
 	 *  Get the initialgoals.
 	 *  @return The initialgoals.
 	 */
-	public List<UnparsedExpression> getInitialGoals()
+	public List<MInitialParameterElement> getInitialGoals()
 	{
 		return initialgoals;
 	}
@@ -69,7 +48,7 @@ public class MConfiguration
 	 *  Set the initialgoals.
 	 *  @param initialgoals The initialgoals to set.
 	 */
-	public void setInitialGoals(List<UnparsedExpression> initialgoals)
+	public void setInitialGoals(List<MInitialParameterElement> initialgoals)
 	{
 		this.initialgoals = initialgoals;
 	}
@@ -78,7 +57,7 @@ public class MConfiguration
 	 *  Get the initialplans.
 	 *  @return The initialplans.
 	 */
-	public List<UnparsedExpression> getInitialPlans()
+	public List<MInitialParameterElement> getInitialPlans()
 	{
 		return initialplans;
 	}
@@ -87,7 +66,7 @@ public class MConfiguration
 	 *  Set the initialplans.
 	 *  @param initialplans The initialplans to set.
 	 */
-	public void setInitialPlans(List<UnparsedExpression> initialplans)
+	public void setInitialPlans(List<MInitialParameterElement> initialplans)
 	{
 		this.initialplans = initialplans;
 	}
@@ -127,11 +106,11 @@ public class MConfiguration
 	 *  Add an initial goal.
 	 *  @param upex	The expression.
 	 */
-	public void	addInitialGoal(UnparsedExpression upex)
+	public void	addInitialGoal(MInitialParameterElement upex)
 	{
 		if(initialgoals==null)
 		{
-			initialgoals	= new ArrayList<UnparsedExpression>();
+			initialgoals	= new ArrayList<MInitialParameterElement>();
 		}
 		initialgoals.add(upex);
 	}
@@ -140,11 +119,11 @@ public class MConfiguration
 	 *  Add an initial plan.
 	 *  @param upex	The expression.
 	 */
-	public void	addInitialPlan(UnparsedExpression upex)
+	public void	addInitialPlan(MInitialParameterElement upex)
 	{
 		if(initialplans==null)
 		{
-			initialplans	= new ArrayList<UnparsedExpression>();
+			initialplans	= new ArrayList<MInitialParameterElement>();
 		}
 		initialplans.add(upex);
 	}

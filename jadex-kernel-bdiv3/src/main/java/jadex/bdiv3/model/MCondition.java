@@ -1,19 +1,12 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
-import jadex.javaparser.javaccimpl.ExpressionNode;
-import jadex.javaparser.javaccimpl.Node;
-import jadex.javaparser.javaccimpl.ParameterNode;
-import jadex.javaparser.javaccimpl.ReflectNode;
 import jadex.rules.eca.EventType;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *  Model element for conditions.

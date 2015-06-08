@@ -77,10 +77,9 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RPlan parentplan, Map<String, Object> vals)
+	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, Map<String, Object> vals)
 	{
 		super(mgoal, goal, agent, vals);
-		this.parentplan = parentplan;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
 //		if(mgoal.getName().indexOf("cleanup")!=-1)
@@ -145,6 +144,24 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	public RElement getParent()
 	{
 		return parentplan!=null? parentplan: parentgoal;
+	}
+
+	/**
+	 *  Set parent (goal or plan).
+	 */
+	public void	setParent(RGoal parent)
+	{
+		assert parentgoal==null && parentplan==null;
+		parentgoal	= parent;
+	}
+	
+	/**
+	 *  Set parent (goal or plan).
+	 */
+	public void	setParent(RPlan parent)
+	{
+		assert parentgoal==null && parentplan==null;
+		parentplan	= parent;
 	}
 
 	/**

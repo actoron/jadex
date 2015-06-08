@@ -1,6 +1,5 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -9,7 +8,6 @@ import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
-import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
@@ -21,13 +19,10 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
-import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -39,9 +34,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.ChangeInfo;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -116,11 +109,7 @@ public abstract class Plan
 	 */
 	public IGoal createGoal(String type)
 	{
-		MGoal mgoal = getCapability().getMCapability().getGoal(type);
-		if(mgoal==null)
-			throw new RuntimeException("Unknown goal type: "+type);
-		RGoal rgoal = new RGoal(getAgent(), mgoal, null, rplan, null);
-		return rgoal;
+		return getGoalbase().createGoal(type);
 	}
 	
 	/**
@@ -129,11 +118,10 @@ public abstract class Plan
 	 */
 	public void	dispatchSubgoalAndWait(IGoal goal)
 	{
+		dispatchSubgoal(goal);
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
-		rplan.addSubgoal(rgoal);
-		RGoal.adoptGoal(rgoal, agent);
 		ret.get();
 	}
 	
@@ -329,7 +317,7 @@ public abstract class Plan
 	 */
 	public IExpression getExpression(String name)
 	{
-		return getCapability().getExpressionbase().getExpression(name);
+		return getExpressionbase().getExpression(name);
 	}
 	
 	/**
@@ -339,7 +327,7 @@ public abstract class Plan
 	 */
 	public IExpression createExpression(String exp)
 	{
-		return getCapability().getExpressionbase().createExpression(exp);
+		return getExpressionbase().createExpression(exp);
 	}
 	
 	/**
@@ -348,8 +336,8 @@ public abstract class Plan
 	 *  @return The filter to wait for an answer.
 	 */
 	public IFuture<Void> sendMessage(IMessageEvent me)
-	{	
-		return agent.getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType());
+	{
+		return getEventbase().sendMessage(me);
 	}
 	
 	/**
@@ -432,7 +420,10 @@ public abstract class Plan
 	 */
 	public void dispatchSubgoal(IGoal subgoal)
 	{
-		throw new UnsupportedOperationException();
+		RGoal rgoal = (RGoal)subgoal;
+		rgoal.setParent(rplan);
+		rplan.addSubgoal(rgoal);
+		RGoal.adoptGoal(rgoal, agent);
 	}
 
 	/**
@@ -504,14 +495,14 @@ public abstract class Plan
 //		throw new UnsupportedOperationException();
 //	}
 
-//	/**
-//	 *  Get the event base.
-//	 *  @return The event base.
-//	 */
-//	public IEventbase getEventbase()
-//	{
-//		throw new UnsupportedOperationException();
-//	}
+	/**
+	 *  Get the event base.
+	 *  @return The event base.
+	 */
+	public IEventbase getEventbase()
+	{
+		return getCapability().getEventbase();
+	}
 
 	/**
 	 * Get the expression base.
@@ -552,18 +543,17 @@ public abstract class Plan
 	 */
 	public void dispatchTopLevelGoal(IGoal goal)
 	{
-		getCapability().getGoalbase().dispatchTopLevelGoal(goal);
+		getGoalbase().dispatchTopLevelGoal(goal);
 	}
 
-	/**
-	 *  Send a message after some delay.
-	 *  @param me	The message event.
-	 *  @return The filter to wait for an answer.
-	 */
-	public IFuture<Void> sendMessage(IMessageEvent me, byte[] codecids)
-	{	
-		return agent.getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType(), codecids);
-	}
+//	/**
+//	 *  Send a message.
+//	 *  @param me	The message event.
+//	 */
+//	public IFuture<Void> sendMessage(IMessageEvent me, byte[] codecids)
+//	{	
+//		return getEventbase().sendMessage(me, codecids);
+//	}
 
 	/**
 	 *  Dispatch an internal event.
@@ -572,8 +562,7 @@ public abstract class Plan
 	 */
 	public void dispatchInternalEvent(IInternalEvent event)
 	{
-		FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction((RProcessableElement)event);
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
+		getEventbase().dispatchInternalEvent(event);
 	}
 
 	/**
@@ -582,10 +571,7 @@ public abstract class Plan
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
-		MMessageEvent mevent = getCapability().getMCapability().getMessageEvent(type);
-		if(mevent==null)
-			throw new RuntimeException("Message event not found: "+type);
-		return new RMessageEvent(mevent, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, agent);
+		return getEventbase().createMessageEvent(type);
 	}
 
 	/**
@@ -594,10 +580,7 @@ public abstract class Plan
 	 */
 	public IInternalEvent createInternalEvent(String type)
 	{
-		MInternalEvent mevent = getCapability().getMCapability().getInternalEvent(type);
-		if(mevent==null)
-			throw new RuntimeException("Internal event not found: "+type);
-		return new RInternalEvent(mevent, agent);
+		return getEventbase().createInternalEvent(type);
 	}
 
 	/**

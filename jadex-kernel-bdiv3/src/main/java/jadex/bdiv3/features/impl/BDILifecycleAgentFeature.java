@@ -15,6 +15,7 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInitialParameterElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MPlan;
@@ -24,7 +25,6 @@ import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bdiv3.runtime.impl.RParameterElement.RParameter;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.IParameter;
@@ -163,19 +163,31 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 				
 				// Create initial goals
-				List<UnparsedExpression> igoals = mconf.getInitialGoals();
+				List<MInitialParameterElement> igoals = mconf.getInitialGoals();
 				if(igoals!=null)
 				{
-					for(UnparsedExpression uexp: igoals)
+					for(MInitialParameterElement igoal: igoals)
 					{
 						MGoal mgoal = null;
-						Object goal = null;
 						Class<?> gcl = null;
+						Object goal = null;
 						
-						// Create goal if expression available
-						if(uexp.getValue()!=null && uexp.getValue().length()>0)
+						// try to fetch via name
+						mgoal = bdimodel.getCapability().getGoal(igoal.getName());
+						if(mgoal==null && igoal.getName().indexOf(".")==-1)
 						{
-							Object o = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+							// try with package
+							mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+igoal.getName());
+						}
+						
+						if(mgoal!=null)
+						{
+							gcl = mgoal.getTargetClass(component.getClassLoader());
+						}
+						// if not found, try expression
+						else
+						{
+							Object o = SJavaParser.parseExpression(igoal.getName(), component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
 							if(o instanceof Class)
 							{
 								gcl = (Class<?>)o;
@@ -185,30 +197,48 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								goal = o;
 								gcl = o.getClass();
 							}
-						}
-						
-						if(gcl==null && uexp.getClazz()!=null)
-						{
-							gcl = uexp.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports());
-						}
-						if(gcl==null)
-						{
-							// try to fetch via name
-							mgoal = bdimodel.getCapability().getGoal(uexp.getName());
-							if(mgoal==null && uexp.getName().indexOf(".")==-1)
-							{
-								// try with package
-								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+uexp.getName());
-							}
-							if(mgoal!=null)
-							{
-								gcl = mgoal.getTargetClass(component.getClassLoader());
-							}
-						}
-						if(mgoal==null)
-						{
 							mgoal = bdimodel.getCapability().getGoal(gcl.getName());
 						}
+
+//						// Create goal if expression available
+//						if(uexp.getName()!=null && uexp.getValue().length()>0)
+//						{
+//							Object o = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+//							if(o instanceof Class)
+//							{
+//								gcl = (Class<?>)o;
+//							}
+//							else
+//							{
+//								goal = o;
+//								gcl = o.getClass();
+//							}
+//						}
+//						
+//						if(gcl==null && uexp.getClazz()!=null)
+//						{
+//							gcl = uexp.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports());
+//						}
+//						if(gcl==null)
+//						{
+//							// try to fetch via name
+//							mgoal = bdimodel.getCapability().getGoal(uexp.getName());
+//							if(mgoal==null && uexp.getName().indexOf(".")==-1)
+//							{
+//								// try with package
+//								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+uexp.getName());
+//							}
+//							if(mgoal!=null)
+//							{
+//								gcl = mgoal.getTargetClass(component.getClassLoader());
+//							}
+//						}						
+//						if(mgoal==null)
+//						{
+//							mgoal = bdimodel.getCapability().getGoal(gcl.getName());
+//						}
+						
+						// Create goal instance
 						if(goal==null && gcl!=null)
 						{
 							try
@@ -245,21 +275,21 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						
 						if(mgoal==null || (goal==null && gcl!=null))
 						{
-							throw new RuntimeException("Could not create initial goal: "+uexp);
+							throw new RuntimeException("Could not create initial goal: "+igoal);
 						}
 						
-						RGoal rgoal = new RGoal(component, mgoal, goal, (RPlan)null, null);
+						RGoal rgoal = new RGoal(component, mgoal, goal, null);
 						RGoal.adoptGoal(rgoal, component);
 					}
 				}
 				
 				// Create initial plans
-				List<UnparsedExpression> iplans = mconf.getInitialPlans();
+				List<MInitialParameterElement> iplans = mconf.getInitialPlans();
 				if(iplans!=null)
 				{
-					for(UnparsedExpression uexp: iplans)
+					for(MInitialParameterElement iplan: iplans)
 					{
-						MPlan mplan = bdimodel.getCapability().getPlan(uexp.getName());
+						MPlan mplan = bdimodel.getCapability().getPlan(iplan.getName());
 						// todo: allow Java plan constructor calls
 	//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 					
@@ -758,14 +788,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								{
 									for(Map<String, Object> binding: bindings)
 									{
-										RGoal rgoal = new RGoal(component, mgoal, null, (RPlan)null, binding);
+										RGoal rgoal = new RGoal(component, mgoal, null, binding);
 										bdif.dispatchTopLevelGoal(rgoal);
 									}
 								}
 								// No binding: generate one candidate.
 								else
 								{
-									RGoal rgoal = new RGoal(component, mgoal, null, (RPlan)null, null);
+									RGoal rgoal = new RGoal(component, mgoal, null, null);
 									bdif.dispatchTopLevelGoal(rgoal);
 								}
 								

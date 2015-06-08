@@ -185,9 +185,10 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		<achievegoal name="configure">
 			<parameter name="configuration" class="Table" />
  			<parameterset name="blocks" class="Block"/>
-			<targetcondition language="jcl">
-				<!-- $beliefbase.table.configurationEquals($goal.configuration)
-				<relevantbeliefset ref="blocks"/> -->
+			<targetcondition>
+				$beliefbase.table.configurationEquals($goal.configuration)
+<!-- 				<relevantbeliefset ref="blocks"/> -->
+<!-- 
 				// There is no block on the table for which there is no block in the configuration
 				!(Block $block1 &amp;&amp;
 					Arrays.asList($beliefbase.table.getAllBlocks()).contains($block1) &amp;&amp;
@@ -206,7 +207,8 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 				!(	Block $block5 &amp;&amp; Arrays.asList($beliefbase.table.getAllBlocks()).contains($block5) &amp;&amp;
 					Block $block6 &amp;&amp; Arrays.asList($goal.configuration.getAllBlocks()).contains($block6) &amp;&amp;
 					$block5.color==$block6.color &amp;&amp; $block5.lower.color!=$block6.lower.color)
-			</targetcondition>
+ -->
+ 			</targetcondition>
 		</achievegoal>
 	</goals>
 
@@ -276,6 +278,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 	
 	<properties>
 		<property name="debugging">false</property>
+		<property name="logging.level">java.util.logging.Level.INFO</property>
 	</properties>
 
 	<configurations>

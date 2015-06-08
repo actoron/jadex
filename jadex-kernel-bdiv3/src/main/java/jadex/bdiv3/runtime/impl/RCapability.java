@@ -5,7 +5,8 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3x.runtime.RBeliefbase;
-import jadex.bdiv3x.runtime.RExpressionBase;
+import jadex.bdiv3x.runtime.REventbase;
+import jadex.bdiv3x.runtime.RExpressionbase;
 import jadex.bdiv3x.runtime.RGoalbase;
 import jadex.bridge.IInternalAccess;
 
@@ -56,7 +57,10 @@ public class RCapability extends RElement
 	protected RGoalbase goalbase;
 	
 	/** The expressionbase. */
-	protected RExpressionBase expressionbase;
+	protected RExpressionbase expressionbase;
+	
+	/** The eventbase. */
+	protected REventbase eventbase;
 	
 	//-------- constructors --------
 	
@@ -382,7 +386,7 @@ public class RCapability extends RElement
 	 *  Get the expressionbase.
 	 *  @return The expressionbase
 	 */
-	public RExpressionBase getExpressionbase()
+	public RExpressionbase getExpressionbase()
 	{
 		return expressionbase;
 	}
@@ -391,9 +395,27 @@ public class RCapability extends RElement
 	 *  The expressionbase to set.
 	 *  @param expressionbase The expressionbase to set
 	 */
-	public void setExpressionbase(RExpressionBase expressionbase)
+	public void setExpressionbase(RExpressionbase expressionbase)
 	{
 		this.expressionbase = expressionbase;
+	}
+
+	/**
+	 *  Get the eventbase.
+	 *  @return The eventbase
+	 */
+	public REventbase getEventbase()
+	{
+		return eventbase;
+	}
+
+	/**
+	 *  The eventbase to set.
+	 *  @param eventbase The eventbase to set
+	 */
+	public void setEventbase(REventbase eventbase)
+	{
+		this.eventbase = eventbase;
 	}
 
 	/**
