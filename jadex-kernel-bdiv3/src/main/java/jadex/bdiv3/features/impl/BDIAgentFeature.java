@@ -2322,7 +2322,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 * 
 	 */
-	protected static void addEvent(List<EventType> events, EventType event)
+	public static void addEvent(List<EventType> events, EventType event)
 	{
 		if(!events.contains(event))
 			events.add(event);

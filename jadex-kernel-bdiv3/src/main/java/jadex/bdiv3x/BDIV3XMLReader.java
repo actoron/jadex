@@ -788,21 +788,25 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				return 0;
 			}
 		};
-		
+		AttributeInfo[]	condattrs	= new AttributeInfo[]
+		{
+			new AttributeInfo(new AccessInfo("beliefs", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("parameters", null, AccessInfo.IGNORE_READ))
+		};
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(UnparsedExpression.class, condexpost),
-			new MappingInfo(null, null, "value")));
+			new MappingInfo(null, null, "value", condattrs)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "creationcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
-			new MappingInfo(null, null, "value", new AttributeInfo[]{new AttributeInfo(new AccessInfo("beliefs", null, AccessInfo.IGNORE_READ))})));
+			new MappingInfo(null, null, "value", condattrs)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "dropcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
-			new MappingInfo(null, null, "value")));
+			new MappingInfo(null, null, "value", condattrs)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "targetcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
-			new MappingInfo(null, null, "value")));
+			new MappingInfo(null, null, "value", condattrs)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "maintaincondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
-			new MappingInfo(null, null, "value")));
+			new MappingInfo(null, null, "value", condattrs)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "recurcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
-			new MappingInfo(null, null, "value")));
+			new MappingInfo(null, null, "value", condattrs)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
-			new MappingInfo(null, null, "value")));
+			new MappingInfo(null, null, "value", condattrs)));
 		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "achievegoal"), new QName(uri, "publish")}), new ObjectInfo(OAVBDIMetaModel.publish_type, scpost), 
 //				new MappingInfo(null, new AttributeInfo[]{
