@@ -2,8 +2,11 @@ package jadex.commons.meta;
 
 import jadex.commons.IPropertyObject;
 
-public interface ITypedPropertyObject extends IPropertyObject {
-	
+/**
+ * 
+ */
+public interface ITypedPropertyObject extends IPropertyObject 
+{	
 	/**
 	 * Returns for the given property name the specific metadata information
 	 * @param propertyName the name of the property

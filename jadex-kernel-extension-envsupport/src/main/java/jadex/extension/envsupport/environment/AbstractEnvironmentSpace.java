@@ -2761,7 +2761,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		{
 			MObjectType	props = (MObjectType)objecttypes.get(object.getType());
 			
-			if (props != null) {
+			if(props != null) 
+			{
 				MObjectTypeProperty prop = (MObjectTypeProperty)props.getProperty(property);
 				fire = prop != null && prop.isEvent();
 			}

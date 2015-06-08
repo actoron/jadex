@@ -6,7 +6,6 @@ import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MParameter;
-import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.RElement;
@@ -86,6 +85,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				boolean	hasinival	= false;
 				
 				if(MParameter.EvaluationMode.STATIC.equals(mbel.getEvaluationMode()))
+//					|| MParameter.EvaluationMode.PUSH.equals(mbel.getEvaluationMode()))
 				{
 					if(args.containsKey(mbel.getName())) // mbel.isExported() && 
 					{	
@@ -382,8 +382,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public void setFact(Object value)
 		{
-//			if(getName().equals("daytime"))
-//				System.out.println("belief set val: "+value);
+			if(getName().equals("myself"))
+				System.out.println("belief set val: "+value);
 			Object oldvalue = value;
 			this.value = value;
 			publisher.entryChanged(oldvalue, value, -1);

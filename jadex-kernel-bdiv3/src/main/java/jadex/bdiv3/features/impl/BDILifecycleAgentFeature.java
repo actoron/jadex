@@ -277,22 +277,45 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		{
 			List<EventType> events = mbel.getAllEvents(component);
 			
-			// Automatic reevaluation if belief depends on other beliefs
-			if(!events.isEmpty())
+//			Object cap = null;
+//			if(component.getComponentFeature0(IPojoComponentFeature.class)!=null)
+//			{
+//				Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+//				Object ocapa = agent;
+//				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
+//				if(i!=-1)
+//				{
+//					ocapa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
+//				}
+//				cap	= ocapa;
+//			}
+//			final Object fcapa = cap;
+			
+			String name = null;
+			Object capa = null;
+			if(component.getComponentFeature0(IPojoComponentFeature.class)!=null)
 			{
-				Object cap = null;
-				if(component.getComponentFeature0(IPojoComponentFeature.class)!=null)
+				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
+				if(i!=-1)
+				{
+					capa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
+					name	= mbel.getName().substring(mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)+1); 
+				}
+				else
 				{
 					Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-					Object ocapa = agent;
-					int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
-					if(i!=-1)
-					{
-						ocapa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
-					}
-					cap	= ocapa;
+					capa	= agent;
+					name	= mbel.getName();
 				}
-				final Object fcapa = cap;
+			}
+			final String fname = name;
+			final Object fcapa = capa;
+			
+			// Automatic reevaluation if belief depends on other beliefs
+			if(!events.isEmpty() || mbel.getEvaluationMode().equals(EvaluationMode.PUSH))
+			{
+				// Add the dependencies that come from the expression 
+				BDIAgentFeature.addExpressionEvents(mbel.getDefaultFact(), events, null);
 				
 				Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
@@ -343,26 +366,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			if(mbel.getUpdaterate()>0)
 			{
-				String name = null;
-				Object capa = null;
-				if(component.getComponentFeature0(IPojoComponentFeature.class)!=null)
-				{
-					int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
-					if(i!=-1)
-					{
-						capa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
-						name	= mbel.getName().substring(mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)+1); 
-					}
-					else
-					{
-						Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-						capa	= agent;
-						name	= mbel.getName();
-					}
-				}
-				final String fname = name;
-				final Object fcapa = capa;
-				
 				final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //				cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
 				ITimedObject to = new ITimedObject()

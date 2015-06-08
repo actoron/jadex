@@ -33,7 +33,6 @@
 	<beliefs>
 		<belief name="environment" class="ContinuousSpace2D">
  			<fact class="ContinuousSpace2D">jadex.extension.envsupport.EnvironmentService.getSpace($component).get()</fact>
- 			<!-- $scope.getParentAccess().getExtension("my2dspace") -->
  		</belief>
  		
  		<belief name="myself" class="ISpaceObject" exported="true">
@@ -134,15 +133,15 @@
 				$beliefbase.daytime
  			</contextcondition>
 			<dropcondition language="jcl">
-				$beliefbase.carriedwaste==null &amp;&amp;
+				$beliefbase.myself.waste==null &amp;&amp;
 					!$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
  			</dropcondition>
 			<!-- <deliberation cardinality="1"> -->
 			<deliberation>
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup" language="jcl">
-					$goal.waste.equals($beliefbase.carriedwaste) || 
-					(!$ref.waste.equals($beliefbase.carriedwaste) &amp;&amp;
+					$goal.waste.equals($beliefbase.myself.waste) || 
+					(!$ref.waste.equals($beliefbase.myself.waste) &amp;&amp;
 					$beliefbase.my_location.getDistance($goal.waste.getLocation())
 					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation()))
 				</inhibits>

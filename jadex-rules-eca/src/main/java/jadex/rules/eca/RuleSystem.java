@@ -318,6 +318,9 @@ public class RuleSystem
 		{
 			IEvent event = pcman.removeEvent(0);
 			
+//			if(event.getType().toString().indexOf("factchanged.myself")!=-1)
+//				System.out.println("sdgfsdgf");
+			
 //			if(event.getType().getType(0).indexOf("factadded")!=-1)// && event.getType().getType(1).indexOf("mybean")!=-1)
 //				&& event.getType().getType(1).indexOf("Ambu")!=-1)
 //				System.out.println("proc ev: "+event);
@@ -520,7 +523,8 @@ public class RuleSystem
 	 */
 	public void addEvent(IEvent event)
 	{
-//		System.out.println("added: "+event.getType()+" "+this);
+//		if(event.getType().toString().indexOf("factchanged.myself")!=-1)
+//			System.out.println("added: "+event.getType()+" "+event.getContent());
 //		if(event.getType().getTypes().length==1)
 //			System.out.println("herer: "+event.getType());
 //		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
