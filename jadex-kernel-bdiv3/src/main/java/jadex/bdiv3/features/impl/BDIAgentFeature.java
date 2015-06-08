@@ -35,6 +35,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -45,6 +46,7 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -62,6 +64,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.javaccimpl.ExpressionNode;
+import jadex.javaparser.javaccimpl.Node;
+import jadex.javaparser.javaccimpl.ParameterNode;
+import jadex.javaparser.javaccimpl.ReflectNode;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.rules.eca.ChangeInfo;
@@ -81,6 +87,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -98,6 +105,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		new Class[]{IMicroLifecycleFeature.class}, null);
 		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class});
 	
+	
 	/** The bdi model. */
 	protected BDIModel bdimodel;
 	
@@ -106,6 +114,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	
 	/** The bdi state. */
 	protected RCapability capa;
+	
+	/** The event adders. */
+	protected Map<EventType, IResultCommand<IFuture<Void>, PropertyChangeEvent>> eventadders 
+		= new HashMap<EventType, IResultCommand<IFuture<Void>,PropertyChangeEvent>>();
 	
 //	/** Is the agent inited and allowed to execute rules? */
 //	protected boolean	inited;
@@ -221,7 +233,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			Object oldval = setFieldValue(obj, fieldname, val);
 			
 			// unobserve old value for property changes
-			rs.unobserveObject(oldval);
+			unobserveObject(getComponent(), oldval, ev2, rs);
+//			rs.unobserveObject(oldval);
 
 			MBelief	mbel = ((MCapability)((IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
 		
@@ -493,10 +506,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
 		
 		Object oldval = null;
+		EventType etype = new EventType(new String[]{ChangeEvent.FACTCHANGED, belname});
 		if(isbeliefwrite)
 		{
 			oldval = Array.get(array, index);
-			rs.unobserveObject(oldval);	
+			unobserveObject(agent, oldval, etype, rs);
+//			rs.unobserveObject(oldval);	
 		}
 		
 		Class<?> ct = array.getClass().getComponentType();
@@ -519,7 +534,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			{
 				publishToolBeliefEvent(agent, mbel);
 
-				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}), new ChangeInfo<Object>(val, oldval, Integer.valueOf(index))); // todo: index
+				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(val, oldval, Integer.valueOf(index))); // todo: index
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
@@ -544,7 +559,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			Object oldval = getter.invoke(pojo, new Object[0]);
 		
 			RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
-			rs.unobserveObject(oldval);	
+			
+			// todo: is this the only event thrown?
+			unobserveObject(agent, oldval, new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}), rs);
+//			rs.unobserveObject(oldval);	
 		}
 		catch(Exception e)
 		{
@@ -568,62 +586,89 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
 
 		if(val!=null)
+			rs.observeObject(val, true, false, getEventAdder(agent, etype, mbel, rs));
+	}
+
+	/**
+	 * 
+	 */
+	protected static synchronized IResultCommand<IFuture<Void>, PropertyChangeEvent> getEventAdder(final IInternalAccess agent, final EventType etype, final MBelief mbel, final RuleSystem rs)
+	{
+		Map<EventType, IResultCommand<IFuture<Void>, PropertyChangeEvent>> eventadders = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getEventAdders();
+		IResultCommand<IFuture<Void>, PropertyChangeEvent> ret = eventadders.get(etype);
+		
+		if(ret==null)
 		{
-			rs.observeObject(val, true, false, new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
+			ret = new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
 			{
+				final IResultCommand<IFuture<Void>, PropertyChangeEvent> self = this;
 				public IFuture<Void> execute(final PropertyChangeEvent event)
 				{
 					final Future<Void> ret = new Future<Void>();
 					try
 					{
-						IFuture<Void> fut = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+						if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
 						{
-							public IFuture<Void> execute(IInternalAccess ia)
+							IFuture<Void> fut = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 							{
-								publishToolBeliefEvent(agent, mbel);
-								
-		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
-		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
-								jadex.rules.eca.Event ev = new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
-								rs.addEvent(ev);
-								return IFuture.DONE;
-//									return new Future<IEvent>(ev);
-							}
-						});
-						fut.addResultListener(new DelegationResultListener<Void>(ret)
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									publishToolBeliefEvent(agent, mbel);
+									
+			//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
+			//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
+									jadex.rules.eca.Event ev = new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
+									rs.addEvent(ev);
+									return IFuture.DONE;
+		//								return new Future<IEvent>(ev);
+								}
+							});
+							fut.addResultListener(new DelegationResultListener<Void>(ret)
+							{
+								public void exceptionOccurred(Exception exception)
+								{
+									if(exception instanceof ComponentTerminatedException)
+									{
+		//								System.out.println("Ex in observe: "+exception.getMessage());
+										Object val = event.getSource();
+										rs.unobserveObject(val, self);
+										ret.setResult(null);
+									}
+									else
+									{
+										super.exceptionOccurred(exception);
+									}
+								}
+							});
+						}
+						else
 						{
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ComponentTerminatedException)
-								{
-//										System.out.println("Ex in observe: "+exception.getMessage());
-									rs.unobserveObject(val);
-									ret.setResult(null);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
-						});
+							publishToolBeliefEvent(agent, mbel);
+							jadex.rules.eca.Event ev = new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
+							rs.addEvent(ev);
+						}
 					}
 					catch(Exception e)
 					{
 						if(!(e instanceof ComponentTerminatedException))
 							System.out.println("Ex in observe: "+e.getMessage());
-						rs.unobserveObject(val);
+						Object val = event.getSource();
+						rs.unobserveObject(val, self);
 						ret.setResult(null);
 					}
 					return ret;
 				}
-			});
+			};
+			eventadders.put(etype, ret);
 		}
+		
+		return ret;
 	}
-
+	
 	/**
 	 *  Get the value of an abstract belief.
 	 */
-	public static Object	getAbstractBeliefValue(IInternalAccess component, String capa, String name, Class<?> type)
+	public static Object getAbstractBeliefValue(IInternalAccess component, String capa, String name, Class<?> type)
 	{
 //			System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
 		BDIModel bdimodel = (BDIModel)((IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
@@ -676,10 +721,11 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		if(field)
 		{
 //			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
+			EventType etype = new EventType(ChangeEvent.FACTCHANGED+"."+mbel.getName());
 			RuleSystem rs = ((IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
-			rs.unobserveObject(old);	
+			unobserveObject(component, old, etype, rs);	
 			createChangeEvent(value, old, null, component, mbel.getName());
-			observeValue(rs, value, component, ChangeEvent.FACTCHANGED+"."+mbel.getName(), mbel);
+			observeValue(rs, value, component, etype, mbel);
 		}
 	}
 	
@@ -687,6 +733,16 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		{
 //			createChangeEvent(val, null, null, agent, belname);
 //		}
+	
+	/**
+	 *  Unobserve an object.
+	 */
+	public static void unobserveObject(IInternalAccess agent, final Object object, EventType etype, RuleSystem rs)
+	{
+		Map<EventType, IResultCommand<IFuture<Void>, PropertyChangeEvent>> eventadders = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getEventAdders();
+		IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder = eventadders.get(etype);
+		rs.unobserveObject(object, eventadder);
+	}
 	
 	/**
 	 *  Caution: this method is used from byte engineered code, change signature with caution
@@ -909,10 +965,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
 		
 		Object oldval = null;
+		EventType etype = new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname});
 		if(isparamwrite)
 		{
 			oldval = Array.get(array, index);
-			rs.unobserveObject(oldval);	
+			unobserveObject(agent, oldval, etype, rs);
+//			rs.unobserveObject(oldval);	
 		}
 		
 		Class<?> ct = array.getClass().getComponentType();
@@ -930,7 +988,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			if(!SUtil.equals(val, oldval))
 			{
-				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), new ChangeInfo<Object>(val, oldval, Integer.valueOf(index)));
+				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(val, oldval, Integer.valueOf(index)));
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
@@ -2168,11 +2226,106 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		events.add(new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, paramname})); // the whole value was changed
 		events.add(new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, paramname})); // property change of a value
 		
-		if(mparam.isMulti(cl))
+		if(cl==null || mparam.isMulti(cl))
 		{
 			events.add(new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, paramname}));
 			events.add(new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, paramname}));
 		}
+	}
+	
+	/**
+	 *  Init the event, when loaded from xml.
+	 */
+	public static void addExpressionEvents(UnparsedExpression expression, List<EventType> events, MElement owner)
+	{
+		if(expression!=null)// && expression.getParsed() instanceof ExpressionNode)
+		{
+			Set<String>	done	= new HashSet<String>();
+			ParameterNode[]	params	= ((ExpressionNode)expression.getParsed()).getUnboundParameterNodes();
+			for(ParameterNode param: params)
+			{
+				if("$beliefbase".equals(param.getText()))
+				{
+					Node parent	= param.jjtGetParent();
+					if(parent instanceof ReflectNode)
+					{
+						ReflectNode	ref	= (ReflectNode)parent;
+						if(ref.getType()==ReflectNode.FIELD)
+						{
+							// Todo: differentiate between beliefs/sets
+							addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.FACTCHANGED, ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.FACTADDED, ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.FACTREMOVED, ref.getText()));
+						}
+						
+						else if(ref.getType()==ReflectNode.METHOD)
+						{
+							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+							if("getBelief".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(events, new EventType(ChangeEvent.FACTCHANGED, name));
+							}
+							else if("getBeliefSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(events, new EventType(ChangeEvent.FACTCHANGED, name));
+								addEvent(events, new EventType(ChangeEvent.FACTADDED, name));
+								addEvent(events, new EventType(ChangeEvent.FACTREMOVED, name));
+							}
+						}
+					}
+				}
+				
+				else if("$goal".equals(param.getText()) || "$plan".equals(param.getText()))
+				{
+					Node parent	= param.jjtGetParent();
+					if(parent instanceof ReflectNode)
+					{
+						ReflectNode	ref	= (ReflectNode)parent;
+						if(ref.getType()==ReflectNode.FIELD && !done.contains(ref.getText()))
+						{
+							// Todo: differentiate between parameters/sets
+							addEvent(events, new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.VALUECHANGED, owner.getName(), ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.VALUEADDED, owner.getName(), ref.getText()));
+							addEvent(events, new EventType(ChangeEvent.VALUEREMOVED, owner.getName(), ref.getText()));
+						}
+						
+						else if(ref.getType()==ReflectNode.METHOD)
+						{
+							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+							if("getParameter".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), name));
+								addEvent(events, new EventType(ChangeEvent.VALUECHANGED, owner.getName(), name));
+							}
+							else if("getParameterSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.PARAMETERCHANGED, owner.getName(), name));
+								addEvent(events, new EventType(ChangeEvent.VALUECHANGED, owner.getName(), name));
+								addEvent(events, new EventType(ChangeEvent.VALUEADDED, owner.getName(), name));
+								addEvent(events, new EventType(ChangeEvent.VALUEREMOVED, owner.getName(), name));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected static void addEvent(List<EventType> events, EventType event)
+	{
+		if(!events.contains(event))
+			events.add(event);
 	}
 		
 	/**
@@ -2472,4 +2625,13 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			}
 //		};
 //	}
+	
+	/**
+	 *  Get the event type.
+	 *  @return The event adder.
+	 */
+	public Map<EventType, IResultCommand<IFuture<Void>, PropertyChangeEvent>> getEventAdders()
+	{
+		return eventadders;
+	}
 }

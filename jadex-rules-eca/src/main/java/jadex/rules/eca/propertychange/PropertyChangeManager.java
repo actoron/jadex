@@ -22,10 +22,11 @@ public abstract class PropertyChangeManager
 	/** The event list. */
 	protected List<IEvent> events;
 	
-	/** The property change listeners. 
-	 *  Value type must be object, because java.beans/jadex.commons.beans don't share an interface
+	/** 
+	 * The property change listeners. 
+	 * Value type must be object, because java.beans/jadex.commons.beans don't share an interface
 	 */
-	protected Map<Object, Object>	pcls;
+	protected Map<Object, Map<Object, Object>> pcls;
 	
 	/** The argument types for property change listener adding/removal (cached for speed). */
 	protected static Class<?>[]	PCL	= new Class[]{jadex.commons.beans.PropertyChangeListener.class};
@@ -39,7 +40,7 @@ public abstract class PropertyChangeManager
 	/** Returns a new PropertyChangeManager instance **/ 
 	public static PropertyChangeManager createInstance()
 	{
-		if (SReflect.isAndroid()) 
+		if(SReflect.isAndroid()) 
 		{
 			return new PropertyChangeManagerAndroid();
 		} 
@@ -58,7 +59,7 @@ public abstract class PropertyChangeManager
 	 *  Deregister a value for observation.
 	 *  if its a bean then remove the property listener.
 	 */
-	public abstract void removePropertyChangeListener(Object object);
+	public abstract void removePropertyChangeListener(Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder);
 	
 	/**
 	 *  Add an event.

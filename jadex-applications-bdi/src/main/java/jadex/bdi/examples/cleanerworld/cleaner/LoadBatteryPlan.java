@@ -1,8 +1,10 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -43,16 +45,16 @@ public class LoadBatteryPlan extends Plan
 			dispatchSubgoalAndWait(moveto);
 //			System.out.println("Reached: "+location+" "+this);
 
-			SyncResultListener	res	= new SyncResultListener();
-			Map props = new HashMap();
+			Map<String, Object> props = new HashMap<String, Object>();
 			props.put(LoadBatteryTask.PROPERTY_TARGET, station);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 			Object taskid = space.createObjectTask(LoadBatteryTask.PROPERTY_TYPENAME, props, myself.getId());
-			space.addTaskListener(taskid, myself.getId(), res);
+			Future<Void> fut = new Future<Void>();
+			space.addTaskListener(taskid, myself.getId(), new DelegationResultListener<Void>(fut));
 			// Its important to wait for the task, as otherwise the plan is immediately finished and the maintaingoal is failed (one plan, no recur) 
-			res.waitForResult();
+			fut.get();
 //			load = new LoadBatteryTask(station, res);
 //			myself.addTask(load);
 		}

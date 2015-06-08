@@ -1,7 +1,9 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -33,19 +35,12 @@ public class PickUpWastePlan extends Plan
 		dispatchSubgoalAndWait(moveto);
 
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
-		Map params = new HashMap();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 		params.put(ISpaceAction.OBJECT_ID, getParameter("waste").getValue());
-		SyncResultListener srl	= new SyncResultListener();
-		env.performSpaceAction("pickup_waste", params, srl);
-		try
-		{
-			srl.waitForResult();
-		}
-		catch(RuntimeException e)
-		{
-			fail();
-		}
+		Future<Void> fut = new Future<Void>();
+		env.performSpaceAction("pickup_waste", params, new DelegationResultListener<Void>(fut));
+		fut.get();
 	}
 	
 	public void failed()

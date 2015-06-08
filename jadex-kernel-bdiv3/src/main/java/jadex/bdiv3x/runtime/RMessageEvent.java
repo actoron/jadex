@@ -51,7 +51,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameter createParameter(MParameter modelelement, IInternalAccess agent)
 	{
-		return new RParam(modelelement, modelelement.getName(), agent);
+		return new RParam(modelelement, modelelement.getName(), agent, getModelElement().getName());
 	}
 	
 	/**
@@ -59,7 +59,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, Object value)
 	{
-		return new RParam(modelelement, modelelement.getName(), agent, value);
+		return new RParam(modelelement, modelelement.getName(), agent, value, getModelElement().getName());
 	}
 	
 	/**
@@ -67,7 +67,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent)
 	{
-		return new RParamSet(modelelement, modelelement.getName(), agent);
+		return new RParamSet(modelelement, modelelement.getName(), agent, getModelElement().getName());
 	}
 	
 	/**
@@ -75,7 +75,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, Object[] values)
 	{
-		return new RParamSet(modelelement, modelelement.getName(), agent, values);
+		return new RParamSet(modelelement, modelelement.getName(), agent, values, getModelElement().getName());
 	}
 	
 	//-------- methods --------
@@ -122,7 +122,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(!super.hasParameter(name))
 		{
 			MParameter mp = getMMessageEvent().getParameter(name);
-			param = new RParam(mp, name, getAgent());
+			param = new RParam(mp, name, getAgent(), getModelElement().getName());
 			addParameter(param);
 		}
 		else
@@ -147,7 +147,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(!super.hasParameterSet(name))
 		{
 			MParameter mp = getMMessageEvent().getParameter(name);
-			paramset = new RParamSet(mp, name, getAgent());
+			paramset = new RParamSet(mp, name, getAgent(), getModelElement().getName());
 			addParameterSet(paramset);
 		}
 		else
@@ -222,9 +222,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParam(MParameter modelelement, String name, IInternalAccess agent)
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, String pename)
 		{
-			super(modelelement, name, agent, agent.getFetcher());
+			super(modelelement, name, agent, agent.getFetcher(), pename);
 		}
 		
 		/**
@@ -232,9 +232,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParam(MParameter modelelement, String name, IInternalAccess agent, Object value)
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, Object value, String pename)
 		{
-			super(modelelement, name, agent, value);
+			super(modelelement, name, agent, value, pename);
 		}
 		
 		/**
@@ -267,9 +267,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParamSet(MParameter modelelement, String name, IInternalAccess agent)
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, String pename)
 		{
-			super(modelelement, name, agent, agent.getFetcher());
+			super(modelelement, name, agent, agent.getFetcher(), pename);
 		}
 		
 		/**
@@ -277,9 +277,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, Object[] values)
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, Object[] values, String pename)
 		{
-			super(modelelement, name, agent, values);
+			super(modelelement, name, agent, values, pename);
 		}
 		
 		/**

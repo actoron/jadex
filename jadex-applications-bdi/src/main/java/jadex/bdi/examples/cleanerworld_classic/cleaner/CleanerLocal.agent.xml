@@ -64,7 +64,7 @@
 
 		<!-- The current cleaner location. -->
 		<belief name="my_location"  class="Location">
-			<fact>new Location(0.2, 0.2)</fact>
+			<fact>new Location(0.5, 0.5)</fact>
 		</belief>
 
 		<!-- The speed. -->
@@ -112,9 +112,9 @@
 		<!-- Observe the battery state. -->
 		<maintaingoal name="maintainbatteryloaded">
 			<deliberation>
-				<inhibits ref="performlookforwaste" inhibit="when_in_process"/>
-				<inhibits ref="achievecleanup" inhibit="when_in_process"/>
-				<inhibits ref="performpatrol" inhibit="when_in_process"/>
+				<inhibits ref="performlookforwaste"/>
+				<inhibits ref="achievecleanup"/>
+				<inhibits ref="performpatrol"/>
 			</deliberation>
 			<!-- Engage in actions when the state is below 0.2. -->
  			<maintaincondition language="jcl">
@@ -135,6 +135,7 @@
 			<unique/>
 			<!-- Create a new goal when new waste is seen and
 				the agent isnt already cleaning. -->
+			<!-- <creationcondition beliefs="wastes">-->
 			<creationcondition beliefs="wastes">
 				true
 			</creationcondition>
@@ -152,8 +153,10 @@
 			<deliberation> <!--   cardinality="1"> -->
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup">
+					$goal.waste.equals($beliefbase.carriedwaste) || 
+					(!$ref.waste.equals($beliefbase.carriedwaste) &amp;&amp;
 					$beliefbase.my_location.getDistance($goal.waste.getLocation())
-					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation()))
 				</inhibits>
 			</deliberation>
 			<!-- The goal is achieved when the waste is in some wastebin. -->
@@ -435,9 +438,9 @@
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="performlookforwaste"/>
-  				<!--  <initialgoal ref="performpatrol"/>
+  				<initialgoal ref="performpatrol"/>
 		  		<initialgoal ref="maintainbatteryloaded"/>
-				<initialgoal ref="performmemorizepositions"/> -->
+				<initialgoal ref="performmemorizepositions"/>
 			</goals>
 		</configuration>
 	</configurations>

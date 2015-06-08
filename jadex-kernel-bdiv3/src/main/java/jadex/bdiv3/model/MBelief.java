@@ -105,7 +105,8 @@ public class MBelief extends MElement
 			}
 		}
 		this.rawevents = rawevents;
-		
+
+		// Set to push if user specified event dependencies (not if only deduced from an expression)
 		if(this.beliefevents.size()>0 || (this.rawevents!=null && this.rawevents.size()>0))
 			this.evaluationmode = MParameter.EvaluationMode.PUSH;
 		

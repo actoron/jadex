@@ -213,13 +213,13 @@ public class MoveToLocationPlan extends Plan
 //		System.out.println("update vision: "+(System.currentTimeMillis()-start));
 	}
 	
-	public void aborted()
-	{
-		System.out.println("Aborted: "+this);
-	}
-	
-	public void failed()
-	{
-		System.out.println("Failed: "+this);
-	}
+//	public void aborted()
+//	{
+//		System.out.println("Aborted: "+this);
+//	}
+//	
+//	public void failed()
+//	{
+//		System.out.println("Failed: "+this);
+//	}
 }

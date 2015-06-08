@@ -38,6 +38,9 @@ public class EventPublisher
 	
 	/** The belief model. */
 	protected MElement melement;
+	
+	/** The event adder. */
+	protected IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder;
 
 	/**
 	 *  Create a new publisher.
@@ -59,14 +62,72 @@ public class EventPublisher
 	/**
 	 *  Create a new publisher.
 	 */
-	public EventPublisher(IInternalAccess agent, 
-		EventType addevent, EventType remevent, EventType changeevent, MElement melement)
+	public EventPublisher(final IInternalAccess agent, 
+		EventType addevent, EventType remevent, final EventType changeevent, MElement melement)
 	{
 		this.agent = agent;
 		this.addevent = addevent;
 		this.remevent = remevent;
 		this.changeevent = changeevent;
 		this.melement = melement;
+		
+		eventadder = new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
+		{
+			final IResultCommand<IFuture<Void>, PropertyChangeEvent> self = this;
+			public IFuture<Void> execute(final PropertyChangeEvent event)
+			{
+				final Future<Void> ret = new Future<Void>();
+				try
+				{
+					if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
+					{
+						IFuture<Void> fut = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								publishToolBeliefEvent();
+								Event ev = new Event(changeevent, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
+								getRuleSystem().addEvent(ev);
+								return IFuture.DONE;
+//								return new Future<IEvent>(ev);
+							}
+						});
+						fut.addResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ComponentTerminatedException)
+								{
+//									System.out.println("Ex in observe: "+exception.getMessage());
+									Object val = event.getSource();
+									getRuleSystem().unobserveObject(val, self);
+									ret.setResult(null);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						});
+					}
+					else
+					{
+						publishToolBeliefEvent();
+						Event ev = new Event(changeevent, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
+						getRuleSystem().addEvent(ev);
+					}
+				}
+				catch(Exception e)
+				{
+					if(!(e instanceof ComponentTerminatedException))
+						System.out.println("Ex in observe: "+e.getMessage());
+					Object val = event.getSource();
+					getRuleSystem().unobserveObject(val, self);
+					ret.setResult(null);
+				}
+				return ret;
+			}
+		};
 	}
 	
 //	/**
@@ -93,53 +154,7 @@ public class EventPublisher
 	public void observeValue(final Object val)
 	{
 		if(val!=null)
-		{
-			getRuleSystem().observeObject(val, true, false, new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
-			{
-				public IFuture<Void> execute(final PropertyChangeEvent event)
-				{
-					final Future<Void> ret = new Future<Void>();
-					try
-					{
-						IFuture<Void> fut = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								publishToolBeliefEvent();
-								Event ev = new Event(changeevent, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
-								getRuleSystem().addEvent(ev);
-								return IFuture.DONE;
-//								return new Future<IEvent>(ev);
-							}
-						});
-						fut.addResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ComponentTerminatedException)
-								{
-//									System.out.println("Ex in observe: "+exception.getMessage());
-									getRuleSystem().unobserveObject(val);
-									ret.setResult(null);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
-						});
-					}
-					catch(Exception e)
-					{
-						if(!(e instanceof ComponentTerminatedException))
-							System.out.println("Ex in observe: "+e.getMessage());
-						getRuleSystem().unobserveObject(val);
-						ret.setResult(null);
-					}
-					return ret;
-				}
-			});
-		}
+			getRuleSystem().observeObject(val, true, false, eventadder);
 	}
 
 	/**
@@ -147,7 +162,7 @@ public class EventPublisher
 	 */
 	public void unobserveValue(Object val)
 	{
-		getRuleSystem().unobserveObject(val);
+		getRuleSystem().unobserveObject(val, eventadder);
 	}
 	
 	/**

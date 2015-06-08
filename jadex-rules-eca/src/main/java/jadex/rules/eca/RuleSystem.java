@@ -75,6 +75,9 @@ public class RuleSystem
 		// Create proxy object if eventcreators are present
 		Object proxy = object;
 					
+//		if(object.getClass().getName().indexOf("Wastebin")!=-1)
+//			System.out.println("sdfsdff");
+		
 		Class<?> clazz = object.getClass();
 
 		if(bean && !(object instanceof Class))
@@ -184,12 +187,15 @@ public class RuleSystem
 	/**
 	 *  Unobserve an object.
 	 */
-	public void unobserveObject(final Object object)
+	public void unobserveObject(final Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
 	{
 		if(object==null)
 			return;
 		
-		pcman.removePropertyChangeListener(object);
+//		if(object.getClass().getName().indexOf("Wastebin")!=-1)
+//			System.out.println("sdfsdff");
+		
+		pcman.removePropertyChangeListener(object, eventadder);
 
 		Tuple2<Object, IRule<?>[]> tup = rules.remove(object);
 		if(tup!=null)
@@ -519,6 +525,8 @@ public class RuleSystem
 //			System.out.println("herer: "+event.getType());
 //		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
 //			&& event.getType().getType(1).indexOf("Ambu")!=-1)
+//			System.out.println("add event: "+event);
+//		if(event.getType().getType(0).indexOf("factadded")!=-1 && event.getType().getType(1).indexOf("wastebins")!=-1)
 //			System.out.println("add event: "+event);
 
 		pcman.addEvent(event);

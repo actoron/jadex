@@ -1,7 +1,9 @@
 package jadex.bdi.examples.garbagecollector;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -39,11 +41,11 @@ public class TakePlanEnv extends Plan
 
 		// Put down the garbarge.
 //		System.out.println("Calling drop: "+getAgentName());
-		Map params = new HashMap();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
-		SyncResultListener srl	= new SyncResultListener();
-		grid.performSpaceAction("drop", params, srl);
-		srl.waitForResult();
+		Future<Void> fut = new Future<Void>();
+		grid.performSpaceAction("drop", params, new DelegationResultListener<Void>(fut));
+		fut.get();
 		
 		// Go back.
 		IGoal goback = createGoal("go");

@@ -7,10 +7,15 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.commons.IResultCommand;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.future.IFuture;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.RuleSystem;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  *  Methods internally called on the BDI agent feature. 
@@ -41,6 +46,12 @@ public interface IInternalBDIAgentFeature extends IBDIAgentFeature
 	 */
 	public RuleSystem getRuleSystem();
 
+	/**
+	 *  Get the event adders map.
+	 *  @return The event adders.
+	 */
+	public Map<EventType, IResultCommand<IFuture<Void>, PropertyChangeEvent>> getEventAdders();
+	
 //	/**
 //	 *  Get parameter values for injection into method and constructor calls.
 //	 */

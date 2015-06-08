@@ -9,6 +9,7 @@ import jadex.commons.future.IFuture;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Supports Usage of java.beans and jadex.commons.beans types in watched objects.  
@@ -23,7 +24,6 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 	 */
 	protected PropertyChangeManagerDesktop()
 	{
-		super();
 	}
 	
 	/**  
@@ -37,8 +37,9 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 			try
 			{
 				if(pcls==null)
-					pcls = new IdentityHashMap<Object, Object>(); // values may change, therefore identity hash map
-				Object pcl = pcls.get(object);
+					pcls = new IdentityHashMap<Object, Map<Object, Object>>(); // values may change, therefore identity hash map
+				Map<Object, Object> mypcls = pcls.get(object);
+				Object pcl = mypcls==null? null: mypcls.get(eventadder);
 				
 				// check if java.beans or jadex.commons are used:
 				boolean javaBeans = false;
@@ -56,6 +57,12 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 				if(pcl==null)
 				{
 					PropertyChangeListener jadexPcl = createPCL(eventadder);
+					if(mypcls==null)
+					{
+						mypcls = new IdentityHashMap<Object, Object>();
+						pcls.put(object, mypcls);
+					}
+					
 					if(javaBeans) 
 					{
 						pcl = wrapJadexPcl(jadexPcl);
@@ -64,13 +71,15 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 					{
 						pcl = jadexPcl;
 					}
+					
+					mypcls.put(eventadder, pcl);
 				}
 				
 				if(meth!=null)
 				{
 					meth.invoke(object, new Object[]{pcl});	
 				}
-				pcls.put(object, pcl);
+				mypcls.put(object, pcl);
 			}
 			catch(IllegalAccessException e){e.printStackTrace();}
 			catch(InvocationTargetException e){e.printStackTrace();}
@@ -99,7 +108,7 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 	 *  Deregister a value for observation.
 	 *  if its a bean then remove the property listener.
 	 */
-	public void	removePropertyChangeListener(Object object)
+	public void	removePropertyChangeListener(Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
 	{
 		if(object!=null)
 		{
@@ -107,30 +116,55 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 			// Stop listening for bean events.
 			if(pcls!=null)
 			{
-				Object pcl = pcls.remove(object);
-				if(pcl!=null)
+				Map<Object, Object> mypcls = pcls.get(object);
+				if(mypcls!=null)
 				{
-					try
+					if(eventadder!=null)
 					{
-//						System.out.println(getTypeModel().getName()+": Deregister: "+value+", "+type);						
-						// Do not use Class.getMethod (slow).
-						Method	meth = null;
-						if(pcl instanceof jadex.commons.beans.PropertyChangeListener) 
-						{
-							meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", PCL);
-						} 
-						else 
-						{
-							meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", JAVABEANS_PCL);
-						}
-						
-						if(meth!=null)
-							meth.invoke(object, new Object[]{pcl});
+						Object pcl = mypcls.remove(eventadder);
+						removePCL(object, pcl);
 					}
-					catch(IllegalAccessException e){e.printStackTrace();}
-					catch(InvocationTargetException e){e.printStackTrace();}
+					else
+					{
+						for(Object pcl: mypcls.values())
+						{
+							removePCL(object, pcl);
+						}
+						mypcls.clear();
+					}
+					if(mypcls.size()==0)
+						pcls.remove(object);
 				}
 			}
+		}
+	}
+		
+	/**
+	 * 
+	 */
+	protected void removePCL(Object object, Object pcl)
+	{
+		if(pcl!=null)
+		{
+			try
+			{
+//				System.out.println(getTypeModel().getName()+": Deregister: "+value+", "+type);						
+				// Do not use Class.getMethod (slow).
+				Method	meth = null;
+				if(pcl instanceof jadex.commons.beans.PropertyChangeListener) 
+				{
+					meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", PCL);
+				} 
+				else 
+				{
+					meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", JAVABEANS_PCL);
+				}
+				
+				if(meth!=null)
+					meth.invoke(object, new Object[]{pcl});
+			}
+			catch(IllegalAccessException e){e.printStackTrace();}
+			catch(InvocationTargetException e){e.printStackTrace();}
 		}
 	}
 

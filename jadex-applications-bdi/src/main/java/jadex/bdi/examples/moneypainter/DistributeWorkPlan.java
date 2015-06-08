@@ -1,10 +1,7 @@
 package jadex.bdi.examples.moneypainter;
 
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
 /**
@@ -35,7 +32,6 @@ public class DistributeWorkPlan extends Plan
 	public void createOneEuroSubgoal()
 	{
 		final IGoal getone = createGoal("getoneeuro");
-		final Object handle = ((GoalFlyweight)getone).getHandle();
 		getone.addGoalListener(new IGoalListener()
 		{
 			public void goalFinished(AgentEvent ae)

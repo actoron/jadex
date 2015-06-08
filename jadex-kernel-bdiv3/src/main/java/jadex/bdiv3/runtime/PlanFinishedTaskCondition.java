@@ -11,7 +11,7 @@ public class PlanFinishedTaskCondition implements IBooleanCondition
 	//-------- attributes --------
 	
 	/** The finished flag. */
-	protected boolean	finished;
+	protected IPlan	plan;
 	
 	//-------- constructors --------
 	
@@ -21,14 +21,7 @@ public class PlanFinishedTaskCondition implements IBooleanCondition
 	 */
 	public PlanFinishedTaskCondition(final IPlan plan)
 	{
-		plan.addPlanListener(new IPlanListener<Object>()
-		{	
-			public void planFinished(Object result)
-			{
-//				System.out.println("plan fini: "+plan);
-				finished	= true;
-			}
-		});
+		this.plan = plan;
 	}
 	
 	//-------- IBooleanCondition interface --------
@@ -39,6 +32,6 @@ public class PlanFinishedTaskCondition implements IBooleanCondition
 	 */
 	public boolean isValid()
 	{
-		return !finished;
+		return !plan.isFinished();
 	}
 }
