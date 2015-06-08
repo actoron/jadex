@@ -1,6 +1,7 @@
 package jadex.bdiv3x.runtime;
 
 import jadex.bdiv3.runtime.IGoal;
+import jadex.commons.future.IFuture;
 
 
 /**
@@ -49,7 +50,7 @@ public interface IGoalbase extends IElement
 	 *  Dispatch a new top-level goal.
 	 *  @param goal The new goal.
 	 */
-	public void	dispatchTopLevelGoal(IGoal goal);
+	public <T>	IFuture<T>	dispatchTopLevelGoal(IGoal goal);
 
 	/**
 	 *  Register a new goal model.

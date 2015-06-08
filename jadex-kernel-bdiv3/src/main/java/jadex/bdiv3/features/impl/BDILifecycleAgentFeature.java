@@ -1043,12 +1043,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								}
 								else
 								{
-									if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+									if(!goal.isFinished() && evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 									{
-										if(!goal.isFinished())
-										{
-											goal.targetConditionTriggered(component, event, rule, context);
-										}
+										goal.targetConditionTriggered(component, event, rule, context);
 									}
 								}
 							}

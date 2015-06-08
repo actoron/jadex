@@ -185,9 +185,9 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		<achievegoal name="configure">
 			<parameter name="configuration" class="Table" />
  			<parameterset name="blocks" class="Block"/>
-			<targetcondition>
+			<targetcondition beliefs="blocks">
 				$beliefbase.table.configurationEquals($goal.configuration)
-<!-- 				<relevantbeliefset ref="blocks"/> -->
+<!--  				<relevantbeliefset ref="blocks"/> -->
 <!-- 
 				// There is no block on the table for which there is no block in the configuration
 				!(Block $block1 &amp;&amp;

@@ -30,7 +30,6 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.eca.Event;

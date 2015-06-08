@@ -1239,10 +1239,30 @@ In the configurations section, predefined
 	</xs:complexType>
 	<xs:complexType name="MCondition" mixed="true">
 		<xs:annotation>
-			<xs:documentation>An expression that is monitored.</xs:documentation>
+			<xs:documentation>
+				An expression that is monitored.
+			</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MExpression"/>
+			<xs:extension base="MExpression">
+				<xs:attribute name="beliefs" type="xs:string"
+					use="optional">
+					<xs:annotation>
+						<xs:documentation>
+							The beliefs on which the condition depends.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="parameters" type="xs:string"
+					use="optional">
+					<xs:annotation>
+						<xs:documentation>
+							The parameters (i.e. for goal and plan
+							conditions) on which the condition depends.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MInternalCondition" mixed="true">
@@ -1250,7 +1270,25 @@ In the configurations section, predefined
 			<xs:documentation>For conditions that are not conatined in the expressionbase. Cannot be exported.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MInternalExpression"/>
+			<xs:extension base="MInternalExpression">
+				<xs:attribute name="beliefs" type="xs:string"
+					use="optional">
+					<xs:annotation>
+						<xs:documentation>
+							The beliefs on which the condition depends.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="parameters" type="xs:string"
+					use="optional">
+					<xs:annotation>
+						<xs:documentation>
+							The parameters (i.e. for goal and plan
+							conditions) on which the condition depends.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MCapabilityReference">

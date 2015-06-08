@@ -12,8 +12,10 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.Dialog;
@@ -254,19 +256,21 @@ public class AlarmSettingsDialog extends JDialog
 								RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 								playing = bia.getGoalbase().createGoal("play_song");
 								playing.getParameter("song").setValue(song);
-								playing.addGoalListener(new IGoalListener()
+								bia.getGoalbase().dispatchTopLevelGoal(playing)
+									.addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
 								{
-									public void goalFinished(AgentEvent ae)
+									public void exceptionOccurred(Exception exception)
 									{
 										play.setIcon(icons.getIcon("Play"));
 										stopPlaying();
 									}
 									
-									public void goalAdded(AgentEvent ae)
+									public void resultAvailable(Object result)
 									{
+										play.setIcon(icons.getIcon("Play"));
+										stopPlaying();
 									}
-								});
-								bia.getGoalbase().dispatchTopLevelGoal(playing);
+								}));
 								return IFuture.DONE;
 							}
 						});

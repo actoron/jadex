@@ -7,6 +7,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 
 import java.util.Collection;
 
@@ -82,9 +83,9 @@ public class RGoalbase extends RElement implements IGoalbase
 	 *  Dispatch a new top-level goal.
 	 *  @param goal The new goal.
 	 */
-	public void	dispatchTopLevelGoal(IGoal goal)
+	public <T>	IFuture<T>	dispatchTopLevelGoal(IGoal goal)
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
+		return agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
 	}
 
 	/**
