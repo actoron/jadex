@@ -989,6 +989,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			catch(Throwable t)
 			{
 				ex = t;
+				
+				if(!(t instanceof StepAborted))
+				{
+					StringWriter	sw	= new StringWriter();
+					t.printStackTrace(new PrintWriter(sw));
+					getComponent().getLogger().warning("Component step threw hard exception: "+step.getStep()+"\n"+sw);
+				}
 			}
 			
 			if(ex!=null)

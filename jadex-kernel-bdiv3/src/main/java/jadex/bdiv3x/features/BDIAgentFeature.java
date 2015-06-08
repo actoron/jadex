@@ -30,6 +30,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bdiv3x.runtime.RBeliefbase;
+import jadex.bdiv3x.runtime.REventbase;
 import jadex.bdiv3x.runtime.RExpressionbase;
 import jadex.bdiv3x.runtime.RGoalbase;
 import jadex.bridge.IInternalAccess;
@@ -133,6 +134,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		RGoalbase gb = new RGoalbase(getComponent());
 		getCapability().setGoalbase(gb);
+
+		REventbase evb = new REventbase(getComponent());
+		getCapability().setEventbase(evb);
 
 		// cannot do this in constructor because it needs access to this feature in expressions
 	
