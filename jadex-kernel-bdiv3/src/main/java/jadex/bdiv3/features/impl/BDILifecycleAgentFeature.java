@@ -1015,6 +1015,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						public IFuture<Void> execute(final IEvent event, final IRule<Void> rule, final Object context, Object condresult)
 						{
+							if(mgoal.getName().indexOf("cleanup")!=-1)
+								System.out.println("target test");
+							
 							for(final RGoal goal: bdif.getCapability().getGoals(mgoal))
 							{
 								if(m!=null)

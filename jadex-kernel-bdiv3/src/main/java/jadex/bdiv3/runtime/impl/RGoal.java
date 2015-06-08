@@ -412,8 +412,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		
 		if(GoalLifecycleState.DROPPING.equals(lifecyclestate))
 		{
-//			if(getId().indexOf("AchieveCleanup")!=-1)
-//				System.out.println("dropping achievecleanup");
+			if(getId().indexOf("cleanup")!=-1)
+				System.out.println("dropping achievecleanup: "+lifecyclestate+" "+processingstate);
 			
 //			if(getId().indexOf("cleanup")!=-1)
 //				System.out.println("dropping: "+getId());

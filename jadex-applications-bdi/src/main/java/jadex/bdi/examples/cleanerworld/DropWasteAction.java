@@ -10,6 +10,7 @@ import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 	 * @param space the environment space
 	 * @return action return value
 	 */
-	public Object perform(Map parameters, IEnvironmentSpace space)
+	public Object perform(Map<String, Object> parameters, IEnvironmentSpace space)
 	{	
 		Space2D env = (Space2D)space;
 		
@@ -43,12 +44,14 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 		if(((Boolean)wastebin.getProperty("full")).booleanValue())
 			throw new RuntimeException("Wastebin already full: "+wastebin+" "+avatar);
 
+		HashSet<Object> wasteids = (HashSet<Object>)wastebin.getProperty("wasteids");
+		wasteids.add(waste.getId());
 		int wastes = ((Integer)wastebin.getProperty("wastes")).intValue();
 		wastebin.setProperty("wastes", Integer.valueOf(wastes+1));
 		env.destroySpaceObject(waste.getId());
 		avatar.setProperty("waste", null);
 
-//		System.out.println("pickup waste action "+parameters);
+		System.out.println("drop waste action finished: "+parameters);
 
 		return null;
 	}

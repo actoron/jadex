@@ -3007,6 +3007,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		return classloader;
 	}
+	
+	/**
+	 *  Get the object type.
+	 */
+	public MObjectType getSpaceObjectType(String type)
+	{
+		return (MObjectType)objecttypes.get(type);
+	}
 
 //	/**
 //	 * @return the _areaSize

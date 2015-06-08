@@ -129,35 +129,35 @@
 			<creationcondition language="jcl" beliefs="wastes">
 				true
 			</creationcondition>
-			<contextcondition language="jcl">
+			<!-- <contextcondition language="jcl">
 				$beliefbase.daytime
- 			</contextcondition>
+ 			</contextcondition> -->
 			<dropcondition language="jcl">
 				$beliefbase.myself.waste==null &amp;&amp;
 					!$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
  			</dropcondition>
 			<!-- <deliberation cardinality="1"> -->
-			<deliberation>
+			<deliberation cardinalityone="true">
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup" language="jcl">
-					$goal.waste.equals($beliefbase.myself.waste) || 
-					(!$ref.waste.equals($beliefbase.myself.waste) &amp;&amp;
-					$beliefbase.my_location.getDistance($goal.waste.getLocation())
-					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation()))
+					$goal.waste.equals($beliefbase.myself.waste) || $goal.waste.position==null || 
+					(!$ref.waste.equals($beliefbase.myself.waste) &amp;&amp; !($ref.waste.position==null) &amp;&amp;
+					$beliefbase.my_location.getDistance($goal.waste.position).getAsDouble()
+					&lt; $beliefbase.my_location.getDistance($ref.waste.position).getAsDouble())
 				</inhibits>
 			</deliberation>
-			<!-- <targetcondition>
+			<targetcondition>
 				(select one ISpaceObject $wastebin from $beliefbase.wastebins
-				where $wastebin.contains($goal.waste))!=null
-			</targetcondition>-->
+				where $wastebin.wasteids.contains($goal.waste.getId()))!=null
+			</targetcondition>
 		</achievegoal>
 
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
-			<contextcondition language="jcl">
+			<!-- <contextcondition language="jcl">
 				$beliefbase.daytime
- 			</contextcondition>
+ 			</contextcondition> -->
  		</performgoal>
 
 		<!-- Perform patrols at night when the agent is not loading. -->
@@ -203,7 +203,7 @@
 					select one ISpaceObject $wastebin
 					from $beliefbase.wastebins
 					where !$wastebin.full
-					order by $beliefbase.my_location.getDistance($wastebin.location)
+					order by $beliefbase.my_location.getDistance($wastebin.position).getAsDouble()
 				</value>
 			</parameter>
 		</querygoal>
@@ -214,7 +214,7 @@
 				<value language="jcl">
 					select one ISpaceObject $station
 					from $beliefbase.chargingstations
-					order by $beliefbase.my_location.getDistance($station.location)
+					order by $beliefbase.my_location.getDistance($station.position).getAsDouble()
 				</value>
 			</parameter>
 		</querygoal>
@@ -378,8 +378,8 @@
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="performlookforwaste"/>
-  				<initialgoal ref="performpatrol"/>
-		  		<initialgoal ref="maintainbatteryloaded"/>
+  				<!-- <initialgoal ref="performpatrol"/>
+		  		<initialgoal ref="maintainbatteryloaded"/>-->
 				<initialgoal ref="performmemorizepositions"/>
 			</goals>
 		</configuration>

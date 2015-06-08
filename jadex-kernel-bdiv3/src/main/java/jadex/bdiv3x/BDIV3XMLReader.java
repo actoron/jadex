@@ -323,7 +323,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), new ObjectInfo(OAVBDIMetaModel.metagoaltrigger_type)));
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "deliberation")), new ObjectInfo(MDeliberation.class),
-			new MappingInfo(null, null, new SubobjectInfo[]{new SubobjectInfo(new XMLInfo(new QName(uri, "inhibits")), new AccessInfo("inhibits", "inhibitionExpression"))})));
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cardinalityone", "cardinalityOne"))}, 
+			new SubobjectInfo[]{new SubobjectInfo(new XMLInfo(new QName(uri, "inhibits")), new AccessInfo("inhibits", "inhibitionExpression"))})));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "inhibits")}), new ObjectInfo(UnparsedExpression.class, null),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{

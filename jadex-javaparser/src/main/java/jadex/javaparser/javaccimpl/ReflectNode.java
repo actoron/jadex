@@ -486,7 +486,7 @@ public class ReflectNode	extends ExpressionNode
  			}
 			
 			// Handle IPropertyObject
-			else if(type==FIELD && ref!=null && ref instanceof IPropertyObject)
+			else if(type==FIELD && ref instanceof IPropertyObject && ((IPropertyObject)ref).hasProperty(getText()))
 			{
 				value = ((IPropertyObject)ref).getProperty(getText());
 			}

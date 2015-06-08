@@ -95,12 +95,13 @@ public abstract class SynchronizedPropertyObject extends TypedPropertyObject
 			pcs.firePropertyChange(name, oldval, value);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see jadex.commons.SimplePropertyObject#hasProperty(java.lang.String)
+	/**
+	 *  Test if has a property.
 	 */
-	public boolean hasProperty(String name) {
-		synchronized (monitor) {
+	public boolean hasProperty(String name) 
+	{
+		synchronized (monitor) 
+		{
 			return super.hasProperty(name);
 		}
 	}

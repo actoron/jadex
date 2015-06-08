@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.environment;
 
 import jadex.extension.envsupport.MObjectType;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
@@ -111,8 +112,8 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 */
 	public void setProperty(String name, Object value)
 	{
-//		if(getType().equals("cleaner") && name.equals(Space2D.PROPERTY_POSITION))
-//			System.out.println("Setting: "+name+" "+value);
+		if(getType().equals("waste") && name.equals(Space2D.PROPERTY_POSITION))
+			System.out.println("Setting: "+name+" "+value);
 		
 		Object	oldvalue;
 		synchronized(getMonitor())
@@ -372,6 +373,23 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 		{
 			String	prop	= (String)it.next();
 			ret.put(prop, getProperty(prop));
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Test if has a property.
+	 */
+	public boolean hasProperty(String name) 
+	{
+		boolean ret = false;
+		synchronized(monitor) 
+		{
+			MObjectType type = space.getSpaceObjectType(typename);
+			if(type!=null)
+			{
+				ret = type.getProperty(name)!=null;
+			}
 		}
 		return ret;
 	}

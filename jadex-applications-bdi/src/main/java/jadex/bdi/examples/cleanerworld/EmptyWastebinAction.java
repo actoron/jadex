@@ -5,6 +5,7 @@ import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -22,6 +23,7 @@ public class EmptyWastebinAction  extends SimplePropertyObject implements ISpace
 	{
 		ISpaceObject wastebin = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
 		wastebin.setProperty("wastes", Integer.valueOf(0));
+		wastebin.setProperty("wasteids", new HashSet<Object>());
 		return Boolean.TRUE;
 	}
 }

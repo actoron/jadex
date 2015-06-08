@@ -34,9 +34,9 @@ public class DropWastePlan extends Plan
 		IVector2 location = (IVector2)wastebin.getProperty(Space2D.PROPERTY_POSITION);
 		IGoal moveto = createGoal("achievemoveto");
 		moveto.getParameter("location").setValue(location);
-//		System.out.println("Created dwp: "+location+" "+this);
+		System.out.println("Created dwp: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
-//		System.out.println("Reached: "+location+" "+this);		
+		System.out.println("Reached: "+location+" "+this);		
 
 		// Drop waste to waste-bin.
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
@@ -57,13 +57,18 @@ public class DropWastePlan extends Plan
 		}
 	}
 
+	public void passed()
+	{
+		System.err.println("passed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+	}
+	
 	public void failed()
 	{
-//		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
 	}
 
 	public void aborted()
 	{
-//		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
 	}
 }

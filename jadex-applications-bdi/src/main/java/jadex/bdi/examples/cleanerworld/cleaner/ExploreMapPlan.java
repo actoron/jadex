@@ -37,7 +37,7 @@ public class ExploreMapPlan extends Plan
 		Space2D env = (Space2D)getBeliefbase().getBelief("environment").getFact();
 		IVector2 mypos = (IVector2)getBeliefbase().getBelief("my_location").getFact();
 
-		List	mps = (List)getExpression("query_min_quantity").execute();
+		List<MapPoint> mps = (List<MapPoint>)getExpression("query_min_quantity").execute();
 		MapPoint mp = (MapPoint)mps.get(0);
 		IVector1 dist = env.getDistance(mypos, mp.getLocation());
 		int cnt	= 1;

@@ -382,8 +382,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public void setFact(Object value)
 		{
-			if(getName().equals("myself"))
-				System.out.println("belief set val: "+value);
+//			if(getName().equals("myself"))
+//				System.out.println("belief set val: "+value);
 			Object oldvalue = value;
 			this.value = value;
 			publisher.entryChanged(oldvalue, value, -1);

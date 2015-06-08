@@ -49,6 +49,7 @@
 					<env:property name="chargestate">1.0</env:property>
 					<env:property name="waste" />
 					<env:property name="position" event="true"/>
+					<env:property name="owner"/>
 				</env:objecttype>
 				
 				<env:objecttype name="truck">
@@ -56,18 +57,24 @@
 					<env:property name="speed">0.2</env:property>
 					<env:property name="chargestate">1.0</env:property>
 					<env:property name="position">new Vector2Double(0, 0.5)</env:property>
+					<env:property name="owner"/>
 				</env:objecttype>
 				
-				<env:objecttype name="waste" />
+				<env:objecttype name="waste">
+					<env:property name="position"/>
+				</env:objecttype>
 				
 				<env:objecttype name="chargingstation">
+					<env:property name="position"/>
 					<!-- <property name="name">"Chargingstation%n"</property>  -->
 				</env:objecttype>
 				
 				<env:objecttype name="wastebin">
 					<env:property name="wastes">0</env:property>
+					<env:property name="wasteids">new java.util.HashSet()</env:property>
 					<env:property name="capacity">3</env:property>
 					<env:property name="full" dynamic="true">$object.wastes &gt;= $object.capacity</env:property>
+					<env:property name="position"/>
 				</env:objecttype>
 			</env:objecttypes>
 			
