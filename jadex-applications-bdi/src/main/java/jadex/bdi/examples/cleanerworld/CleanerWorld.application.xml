@@ -27,12 +27,19 @@
 		<import>jadex.commons.future.*</import>
 	</imports>
 	
+	<services>
+		<providedservice class="jadex.extension.envsupport.IEnvironmentService">
+			<implementation class="jadex.extension.envsupport.EnvironmentService"/>
+		</providedservice>
+	</services>
+	
 	<extensiontypes>
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:property name="border">Space2D.BORDER_STRICT</env:property>
-			<env:property name="time" dynamic="true">$properties.clock.getTime()</env:property>
+			<env:property name="time" dynamic="true">((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()</env:property>
 			<env:property name="timeofday" dynamic="true">(int)($space.time %86400)</env:property>
 			<env:property name="daytime" dynamic="true">$space.timeofday &lt; 43200</env:property>
+			<env:property name="readabletime" dynamic="true">CleanerGui.formatDaytime($space.timeofday)</env:property>
 			<!-- <env:property name="alpha" dynamic="true">100-(int)(Math.sin($space.timeofday/86400.0*2*Math.PI)*50+50)</env:property> -->
 	
 			<env:objecttypes>

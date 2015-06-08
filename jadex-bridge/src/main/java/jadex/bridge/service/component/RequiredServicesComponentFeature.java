@@ -493,6 +493,9 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> IFuture<T> searchService(final Class<T> type, String scope)
 	{
+//		if(type.getName().toLowerCase().indexOf("environment")!=-1)
+//			System.out.println("dghfhj");
+		
 		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getService(getComponent(), type, scope).addResultListener(new DelegationResultListener<T>(fut)
 		{

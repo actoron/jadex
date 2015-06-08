@@ -32,7 +32,8 @@
 
 	<beliefs>
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
+ 			<fact class="ContinuousSpace2D">jadex.extension.envsupport.EnvironmentService.getSpace($component).get()</fact>
+ 			<!-- $scope.getParentAccess().getExtension("my2dspace") -->
  		</belief>
  		
  		<belief name="myself" class="ISpaceObject" exported="true">
@@ -126,7 +127,7 @@
 				<bindingoptions>$beliefbase.wastes</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl">
+			<creationcondition language="jcl" beliefs="wastes">
 				true
 			</creationcondition>
 			<contextcondition language="jcl">

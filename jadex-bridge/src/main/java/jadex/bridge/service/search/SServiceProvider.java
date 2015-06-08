@@ -54,6 +54,39 @@ public class SServiceProvider
 	//-------- sync method (only local search) --------
 	
 	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(IComponentIdentifier component, Class<T> type)
+	{
+		return getLocalService(component, type);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(IComponentIdentifier component, Class<T> type, final String scope)
+	{
+		return getLocalService(component, type, scope, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(IComponentIdentifier component, final Class<T> type, final String scope, final IFilter<T> filter)
+	{
+		return PlatformServiceRegistry.getRegistry(component.getRoot()).searchService(type, component, scope, filter);
+	}
+	
+	/**
 	 *  Get one service of a type. 
 	 *  (Returns required service proxy).
 	 *  @param type The class.

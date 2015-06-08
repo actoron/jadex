@@ -75,29 +75,29 @@ public class RElement
 		this.id = id;
 	}
 
-	/** 
-	 *  Get the hashcode.
-	 *  @return The hashcode.
-	 */
-	public int hashCode()
-	{
-		return 31 + id.hashCode();
-	}
-
-	/** 
-	 *  Test if equal to other object.
-	 *  @param obj The other object.
-	 *  @return True, if equal.
-	 */
-	public boolean equals(Object obj)
-	{
-		boolean ret = false;
-		if(obj instanceof RElement)
-		{
-			ret = ((RElement)obj).getId().equals(getId());
-		}
-		return ret;
-	}
+//	/** 
+//	 *  Get the hashcode.
+//	 *  @return The hashcode.
+//	 */
+//	public int hashCode()
+//	{
+//		return 31 + id.hashCode();
+//	}
+//
+//	/** 
+//	 *  Test if equal to other object.
+//	 *  @param obj The other object.
+//	 *  @return True, if equal.
+//	 */
+//	public boolean equals(Object obj)
+//	{
+//		boolean ret = false;
+//		if(obj instanceof RElement)
+//		{
+//			ret = ((RElement)obj).getId().equals(getId());
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the agent.
