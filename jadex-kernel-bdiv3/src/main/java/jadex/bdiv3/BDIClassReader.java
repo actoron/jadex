@@ -36,12 +36,12 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInitialParameterElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 import jadex.bridge.ClassInfo;
@@ -487,10 +487,10 @@ public class BDIClassReader extends MicroClassReader
 						List<UnparsedExpression> ibels = createUnparsedExpressionsList(configs[i].initialbeliefs());
 						if(ibels!=null)
 							bdiconf.setInitialBeliefs(ibels);
-						List<UnparsedExpression> iplans = createUnparsedExpressionsList(configs[i].initialplans());
+						List<MInitialParameterElement> iplans = createIniParamElementsList(configs[i].initialplans());
 						if(iplans!=null)
 							bdiconf.setInitialPlans(iplans);
-						List<UnparsedExpression> igoals = createUnparsedExpressionsList(configs[i].initialgoals());
+						List<MInitialParameterElement> igoals = createIniParamElementsList(configs[i].initialgoals());
 						if(igoals!=null)
 							bdiconf.setInitialGoals(igoals);
 						
@@ -1334,6 +1334,28 @@ public class BDIClassReader extends MicroClassReader
 		return ret;
 	}
 
+	/**
+	 *  Create unparsed expressions.
+	 */
+	protected List<MInitialParameterElement> createIniParamElementsList(NameValue[] values)
+	{
+		List<MInitialParameterElement>  ret = null;
+		if(values.length>0)
+		{
+			ret = new ArrayList<MInitialParameterElement>();
+			for(int i=0; i<values.length; i++)
+			{
+				String val = values[i].value();
+				String clname = values[i].clazz().equals(Object.class) ? null : values[i].clazz().getName();
+				String v = (val==null || val.length()==0) && clname!=null? clname+".class": val;
+				MInitialParameterElement	elm	= new MInitialParameterElement();
+				elm.setName(v==null ? values[i].name() : v);
+				ret.add(elm);
+			}
+		}
+		return ret;
+	}
+	
 //	/**
 //	 * 
 //	 */

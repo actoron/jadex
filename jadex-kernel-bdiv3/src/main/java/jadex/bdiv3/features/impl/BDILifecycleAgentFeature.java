@@ -15,6 +15,7 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInitialParameterElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
@@ -161,17 +162,17 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 				
 				// Create initial goals
-				List<UnparsedExpression> igoals = mconf.getInitialGoals();
+				List<MInitialParameterElement> igoals = mconf.getInitialGoals();
 				if(igoals!=null)
 				{
-					for(UnparsedExpression uexp: igoals)
+					for(MInitialParameterElement uexp: igoals)
 					{
 						MGoal mgoal = null;
 						Object goal = null;
 						Class<?> gcl = null;
 						
 						// Create goal if expression available
-						if(uexp.getValue()!=null && uexp.getValue().length()>0)
+						if(uexp.getName()!=null && uexp.getValue().length()>0)
 						{
 							Object o = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
 							if(o instanceof Class)
