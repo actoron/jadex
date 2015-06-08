@@ -1,6 +1,5 @@
 package jadex.bdiv3.benchmarks;
 
-import jadex.base.Starter;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -14,7 +13,6 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;

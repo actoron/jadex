@@ -34,19 +34,6 @@ public class StackBlocksPlan	extends Plan
 	/** The quiet flag (do not printout messages). */
 	protected boolean	quiet;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public StackBlocksPlan()
-	{
-		this.block	= (Block)getParameter("block").getValue();
-		this.target	= (Block)getParameter("target").getValue();
-		this.mode	= (String)getBeliefbase().getBelief("mode").getFact();
-		this.quiet	= ((Boolean)getBeliefbase().getBelief("quiet").getFact()).booleanValue();
-	}
-
 	//-------- methods --------
 
 	/**
@@ -54,6 +41,11 @@ public class StackBlocksPlan	extends Plan
 	 */
 	public void body()
 	{
+		this.block	= (Block)getParameter("block").getValue();
+		this.target	= (Block)getParameter("target").getValue();
+		this.mode	= (String)getBeliefbase().getBelief("mode").getFact();
+		this.quiet	= ((Boolean)getBeliefbase().getBelief("quiet").getFact()).booleanValue();
+		
 		// Clear blocks.
 		IGoal clear = createGoal("clear");
 		clear.getParameter("block").setValue(block);

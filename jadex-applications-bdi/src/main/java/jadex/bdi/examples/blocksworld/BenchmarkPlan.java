@@ -20,15 +20,6 @@ public class BenchmarkPlan	extends Plan
 	/** The number of different goals to be executed per run. */
 	protected int	goals;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public BenchmarkPlan()
-	{
-	}
-
 	//-------- methods --------
 
 	/**

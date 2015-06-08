@@ -166,16 +166,28 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				List<MInitialParameterElement> igoals = mconf.getInitialGoals();
 				if(igoals!=null)
 				{
-					for(MInitialParameterElement uexp: igoals)
+					for(MInitialParameterElement igoal: igoals)
 					{
 						MGoal mgoal = null;
-						Object goal = null;
 						Class<?> gcl = null;
+						Object goal = null;
 						
-						// Create goal if expression available
-						if(uexp.getName()!=null && uexp.getValue().length()>0)
+						// try to fetch via name
+						mgoal = bdimodel.getCapability().getGoal(igoal.getName());
+						if(mgoal==null && igoal.getName().indexOf(".")==-1)
 						{
-							Object o = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+							// try with package
+							mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+igoal.getName());
+						}
+						
+						if(mgoal!=null)
+						{
+							gcl = mgoal.getTargetClass(component.getClassLoader());
+						}
+						// if not found, try expression
+						else
+						{
+							Object o = SJavaParser.parseExpression(igoal.getName(), component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
 							if(o instanceof Class)
 							{
 								gcl = (Class<?>)o;
@@ -185,30 +197,48 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								goal = o;
 								gcl = o.getClass();
 							}
-						}
-						
-						if(gcl==null && uexp.getClazz()!=null)
-						{
-							gcl = uexp.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports());
-						}
-						if(gcl==null)
-						{
-							// try to fetch via name
-							mgoal = bdimodel.getCapability().getGoal(uexp.getName());
-							if(mgoal==null && uexp.getName().indexOf(".")==-1)
-							{
-								// try with package
-								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+uexp.getName());
-							}
-							if(mgoal!=null)
-							{
-								gcl = mgoal.getTargetClass(component.getClassLoader());
-							}
-						}
-						if(mgoal==null)
-						{
 							mgoal = bdimodel.getCapability().getGoal(gcl.getName());
 						}
+
+//						// Create goal if expression available
+//						if(uexp.getName()!=null && uexp.getValue().length()>0)
+//						{
+//							Object o = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+//							if(o instanceof Class)
+//							{
+//								gcl = (Class<?>)o;
+//							}
+//							else
+//							{
+//								goal = o;
+//								gcl = o.getClass();
+//							}
+//						}
+//						
+//						if(gcl==null && uexp.getClazz()!=null)
+//						{
+//							gcl = uexp.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports());
+//						}
+//						if(gcl==null)
+//						{
+//							// try to fetch via name
+//							mgoal = bdimodel.getCapability().getGoal(uexp.getName());
+//							if(mgoal==null && uexp.getName().indexOf(".")==-1)
+//							{
+//								// try with package
+//								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+uexp.getName());
+//							}
+//							if(mgoal!=null)
+//							{
+//								gcl = mgoal.getTargetClass(component.getClassLoader());
+//							}
+//						}						
+//						if(mgoal==null)
+//						{
+//							mgoal = bdimodel.getCapability().getGoal(gcl.getName());
+//						}
+						
+						// Create goal instance
 						if(goal==null && gcl!=null)
 						{
 							try
@@ -245,7 +275,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						
 						if(mgoal==null || (goal==null && gcl!=null))
 						{
-							throw new RuntimeException("Could not create initial goal: "+uexp);
+							throw new RuntimeException("Could not create initial goal: "+igoal);
 						}
 						
 						RGoal rgoal = new RGoal(component, mgoal, goal, null);
@@ -254,12 +284,12 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 				
 				// Create initial plans
-				List<UnparsedExpression> iplans = mconf.getInitialPlans();
+				List<MInitialParameterElement> iplans = mconf.getInitialPlans();
 				if(iplans!=null)
 				{
-					for(UnparsedExpression uexp: iplans)
+					for(MInitialParameterElement iplan: iplans)
 					{
-						MPlan mplan = bdimodel.getCapability().getPlan(uexp.getName());
+						MPlan mplan = bdimodel.getCapability().getPlan(iplan.getName());
 						// todo: allow Java plan constructor calls
 	//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 					
