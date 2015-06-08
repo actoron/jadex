@@ -895,7 +895,7 @@ public class PlatformServiceRegistry
 	/**
 	 *  Get the registry from a component.
 	 */
-	public static PlatformServiceRegistry	getRegistry(IComponentIdentifier platform)
+	public static PlatformServiceRegistry getRegistry(IComponentIdentifier platform)
 	{
 		return (PlatformServiceRegistry)Starter.getPlatformValue(platform, Starter.DATA_SERVICEREGISTRY);
 	}
@@ -903,7 +903,7 @@ public class PlatformServiceRegistry
 	/**
 	 *  Get the registry from a component.
 	 */
-	public static PlatformServiceRegistry	getRegistry(IInternalAccess ia)
+	public static PlatformServiceRegistry getRegistry(IInternalAccess ia)
 	{
 		return getRegistry(ia.getComponentIdentifier());
 	}

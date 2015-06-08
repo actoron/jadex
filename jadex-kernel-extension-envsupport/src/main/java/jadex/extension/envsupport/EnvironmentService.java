@@ -21,7 +21,7 @@ import jadex.extension.envsupport.environment.IEnvironmentSpace;
  *  Environment service implementation.
  */
 @Service
-public class	EnvironmentService	implements IEnvironmentService
+public class EnvironmentService	implements IEnvironmentService
 {
 	//-------- attributes --------
 	

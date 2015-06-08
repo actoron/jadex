@@ -1,5 +1,7 @@
 package jadex.bdi.planlib;
 
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -92,19 +94,19 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		{
 			// HACK!!! todo
 			SServiceProvider.getService(space.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new IResultListener()
+				.addResultListener(new IResultListener<IComponentManagementService>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(IComponentManagementService result)
 				{
-					IFuture fut = ((IComponentManagementService)result).getExternalAccess(agent.getName());
-					fut.addResultListener(new IResultListener()
+					IFuture<IExternalAccess> fut = result.getExternalAccess(agent.getName());
+					fut.addResultListener(new IResultListener<IExternalAccess>()
 					{
 						public void exceptionOccurred(Exception exception)
 						{
 							// Happens when component already removed
 //							exception.printStackTrace();
 						}
-						public void resultAvailable(Object result)
+						public void resultAvailable(IExternalAccess result)
 						{
 							final IExternalAccess exta = (IExternalAccess)result;
 							
@@ -132,14 +134,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("add")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
+											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+											Object[]	facts	= bdif.getCapability().getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											
 											if(!SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
 											{
-												scope.getBeliefbase().getBeliefSet(name).addFact(percept);
+												bdif.getCapability().getBeliefbase().getBeliefSet(name).addFact(percept);
 //												System.out.println("added: "+percept+" to: "+belset);
 											}
 											return IFuture.DONE;
@@ -153,14 +155,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("remove")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
+											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+											Object[]	facts	= bdif.getCapability().getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											
 											if(SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
 											{
-												scope.getBeliefbase().getBeliefSet(name).removeFact(percept);
+												bdif.getCapability().getBeliefbase().getBeliefSet(name).removeFact(percept);
 //												System.out.println("removed: "+percept+" from: "+belset);
 											}
 											return IFuture.DONE;
@@ -174,14 +176,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("set")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-											Object	fact	= scope.getBeliefbase().getBelief(name).getFact();
+											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+											Object	fact	= bdif.getCapability().getBeliefbase().getBelief(name).getFact();
 											if(cond!=null)
 												fetcher.setValue("$fact", fact);
 											
 											if(cond==null || evaluate(cond, fetcher))
 											{
-												scope.getBeliefbase().getBelief(name).setFact(percept);
+												bdif.getCapability().getBeliefbase().getBelief(name).setFact(percept);
 //												System.out.println("set: "+percept+" on: "+belset);
 											}
 											return IFuture.DONE;
@@ -195,14 +197,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("unset")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-											Object	fact	= scope.getBeliefbase().getBelief(name).getFact();
+											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+											Object	fact	= bdif.getCapability().getBeliefbase().getBelief(name).getFact();
 											if(cond!=null)
 												fetcher.setValue("$fact", fact);
 											
 											if(cond==null || evaluate(cond, fetcher))
 											{
-												scope.getBeliefbase().getBelief(name).setFact(null);
+												bdif.getCapability().getBeliefbase().getBelief(name).setFact(null);
 //												System.out.println("unset: "+percept+" on: "+belset);
 											}
 											return IFuture.DONE;
@@ -216,8 +218,8 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("removeoutdated")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
+											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+											Object[]	facts	= bdif.getCapability().getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											
@@ -235,7 +237,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 													if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
 													{
 //														System.out.println("Removing disappeared object: "+percept+", "+known[j]);
-														scope.getBeliefbase().getBeliefSet(name).removeFact(known[j]);
+														bdif.getCapability().getBeliefbase().getBeliefSet(name).removeFact(known[j]);
 													}
 												}
 											}

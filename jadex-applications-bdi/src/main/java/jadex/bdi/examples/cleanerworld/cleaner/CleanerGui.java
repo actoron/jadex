@@ -112,4 +112,32 @@ public class CleanerGui	extends JFrame
 			}
 		});
 	}		
+	
+	/**
+	 *  Get the daytime in 03:23:22 notation.
+	 */
+	public static String formatDaytime(int daytime)
+	{
+		StringBuffer ret = new StringBuffer();
+
+		int hour = daytime/60/60;
+		int min = (daytime/60)%60;
+		int sec = daytime%60;
+		
+		if(hour<10)
+			ret.append(" ");
+		ret.append(hour);
+		ret.append(":");
+		
+		if(min<10)
+			ret.append("0");
+		ret.append(min);
+		ret.append(":");
+		
+		if(sec<10)
+			ret.append("0");
+		ret.append(sec);
+		
+		return ret.toString();
+	}
 }
