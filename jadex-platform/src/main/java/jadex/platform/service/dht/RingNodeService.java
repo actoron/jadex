@@ -733,7 +733,11 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 					if (!result.getNodeId().equals(finger.getNodeId())) {
 						Finger oldFinger = finger.clone();
 						finger.set(result);
-						notifySubscribers(RingNodeEvent.fingerChange(myId, index, oldFinger, finger));
+						if (index == 0) {
+							notifySubscribers(RingNodeEvent.successorChange(myId, oldFinger, finger));
+						} else {
+							notifySubscribers(RingNodeEvent.fingerChange(myId, index, oldFinger, finger));
+						}
 						counter.resultAvailable(null);
 					}
 				}
