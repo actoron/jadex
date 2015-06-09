@@ -62,7 +62,6 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		
 		int size = kernelList.size();
 		platformKernels = kernelList.toArray(new String[size]);
-		System.out.println("Starting with " + Arrays.toString(platformKernels));
 	}
 
 	@Override
@@ -175,6 +174,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	
 	final protected IFuture<IExternalAccess> startPlatform()
 	{
+		System.out.println("Starting with " + Arrays.toString(platformKernels));
 		return startJadexPlatform(platformKernels, platformName, platformOptions);
 	}
 	
