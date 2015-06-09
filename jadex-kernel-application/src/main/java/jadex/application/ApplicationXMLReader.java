@@ -1,8 +1,9 @@
 package jadex.application;
 
 import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.component.ComponentXMLReader;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -67,13 +68,33 @@ public class ApplicationXMLReader extends ComponentXMLReader
 				it.remove();
 			}
 		}
-
+		
+		// Add environment service, if necessary but not present.
 		IPostProcessor	appproc	= new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				ModelInfo	mi	= (ModelInfo)object;
-				boolean	hasspace	= false;
+				ApplicationModelInfo	mi	= (ApplicationModelInfo)object;
+				if(mi.getExtensionTypes().length>0)
+				{
+					boolean found	= false;
+					for(ProvidedServiceInfo pi: mi.getProvidedServices())
+					{
+						if(IEnvironmentService.class.equals(pi.getType().getType(context.getClassLoader(), mi.getAllImports())))
+						{
+							found	= true;
+							break;
+						}
+					}
+					
+					if(!found)
+					{
+						mi.addProvidedService(new ProvidedServiceInfo(null, IEnvironmentService.class,
+							new ProvidedServiceImplementation(EnvironmentService.class, null, null, null, null),
+							null, null, null));
+					}
+				}
+				
 				return null;
 			}
 			

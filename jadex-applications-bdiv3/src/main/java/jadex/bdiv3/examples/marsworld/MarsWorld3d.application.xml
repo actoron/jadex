@@ -244,12 +244,6 @@
 		<componenttype name="Carry" filename="jadex/bdiv3/examples/marsworld/carry/CarryBDI.class"/>
 	</componenttypes>
 	
-	<services>
-	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
-	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
-	    </providedservice>
-	</services>
-	
 	<configurations>
 		<configuration name="1 Sentry / 2 Producers / 3 Carries">
 			<extensions>

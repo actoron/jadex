@@ -169,12 +169,6 @@
 		<componenttype name="Ambulance" filename="ambulance/AmbulanceBDI.class"/>
 	</componenttypes>
 
-	<services>
-	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
-	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
-	    </providedservice>
-	</services>
-	
 	<configurations>
 		<configuration name="default">
 			<extensions>

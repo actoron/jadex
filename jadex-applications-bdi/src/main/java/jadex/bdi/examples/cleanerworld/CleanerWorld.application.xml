@@ -26,13 +26,7 @@
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 	</imports>
-	
-	<services>
-		<providedservice class="jadex.extension.envsupport.IEnvironmentService">
-			<implementation class="jadex.extension.envsupport.EnvironmentService"/>
-		</providedservice>
-	</services>
-	
+		
 	<extensiontypes>
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:property name="border">Space2D.BORDER_STRICT</env:property>
