@@ -25,6 +25,8 @@ public class ColorLayerJ2DRenderer implements ILayerJ2DRenderer
 		Color c = layer.getColor() instanceof Color? (Color)layer.getColor(): (Color)SObjectInspector.getProperty(persp, (String)layer.getColor(), "$perspective", 
 				vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 		g.setColor(c);
+		if(c==null)
+			c=Color.WHITE;
 		Rectangle2D r = new Rectangle2D.Double(0.0, 0.0, areaSize.getXAsDouble(), areaSize.getYAsDouble());
 		g.fill(r);
 	}

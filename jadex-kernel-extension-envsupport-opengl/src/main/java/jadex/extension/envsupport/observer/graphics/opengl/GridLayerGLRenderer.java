@@ -23,6 +23,8 @@ public class GridLayerGLRenderer implements ILayerGLRenderer
 	{
 		Color c = layer.getColor() instanceof Color? (Color)layer.getColor(): (Color)SObjectInspector.getProperty(persp, (String)layer.getColor(), "$perspective", 
 				vp.getPerspective().getObserverCenter().getSpace().getFetcher());
+		if(c==null)
+			c=Color.WHITE;
 		
 		GL gl = vp.getContext();
 		

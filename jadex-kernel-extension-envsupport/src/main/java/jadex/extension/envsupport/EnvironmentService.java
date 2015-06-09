@@ -60,7 +60,13 @@ public class EnvironmentService	implements IEnvironmentService
 				AbstractEnvironmentSpace	aspace	= clazz.newInstance();
 				aspace.setInitData(component, mesi, component.getFetcher());
 				space	= aspace;
-				return space.init();
+				space.init().addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						super.customResultAvailable(result);
+					}
+				});
 			}
 			catch(Exception e)
 			{

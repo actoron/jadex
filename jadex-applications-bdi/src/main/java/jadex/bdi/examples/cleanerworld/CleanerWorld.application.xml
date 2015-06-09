@@ -76,6 +76,11 @@
 					<env:property name="full" dynamic="true">$object.wastes &gt;= $object.capacity</env:property>
 					<env:property name="position"/>
 				</env:objecttype>
+				
+				<env:objecttype name="clock">
+					<env:property name="text" dynamic="true">$space.readabletime</env:property>
+					<env:property name="position"/>
+				</env:objecttype>
 			</env:objecttypes>
 			
 			<env:tasktypes>
@@ -155,7 +160,7 @@
 			
 			<env:perspectives>			
 				<env:perspective name="icons" class="Perspective2D" invertyaxis="false">
-					<env:property name="alpha" dynamic="true">100-(int)(Math.sin($space.timeofday/86400.0*2*Math.PI)*50+50)</env:property>
+					<env:property name="alpha" dynamic="true">200-(int)(Math.sin(Math.PI*1.5+$space.timeofday/86400.0*2*Math.PI)*100+100)</env:property>
 					<env:property name="color" dynamic="true">new java.awt.Color(0,0,0, $perspective.alpha)</env:property>
 					
 					<env:drawable objecttype="cleaner" width="0.1" height="0.1">
@@ -190,6 +195,10 @@
 					
 					<env:drawable objecttype="chargingstation" width="0.06" height="0.06">
 						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/cleanerworld/images/chargingstation.png" />
+					</env:drawable>
+					
+					<env:drawable objecttype="clock" width="0.1" height="0.1">
+						<env:text layer="4" text="$text$"></env:text>
 					</env:drawable>
 					
 					<env:prelayers>
@@ -229,6 +238,9 @@
 					<!-- <env:property name="daytime">true</env:property> -->
 					
 					<env:objects>
+						<env:object type="clock">
+							<env:property name="position">new Vector2Double(0.8, 0.95)</env:property>
+						</env:object>
 						<env:object type="chargingstation">
 							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
 						</env:object>
@@ -264,7 +276,10 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="Observer" dataview="view_all" perspective="abstract" />
+						<env:observer name="Observer" dataview="view_all" perspective="abstract">
+							<env:plugin name="evaluation" class="AddWastePlugin">
+							</env:plugin>
+						</env:observer>
 					</env:observers>
 				</env:envspace>
 			</extensions>
@@ -279,6 +294,9 @@
 					<!-- <env:property name="daytime">true</env:property> -->
 					
 					<env:objects>
+						<env:object type="clock">
+							<env:property name="position">new Vector2Double(0.8, 0.9)</env:property>
+						</env:object>
 						<env:object type="chargingstation">
 							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
 						</env:object>

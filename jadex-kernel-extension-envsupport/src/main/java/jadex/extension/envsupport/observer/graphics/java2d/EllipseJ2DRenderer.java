@@ -38,6 +38,8 @@ public class EllipseJ2DRenderer extends AbstractJ2DRenderer
 		if(!setupMatrix(dc, primitive, obj, g, vp))
 			return;
 		Color c = (Color) dc.getBoundValue(obj, primitive.getColor(), vp);
+		if(c==null)
+			c=Color.WHITE;
 		g.setColor(c);
 		g.fill(shape);
 	}

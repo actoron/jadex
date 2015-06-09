@@ -25,7 +25,7 @@ public class RectangleGLRenderer extends AbstractGLRenderer
 		{
 			dList = ((Integer) primitive.getRenderInfo(0)).intValue();
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 			String listName = getClass().getName();
 			Integer list = vp.getDisplayList(listName);
@@ -49,6 +49,8 @@ public class RectangleGLRenderer extends AbstractGLRenderer
 			primitive.setRenderInfo(0, list);
 		}
 		Color c = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
+		if(c==null)
+			c = Color.WHITE;
 		gl.glColor4fv(c.getComponents(null), 0);
 		if(setupMatrix(dc, primitive, obj, gl, vp))
 			gl.glCallList(dList);

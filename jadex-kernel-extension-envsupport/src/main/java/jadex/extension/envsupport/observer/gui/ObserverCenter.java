@@ -108,6 +108,9 @@ public class ObserverCenter implements IObserverCenter
 	/** Flag to indicate that observer is disposed. */
 	protected boolean	disposed;
 
+	/**
+	 * 
+	 */
 	public ObserverCenter()
 	{
 	}
@@ -338,7 +341,6 @@ public class ObserverCenter implements IObserverCenter
 		return allViews;
 	}
 	
-	
 	/**
 	 * Returns the selected dataview.
 	 * 
@@ -511,10 +513,6 @@ public class ObserverCenter implements IObserverCenter
 			selectedperspective = perspective;
 			mainwindow.setPerspectiveView(perspective.getView());
 			perspective.setSelectedObject(null);
-				
-			
-			
-			
 		}
 		else
 		{
@@ -667,13 +665,20 @@ public class ObserverCenter implements IObserverCenter
 		
 		this.plugins = (IObserverCenterPlugin[])plugins.toArray(new IObserverCenterPlugin[0]);
 		
-		for (int i = 0; i < this.plugins.length; ++i)
+		for(int i = 0; i < this.plugins.length; ++i)
 		{
 			addPluginButton(this.plugins[i]);
 		}
 		
 		if(this.plugins.length>0)
+		{
 			activatePlugin(this.plugins[0]);
+			for(int i=1; i<this.plugins.length; i++)
+			{
+				if(this.plugins[i].isStartOnLoad())
+					activatePlugin(this.plugins[i]);
+			}
+		}
 	}
 	
 	/** Adds a plugin to the toolbar.
@@ -682,8 +687,11 @@ public class ObserverCenter implements IObserverCenter
 	 */
 	private void addPluginButton(IObserverCenterPlugin plugin)
 	{
+		if(!plugin.isVisible())
+			return;
+			
 		String iconPath = plugin.getIconPath();
-		if (iconPath == null)
+		if(iconPath == null)
 		{
 			mainwindow.addToolbarItem(plugin.getName(), new PluginAction(plugin));
 		}
@@ -712,12 +720,14 @@ public class ObserverCenter implements IObserverCenter
 //			if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
 //				System.out.println("activating plugin: "+this+", "+plugin);
 			IObserverCenterPlugin oldPlugin = activeplugin;
-			if (oldPlugin != null)
+			if(oldPlugin != null)
 			{
-				oldPlugin.shutdown();
+				if(!oldPlugin.isStartOnLoad())
+					oldPlugin.shutdown();
 			}
 
-			mainwindow.setPluginView(plugin.getName(), plugin.getView());
+			if(plugin.isVisible())
+				mainwindow.setPluginView(plugin.getName(), plugin.getView());
 			plugin.start(this);
 			activeplugin = plugin;
 		}

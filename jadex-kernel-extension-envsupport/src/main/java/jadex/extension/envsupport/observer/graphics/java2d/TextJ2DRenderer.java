@@ -86,8 +86,10 @@ public class TextJ2DRenderer implements IJ2DRenderer
 		
 		AffineTransform t = g.getTransform();
 		g.setTransform(vp.getDefaultTransform());
-		Color color = (Color) dc.getBoundValue(obj, primitive.getColor(), vp);
-		g.setColor(color);
+		Color c = (Color) dc.getBoundValue(obj, primitive.getColor(), vp);
+		if(c==null)
+			c = Color.WHITE;
+		g.setColor(c);
 		for (int i = 0; i < lines.length; ++i)
 		{
 			TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);

@@ -43,7 +43,7 @@ public class TiledLayerJ2DRenderer implements ILayerJ2DRenderer
 		if (!Color.WHITE.equals(layer.getColor()))
 		{
 			final Color color = layer.getColor() instanceof Color? (Color)layer.getColor(): (Color)SObjectInspector.getProperty(persp, (String)layer.getColor(), "$perspective", 
-					vp.getPerspective().getObserverCenter().getSpace().getFetcher());
+				vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 			g.setComposite(new ModulateComposite()
 			{
 				protected Color getColor()

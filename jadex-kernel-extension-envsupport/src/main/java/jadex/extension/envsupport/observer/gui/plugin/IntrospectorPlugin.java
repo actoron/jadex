@@ -87,6 +87,9 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 	 */
 	private ChangeListener selectionListener;
 	
+	/**
+	 * 
+	 */
 	public IntrospectorPlugin()
 	{
 		mainPane_ = new JTabbedPane();
@@ -328,9 +331,9 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		}
 		
 		IPerspective p = observerCenter_.getSelectedPerspective();
-//		if(p==null)
-//			System.out.println("h");
-		Object observedObj = p.getSelectedObject();
+		if(p==null)
+			System.out.println("h");
+		Object observedObj = p==null? null: p.getSelectedObject();
 		if(observedObj == null)
 		{
 			objIdLabel_.setText("");
@@ -344,7 +347,8 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		{
 			if(!fillPropertyTable(objPropertyTable_, observedObj))
 			{
-				p.setSelectedObject(null);
+				if(p!=null)
+					p.setSelectedObject(null);
 			}
 			else
 			{
@@ -384,7 +388,7 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 	
 	private static boolean fillPropertyTable(JTable table, Object propHolder)
 	{
-		Set propNames = SObjectInspector.getPropertyNames(propHolder);
+		Set propNames = propHolder==null? null: SObjectInspector.getPropertyNames(propHolder);
 //		System.out.println("prop holder: "+propHolder+" "+propNames);
 		if(propNames != null)
 		{
@@ -406,5 +410,21 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 			}
 		}
 		return propNames!=null;
+	}
+	
+	/**
+	 *  Should plugin be visible.
+	 */
+	public boolean isVisible()
+	{
+		return true;
+	}
+	
+	/**
+	 *  Should plugin be started on load.
+	 */
+	public boolean isStartOnLoad()
+	{
+		return false;
 	}
 }

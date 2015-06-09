@@ -47,6 +47,7 @@ public class CleanUpWastePlan extends Plan
 			}
 			catch(RuntimeException e)
 			{
+				System.out.println("dropwaste failed: "+e);
 			}
 		}
 	}

@@ -21,6 +21,9 @@ import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+/**
+ * 
+ */
 public abstract class AbstractInteractionPlugin extends SimplePropertyObject implements IObserverCenterPlugin
 {
 	private DrawableCombiner marker;
@@ -95,12 +98,19 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 		return "jadex/application/space/envsupport/observer/images/introspector_icon.png";
 	}
 
-	public final void shutdown()
+	public void shutdown()
 	{
-		// TODO Auto-generated method stub
-		((Perspective2D) obsCenter.getSelectedPerspective()).setMarkerDrawCombiner(marker);
-		((Canvas) ((Perspective2D) obsCenter.getSelectedPerspective()).getView()).removeMouseListener(clickListener);
-		obsCenter.removeSelectedObjectListener(objectListener);
+		if(marker!=null)
+		{
+			((Perspective2D)obsCenter.getSelectedPerspective()).setMarkerDrawCombiner(marker);
+			((Canvas)((Perspective2D)obsCenter.getSelectedPerspective()).getView()).removeMouseListener(clickListener);
+			obsCenter.removeSelectedObjectListener(objectListener);
+		}
+		else if(marker3d!=null)
+		{
+			((Perspective3D)obsCenter.getSelectedPerspective()).setMarkerDrawCombiner(marker3d);
+			((Canvas)((Perspective3D)obsCenter.getSelectedPerspective()).getView()).removeMouseListener(clickListener);
+		}
 		
 		cleanUp(obsCenter);
 	}
@@ -158,8 +168,8 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 			{
 				public void stateChanged(ChangeEvent e)
 				{
-					if (obsCenter.getSelectedPerspective().getSelectedObject() != null)
-						handleObjectClick((ISpaceObject) obsCenter.getSelectedPerspective().getSelectedObject());
+					if(obsCenter.getSelectedPerspective().getSelectedObject() != null)
+						handleObjectClick((ISpaceObject)obsCenter.getSelectedPerspective().getSelectedObject());
 				}
 			};
 			
@@ -171,7 +181,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 		main.getSelectedPerspective().setSelectedObject(null);
 		if(main.getSelectedPerspective() instanceof Perspective2D)
 		{
-			
 			marker = ((Perspective2D) main.getSelectedPerspective()).getMarkerDrawCombiner();
 			((Perspective2D) main.getSelectedPerspective()).setMarkerDrawCombiner(new DrawableCombiner());
 			
@@ -183,7 +192,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 			marker3d = ((Perspective3D) main.getSelectedPerspective()).getMarkerDrawCombiner();
 			System.out.println("3d PLUGIN? " + this.getClass().getName());
 		}
-
 		
 		startUp(main);
 	}

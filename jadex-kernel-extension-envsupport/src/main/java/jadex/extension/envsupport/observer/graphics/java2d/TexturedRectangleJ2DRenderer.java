@@ -41,28 +41,29 @@ public class TexturedRectangleJ2DRenderer extends AbstractJ2DRenderer
 		if (!setupMatrix(dc, primitive, obj, g, vp))
 			return;
 		
-		final Color currentColor = (Color) dc.getBoundValue(obj, primitive.getColor(), vp);
+		Color currentColor = (Color) dc.getBoundValue(obj, primitive.getColor(), vp);
+		if(currentColor==null)
+			currentColor = Color.WHITE;
+		final Color fcurrentColor = currentColor;
 		
-		if (!Color.WHITE.equals(currentColor))
+		if(!Color.WHITE.equals(currentColor))
 		{
 			ModulateComposite modComposite = new ModulateComposite()
 			{
 				protected Color getColor()
 				{
-					return currentColor;
+					return fcurrentColor;
 				}
 			};
 			
 			Composite c = g.getComposite();
 			g.setComposite(modComposite);
-			g.drawImage(image, vp.getImageTransform(image.getWidth(), image
-					.getHeight()), null);
+			g.drawImage(image, vp.getImageTransform(image.getWidth(), image.getHeight()), null);
 			g.setComposite(c);
 		}
 		else
 		{
-			g.drawImage(image, vp.getImageTransform(image.getWidth(), image
-					.getHeight()), null);
+			g.drawImage(image, vp.getImageTransform(image.getWidth(), image.getHeight()), null);
 		}
 	}
 }

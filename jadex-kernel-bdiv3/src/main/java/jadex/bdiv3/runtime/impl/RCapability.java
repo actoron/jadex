@@ -178,7 +178,7 @@ public class RCapability extends RElement
 			cgoals	= new HashMap<Class<?>, Collection<RGoal>>();
 		}
 		
-//		if(goal.getModelElement().getName().indexOf("cleanup")!=-1)
+//		if(goal.getModelElement().getName().indexOf("help")!=-1)
 //			System.out.println("dffded");
 		
 		if(goals.contains(goal))

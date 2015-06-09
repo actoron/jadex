@@ -610,19 +610,22 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			{
 				MGoal mgoal	= (MGoal)getModelElement();
 				ret = 31 + mgoal.hashCode();
-				for(MParameter param: mgoal.getParameters())
+				if(mgoal.getParameters()!=null)
 				{
-					if(mgoal.getExcludes()==null || !mgoal.getExcludes().contains(mgoal.getName()))
+					for(MParameter param: mgoal.getParameters())
 					{
-						if(!param.isMulti(getAgent().getClassLoader()))
+						if(mgoal.getExcludes()==null || !mgoal.getExcludes().contains(mgoal.getName()))
 						{
-							Object val = getParameter(param.getName()).getValue();
-							ret = 31*ret + (val==null? 0: val.hashCode());
-						}
-						else
-						{
-							Object[] vals = getParameterSet(param.getName()).getValues();
-							ret = 31*ret + (vals==null? 0: Arrays.hashCode(vals));
+							if(!param.isMulti(getAgent().getClassLoader()))
+							{
+								Object val = getParameter(param.getName()).getValue();
+								ret = 31*ret + (val==null? 0: val.hashCode());
+							}
+							else
+							{
+								Object[] vals = getParameterSet(param.getName()).getValues();
+								ret = 31*ret + (vals==null? 0: Arrays.hashCode(vals));
+							}
 						}
 					}
 				}
@@ -1406,26 +1409,29 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			// Check parameter correspondence of goal.
 			MGoal mgoal	= (MGoal)goal.getModelElement();
 
-			for(MParameter param: mgoal.getParameters())
+			if(mgoal.getParameters()!=null)
 			{
-				if(!param.isMulti(getAgent().getClassLoader()))
+				for(MParameter param: mgoal.getParameters())
 				{
-					// Compare parameter values.
-					// Todo: Catch exceptions on parameter access?
-					Object	val1	= this.getParameter(param.getName()).getValue();
-					Object	val2	= goal.getParameter(param.getName()).getValue();
-					same	= val1==val2 || val1!=null && val1.equals(val2);
-				}
-				else
-				{
-					// Compare parameter set values.
-					// Todo: Catch exceptions on parameter set access?
-					Object[] vals1 = this.getParameterSet(param.getName()).getValues();
-					Object[] vals2 = goal.getParameterSet(param.getName()).getValues();
-					same = vals1.length==vals2.length;
-					for(int j = 0; same && j < vals1.length; j++)
+					if(!param.isMulti(getAgent().getClassLoader()))
 					{
-						same = vals1[j] == vals2[j] || vals1[j] != null && vals1[j].equals(vals2[j]);
+						// Compare parameter values.
+						// Todo: Catch exceptions on parameter access?
+						Object	val1	= this.getParameter(param.getName()).getValue();
+						Object	val2	= goal.getParameter(param.getName()).getValue();
+						same	= val1==val2 || val1!=null && val1.equals(val2);
+					}
+					else
+					{
+						// Compare parameter set values.
+						// Todo: Catch exceptions on parameter set access?
+						Object[] vals1 = this.getParameterSet(param.getName()).getValues();
+						Object[] vals2 = goal.getParameterSet(param.getName()).getValues();
+						same = vals1.length==vals2.length;
+						for(int j = 0; same && j < vals1.length; j++)
+						{
+							same = vals1[j] == vals2[j] || vals1[j] != null && vals1[j].equals(vals2[j]);
+						}
 					}
 				}
 			}

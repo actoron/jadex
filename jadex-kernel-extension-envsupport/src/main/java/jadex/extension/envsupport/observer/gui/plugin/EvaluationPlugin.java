@@ -159,6 +159,22 @@ public class EvaluationPlugin extends SimplePropertyObject implements IObserverC
 		}
 	}
 	
+	/**
+	 *  Should plugin be visible.
+	 */
+	public boolean isVisible()
+	{
+		return true;
+	}
+	
+	/**
+	 *  Should plugin be started on load.
+	 */
+	public boolean isStartOnLoad()
+	{
+		return false;
+	}
+	
 	public static void main(String[] args)
 	{
 		double test = Math.sqrt(2);

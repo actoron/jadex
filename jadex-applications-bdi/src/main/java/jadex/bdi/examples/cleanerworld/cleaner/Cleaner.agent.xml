@@ -60,7 +60,7 @@
 		</beliefset>
 
 		<!-- <belief name="daytime" class="boolean" evaluationmode="push">
-			<fact language="jcl">$beliefbase.environment.daytime</fact>
+			<fact >$beliefbase.environment.daytime</fact>
 		</belief> //does not work because environment does not throw change event for time :-( ? -->
 		
 		<belief name="daytime" class="boolean" evaluationmode="pull" updaterate="1000">
@@ -68,19 +68,19 @@
 		</belief>
 
 		<belief name="my_location" class="IVector2" evaluationmode="push">
-			<fact language="jcl">$beliefbase.myself.position</fact>
+			<fact >$beliefbase.myself.position</fact>
  		</belief>
  		
  		<belief name="my_speed" class="double" evaluationmode="push">
-			<fact language="jcl">$beliefbase.myself.speed</fact>
+			<fact >$beliefbase.myself.speed</fact>
  		</belief>
  		
  		<belief name="my_vision" class="double" evaluationmode="push">
-			<fact language="jcl">$beliefbase.myself.vision_range</fact>
+			<fact >$beliefbase.myself.vision_range</fact>
  		</belief>
  		
  		<belief name="my_chargestate" class="double" evaluationmode="push">
-			<fact language="jcl">$beliefbase.myself.chargestate</fact>
+			<fact >$beliefbase.myself.chargestate</fact>
  		</belief>
 
 		<beliefset name="patrolpoints" class="IVector2">
@@ -112,10 +112,10 @@
 				<inhibits ref="achievecleanup"/>
 				<inhibits ref="performpatrol"/>
 			</deliberation>
- 			<maintaincondition language="jcl">
+ 			<maintaincondition >
  				$beliefbase.my_chargestate > 0.2
  			</maintaincondition>
-			<targetcondition language="jcl">
+			<targetcondition >
  				$beliefbase.my_chargestate >= 1.0
  			</targetcondition>
 		</maintaingoal>
@@ -126,20 +126,20 @@
 				<bindingoptions>$beliefbase.wastes</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl" beliefs="wastes">
+			<creationcondition beliefs="wastes">
 				true
 			</creationcondition>
-			<!-- <contextcondition language="jcl">
-				$beliefbase.daytime
- 			</contextcondition> -->
-			<dropcondition language="jcl">
+			<contextcondition >
+				$beliefbase.my_chargestate&gt;0
+ 			</contextcondition>
+			<dropcondition >
 				$beliefbase.myself.waste==null &amp;&amp;
 					!$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
  			</dropcondition>
 			<!-- <deliberation cardinality="1"> -->
 			<deliberation cardinalityone="true">
 				<inhibits ref="performlookforwaste"/>
-				<inhibits ref="achievecleanup" language="jcl">
+				<inhibits ref="achievecleanup" >
 					$goal.waste.equals($beliefbase.myself.waste) || $goal.waste.position==null || 
 					(!$ref.waste.equals($beliefbase.myself.waste) &amp;&amp; !($ref.waste.position==null) &amp;&amp;
 					$beliefbase.my_location.getDistance($goal.waste.position).getAsDouble()
@@ -155,15 +155,18 @@
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
-			<!-- <contextcondition language="jcl">
+			<!-- <contextcondition >
 				$beliefbase.daytime
  			</contextcondition> -->
+ 			<contextcondition >
+				$beliefbase.my_chargestate&gt;0
+ 			</contextcondition>
  		</performgoal>
 
 		<!-- Perform patrols at night when the agent is not loading. -->
 		<performgoal name="performpatrol" retry="true" exclude="never">
-			<contextcondition language="jcl">
-				!$beliefbase.daytime
+			<contextcondition >
+				!$beliefbase.daytime &amp;&amp; $beliefbase.my_chargestate>0
  			</contextcondition>
  		</performgoal>
 
@@ -180,8 +183,8 @@
 			<parameter name="waste" class="ISpaceObject"/>
 			
 			<!-- The goal has failed when the aimed wastebin is full. -->
-			<dropcondition language="jcl">
-				$goal.wastebin.wastes >= $goal.wastebin.capacity 
+			<dropcondition >
+				$goal.wastebin.wastes &gt;= $goal.wastebin.capacity 
 			</dropcondition>
 		</achievegoal>
 
@@ -199,7 +202,7 @@
 			is as near as possible to the agent. -->
 		<querygoal name="querywastebin" exclude="never">
 			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
-				<value language="jcl">
+				<value >
 					select one ISpaceObject $wastebin
 					from $beliefbase.wastebins
 					where !$wastebin.full
@@ -211,7 +214,7 @@
 		<!-- Find the nearest charging station. -->
 		<querygoal name="querychargingstation" exclude="never">
 			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
-				<value language="jcl">
+				<value >
 					select one ISpaceObject $station
 					from $beliefbase.chargingstations
 					order by $beliefbase.my_location.getDistance($station.position).getAsDouble()
@@ -233,8 +236,19 @@
 		</achievegoal>
 
 		<!-- Memorize the already visited positions in a raster. -->
-		<performgoal name="performmemorizepositions"/>
-
+		<performgoal name="performmemorizepositions">
+			<contextcondition>
+				$beliefbase.my_chargestate&gt;0
+ 			</contextcondition>
+		</performgoal>
+		
+		<!-- Drop a piece of waste. -->
+		<achievegoal name="helpbatteryempty">
+			<unique/>
+			<creationcondition>
+				$beliefbase.my_chargestate==0
+ 			</creationcondition>
+		</achievegoal>
  	</goals>
 
 	<plans>
@@ -339,6 +353,13 @@
 			<body class="MemorizePositionsPlan"/>
 			<trigger>
 				<goal ref="performmemorizepositions"/>
+			</trigger>
+		</plan>
+		
+		<plan name="searchhelpplan">
+			<body class="SearchHelpPlan"/>
+			<trigger>
+				<goal ref="helpbatteryempty"/>
 			</trigger>
 		</plan>
 	</plans>

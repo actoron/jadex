@@ -69,9 +69,6 @@ public class ObserverCenterWindow extends JFrame
 	
 	protected KeyListener fullscreenlistener;
 	
-	
-	
-
 	/**
 	 * Creates the main window.
 	 * 
@@ -120,7 +117,6 @@ public class ObserverCenterWindow extends JFrame
 					setVisible(true);
 					splitpane.setDividerLocation(250);
 					
-					
 					fullscreenlistener = new KeyAdapter()
 					{
 					
@@ -134,7 +130,6 @@ public class ObserverCenterWindow extends JFrame
 						}
 					};
 					
-
 //					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 //					manager.addKeyEventDispatcher(new KeyEventDispatcher()
 //					{
@@ -154,25 +149,21 @@ public class ObserverCenterWindow extends JFrame
 //					});
 
 				}
-				
-
 			}
 		};
 
 
 		if(EventQueue.isDispatchThread())
 		{
-			
 			runnable.run();
-
 		}
 		else
 		{
 			// try
-			{
+//			{
 				// EventQueue.invokeAndWait(runnable);
 				EventQueue.invokeLater(runnable);
-			}
+//			}
 			// catch (InterruptedException e)
 			// {
 			// }
@@ -315,6 +306,9 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	public void setPluginView(String pluginname, Component view)
 	{
+		if(view==null)
+			return;
+		
 		JPanel pluginpanel = (JPanel)splitpane.getLeftComponent();
 		CardLayout cl = (CardLayout)(pluginpanel.getLayout());
 

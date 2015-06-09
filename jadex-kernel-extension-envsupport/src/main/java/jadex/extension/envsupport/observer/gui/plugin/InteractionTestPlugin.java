@@ -9,20 +9,26 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
+/**
+ * 
+ */
 public class InteractionTestPlugin extends AbstractInteractionPlugin
 {
-	
-	@Override
+	/**
+	 * 
+	 */
 	protected void handleObjectClick(ISpaceObject object)
 	{
 		System.out.println(object.getType());
 	}
 	
+	/**
+	 * 
+	 */
 	protected void initialize(ObserverCenter center)
 	{
 		addMouseListener(new MouseAdapter()
 		{
-			@Override
 			public void mouseClicked(MouseEvent e)
 			{
 				System.out.println(getWorldCoordinates(e.getPoint()));
@@ -39,5 +45,20 @@ public class InteractionTestPlugin extends AbstractInteractionPlugin
 	{
 		return new JPanel();
 	}
-
+	
+	/**
+	 *  Should plugin be visible.
+	 */
+	public boolean isVisible()
+	{
+		return true;
+	}
+	
+	/**
+	 *  Should plugin be started on load.
+	 */
+	public boolean isStartOnLoad()
+	{
+		return false;
+	}
 }

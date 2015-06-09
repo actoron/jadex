@@ -58,6 +58,8 @@ public class RegularPolygonGLRenderer extends AbstractGLRenderer
 		}
 		
 		Color c = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
+		if(c==null)
+			c=Color.WHITE;
 		gl.glColor4fv(c.getComponents(null), 0);
 		if (setupMatrix(dc, primitive, obj, gl, vp))
 			gl.glCallList(dList);

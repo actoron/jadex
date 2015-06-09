@@ -9,36 +9,47 @@ import java.awt.Component;
  */
 public interface IObserverCenterPlugin
 {
-	/** Starts the plugin
-	 *  
+	/** 
+	 *  Starts the plugin
 	 *  @param the observer center
 	 */
 	public void start(ObserverCenter main);
 	
-	/** Stops the plugin
-	 *  
+	/** 
+	 *  Stops the plugin
 	 */
 	public void shutdown();
 	
-	/** Returns the name of the plugin
-	 *  
+	/** 
+	 *  Returns the name of the plugin
 	 *  @return name of the plugin
 	 */
 	public String getName();
 	
-	/** Returns the path to the icon for the plugin in the toolbar.
-	 * 
+	/** 
+	 *  Returns the path to the icon for the plugin in the toolbar.
 	 *  @return path to the icon
 	 */
 	public String getIconPath();
 	
-	/** Returns the viewable component of the plugin
-	 *  
+	/** 
+	 *  Returns the viewable component of the plugin
 	 *  @return viewable component of the plugin
 	 */
 	public Component getView();
 	
-	/** Refreshes the display
+	/** 
+	 *  Refreshes the display
 	 */
 	public void refresh();
+	
+	/**
+	 *  Should plugin be visible.
+	 */
+	public boolean isVisible();
+	
+	/**
+	 *  Should plugin be started on load.
+	 */
+	public boolean isStartOnLoad();
 }

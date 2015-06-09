@@ -80,6 +80,9 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	 */
 	private ListSelectionListener dataviewController_;
 	
+	/**
+	 * 
+	 */
 	public VisualsPlugin()
 	{
 		mainPane = new JSplitPane();
@@ -509,7 +512,21 @@ public class VisualsPlugin implements IObserverCenterPlugin
 			invertXBox.setSelected(pers.getInvertXAxis());
 			invertYBox.setSelected(pers.getInvertYAxis());
 		}
-		
-		
+	}
+	
+	/**
+	 *  Should plugin be visible.
+	 */
+	public boolean isVisible()
+	{
+		return true;
+	}
+	
+	/**
+	 *  Should plugin be started on load.
+	 */
+	public boolean isStartOnLoad()
+	{
+		return false;
 	}
 }

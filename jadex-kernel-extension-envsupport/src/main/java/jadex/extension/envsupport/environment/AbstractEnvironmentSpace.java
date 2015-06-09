@@ -213,6 +213,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //		if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
 //			System.out.println("Initing space: "+this);
 
+		
 		try
 		{
 			this.classloader	= ia.getClassLoader();
@@ -228,7 +229,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			MEnvSpaceType.setProperties(this, spaceprops, fetcher);
 			
 			this.exta = ia.getExternalAccess();
-			
 			if(this instanceof Space2D) // Hack?
 			{
 				Double width = config.getProperty("width")!=null? (Double)config.getProperty("width"): (Double)mspacetype.getProperty("width");
@@ -242,7 +242,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				Double depth = config.getProperty("depth")!=null? (Double)config.getProperty("depth"): (Double)mspacetype.getProperty("depth");
 				((Space3D)this).setAreaSize(Vector3Double.getVector3(width,depth, height));
 			}
-			
 			// Create space object types.
 			List objecttypes = mspacetype.getPropertyList("objecttypes");
 			if(objecttypes!=null)
@@ -271,7 +270,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addSpaceObjectType(mobjecttype.getName(), mobjecttype);
 				}
 			}
-			
 			// Add avatar mappings.
 			List avmappings = mspacetype.getPropertyList("avatarmappings");
 			if(avmappings!=null)
@@ -321,7 +319,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addPerceptType(pt);
 				}
 			}
-			
 			// Create space actions.
 			List spaceactions = mspacetype.getPropertyList("actiontypes");
 			if(spaceactions!=null)
@@ -337,7 +334,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addSpaceAction((String)MEnvSpaceType.getProperty(maction, "name"), action);
 				}
 			}
-			
 			// Create process types.
 			List processtypes = mspacetype.getPropertyList("processtypes");
 			if(processtypes!=null)
@@ -354,7 +350,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addSpaceProcessType(name, clazz, props);
 				}
 			}
-	
 			// Create task types.
 			List tasktypes = mspacetype.getPropertyList("tasktypes");
 			if(tasktypes!=null)
@@ -370,7 +365,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addObjectTaskType(name, clazz, props);
 				}
 			}
-			
 			// Create percept generators.
 			List gens = mspacetype.getPropertyList("perceptgenerators");
 			if(gens!=null)
@@ -386,7 +380,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addPerceptGenerator(MEnvSpaceType.getProperty(mgen, "name"), gen);
 				}
 			}
-			
 			// Create percept processors.
 			List pmaps = mspacetype.getPropertyList("perceptprocessors");
 			if(pmaps!=null)
@@ -403,7 +396,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addPerceptProcessor(componenttype, ptypes==null? null: new HashSet(ptypes), proc);
 				}
 			}
-			
 			// Create initial objects.
 			List objects = (List)config.getPropertyList("objects");
 			if(objects!=null)
@@ -444,7 +436,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					}
 				}
 			}
-			
 			// Register initial avatars
 			List avatars = (List)config.getPropertyList("avatars");
 			if(avatars!=null)
@@ -473,7 +464,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addInitialAvatar(ownerid, (String)MEnvSpaceType.getProperty(mobj, "type"), props);
 				}
 			}
-			
 			// Create initial processes.
 			List procs = (List)config.getPropertyList("processes");
 			if(procs!=null)
@@ -487,7 +477,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	//				System.out.println("Create space process: "+getProperty(mproc, "type"));
 				}
 			}
-			
 			// Create initial space actions.
 			List actions = (List)config.getPropertyList("spaceactions");
 			if(actions!=null)
@@ -512,7 +501,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.performSpaceAction((String)MEnvSpaceType.getProperty(action, "type"), params);
 				}
 			}
-			
 	//		Map themes = new HashMap();
 			List sourceviews = mspacetype.getPropertyList("dataviews");
 			if(sourceviews!=null)
@@ -535,7 +523,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					}
 				}
 			}
-			
 			// Create the data providers.
 			List providers = mspacetype.getPropertyList("dataproviders");
 			List tmp = config.getPropertyList("dataproviders");
@@ -580,7 +567,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addDataProvider(tablename, tprov);
 				}
 			}
-			
 			// Create the data consumers.
 			List consumers = mspacetype.getPropertyList("dataconsumers");
 			tmp = config.getPropertyList("dataconsumers");
@@ -607,7 +593,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			
 //			if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
 //				System.out.println("Initing space observers: "+this);
-
 			Future<Void>	ocsdone	= new Future<Void>();
 			List observers = config.getPropertyList("observers");
 			if(observers!=null)
@@ -649,8 +634,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //					if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
 //						System.out.println("starting observer: "+this+", "+tmpoc);
 					final IObserverCenter oc = tmpoc;
-					oc.startObserver(title, AbstractEnvironmentSpace.this,
-							ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
+//					oc.startObserver(title, AbstractEnvironmentSpace.this,
+//							ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
 					SServiceProvider.getService(getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -712,6 +697,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							crl2.exceptionOccurred(e);
 						}
 					}
+					
+					oc.startObserver(title, AbstractEnvironmentSpace.this,
+						ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
 				}
 			}
 			else
@@ -2883,7 +2871,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("inited space");
+				System.out.println("inited space");
 				
 //				ia.addComponentListener(new IComponentListener()
 //				{

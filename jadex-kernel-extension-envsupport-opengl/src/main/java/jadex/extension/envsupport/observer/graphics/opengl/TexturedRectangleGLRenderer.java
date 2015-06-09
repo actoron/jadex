@@ -67,6 +67,8 @@ public class TexturedRectangleGLRenderer extends AbstractGLRenderer
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
 		
 		Color currentColor = (Color) dc.getBoundValue(obj, primitive.getColor(), vp);
+		if(currentColor==null)
+			currentColor=Color.WHITE;
 		
 		gl.glColor4fv(currentColor.getComponents(null), 0);
 		

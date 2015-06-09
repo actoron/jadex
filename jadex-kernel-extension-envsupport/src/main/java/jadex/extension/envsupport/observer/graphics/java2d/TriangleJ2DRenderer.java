@@ -8,6 +8,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 
+/**
+ * 
+ */
 public class TriangleJ2DRenderer extends AbstractJ2DRenderer
 {
 	/** Triangle path for Java2D. */

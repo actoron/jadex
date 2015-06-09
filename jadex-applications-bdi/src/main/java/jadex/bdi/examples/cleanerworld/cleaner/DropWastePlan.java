@@ -34,9 +34,9 @@ public class DropWastePlan extends Plan
 		IVector2 location = (IVector2)wastebin.getProperty(Space2D.PROPERTY_POSITION);
 		IGoal moveto = createGoal("achievemoveto");
 		moveto.getParameter("location").setValue(location);
-		System.out.println("Created dwp: "+location+" "+this);
+//		System.out.println("Created dwp: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
-		System.out.println("Reached: "+location+" "+this);		
+//		System.out.println("Reached: "+location+" "+this);		
 
 		// Drop waste to waste-bin.
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();

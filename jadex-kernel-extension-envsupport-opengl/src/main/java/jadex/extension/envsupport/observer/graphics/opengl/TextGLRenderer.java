@@ -79,6 +79,8 @@ public class TextGLRenderer implements IGLRenderer
 		TextRenderer tr = vp.getTextRenderer(font);
 		
 		Color color = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
+		if(color==null)
+			color=Color.WHITE;
 		tr.setColor(color);
 		
 		IVector2 pos = Text.getBasePosition(vp, dcPos, position, canvasSize, vp.getInvertX(), vp.getInvertY());
