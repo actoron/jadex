@@ -1,4 +1,4 @@
-package jadex.bridge.modelinfo;
+package jadex.application;
 
 import jadex.commons.future.IFuture;
 

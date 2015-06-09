@@ -2,7 +2,7 @@ package jadex.bdi.examples.blackjack.player;
 
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.RequestJoin;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.Done;

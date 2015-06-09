@@ -7,8 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -385,15 +384,13 @@ public class ClockFrame extends JFrame
 				{
 					RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
-					SServiceProvider.getService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//					ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
-						.addResultListener(new SwingDefaultResultListener(ClockFrame.this)
+					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+					fut.addResultListener(new SwingDefaultResultListener<IClockService>(ClockFrame.this)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(final IClockService cs)
 						{
 							if(!shutdown)
 							{
-								IClockService cs = (IClockService)result;
 								Date current = new Date(cs.getTime());
 								
 								if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || init)

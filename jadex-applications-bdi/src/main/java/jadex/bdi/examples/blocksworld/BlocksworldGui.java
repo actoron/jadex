@@ -3,9 +3,7 @@ package jadex.bdi.examples.blocksworld;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.impl.CapabilityWrapper;
 import jadex.bdiv3.runtime.impl.RCapability;
-import jadex.bdiv3x.features.BDIAgentFeature;
 import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -144,17 +142,17 @@ public class BlocksworldGui	extends JFrame
 						});
 
 						// Create target option panel.
-						final DefaultListModel	newblocks	= new DefaultListModel();
+						final DefaultListModel<Block>	newblocks	= new DefaultListModel<Block>();
 						for(int i=0; i<blocks.length; i++)
 							newblocks.addElement(new Block(blocks[i].number, blocks[i].getColor(), null));
-						final JList	selblocks	= new JList(newblocks);
+						final JList<Block>	selblocks	= new JList<Block>(newblocks);
 						selblocks.setVisibleRowCount(3);
 						selblocks.setCellRenderer(new BlockCellRenderer());
 						JScrollPane	ssp	= new JScrollPane(selblocks);
 						ssp.setBorder(new BevelBorder(BevelBorder.LOWERED));
-						final DefaultComboBoxModel	addblocks	= new DefaultComboBoxModel();
+						final DefaultComboBoxModel<Block>	addblocks	= new DefaultComboBoxModel<Block>();
 						addblocks.addElement(newtable);
-						final JComboBox	addtarget	= new JComboBox(addblocks);
+						final JComboBox<Block>	addtarget	= new JComboBox<Block>(addblocks);
 						addtarget.setRenderer(new BlockCellRenderer());
 						selblocks.addMouseListener(new MouseAdapter()
 						{
@@ -276,10 +274,10 @@ public class BlocksworldGui	extends JFrame
 						final JLabel	showcol	= new JLabel(" color ");
 						showcol.setOpaque(true);
 						showcol.setBackground(new Color(240, 128, 16));
-						final DefaultComboBoxModel	delblocks	= new DefaultComboBoxModel();
+						final DefaultComboBoxModel<Block>	delblocks	= new DefaultComboBoxModel<Block>();
 						for(int i=0; i<blocks.length; i++)
 							delblocks.addElement(blocks[i]);
-						final JComboBox	delblock	= new JComboBox(delblocks);
+						final JComboBox<Block>	delblock	= new JComboBox<Block>(delblocks);
 						delblock.setRenderer(new BlockCellRenderer());
 						JButton	create	= new JButton("create block");
 						create.addActionListener(new ActionListener()
@@ -365,7 +363,7 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						// Execution mode components
-						final JComboBox	mode	= new JComboBox(new String[]
+						final JComboBox<String>	mode	= new JComboBox<String>(new String[]
 							{StackBlocksPlan.MODE_NORMAL, StackBlocksPlan.MODE_STEP, StackBlocksPlan.MODE_SLOW});
 						
 						mode.setSelectedItem(md);
@@ -423,7 +421,7 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						// Bucket components
-						final JList bucket = new JList();
+						final JList<Block> bucket = new JList<Block>();
 						bucket.setModel(new BlocksListModel(buck));
 //						agent.getBeliefbase().getBeliefFact("bucket").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
 //						{

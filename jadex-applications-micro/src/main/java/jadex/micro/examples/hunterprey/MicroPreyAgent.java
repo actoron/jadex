@@ -1,5 +1,6 @@
 package jadex.micro.examples.hunterprey;
 
+import jadex.application.EnvironmentService;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -8,8 +9,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.extension.envsupport.EnvironmentService;
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -58,10 +57,10 @@ public class MicroPreyAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		EnvironmentService.getSpace(agent)
-			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Void>(ret)
+		EnvironmentService.getSpace(agent, "my2dspace")
+			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
-			public void customResultAvailable(IEnvironmentSpace result)
+			public void customResultAvailable(Object result)
 			{
 				env	= (Grid2D)result;
 		

@@ -27,9 +27,6 @@ public class ConfigurationInfo extends Startable
 	/** The list of result default values. */
 	protected List<UnparsedExpression> results;
 	
-	/** The list of extensions. */
-	protected List<IExtensionInfo> extensions;
-	
 	/** The provided service overridings. */
 	protected List<ProvidedServiceInfo> providedservices;
 	
@@ -224,33 +221,6 @@ public class ConfigurationInfo extends Startable
 		if(results==null)
 			results = new ArrayList<UnparsedExpression>();
 		results.add(res);
-	}
-	
-	/**
-	 *  Get the extension names. 
-	 */
-	public IExtensionInfo[] getExtensions()
-	{
-		return extensions!=null? extensions.toArray(new IExtensionInfo[extensions.size()]): new IExtensionInfo[0];
-	}
-	
-	/**
-	 *  Set the extension types.
-	 */
-	public void setExtensions(IExtensionInfo[] extensions)
-	{
-		this.extensions = SUtil.arrayToList(extensions);
-	}
-	
-	/**
-	 *  Add a extension type.
-	 *  @param extension The extension type.
-	 */
-	public void addExtension(IExtensionInfo extension)
-	{
-		if(extensions==null)
-			extensions = new ArrayList<IExtensionInfo>();
-		extensions.add(extension);
 	}
 	
 	/**

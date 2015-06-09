@@ -88,13 +88,11 @@ public class AlarmsGui extends JFrame
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-				ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
-					.addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
+				IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+				fut.addResultListener(new SwingDefaultResultListener<IClockService>(AlarmsGui.this)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(final IClockService cs)
 					{
-						final IClockService cs = (IClockService)result;
 						alarms = new JTable(tadata)
 						{
 							public Component prepareRenderer(

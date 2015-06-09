@@ -634,8 +634,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //					if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
 //						System.out.println("starting observer: "+this+", "+tmpoc);
 					final IObserverCenter oc = tmpoc;
-//					oc.startObserver(title, AbstractEnvironmentSpace.this,
-//							ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
+					oc.startObserver(title, AbstractEnvironmentSpace.this,
+						ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
 					SServiceProvider.getService(getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -698,8 +698,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						}
 					}
 					
-					oc.startObserver(title, AbstractEnvironmentSpace.this,
-						ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
+//					oc.startObserver(title, AbstractEnvironmentSpace.this,
+//						ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
 				}
 			}
 			else

@@ -568,7 +568,7 @@ public class DhtViewerPanel extends JPanel
 				public void resultAvailable(Object result) {
 					IDistributedKVStoreService storage = (IDistributedKVStoreService) result;
 					statusTf.setText("Status: Found corresponding store service: " + result);
-					storage.publish(key, value).addResultListener(new DefaultResultListener<IID>() {
+					storage.put(key, value).addResultListener(new DefaultResultListener<IID>() {
 
 						@Override
 						public void resultAvailable(IID result) {

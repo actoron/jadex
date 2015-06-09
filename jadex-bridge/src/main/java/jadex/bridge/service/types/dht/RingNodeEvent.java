@@ -31,8 +31,14 @@ public class RingNodeEvent
 		 */
 		PREDECESSOR_CHANGE,
 		/**
+		 * Thrown when successor changes. oldFinger and newFinger will be set
+		 * to the old/new successor.
+		 */
+		SUCCESSOR_CHANGE,
+		/**
 		 * Thrown when a fingertable entry changes. oldFinger and newFigner and
 		 * indexes will hold the old/new finger entry.
+		 * Only thrown if index != 0, in this case SUCCESSOR_CHANGE is used.
 		 */
 		FINGERTABLE_CHANGE
 	}
@@ -106,7 +112,7 @@ public class RingNodeEvent
 	 */
 	public static RingNodeEvent successorChange(IID myNodeId, IFinger oldFinger, IFinger newFinger)
 	{
-		return new RingNodeEvent(myNodeId, EventType.FINGERTABLE_CHANGE, 0, oldFinger, newFinger);
+		return new RingNodeEvent(myNodeId, EventType.SUCCESSOR_CHANGE, 0, oldFinger, newFinger);
 	}
 
 	/**

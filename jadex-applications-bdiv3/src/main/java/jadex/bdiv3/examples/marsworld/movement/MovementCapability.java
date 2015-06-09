@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.marsworld.movement;
 
+import jadex.application.EnvironmentService;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
@@ -14,7 +15,6 @@ import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
@@ -48,7 +48,7 @@ public class MovementCapability
 	protected ICapability	capa;
 	
 	/** The environment. */
-	protected AbstractEnvironmentSpace env = (AbstractEnvironmentSpace)EnvironmentService.getSpace(capa.getAgent()).get();
+	protected AbstractEnvironmentSpace env = (AbstractEnvironmentSpace)EnvironmentService.getSpace(capa.getAgent(), "myspace").get();
 	
 	/** The environment. */
 	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());

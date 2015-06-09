@@ -1,5 +1,6 @@
 package jadex.extension.envsupport;
 
+import jadex.application.ApplicationModelInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
@@ -210,11 +211,11 @@ public class MEnvSpaceType
 	
 	//-------- static part --------
 	
-	protected static final Set	TYPES;
+	protected static final Set<TypeInfo>	TYPES;
 	
 	static
 	{
-		Set types = new HashSet();
+		Set<TypeInfo> types = new HashSet<TypeInfo>();
 		
 		IStringObjectConverter typeconv = new ClassConverter();
 		IStringObjectConverter colorconv = new ColorConverter();
@@ -2744,7 +2745,7 @@ public class MEnvSpaceType
 				public Object postProcess(IContext context, Object object)
 				{
 					MEnvSpaceInstance	si	= (MEnvSpaceInstance)object;
-					IModelInfo	model	= (IModelInfo)context.getRootObject();
+					ApplicationModelInfo	model	= (ApplicationModelInfo)context.getRootObject();
 					Object[] extypes = model.getExtensionTypes();
 					for(int i=0; i<extypes.length; i++)
 					{
@@ -2763,6 +2764,7 @@ public class MEnvSpaceType
 					return 1;
 				}
 		}),
+
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("type", "typeName")),
 			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),

@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -80,9 +79,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The subcomponent types. */
 	protected List<SubcomponentTypeInfo> subcomponents;
-	
-	/** The extensions. */
-	protected List<Object> extensions;
 	
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
@@ -928,23 +924,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	}
 	
 	/**
-	 *  Get the extension names. 
-	 */
-	public Object[] getExtensionTypes()
-	{
-		return extensions!=null? extensions.toArray(): new Object[0];
-	}
-	
-	// written with small 'types' to exclude from xml 
-	/**
-	 *  Set the extension types.
-	 */
-	public void setExtensiontypes(Object[] extensions)
-	{
-		this.extensions = SUtil.arrayToList(extensions);
-	}
-	
-	/**
 	 *  Get the possible breakpoint places in that model.
 	 *  @return The breakpoints.
 	 */
@@ -960,17 +939,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void setBreakpoints(String[] breakpoints)
 	{
 		this.breakpoints = breakpoints;
-	}
-
-	/**
-	 *  Add a extension type.
-	 *  @param extension The extension type.
-	 */
-	public void addExtensiontype(Object extension)
-	{
-		if(extensions==null)
-			extensions = new ArrayList<Object>();
-		extensions.add(extension);
 	}
 
 	/**

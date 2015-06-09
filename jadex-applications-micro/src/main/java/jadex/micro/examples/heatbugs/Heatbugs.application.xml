@@ -122,13 +122,6 @@
 		<!--  <componenttype name="Heatbug" filename="jadex.micro.examples.heatbugs.HeatbugAgent.class"/>-->
 	</componenttypes>
 	
-	<services>
-	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
-	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
-	    </providedservice>
-	</services>
-	
-	
 	<configurations>
 		<configuration name="20x20 and 20 bugs">
 			<extensions>

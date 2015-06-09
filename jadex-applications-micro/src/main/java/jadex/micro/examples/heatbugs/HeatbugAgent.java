@@ -1,16 +1,12 @@
 package jadex.micro.examples.heatbugs;
 
+import jadex.application.EnvironmentService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.extension.envsupport.EnvironmentService;
-import jadex.extension.envsupport.IEnvironmentService;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -61,10 +57,10 @@ public class HeatbugAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		EnvironmentService.getSpace(agent)
-			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Void>(ret)
+		EnvironmentService.getSpace(agent, "mygc2dspace")
+			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
-			public void customResultAvailable(IEnvironmentSpace result)
+			public void customResultAvailable(Object result)
 			{
 				final Grid2D grid = (Grid2D)result;
 				ISpaceObject avatar = grid.getAvatar(agent.getComponentDescription());

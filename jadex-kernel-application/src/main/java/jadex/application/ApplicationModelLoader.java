@@ -6,6 +6,7 @@ import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
 import jadex.kernelbase.CacheableKernelModel;
+import jadex.xml.TypeInfo;
 
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class ApplicationModelLoader extends AbstractModelLoader
 	/**
 	 *  Create a new BPMN model loader.
 	 */
-	public  ApplicationModelLoader(Set[] mappings)
+	public  ApplicationModelLoader(Set<TypeInfo>[] mappings)
 	{
 		super(new String[]{FILE_EXTENSION_APPLICATION});
 		this.reader = new ApplicationXMLReader(mappings);

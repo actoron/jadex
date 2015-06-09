@@ -214,12 +214,6 @@
 		<componenttype name="Burner" filename="jadex/bdiv3/examples/garbagecollector/GarbageBurnerBDI.class"/>
 	</componenttypes>
 	
-	<services>
-	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
-	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
-	    </providedservice>
-	</services>
-	
 	<!-- Application instance definitions. -->
 	<configurations>
 	

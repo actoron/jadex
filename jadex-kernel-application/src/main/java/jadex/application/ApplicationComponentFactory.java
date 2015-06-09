@@ -17,8 +17,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.extension.agr.AGRExtensionService;
-import jadex.extension.envsupport.MEnvSpaceType;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.io.IOException;
@@ -149,13 +147,33 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					{
 						libservice = result;
 						
-						// Todo: make configurable again?
-						Set<?>[]	mappings	= new Set[]
+						// Todo: hack!!! make extensions configurable also for reflective constructor (how?)
+						String[]	extensions	= new String[]
 						{
-							AGRExtensionService.getXMLMapping(),
-							MEnvSpaceType.getXMLMapping()
+							"jadex.extension.envsupport.MEnvSpaceType", "getXMLMapping",
+							"jadex.extension.agr.AGRExtensionService", "getXMLMapping"
 						};
-						loader = new ApplicationModelLoader(mappings);
+						List<Set<?>>	mappings	= new ArrayList<Set<?>>();
+						for(int i=0; i<extensions.length; i+=2)
+						{
+							try
+							{
+								Class<?>	clazz	= Class.forName(extensions[i], true, getClass().getClassLoader());
+								Method	m	= clazz.getMethod(extensions[i+1], new Class[0]);
+								mappings.add((Set<?>)m.invoke(null, new Object[0]));
+							}
+							catch(ClassNotFoundException e)
+							{
+								// Extension not present -> ignore.
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();				
+							}
+							
+						}
+						
+						loader = new ApplicationModelLoader(mappings.toArray(new Set[0]));
 						
 						libservicelistener = new ILibraryServiceListener()
 						{
@@ -324,8 +342,14 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public Map<String, Object>	getProperties(String type)
 	{
-		return FILETYPE_APPLICATION.equals(type)
-			? Collections.EMPTY_MAP : null;
+		if(FILETYPE_APPLICATION.equals(type))
+		{
+			return Collections.emptyMap();
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	

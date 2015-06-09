@@ -4,6 +4,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
@@ -46,7 +47,7 @@ public class BenchmarkPlan	extends Plan
 			for(int i=1; i<=goals; i++)
 			{
 				// Create copies of existing blocks.
-				ArrayList	newblocks	= new ArrayList();
+				List<Block>	newblocks	= new ArrayList<Block>();
 				for(int j=0; j<blocks.length; j++)
 				{
 					newblocks.add(new Block(blocks[j].number, blocks[j].getColor(), null));
@@ -54,7 +55,7 @@ public class BenchmarkPlan	extends Plan
 
 				// Create random configuration of copied blocks.
 				Table	table	= new Table();
-				ArrayList	targets	= new ArrayList();
+				List<Block>	targets	= new ArrayList<Block>();
 				targets.add(table);
 				while(newblocks.size()>0)
 				{

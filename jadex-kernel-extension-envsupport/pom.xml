@@ -43,7 +43,7 @@
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-component</artifactId>
+			<artifactId>jadex-kernel-application</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		

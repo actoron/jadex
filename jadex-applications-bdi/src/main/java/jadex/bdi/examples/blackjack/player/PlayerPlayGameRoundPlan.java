@@ -9,11 +9,11 @@ import jadex.bdi.examples.blackjack.RequestBet;
 import jadex.bdi.examples.blackjack.RequestDraw;
 import jadex.bdi.examples.blackjack.RequestFinished;
 import jadex.bdi.examples.blackjack.player.HumanPlayerInterface.HumanPlayerControlPanel;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.fipa.SFipa;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.gui.GuiCreator;
 
 /**

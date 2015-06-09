@@ -1,8 +1,8 @@
 package jadex.extension.agr;
 
+import jadex.application.IExtensionInfo;
+import jadex.application.IExtensionInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.modelinfo.IExtensionInfo;
-import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;

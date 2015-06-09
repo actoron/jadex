@@ -1,6 +1,6 @@
 package jadex.bdiv3.examples.disastermanagement.movement;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jadex.application.EnvironmentService;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
@@ -10,7 +10,6 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -19,6 +18,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * 
@@ -38,7 +38,7 @@ public class MovementCapa implements IEnvAccess
 	protected ICapability capa;
 	
 	/** The environment. */
-	protected ContinuousSpace2D env = (ContinuousSpace2D)EnvironmentService.getSpace(capa.getAgent()).get();
+	protected ContinuousSpace2D env = (ContinuousSpace2D)EnvironmentService.getSpace(capa.getAgent(), "my2dspace").get();
 	
 	/** The environment. */
 	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());

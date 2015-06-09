@@ -36,7 +36,7 @@ public class BlocksworldPanel	extends JPanel
 	protected PropertyChangeListener	pcl;
 
 	/** The known blocks. */
-	protected Map	blocks;
+	protected Map<Block, String>	blocks;
 
 	/** The block size (in pixels). */
 	protected int	blocksize;
@@ -56,7 +56,7 @@ public class BlocksworldPanel	extends JPanel
 		this.table	= table;
 		this.imaginary	= imaginary;
 		this.blocksize	= 100;
-		this.blocks	= new WeakHashMap();
+		this.blocks	= new WeakHashMap<Block, String>();
 
 		// Update gui when table changes.
 		this.pcl	= new PropertyChangeListener()

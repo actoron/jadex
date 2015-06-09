@@ -62,7 +62,6 @@
 					<xs:element name="properties" type="properties" minOccurs="0"/>
 					<xs:element name="nfproperties" type="nfproperties" minOccurs="0"/>
 					<xs:element name="configurations" type="configurations" minOccurs="0"/>
-					<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
 				</xs:all>
 				<xs:attribute name="name" type="xs:string" use="required"/>
 				<xs:attribute name="package" type="xs:string" use="optional"/>
@@ -187,37 +186,6 @@ In the configurations section, predefined
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="extensiontypes">
-		<xs:annotation>
-			<xs:documentation>
-In this section, specifications for extensions as required
- by some specific factory component extension service (e.g.
- EnvSupport) can be placed.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:any minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="subcomponenttype">
-		<xs:annotation>
-			<xs:documentation>Defines a component type.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="startabletype">
-				<xs:attribute name="name" type="xs:string" use="required">
-					<xs:annotation>
-						<xs:documentation>The name of the agent type (used for referring to the agent type from other parts of the application descriptor).</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-				<xs:attribute name="filename" type="xs:string" use="required">
-					<xs:annotation>
-						<xs:documentation>The implementation of the agent type. Can be a logical name (resolved using imports) or a concrete file name (e.g. to a bdi agent.xml).</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
 	<xs:complexType name="configuration">
 		<xs:annotation>
 			<xs:documentation>A predefined application configuration.</xs:documentation>
@@ -228,7 +196,6 @@ In this section, specifications for extensions as required
 					<xs:element name="arguments" type="configarguments" minOccurs="0"/>
 					<xs:element name="components" type="configcomponents" minOccurs="0"/>
 					<xs:element name="services" type="configservices" minOccurs="0"/>
-					<xs:element name="extensions" type="extensions" minOccurs="0"/>
 					<xs:element name="steps" type="configsteps" minOccurs="0"/>
 				</xs:all>
 				<xs:attribute name="name" type="xs:string" use="required"/>
@@ -302,17 +269,24 @@ In this section, specifications for extensions as required
 			<xs:element name="endstep" type="steptype" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="extensions">
+	<xs:complexType name="subcomponenttype">
 		<xs:annotation>
-			<xs:documentation>
-In this section, specifications for extensions as required
- by some specific factory component extension service (e.g.
-				EnvSupport) can be placed.
-			</xs:documentation>
+			<xs:documentation>Defines a component type.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:any minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
+		<xs:complexContent>
+			<xs:extension base="startabletype">
+				<xs:attribute name="name" type="xs:string" use="required">
+					<xs:annotation>
+						<xs:documentation>The name of the agent type (used for referring to the agent type from other parts of the application descriptor).</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="filename" type="xs:string" use="required">
+					<xs:annotation>
+						<xs:documentation>The implementation of the agent type. Can be a logical name (resolved using imports) or a concrete file name (e.g. to a bdi agent.xml).</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="component">
 		<xs:annotation>

@@ -1,7 +1,6 @@
 package jadex.bdi.examples.blackjack.manager;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;

@@ -249,20 +249,7 @@
 		</property>
 	</properties>
 
-	<services>
-	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
-	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
-	    </providedservice>
-	</services>
-	
 	<configurations>
-		
- 	 
- 		
- 		
- 		
- 		
- 		
  		<configuration name="1 Sentry / 2 Producers / 3 Carries">
 			<extensions>
 				<env:envspace name="myspace" type="3dspace">

@@ -5,6 +5,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Exclude;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -20,7 +21,34 @@ public interface IDistributedKVStoreService
 	 * @param value The Value.
 	 * @return The ID of the node this key was saved in.
 	 */
-	public IFuture<IID> publish(String key, Object value);
+	public IFuture<IID> put(String key, Object value);
+	
+	/**
+	 * Add a key/value pair to the collection addressed by the given key.
+	 * 
+	 * @param key The Key.
+	 * @param value The Value to add.
+	 * @return The ID of the node this key was saved in.
+	 */
+	public IFuture<IID> add(String key, Object value);
+	
+	/**
+	 * Store a key/value pair in the local map.
+	 * 
+	 * @param key The key
+	 * @param value The value
+	 * @return the ID of the local node.
+	 */
+//	public IFuture<IID> putLocal(String key, Object value);
+	
+	/**
+	 * Store a key/value pair in the local map.
+	 * 
+	 * @param key The key
+	 * @param value The value
+	 * @return the ID of the local node.
+	 */
+//	public IFuture<IID> addLocal(String key, Object value);
 	
 	/**
 	 * Lookup a key and return the responsible Node ID.
@@ -64,15 +92,6 @@ public interface IDistributedKVStoreService
 	public IFuture<IRingApplicationService> getRingService();
 
 	/**
-	 * Store a key/value pair in the local map.
-	 * 
-	 * @param key The key
-	 * @param value The value
-	 * @return the ID of the local node.
-	 */
-	public IFuture<IID> storeLocal(String key, Object value);
-	
-	/**
 	 * Returns all keys stored in this node.
 	 * 
 	 * @return Set of Keys.
@@ -85,7 +104,7 @@ public interface IDistributedKVStoreService
 	 * @param targetNodeId
 	 * @return Set of all matching entries.
 	 */
-	public IFuture<Set<StoreEntry>> moveEntries(IID targetNodeId);
+	public IFuture<Collection<StoreEntry>> moveEntries(IID targetNodeId);
 
 	/**
 	 * Sets the initialized flag.

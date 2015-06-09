@@ -32,7 +32,7 @@
 
 	<beliefs>
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact class="ContinuousSpace2D">jadex.extension.envsupport.EnvironmentService.getSpace($component).get()</fact>
+ 			<fact class="ContinuousSpace2D">jadex.application.EnvironmentService.getSpace($component, "my2dspace").get()</fact>
  		</belief>
  		
  		<belief name="myself" class="ISpaceObject" exported="true">

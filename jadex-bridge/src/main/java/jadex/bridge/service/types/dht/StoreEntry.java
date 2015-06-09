@@ -9,6 +9,13 @@ public class StoreEntry
 {
 
 	private Tuple3<IID, String, Object> content;
+
+	/**
+	 * Empty constructor.
+	 */
+	public StoreEntry()
+	{
+	}
 	
 	/**
 	 * Constructor.
@@ -20,6 +27,14 @@ public class StoreEntry
 	{
 		content = new Tuple3<IID, String, Object>(hash, key, value);
 	}
+
+	/**
+	 * Copy Constructor.
+	 */
+//	public StoreEntry(StoreEntry entry)
+//	{
+//		this(entry.getIdHash(), entry.getKey(), entry.getValue());
+//	}
 
 	/**
 	 * Get the hash.

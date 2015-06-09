@@ -1,5 +1,6 @@
 package jadex.micro.examples.fireflies;
 
+import jadex.application.EnvironmentService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -7,8 +8,6 @@ import jadex.commons.IFilter;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.extension.envsupport.EnvironmentService;
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
@@ -53,10 +52,10 @@ public class FireflyAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		EnvironmentService.getSpace(agent)
-			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Void>(ret)
+		EnvironmentService.getSpace(agent, "mygc2dspace")
+			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
-			public void customResultAvailable(IEnvironmentSpace result)
+			public void customResultAvailable(Object result)
 			{
 				final ContinuousSpace2D space = (ContinuousSpace2D)result;
 					

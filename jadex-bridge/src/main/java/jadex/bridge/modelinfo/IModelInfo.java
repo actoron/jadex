@@ -10,7 +10,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -241,13 +240,6 @@ public interface IModelInfo
 	 *  Get the subcomponent names. 
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes();
-	
-	/**
-	 *  Get the extension types.
-	 *  @return An array of extension declarations as specified in the extensions section of the component model.
-	 *    The concrete object type depends on the type of the extension (e.g. EnvSupport vs. AGR).
-	 */
-	public Object[] getExtensionTypes();
 	
 	/**
 	 *  Get the possible breakpoint places in that model.
