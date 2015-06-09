@@ -17,6 +17,7 @@ import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingNodeService;
+import jadex.bridge.service.types.dht.StoreEntry;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
@@ -27,7 +28,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -124,8 +128,31 @@ public class DistributedKVStoreTest extends TestCase
 	{
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 		
+		IComponentIdentifier identifier = createComponent(cms, DistributedKVStoreAgent.class);
+		
+//		IDebugRingNode declaredService = SServiceProvider.getDeclaredService(platform, IDebugRingNode.class).get();
+//		System.out.println(declaredService);
+		
+		IDistributedKVStoreService storeService = SServiceProvider.getService(platform, identifier, IDistributedKVStoreService.class).get(timeout);
+		
+		IRingNodeDebugService iDebugRingNode = null; 
+		
+//		IComponentIdentifier[] iComponentIdentifiers = cms.getChildren(identifier).get();
+//		for(IComponentIdentifier cid : iComponentIdentifiers)
+//		{
+//			if (cid.getLocalName().equals("RingNode")) {
+				iDebugRingNode = SServiceProvider.getService(platform, identifier, IRingNodeDebugService.class).get(timeout);		
+//			}
+//		}
+		
+		iDebugRingNode.disableSchedules();
+		return new Tuple2<IDistributedKVStoreService, IRingNodeDebugService>(storeService, iDebugRingNode);
+	}
+
+	private IComponentIdentifier createComponent(IComponentManagementService cms, Class<?> clazz)
+	{
 		final Future<IComponentIdentifier> future = new Future<IComponentIdentifier>();
-		cms.createComponent(DistributedKVStoreAgent.class.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>()
+		cms.createComponent(clazz.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>()
 		{
 			@Override
 			public void firstResultAvailable(IComponentIdentifier result)
@@ -146,30 +173,71 @@ public class DistributedKVStoreTest extends TestCase
 		
 		// wait for creation
 		IComponentIdentifier identifier = future.get(timeout);
-		
-//		IDebugRingNode declaredService = SServiceProvider.getDeclaredService(platform, IDebugRingNode.class).get();
-//		System.out.println(declaredService);
-		
-		IDistributedKVStoreService storeService = SServiceProvider.getService(platform, identifier, IDistributedKVStoreService.class).get(timeout);
-		
-		IRingNodeDebugService iDebugRingNode = null; 
-		
-//		IComponentIdentifier[] iComponentIdentifiers = cms.getChildren(identifier).get();
-//		for(IComponentIdentifier cid : iComponentIdentifiers)
-//		{
-//			if (cid.getLocalName().equals("RingNode")) {
-				iDebugRingNode = SServiceProvider.getService(platform, identifier, IRingNodeDebugService.class).get(timeout);		
-//			}
-//		}
-		
-		iDebugRingNode.disableSchedules();
-		return new Tuple2<IDistributedKVStoreService, IRingNodeDebugService>(storeService, iDebugRingNode);
+		return identifier;
 	}
 	
 	@Test
 	public void testSave() {
-		store1.storeLocal("test", "testValue");
+		store1.put("test", "testValue");
 		assertEquals("testValue", store1.lookup("test").get());
+	}
+	
+	@Test
+	public void testSaveRemote() {
+		ring1.join(ring2).get();
+		stabilize2(ring1, ring2, ring3).get();
+		ring3.join(ring2).get();
+		stabilize2(ring1, ring2, ring3).get();
+		
+		assertCircle(ring1,ring2,ring3);
+		IID iid = ring1.getId().get();
+		final String key = findKeyForStoreId(iid, ring2.getId().get(), ring3.getId().get());
+		
+		System.out.println("key for id : " + iid + " is: "  + key + " with hash: " + ID.get(key));
+		
+		// value has to be stored in store1, so store2 should pass it through.
+		IID put = store2.put(key, "testValue").get();
+		
+		// check if store1 knows it is responsible for the key
+		IID responsibleId = store1.lookupResponsibleStore(key).get();
+		assertEquals(iid, responsibleId);
+
+		// check if retrieval works by calling lookup on all stores.
+		assertEquals("testValue", store1.lookup(key).get());
+		assertEquals("testValue", store2.lookup(key).get());
+		assertEquals("testValue", store3.lookup(key).get());
+	}
+	
+//	@Test
+//	public void testMove() {
+//		store1.put("testXX", "testValue");
+//		Set<StoreEntry> moveEntries = store1.moveEntries(store1.getRingService().get().getId().get()).get();
+//		StoreEntry next = moveEntries.iterator().next();
+//		assertEquals("testXX", next.getKey());
+//		assertEquals("testValue", next.getValue());
+//	}
+	
+	@Test
+	public void testMoveRemote() {
+//		ring1.join(ring2).get();
+//		stabilize2(ring1, ring2, ring3).get();
+		// ring consists of ring1 only
+		
+		final String key = findKeyForStoreId(ring2.getId().get(), ring1.getId().get(), ring3.getId().get());
+		IID put = store1.put(key, "testValue").get();
+		// value is stored in store1, but the key is in the range of store2.
+		
+		// during join, the key should be moved to ring2:
+		ring2.join(ring1).get();
+		stabilize2(ring1, ring2, ring3).get();
+		
+		// check if all stores know that store2 is responsible for the key now:
+		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
+		
+		// check if correct value is saved now:
+		assertEquals("testValue", store2.lookup(key).get());
+		assertEquals("testValue", store1.lookup(key).get());
 	}
 	
 //	@Test
@@ -206,6 +274,36 @@ public class DistributedKVStoreTest extends TestCase
 	// --------- HELPER ------------
 	// -----------------------------
 	
+	private String findKeyForStoreId(IID storeId, IID... others)
+	{
+		Random random = new Random();
+		boolean found = false;
+		String foundKey = null;
+		
+//		System.out.println("Searching for matching key: " + storeId);
+//		for(int i = 0; i < others.length; i++)
+//		{
+//			System.out.println("other id: " + others[i]);
+//		}
+		
+		while (!found) {
+			int nextInt = random.nextInt(Integer.MAX_VALUE);
+			String s = "key_" + nextInt;
+			foundKey = s;
+			IID iid = ID.get(s);
+			found = true;
+			for(IID other : others)
+			{
+				if (!iid.isInInterval(other, storeId)) 
+				{
+					found = false;
+					break;
+				}
+			}
+		}
+		return foundKey;
+	}
+
 	private void assertCircle(IRingNodeDebugService ... rns)
 	{
 		IRingNodeService[] circleContents = new IRingNodeService[rns.length];
@@ -274,12 +372,12 @@ public class DistributedKVStoreTest extends TestCase
 		}
 	}
 
-	private IFuture<Void> stabilize2(IRingNodeDebugService[] nodes) {
+	private IFuture<Void> stabilize2(IRingNodeDebugService ... nodes) {
 		stabilize(nodes).get();
 		return stabilize(nodes);
 	}
 	
-	private IFuture<Void> stabilize(IRingNodeDebugService[] nodes)
+	private IFuture<Void> stabilize(IRingNodeDebugService ... nodes)
 	{
 		final Future<Void> future = new Future<Void>();
 
@@ -290,7 +388,7 @@ public class DistributedKVStoreTest extends TestCase
 			public void resultAvailable(Void result)
 			{
 				super.resultAvailable(result);
-				System.out.println("count: " + cnt);
+//				System.out.println("count: " + cnt);
 			}
 
 			@Override

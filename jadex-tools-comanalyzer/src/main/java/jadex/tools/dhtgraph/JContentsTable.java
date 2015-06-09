@@ -5,12 +5,18 @@ import jadex.bridge.service.types.dht.IID;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.table.AbstractTableModel;
 
 public class JContentsTable extends JTable {
@@ -36,8 +42,72 @@ public class JContentsTable extends JTable {
 
 		model = new ContentsModel(content);
 		setModel(model);
+		
+		addMouseListener(new MouseAdapter()
+		{
+
+			@Override
+			public void mouseClicked(final MouseEvent e)
+			{
+				if (e.getClickCount() == 2) {
+					 java.awt.Point p = e.getPoint();
+			        int rowIndex = rowAtPoint(p);
+//			        int colIndex = columnAtPoint(p);
+			        
+			        try {
+			        	final Object key = getValueAt(rowIndex, 0);
+			            Object value = getValueAt(rowIndex, 2);
+			            final StringBuilder display = new StringBuilder();
+			            if (value instanceof Collection) {
+			            	Collection col = (Collection)value;
+//			            	display.append("Collection:\n");
+			            	for(Object object : col)
+							{
+								display.append(object.toString() + "\n");
+							}
+			            } else {
+			            	display.append(value.toString());
+			            }
+			            
+			            new JDialog() {{
+			            	setTitle("Value for Key: " + key.toString());
+			            	setLocation(e.getXOnScreen()-200, e.getYOnScreen() -200);
+			            	add(new JTextArea() {{
+			            		setText(display.toString());
+			            	}});
+			            	setSize(400, 400);
+			            	setPreferredSize(new Dimension(400,400));
+			            	setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			            }}.setVisible(true);
+			        } catch (RuntimeException e1) {
+			            //catch null pointer exception if mouse is over an empty line
+			        }
+				        
+				}
+			}
+			
+		});
 	}
 	
+	@Override
+	public String getToolTipText(MouseEvent e)
+	{
+		String tip = null;
+        java.awt.Point p = e.getPoint();
+        int rowIndex = rowAtPoint(p);
+        int colIndex = columnAtPoint(p);
+
+        try {
+            tip = getValueAt(rowIndex, colIndex).toString();
+        } catch (RuntimeException e1) {
+            //catch null pointer exception if mouse is over an empty line
+        }
+
+        return tip;
+	}
+	
+	
+
 	public void setSortedContent(List<Tuple2<String, Object>> content) {
 		if (content == null) {
 			content = new ArrayList<Tuple2<String, Object>>();
