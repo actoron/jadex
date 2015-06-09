@@ -36,7 +36,8 @@
 			<!-- The objecttypes of this environment. -->
 			<env:objecttypes>
 				<env:objecttype name="collector">
-					<env:property name="rotation" dynamic="true">
+					<env:property name="lastmove"/>
+				    <env:property name="rotation" dynamic="true">
 						$object.lastmove==null || $object.lastmove.equals("right")? null:
 						$object.lastmove.equals("left")? new Vector3Double(Math.PI,0,Math.PI):
 						$object.lastmove.equals("up")? new Vector3Double(0,0,Math.PI*3/2):
@@ -44,9 +45,12 @@
 					</env:property>
 					<env:property name="vision_range">0</env:property>
 					<env:property name="position" event="true"/>
+					<env:property name="garbage" event="true"/>
 				</env:objecttype>
 				<env:objecttype name="burner">
 					<env:property name="vision_range">0</env:property>
+					<env:property name="garbage"/>
+					<env:property name="position"/>
 				</env:objecttype>
 				<env:objecttype name="garbage">
 					<env:property name="position" event="true"/>

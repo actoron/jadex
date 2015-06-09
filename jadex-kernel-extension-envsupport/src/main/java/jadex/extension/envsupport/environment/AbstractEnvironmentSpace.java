@@ -2873,7 +2873,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		{
 			public void customResultAvailable(Void result)
 			{
-				System.out.println("inited space");
+//				System.out.println("inited space");
 				
 //				ia.addComponentListener(new IComponentListener()
 //				{
