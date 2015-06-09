@@ -273,7 +273,6 @@ public class BDIClassReader extends MicroClassReader
 			String name = entry.getKey();
 			BDIModel capa = entry.getValue();
 			
-			capa.getModelInfo().getExtensionTypes(); //???
 			capa.getModelInfo().getConfigurations();	// todo!!!
 
 			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())

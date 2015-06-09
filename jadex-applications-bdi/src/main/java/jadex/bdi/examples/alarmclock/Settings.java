@@ -23,7 +23,7 @@ public class Settings implements Cloneable, Serializable
 	protected int fontsize;
 
 	/** The alarms. */
-	protected List alarms;
+	protected List<Alarm> alarms;
 
 	/** The actual filename for this settings. */
 	protected String filename;
@@ -172,7 +172,7 @@ public class Settings implements Cloneable, Serializable
 	 */
 	public void setAlarms(Alarm[] alarms)
 	{
-		this.alarms = new ArrayList();
+		this.alarms = new ArrayList<Alarm>();
 		for(int i = 0; alarms != null && i < alarms.length; i++)
 		{
 			addAlarm(alarms[i]);
@@ -232,7 +232,7 @@ public class Settings implements Cloneable, Serializable
 		try
 		{
 			ret = (Settings)super.clone();
-			ret.alarms = new ArrayList();
+			ret.alarms = new ArrayList<Alarm>();
 			for(int i = 0; i < alarms.size(); i++)
 			{
 				ret.addAlarm((Alarm)((Alarm)alarms.get(i)).clone());

@@ -11,7 +11,7 @@ import javax.swing.DefaultListModel;
  *  A list model representing a collection of blocks
  *  on a table or in a bucket.
  */
-public class BlocksListModel	extends DefaultListModel
+public class BlocksListModel	extends DefaultListModel<Block>
 {
 	/**
 	 *  Create a list model for the given table.
@@ -36,7 +36,7 @@ public class BlocksListModel	extends DefaultListModel
 					}
 					if(pce.getNewValue()!=null)
 					{
-						addElement(pce.getNewValue());
+						addElement((Block)pce.getNewValue());
 					}
 				}
 			}

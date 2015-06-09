@@ -5,7 +5,6 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.GameStateFrame;
 import jadex.bdi.examples.blackjack.gui.PlayerPanel;
-import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;

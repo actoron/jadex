@@ -160,7 +160,7 @@ public class StartPeerPlan extends Plan
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
 	 */
-	protected IComponentIdentifier serviceCreateAgent(String name, Map args)
+	protected IComponentIdentifier serviceCreateAgent(String name, Map<String, Object> args)
 	{
 		final IComponentManagementService ces = (IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 //		IComponentManagementService ces = SServiceProvider.getLocalService(getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
@@ -168,8 +168,9 @@ public class StartPeerPlan extends Plan
 //		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
 //		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 		
-		IFuture<IComponentIdentifier> ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(null, args, getComponentDescription().getResourceIdentifier()), null);
-		IComponentIdentifier aid = (IComponentIdentifier)ret.get();
+		IComponentIdentifier aid = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml",
+			new CreationInfo(null, args, getComponentDescription().getResourceIdentifier()))
+			.getFirstResult();
 		return aid;
 	}
 	
@@ -220,9 +221,6 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void capabilityDestroyAgent(String name)
 	{
-		final IComponentManagementService ces = (IComponentManagementService)getAgent()
-			.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
-//		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
 		IGoal sp = createGoal("cms_destroy_component");
 		sp.getParameter("componentidentifier").setValue(aid);

@@ -1,14 +1,13 @@
 package jadex.extension.envsupport;
 
+import jadex.application.IExtensionInfo;
+import jadex.application.IExtensionInstance;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.IExtensionInfo;
-import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
@@ -146,11 +145,6 @@ public class MEnvSpaceInstance	implements IExtensionInfo
 		this.spacetype	= spacetype;
 	}
 
-//	public Class getClazz()
-//	{		
-//		return (Class)getProperty(((MEnvSpaceType)getType()).getProperties(), "clazz");
-//	}
-	
 	/**
 	 *  Get the name.
 	 *  @return the name.

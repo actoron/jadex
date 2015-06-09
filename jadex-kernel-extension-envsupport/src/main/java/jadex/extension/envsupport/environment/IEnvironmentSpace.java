@@ -1,14 +1,14 @@
 
 package jadex.extension.envsupport.environment;
 
-import jadex.extension.envsupport.dataview.IDataView;
+import jadex.application.IExtensionInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IPropertyObject;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
+import jadex.extension.envsupport.dataview.IDataView;
 
 import java.util.List;
 import java.util.Map;

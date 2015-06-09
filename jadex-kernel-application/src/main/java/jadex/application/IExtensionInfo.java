@@ -1,4 +1,4 @@
-package jadex.bridge.modelinfo;
+package jadex.application;
 
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IValueFetcher;

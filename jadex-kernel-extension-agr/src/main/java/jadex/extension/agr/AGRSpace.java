@@ -1,10 +1,10 @@
 package jadex.extension.agr;
 
+import jadex.application.IExtensionInstance;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;

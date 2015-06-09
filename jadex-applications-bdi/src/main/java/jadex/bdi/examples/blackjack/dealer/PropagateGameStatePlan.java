@@ -2,8 +2,8 @@ package jadex.bdi.examples.blackjack.dealer;
 
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.Player;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.IParameterSet;
+import jadex.bdiv3x.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;

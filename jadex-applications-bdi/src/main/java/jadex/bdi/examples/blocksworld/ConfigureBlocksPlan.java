@@ -26,7 +26,7 @@ public class ConfigureBlocksPlan	extends Plan
 		// Create set of blocks currently on the table.
 		Table	table	= (Table)getBeliefbase().getBelief("table").getFact();
 		Block[]	blocks	= table.getAllBlocks();
-		Set	oldblocks	= new HashSet();
+		Set<Block>	oldblocks	= new HashSet<Block>();
 		for(int i=0; i<blocks.length; i++)
 			oldblocks.add(blocks[i]);
 		blocks	= (Block[])getBeliefbase().getBeliefSet("blocks").getFacts(); 
@@ -69,7 +69,7 @@ public class ConfigureBlocksPlan	extends Plan
 
 		// Move old blocks, which are not part of configuration, to bucket.
 		Object	bucket	= getBeliefbase().getBelief("bucket").getFact();
-		for(Iterator i=oldblocks.iterator(); i.hasNext(); )
+		for(Iterator<Block> i=oldblocks.iterator(); i.hasNext(); )
 		{
 			// Create stack goal.
  			IGoal stack = createGoal("stack");

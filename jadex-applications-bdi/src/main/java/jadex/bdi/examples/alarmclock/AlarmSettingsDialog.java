@@ -66,7 +66,7 @@ public class AlarmSettingsDialog extends JDialog
 	protected Alarm alarm;
 
 	/** The mode. */
-	protected JComboBox mode;
+	protected JComboBox<?> mode;
 
 	/** The date. */
 	protected JDateChooser date;
@@ -102,7 +102,7 @@ public class AlarmSettingsDialog extends JDialog
 		//content.setBorder(BorderFactory.createTitledBorder(
 		//BorderFactory.createEtchedBorder(), "Alarm settings"));
 
-		mode = new JComboBox(Alarm.ALARMS);
+		mode = new JComboBox<Object>(Alarm.ALARMS);
 		date = new JDateChooser();
 		time = new TimeSpinner();
 		JButton now = new JButton("Now");
@@ -414,13 +414,11 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-//					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-					ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
-						.addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
+					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+					fut.addResultListener(new SwingDefaultResultListener<IClockService>(AlarmSettingsDialog.this)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(IClockService cs)
 						{
-							IClockService cs = (IClockService)result;
 							al.setTime(new Time(new Date(cs.getTime())));
 							setAlarm(al);
 						}

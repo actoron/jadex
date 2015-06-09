@@ -1,7 +1,6 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
-import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;

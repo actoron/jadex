@@ -1,8 +1,9 @@
 package jadex.extension.envsupport;
 
+import jadex.application.ApplicationConfigurationInfo;
+import jadex.application.IExtensionInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.IExtensionInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -41,7 +42,7 @@ public class EnvironmentService	implements IEnvironmentService
 	public IFuture<Void>	initSpace()
 	{
 		MEnvSpaceInstance	mesi	= null;
-		ConfigurationInfo	config	= component.getModel().getConfiguration(component.getConfiguration());
+		ApplicationConfigurationInfo	config	= (ApplicationConfigurationInfo)component.getModel().getConfiguration(component.getConfiguration());
 		for(IExtensionInfo ei: config.getExtensions())
 		{
 			if(ei instanceof MEnvSpaceInstance)

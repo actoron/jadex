@@ -20,7 +20,6 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;

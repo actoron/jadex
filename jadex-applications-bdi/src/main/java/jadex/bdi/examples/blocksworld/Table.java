@@ -20,7 +20,7 @@ public class Table	extends Block
 	protected String	name;
 
 	/** The blocks located on top of the table. */
-	protected List	blocks;
+	protected List<Block>	blocks;
 
 	/** The target configuration (if any). */
 	protected Table	target;
@@ -72,7 +72,7 @@ public class Table	extends Block
 	{
 		super(-1, color, null);
 		this.name	= name;
-		this.blocks	= new ArrayList();
+		this.blocks	= new ArrayList<Block>();
 	}
 
 	//-------- methods --------
@@ -99,7 +99,7 @@ public class Table	extends Block
 	 */
 	public Block[]	getAllBlocks()
 	{
-		List	ret	= new ArrayList(blocks);
+		List<Block>	ret	= new ArrayList<Block>(blocks);
 		for(int i=0; i<ret.size(); i++)
 		{
 			Block	b	= (Block)ret.get(i);
@@ -117,7 +117,7 @@ public class Table	extends Block
 		Block[][]	stacks	= new Block[blocks.size()][];
 		for(int i=0; i<stacks.length; i++)
 		{
-			List	ret	= new ArrayList();
+			List<Block>	ret	= new ArrayList<Block>();
 			Block	b	= (Block)blocks.get(i);
 			while(b!=null)
 			{
@@ -149,7 +149,7 @@ public class Table	extends Block
 		{
 			// Iterate through base blocks.
 			ret	= true;
-			for(Iterator i=blocks.iterator(); ret && i.hasNext(); )
+			for(Iterator<Block> i=blocks.iterator(); ret && i.hasNext(); )
 			{
 				Block	block	= (Block)i.next();
 				int	index	= table.blocks.indexOf(block);
