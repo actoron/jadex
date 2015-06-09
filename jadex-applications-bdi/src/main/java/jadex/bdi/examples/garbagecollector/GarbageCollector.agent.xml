@@ -134,7 +134,7 @@
 		<!-- The environment may throw exceptions when executing property listeners
 			and these listeners are not valid any longer. This leads to normal plan
 			failure and can therefore be ignored. -->
-		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
 		<property name="debugging">false</property>
     </properties>
 
