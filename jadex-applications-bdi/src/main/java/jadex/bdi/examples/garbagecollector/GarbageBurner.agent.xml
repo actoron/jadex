@@ -26,7 +26,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">
- 			<fact class="IFuture">$scope.getParentAccess().getExtension("mygc2dspace")</fact>
+ 			<fact>jadex.application.EnvironmentService.getSpace($component, "mygc2dspace").get()</fact>
  		</belief>
  		
  		<!-- Myself. -->
@@ -36,9 +36,8 @@
 
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="IVector2" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
 				$beliefbase.myself.position
-				//$beliefbase.myself.getProperty("position")
 			</fact>
  		</belief>
 		
@@ -52,14 +51,16 @@
  			The unique tag avoids creating more than one goal
  			per specific piece of garbage. -->
 		<achievegoal name="burn">
-			<parameter name="garbage" class="ISpaceObject">
-				<value>$garbage</value>
+   			<parameter name="garbage" class="ISpaceObject">
+   				<bindingoptions>
+				    $beliefbase.garbages
+				</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl">
-				ISpaceObject $garbage &amp;&amp; Arrays.asList($beliefbase.garbages).contains($garbage)
+			<creationcondition>
+			    $beliefbase.garbages.length>0
 			</creationcondition>
-			<deliberation cardinality="1"/>
+			<!-- <deliberation cardinality="1"/> -->
 		</achievegoal>
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->

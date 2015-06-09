@@ -25,7 +25,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">
- 			<fact class="IFuture">$scope.getParentAccess().getExtension("mygc2dspace")</fact>
+ 			<fact>jadex.application.EnvironmentService.getSpace($component, "mygc2dspace").get()</fact>
  		</belief>
  		
  		<!-- Myself. -->
@@ -35,9 +35,8 @@
 
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="IVector2" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
 				$beliefbase.myself.position
-				// $beliefbase.myself.getProperty("position")
 			</fact>
  		</belief>
 
@@ -47,16 +46,15 @@
 		<!-- When at least one piece of waste is present on the
 			current position the actual position is perceived as dirty. -->
 		<belief name="is_dirty" class="boolean" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
 				$beliefbase.garbages.length>0
 			</fact>
 		</belief>
 		
 		<!-- Flag indicating if the agent currently carries garbage. -->
 		<belief name="has_garbage" class="boolean" evaluationmode="push">
- 			<fact language="jcl">
+ 			<fact>
  				$beliefbase.myself.garbage!=null
-  				//$beliefbase.myself.getProperty("garbage")
 			</fact>
 		</belief>
 	</beliefs>
@@ -69,7 +67,7 @@
  			burner present. -->
 		<achievegoal name="take">
 			<unique/>
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.is_dirty &amp;&amp; $beliefbase.env.getSpaceObjectsByGridPosition($beliefbase.pos, "burner")==null
 			</creationcondition>
 			<deliberation>
@@ -88,7 +86,7 @@
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
 		<achievegoal name="pick" exclude="never" retrydelay="100">
- 			<dropcondition language="jcl">
+ 			<dropcondition>
  				!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
  			</dropcondition>
 		</achievegoal>
