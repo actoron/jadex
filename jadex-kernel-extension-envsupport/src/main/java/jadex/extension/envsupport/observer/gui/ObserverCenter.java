@@ -63,7 +63,7 @@ public class ObserverCenter implements IObserverCenter
 	private IObserverCenterPlugin activeplugin;
 	
 	/** The plugins. */
-	private IObserverCenterPlugin[] plugins;
+	private List<IObserverCenterPlugin> plugins;
 	
 	/** Viewport refresh timer. */
 	private Timer vptimer;
@@ -122,16 +122,17 @@ public class ObserverCenter implements IObserverCenter
 	 *  @param classloader the application class loader for loading resources (images etc.)
 	 *  @param plugins custom plugins used in the observer
 	 */
-	public void startObserver(final String title, final IEnvironmentSpace space, ClassLoader classloader, List plugins, boolean killonexit)
+	public void startObserver(final String title, final IEnvironmentSpace space, ClassLoader classloader, boolean killonexit)
 	{
 //		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
 //			System.out.println("starting observer: "+this);
+		this.plugins = new ArrayList<IObserverCenterPlugin>();
 		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
 		this.space = (AbstractEnvironmentSpace)space;
 		this.killonexit	= killonexit;
 		perspectives = Collections.synchronizedMap(new HashMap());
 		externaldataviews = Collections.synchronizedMap(new HashMap());
-		final List cplugins = plugins == null? new ArrayList(): plugins;
+	
 		this.classloader = classloader;
 		Map spaceviews = space.getDataViews();
 		if(!spaceviews.isEmpty())
@@ -157,7 +158,7 @@ public class ObserverCenter implements IObserverCenter
 				if(disposed)
 					return;
 				mainwindow = new ObserverCenterWindow(title);
-				loadPlugins(cplugins);
+//				loadPlugins(cplugins);
 				
 				JMenu refreshMenu = new JMenu("Display");
 				
@@ -227,13 +228,9 @@ public class ObserverCenter implements IObserverCenter
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						synchronized(ObserverCenter.this.plugins)
-						{
-							if(activeplugin != null)
-							{
-								activeplugin.refresh();
-							}
-						}
+						IObserverCenterPlugin apl = activeplugin;
+						if(apl != null)
+							apl.refresh();
 					}
 				});
 				plugintimer.start();
@@ -491,18 +488,16 @@ public class ObserverCenter implements IObserverCenter
 			
 			if(selp!=null)
 			{
-			
 				if(selp instanceof Perspective3D)
 				{
-					((Perspective3D) selp).getViewport().pauseApp();
-			        try {
-			        	// Hack??
+					((Perspective3D)selp).getViewport().pauseApp();
+					// todo: Hack!!!!
+					try {
 			            Thread.sleep(1000);
 			        } catch (InterruptedException ex) {
 			        }
 				}
 			}
-				
 		
 			IPerspective perspective = (IPerspective)perspectives.get(name);
 			if (perspective instanceof Perspective2D)
@@ -638,45 +633,61 @@ public class ObserverCenter implements IObserverCenter
 	 * Loads all available plugins
 	 * @param customplugins custom plugins used in addition to standard plugins
 	 */
-	private void loadPlugins(List customplugins)
+	public void loadPlugins(final List customplugins)
+	{
+		if(SwingUtilities.isEventDispatchThread())
+		{
+			internalLoadPlugins(customplugins);
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run() 
+				{
+					internalLoadPlugins(customplugins);
+				}
+			});
+		}
+	}
+	
+	protected void internalLoadPlugins(List customplugins)
 	{
 //		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-//			System.out.println("loading plugins1: "+this);
-		ArrayList plugins = new ArrayList();
-		
+//		System.out.println("loading plugins1: "+this);
+	
 		IObserverCenterPlugin plugin = new IntrospectorPlugin();
 		
 		// default plugins
 		// TODO: remove hard coding
 		plugins.add(plugin);
 		
-//		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-//			System.out.println("loading plugins2: "+this);
+	//	if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+	//		System.out.println("loading plugins2: "+this);
 		// TODO: port from simsupport
 		plugin = new VisualsPlugin();
 		plugins.add(plugin);
 		
-//		plugin = new EvaluationPlugin();
-//		plugins.add(plugin);
+	//	plugin = new EvaluationPlugin();
+	//	plugins.add(plugin);
 		
 		//plugin = new ToolboxPlugin();
 		//plugins.add(plugin);
-		plugins.addAll(customplugins);
+		if(customplugins!=null)
+			plugins.addAll(customplugins);
 		
-		this.plugins = (IObserverCenterPlugin[])plugins.toArray(new IObserverCenterPlugin[0]);
-		
-		for(int i = 0; i < this.plugins.length; ++i)
+		for(int i = 0; i < plugins.size(); ++i)
 		{
-			addPluginButton(this.plugins[i]);
+			addPluginButton(plugins.get(i));
 		}
 		
-		if(this.plugins.length>0)
+		if(plugins.size()>0)
 		{
-			activatePlugin(this.plugins[0]);
-			for(int i=1; i<this.plugins.length; i++)
+			activatePlugin(plugins.get(0));
+			for(int i=1; i<plugins.size(); i++)
 			{
-				if(this.plugins[i].isStartOnLoad())
-					activatePlugin(this.plugins[i]);
+				if(plugins.get(i).isStartOnLoad())
+					activatePlugin(this.plugins.get(i));
 			}
 		}
 	}
@@ -715,22 +726,19 @@ public class ObserverCenter implements IObserverCenter
 	
 	private void activatePlugin(IObserverCenterPlugin plugin)
 	{
-		synchronized(this.plugins)
+//		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//			System.out.println("activating plugin: "+this+", "+plugin);
+		IObserverCenterPlugin oldPlugin = activeplugin;
+		if(oldPlugin != null)
 		{
-//			if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-//				System.out.println("activating plugin: "+this+", "+plugin);
-			IObserverCenterPlugin oldPlugin = activeplugin;
-			if(oldPlugin != null)
-			{
-				if(!oldPlugin.isStartOnLoad())
-					oldPlugin.shutdown();
-			}
-
-			if(plugin.isVisible())
-				mainwindow.setPluginView(plugin.getName(), plugin.getView());
-			plugin.start(this);
-			activeplugin = plugin;
+			if(!oldPlugin.isStartOnLoad())
+				oldPlugin.shutdown();
 		}
+
+		if(plugin.isVisible())
+			mainwindow.setPluginView(plugin.getName(), plugin.getView());
+		plugin.start(this);
+		activeplugin = plugin;
 	}
 	
 	/**

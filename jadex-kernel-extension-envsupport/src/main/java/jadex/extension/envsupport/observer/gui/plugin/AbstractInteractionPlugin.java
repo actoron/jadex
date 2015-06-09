@@ -117,7 +117,7 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 
 	public final void start(ObserverCenter main)
 	{
-		if (!initialized)
+		if(!initialized)
 		{
 			initialize(main);
 			obsCenter = main;

@@ -17,7 +17,8 @@ public interface IObserverCenter
 	 *  @param classloader the application class loader for loading resources (images etc.)
 	 *  @param plugins custom plugins used in the observer
 	 */
-	public void startObserver(final String title, final IEnvironmentSpace space, ClassLoader classloader, List plugins, boolean killonexit);
+	public void startObserver(final String title, final IEnvironmentSpace space, ClassLoader classloader, boolean killonexit);
+	public void loadPlugins(List plugins);
 	
 	/**
 	 *  Dispose the observer center. 

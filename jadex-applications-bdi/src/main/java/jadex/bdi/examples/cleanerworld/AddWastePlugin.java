@@ -1,6 +1,10 @@
 package jadex.bdi.examples.cleanerworld;
 
-import java.awt.Canvas;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.observer.gui.ObserverCenter;
+import jadex.extension.envsupport.observer.gui.plugin.AbstractInteractionPlugin;
+
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -8,16 +12,8 @@ import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JPanel;
-
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
-import jadex.extension.envsupport.observer.gui.plugin.AbstractInteractionPlugin;
-import jadex.extension.envsupport.observer.perspective.Perspective2D;
-
 /**
- * 
+ *  Plugin that allows for adding waste via mouse clicks.
  */
 public class AddWastePlugin extends AbstractInteractionPlugin
 {
@@ -29,16 +25,17 @@ public class AddWastePlugin extends AbstractInteractionPlugin
 	 */
 	protected void initialize(final ObserverCenter center)
 	{
-		System.out.println("init");
 		this.ml = new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)
 			{
-				System.out.println(getWorldCoordinates(e.getPoint()));
-				AbstractEnvironmentSpace space = center.getSpace();
-				Map<String, Object> props = new HashMap<String, Object>();
-				props.put(Space2D.PROPERTY_POSITION, getWorldCoordinates(e.getPoint()));
-				space.createSpaceObject("waste", props, null);
+				if(e.getClickCount() == 2)
+				{
+					AbstractEnvironmentSpace space = center.getSpace();
+					Map<String, Object> props = new HashMap<String, Object>();
+					props.put(Space2D.PROPERTY_POSITION, getWorldCoordinates(e.getPoint()));
+					space.createSpaceObject("waste", props, null);
+				}
 			}
 		};
 		addMouseListener(ml);
