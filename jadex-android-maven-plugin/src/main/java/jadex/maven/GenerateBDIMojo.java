@@ -421,12 +421,12 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		{inputUrl}, originalCl);
 		Collection<File> allClasses = FileUtils.listFiles(inputDirectory, null, true);
 		
-		URLClassLoader tempLoader = new URLClassLoader(new URL[]{inputUrl}, originalCl);
+		URLClassLoader tempLoader = new URLClassLoader(new URL[]{inputUrl}, inputCl);
 		
 		for (File bdiFile : allClasses)
 		{
 			gen.clearRecentClassBytes();
-			List<Class<?>> classes = null;
+//			List<Class<?>> classes = null;
 			BDIModel model = null;
 
 			String relativePath = ResourceUtils
@@ -436,18 +436,14 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			{
 				String agentClassName = relativePath.replace(File.separator, ".").replace(".class", "");
 				
-				String clname = relativePath;
-				if(clname.endsWith(".class"))
-					clname = clname.substring(0, clname.indexOf(".class"));
-				clname = clname.replace('\\', '.');
-				clname = clname.replace('/', '.');
-				
-				Class<?> loadClass = tempLoader.loadClass(clname);
-				if (AbstractAsmBdiClassGenerator.isEnhanced(loadClass)) {
-					getLog().info("Already enhanced: " + relativePath);
-					continue;
+				if (inPlace) {
+					Class<?> loadClass = tempLoader.loadClass(agentClassName);
+					if (AbstractAsmBdiClassGenerator.isEnhanced(loadClass)) {
+						getLog().info("Already enhanced: " + relativePath);
+						continue;
+					}
+					tempLoader.close();
 				}
-				tempLoader.close();
 				
 				getLog().debug("Loading Model: " + relativePath);
 				
