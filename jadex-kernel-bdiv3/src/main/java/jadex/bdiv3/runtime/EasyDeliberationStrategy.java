@@ -35,7 +35,6 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	/** The set of inhibitors. */
 	protected Map<RGoal, Set<RGoal>> inhibitions;
 	
-	
 	/**
 	 *  Init the strategy.
 	 *  @param agent The agent.
@@ -162,7 +161,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	}
 	
 	/**
-	 * 
+	 *  Add an inhibitor to a goal.
 	 */
 	public void addInhibitor(RGoal goal, RGoal inhibitor)
 	{		
@@ -179,7 +178,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	}
 	
 	/**
-	 * 
+	 *  Inhibit a goal by making it an option.
 	 */
 	protected void inhibitGoal(RGoal goal)
 	{
@@ -188,7 +187,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	}
 	
 	/**
-	 * 
+	 *  Remove an inhibitor from a goal.
 	 */
 	protected void removeInhibitor(RGoal goal, RGoal inhibitor)
 	{
@@ -212,7 +211,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	}
 	
 	/**
-	 * 
+	 *  (Re)activate a goal.
 	 */
 	protected void reactivateGoal(RGoal goal)
 	{
@@ -328,7 +327,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	}
 	
 	/**
-	 * 
+	 *  Get the rule system.
 	 */
 	protected RuleSystem getRuleSystem()
 	{
@@ -336,7 +335,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	}
 	
 	/**
-	 * 
+	 *  Get the capability.
 	 */
 	protected RCapability getCapability()
 	{
@@ -344,7 +343,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	}
 	
 	/**
-	 * 
+	 *  Get or create the inhibition set.
 	 */
 	protected Set<RGoal> getInhibitions(RGoal goal, boolean create)
 	{
