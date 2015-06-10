@@ -3,6 +3,7 @@ package jadex.android.service;
 import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
+import jadex.android.commons.Logger;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -174,7 +175,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	
 	final protected IFuture<IExternalAccess> startPlatform()
 	{
-		System.out.println("Starting with " + Arrays.toString(platformKernels));
+		Logger.i("Starting with " + Arrays.toString(platformKernels));
 		return startJadexPlatform(platformKernels, platformName, platformOptions);
 	}
 	
