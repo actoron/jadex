@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.ASMBDIClassGenerator;
+import jadex.bdiv3.AbstractAsmBdiClassGenerator;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.PojoBDIAgent;
@@ -146,7 +147,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model, IPersistInfo pinfo) throws Exception
 	{
-		ASMBDIClassGenerator.checkEnhanced(agentclass);
+		AbstractAsmBdiClassGenerator.checkEnhanced(agentclass);
 		
 		MicroAgent ret;
 		final Object agent = agentclass.newInstance();

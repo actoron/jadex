@@ -1,9 +1,9 @@
 package jadex.android;
 
 
+import jadex.android.commons.Logger;
 import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
-import jadex.commons.SUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -104,14 +104,14 @@ public class AndroidContextManager
 			if (lastContext != null) {
 				synchronized (lastContext) {
 					informContextDestroy(lastContext);
-					System.out.println("Context destroy");
+					Logger.d("Context destroyed");
 				}
 			}
 		} else
 		{
 			synchronized (contextProvidingActivity) {
 				informContextCreate(contextProvidingActivity);
-				System.out.println("Context create");
+				Logger.d("Context created");
 			}
 		}
 		lastContext = contextProvidingActivity;

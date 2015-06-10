@@ -1,5 +1,6 @@
 package jadex.maven;
 
+import jadex.bdiv3.AbstractAsmBdiClassGenerator;
 import jadex.bdiv3.ByteKeepingASMBDIClassGenerator;
 import jadex.bdiv3.KernelBDIV3Agent;
 import jadex.bdiv3.MavenBDIModelLoader;
@@ -441,23 +442,12 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				clname = clname.replace('\\', '.');
 				clname = clname.replace('/', '.');
 				
-				System.out.println("test");
 				Class<?> loadClass = tempLoader.loadClass(clname);
-
-				boolean isEnhanced = false;
-				try {
-					Field field = loadClass.getField("__globalname");
-//					getLog().info("enhanced: " + relativePath);
-					isEnhanced = true;
-				} catch (NoSuchFieldException ex) {
-//					getLog().info("Not enhanced: " + relativePath);
-				}
-				tempLoader.close();
-				
-				if (isEnhanced) {
+				if (AbstractAsmBdiClassGenerator.isEnhanced(loadClass)) {
 					getLog().info("Already enhanced: " + relativePath);
 					continue;
 				}
+				tempLoader.close();
 				
 				getLog().debug("Loading Model: " + relativePath);
 				
@@ -540,7 +530,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 //		inputCl.close();
 //		outputCl.close();
 	}
-	
+
 	private void removeAndroidIncompatible(File path) throws IOException {
 		@SuppressWarnings("unchecked")
 		Collection<File> allFiles = FileUtils.listFiles(path, new FileFileFilter() {
