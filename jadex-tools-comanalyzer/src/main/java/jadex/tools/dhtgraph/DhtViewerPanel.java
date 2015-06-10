@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.apache.commons.collections15.Transformer;
@@ -99,6 +100,10 @@ public class DhtViewerPanel extends JPanel
 	protected CircleLayout<IID, String> layout;
 	
 	protected static final long	SEARCH_DELAY	= 30000;
+
+	private static final String	TEXT_LOADING	= "Loading...";
+	
+	private static final String	TEXT_NOPROXY	= "No local proxy!";
 
 	private IInternalAccess access;
 	
@@ -610,79 +615,81 @@ public class DhtViewerPanel extends JPanel
 		
 	}
 
-	protected void updateInfoPanel(IID id) {
-		ProxyHolder proxyHolder = proxies.get(id);
-		if (proxyHolder != null) {
-			String sucText = proxyHolder.successor == null ? "-" : proxyHolder.successor.getNodeId().toString();
-			sucLabel.setText(sucText);
-			idLabel.setText(""+id);
-			componentLabel.setText(""+proxyHolder.ringNode);
-			overlayIdLabel.setText(proxyHolder.overlayId);
-			String preText = proxyHolder.predecessor == null ? "-" : proxyHolder.predecessor.getNodeId().toString();
-			preLabel.setText(preText);
-			
-//			for (int i = 0; i < proxyHolder.fingers.size(); i++) {
-//				JLabel startLabel = fingerStartLabels.get(i);
-//				JLabel nodeIdLabel = fingerNodeLabels.get(i);
+	protected void updateInfoPanel(final IID id) {
+		new Thread() {
+			@Override
+			public void run()
+			{
+				final ProxyHolder proxyHolder = proxies.get(id);
 				
-//				if (startLabel != null && nodeIdLabel != null) {
-//					IFinger f = proxyHolder.fingers.get(i);
-//					startLabel.setText("" + f.getStart());
-//					nodeIdLabel.setText("" + f.getNodeId());
-//				} else {
-//					throw new RuntimeException("Too many finger entries: " + proxyHolder.fingers.size() +", i only support " + i);
-//				}
-//			}
-			
-//			Collections.sort(proxyHolder.fingers, new Comparator<IFinger>() {
-//
-//				@Override
-//				public int compare(IFinger o1, IFinger o2) {
-//					return o1.
-//				}
-//			});
-			
-			fingerTable.setSortedFingers(proxyHolder.fingers);
-			
-			Set<String> set = proxyHolder.store.getLocalKeySet().get();
-			ArrayList<String> keyList = new ArrayList<String>(set);
-			Collections.sort(keyList);
-			
-			ArrayList<Tuple2<String, Object>> tuples = new ArrayList<Tuple2<String,Object>>();
-			
-			for (String key : keyList) {
-				Object value = proxyHolder.store.lookup(key).get();
-				Tuple2<String, Object> tup = new Tuple2<String,Object>(key, value);
-				tuples.add(tup);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						idLabel.setText(""+id);
+						sucLabel.setText(TEXT_LOADING);
+						componentLabel.setText(TEXT_LOADING);
+						overlayIdLabel.setText(TEXT_LOADING);
+						preLabel.setText(TEXT_LOADING);
+						
+						fingerTable.setSortedFingers(new ArrayList<IFinger>());
+						contentsTable.setSortedContent(new ArrayList<Tuple2<String,Object>>());
+					}
+				});
+				
+				if (proxyHolder != null) {
+					final String sucText = proxyHolder.successor == null ? "-" : proxyHolder.successor.getNodeId().toString();
+					final String preText = proxyHolder.predecessor == null ? "-" : proxyHolder.predecessor.getNodeId().toString();
+						
+						
+					Set<String> set = proxyHolder.store.getLocalKeySet().get();
+					ArrayList<String> keyList = new ArrayList<String>(set);
+					Collections.sort(keyList);
+					
+					final ArrayList<Tuple2<String, Object>> tuples = new ArrayList<Tuple2<String,Object>>();
+					
+					for (String key : keyList) {
+						Object value = proxyHolder.store.lookup(key).get();
+						Tuple2<String, Object> tup = new Tuple2<String,Object>(key, value);
+						tuples.add(tup);
+					}
+					
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						
+						@Override
+						public void run()
+						{
+							sucLabel.setText(sucText);
+							componentLabel.setText(""+proxyHolder.ringNode);
+							overlayIdLabel.setText(proxyHolder.overlayId);
+							preLabel.setText(preText);
+							fingerTable.setSortedFingers(proxyHolder.fingers);
+							contentsTable.setSortedContent(tuples);
+						}
+					});
+				} else {
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						
+
+						@Override
+						public void run()
+						{
+							sucLabel.setText(TEXT_NOPROXY);
+							componentLabel.setText(TEXT_NOPROXY);
+							overlayIdLabel.setText(TEXT_NOPROXY);
+							preLabel.setText(TEXT_NOPROXY);
+							
+							fingerTable.setSortedFingers(new ArrayList<IFinger>());
+							contentsTable.setSortedContent(new ArrayList<Tuple2<String,Object>>());
+						}
+					});
+				}
 			}
-			
-			contentsTable.setSortedContent(tuples);
-			
-//			StringBuilder stringBuilder = new StringBuilder();
-//			stringBuilder.append("key\thash\tvalue\n");
-//
-//			if (proxyHolder.store != null) {
-//				Set<String> set = proxyHolder.store.getLocallyStoredKeys().get();
-//				if (set.isEmpty()) {
-//					stringBuilder.append("No Values stored.");
-//				} else {
-//					ArrayList<String> arrayList = new ArrayList<String>(set);
-//					Collections.sort(arrayList);
-//					for (String key : arrayList) {
-//						stringBuilder.append(key);
-//						stringBuilder.append("\t");
-//						stringBuilder.append(hash(key));
-//						stringBuilder.append("\t");
-//						String string = proxyHolder.store.lookup(key).get();
-//						stringBuilder.append(string);
-//						stringBuilder.append("\n");
-//					}
-//				}
-//			} else {
-//				stringBuilder.append("Could not get contents");
-//			}
-//			contentsTa.setText(stringBuilder.toString());
-		}
+		}.start();
 	}
 
 	

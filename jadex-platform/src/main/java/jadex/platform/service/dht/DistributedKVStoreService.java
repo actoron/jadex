@@ -287,70 +287,75 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 			@Override
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
-				// TODO Auto-generated method stub
 				final Future<Object> fut = new Future<Object>();
+				// faster local lookup: check if key is saved locally.
+				StoreEntry storeEntry = keyMap.get(key);
+				if (storeEntry != null && idHash.equals(storeEntry.getIdHash())) {
+					logger.info(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
+					fut.setResult(storeEntry.getValue());
+					return fut;
+				}
+				
+				// if not stored locally, use the expensive successor lookup.
 				ring.findSuccessor(idHash).addResultListener(new DefaultResultListener<IFinger>()
 				{
 				
 					@Override
 					public void resultAvailable(final IFinger finger)
 					{
-						logger.log(Level.INFO, myId + ": retrieving key: " +key+" (hash: " + idHash + ") from successor: " + finger.getNodeId());
-						//	final IComponentIdentifier providerId = result.getSid().getProviderId();
-						execFeature.scheduleStep(new IComponentStep<Object>()
+						if(finger.getNodeId().equals(myId))
 						{
-						
-							@Override
-							public IFuture<Object> execute(IInternalAccess ia)
+							// use local access
+							
+							logger.info(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
+//							if(!isResponsibleFor(idHash))
+//							{
+//								logger.log(Level.WARNING, myId + ": lookupLocal called even if i do not feel responsible for: " + idHash + ". My successor is " + ring.getSuccessor().get().getNodeId());
+//							}
+							StoreEntry storeEntry = keyMap.get(key);
+							if(storeEntry != null) // should not happen as this was checked in beforehand
 							{
-								final Future<Object> ret = new Future<Object>();;
-								if(finger.getNodeId().equals(myId))
+								fut.setResult(storeEntry.getValue());
+							}
+							else
+							{
+								fut.setResult(null);
+							}
+						} else {
+							logger.log(Level.INFO, myId + ": retrieving key: " +key+" (hash: " + idHash + ") from successor: " + finger.getNodeId());
+							//	final IComponentIdentifier providerId = result.getSid().getProviderId();
+							execFeature.scheduleStep(new IComponentStep<Object>()
+							{
+								
+								public IFuture<Object> execute(IInternalAccess ia)
 								{
-									// use local access
-									
-									logger.info(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
-//									if(!isResponsibleFor(idHash))
-//									{
-//										logger.log(Level.WARNING, myId + ": lookupLocal called even if i do not feel responsible for: " + idHash + ". My successor is " + ring.getSuccessor().get().getNodeId());
-//									}
-									StoreEntry storeEntry = keyMap.get(key);
-									if(storeEntry != null)
-									{
-										ret.setResult(storeEntry.getValue());
-									}
-									else
-									{
-										ret.setResult(null);
-									}
-								}
-								else
-								{
+									final Future<Object> ret = new Future<Object>();;
 									// search for remote kvstore service
-		//							System.out.println(myId + ": retrieving from remote: " + " (hash: " + idHash +")");
+									//							System.out.println(myId + ": retrieving from remote: " + " (hash: " + idHash +")");
 									IFuture<IDistributedKVStoreService> storeService = getStoreService(finger);
-		//							IFuture<IDistributedKVStoreService> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDistributedKVStoreService.class,
-		//								providerId.getParent());
+									//							IFuture<IDistributedKVStoreService> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDistributedKVStoreService.class,
+									//								providerId.getParent());
 									storeService.addResultListener(new DefaultResultListener<IDistributedKVStoreService>()
 									{
-										@Override
 										public void resultAvailable(IDistributedKVStoreService result)
 										{
 											IFuture<Object> value = result.lookup(key, idHash);
 											value.addResultListener(new DefaultResultListener<Object>()
-											{
-											
+												{
+												
 												@Override
 												public void resultAvailable(Object result)
 												{
 													ret.setResult(result);
 												}
-											});
+												});
 										}
 									});
+									return ret;
 								}
-								return ret;
-							}
-						}).addResultListener(new DelegationResultListener<Object>(fut));
+							}).addResultListener(new DelegationResultListener<Object>(fut));
+						}
+						
 					}
 				});
 				return fut;
@@ -463,11 +468,20 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 							{
 								for(final StoreEntry storeEntry : result)
 								{
-									// TODO respect existing local collections!
 									if (storeEntry == null) {
 										System.out.println("I am: " + myId + ", trying to get entries from " + successor.getNodeId() + " ... and got null!");
 									}
-									storeLocal(storeEntry.getIdHash(), storeEntry.getKey(), storeEntry.getValue(), false);
+									if (storeEntry.getValue() instanceof Collection) {
+										// respect existing local collection instead of replacing it as whole.
+										Collection collection = (Collection)storeEntry.getValue();
+										for(Object singleValue : collection)
+										{
+											storeLocal(storeEntry.getIdHash(), storeEntry.getKey(), singleValue, true);
+										}
+										
+									} else {
+										storeLocal(storeEntry.getIdHash(), storeEntry.getKey(), storeEntry.getValue(), false);
+									}
 								}
 							}
 						});
