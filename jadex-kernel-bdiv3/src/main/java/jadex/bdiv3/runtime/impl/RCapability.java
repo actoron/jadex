@@ -4,6 +4,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.runtime.IDeliberationStrategy;
 import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.REventbase;
 import jadex.bdiv3x.runtime.RExpressionbase;
@@ -48,6 +49,10 @@ public class RCapability extends RElement
 	/** The plans by model element. */
 	protected Map<MPlan, Collection<RPlan>> mplans;
 
+	
+	/** The deliberation strategy. */
+	protected IDeliberationStrategy delstr;
+	
 	//-------- additional xml elements --------
 	
 	/** The beliefbase. */
@@ -437,6 +442,24 @@ public class RCapability extends RElement
 	}
 
 	/**
+	 *  Get the deliberationStrategy.
+	 *  @return The deliberationStrategy
+	 */
+	public IDeliberationStrategy getDeliberationStrategy()
+	{
+		return delstr;
+	}
+
+	/**
+	 *  The deliberationStrategy to set.
+	 *  @param delstr The deliberationStrategy to set
+	 */
+	public void setDeliberationStrategy(IDeliberationStrategy delstr)
+	{
+		this.delstr = delstr;
+	}
+
+	/**
 	 * 
 	 */
 	protected void dumpGoalsPeriodically(IInternalAccess ia)
@@ -507,7 +530,7 @@ public class RCapability extends RElement
 //					}
 //					System.out.println();
 //				}
-				System.out.println("inhibitors: "+goal.getInhibitors());
+//				System.out.println("inhibitors: "+goal.getInhibitors());
 				System.out.println("--------");
 			}
 		}

@@ -68,9 +68,6 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/** The child plan. */
 	protected RPlan childplan;
 	
-	/** The set of inhibitors. */
-	protected Set<RGoal> inhibitors;
-
 	//-------- constructors --------
 	
 	/**
@@ -220,6 +217,9 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	{
 		if(getProcessingState().equals(processingstate))
 			return;
+		
+		if(getMGoal().getName().indexOf("achievecleanup")!=-1)
+			System.out.println("proc state: "+processingstate+" "+this);
 		
 //		if(GoalProcessingState.FAILED.equals(processingstate))
 //			System.out.println("failed: "+this);
@@ -530,70 +530,6 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		this.childplan = childplan;
 	}
 	
-	/**
-	 * 
-	 */
-	public void addInhibitor(RGoal inhibitor, IInternalAccess ia)
-	{		
-		if(inhibitors==null)
-			inhibitors = new HashSet<RGoal>();
-		
-		if(inhibitors.add(inhibitor) && inhibitors.size()==1)
-		{
-//			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALINHIBITED, getMGoal().getName()}), this));
-		}
-		
-//		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
-//			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
-	}
-	
-	/**
-	 * 
-	 */
-	public void removeInhibitor(RGoal inhibitor, IInternalAccess ia)
-	{
-//		System.out.println("rem inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
-		
-//		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
-//			System.out.println("kokoko: "+inhibitor);
-		
-		if(inhibitors!=null)
-		{
-			if(inhibitors.remove(inhibitor) && inhibitors.size()==0)
-			{
-//				System.out.println("goal not inhibited: "+this);
-//				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-				((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, getMGoal().getName()}), this));
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean isInhibited()
-	{
-		return inhibitors!=null && !inhibitors.isEmpty();
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean isInhibitedBy(RGoal other)
-	{
-		return !isFinished() && inhibitors!=null && inhibitors.contains(other);
-	}
-	
-	/**
-	 *  Get the inhibitors.
-	 *  @return The inhibitors.
-	 */
-	public Set<RGoal> getInhibitors()
-	{
-		return inhibitors;
-	}
-
 	/**
 	 *  Get the hashcode.
 	 */
@@ -1111,87 +1047,6 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				throw new RuntimeException(e);
 			}
 		}
-	}
-	
-	/**
-	 *  Test if this goal inhibits the other.
-	 */
-	public boolean inhibits(RGoal other, IInternalAccess ia)
-	{
-		if(this.equals(other))
-			return false;
-		
-		// todo: cardinality
-		
-		boolean ret = false;
-		
-		if(getLifecycleState().equals(GoalLifecycleState.ACTIVE) && getProcessingState().equals(GoalProcessingState.INPROCESS))
-		{
-			MDeliberation delib = getMGoal().getDeliberation();
-			if(delib!=null)
-			{
-				if(delib.isCardinalityOne() && other.getMGoal().equals(getMGoal()))
-				{
-					ret = true;
-				}
-				else
-				{
-//					Set<MGoal> minh = delib.getInhibitions();
-					Set<MGoal> minh = delib.getInhibitions(getMCapability());
-					MGoal mother = other.getMGoal();
-					if(minh!=null && minh.contains(mother))
-					{
-						ret = true;
-						
-						// check if instance relation
-						Map<String, MethodInfo> dms = delib.getInhibitionMethods();
-						if(dms!=null)
-						{
-							MethodInfo mi = dms.get(mother.getName());
-							if(mi!=null)
-							{
-								Method dm = mi.getMethod(ia.getClassLoader());
-								try
-								{
-									dm.setAccessible(true);
-									ret = ((Boolean)dm.invoke(getPojoElement(), new Object[]{other.getPojoElement()})).booleanValue();
-								}
-								catch(Exception e)
-								{
-									Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-									ia.getLogger().severe("Exception in inhibits expression: "+t);
-								}
-							}
-						}
-						
-						// xml inhibition expressions
-						Map<String, UnparsedExpression> uexps = delib.getInhibitionExpressions();
-						if(uexps!=null)
-						{
-							UnparsedExpression uexp = uexps.get(mother.getName());
-							if(uexp!=null && uexp.getValue()!=null && uexp.getValue().length()>0)
-							{
-								SimpleValueFetcher fet = new SimpleValueFetcher(agent.getFetcher());
-								fet.setValue("$goal", this);
-								fet.setValue("$ref", other);
-								
-								try
-								{
-									ret = ((Boolean)SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(fet)).booleanValue();
-								}
-								catch(Exception e)
-								{
-									Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-									ia.getLogger().severe("Exception in inhibits expression: "+t);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return ret;
 	}
 	
 //	/**

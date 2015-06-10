@@ -59,11 +59,11 @@ public class ChangeEvent
 	/** Event type that a goal has been removed. */
 	public static final String GOALNOTINPROCESS = "goalnotinprocess";
 
-	/** Event type that a goal has been added. */
-	public static final String GOALINHIBITED = "goalinhibited";
-
-	/** Event type that a goal has been added. */
-	public static final String GOALNOTINHIBITED = "goalnotinhibited";
+//	/** Event type that a goal has been added. */
+//	public static final String GOALINHIBITED = "goalinhibited";
+//
+//	/** Event type that a goal has been added. */
+//	public static final String GOALNOTINHIBITED = "goalnotinhibited";
 	
 	
 	/** Event type that a plan has been added. */
