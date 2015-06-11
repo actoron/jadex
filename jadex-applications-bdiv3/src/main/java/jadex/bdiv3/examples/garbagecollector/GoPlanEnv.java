@@ -9,7 +9,6 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.ISpaceAction;
@@ -89,6 +88,7 @@ public class GoPlanEnv
 			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(collector.getAgent().getComponentDescription()).getId());
 			action	= env.performSpaceAction("go", params, lis); 
 			fut.get();
+			action	= -1;
 
 //			System.out.println("after go "+this);
 		}

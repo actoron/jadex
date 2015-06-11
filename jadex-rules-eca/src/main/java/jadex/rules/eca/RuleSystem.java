@@ -375,6 +375,8 @@ public class RuleSystem
 					{
 						if(result.getFirstEntity().booleanValue())
 						{
+//							System.out.println("Rule triggered: "+rules[i]+", "+event);
+							
 							IFuture fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, result.getSecondEntity());
 							
 							if(fut instanceof IIntermediateFuture)

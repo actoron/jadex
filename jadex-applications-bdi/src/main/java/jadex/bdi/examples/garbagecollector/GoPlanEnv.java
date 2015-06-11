@@ -18,6 +18,10 @@ import java.util.Map;
  */
 public class GoPlanEnv extends Plan
 {
+	/** The go action id (or -1 if not set). */
+	protected int	action	= -1;
+
+	
 	/**
 	 *  The plan body.
 	 */
@@ -60,8 +64,20 @@ public class GoPlanEnv extends Plan
 			params.put(GoAction.DIRECTION, dir);
 			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentDescription()).getId());
 			Future<Void> fut = new Future<Void>();
-			env.performSpaceAction("go", params, new DelegationResultListener<Void>(fut));
+			action	= env.performSpaceAction("go", params, new DelegationResultListener<Void>(fut));
 			fut.get();
+			action	= -1;
+		}
+	}
+
+	public void	aborted()
+	{
+//		System.out.println("go aborted "+this+", "+action);
+		if(action!=-1)
+		{
+//			System.out.println("canceling action: "+action);
+			Grid2D env = (Grid2D)getBeliefbase().getBelief("env").getFact();
+			env.cancelSpaceAction(action);
 		}
 	}
 }
