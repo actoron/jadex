@@ -3,6 +3,7 @@ package jadex.platform.service.dht;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -91,9 +92,9 @@ public class Fingertable {
 	public void setSuccessor(IFinger node) {
 		Finger oldSuccessor = getSuccessor().clone();
 		getSuccessor().set(node);
-//		if (listener != null) {
+		if (!SUtil.equals(oldSuccessor, node)) {
 			listener.successorChanged(oldSuccessor, node);
-//		}
+		}
 	}
 	
 	/**
@@ -165,9 +166,9 @@ public class Fingertable {
 	public void setPredecessor(IFinger predecessor) {
 		IFinger oldFinger = this.predecessor;
 		this.predecessor = predecessor;
-//		if (listener != null) {
+		if (!SUtil.equals(oldFinger, predecessor)) {
 			listener.predecessorChanged(oldFinger, predecessor);
-//		}
+		}
 	}
 
 	// public void init(IRingNode nDash)
@@ -199,13 +200,7 @@ public class Fingertable {
 				log("resetting finger " + i + " to " + selfFinger);
 				Finger oldFinger = fingers[i].clone();
 				fingers[i].set(selfFinger);
-//				if (listener != null) {
-					listener.fingerChanged(i, oldFinger, selfFinger);
-//				}
-				// } else {
-				// if (rn.getNodeId().equals(fingers[i].getNodeId())) {
-				// System.out.println("should have been replaced: " + i);
-				// }
+				listener.fingerChanged(i, oldFinger, selfFinger);
 			}
 		}
 

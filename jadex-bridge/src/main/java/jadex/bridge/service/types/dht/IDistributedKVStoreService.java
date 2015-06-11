@@ -89,7 +89,7 @@ public interface IDistributedKVStoreService
 	 * 
 	 * @return The local ringnode.
 	 */
-	public IFuture<IRingApplicationService> getRingService();
+//	public IFuture<IRingApplicationService> getRingService();
 
 	/**
 	 * Returns all keys stored in this node.
@@ -104,7 +104,15 @@ public interface IDistributedKVStoreService
 	 * @param targetNodeId
 	 * @return Set of all matching entries.
 	 */
-	public IFuture<Collection<StoreEntry>> moveEntries(IID targetNodeId);
+	public IFuture<Collection<StoreEntry>> pullEntries(IID targetNodeId);
+	
+	/**
+	 * Receive entries from another node and insert them in the local store
+	 * or in the store of a predecessor, if key is matching.
+	 * @param entries the entries
+	 * @return void
+	 */
+	public IFuture<Void> pushEntries(Collection<StoreEntry> entries);
 
 	/**
 	 * Sets the initialized flag.

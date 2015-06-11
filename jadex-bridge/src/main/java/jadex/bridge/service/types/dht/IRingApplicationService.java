@@ -28,7 +28,7 @@ public interface IRingApplicationService
 	 * @param id ID to find the successor of.
 	 * @return The finger entry of the best closest successor.
 	 */
-	@Timeout(TIMEOUT)
+//	@Timeout(TIMEOUT)
 	IFuture<IFinger> findSuccessor(IID id);
 
 	/**

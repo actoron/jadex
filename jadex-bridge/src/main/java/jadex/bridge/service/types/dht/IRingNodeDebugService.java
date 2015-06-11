@@ -41,4 +41,10 @@ public interface IRingNodeDebugService extends IRingNodeService
 	 * Disable stabilize, fix and search for debug purposes.
 	 */
 	public void disableSchedules();
+
+	/**
+	 * Init Ringnode with id.
+	 * @param id
+	 */
+	public void init(IID id);
 }
