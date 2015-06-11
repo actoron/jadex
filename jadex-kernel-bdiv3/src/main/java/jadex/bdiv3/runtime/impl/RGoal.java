@@ -218,8 +218,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(getProcessingState().equals(processingstate))
 			return;
 		
-		if(getMGoal().getName().indexOf("achievecleanup")!=-1)
-			System.out.println("proc state: "+processingstate+" "+this);
+//		if(getMGoal().getName().indexOf("achievecleanup")!=-1)
+//			System.out.println("proc state: "+processingstate+" "+this);
 		
 //		if(GoalProcessingState.FAILED.equals(processingstate))
 //			System.out.println("failed: "+this);
@@ -411,8 +411,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		
 		if(GoalLifecycleState.DROPPING.equals(lifecyclestate))
 		{
-			if(getId().indexOf("cleanup")!=-1)
-				System.out.println("dropping achievecleanup: "+lifecyclestate+" "+processingstate);
+//			if(getId().indexOf("cleanup")!=-1)
+//				System.out.println("dropping achievecleanup: "+lifecyclestate+" "+processingstate);
 			
 //			if(getId().indexOf("cleanup")!=-1)
 //				System.out.println("dropping: "+getId());

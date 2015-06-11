@@ -113,7 +113,7 @@
 				<inhibits ref="performpatrol"/>
 			</deliberation>
  			<maintaincondition >
- 				$beliefbase.my_chargestate > 0.2
+ 				$beliefbase.my_chargestate > 0.2 &amp;&amp; $beliefbase.my_chargestate!=0
  			</maintaincondition>
 			<targetcondition >
  				$beliefbase.my_chargestate >= 1.0
@@ -399,8 +399,8 @@
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="performlookforwaste"/>
-  				<!-- <initialgoal ref="performpatrol"/>
-		  		<initialgoal ref="maintainbatteryloaded"/>-->
+  				<!-- <initialgoal ref="performpatrol"/>-->
+		  		<initialgoal ref="maintainbatteryloaded"/>
 				<initialgoal ref="performmemorizepositions"/>
 			</goals>
 		</configuration>

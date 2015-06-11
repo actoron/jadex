@@ -2534,7 +2534,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 */
 	public void componentRemoved(final IComponentDescription desc)
 	{
-//		System.out.println("comp removed: "+aid);
+		System.out.println("comp removed: "+desc.getName());
 		
 //		getComponentType(cid)
 //			.addResultListener(new DefaultResultListener()
@@ -2924,6 +2924,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					
 					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
+//						System.out.println("rec: "+result);
 						if(result.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START))
 						{
 //							System.out.println("space subscribed");
@@ -2942,6 +2943,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					
 				    public void finished()
 				    {
+//				    	System.out.println("fini");
 				    }
 				    
 				    public void exceptionOccurred(Exception e)

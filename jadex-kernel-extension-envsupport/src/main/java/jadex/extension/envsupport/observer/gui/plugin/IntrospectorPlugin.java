@@ -307,7 +307,7 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 	{
 		fillPropertyTable(spacePropertyTable_, observerCenter_.getSpace());
 		
-		DefaultComboBoxModel plModel = (DefaultComboBoxModel) processList_.getModel();
+		DefaultComboBoxModel plModel = (DefaultComboBoxModel)processList_.getModel();
 		Object selection = processList_.getSelectedValue();
 		plModel.removeAllElements();
 		Set processIds = observerCenter_.getSpace().getSpaceProcessNames();

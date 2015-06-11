@@ -43,13 +43,13 @@ public class PickUpWastePlan extends Plan
 		fut.get();
 	}
 	
-	public void failed()
-	{
+//	public void failed()
+//	{
 //		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
-	}
-
-	public void aborted()
-	{
+//	}
+//
+//	public void aborted()
+//	{
 //		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
-	}
+//	}
 }

@@ -52,19 +52,19 @@ public class CleanUpWastePlan extends Plan
 		}
 	}
 	
-	public void passed()
-	{
-		System.err.println("passed: "+this+", "+getParameter("waste").getValue());
-	}
-	
-	public void failed()
-	{
-		System.err.println("failed: "+this+", "+getParameter("waste").getValue());
-		getException().printStackTrace();
-	}
-
-	public void aborted()
-	{
-		System.err.println("aborted: "+this+", "+getParameter("waste").getValue());
-	}
+//	public void passed()
+//	{
+//		System.err.println("passed: "+this+", "+getParameter("waste").getValue());
+//	}
+//	
+//	public void failed()
+//	{
+//		System.err.println("failed: "+this+", "+getParameter("waste").getValue());
+//		getException().printStackTrace();
+//	}
+//
+//	public void aborted()
+//	{
+//		System.err.println("aborted: "+this+", "+getParameter("waste").getValue());
+//	}
 }

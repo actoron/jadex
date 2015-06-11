@@ -57,18 +57,18 @@ public class DropWastePlan extends Plan
 		}
 	}
 
-	public void passed()
-	{
-		System.err.println("passed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
-	}
-	
-	public void failed()
-	{
-		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
-	}
-
-	public void aborted()
-	{
-		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
-	}
+//	public void passed()
+//	{
+//		System.err.println("passed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+//	}
+//	
+//	public void failed()
+//	{
+//		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+//	}
+//
+//	public void aborted()
+//	{
+//		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+//	}
 }

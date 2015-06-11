@@ -15,6 +15,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -288,7 +289,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	/**
 	 *  Called, when a subcomponent has been created.
 	 */
-	public IFuture<Void>	componentCreated(final IComponentDescription desc, IModelInfo model)
+	public IFuture<Void>	componentCreated(final IComponentDescription desc)
 	{
 		// Throw component events for extensions (envsupport)
 		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
@@ -303,6 +304,43 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 					{
 						MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
 							MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime(), PublishEventLevel.COARSE);
+						me.setProperty("details", desc);
+						// for extensions only
+						mon.publishEvent(me, PublishTarget.TOALL) .addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+					return ret;
+				}
+			});
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
+	}
+	
+	/**
+	 *  Called, when a subcomponent has been removed.
+	 */
+	public IFuture<Void> componentRemoved(final IComponentDescription desc)
+	{
+		// Throw component events for extensions (envsupport)
+		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
+		if(mon!=null)
+		{
+			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					Future<Void>	ret	= new Future<Void>();
+					if(mon.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+					{
+						long time = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+						MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
+							MonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), time, PublishEventLevel.COARSE);
 						me.setProperty("details", desc);
 						// for extensions only
 						mon.publishEvent(me, PublishTarget.TOALL) .addResultListener(new DelegationResultListener<Void>(ret));

@@ -51,7 +51,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 		env.destroySpaceObject(waste.getId());
 		avatar.setProperty("waste", null);
 
-		System.out.println("drop waste action finished: "+parameters);
+//		System.out.println("drop waste action finished: "+parameters);
 
 		return null;
 	}

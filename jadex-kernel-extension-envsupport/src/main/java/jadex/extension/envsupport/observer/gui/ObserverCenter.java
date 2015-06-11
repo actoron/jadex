@@ -228,6 +228,7 @@ public class ObserverCenter implements IObserverCenter
 				{
 					public void actionPerformed(ActionEvent e)
 					{
+//						System.out.println("activeplugin: "+activeplugin);
 						IObserverCenterPlugin apl = activeplugin;
 						if(apl != null)
 							apl.refresh();
@@ -683,12 +684,13 @@ public class ObserverCenter implements IObserverCenter
 		
 		if(plugins.size()>0)
 		{
-			activatePlugin(plugins.get(0));
 			for(int i=1; i<plugins.size(); i++)
 			{
 				if(plugins.get(i).isStartOnLoad())
 					activatePlugin(this.plugins.get(i));
 			}
+			// activate at last to set activeplugin to the first
+			activatePlugin(plugins.get(0));
 		}
 	}
 	

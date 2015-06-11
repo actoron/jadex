@@ -33,7 +33,7 @@ import java.util.Set;
  */
 public class CreateCollectionTruckProcess extends SimplePropertyObject implements ISpaceProcess
 {
-	protected Set ongoing = new HashSet();
+	protected Set<ISpaceObject> ongoing = new HashSet<ISpaceObject>();
 	
 	//-------- ISpaceProcess interface --------
 	
@@ -70,7 +70,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 		
 		if(wastebins.length>0)
 		{
-			final Set todo = new HashSet();
+			final Set<ISpaceObject> todo = new HashSet<ISpaceObject>();
 			
 			for(int i=0; i<wastebins.length; i++)
 			{
@@ -85,34 +85,31 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 			{
 //				System.out.println("Creating garbage collection truck.");
 //				final IApplication app = space.getContext();
-				final Map params = new HashMap();
+				final Map<String, Object> params = new HashMap<String, Object>();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
 				SServiceProvider.getService(space.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DefaultResultListener()
+					.addResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(final IComponentManagementService cms)
 					{
-						final IComponentManagementService cms	= (IComponentManagementService)result;
-						IFuture ret = cms.createComponent(null, "Truck",
+						IFuture<IComponentIdentifier> ret = cms.createComponent(null, "Truck",
 							new CreationInfo(null, params, space.getExternalAccess().getComponentIdentifier(), null, null, null, null, null, null, null, space.getExternalAccess().getModel().getAllImports(), null, null), null);
 						
-						IResultListener lis = new IResultListener()
+						IResultListener<IComponentIdentifier> lis = new IResultListener<IComponentIdentifier>()
 						{
 							public void exceptionOccurred(Exception exception)
 							{
 							}
-							public void resultAvailable(Object result)
+							public void resultAvailable(IComponentIdentifier truck)
 							{
-								IComponentIdentifier truck = (IComponentIdentifier)result;
-								cms.getExternalAccess(truck).addResultListener(new IResultListener()
+								cms.getExternalAccess(truck).addResultListener(new IResultListener<IExternalAccess>()
 								{
 									public void exceptionOccurred(Exception exception)
 									{
 									}
-									public void resultAvailable(Object result)
+									public void resultAvailable(IExternalAccess ex)
 									{
-										IExternalAccess ex = (IExternalAccess)result;
 										ex.scheduleStep(new IComponentStep<Void>()
 										{
 											@Classname("rem")

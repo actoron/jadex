@@ -105,8 +105,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		
 		DefaultTableModel perspectiveModel = new DefaultTableModel(new String[]{"Perspective", "OpenGL"}, 0)
 		{
-			@Override
-			public Class getColumnClass(int columnIndex)
+			public Class<?> getColumnClass(int columnIndex)
 			{
 				if (columnIndex == 1)
 					return Boolean.class;

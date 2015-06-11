@@ -1684,8 +1684,7 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		
 		// Register component at parent.
-		return ((IInternalSubcomponentsFeature)pad.getComponentFeature(ISubcomponentsFeature.class))
-			.componentCreated(ad, lmodel);
+		return ((IInternalSubcomponentsFeature)pad.getComponentFeature(ISubcomponentsFeature.class)).componentCreated(ad);//, lmodel);
 	}
 	
 	/**
@@ -1881,6 +1880,9 @@ public class ComponentManagementService implements IComponentManagementService
 					}
 				}
 				pad	= (PlatformComponent)components.get(desc.getName().getParent());
+				
+				// todo: wait for result?!
+				((IInternalSubcomponentsFeature)pad.getComponentFeature(ISubcomponentsFeature.class)).componentRemoved(desc);
 			}
 			
 			// Must be executed out of sync block due to deadlocks
