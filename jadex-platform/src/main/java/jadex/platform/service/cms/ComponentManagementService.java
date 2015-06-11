@@ -1882,7 +1882,8 @@ public class ComponentManagementService implements IComponentManagementService
 				pad	= (PlatformComponent)components.get(desc.getName().getParent());
 				
 				// todo: wait for result?!
-				((IInternalSubcomponentsFeature)pad.getComponentFeature(ISubcomponentsFeature.class)).componentRemoved(desc);
+				if(pad!=null)
+					((IInternalSubcomponentsFeature)pad.getComponentFeature(ISubcomponentsFeature.class)).componentRemoved(desc);
 			}
 			
 			// Must be executed out of sync block due to deadlocks

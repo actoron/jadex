@@ -209,7 +209,7 @@ public class TypeInfo extends AbstractInfo
 	 */
 	public Collection<AttributeInfo> getAttributeInfos()
 	{
-		Collection<AttributeInfo> ret = attributeinfos==null? new HashSet<AttributeInfo>(): attributeinfos.values();
+		Collection<AttributeInfo> ret = attributeinfos==null? new HashSet<AttributeInfo>(): new HashSet<AttributeInfo>(attributeinfos.values());
 		if(getSupertype()!=null)
 			ret.addAll(getSupertype().getAttributeInfos());
 		return ret;

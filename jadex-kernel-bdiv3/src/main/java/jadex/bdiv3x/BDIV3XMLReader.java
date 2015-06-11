@@ -23,9 +23,15 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.component.ComponentXMLReader;
@@ -49,6 +55,7 @@ import jadex.xml.stax.QName;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -412,7 +419,66 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}
 		};
 		
-		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(BDIV3XModel.class), 
+		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(BDIV3XModel.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				AReadContext ar = (AReadContext)context;
+				BDIV3XModel model = (BDIV3XModel)context.getRootObject();
+				MCapability mcapa = model.getCapability();
+				
+				if(mcapa.getGoalPublications()!=null)
+				{
+					for(Map.Entry<ClassInfo, List<Tuple2<MGoal, String>>> entry: mcapa.getGoalPublications().entrySet())
+					{
+						ClassInfo key = entry.getKey();
+						List<Tuple2<MGoal, String>> vals = entry.getValue();
+						Map<String, String> goalnames = new LinkedHashMap<String, String>();
+						for(Tuple2<MGoal, String> val: vals)
+						{
+							goalnames.put(val.getSecondEntity(), val.getFirstEntity().getName());
+						}
+		//				System.out.println("found goal publish: "+key);
+						
+						StringBuffer buf = new StringBuffer();
+						buf.append("jadex.bdiv3.BDIClassReader.createServiceImplementation($component, "); // todo: move to other place
+						buf.append(key.getTypeName()+".class, ");
+						buf.append("new String[]{");
+						for(Iterator<String> it2=goalnames.keySet().iterator(); it2.hasNext(); )
+						{
+							buf.append("\"").append(it2.next()).append("\"");
+							if(it2.hasNext())
+								buf.append(", ");
+						}
+						buf.append("}, ");
+						buf.append("new String[]{");
+						for(Iterator<String> it2=goalnames.keySet().iterator(); it2.hasNext(); )
+						{
+							buf.append("\"").append(goalnames.get(it2.next())).append("\"");
+							if(it2.hasNext())
+								buf.append(", ");
+						}
+						buf.append("}");
+						buf.append(")");
+						
+		//				System.out.println("service creation expression: "+buf.toString());
+						
+						ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, buf.toString(), 
+							BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
+						
+						// todo: allow specifying scope
+						model.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null));
+					}
+				}	
+				
+				return null;
+			}
+			
+			public int getPass()
+			{
+				return 1;
+			}
+		}), 
 			new MappingInfo(comptype, null, null, 
 				new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},  
@@ -538,14 +604,16 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "body")), new ObjectInfo(MBody.class), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("impl", "clazz"), new AttributeConverter(classconv, reclassconv))	// Todo: ignore on write?
+				new AttributeInfo(new AccessInfo("impl", "clazz"), new AttributeConverter(classconv, reclassconv)),	// Todo: ignore on write?
+				new AttributeInfo(new AccessInfo("service", "serviceName")),
+				new AttributeInfo(new AccessInfo("method", "serviceMethodName"))
 //			new AttributeInfo(new AccessInfo("impl", OAVBDIMetaModel.body_has_impl))
 			}, null)));//, bopost));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "precondition")), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value")));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
 //			new MappingInfo(ti_expression)));
-//			
+			
 		IPostProcessor mtrpp = new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
@@ -808,6 +876,45 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new MappingInfo(null, null, "value", condattrs)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
 			new MappingInfo(null, null, "value", condattrs)));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "achievegoal"), new QName(uri, "publish")}), new ObjectInfo(null, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				try
+				{
+					BDIV3XModel model = (BDIV3XModel)context.getRootObject();
+					MCapability mcapa = model.getCapability();
+					AReadContext ar = (AReadContext)context;
+					Map<String, String> rawattrs = ar.getTopStackElement().getRawAttributes();
+					String service = rawattrs.get("class");
+					String method = rawattrs.get("method");
+					MGoal mgoal = (MGoal)ar.getStackElement(ar.getStackSize()-2).getObject();
+					
+					Class<?> iface = SReflect.findClass(service, model.getAllImports(), ar.getClassLoader());
+					ClassInfo ci = new ClassInfo(iface.getName());
+					
+					// Just use first method if no name is given
+					if(method==null)
+						method = iface.getDeclaredMethods()[0].getName();
+					
+					mcapa.addGoalPublication(ci, mgoal, method);
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+				return null;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}), new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("method", null, AccessInfo.IGNORE_READ))
+		})));
 		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "achievegoal"), new QName(uri, "publish")}), new ObjectInfo(OAVBDIMetaModel.publish_type, scpost), 
 //				new MappingInfo(null, new AttributeInfo[]{
