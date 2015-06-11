@@ -88,15 +88,34 @@ public class TextJ2DRenderer implements IJ2DRenderer
 		g.setTransform(vp.getDefaultTransform());
 		Color color = (Color) dc.getBoundValue(obj, primitive.getColor(), vp);
 		g.setColor(color);
+		
+		if (textP.getVAlign() == Primitive.ALIGN_MIDDLE || textP.getVAlign() == Primitive.ALIGN_BOTTOM)
+		{
+			double hadj = 0;
+			for (int i = 0; i < lines.length; ++i)
+			{
+				TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);
+				hadj += tl.getAscent() + tl.getDescent() + tl.getLeading();
+			}
+			if (textP.getVAlign() == Primitive.ALIGN_MIDDLE)
+			{
+				hadj *= 0.5;
+			}
+			yPos -= hadj;
+		}
+		
 		for (int i = 0; i < lines.length; ++i)
 		{
 			TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);
 			
-			if (i != 0)
-				yPos += tl.getAscent();
-			tl.draw(g, (int) (xPos + textP.getAlignment(tl)), (int) (yPos));
+//			if (i != 0)
+//				yPos += tl.getAscent();
+			yPos += tl.getLeading() + tl.getAscent();
 			
-			yPos += (tl.getDescent() + tl.getLeading());
+			tl.draw(g, (int) (xPos + textP.getTextHAlignment(tl)), (int) (yPos));
+			
+//			yPos += (tl.getDescent() + tl.getLeading());
+			yPos += tl.getDescent();
 		}
 		g.setTransform(t);
 	}
