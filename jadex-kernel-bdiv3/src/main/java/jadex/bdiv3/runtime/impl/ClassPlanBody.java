@@ -223,6 +223,11 @@ public class ClassPlanBody extends AbstractPlanBody
 								f.setAccessible(true);
 								f.set(plan, reason);
 							}
+							else 
+							{
+								f.setAccessible(true);
+								f.set(plan, r);
+							}
 						}
 						else if(r instanceof ChangeEvent)
 						{

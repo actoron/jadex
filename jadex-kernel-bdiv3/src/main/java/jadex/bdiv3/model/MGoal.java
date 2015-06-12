@@ -322,6 +322,9 @@ public class MGoal extends MClassBasedElement
 	 */
 	public Object getPojoResultWriteAccess(ClassLoader cl)
 	{
+		if(target==null)
+			return null;
+		
 		if(pojoresultwriteaccess==null)
 		{
 			Class<?> pojocl = getTargetClass(cl);

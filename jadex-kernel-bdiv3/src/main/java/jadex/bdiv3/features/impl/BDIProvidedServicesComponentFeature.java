@@ -41,25 +41,29 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 	 */
 	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
 	{
-		int i	= info.getName()!=null ? info.getName().indexOf(MElement.CAPABILITY_SEPARATOR) : -1;
-		Object	ocapa	= getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-		String	capa	= null;
-		if(i!=-1)
+		// todo: cleanup this HACK!!!
+		if(getComponent().getComponentFeature0(IPojoComponentFeature.class)!=null)
 		{
-			capa	= info.getName().substring(0, i); 
-			SimpleValueFetcher fet = new SimpleValueFetcher(fetcher);
-			ocapa = ((BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capa);
-			fet.setValue("$pojocapa", ocapa);
-			fetcher = fet;
-			
-			Set<Object> vals = new HashSet<Object>();
-			vals.add(ocapa);
-			vals.add(new CapabilityWrapper(getComponent(), ocapa, capa));
-			hackguesser = new SimpleParameterGuesser(super.getParameterGuesser(), vals);
-		}
-		else
-		{
-			hackguesser = null;
+			int i = info.getName()!=null ? info.getName().indexOf(MElement.CAPABILITY_SEPARATOR) : -1;
+			Object	ocapa	= getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+			String	capa	= null;
+			if(i!=-1)
+			{
+				capa	= info.getName().substring(0, i); 
+				SimpleValueFetcher fet = new SimpleValueFetcher(fetcher);
+				ocapa = ((BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capa);
+				fet.setValue("$pojocapa", ocapa);
+				fetcher = fet;
+				
+				Set<Object> vals = new HashSet<Object>();
+				vals.add(ocapa);
+				vals.add(new CapabilityWrapper(getComponent(), ocapa, capa));
+				hackguesser = new SimpleParameterGuesser(super.getParameterGuesser(), vals);
+			}
+			else
+			{
+				hackguesser = null;
+			}
 		}
 		
 		// Support special case that BDI should implement provided service with plans.

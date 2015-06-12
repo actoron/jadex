@@ -41,14 +41,14 @@ public class PaintOneEuroPlan extends Plan
 //		getBeliefbase().getBelief("painting").setFact(Boolean.FALSE);
 	}
 	
-//	public void failed()
-//	{
-//		System.out.println("failed: "+this.getRPlan());
-//	}
-//
-//	public void aborted()
-//	{
-//		System.out.println("aborted: "+this.getRPlan());
-//	}
+	public void failed()
+	{
+		System.out.println("failed: "+this.getRPlan());
+	}
+
+	public void aborted()
+	{
+		System.out.println("aborted: "+this.getRPlan());
+	}
 	
 }

@@ -23,7 +23,9 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -441,7 +443,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		//				System.out.println("found goal publish: "+key);
 						
 						StringBuffer buf = new StringBuffer();
-						buf.append("jadex.bdiv3.BDIClassReader.createServiceImplementation($component, "); // todo: move to other place
+						buf.append("jadex.bdiv3.runtime.impl.GoalDelegationHandler.createServiceImplementation($component, ");
 						buf.append(key.getTypeName()+".class, ");
 						buf.append("new String[]{");
 						for(Iterator<String> it2=goalnames.keySet().iterator(); it2.hasNext(); )
@@ -877,7 +879,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
 			new MappingInfo(null, null, "value", condattrs)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "achievegoal"), new QName(uri, "publish")}), new ObjectInfo(null, new IPostProcessor()
+		IPostProcessor pubproc = new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
@@ -911,7 +913,28 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			{
 				return 0;
 			}
-		}), new MappingInfo(null, new AttributeInfo[]{
+		};
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "achievegoal"), new QName(uri, "publish")}), new ObjectInfo(null, pubproc), 
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("method", null, AccessInfo.IGNORE_READ))
+		})));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "performgoal"), new QName(uri, "publish")}), new ObjectInfo(null, pubproc), 
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("method", null, AccessInfo.IGNORE_READ))
+		})));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "querygoal"), new QName(uri, "publish")}), new ObjectInfo(null, pubproc), 
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("method", null, AccessInfo.IGNORE_READ))
+		})));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "maintaingoal"), new QName(uri, "publish")}), new ObjectInfo(null, pubproc), 
+			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("class", null, AccessInfo.IGNORE_READ)),
 			new AttributeInfo(new AccessInfo("method", null, AccessInfo.IGNORE_READ))
 		})));
@@ -965,6 +988,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
 				new AttributeInfo(new AccessInfo("updaterate", "updateRate")),
 				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "servicemapping"), new QName("ref")}, "serviceMapping"))
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "bindingoptions"), "bindingOptions"))
@@ -978,8 +1002,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
 				new AttributeInfo(new AccessInfo("updaterate", "updateRate")),
 				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
-				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
-				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping"))
+//				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
+//				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping")),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "servicemapping"), new QName("ref")}, "serviceMapping"))
 			}, new SubobjectInfo[]{
 				// because there is only MParameter the values expression is stored as default value
 				// and multiple facts are added to a list
@@ -993,7 +1018,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
-				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping"))
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping")),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "servicemapping"), new QName("ref")}, "serviceMapping"))
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "bindingoptions"), "bindingOptions"))
@@ -1005,7 +1031,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
-				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping"))
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping")),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "servicemapping"), new QName("ref")}, "serviceMapping"))
 			}, new SubobjectInfo[]{
 				// because there is only MParameter the values expression is stored as default value
 				// and multiple facts are added to a list

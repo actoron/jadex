@@ -78,10 +78,6 @@ public class MBody
 		this.servicemethodname = servicemethodname;
 		this.mapperclass = mapperclass;
 		this.component	= component;
-		
-		// Hack?
-		if(servicename!=null)
-			this.clazz = new ClassInfo(ServiceCallPlan.class);
 	}
 
 	/**
@@ -108,6 +104,8 @@ public class MBody
 	 */
 	public ClassInfo getClazz()
 	{
+		if(clazz==null && getServiceName()!=null)
+			clazz = new ClassInfo(ServiceCallPlan.class.getName());
 		return clazz;
 	}
 

@@ -3,9 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -46,11 +44,14 @@ public class ServiceCallPlan
 	/** The plan. */
 	protected RPlan rplan;
 	
+	public static int cnt;
+	
 	/**
 	 * 
 	 */
 	public ServiceCallPlan(IInternalAccess agent, String service, String method, IServiceParameterMapper<Object> mapper, RPlan rplan)
 	{
+		System.out.println("created service call plan: "+method);
 		this.agent = agent;
 		this.service = service;
 		this.method = method;
@@ -60,7 +61,10 @@ public class ServiceCallPlan
 	
 	@PlanBody
 	public IFuture<Void> body()
-	{
+	{		
+		final int mycnt = cnt++;
+		System.out.println("service call made: "+mycnt);
+		
 		final Future<Void> ret = new Future<Void>();
 
 //		IIntermediateFuture<Object> services = agent.getServiceContainer().getRequiredServices(service);
@@ -89,11 +93,16 @@ public class ServiceCallPlan
 						tmp = SReflect.getMethods(proxy.getClass(), method)[0];
 					}
 					final Method m = tmp;
-					Object[] myargs = mapper.createServiceParameters(reason, m);
+					Object[] myargs = mapper.createServiceParameters(reason, m, rplan);
 //					System.out.println("invoking service, args: "+SUtil.arrayToString(myargs));
 					
+					// todo: HACK! do we need this call to enhance the parameters?
 					List<Object> ar = new ArrayList<Object>();
-					ar.add(myargs);
+					if(myargs!=null)
+					{
+						for(Object myarg: myargs)
+							ar.add(myarg);
+					}
 					Object[] meargs = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), null, null, null, rplan, null, ar, agent);
 					
 					Object	res	= m.invoke(proxy, meargs);
@@ -104,7 +113,7 @@ public class ServiceCallPlan
 						{
 							public void resultAvailable(Object result)
 							{
-								mapper.handleServiceResult(reason, m, result);
+								mapper.handleServiceResult(reason, m, result, rplan);
 								opencalls--;
 								proceed();
 							}
@@ -112,7 +121,7 @@ public class ServiceCallPlan
 							public void exceptionOccurred(Exception exception)
 							{
 								ex = exception;
-								mapper.handleServiceResult(reason, m, exception);
+								mapper.handleServiceResult(reason, m, exception, rplan);
 								opencalls--;
 								proceed();
 							}
@@ -122,7 +131,7 @@ public class ServiceCallPlan
 					}
 					else
 					{
-						mapper.handleServiceResult(reason, m, res);
+						mapper.handleServiceResult(reason, m, res, rplan);
 						opencalls--;
 						proceed();
 					}
@@ -158,6 +167,8 @@ public class ServiceCallPlan
 			{
 				if(opencalls==0 && fini)
 				{
+					System.out.println("service call retured: "+mycnt+" "+ex);
+
 					if(ex==null)
 					{
 						ret.setResult(null);

@@ -1,14 +1,17 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MPlanParameter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
@@ -16,13 +19,16 @@ import jadex.commons.future.IResultListener;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 /**
  *  Handler used for service-goal delegation.
  *  Creates specific goal for an incoming service request.
- *  Goal must have constructor that exactly fits to
+ *  For Pojo Goal must have constructor that exactly fits to
  *  service invocation parameters
  */
 @Service
@@ -36,21 +42,27 @@ public class GoalDelegationHandler  implements InvocationHandler
 	/** The goal name. */
 	protected Map<String, String> goalnames;
 	
+	/** The type. */
+	protected Class<?> type;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service wrapper invocation handler.
 	 *  @param agent The internal access of the agent.
 	 */
-	public GoalDelegationHandler(IInternalAccess agent, Map<String, String> goalnames)
+	public GoalDelegationHandler(IInternalAccess agent, Map<String, String> goalnames, Class<?> type)
 	{
 		if(agent==null)
 			throw new IllegalArgumentException("Agent must not null.");
 		if(goalnames==null)
 			throw new IllegalArgumentException("Goal names must not null.");
+		if(type==null)
+			throw new IllegalArgumentException("Type must not null.");
 		
 		this.agent = agent;
 		this.goalnames = goalnames;
+		this.type = type;
 	}
 	
 	//-------- methods --------
@@ -73,28 +85,100 @@ public class GoalDelegationHandler  implements InvocationHandler
 		final MGoal mgoal = mcapa.getGoal(goalname);
 		
 		Class<?> goalcl = mgoal.getTargetClass(agent.getClassLoader());
-		
-		Class<?>[] mptypes = method.getParameterTypes();
-		
+
 		Object goal;
+		if(goalcl!=null)
+		{
+			Class<?>[] mptypes = method.getParameterTypes();
+			
+			try
+			{
+				Constructor<?> c = goalcl.getConstructor(mptypes);
+				goal = c.newInstance(args);
+			}
+			catch(Exception e)
+			{
+				Class<?>[] mptypes2 = new Class<?>[mptypes.length+1];
+				System.arraycopy(mptypes, 0, mptypes2, 1, mptypes.length);
+				Object pojo = agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				mptypes2[0] = pojo.getClass();
+				Constructor<?> c = goalcl.getConstructor(mptypes2);
+				Object[] args2 = new Object[args.length+1];
+				System.arraycopy(args, 0, args2, 1, args.length);
+				args2[0] = pojo;
+				goal = c.newInstance(args2);
+			}
+			
+		}
+		else
+		{
+			Map<String, Object> vals = new HashMap<String, Object>();
+//			Annotation[][] annss = method.getParameterAnnotations();
+//			if(annss!=null)
+//			{
+//				for(int i=0; i<annss.length; i++)
+//				{
+//					for(Annotation ann: annss[i])
+//					{
+//						if(ann instanceof ParameterInfo)
+//						{
+//							ParameterInfo pi = (ParameterInfo)ann;
+//							String name = pi.value();
+//							vals.put(name, args[i]);
+//						}
+//					}
+//				}
+//			}
+			
+			List<MParameter> mparams = mgoal.getParameters();
+			if(mparams!=null)
+			{
+				String typename = SReflect.getInnerClassName(type);
+				String methodname = method.getName();
+				
+				for(MParameter mparam: mparams)
+				{
+					List<String> mappings = mparam.getServiceMappings();
+					if(mappings!=null)
+					{
+						for(String mapping: mappings)
+						{
+							boolean ok = false;
+							
+							int count = mapping.length() - mapping.replace(".", "").length();
+							if(count==1)
+							{
+								ok = mapping.indexOf(typename)!=-1;
+								if(!ok)
+								{
+									ok = mapping.indexOf(methodname)!=-1;
+								}
+							}
+							else if(count==2)
+							{
+								ok = mapping.indexOf(typename)!=-1 && mapping.indexOf(methodname)!=-1;
+							}
+							if(ok)
+							{
+								String target = mapping.substring(mapping.lastIndexOf(".")+1); 
+								if("result".equals(target))
+									continue;
+								if(target.startsWith("arg"))
+									target=target.substring(3);
+								if(target.startsWith("argument"))
+									target=target.substring(8);
+								int num = Integer.valueOf(target);
+								vals.put(mparam.getName(), args[num]);
+								break;
+							}
+						}
+					}
+				}
+			}
+			
+			goal = new RGoal(agent, mgoal, null, vals);
+		}
 		
-		try
-		{
-			Constructor<?> c = goalcl.getConstructor(mptypes);
-			goal = c.newInstance(args);
-		}
-		catch(Exception e)
-		{
-			Class<?>[] mptypes2 = new Class<?>[mptypes.length+1];
-			System.arraycopy(mptypes, 0, mptypes2, 1, mptypes.length);
-			Object pojo = agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-			mptypes2[0] = pojo.getClass();
-			Constructor<?> c = goalcl.getConstructor(mptypes2);
-			Object[] args2 = new Object[args.length+1];
-			System.arraycopy(args, 0, args2, 1, args.length);
-			args2[0] = pojo;
-			goal = c.newInstance(args2);
-		}
 		final Object fgoal = goal;
 		
 		// Drop goal when future is terminated from service caller
@@ -103,19 +187,21 @@ public class GoalDelegationHandler  implements InvocationHandler
 			public void terminate(Exception reason, IResultListener<Void> terminate)
 			{
 //				System.out.println("terminated call: "+fgoal);
-				((BDIAgentFeature)bdif).dropGoal(fgoal);
+				((IBDIAgentFeature)bdif).dropGoal(fgoal);
 				super.terminate(reason, terminate);
 			}
 		});
 		
-		((BDIAgentFeature)bdif).dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
+		((IBDIAgentFeature)bdif).dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 //				Object res = RGoal.getGoalResult(fgoal, mgoal, agent.getClassLoader());
 //				Object res = RGoal.getGoalResult(rgoal, agent.getClassLoader());
+				
 				// Do not set goal itself as result of service call but null then
 				// Use setResultIfUndo as it could be a terminable future
+				
 				ret.setResultIfUndone(fgoal==result? null: result);
 			}
 			public void exceptionOccurred(Exception exception)
@@ -125,5 +211,21 @@ public class GoalDelegationHandler  implements InvocationHandler
 		});
 	
 		return ret;
+	}
+	
+	/**
+	 *  Create a wrapper service implementation based on a published goal.
+	 */
+	public static Object createServiceImplementation(IInternalAccess agent, Class<?> type, String[] methodnames, String[] goalnames)
+	{
+//		if(methodnames==null || methodnames.length==0)
+//			throw new IllegalArgumentException("At least one method-goal mapping must be given.");
+		Map<String, String> gn = new HashMap<String, String>();
+		for(int i=0; i<methodnames.length; i++)
+		{
+			gn.put(methodnames[i], goalnames[i]);
+		}
+		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
+			new GoalDelegationHandler(agent, gn, type));
 	}
 }
