@@ -8,24 +8,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *  Annotation for a service plan, i.e. a service invocation is used as plan.
  */
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServicePlan
 {
 	/**
-	 * 
+	 *  The required service name.
 	 */
 	public String name();
 	
 	/**
-	 * 
+	 *  The method name.
 	 */
 	public String method() default "";
 	
 	/**
-	 * 
+	 *  The parameter mapper between goal parameters and service arguments/results.
 	 */
 	public Class<? extends IServiceParameterMapper> mapper() default IServiceParameterMapper.class;
 //	public Class<? extends IServiceParameterMapper<?>> mapper() default IServiceParameterMapper.class;

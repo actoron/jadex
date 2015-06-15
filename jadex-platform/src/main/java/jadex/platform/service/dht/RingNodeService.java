@@ -23,6 +23,7 @@ import jadex.commons.IAsyncFilter;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -185,7 +186,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	 * 
 	 * @param id
 	 */
-	void init(IID id)
+	public void init(IID id)
 	{
 		this.myId = id;
 		IRingNodeService me = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IRingNodeService.class);
@@ -256,7 +257,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			ret.setException(new IllegalStateException("RingNode not yet initialized!"));
 			return ret;
 		}
-//		log("findSuccessor for: " + id);		
+		log("findSuccessor for: " + id);		
 		final IFinger nDash = findPredecessor(id).get();
 //		IRingNode suc = nDash.findSuccessor(id).get();
 		getRingService(nDash).addResultListener(new InvalidateFingerAndTryAgainListener<IRingNodeService, IFinger>(nDash, new FindSuccessorStep(id), ret, "findSuccessor")
@@ -264,13 +265,13 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			@Override
 			public void resultAvailable(IRingNodeService result)
 			{
-//				log("Got ring node");
+				log("Got ring node for: " + nDash.getNodeId());
 				result.getSuccessor().addResultListener(new InvalidateFingerAndTryAgainListener<IFinger, IFinger>(nDash, new FindSuccessorStep(id), ret, "findSuccessor")
 				{
 					@Override
 					public void resultAvailable(IFinger result)
 					{
-//						log("Got finger");
+						log("Got finger");
 						ret.setResult(result);
 					}
 				});
@@ -476,16 +477,54 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		fingertable.setPredecessor(null);
 		if(nDashRing != null)
 		{
-			nDashRing.findSuccessor(myId).addResultListener(new InvalidateFingerAndTryAgainListener<IFinger, Boolean>(new Finger(nDashRing, null), new JoinStep(nDashRing), future, "join")
+			nDashRing.findSuccessor(myId).addResultListener(new IResultListener<IFinger>()
 			{
-
-				@Override
+				
 				public void resultAvailable(IFinger suc)
 				{
 					fingertable.setSuccessor(suc);
 					log("Join complete with successor: " + suc.getNodeId());
 					setState(State.JOINED);
-					future.setResult(true);
+					getRingService(suc).addResultListener(new IResultListener<IRingNodeService>()
+					{
+
+						@Override
+						public void resultAvailable(IRingNodeService result)
+						{
+//							future.setResult(true);
+							// for faster propagation, notify the node about me
+							result.notify(fingertable.getSelf()).addResultListener(new IResultListener<Void>()
+							{
+
+								@Override
+								public void resultAvailable(Void result)
+								{
+									future.setResult(true);
+								}
+
+								@Override
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									future.setResult(false);
+								}
+							});
+						}
+
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							exception.printStackTrace();
+							future.setResult(false);	
+						}
+					});
+					
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+					future.setResult(false);
 				}
 			});
 		}
@@ -527,6 +566,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		{
 			public void terminated(Exception reason)
 			{
+				reason.printStackTrace();
 				subscriptions.remove(sub);
 			}
 		};
@@ -557,7 +597,15 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		final Future<Void> future = new Future<Void>();
 		IFinger pre = getPredecessor().get();
 		if (pre == null || nDash.getNodeId().isInInterval(pre.getNodeId(), myId)) {
-			setPredecessor(nDash).addResultListener(new DelegationResultListener<Void>(future));
+			setPredecessor(nDash).addResultListener(new ExceptionDelegationResultListener<Void, Void>(future) {
+				@Override
+				public void customResultAvailable(Void result)
+				{
+					// non-chord: my successor could be wrong, ask my predecessor about it:
+					// this speeds up the stabilizing process
+					stabilize().addResultListener(new DelegationResultListener<Void>(future));
+				}
+			});
 		} else {
 			future.setResult(null);
 		}
@@ -598,7 +646,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		final CounterResultListener<Void> counter = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
 		
 		final IFinger successor = fingertable.getSuccessor();
-		
+		log("Stabilizing");
 //		log("Stabilizing (suc: " 
 //			+ (fingertable.getSuccessor() != null ? fingertable.getSuccessor().getNodeId(): "null") + ", pre: "
 //			+ (fingertable.getPredecessor() != null ? fingertable.getPredecessor().getNodeId(): "null") + ")");
@@ -664,15 +712,15 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 
 		});
 		
-//		ret.addResultListener(new DefaultResultListener<Void>() {
-//
-//			@Override
-//			public void resultAvailable(Void result)
-//			{
-//				log("stabilize ret has result");
-//			}
-//			
-//		});
+		ret.addResultListener(new DefaultResultListener<Void>() {
+
+			@Override
+			public void resultAvailable(Void result)
+			{
+				log("Stabilize done.");
+			}
+			
+		});
 		return ret;
 	}
 	
@@ -719,6 +767,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	 */
 	public IFuture<Void> fixFingers()
 	{
+		log("FixFingers");
 		Future<Void> future = new Future<Void>();
 		Finger[] fingers = fingertable.getFingers();
 		final CounterResultListener<Void> counter = new CounterResultListener<Void>(fingers.length, new DelegationResultListener<Void>(future));
@@ -989,19 +1038,4 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	{
 		return overlayId + " - Ringnode (" + myId + ")";
 	}
-	
-	private final class OverlayIdFilter implements IAsyncFilter<IRingNodeService>
-	{
-		private String	overlayId;
-		public OverlayIdFilter(String overlayId)
-		{
-			this.overlayId = overlayId;
-		}
-		@Override
-		public IFuture<Boolean> filter(IRingNodeService obj)
-		{
-			return new Future<Boolean>(overlayId.equals(obj.getOverlayId()));
-		}
-	}
-	
 }

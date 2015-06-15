@@ -2,36 +2,30 @@ package jadex.platform.service.dht;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
-import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
+import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IRingNodeService;
-import jadex.bridge.service.types.dht.StoreEntry;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -48,18 +42,21 @@ public class DistributedKVStoreTest extends TestCase
 	private IDistributedKVStoreService	store1;
 	private IDistributedKVStoreService	store2;
 	private IDistributedKVStoreService	store3;
+	private IDistributedKVStoreService	store4;
 	
 	private IRingNodeDebugService	ring1;
 	private IRingNodeDebugService 	ring2;
 	private IRingNodeDebugService 	ring3;
+	private IRingNodeDebugService 	ring4;
 
 	private long	timeout;
 
-	private IExternalAccess	platform3;
-
-	private IExternalAccess	platform2;
-
 	private IExternalAccess	platform1;
+	private IExternalAccess	platform2;
+	private IExternalAccess	platform3;
+	private IExternalAccess	platform4;
+
+
 
 	
 	@Before
@@ -91,6 +88,13 @@ public class DistributedKVStoreTest extends TestCase
 	//					"-deftimeout", Long.toString(timeout),
 	//					"-logging", "true",
 		}).get(timeout);
+		
+		platform4 = Starter.createPlatform(new String[]{"-platformname", pid,
+			"-dht true -saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+	//					"-relaytransport", "false",
+	//					"-deftimeout", Long.toString(timeout),
+	//					"-logging", "true",
+		}).get(timeout);
 				
 		
 		// rn1 should join rn2
@@ -110,7 +114,11 @@ public class DistributedKVStoreTest extends TestCase
 		store3 = t3.getFirstEntity();
 		ring3 = t3.getSecondEntity();
 		
-		createProxies(platform1, platform2, platform3);
+		Tuple2<IDistributedKVStoreService, IRingNodeDebugService> t4 = createRingAgent(platform4);
+		store4 = t4.getFirstEntity();
+		ring4 = t4.getSecondEntity();
+		
+		createProxies(platform1, platform2, platform3, platform4);
 	}
 
 	private void createProxies(IExternalAccess ... platforms)
@@ -178,7 +186,7 @@ public class DistributedKVStoreTest extends TestCase
 	
 	@Test
 	public void testSave() {
-		store1.put("test", "testValue");
+		store1.put("test", "testValue").get();
 		assertEquals("testValue", store1.lookup("test").get());
 	}
 	
@@ -218,18 +226,16 @@ public class DistributedKVStoreTest extends TestCase
 //	}
 	
 	@Test
-	public void testMoveRemote() {
-//		ring1.join(ring2).get();
-//		stabilize2(ring1, ring2, ring3).get();
+	public void testMove_afterStabilize() {
 		// ring consists of ring1 only
 		
-		final String key = findKeyForStoreId(ring2.getId().get(), ring1.getId().get(), ring3.getId().get());
+		final String key = findKeyForStoreId(ring2, ring1, ring3);
 		IID put = store1.put(key, "testValue").get();
 		// value is stored in store1, but the key is in the range of store2.
 		
 		// during join, the key should be moved to ring2:
 		ring2.join(ring1).get();
-		stabilize2(ring1, ring2, ring3).get();
+		stabilize2(ring1, ring2).get();
 		
 		// check if all stores know that store2 is responsible for the key now:
 		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
@@ -238,6 +244,151 @@ public class DistributedKVStoreTest extends TestCase
 		// check if correct value is saved now:
 		assertEquals("testValue", store2.lookup(key).get());
 		assertEquals("testValue", store1.lookup(key).get());
+	}
+	
+	@Test
+	public void testMove_onSuccessorChange() {
+		// ring consists of ring1 only
+		
+		final String key = findKeyForStoreId(ring2, ring1, ring3);
+		IID put = store1.put(key, "testValue").get();
+		// value is stored in store1, but the key is in the range of store2.
+		
+		// during join, the key should be moved to ring2:
+		ring2.join(ring1).get();
+		
+		// check if all stores know that store2 is responsible for the key now:
+		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+
+		// check if correct value is saved now:
+		assertEquals("testValue", store2.lookup(key).get());
+		assertEquals("testValue", store1.lookup(key).get());
+	}
+	
+	@Test
+	public void testMoveCollection_onSuccessorChange() {
+		// ring consists of ring1 only
+		
+		final String key = findKeyForStoreId(ring2, ring1, ring3);
+		List<String> asList = Arrays.asList(new String[]{"testValue", "testValue2"});
+		IID put = store1.put(key, asList).get();
+		// value is stored in store1, but the key is in the range of store2.
+		
+		// during join, the key should be moved to ring2:
+		ring2.join(ring1).get();
+		
+		// check if all stores know that store2 is responsible for the key now:
+		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+
+		// check if correct value is saved now:
+		assertEquals(asList, store2.lookup(key).get());
+		assertEquals(asList, store1.lookup(key).get());
+	}
+	
+	@Test
+	public void testMove_onPredecessorChange() {
+		// ring consists of ring1 only
+		
+		final String key = findKeyForStoreId(ring2, ring1, ring3);
+		IID put = store1.put(key, "testValue").get();
+		// value is stored in store1, but the key is in the range of store2.
+		
+		// during join, the key should be moved to ring2:
+		ring1.join(ring2).get();
+		
+//		stabilize2(ring1, ring2).get();
+		
+		// check if all stores know that store2 is responsible for the key now:
+		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
+		
+		// check if correct value is saved now:
+		assertEquals("testValue", store2.lookup(key).get());
+		assertEquals("testValue", store1.lookup(key).get());
+	}
+	
+	@Test
+	public void testMoveEntries_withThreeNodes() {
+		// This tests if already existing data is passed to the right node eventually.
+		// Example: Data with hash = 18 exists in node 10.
+		// Nodes 20 - 30 - 40 are in a ring.
+		// Now 40 joins 10 -> data has to be copied to 20.
+		
+		// ring consists of ring1 only
+		ring1.init(createId2(10));
+		ring2.init(createId2(20));
+		ring3.init(createId2(30));
+		ring4.init(createId2(40));
+		
+		// propagate id change to kvstores:
+		store1.setRingService(ring1);
+		store2.setRingService(ring2);
+		store3.setRingService(ring3);
+		store4.setRingService(ring4);
+		
+		final String key = findKeyForStoreId(ring2, ring1, ring3, ring4);
+
+		// ring 3 is responsible for the key.
+		// but the others don't know that.
+		IID put = store1.put(key, "testValue").get();
+		
+		ring2.join(ring3).get();
+		ring3.join(ring4).get();
+		// ring is now: ring2 - ring3 - ring4
+		ring4.join(ring1).get();
+		// ring is now ring1 - ring 2 - ring3
+		
+		// stabilize for responsibilities:
+		// this is an artificial example where stabilizing is done in the correct order and
+		// one-after another.
+		for(int i = 0; i < 3; i++)
+		{
+			ring4.stabilize().get();
+			ring1.stabilize().get();
+			ring3.stabilize().get();
+			ring2.stabilize().get();
+//			ring2.stabilize().get();
+		}
+		
+		// after stabilize, store 1 knows it is not responsible anymore
+		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store3.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store4.lookupResponsibleStore(key).get());
+
+		// and the corresponding value should be moved, too.
+		assertEquals("testValue", store1.lookup(key).get());
+		assertEquals("testValue", store2.lookup(key).get());
+		assertEquals("testValue", store3.lookup(key).get());
+		assertEquals("testValue", store4.lookup(key).get());
+	}
+	
+	@Test
+	public void testResponsibility_afterJoin_askJoining() {
+		// ring consists of ring1 only
+		final String key = findKeyForStoreId(ring2, ring1, ring3);
+		
+		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+		
+		ring1.join(ring2).get();
+		
+		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
+	}
+	
+	@Test
+	public void testResponsibility_afterJoin_askJoined() {
+		// ring consists of ring1 only
+		final String key = findKeyForStoreId(ring2, ring1, ring3);
+		
+		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+		
+		ring2.join(ring1).get();
+		// responsibility is only correct after stabilize...
+		stabilize2(ring1, ring2).get();
+		
+		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
 	}
 	
 //	@Test
@@ -273,6 +424,18 @@ public class DistributedKVStoreTest extends TestCase
 	// -----------------------------
 	// --------- HELPER ------------
 	// -----------------------------
+	
+	private String findKeyForStoreId(IRingNodeDebugService ring, IRingNodeDebugService... others)
+	{
+		IID[] iids = new IID[others.length];
+		for(int i = 0; i < others.length; i++)
+		{
+			IID iid = others[i].getId().get();
+			iids[i] = iid;
+		}
+		
+		return findKeyForStoreId(ring.getId().get(), iids);
+	}
 	
 	private String findKeyForStoreId(IID storeId, IID... others)
 	{
@@ -424,5 +587,10 @@ public class DistributedKVStoreTest extends TestCase
 			}
 //		}
 		return future;
+	}
+	
+	private ID createId2(int firstByte)
+	{
+		return new ID(new byte[]{(byte)(firstByte - 128)});
 	}
 }

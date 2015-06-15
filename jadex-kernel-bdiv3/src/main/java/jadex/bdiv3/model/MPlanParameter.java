@@ -12,13 +12,13 @@ public class MPlanParameter	extends MParameter
 	//-------- attributes --------
 	
 	/** The goal mappings. */
-	List<String>	goalmappings;
+	protected List<String> goalmappings;
 	
 	/** The message event mappings. */
-	List<String>	messageeventmappings;
+	protected List<String> messageeventmappings;
 	
 	/** The internal event mappings. */
-	List<String>	internaleventmappings;
+	protected List<String> internaleventmappings;
 	
 	//-------- methods --------
 	

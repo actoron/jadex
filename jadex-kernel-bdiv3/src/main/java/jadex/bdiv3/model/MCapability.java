@@ -1,11 +1,15 @@
 package jadex.bdiv3.model;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  The capability model.
@@ -43,6 +47,9 @@ public class MCapability extends MElement
 	
 	/** The element references. */
 	protected List<MElementRef> elementrefs;
+	
+	/** The goal/service publications. */
+	protected Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs = new HashMap<ClassInfo, List<Tuple2<MGoal, String>>>();
 	
 	/**
 	 *	Bean Constructor. 
@@ -612,5 +619,38 @@ public class MCapability extends MElement
 			elementrefs = new ArrayList<MElementRef>();
 		elementrefs.add(ref);
 	}
+
+	/**
+	 *  Get the pubs.
+	 *  @return The pubs
+	 */
+	public Map<ClassInfo, List<Tuple2<MGoal, String>>> getGoalPublications()
+	{
+		return pubs;
+	}
+
+	/**
+	 *  The pubs to set.
+	 *  @param pubs The pubs to set
+	 */
+	public void setGoalPublications(Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	{
+		this.pubs = pubs;
+	}
 	
+	/**
+	 *  Add a publication info.
+	 */
+	public void addGoalPublication(ClassInfo ci, MGoal mgoal, String methodname)
+	{
+		if(pubs==null)
+			pubs = new HashMap<ClassInfo, List<Tuple2<MGoal,String>>>();
+		List<Tuple2<MGoal, String>> ps = pubs.get(ci);
+		if(ps==null)
+		{
+			ps = new ArrayList<Tuple2<MGoal,String>>();
+			pubs.put(ci, ps);
+		}
+		ps.add(new Tuple2<MGoal, String>(mgoal, methodname));
+	}
 }

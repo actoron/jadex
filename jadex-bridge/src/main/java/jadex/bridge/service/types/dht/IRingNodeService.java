@@ -13,7 +13,7 @@ import java.util.List;
 public interface IRingNodeService extends IRingApplicationService
 {
 
-	public static int TIMEOUT=2112;
+//	public static int TIMEOUT=2112;
 	
 	/**
 	 * Return the finger that preceeds the given ID and is closest to it in the
@@ -23,7 +23,7 @@ public interface IRingNodeService extends IRingApplicationService
 	 * @return {@link IFinger} The finger that is closest preceeding the given
 	 *         key.
 	 */
-	@Timeout(TIMEOUT)
+//	@Timeout(TIMEOUT)
 	IFuture<IFinger> getClosestPrecedingFinger(IID id);
 
 	/**
@@ -55,7 +55,7 @@ public interface IRingNodeService extends IRingApplicationService
 	 * 
 	 * @param nDash possible new predecessor
 	 */
-	@Timeout(TIMEOUT)
+//	@Timeout(TIMEOUT)
 	IFuture<Void> notify(IFinger ringNode);
 
 	/**

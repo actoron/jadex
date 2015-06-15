@@ -13,6 +13,7 @@ import jadex.xml.TypeInfoPathManager;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -410,7 +411,18 @@ public class Reader extends AReader
 							atcnt--;
 						if(rawattrs.containsKey(SXML.ARRAYLEN))
 							atcnt--;
+						
+						Collection<AttributeInfo> attrinfos = typeinfo==null? null: typeinfo.getAttributeInfos();
+						if(attrinfos!=null)
+						{
+							for(AttributeInfo attrinfo: attrinfos)
+							{
+								if(rawattrs.containsKey(attrinfo.getAccessInfo().getXmlObjectName().getLocalPart()) && attrinfo.isIgnoreRead())
+									atcnt--;
+							}
+						}
 					}
+
 					if(atcnt>0)
 					{
 						List<QName>	attrpath	= null;

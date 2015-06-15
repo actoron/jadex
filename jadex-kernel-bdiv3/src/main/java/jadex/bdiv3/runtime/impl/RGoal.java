@@ -626,6 +626,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //			if(rplan.getModelElement().getName().indexOf("seen")!=-1)
 //				System.out.println("hhhhhhhhhhhhhggg");
 			
+			System.out.println("plan fini: "+rplan);
+			
 			// Find parameter mappings for xml agents
 			// todo: goal-goal mappings
 			if(rplan instanceof RPlan && rplan.isPassed())
@@ -639,27 +641,30 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 						if(MParameter.Direction.OUT.equals(mparam.getDirection()) || MParameter.Direction.INOUT.equals(mparam.getDirection()))
 						{
 							List<String> mappings = ((MPlanParameter)mparam).getGoalMappings();
-							for(String mapping: mappings)
+							if(mappings!=null)
 							{
-								if(mapping.startsWith(getModelElement().getName()))
+								for(String mapping: mappings)
 								{
-									String target = mapping.substring(mapping.indexOf(".")+1);
-									if(mappingvals==null)
-										mappingvals = new HashMap<String, Object>();
-									if(mparam.isMulti(null))
+									if(mapping.startsWith(getModelElement().getName()))
 									{
-										getParameterSet(target).removeValues();
-										Object[] vals = rplan.getParameterSet(mparam.getName()).getValues();
-										for(Object val: vals)
+										String target = mapping.substring(mapping.indexOf(".")+1);
+										if(mappingvals==null)
+											mappingvals = new HashMap<String, Object>();
+										if(mparam.isMulti(null))
 										{
-											getParameterSet(target).addValue(val);
+											getParameterSet(target).removeValues();
+											Object[] vals = rplan.getParameterSet(mparam.getName()).getValues();
+											for(Object val: vals)
+											{
+												getParameterSet(target).addValue(val);
+											}
 										}
+										else
+										{
+											getParameter(target).setValue(rplan.getParameter(mparam.getName()).getValue());
+										}
+										break;
 									}
-									else
-									{
-										getParameter(target).setValue(rplan.getParameter(mparam.getName()).getValue());
-									}
-									break;
 								}
 							}
 						}

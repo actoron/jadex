@@ -150,6 +150,9 @@ public class MParameter extends MElement
 	/** Cached aggregated events. */
 	protected List<EventType> allevents;
 	
+	/** The service mappings. */
+	protected List<String> servicemappings;
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -255,7 +258,7 @@ public class MParameter extends MElement
 //	}
 
 	/**
-	 *  Set the value of the belief.
+	 *  Set the value of the parameter.
 	 *  @param object The rparameterelement (such as goal).
 	 *  @param value The value.
 	 *  @param cl The classloader.
@@ -670,5 +673,33 @@ public class MParameter extends MElement
 				allevents.addAll(rawevents);
 		}
 		return allevents;
+	}
+	
+	/**
+	 *  Get the service mappings.
+	 */
+	public List<String>	getServiceMappings()
+	{
+		return servicemappings;
+	}
+	
+	/**
+	 *  Set the service mappings.
+	 */
+	public void	setServiceMappings(List<String> servicemappings)
+	{
+		this.servicemappings	= servicemappings;
+	}
+	
+	/**
+	 *  Add a service mapping.
+	 */
+	public void	addServiceMapping(String mapping)
+	{
+		if(servicemappings==null)
+		{
+			servicemappings	= new ArrayList<String>();
+		}
+		servicemappings.add(mapping);
 	}
 }

@@ -2,11 +2,13 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
-import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -40,32 +42,67 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 	 *  @param m The service method called.
 	 *  @return The parameter array for the service call.
 	 */
-	public Object[] createServiceParameters(T goal, Method m)
+	public Object[] createServiceParameters(T goal, Method m, RPlan plan)
 	{
 		Object[] ret = null;
 		
-		BDIModel model = (BDIModel)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
-		final MGoal mgoal = model.getCapability().getGoal(goal.getClass().getName());
-		MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
+		IBDIModel model = (IBDIModel)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
 		
-		if(mi!=null)
+		boolean done = false;
+		
+		MGoal mgoal;
+		// Use plan parameters in xml case because the should exactly match the call in order and type
+		if(goal instanceof RGoal)
 		{
-			try
+			mgoal = (MGoal)((RGoal)goal).getModelElement();
+			MPlan mplan = (MPlan)plan.getModelElement();
+			List<MParameter> params = mplan.getParameters();
+			if(params==null)
 			{
-				Method me = mi.getMethod(model.getClassloader());
-				ret = (Object[])me.invoke(goal, new Object[]{m});
+				ret = new Object[0];
+				done = true;
 			}
-			catch(RuntimeException e)
+			else
 			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
+				ret = new Object[m.getParameterTypes().length];
+				int cnt = 0;
+				for(MParameter mparam: params)
+				{
+					if(MParameter.Direction.IN.equals(mparam.getDirection())
+						|| MParameter.Direction.INOUT.equals(mparam.getDirection()))
+					{
+						ret[cnt++] = plan.getParameter(mparam.getName()).getValue();
+					}
+				}
+				done = true;
 			}
 		}
-		// Try using goal parameters if nothing is specified
 		else
+		{
+			mgoal = model.getCapability().getGoal(goal.getClass().getName());
+			MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
+		
+			if(mi!=null)
+			{
+				try
+				{
+					Method me = mi.getMethod(agent.getClassLoader());
+					ret = (Object[])me.invoke(goal, new Object[]{m});
+					done = true;
+				}
+				catch(RuntimeException e)
+				{
+					throw e;
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		
+		// Try using goal parameters if nothing is specified
+		if(!done)
 		{
 			List<MParameter> params = mgoal.getParameters();
 			if(params==null)
@@ -78,7 +115,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 				for(int i=0; i<params.size(); i++)
 				{
 					MParameter p = params.get(i);
-					ret[i] = p.getValue(goal, model.getClassloader());
+					ret[i] = p.getValue(goal, agent.getClassLoader());
 				}
 			}
 		}
@@ -92,30 +129,62 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 	 *  @param m The method.
 	 *  @param result The service call result.
 	 */
-	public void handleServiceResult(T goal, Method m, Object result)
+	public void handleServiceResult(T goal, Method m, Object result, RPlan plan)
 	{
-		RGoal rgoal = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getRGoal(goal);
-		final MGoal mgoal = rgoal.getMGoal();
-		MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
+		boolean done = false;
 		
-		if(mi!=null)
+		RGoal rgoal;
+		// Use out plan parameter in case of xml
+		if(goal instanceof RGoal)
 		{
-			try
+			rgoal = (RGoal)goal;
+			MPlan mplan = (MPlan)plan.getModelElement();
+			List<MParameter> params = mplan.getParameters();
+			if(params!=null)
 			{
-				Method me = mi.getMethod(agent.getClassLoader());
-				me.invoke(goal, new Object[]{m, result});
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
+				for(int i=0; i<params.size(); i++)
+				{
+					MParameter mparam = params.get(i);
+					if(MParameter.Direction.OUT.equals(mparam.getDirection())
+						|| MParameter.Direction.INOUT.equals(mparam.getDirection()))
+					{
+						if(SReflect.isSupertype(mparam.getType(agent.getClassLoader()), result.getClass()))
+						{
+							plan.getParameter(mparam.getName()).setValue(result);
+							done = true;
+							break;
+						}
+					}
+				}
 			}
 		}
-		// Try using goal result if nothing is specified
 		else
+		{
+			rgoal = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getRGoal(goal);
+			MGoal mgoal = rgoal.getMGoal();
+			MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
+			
+			if(mi!=null)
+			{
+				try
+				{
+					Method me = mi.getMethod(agent.getClassLoader());
+					me.invoke(goal, new Object[]{m, result});
+					done = true;
+				}
+				catch(RuntimeException e)
+				{
+					throw e;
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		}			
+		
+		// Try using goal result if nothing is specified
+		if(!done)
 		{
 			rgoal.setGoalResult(result, agent.getClassLoader());
 		}

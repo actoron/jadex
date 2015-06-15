@@ -23,6 +23,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -30,6 +31,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.ChangeInfo;
@@ -418,12 +420,15 @@ public abstract class Plan
 	 *  @param subgoal The new subgoal.
 	 *  Note: plan step is interrupted after call.
 	 */
-	public void dispatchSubgoal(IGoal subgoal)
+	public IFuture<Void> dispatchSubgoal(IGoal subgoal)
 	{
+		Future<Void> ret = new Future<Void>();
 		RGoal rgoal = (RGoal)subgoal;
 		rgoal.setParent(rplan);
 		rplan.addSubgoal(rgoal);
 		RGoal.adoptGoal(rgoal, agent);
+		rgoal.addListener(new DelegationResultListener<Void>(ret));
+		return ret;
 	}
 
 	/**

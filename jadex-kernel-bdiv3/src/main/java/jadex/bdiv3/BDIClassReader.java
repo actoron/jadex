@@ -45,12 +45,9 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.SBDIModel;
-import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
-import jadex.bdiv3x.BDIV3XModel;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
@@ -88,11 +85,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -518,7 +513,7 @@ public class BDIClassReader extends MicroClassReader
 	//		System.out.println("found goal publish: "+key);
 			
 			StringBuffer buf = new StringBuffer();
-			buf.append("jadex.bdiv3.BDIClassReader.createServiceImplementation($component, ");
+			buf.append("jadex.bdiv3.runtime.impl.GoalDelegationHandler.createServiceImplementation($component, ");
 			buf.append(key.getTypeName()+".class, ");
 			buf.append("new String[]{");
 			for(Iterator<String> it2=goalnames.keySet().iterator(); it2.hasNext(); )
@@ -791,21 +786,21 @@ public class BDIClassReader extends MicroClassReader
 		return mplan;
 	}
 	
-	/**
-	 *  Create a wrapper service implementation based on a published goal.
-	 */
-	public static Object createServiceImplementation(IInternalAccess agent, Class<?> type, String[] methodnames, String[] goalnames)
-	{
-//		if(methodnames==null || methodnames.length==0)
-//			throw new IllegalArgumentException("At least one method-goal mapping must be given.");
-		Map<String, String> gn = new HashMap<String, String>();
-		for(int i=0; i<methodnames.length; i++)
-		{
-			gn.put(methodnames[i], goalnames[i]);
-		}
-		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
-			new GoalDelegationHandler(agent, gn));
-	}
+//	/**
+//	 *  Create a wrapper service implementation based on a published goal.
+//	 */
+//	public static Object createServiceImplementation(IInternalAccess agent, Class<?> type, String[] methodnames, String[] goalnames)
+//	{
+////		if(methodnames==null || methodnames.length==0)
+////			throw new IllegalArgumentException("At least one method-goal mapping must be given.");
+//		Map<String, String> gn = new HashMap<String, String>();
+//		for(int i=0; i<methodnames.length; i++)
+//		{
+//			gn.put(methodnames[i], goalnames[i]);
+//		}
+//		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
+//			new GoalDelegationHandler(agent, gn));
+//	}
 	
 	/**
 	 * 

@@ -13,11 +13,12 @@ public interface IServiceParameterMapper<T>
 {
 	/**
 	 *  Create service parameters.
-	 *  @param obj The pojo goal.
+	 *  @param obj The pojo or rgoal.
+	 *  @param plan The service call plan (possibly has parameter definitions).
 	 *  @param m The service method called.
 	 *  @return The parameter array for the service call.
 	 */
-	public Object[] createServiceParameters(T obj, Method m);
+	public Object[] createServiceParameters(T obj, Method m, RPlan plan);
 	
 	/**
 	 *  Create service result.
@@ -25,5 +26,5 @@ public interface IServiceParameterMapper<T>
 	 *  @param m The method.
 	 *  @param result The service call result.
 	 */
-	public void handleServiceResult(T obj, Method m, Object result);
+	public void handleServiceResult(T obj, Method m, Object result, RPlan plan);
 }
