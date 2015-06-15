@@ -10,10 +10,8 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.FieldInfo;
-import jadex.commons.IterableIteratorWrapper;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.EventType;
 
 import java.lang.reflect.Field;

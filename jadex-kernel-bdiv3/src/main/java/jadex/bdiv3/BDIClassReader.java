@@ -28,22 +28,26 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.ConstructorInfo;
+import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCondition;
+import jadex.bdiv3.model.MConfigBeliefElement;
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MInitialParameterElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.model.SBDIModel;
 import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
+import jadex.bdiv3x.BDIV3XModel;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -211,7 +215,7 @@ public class BDIClassReader extends MicroClassReader
 //		try
 //		{
 		
-		Map<String, BDIModel>	capas	= new LinkedHashMap<String, BDIModel>();
+		Map<String, IBDIModel>	capas	= new LinkedHashMap<String, IBDIModel>();
 		
 		Map<String, ConfigurationInfo> confs = new LinkedHashMap<String, ConfigurationInfo>();
 		List<MConfiguration> bdiconfs = new ArrayList<MConfiguration>();
@@ -267,89 +271,7 @@ public class BDIClassReader extends MicroClassReader
 			}
 		}
 		
-		// Add elements from capabilities.
-		for(Map.Entry<String, BDIModel> entry: capas.entrySet())
-		{
-			String name = entry.getKey();
-			BDIModel capa = entry.getValue();
-			
-			capa.getModelInfo().getConfigurations();	// todo!!!
-
-			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
-			{
-				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getScope(), psi.getPublish(), psi.getProperties());
-				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
-			}
-			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
-			{
-				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+MElement.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding(), rsi.getNFRProperties());
-				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
-			}
-			
-			for(MBelief bel: capa.getCapability().getBeliefs())
-			{
-//				List<String>	events	= new ArrayList<String>();
-//				for(String event: bel.getEvents())
-//				{
-//					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
-//					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
-//				}
-				List<String> events = convertEvents(name, bel.getBeliefEvents(), bdimodel);
-				
-				MBelief	bel2;
-				if(bel.getField()!=null)
-				{
-					bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
-				}
-				else
-				{
-					bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
-					bel2.setSetter(bel.getSetter());
-				}
-				bel2.setName(name+MElement.CAPABILITY_SEPARATOR+bel.getName());
-				
-				bdimodel.getCapability().addBelief(bel2);
-			}
-			
-			for(String target: capa.getBeliefMappings().keySet())
-			{
-				bdimodel.addBeliefMapping(name+MElement.CAPABILITY_SEPARATOR+target, name+MElement.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
-			}
-			
-			for(MGoal goal: capa.getCapability().getGoals())
-			{
-				MGoal goal2	= new MGoal(name+MElement.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
-					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
-					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), goal.getParameters(),
-					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), new ArrayList<String>(goal.getTriggerGoals())); // clone params?
-						
-				// Convert goal condition events
-				if(goal.getConditions()!=null)
-				{
-					for(String type: goal.getConditions().keySet())
-					{
-						List<MCondition> conds = goal.getConditions(type);
-						for(MCondition cond: conds)
-						{
-							MCondition ccond = new MCondition(cond.getName(), convertEventTypes(name, cond.getEvents(), bdimodel));
-							ccond.setConstructorTarget(cond.getConstructorTarget());
-							ccond.setMethodTarget(cond.getMethodTarget());
-							goal2.addCondition(type, ccond);
-						}
-					}
-				}
-
-				bdimodel.getCapability().addGoal(goal2);
-			}
-			
-			for(MPlan plan : capa.getCapability().getPlans())
-			{
-				MPlan plan2	= new MPlan(name+MElement.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
-					copyTrigger(bdimodel, name, plan.getTrigger()), copyTrigger(bdimodel, name, plan.getWaitqueue()),
-					plan.getPriority());
-				bdimodel.getCapability().addPlan(plan2);
-			}
-		}
+		SBDIModel.mergeSubcapabilities(bdimodel, capas);
 		
 		for(Class<?> clazz: agtcls)
 		{
@@ -483,15 +405,14 @@ public class BDIClassReader extends MicroClassReader
 						MConfiguration bdiconf = new MConfiguration(configs[i].name());
 						bdiconfs.add(bdiconf);
 							
-						List<UnparsedExpression> ibels = createUnparsedExpressionsList(configs[i].initialbeliefs());
-						if(ibels!=null)
-							bdiconf.setInitialBeliefs(ibels);
-						List<MInitialParameterElement> iplans = createIniParamElementsList(configs[i].initialplans());
-						if(iplans!=null)
-							bdiconf.setInitialPlans(iplans);
-						List<MInitialParameterElement> igoals = createIniParamElementsList(configs[i].initialgoals());
-						if(igoals!=null)
-							bdiconf.setInitialGoals(igoals);
+						bdiconf.setInitialBeliefs(createConfigBeliefsList(configs[i].initialbeliefs()));
+						bdiconf.setEndBeliefs(createConfigBeliefsList(configs[i].endbeliefs()));
+						
+						bdiconf.setInitialPlans(createConfigParamElementsList(configs[i].initialplans()));
+						bdiconf.setEndPlans(createConfigParamElementsList(configs[i].endplans()));
+						
+						bdiconf.setInitialGoals(createConfigParamElementsList(configs[i].initialgoals()));
+						bdiconf.setEndGoals(createConfigParamElementsList(configs[i].endgoals()));
 						
 						// Need to repeat the code as annotation type BDIConfiguration is different :-(
 						
@@ -648,100 +569,7 @@ public class BDIClassReader extends MicroClassReader
 //		{
 //			e.printStackTrace();
 //		}
-	}
-
-	/**
-	 *  Coyp a plan trigger or waitqueue and map the events.
-	 */
-	protected MTrigger	copyTrigger(BDIModel bdimodel, String capa, MTrigger trigger)
-	{
-		MTrigger trigger2	= null;
-		if(trigger!=null)
-		{
-			trigger2	= new MTrigger();
-			if(trigger.getFactAddeds()!=null)
-			{
-				for(String event: trigger.getFactAddeds())
-				{
-					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+event;
-					trigger2.addFactAdded(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
-				}
-			}
-			if(trigger.getFactChangeds()!=null)
-			{
-				for(String event: trigger.getFactChangeds())
-				{
-					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+event;
-					trigger2.addFactChangeds(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
-				}
-			}
-			if(trigger.getFactRemoveds()!=null)
-			{
-				for(String event: trigger.getFactRemoveds())
-				{
-					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+event;
-					trigger2.addFactRemoved(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
-				}
-			}
-			if(trigger.getGoals()!=null)
-			{
-				for(MGoal goal: trigger.getGoals())
-				{
-					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+goal.getName();
-					trigger2.addGoal(bdimodel.getCapability().getGoal(mapped));
-				}
-			}
-			if(trigger.getGoalFinisheds()!=null)
-			{
-				for(MGoal goal: trigger.getGoalFinisheds())
-				{
-					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+goal.getName();
-					trigger2.addGoalFinished(bdimodel.getCapability().getGoal(mapped));
-				}
-			}
-			if(trigger.getServices()!=null)
-			{
-				for(MServiceCall ser: trigger.getServices())
-				{
-					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+ser.getName();
-					trigger2.addService(bdimodel.getCapability().getService(mapped));
-				}
-			}
-		}
-		
-		return trigger2;
-	}
-	
-	/**
-	 * 
-	 */
-	protected List<String> convertEvents(String name, Collection<String> evs, BDIModel bdimodel)
-	{
-		List<String>	events	= new ArrayList<String>();
-		for(String event: evs)
-		{
-			String	mapped	= name+MElement.CAPABILITY_SEPARATOR+event;
-			events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
-		}
-		return events;
-	}
-	
-	/**
-	 * 
-	 */
-	protected List<EventType> convertEventTypes(String name, Collection<EventType> evs, BDIModel bdimodel)
-	{
-		List<EventType>	events	= new ArrayList<EventType>();
-		for(EventType event: evs)
-		{
-			String[]	types	= event.getTypes().clone();
-			String	mapped = name+MElement.CAPABILITY_SEPARATOR+types[types.length-1];
-			types[types.length-1]	= bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped;
-			events.add(new EventType(types));
-		}
-		return events;
-	}
-	
+	}	
 	
 	/**
 	 * 
@@ -1334,20 +1162,40 @@ public class BDIClassReader extends MicroClassReader
 	}
 
 	/**
-	 *  Create unparsed expressions.
+	 *  Create config beliefs.
 	 */
-	protected List<MInitialParameterElement> createIniParamElementsList(NameValue[] values)
+	protected List<MConfigBeliefElement> createConfigBeliefsList(NameValue[] values)
 	{
-		List<MInitialParameterElement>  ret = null;
+		List<MConfigBeliefElement>  ret = null;
 		if(values.length>0)
 		{
-			ret = new ArrayList<MInitialParameterElement>();
+			ret = new ArrayList<MConfigBeliefElement>();
+			for(int i=0; i<values.length; i++)
+			{
+				MConfigBeliefElement	elm	= new MConfigBeliefElement();
+				elm.setName(values[i].name());
+				elm.addFact(new UnparsedExpression(null, values[i].value()));
+				ret.add(elm);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Create config parameter elements.
+	 */
+	protected List<MConfigParameterElement> createConfigParamElementsList(NameValue[] values)
+	{
+		List<MConfigParameterElement>  ret = null;
+		if(values.length>0)
+		{
+			ret = new ArrayList<MConfigParameterElement>();
 			for(int i=0; i<values.length; i++)
 			{
 				String val = values[i].value();
 				String clname = values[i].clazz().equals(Object.class) ? null : values[i].clazz().getName();
 				String v = (val==null || val.length()==0) ? clname!=null? clname+".class": null : val;
-				MInitialParameterElement	elm	= new MInitialParameterElement();
+				MConfigParameterElement	elm	= new MConfigParameterElement();
 				elm.setName(v==null ? values[i].name() : v);
 				ret.add(elm);
 			}

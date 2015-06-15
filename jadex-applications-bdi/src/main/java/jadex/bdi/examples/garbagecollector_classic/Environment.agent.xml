@@ -11,11 +11,6 @@
 	name="Environment"
 	package="jadex.bdi.examples.garbagecollector_classic">
 
-	<capabilities>
-		<!-- AMS capability is required to kill other agents on exit. -->
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
-	</capabilities>
-	
 	<beliefs>
 		<!-- Environment object as singleton.
  			Parameters are name and type of agent for adding it
@@ -31,13 +26,6 @@
  		</belief>
 	</beliefs>
 	
-	<goals>
-		<!-- Used to stop other agents. -->
-		<achievegoalref name="cms_destroy_component">
-			<concrete ref="cmscap.cms_destroy_component"/>
-		</achievegoalref>
-	</goals>
-
 	<plans>
 		<!-- Initial plan for continually creating
 			garbarge at random positions. -->

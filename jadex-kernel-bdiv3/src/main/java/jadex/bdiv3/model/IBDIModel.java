@@ -1,5 +1,7 @@
 package jadex.bdiv3.model;
 
+import jadex.bridge.modelinfo.IModelInfo;
+
 import java.util.Map;
 
 /**
@@ -7,6 +9,11 @@ import java.util.Map;
  */
 public interface IBDIModel 
 {
+	/**
+	 *  Get the component model.
+	 */
+	public IModelInfo	getModelInfo();
+	
 	/**
 	 *  Get the mcapa.
 	 *  @return The mcapa.

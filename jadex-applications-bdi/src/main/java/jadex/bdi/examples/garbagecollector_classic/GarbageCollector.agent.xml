@@ -24,7 +24,7 @@
 
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="Position" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
 				$beliefbase.env.getPosition($scope.getAgentName())
 			</fact>
  		</belief>
@@ -32,15 +32,14 @@
 		<!-- When at least one piece of waste is present on the
 			current posistion the actual position is perceived as dirty. -->
 		<belief name="is_dirty" class="boolean" evaluationmode="push">
- 			<fact language="jcl">
- 				// ((Environment)$beliefbase.getBelief("env").getFact()).isDirty((Position)$beliefbase.getBelief("pos").getFact())
+ 			<fact>
  				$beliefbase.env.isDirty($beliefbase.pos)
  			</fact>
 		</belief>
 		
 		<!-- Flag indicating if the agent currently carries garbage. -->
 		<belief name="has_garbage" class="boolean" evaluationmode="push">
- 			<fact language="jcl">
+ 			<fact>
  				$beliefbase.env.hasGarbage($scope.getAgentName())
 			</fact>
 		</belief>
@@ -54,24 +53,8 @@
  			burner present. -->
 		 <achievegoal name="take">
 			<unique/>
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.is_dirty &amp;&amp; !$beliefbase.env.isBurnerPresent($beliefbase.pos)
-
-				// // unique (?rcapa and ?mgoal are provided internally)
-				// (not (and
-				// 	?adopted	= (goal (element_has_model ?mgoal))
-				// 	?rcapa		= (capability (capability_has_goals contains ?adopted))
-				// ))
-				// 
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				// ?mbelief = (mbelief (melement_has_name "is_dirty"))
- 				// (not (and
-				// 	?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				// 	?mbel_pos = (mbelief (melement_has_name "pos"))
-				// 	?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				// 	?mbel_env = (mbelief (melement_has_name "env"))
-				// 	?env	= (Environment (isBurnerPresent (?pos) true))
-				// ))
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="check"/>
@@ -89,13 +72,8 @@
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->
 		<achievegoal name="pick" exclude="never" retrydelay="100">
- 			<dropcondition language="jcl">
+ 			<dropcondition>
  				!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				// ?mbelief = (mbelief (melement_has_name "is_dirty"))
-				// ?rbelief2 = (belief (element_has_model ?mbelief2) (belief_has_fact false))
-				// ?mbelief2 = (mbelief (melement_has_name "has_garbage"))
  			</dropcondition>
 		</achievegoal>
 	</goals>

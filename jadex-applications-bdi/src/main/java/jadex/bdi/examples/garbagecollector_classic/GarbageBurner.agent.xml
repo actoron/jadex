@@ -22,14 +22,14 @@
 
 		<!-- The actual position on the grid world. -->
 		<belief name="pos" class="Position" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
 				$beliefbase.env.getPosition($scope.getAgentName())
 			</fact>
  		</belief>
 
 		<!-- The garbages at the current position. -->
 		<beliefset name="garbages" class="WorldObject" evaluationmode="push">
-			<facts language="jcl">
+			<facts>
 				$beliefbase.env.getGarbages($beliefbase.pos)
 			</facts>
 		</beliefset>
@@ -41,16 +41,16 @@
  			The unique tag avoids creating more than one goal
  			per specific piece of garbage. -->
 		<achievegoal name="burn">
-			<parameter name="garbage" class="String">
-				<!-- Bind against variable from creation condition. -->
-				<value>$garbage</value>
+  			<parameter name="garbage" class="WorldObject">
+   				<bindingoptions>
+				    $beliefbase.garbages
+				</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl">
-				WorldObject $garbage
-				&amp;&amp; java.util.Arrays.asList($beliefbase.garbages).contains($garbage)
+			<creationcondition>
+			    $beliefbase.garbages.length>0
 			</creationcondition>
-			<deliberation cardinality="1"/>
+			<!-- <deliberation cardinality="1"/> -->
 		</achievegoal>
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->

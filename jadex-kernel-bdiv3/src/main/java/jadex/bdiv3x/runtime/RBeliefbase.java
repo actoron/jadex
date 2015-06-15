@@ -4,6 +4,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MConfigBeliefElement;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -54,7 +55,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	public void init()
 	{	
 		Map<String, Object> args = getAgent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
-		Map<String, UnparsedExpression> inibels = new HashMap<String, UnparsedExpression>();
+		Map<String, MConfigBeliefElement> inibels = new HashMap<String, MConfigBeliefElement>();
 		
 		String confname = getAgent().getConfiguration();
 		if(confname!=null)
@@ -65,12 +66,12 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			if(mconf!=null)
 			{
 				// Set initial belief values
-				List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
+				List<MConfigBeliefElement> ibels = mconf.getInitialBeliefs();
 				if(ibels!=null)
 				{
-					for(UnparsedExpression uexp: ibels)
+					for(MConfigBeliefElement ibel: ibels)
 					{
-						inibels.put(uexp.getName(), uexp);
+						inibels.put(ibel.getName(), ibel);
 					}
 				}
 			}
@@ -96,7 +97,20 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 					{
 						try
 						{
-							inival = SJavaParser.parseExpression(inibels.get(mbel.getName()), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+							MConfigBeliefElement	inibel	= inibels.get(mbel.getName());
+							if(mbel.isMulti(agent.getClassLoader()))
+							{
+								List<Object>	inivals	= new ArrayList<Object>();
+								for(UnparsedExpression upex: inibel.getFacts())
+								{
+									inivals.add(SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher()));
+								}
+								inival	= inivals;
+							}
+							else if(!inibel.getFacts().isEmpty())
+							{
+								inival	= SJavaParser.parseExpression(inibel.getFacts().get(0), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());								
+							}
 							hasinival	= true;
 						}
 						catch(RuntimeException e)

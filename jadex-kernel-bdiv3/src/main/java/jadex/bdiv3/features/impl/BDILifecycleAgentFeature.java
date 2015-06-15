@@ -11,11 +11,11 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCondition;
+import jadex.bdiv3.model.MConfigBeliefElement;
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MConfiguration;
-import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MInitialParameterElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MPlan;
@@ -80,7 +80,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
@@ -112,6 +111,16 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		inited	= true;
 		return super.body();
 	}
+
+	/**
+	 *  Cleanup the agent.
+	 */
+	public IFuture<Void> shutdown()
+	{
+		// Todo: wait for end goals and end plans
+		
+		return super.shutdown();
+	}
 	
 	/**
 	 *  Start the component behavior.
@@ -138,18 +147,16 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				if(bdimodel instanceof BDIModel)
 				{
 					// Set initial belief values
-					List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
+					List<MConfigBeliefElement> ibels = mconf.getInitialBeliefs();
 					if(ibels!=null)
 					{
-						for(UnparsedExpression uexp: ibels)
+						for(MConfigBeliefElement ibel: ibels)
 						{
 							try
 							{
-								MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
-								Object val = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
-		//						Field f = mbel.getTarget().getField(getClassLoader());
-		//						f.setAccessible(true);
-		//						f.set(agent, val);
+								UnparsedExpression	fact	= ibel.getFacts().get(0);	// pojo initial beliefs are @NameValue, thus exactly one fact.
+								MBelief mbel = bdimodel.getCapability().getBelief(ibel.getName());
+								Object val = SJavaParser.parseExpression(fact, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
 								mbel.setValue(component, val);
 							}
 							catch(RuntimeException e)
@@ -165,10 +172,10 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 				
 				// Create initial goals
-				List<MInitialParameterElement> igoals = mconf.getInitialGoals();
+				List<MConfigParameterElement> igoals = mconf.getInitialGoals();
 				if(igoals!=null)
 				{
-					for(MInitialParameterElement igoal: igoals)
+					for(MConfigParameterElement igoal: igoals)
 					{
 						MGoal mgoal = null;
 						Class<?> gcl = null;
@@ -286,10 +293,10 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 				
 				// Create initial plans
-				List<MInitialParameterElement> iplans = mconf.getInitialPlans();
+				List<MConfigParameterElement> iplans = mconf.getInitialPlans();
 				if(iplans!=null)
 				{
-					for(MInitialParameterElement iplan: iplans)
+					for(MConfigParameterElement iplan: iplans)
 					{
 						MPlan mplan = bdimodel.getCapability().getPlan(iplan.getName());
 						// todo: allow Java plan constructor calls
@@ -299,6 +306,29 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						RPlan.executePlan(rplan, component);
 					}
 				}
+
+				// Create initial events: todo
+//				List<MConfigParameterElement> ievents = mconf.getInitialEvents();
+//				if(ievents!=null)
+//				{
+//					for(MConfigParameterElement ievent: ievents)
+//					{
+//						if(bdimodel.getCapability().hasInternalEvent(ievent.getName()))
+//						{
+//							IInt	bdif.getCapability().getEventbase().createInternalEvent(ievent.getName());
+//						}
+//						else
+//						{
+//							
+//						}
+//						MPlan mplan = bdimodel.getCapability().getPlan(ievent.getName());
+//						// todo: allow Java plan constructor calls
+//	//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
+//					
+//						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null);
+//						RPlan.executePlan(rplan, component);
+//					}
+//				}
 			}
 		}
 		

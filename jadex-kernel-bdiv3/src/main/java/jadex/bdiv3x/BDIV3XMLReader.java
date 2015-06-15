@@ -6,12 +6,13 @@ import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCapabilityReference;
 import jadex.bdiv3.model.MCondition;
+import jadex.bdiv3.model.MConfigBeliefElement;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MElementRef;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MInitialParameterElement;
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
@@ -507,8 +508,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}), null));//, new OAVObjectReaderHandler()));	
 		
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MElementRef.class),
-			null, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MElementRef.class),	null, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(MElementRef.class),	null, null));
 //		
 //		TypeInfo ti_belset = new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(OAVBDIMetaModel.beliefset_type, tepost), 
 //			new MappingInfo(null, new AttributeInfo[]{
@@ -977,36 +978,26 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialcapability")), new ObjectInfo(OAVBDIMetaModel.initialcapability_type),
 //			null, null, new OAVObjectReaderHandler()));
 
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbelief"), new QName(uri, "fact")}), new ObjectInfo(String.class)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbeliefset"), new QName(uri, "facts")}), new ObjectInfo(String.class)));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbelief"), new QName(uri, "fact")}), new ObjectInfo(String.class)));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbeliefset"), new QName(uri, "fact")}), new ObjectInfo(String.class)));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbeliefset"), new QName(uri, "facts")}), new ObjectInfo(String.class)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbelief")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", "name")),
-				new AttributeInfo(new AccessInfo("cref", "name"))
-			}, new SubobjectInfo[]{
-				new SubobjectInfo(new XMLInfo(new QName(uri, "fact")), new AccessInfo("fact", "value"))
-			}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbeliefset")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", "name")),
-				new AttributeInfo(new AccessInfo("cref", "name"))
-			}, new SubobjectInfo[]{
-				new SubobjectInfo(new XMLInfo(new QName(uri, "facts")), new AccessInfo("facts", "value"))
-			}), null));	// Todo: multiple <fact> entries
-		
-		MappingInfo	ipemapping	= new MappingInfo(null, new AttributeInfo[]{
+		MappingInfo	configelementmapping	= new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("ref", "name")),
 			new AttributeInfo(new AccessInfo("cref", "name"))
 		});
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialinternalevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialmessageevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endgoal")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endplan")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endinternalevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endmessageevent")), new ObjectInfo(MInitialParameterElement.class), ipemapping, null));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbelief")), new ObjectInfo(MConfigBeliefElement.class), configelementmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbeliefset")), new ObjectInfo(MConfigBeliefElement.class), configelementmapping, null));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialinternalevent")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialmessageevent")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endgoal")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endplan")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endinternalevent")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endmessageevent")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, null));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialgoal"), new QName(uri, "parameter")}), new ObjectInfo(null)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialgoal"), new QName(uri, "parameterset")}), new ObjectInfo(null)));

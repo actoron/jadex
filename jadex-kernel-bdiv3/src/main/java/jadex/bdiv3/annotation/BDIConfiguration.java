@@ -100,6 +100,21 @@ public @interface BDIConfiguration
 	 *  The initial plans.
 	 */
 	public NameValue[] initialplans() default {};
+
+	/**
+	 *  The end beliefs.
+	 */
+	public NameValue[] endbeliefs() default {};
+
+	/**
+	 *  The end goals.
+	 */
+	public NameValue[] endgoals() default {};
+
+	/**
+	 *  The end plans.
+	 */
+	public NameValue[] endplans() default {};
 }
 
 

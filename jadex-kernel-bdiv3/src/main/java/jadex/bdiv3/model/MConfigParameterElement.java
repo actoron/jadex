@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Initial goals and plans.
+ *  Initial / end goals and plans.
  */
-public class MInitialParameterElement	extends MElement
+public class MConfigParameterElement	extends MElement
 {
 	//-------- attributes --------
 	
