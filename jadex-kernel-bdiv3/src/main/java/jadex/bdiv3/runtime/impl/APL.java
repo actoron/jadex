@@ -297,6 +297,7 @@ public class APL
 		}
 
 //		final CollectionResultListener<MPlan> lis = new CollectionResultListener<MPlan>(precandidates.size(), true, new IResultListener<Collection<MPlan>>()
+//		System.out.println("apl: "+(precandidates.size()+goalprecandidates.size()));
 		final CollectionResultListener<Object> lis = new CollectionResultListener<Object>(precandidates.size()+goalprecandidates.size(), true, new IResultListener<Collection<Object>>()
 		{
 			public void resultAvailable(Collection<Object> result) 
@@ -322,7 +323,13 @@ public class APL
 				public void resultAvailable(Boolean result)
 				{
 					if(result.booleanValue())
+					{
 						lis.resultAvailable(mplan);
+					}
+					else
+					{
+						lis.exceptionOccurred(null);
+					}
 				}
 				
 				public void exceptionOccurred(Exception exception)

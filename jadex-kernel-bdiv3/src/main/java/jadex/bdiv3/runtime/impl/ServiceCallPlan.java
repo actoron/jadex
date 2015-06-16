@@ -44,14 +44,14 @@ public class ServiceCallPlan
 	/** The plan. */
 	protected RPlan rplan;
 	
-	public static int cnt;
+//	public static int cnt;
 	
 	/**
-	 * 
+	 *  Create a new service call plan.
 	 */
 	public ServiceCallPlan(IInternalAccess agent, String service, String method, IServiceParameterMapper<Object> mapper, RPlan rplan)
 	{
-		System.out.println("created service call plan: "+method);
+//		System.out.println("created service call plan: "+method);
 		this.agent = agent;
 		this.service = service;
 		this.method = method;
@@ -59,11 +59,14 @@ public class ServiceCallPlan
 		this.rplan = rplan;
 	}
 	
+	/**
+	 *  The body.
+	 */
 	@PlanBody
 	public IFuture<Void> body()
 	{		
-		final int mycnt = cnt++;
-		System.out.println("service call made: "+mycnt);
+//		final int mycnt = cnt++;
+//		System.out.println("service call made: "+mycnt);
 		
 		final Future<Void> ret = new Future<Void>();
 
@@ -113,6 +116,7 @@ public class ServiceCallPlan
 						{
 							public void resultAvailable(Object result)
 							{
+//								System.out.println("ires: "+mycnt);
 								mapper.handleServiceResult(reason, m, result, rplan);
 								opencalls--;
 								proceed();
@@ -120,6 +124,7 @@ public class ServiceCallPlan
 
 							public void exceptionOccurred(Exception exception)
 							{
+//								System.out.println("iex: "+mycnt);
 								ex = exception;
 								mapper.handleServiceResult(reason, m, exception, rplan);
 								opencalls--;
@@ -138,6 +143,7 @@ public class ServiceCallPlan
 				}
 				catch(Exception e)
 				{
+//					System.out.println("oex: "+mycnt);
 					opencalls--;
 					proceed();
 				}
@@ -145,6 +151,7 @@ public class ServiceCallPlan
 			
 			public void finished()
 			{
+//				System.out.println("fin: "+mycnt);
 				fini = true;
 				proceed();
 			}
@@ -167,7 +174,7 @@ public class ServiceCallPlan
 			{
 				if(opencalls==0 && fini)
 				{
-					System.out.println("service call retured: "+mycnt+" "+ex);
+//					System.out.println("service call retured: "+mycnt+" "+ex);
 
 					if(ex==null)
 					{
@@ -178,6 +185,10 @@ public class ServiceCallPlan
 						ret.setException(ex);
 					}
 				}
+//				else
+//				{
+//					System.out.println("returned with opencalls: "+opencalls+" "+mycnt);
+//				}
 			}
 		});
 		
