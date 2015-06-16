@@ -297,98 +297,74 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		final IFinger beginDash = fingertable.getSelf();
 		final IRingNodeService beginDashRing = this;
 		
-		// TODO: fail-over here:
+		return findPredecessor_recursive(id, beginDash, beginDashRing);
+	}
+	
+	protected IFuture<IFinger> findPredecessor_recursive(final IID id, IFinger beginDash, IRingNodeService beginDashRing) {
+		final Future<IFinger> ret = new Future<IFinger>();
+
+		final IFinger nDash = beginDash;
+		final IRingNodeService nDashRing = beginDashRing;
 		
-		IComponentStep<IFinger> step = new IComponentStep<IFinger>()
+		nDashRing.getSuccessor().addResultListener(new DefaultResultListener<IFinger>()
 		{
-
-			IComponentStep<IFinger> thisStep = this;
-			IFinger nDash = beginDash;
-			IRingNodeService nDashRing = beginDashRing;
 			
-			public IFuture<IFinger> execute(IInternalAccess ia)
+			public void resultAvailable(IFinger successor)
 			{
-				final Future<IFinger> ret = new Future<IFinger>();
-				nDashRing.getSuccessor().addResultListener(new DefaultResultListener<IFinger>()
-				{
-					
-					public void resultAvailable(IFinger successor)
+				IID sucId = successor.getNodeId();
+				if (!id.isInInterval(nDash.getNodeId(), sucId, false, true)) {
+					nDashRing.getClosestPrecedingFinger(id).addResultListener(new DefaultResultListener<IFinger>()
 					{
-						IID sucId = successor.getNodeId();
-						if (!id.isInInterval(nDash.getNodeId(), sucId, false, true)) {
-							nDashRing.getClosestPrecedingFinger(id).addResultListener(new DefaultResultListener<IFinger>()
-							{
-								
-								public void resultAvailable(IFinger result)
-								{
-									nDash = result;
-									if (nDash == null) {
-										nDash = fingertable.getSelf();
-										ret.setResult(nDash);
-									} else {
-										getRingService(nDash).addResultListener(new DefaultResultListener<IRingNodeService>() {
-											
-											public void resultAvailable(IRingNodeService result)
-											{
-												nDashRing = result;
-												agent.getExternalAccess().scheduleStep(thisStep).addResultListener(new DelegationResultListener<IFinger>(ret));
-											}
-											
-											@Override
-											public void exceptionOccurred(Exception exception)
-											{
-												super.exceptionOccurred(exception);
-												log("findPredecessor: could not get RingService from " + nDash.getNodeId());
-												ret.setResult(fingertable.getSelf());
-											}
-										});
+						public void resultAvailable(final IFinger nDash)
+						{
+							if (nDash == null) {
+								ret.setResult(fingertable.getSelf());
+							} else {
+								getRingService(nDash).addResultListener(new DefaultResultListener<IRingNodeService>() {
+									
+									public void resultAvailable(IRingNodeService nDashRing)
+									{
+										findPredecessor_recursive(id, nDash, nDashRing).addResultListener(new DelegationResultListener<IFinger>(ret));
 									}
-								}
-								
-								@Override
-								public void exceptionOccurred(Exception exception)
-								{
-									super.exceptionOccurred(exception);
-									log("findPredecessor: could not get ClosestPrecedingFinger from " + nDash.getNodeId());
-									ret.setResult(fingertable.getSelf());
-								}
-								
-							});
-						} else {
-							ret.setResult(nDash);
+									
+									@Override
+									public void exceptionOccurred(Exception exception)
+									{
+										super.exceptionOccurred(exception);
+										log("findPredecessor: could not get RingService from " + nDash.getNodeId());
+										ret.setResult(fingertable.getSelf());
+									}
+								});
+							}
 						}
-					}
-
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						super.exceptionOccurred(exception);
-						log("findPredecessor: could not get successor of " + nDash.getNodeId());
-						ret.setResult(fingertable.getSelf());
-					}
-					
-					
-				});
-				
-				
-				return ret;
+						
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							super.exceptionOccurred(exception);
+							log("findPredecessor: could not get ClosestPrecedingFinger from " + nDash.getNodeId());
+							ret.setResult(fingertable.getSelf());
+						}
+						
+					});
+				} else {
+					ret.setResult(nDash);
+				}
 			}
-		};
-		
-		return agent.getExternalAccess().scheduleStep(step);
-		
-//		while (!id.isInInterval(nDash.getNodeId(), nDashRing.getSuccessor().get(REMOTE_TIMEOUT).getNodeId(), false, true)) {
-//			nDash = nDashRing.getClosestPrecedingFinger(id).get(REMOTE_TIMEOUT);
-//			if (nDash == null) {
-//				nDash = fingertable.getSelf();
-//				break;
-//			}
-//			nDashRing = getRingService(nDash).get(REMOTE_TIMEOUT);
-//		}
-		
-//		ret.setResult(nDash);
-//		
-//		return ret;
+
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				super.exceptionOccurred(exception);
+				log("findPredecessor: could not get successor of " + nDash.getNodeId());
+				ret.setResult(fingertable.getSelf());
+			}
+			
+			
+		});
+			
+			
+		return ret;
 	}
 	
 	/**
@@ -447,16 +423,6 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	}
 
 	/**
-	 * Return the CID of the provider of this Service.
-	 * 
-	 * @return CID.
-	 */
-//	public IFuture<IComponentIdentifier> getCID()
-//	{
-//		return new Future<IComponentIdentifier>(this.agent.getComponentIdentifier());
-//	}
-
-	/**
 	 * Component Step to join the ring with a known other ring node.
 	 */
 	class JoinStep implements IComponentStep<Boolean>
@@ -503,6 +469,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 						public void resultAvailable(IRingNodeService result)
 						{
 //							future.setResult(true);
+							// non-chord:
 							// for faster propagation, notify the node about me
 							result.notify(fingertable.getSelf()).addResultListener(new IResultListener<Void>()
 							{
