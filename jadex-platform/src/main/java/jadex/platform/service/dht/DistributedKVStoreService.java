@@ -7,10 +7,12 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.dht.IDistributedKVStoreDebugService;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingApplicationService;
+import jadex.bridge.service.types.dht.IRingApplicationService.State;
 import jadex.bridge.service.types.dht.RingNodeEvent;
 import jadex.bridge.service.types.dht.StoreEntry;
 import jadex.commons.future.DefaultResultListener;
@@ -18,6 +20,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 
@@ -35,8 +38,12 @@ import java.util.logging.Logger;
  * Service that allows storing of key/value pairs in a DHT ring.
  */
 @Service
-public class DistributedKVStoreService implements IDistributedKVStoreService
+public class DistributedKVStoreService implements IDistributedKVStoreService, IDistributedKVStoreDebugService
 {
+	
+	/** Delay in ms between two stabilize runs **/
+	protected static final long	CHECK_STORED_DATA_DELAY		= 60 * 1000;
+	
 	/** Map that stores the actual data. Key -> StoreEntry **/
 	protected Map<String, StoreEntry>	keyMap;
 	
@@ -450,12 +457,13 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	{
 		IFinger predec = ring.getPredecessor().get();
 //		log("pushEntries received. Current predecessor: " + (predec != null ? predec.getNodeId() : null));
+		log("pushEntries received with " + entries.size() + " entries.");
 		final Collection<StoreEntry> collForPredec = new ArrayList<StoreEntry>();
 		boolean responsible = true;
 		for(final StoreEntry storeEntry : entries)
 		{
 			responsible = true;
-			if (predec != null && predec.getNodeId() != myId) {
+			if (predec != null && !predec.getNodeId().equals(myId)) {
 				if (storeEntry.getIdHash().isInInterval(myId, predec.getNodeId(), false, true)) {
 					// this entry belongs to my predecessor
 					responsible = false;
@@ -527,6 +535,101 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 		return searchService;
 	}
 	
+	
+	
+	@Override
+	public void disableSchedules()
+	{
+		checkDataStep = new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return Future.DONE;
+			}
+		};
+	}
+	
+	/**
+	 * Check all entries for validity and move them to another node, if necessary.
+	 * @return Void
+	 */
+	public IFuture<Void> checkData()
+	{
+		final Future<Void> ret = new Future<Void>();
+		if (ring.getState() == State.JOINED) {
+			final IFinger predec = ring.getPredecessor().get();
+			if (predec != null && !predec.getNodeId().equals(myId)) {
+				final Collection<StoreEntry> collForPredec = new ArrayList<StoreEntry>();
+				
+				Iterator<StoreEntry> it = keyMap.values().iterator();
+				while(it.hasNext())
+				{
+					StoreEntry storeEntry = it.next();
+					// TODO: check lease times!
+					if (predec != null && !predec.getNodeId().equals(myId)) {
+						if (storeEntry.getIdHash().isInInterval(myId, predec.getNodeId(), false, true)) {
+							// this entry belongs to my predecessor
+							collForPredec.add(storeEntry);
+							it.remove();
+						}
+					}
+				}
+				if (!collForPredec.isEmpty()) {
+					getStoreService(predec).addResultListener(new ExceptionDelegationResultListener<IDistributedKVStoreService, Void>(ret)
+					{
+						public void customResultAvailable(IDistributedKVStoreService result) {
+							log("checkData moving " + collForPredec.size() + " items to predecessor: " + predec.getNodeId());
+							result.pushEntries(collForPredec).addResultListener(new ExceptionDelegationResultListener<Void,Void>(ret)
+							{
+								public void customResultAvailable(Void result) {
+									log("checkData moved " + collForPredec.size() + " items to predecessor: " + predec.getNodeId());
+									ret.setResult(null);
+								};
+								public void exceptionOccurred(Exception exception) {
+									// re-add temporarily?
+									exception.printStackTrace();
+									log("Could not move " + collForPredec.size() + " items to predecessor: " + predec.getNodeId());
+								};
+							});
+						};
+					});
+				} else {
+					ret.setResult(null);
+				}
+			} else {
+				ret.setResult(null);
+			}
+		} else {
+			ret.setResult(null);
+		}
+		
+		// reschedule this step
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				agent.getExternalAccess().scheduleStep(checkDataStep, CHECK_STORED_DATA_DELAY);
+			}
+			public void resultAvailable(Void result)
+			{
+				agent.getExternalAccess().scheduleStep(checkDataStep, CHECK_STORED_DATA_DELAY);
+			}
+		});
+		return ret;
+	}
+
+
+
+	protected IComponentStep<Void> checkDataStep = new IComponentStep<Void>()
+	{
+
+		@Override
+		public IFuture<Void> execute(IInternalAccess ia)
+		{
+			return checkData();
+		}
+	};
+	
 	/**
 	 * Called upon events received from the ring service.
 	 * @param event
@@ -536,27 +639,30 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 		switch(event.type)
 		{
 			case JOIN:
+				agent.getExternalAccess().scheduleStep(checkDataStep, CHECK_STORED_DATA_DELAY);
 				break;
 			case SUCCESSOR_CHANGE:
 				// move data with id in (predecessor, myId] from successor,
 				// so get everything < myId.
 				final IFinger successor = event.newFinger;
-				getStoreService(successor).addResultListener(new DefaultResultListener<IDistributedKVStoreService>()
-				{
-					public void resultAvailable(final IDistributedKVStoreService sucStore)
+				if (!successor.getNodeId().equals(myId)) {
+					getStoreService(successor).addResultListener(new DefaultResultListener<IDistributedKVStoreService>()
 					{
-						sucStore.pullEntries(myId).addResultListener(new DefaultResultListener<Collection<StoreEntry>>()
+						public void resultAvailable(final IDistributedKVStoreService sucStore)
 						{
-							public void resultAvailable(Collection<StoreEntry> result)
+							sucStore.pullEntries(myId).addResultListener(new DefaultResultListener<Collection<StoreEntry>>()
 							{
-//								System.out.println("I am: " + myId + ", got " + result.size() + " entries from " + successor.getNodeId());
-								if (!result.isEmpty()) {
-									pushEntries(result).get();
+								public void resultAvailable(Collection<StoreEntry> result)
+								{
+	//								System.out.println("I am: " + myId + ", got " + result.size() + " entries from " + successor.getNodeId());
+									if (!result.isEmpty()) {
+										pushEntries(result).get();
+									}
 								}
-							}
-						});
-					}
-				});
+							});
+						}
+					});
+				}
 				break;
 			case PART:
 				break;
@@ -566,59 +672,60 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 					// So between join and stabilize, i could have stored keys that belong to my predecessor
 					// - or to any other node i didn't know before.
 					
-					executor.scheduleStep(new IComponentStep<Void>()
-					{
-
-						@Override
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							final Future<Void> ret = new Future<Void>();
-							final Set<StoreEntry> entries = new LinkedHashSet<StoreEntry>();
-							
-							Iterator<StoreEntry> it = keyMap.values().iterator();
-//							System.out.println(myId + ": Got " + keyMap.size() + " entries in total.");
-			
-							while(it.hasNext())
-							{
-								StoreEntry entry = (StoreEntry)it.next();
-								if (entry.getIdHash().isInInterval(myId, event.newFinger.getNodeId(), false, true)) {
-									entries.add(entry);
-									it.remove();
-								}
-							}
-							
-							getStoreService(event.newFinger).addResultListener(new ExceptionDelegationResultListener<IDistributedKVStoreService, Void>(ret)
-							{
-			
-								@Override
-								public void customResultAvailable(IDistributedKVStoreService predec)
-								{
-//									System.out.println("I am: " + myId + ", pushing " + entries.size() + " entries to " + event.newFinger.getNodeId());
-									predec.pushEntries(entries).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
-									{
-			
-										@Override
-										public void customResultAvailable(Void result)
-										{
-											ret.setResult(null);
-										}
-										
-										@Override
-										public void exceptionOccurred(Exception exception)
-										{
-											super.exceptionOccurred(exception);
-											// re-add local entries.
-											for(StoreEntry e : entries)
-											{
-												keyMap.put(e.getKey(), e);
-											}
-										}
-									});
-								}
-							});
-							return ret;
-						}
-					});
+//					executor.scheduleStep(new IComponentStep<Void>()
+//					{
+//
+//						@Override
+//						public IFuture<Void> execute(IInternalAccess ia)
+//						{
+//							final Future<Void> ret = new Future<Void>();
+//							final Set<StoreEntry> entries = new LinkedHashSet<StoreEntry>();
+//							
+//							Iterator<StoreEntry> it = keyMap.values().iterator();
+////							System.out.println(myId + ": Got " + keyMap.size() + " entries in total.");
+//			
+//							while(it.hasNext())
+//							{
+//								StoreEntry entry = (StoreEntry)it.next();
+//								if (entry.getIdHash().isInInterval(myId, event.newFinger.getNodeId(), false, true)) {
+//									entries.add(entry);
+//									it.remove();
+//								}
+//							}
+//							
+//							getStoreService(event.newFinger).addResultListener(new ExceptionDelegationResultListener<IDistributedKVStoreService, Void>(ret)
+//							{
+//			
+//								@Override
+//								public void customResultAvailable(IDistributedKVStoreService predec)
+//								{
+////									System.out.println("I am: " + myId + ", pushing " + entries.size() + " entries to " + event.newFinger.getNodeId());
+//									predec.pushEntries(entries).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+//									{
+//			
+//										@Override
+//										public void customResultAvailable(Void result)
+//										{
+//											ret.setResult(null);
+//										}
+//										
+//										@Override
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											super.exceptionOccurred(exception);
+//											// re-add local entries.
+//											System.err.println("Couldn't push entries.");
+//											for(StoreEntry e : entries)
+//											{
+//												keyMap.put(e.getKey(), e);
+//											}
+//										}
+//									});
+//								}
+//							});
+//							return ret;
+//						}
+//					});
 					
 				}
 				break;

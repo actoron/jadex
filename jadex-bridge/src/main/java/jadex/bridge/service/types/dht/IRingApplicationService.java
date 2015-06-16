@@ -13,6 +13,12 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 public interface IRingApplicationService
 {
 	public static int	TIMEOUT	= 2112;
+	
+	/** State enum. **/
+	public enum State
+	{
+		JOINED, UNJOINED
+	}
 
 	/**
 	 * Return the successor of this node.
@@ -54,6 +60,12 @@ public interface IRingApplicationService
 	@Timeout(Timeout.NONE)
 	ISubscriptionIntermediateFuture<RingNodeEvent> subscribeForEvents();
 
+	/**
+	 * Returns the current state of this ring node.
+	 * @return State
+	 */
+	State getState();
+	
 	/**
 	 * Sets the initialized flag.
 	 */

@@ -57,23 +57,13 @@ public class JContentsTable extends JTable {
 			        try {
 			        	final Object key = getValueAt(rowIndex, 0);
 			            Object value = getValueAt(rowIndex, 2);
-			            final StringBuilder display = new StringBuilder();
-			            if (value instanceof Collection) {
-			            	Collection col = (Collection)value;
-//			            	display.append("Collection:\n");
-			            	for(Object object : col)
-							{
-								display.append(object.toString() + "\n");
-							}
-			            } else {
-			            	display.append(value.toString());
-			            }
+			            final String display = DhtViewerPanel.toListString(value);
 			            
 			            new JDialog() {{
 			            	setTitle("Value for Key: " + key.toString());
 			            	setLocation(e.getXOnScreen()-200, e.getYOnScreen() -200);
 			            	add(new JTextArea() {{
-			            		setText(display.toString());
+			            		setText(display);
 			            	}});
 			            	setSize(400, 400);
 			            	setPreferredSize(new Dimension(400,400));
@@ -85,6 +75,8 @@ public class JContentsTable extends JTable {
 				        
 				}
 			}
+
+			
 			
 		});
 	}

@@ -8,6 +8,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.dht.IDistributedKVStoreDebugService;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
@@ -39,10 +40,10 @@ public class DistributedKVStoreTest extends TestCase
 	@Rule 
 	public TestName name = new TestName();
 
-	private IDistributedKVStoreService	store1;
-	private IDistributedKVStoreService	store2;
-	private IDistributedKVStoreService	store3;
-	private IDistributedKVStoreService	store4;
+	private IDistributedKVStoreDebugService	store1;
+	private IDistributedKVStoreDebugService	store2;
+	private IDistributedKVStoreDebugService	store3;
+	private IDistributedKVStoreDebugService	store4;
 	
 	private IRingNodeDebugService	ring1;
 	private IRingNodeDebugService 	ring2;
@@ -101,19 +102,19 @@ public class DistributedKVStoreTest extends TestCase
 //		rn1 = SServiceProvider
 //			.getService(platform1, IDebugRingNode.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 		
-		Tuple2<IDistributedKVStoreService, IRingNodeDebugService> t1 = createRingAgent(platform1);
+		Tuple2<IDistributedKVStoreDebugService, IRingNodeDebugService> t1 = createRingAgent(platform1);
 		store1 = t1.getFirstEntity();
 		ring1 = t1.getSecondEntity();
 		
-		Tuple2<IDistributedKVStoreService, IRingNodeDebugService> t2 = createRingAgent(platform2);
+		Tuple2<IDistributedKVStoreDebugService, IRingNodeDebugService> t2 = createRingAgent(platform2);
 		store2 = t2.getFirstEntity();
 		ring2 = t2.getSecondEntity();
 		
-		Tuple2<IDistributedKVStoreService, IRingNodeDebugService> t3 = createRingAgent(platform3);
+		Tuple2<IDistributedKVStoreDebugService, IRingNodeDebugService> t3 = createRingAgent(platform3);
 		store3 = t3.getFirstEntity();
 		ring3 = t3.getSecondEntity();
 		
-		Tuple2<IDistributedKVStoreService, IRingNodeDebugService> t4 = createRingAgent(platform4);
+		Tuple2<IDistributedKVStoreDebugService, IRingNodeDebugService> t4 = createRingAgent(platform4);
 		store4 = t4.getFirstEntity();
 		ring4 = t4.getSecondEntity();
 		
@@ -131,7 +132,7 @@ public class DistributedKVStoreTest extends TestCase
 		}
 	}
 
-	private Tuple2<IDistributedKVStoreService, IRingNodeDebugService> createRingAgent(IExternalAccess platform)
+	private Tuple2<IDistributedKVStoreDebugService, IRingNodeDebugService> createRingAgent(IExternalAccess platform)
 	{
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 		
@@ -140,7 +141,7 @@ public class DistributedKVStoreTest extends TestCase
 //		IDebugRingNode declaredService = SServiceProvider.getDeclaredService(platform, IDebugRingNode.class).get();
 //		System.out.println(declaredService);
 		
-		IDistributedKVStoreService storeService = SServiceProvider.getService(platform, identifier, IDistributedKVStoreService.class).get(timeout);
+		IDistributedKVStoreDebugService storeService = SServiceProvider.getService(platform, identifier, IDistributedKVStoreDebugService.class).get(timeout);
 		
 		IRingNodeDebugService iDebugRingNode = null; 
 		
@@ -153,7 +154,8 @@ public class DistributedKVStoreTest extends TestCase
 //		}
 		
 		iDebugRingNode.disableSchedules();
-		return new Tuple2<IDistributedKVStoreService, IRingNodeDebugService>(storeService, iDebugRingNode);
+		storeService.disableSchedules();
+		return new Tuple2<IDistributedKVStoreDebugService, IRingNodeDebugService>(storeService, iDebugRingNode);
 	}
 
 	private IComponentIdentifier createComponent(IComponentManagementService cms, Class<?> clazz)
@@ -322,54 +324,55 @@ public class DistributedKVStoreTest extends TestCase
 		ID.DEBUG = oldDebug;
 	}
 	
-	@Test
-	public void testMoveEntries_withFourNodes() {
-		boolean oldDebug = ID.DEBUG;
-		ID.DEBUG = true;
-		// This tests if already existing data is passed to the right node eventually.
-		// Example: Data with hash = 18 exists in node 10.
-		// Nodes 20 - 30 - 40 are in a ring.
-		// Now 40 joins 10 -> data has to be copied to 20.
-		
-		initRing(10,20,30,40);
-		
-		final String key = findKeyForStoreId(ring2, ring1, ring3, ring4);
-
-		// ring 3 is responsible for the key.
-		// but the others don't know that.
-		IID put = store1.put(key, "testValue").get();
-		
-		ring2.join(ring3).get();
-		ring3.join(ring4).get();
-		// ring is now: ring2 - ring3 - ring4
-		ring4.join(ring1).get();
-		// ring is now ring1 - ring 2 - ring3
-		
-		// stabilize for responsibilities:
-		// this is an artificial example where stabilizing is done in the correct order and
-		// one-after another.
-		for(int i = 0; i < 3; i++)
-		{
-			ring4.stabilize().get();
-			ring1.stabilize().get();
-			ring3.stabilize().get();
-			ring2.stabilize().get();
-		}
-		
-		// after stabilize, all stores should know who is responsible
-		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
-		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
-		assertEquals(ring2.getId().get(), store3.lookupResponsibleStore(key).get());
-		assertEquals(ring2.getId().get(), store4.lookupResponsibleStore(key).get());
-
-		// and the corresponding value should be moved, too.
-		assertEquals("testValue", store1.lookup(key).get());
-		assertEquals("testValue", store2.lookup(key).get());
-		assertEquals("testValue", store3.lookup(key).get());
-		assertEquals("testValue", store4.lookup(key).get());
-		
-		ID.DEBUG = oldDebug;
-	}
+//	@Test
+//	public void testMoveEntries_withFourNodes() {
+//		boolean oldDebug = ID.DEBUG;
+//		ID.DEBUG = true;
+//		// This tests if already existing data is passed to the right node eventually.
+//		// Example: Data with hash = 18 exists in node 10.
+//		// Nodes 20 - 30 - 40 are in a ring.
+//		// Now 40 joins 10 -> data has to be copied to 20.
+//		
+//		initRing(10,20,30,40);
+//		
+//		final String key = findKeyForStoreId(ring2, ring1, ring3, ring4);
+//
+//		// ring 3 is responsible for the key.
+//		// but the others don't know that.
+//		IID put = store1.put(key, "testValue").get();
+//		
+//		ring2.join(ring3).get();
+//		ring3.join(ring4).get();
+//		// ring is now: ring2 - ring3 - ring4
+//		ring4.join(ring1).get();
+//		// ring is now ring1 - ring 2 - ring3
+//		
+//		// stabilize for responsibilities:
+//		// this is an artificial example where stabilizing is done in the correct order and
+//		// one-after another.
+//		for(int i = 0; i < 3; i++)
+//		{
+//			ring4.stabilize().get();
+//			ring1.stabilize().get();
+//			ring3.stabilize().get();
+//			ring2.stabilize().get();
+//		}
+//		checkData2(store1,store2,store3,store4).get();
+//		
+//		// after stabilize, all stores should know who is responsible
+//		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
+//		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+//		assertEquals(ring2.getId().get(), store3.lookupResponsibleStore(key).get());
+//		assertEquals(ring2.getId().get(), store4.lookupResponsibleStore(key).get());
+//
+//		// and the corresponding value should be moved, too.
+//		assertEquals("testValue", store1.lookup(key).get());
+//		assertEquals("testValue", store2.lookup(key).get());
+//		assertEquals("testValue", store3.lookup(key).get());
+//		assertEquals("testValue", store4.lookup(key).get());
+//		
+//		ID.DEBUG = oldDebug;
+//	}
 
 	@Test
 	public void testMoveEntries_withFourNodes_nonArtificial() {
@@ -397,8 +400,7 @@ public class DistributedKVStoreTest extends TestCase
 		// stabilize for responsibilities and data move:
 		stabilize2(ring1,ring2,ring3,ring4).get();
 		stabilize2(ring1,ring2,ring3,ring4).get();
-//		stabilize2(ring1,ring2,ring3,ring4).get();
-//		stabilize2(ring1,ring2,ring3,ring4).get();
+		checkData2(store1,store2,store3,store4).get();
 		
 		// after stabilize, all stores should know who is responsible
 		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
@@ -414,6 +416,40 @@ public class DistributedKVStoreTest extends TestCase
 		
 		ID.DEBUG = oldDebug;
 	}
+	
+//	@Test
+//	public void testStoreJoin_raceCondition() {
+//		boolean oldDebug = ID.DEBUG;
+//		ID.DEBUG = true;
+//		// This tests if already existing data is passed to the right node eventually.
+//		// Example: Data with hash = 18 exists in node 10.
+//		// Nodes 20 - 30 - 40 are in a ring.
+//		// Now 40 joins 10 -> data has to be copied to 20.
+//		
+//		initRing(65,177,30,40);
+//		
+//		final String key = findKeyForStoreId(ring1, ring2);
+//		
+//		IFuture<IID> put = store2.put(key, "testValue"); // no get!
+//		
+//		IFuture<Boolean> join = ring1.join(ring2);
+//		
+//		join.get();
+//		put.get();
+//
+//		// stabilize for responsibilities:
+//		stabilize2(ring1,ring2).get();
+//		
+//		// after stabilize, all stores should know who is responsible
+//		assertEquals(ring1.getId().get(), store1.lookupResponsibleStore(key).get());
+//		assertEquals(ring1.getId().get(), store2.lookupResponsibleStore(key).get());
+//
+//		// and the corresponding value should be moved, too.
+//		assertEquals("testValue", store1.lookup(key).get());
+//		assertEquals("testValue", store2.lookup(key).get());
+//		
+//		ID.DEBUG = oldDebug;
+//	}
 	
 	@Test
 	public void testResponsibility_afterJoin_askJoining() {
@@ -616,6 +652,40 @@ public class DistributedKVStoreTest extends TestCase
 		store3.setRingService(ring3);
 		store4.setRingService(ring4);
 	}
+	
+	private IFuture<Void> checkData2(IDistributedKVStoreDebugService ... nodes) {
+		checkData(nodes).get();
+		return checkData(nodes);
+	}
+	
+	private IFuture<Void> checkData(IDistributedKVStoreDebugService ... nodes) {
+		final Future<Void> future = new Future<Void>();
+
+		CounterResultListener<Void> rejoinListener = new CounterResultListener<Void>((nodes.length), new DelegationResultListener<Void>(future))
+		{
+			public void resultAvailable(Void result)
+			{
+				super.resultAvailable(result);
+			}
+			public void exceptionOccurredIfUndone(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		};
+		for(int i = 0; i < nodes.length; i++)
+		{
+			try
+			{
+				nodes[i].checkData().addResultListener(rejoinListener);
+			}
+			catch(TimeoutException e)
+			{
+				System.out.println("to for node " + nodes[i]);
+			}
+		}
+		return future;
+	}
+	
 
 	private IFuture<Void> stabilize2(IRingNodeDebugService ... nodes) {
 		stabilize(nodes).get();

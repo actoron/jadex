@@ -3,6 +3,7 @@ package jadex.platform.service.dht;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.types.dht.IDistributedKVStoreDebugService;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -27,7 +28,8 @@ import jadex.micro.annotation.RequiredServices;
 	})
 })
 @ProvidedServices( {
-	@ProvidedService(type = IDistributedKVStoreService.class, implementation = @Implementation(value = DistributedKVStoreService.class), scope = RequiredServiceInfo.SCOPE_GLOBAL)
+	@ProvidedService(name="providedKV", type = IDistributedKVStoreService.class, implementation = @Implementation(value = DistributedKVStoreService.class), scope = RequiredServiceInfo.SCOPE_GLOBAL),
+	@ProvidedService(type = IDistributedKVStoreDebugService.class, implementation = @Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"providedKV\")"), scope = RequiredServiceInfo.SCOPE_GLOBAL)
 })
 @RequiredServices({
 	@RequiredService(name="store", type = IDistributedKVStoreService.class, binding=@Binding(scope=Binding.SCOPE_COMPONENT, create = false))

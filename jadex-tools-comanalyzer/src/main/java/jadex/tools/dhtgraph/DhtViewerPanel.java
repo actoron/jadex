@@ -41,6 +41,7 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -138,7 +139,7 @@ public class DhtViewerPanel extends JPanel
 	private JButton saveValueBtn;
 	
 	private JTextField readKeyTf;
-	private JTextField readValueTf;
+	private JLabel readValueLabel;
 	private JButton readValueBtn;
 	
 	private JContentsTable contentsTable;
@@ -424,13 +425,21 @@ public class DhtViewerPanel extends JPanel
 				
 				c.fill = GridBagConstraints.HORIZONTAL;
 				
-				add(new JScrollPane(new JFingerTable() 
-					{{
-						fingerTable = this;
-					}}) 
+				add(new JLabel("Fingertable (index|start|nodeId)") ,c);
+				c.gridy++;
+				
+				add(new JFingerTable() 
 				{{
-					setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-				}},c);
+					fingerTable = this;
+				}}, c);
+				
+//				add(new JScrollPane(new JFingerTable() 
+//					{{
+//						fingerTable = this;
+//					}}) 
+//				{{
+//					setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//				}},c);
 					
 			}}, BorderLayout.NORTH);
 				
@@ -479,9 +488,8 @@ public class DhtViewerPanel extends JPanel
 				add(new JTextField("") {{ readKeyTf = this; }});
 				
 				add(new JLabel("Value: "));
-				add(new JTextField("") {{ 
-					setEditable(false);
-					readValueTf = this; 
+				add(new JLabel("") {{ 
+					readValueLabel = this; 
 				}});
 				
 				add(new JLabel(""));
@@ -527,7 +535,9 @@ public class DhtViewerPanel extends JPanel
 								
 								@Override
 								public void resultAvailable(Object result) {
-									readValueTf.setText(""+result);
+									String labelText = String.format("<html><div style=\"width:%dpx;\">%s</div><html>", 150, toListString(result));
+									readValueLabel.setText(labelText);
+									readValueLabel.setToolTipText(labelText);
 									statusTf.setText("Status: Read successful from node: " + respId);
 									blink(respId);
 								}
@@ -787,7 +797,15 @@ public class DhtViewerPanel extends JPanel
 					@Override
 					public void finished()
 					{
-						statusTf.setText("Lookup finished.");
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							
+							@Override
+							public void run()
+							{
+								statusTf.setText("Lookup finished.");
+							}
+						});
 						refresh();
 						access.getExternalAccess().scheduleStep(myStep, SEARCH_DELAY);
 						super.finished();
@@ -1027,6 +1045,22 @@ public class DhtViewerPanel extends JPanel
 			vv.repaint();
 		}
 
+	}
+	
+	public static String toListString(Object value)
+	{
+		final StringBuilder display = new StringBuilder();
+		if (value instanceof Collection) {
+			Collection col = (Collection)value;
+//	            	display.append("Collection:\n");
+			for(Object object : col)
+			{
+				display.append(String.valueOf(object) + "\n");
+			}
+		} else {
+			display.append(value);
+		}
+		return display.toString();
 	}
 	
 	/**

@@ -15,6 +15,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
+import jadex.bridge.service.types.dht.IRingApplicationService.State;
 import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.bridge.service.types.dht.RingNodeEvent;
@@ -48,26 +49,20 @@ import java.util.logging.Logger;
 public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 {
 	/** Delay in ms between two fixfinger runs **/
-	protected static final long	FIX_DELAY			= 10000;
+	protected static final long	FIX_DELAY			= 90 * 1000;
 
 	/** Delay in ms between two stabilize runs **/
-	protected static final long	STABILIZE_DELAY		= 5000;
+	protected static final long	STABILIZE_DELAY		= 60 * 1000;
 
 	/** Delay in ms to wait before restarting the search for other ring nodes **/
-	protected static final long	RETRY_SEARCH_DELAY	= 5000;
+	protected static final long	RETRY_SEARCH_DELAY	= 30 * 1000;
 
 	/** Delay in ms to wait before retrying any remote calls **/
-	protected static final long	RETRY_OTHER_DELAY	= 5000;
+	protected static final long	RETRY_OTHER_DELAY	= 5 * 1000;
 
 
 	/** State of this ring node. **/
 	private State				state				= State.UNJOINED;
-
-	/** State enum. **/
-	enum State
-	{
-		JOINED, UNJOINED
-	}
 
 	/** The agent. */
 	@ServiceComponent
@@ -419,6 +414,15 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		this.fingertable.setPredecessor(predecessor);
 		setState(State.JOINED);
 		return Future.DONE;
+	}
+	
+	/**
+	 * Returns the current state of this ring node.
+	 * @return State
+	 */
+	public State getState()
+	{
+		return state;
 	}
 
 	/**
