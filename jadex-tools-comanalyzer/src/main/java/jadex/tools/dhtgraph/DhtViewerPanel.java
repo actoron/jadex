@@ -528,10 +528,12 @@ public class DhtViewerPanel extends JPanel
 					
 					storage.lookupResponsibleStore(key).addResultListener(new DefaultResultListener<IID>() {
 
+						@SuppressWarnings("unchecked")
 						@Override
 						public void resultAvailable(final IID respId) {
 							
-							storage.lookup(key).addResultListener(new DefaultResultListener<Object>() {
+							IFuture< Object > lookup = (IFuture<Object>)storage.lookup(key);
+							lookup.addResultListener(new DefaultResultListener<Object>() {
 								
 								@Override
 								public void resultAvailable(Object result) {

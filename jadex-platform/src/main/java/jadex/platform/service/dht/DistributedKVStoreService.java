@@ -47,9 +47,6 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	/** Map that stores the actual data. Key -> StoreEntry **/
 	protected Map<String, StoreEntry>	keyMap;
 	
-	/** Map that stores the actual data. ID -> StoreEntry **/
-//	protected Map<IID, StoreEntry>	idMap;
-	
 	/** The local Ring Node  to access the DHT Ring. **/
 	protected IRingApplicationService ring;
 	/** The local ID **/
@@ -66,7 +63,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	protected boolean	initialized;
 	
 	/** The execution Feature of the agent. **/
-	private IExecutionFeature executor;
+	protected IExecutionFeature executor;
 	
 	/**
 	 * Constructor.
@@ -74,7 +71,6 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	public DistributedKVStoreService()
 	{
 		this.keyMap = new HashMap<String, StoreEntry>();
-//		this.idMap = new HashMap<IID, StoreEntry>();
 		this.logger = Logger.getLogger(this.getClass().getName());
 	}
 	
@@ -208,7 +204,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	 * @param addToCollection If true, the value will be added to the collection stored 
 	 * @return the ID of the local node.
 	 */
-	protected IFuture<IID> storeLocal(String key, Object value, boolean addToCollection) {
+	private IFuture<IID> storeLocal(String key, Object value, boolean addToCollection) {
 		IID hash = ID.get(key);
 		return storeLocal(hash, key, value, addToCollection);
 	}
@@ -228,12 +224,12 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 //			logger.log(Level.WARNING, myId + ": storeLocal called even if i do not feel responsible for: " + hash + ". My successor is " + ring.getSuccessor().get().getNodeId());
 //		}
 		
-		return executor.scheduleStep(new IComponentStep<IID>()
-		{
-
-			@Override
-			public IFuture<IID> execute(IInternalAccess ia)
-			{
+//		return executor.scheduleStep(new IComponentStep<IID>()
+//		{
+//
+//			@Override
+//			public IFuture<IID> execute(IInternalAccess ia)
+//			{
 				StoreEntry entry = keyMap.get(key);
 				if (entry == null) {
 					entry = new StoreEntry(hash, key, addToCollection ? new ArrayList() : value);
@@ -258,8 +254,8 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 				//		System.out.println(keyMap.size());
 				//		idMap.put(hash, entry);
 				return ring.getId();
-			}
-		});
+//			}
+//		});
 		
 	}
 
@@ -294,7 +290,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	 * @param key Requested key.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<Object> lookup(String key) {
+	public IFuture<?> lookup(String key) {
 		return lookup(key, ID.get(key));
 	}
 
@@ -305,7 +301,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	 * @param idHash The hashed key to find the corresponding node.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<Object> lookup(final String key, final IID idHash)
+	public IFuture<?> lookup(final String key, final IID idHash)
 	{
 //		final Future<Object> ret = new Future<Object>();
 		if (!initialized) {
@@ -373,7 +369,8 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 									{
 										public void resultAvailable(IDistributedKVStoreService result)
 										{
-											IFuture<Object> value = result.lookup(key, idHash);
+											@SuppressWarnings("unchecked")
+											IFuture<Object> value = (IFuture<Object>)result.lookup(key, idHash);
 											value.addResultListener(new DefaultResultListener<Object>()
 												{
 												
@@ -516,16 +513,6 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 //	}
 
 	/**
-	 * Returns the local ring node.
-	 * 
-	 * @return The local ringnode.
-	 */
-//	public IFuture<IRingApplicationService> getRingService()
-//	{
-//		return new Future<IRingApplicationService>(ring);
-//	}
-	
-	/**
 	 * Lookup the storage service for a given finger.
 	 * @param finger
 	 * @return {@link IDistributedKVStoreService}
@@ -565,13 +552,11 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 				while(it.hasNext())
 				{
 					StoreEntry storeEntry = it.next();
-					// TODO: check lease times!
-					if (predec != null && !predec.getNodeId().equals(myId)) {
-						if (storeEntry.getIdHash().isInInterval(myId, predec.getNodeId(), false, true)) {
-							// this entry belongs to my predecessor
-							collForPredec.add(storeEntry);
-							it.remove();
-						}
+					// check responsibility for this entry
+					if (storeEntry.getIdHash().isInInterval(myId, predec.getNodeId(), false, true)) {
+						// this entry belongs to my predecessor
+						collForPredec.add(storeEntry);
+						it.remove();
 					}
 				}
 				if (!collForPredec.isEmpty()) {
@@ -603,28 +588,14 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 			ret.setResult(null);
 		}
 		
-		// reschedule this step
-		ret.addResultListener(new IResultListener<Void>()
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				agent.getExternalAccess().scheduleStep(checkDataStep, CHECK_STORED_DATA_DELAY);
-			}
-			public void resultAvailable(Void result)
-			{
-				agent.getExternalAccess().scheduleStep(checkDataStep, CHECK_STORED_DATA_DELAY);
-			}
-		});
 		return ret;
 	}
 
-
-
-	protected IComponentStep<Void> checkDataStep = new IComponentStep<Void>()
+	protected IComponentStep<Void> checkDataStep = new RepetitiveComponentStep<Void>(CHECK_STORED_DATA_DELAY)
 	{
 
 		@Override
-		public IFuture<Void> execute(IInternalAccess ia)
+		public IFuture<Void> customExecute(IInternalAccess ia)
 		{
 			return checkData();
 		}
@@ -736,7 +707,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 		}
 	}
 	
-	private void log(String message) {
+	protected void log(String message) {
 		logger.log(Level.INFO, myId + ": " + message);
 	}
 }

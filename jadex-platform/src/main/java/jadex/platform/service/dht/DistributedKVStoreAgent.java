@@ -2,7 +2,6 @@ package jadex.platform.service.dht;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.dht.IDistributedKVStoreDebugService;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.micro.annotation.Agent;

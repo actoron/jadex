@@ -6,7 +6,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -15,12 +14,11 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
-import jadex.bridge.service.types.dht.IRingApplicationService.State;
 import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.bridge.service.types.dht.RingNodeEvent;
 import jadex.commons.DebugException;
-import jadex.commons.IAsyncFilter;
+import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -85,6 +83,8 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 
 	/** Flag that indicates whether this Service is already usable. */
 	protected boolean	initialized;
+	
+	private ThreadPool pool = new ThreadPool();
 	
 	/**
 	 * Constructor.
@@ -252,26 +252,33 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			ret.setException(new IllegalStateException("RingNode not yet initialized!"));
 			return ret;
 		}
-//		log("findSuccessor for: " + id);		
-		final IFinger nDash = findPredecessor(id).get();
-//		IRingNode suc = nDash.findSuccessor(id).get();
-		getRingService(nDash).addResultListener(new InvalidateFingerAndTryAgainListener<IRingNodeService, IFinger>(nDash, new FindSuccessorStep(id), ret, "findSuccessor")
+		
+		pool.execute(new Runnable()
 		{
+
 			@Override
-			public void resultAvailable(IRingNodeService result)
+			public void run()
 			{
-//				log("Got ring node for: " + nDash.getNodeId());
-				result.getSuccessor().addResultListener(new InvalidateFingerAndTryAgainListener<IFinger, IFinger>(nDash, new FindSuccessorStep(id), ret, "findSuccessor")
+				final IFinger nDash = findPredecessor(id).get();
+				getRingService(nDash).addResultListener(new InvalidateFingerAndTryAgainListener<IRingNodeService, IFinger>(nDash, new FindSuccessorStep(id), ret, "findSuccessor")
 				{
 					@Override
-					public void resultAvailable(IFinger result)
+					public void resultAvailable(IRingNodeService result)
 					{
-//						log("Got finger");
-						ret.setResult(result);
+						result.getSuccessor().addResultListener(new InvalidateFingerAndTryAgainListener<IFinger, IFinger>(nDash, new FindSuccessorStep(id), ret, "findSuccessor")
+						{
+							@Override
+							public void resultAvailable(IFinger result)
+							{
+								ret.setResult(result);
+							}
+						});
 					}
 				});
+
 			}
 		});
+		
 		return ret;
 	}
 

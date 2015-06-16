@@ -64,7 +64,7 @@ public interface IDistributedKVStoreService
 	 * @param key Requested key.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<Object> lookup(String key);
+	public IFuture<?> lookup(String key);
 	
 	/**
 	 * Lookup a key in the ring and return the saved value, if any.
@@ -73,7 +73,7 @@ public interface IDistributedKVStoreService
 	 * @param idHash The hashed key to find the corresponding node.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<Object> lookup(String key, IID idHash);
+	public IFuture<?> lookup(String key, IID idHash);
 
 	/**
 	 * Set the local ringNode.
