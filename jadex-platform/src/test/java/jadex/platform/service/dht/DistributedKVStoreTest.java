@@ -61,7 +61,6 @@ public class DistributedKVStoreTest extends TestCase
 	
 	@Before
 	public void setUp() {
-		
 //		System.out.println("Default timeout is: " + timeout);
 		timeout = Starter.getLocalDefaultTimeout(null);
 		
@@ -289,9 +288,13 @@ public class DistributedKVStoreTest extends TestCase
 	
 	@Test
 	public void testMove_onPredecessorChange() {
+		boolean oldDebug = ID.DEBUG;
+		ID.DEBUG = true;
 		// ring consists of ring1 only
+		initRing(20, 100, 220, 230);
 		
-		final String key = findKeyForStoreId(ring2, ring1, ring3);
+		final String key = findKeyWithHash(ring2.getId().get());
+//		final String key = findKeyWithHash(createId2(21));
 		IID put = store1.put(key, "testValue").get();
 		// value is stored in store1, but the key is in the range of store2.
 		
@@ -300,6 +303,15 @@ public class DistributedKVStoreTest extends TestCase
 		
 //		stabilize2(ring1, ring2).get();
 		
+//		try
+//		{
+//			Thread.sleep(1000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+		System.out.println("Join done");
+		
 		// check if all stores know that store2 is responsible for the key now:
 		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
 		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
@@ -307,26 +319,19 @@ public class DistributedKVStoreTest extends TestCase
 		// check if correct value is saved now:
 		assertEquals("testValue", store2.lookup(key).get());
 		assertEquals("testValue", store1.lookup(key).get());
+		ID.DEBUG = oldDebug;
 	}
 	
 	@Test
-	public void testMoveEntries_withThreeNodes() {
+	public void testMoveEntries_withFourNodes() {
+		boolean oldDebug = ID.DEBUG;
+		ID.DEBUG = true;
 		// This tests if already existing data is passed to the right node eventually.
 		// Example: Data with hash = 18 exists in node 10.
 		// Nodes 20 - 30 - 40 are in a ring.
 		// Now 40 joins 10 -> data has to be copied to 20.
 		
-		// ring consists of ring1 only
-		ring1.init(createId2(10));
-		ring2.init(createId2(20));
-		ring3.init(createId2(30));
-		ring4.init(createId2(40));
-		
-		// propagate id change to kvstores:
-		store1.setRingService(ring1);
-		store2.setRingService(ring2);
-		store3.setRingService(ring3);
-		store4.setRingService(ring4);
+		initRing(10,20,30,40);
 		
 		final String key = findKeyForStoreId(ring2, ring1, ring3, ring4);
 
@@ -349,10 +354,9 @@ public class DistributedKVStoreTest extends TestCase
 			ring1.stabilize().get();
 			ring3.stabilize().get();
 			ring2.stabilize().get();
-//			ring2.stabilize().get();
 		}
 		
-		// after stabilize, store 1 knows it is not responsible anymore
+		// after stabilize, all stores should know who is responsible
 		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
 		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
 		assertEquals(ring2.getId().get(), store3.lookupResponsibleStore(key).get());
@@ -363,6 +367,52 @@ public class DistributedKVStoreTest extends TestCase
 		assertEquals("testValue", store2.lookup(key).get());
 		assertEquals("testValue", store3.lookup(key).get());
 		assertEquals("testValue", store4.lookup(key).get());
+		
+		ID.DEBUG = oldDebug;
+	}
+
+	@Test
+	public void testMoveEntries_withFourNodes_nonArtificial() {
+		boolean oldDebug = ID.DEBUG;
+		ID.DEBUG = true;
+		// This tests if already existing data is passed to the right node eventually.
+		// Example: Data with hash = 18 exists in node 10.
+		// Nodes 20 - 30 - 40 are in a ring.
+		// Now 40 joins 10 -> data has to be copied to 20.
+		
+		initRing(10,20,30,40);
+		
+		final String key = findKeyForStoreId(ring2, ring1, ring3, ring4);
+
+		// ring 3 is responsible for the key.
+		// but the others don't know that.
+		IID put = store1.put(key, "testValue").get();
+		
+		ring2.join(ring3).get();
+		ring3.join(ring4).get();
+		// ring is now: ring2 - ring3 - ring4
+		ring4.join(ring1).get();
+		// ring is now ring1 - ring 2 - ring3
+		
+		// stabilize for responsibilities and data move:
+		stabilize2(ring1,ring2,ring3,ring4).get();
+		stabilize2(ring1,ring2,ring3,ring4).get();
+//		stabilize2(ring1,ring2,ring3,ring4).get();
+//		stabilize2(ring1,ring2,ring3,ring4).get();
+		
+		// after stabilize, all stores should know who is responsible
+		assertEquals(ring2.getId().get(), store1.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store2.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store3.lookupResponsibleStore(key).get());
+		assertEquals(ring2.getId().get(), store4.lookupResponsibleStore(key).get());
+
+		// and the corresponding value should be moved, too.
+		assertEquals("testValue", store1.lookup(key).get());
+		assertEquals("testValue", store2.lookup(key).get());
+		assertEquals("testValue", store3.lookup(key).get());
+		assertEquals("testValue", store4.lookup(key).get());
+		
+		ID.DEBUG = oldDebug;
 	}
 	
 	@Test
@@ -424,6 +474,24 @@ public class DistributedKVStoreTest extends TestCase
 	// -----------------------------
 	// --------- HELPER ------------
 	// -----------------------------
+	
+	private String findKeyWithHash(IID hash) {
+		assertEquals("ID debug mode has to be enabled for exact key search!", true, ID.DEBUG);
+		
+		Random random = new Random();
+		boolean found = false;
+		String foundKey = null;
+		while (!found) {
+			int nextInt = random.nextInt(Integer.MAX_VALUE);
+			String s = "key_" + nextInt;
+			foundKey = s;
+			IID iid = ID.get(s);
+			if (iid.equals(hash)) {
+				found = true;
+			}
+		}
+		return foundKey;
+	}
 	
 	private String findKeyForStoreId(IRingNodeDebugService ring, IRingNodeDebugService... others)
 	{
@@ -533,6 +601,20 @@ public class DistributedKVStoreTest extends TestCase
 				}
 			}
 		}
+	}
+	
+	private void initRing(int ring1id, int ring2id, int ring3id, int ring4id)
+	{
+		ring1.init(createId2(ring1id));
+		ring2.init(createId2(ring2id));
+		ring3.init(createId2(ring3id));
+		ring4.init(createId2(ring4id));
+		
+		// propagate id change to kvstores:
+		store1.setRingService(ring1);
+		store2.setRingService(ring2);
+		store3.setRingService(ring3);
+		store4.setRingService(ring4);
 	}
 
 	private IFuture<Void> stabilize2(IRingNodeDebugService ... nodes) {

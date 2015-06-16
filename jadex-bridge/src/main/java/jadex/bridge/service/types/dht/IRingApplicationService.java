@@ -21,6 +21,14 @@ public interface IRingApplicationService
 	 */
 	@Timeout(TIMEOUT)
 	IFuture<IFinger> getSuccessor();
+	
+	/**
+	 * Return the successor of this node.
+	 * 
+	 * @return finger entry of the successor.
+	 */
+	@Timeout(TIMEOUT)
+	IFuture<IFinger> getPredecessor();
 
 	/**
 	 * Find the successor of a given ID in the ring.

@@ -257,7 +257,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			ret.setException(new IllegalStateException("RingNode not yet initialized!"));
 			return ret;
 		}
-		log("findSuccessor for: " + id);		
+//		log("findSuccessor for: " + id);		
 		final IFinger nDash = findPredecessor(id).get();
 //		IRingNode suc = nDash.findSuccessor(id).get();
 		getRingService(nDash).addResultListener(new InvalidateFingerAndTryAgainListener<IRingNodeService, IFinger>(nDash, new FindSuccessorStep(id), ret, "findSuccessor")
@@ -265,13 +265,13 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			@Override
 			public void resultAvailable(IRingNodeService result)
 			{
-				log("Got ring node for: " + nDash.getNodeId());
+//				log("Got ring node for: " + nDash.getNodeId());
 				result.getSuccessor().addResultListener(new InvalidateFingerAndTryAgainListener<IFinger, IFinger>(nDash, new FindSuccessorStep(id), ret, "findSuccessor")
 				{
 					@Override
 					public void resultAvailable(IFinger result)
 					{
-						log("Got finger");
+//						log("Got finger");
 						ret.setResult(result);
 					}
 				});
