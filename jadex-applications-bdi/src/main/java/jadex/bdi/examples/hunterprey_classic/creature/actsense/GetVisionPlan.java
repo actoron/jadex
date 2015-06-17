@@ -2,7 +2,7 @@ package jadex.bdi.examples.hunterprey_classic.creature.actsense;
 
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.RequestVision;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.fipa.Done;
 
 /**

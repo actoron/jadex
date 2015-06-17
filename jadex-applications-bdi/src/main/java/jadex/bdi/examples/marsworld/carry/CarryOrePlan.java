@@ -2,8 +2,8 @@ package jadex.bdi.examples.marsworld.carry;
 
 import jadex.bdi.examples.marsworld.producer.ProduceOreTask;
 import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -40,7 +40,7 @@ public class CarryOrePlan extends Plan
 			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("move.myself").getFact();
 			SyncResultListener	res	= new SyncResultListener();
 //			myself.addTask(new LoadOreTask(target, true, res));
-			Map props = new HashMap();
+			Map<String, Object> props = new HashMap<String, Object>();
 			props.put(LoadOreTask.PROPERTY_TARGET, target);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.TRUE);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));

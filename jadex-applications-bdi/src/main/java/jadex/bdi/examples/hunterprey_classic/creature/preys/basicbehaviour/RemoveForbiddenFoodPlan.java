@@ -2,7 +2,7 @@ package jadex.bdi.examples.hunterprey_classic.creature.preys.basicbehaviour;
 
 import jadex.bdi.examples.hunterprey_classic.Food;
 import jadex.bdi.examples.hunterprey_classic.Vision;
-import jadex.bdi.runtime.IBeliefSet;
+import jadex.bdiv3x.runtime.IBeliefSet;
 import jadex.bdiv3x.runtime.Plan;
 
 /**

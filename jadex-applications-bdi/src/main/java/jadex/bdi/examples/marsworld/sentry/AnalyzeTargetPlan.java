@@ -1,16 +1,16 @@
 package jadex.bdi.examples.marsworld.sentry;
 
+import jadex.application.EnvironmentService;
 import jadex.bdi.examples.marsworld.RequestProduction;
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdi.examples.marsworld.carry.O;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
-import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -42,7 +42,7 @@ public class AnalyzeTargetPlan extends Plan
 		{
 			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 			SyncResultListener	res	= new SyncResultListener();
-			Map props = new HashMap();
+			Map<String, Object> props = new HashMap<String, Object>();
 			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();

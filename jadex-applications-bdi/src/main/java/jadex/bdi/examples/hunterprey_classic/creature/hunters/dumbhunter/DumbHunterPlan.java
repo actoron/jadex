@@ -4,8 +4,8 @@ import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.examples.hunterprey_classic.WorldObject;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 

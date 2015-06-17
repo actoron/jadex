@@ -1,6 +1,7 @@
 package jadex.bdi.examples.marsworld.movement;
 
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
+import jadex.bdi.examples.marsworld.carry.O;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -25,7 +26,7 @@ public class MoveToLocationPlan extends Plan
 		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		IVector2 dest = (IVector2)getParameter("destination").getValue();
 		
-		Map props = new HashMap();
+		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
 		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));

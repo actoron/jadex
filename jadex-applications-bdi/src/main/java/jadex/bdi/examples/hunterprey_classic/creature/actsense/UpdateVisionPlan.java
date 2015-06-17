@@ -7,8 +7,8 @@ import jadex.bdi.examples.hunterprey_classic.Hunter;
 import jadex.bdi.examples.hunterprey_classic.Obstacle;
 import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.WorldObject;
-import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.IBeliefSet;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
@@ -35,10 +35,11 @@ public class UpdateVisionPlan extends Plan
 	{
 		IMessageEvent req = (IMessageEvent)getReason();
 		CurrentVision cv = (CurrentVision)req.getParameter(SFipa.CONTENT).getValue();
-		startAtomic();
+		// todo:
+//		startAtomic();
 			getBeliefbase().getBelief("my_self").setFact(null);
 			getBeliefbase().getBelief("my_self").setFact(cv.getCreature());
-		endAtomic();
+//		endAtomic();
 		getBeliefbase().getBelief("vision").setFact(cv.getVision());
 		WorldObject[] seenobs = cv.getVision().getObjects();
 
