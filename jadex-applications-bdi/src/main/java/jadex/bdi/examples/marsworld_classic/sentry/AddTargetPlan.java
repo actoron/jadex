@@ -2,7 +2,7 @@ package jadex.bdi.examples.marsworld_classic.sentry;
 
 import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Target;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 
