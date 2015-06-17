@@ -1,18 +1,19 @@
 package jadex.bdiv3x;
 
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCapabilityReference;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfigBeliefElement;
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MElementRef;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
@@ -23,10 +24,11 @@ import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.model.SBDIModel;
 import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -149,17 +151,34 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		}
 	};
 	
+	/** The loader constant. */
+	public static final String	CONTEXT_LOADER	= "context_loader";
+	
+	/** The loader for sub capabilities. */
+	protected BDIV3XModelLoader	loader;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new reader.
 	 */
-	public BDIV3XMLReader()
+	public BDIV3XMLReader(BDIV3XModelLoader loader)
 	{
 		super(getXMLMapping());
+		this.loader	= loader;
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Add loader to context.
+	 */
+	public Map<String,Object> createContext()
+	{
+		Map<String,Object>	ret	= super.createContext();
+		ret.put(CONTEXT_LOADER, loader);
+		return ret;
+	}
 	
 	/**
 	 *  Get the type of loaded models.
@@ -422,11 +441,10 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}
 		};
 		
-		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(BDIV3XModel.class, new IPostProcessor()
+		IPostProcessor	capaproc	= new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				AReadContext ar = (AReadContext)context;
 				BDIV3XModel model = (BDIV3XModel)context.getRootObject();
 				MCapability mcapa = model.getCapability();
 				
@@ -472,7 +490,27 @@ public class BDIV3XMLReader extends ComponentXMLReader
 						// todo: allow specifying scope
 						model.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null));
 					}
-				}	
+				}
+				
+				// Load subcapabilities.
+				Map<String, IBDIModel>	subcaps	= new LinkedHashMap<String, IBDIModel>();
+				for(MCapabilityReference subcap: model.getCapability().getCapabilities())
+				{
+					try
+					{
+						IResourceIdentifier	rid	= (IResourceIdentifier)((Map<String,Object>)context.getUserContext()).get(CONTEXT_RID);
+						IComponentIdentifier	root	= (IComponentIdentifier)((Map<String,Object>)context.getUserContext()).get(CONTEXT_ROOT);
+						BDIV3XModelLoader	loader	= (BDIV3XModelLoader)((Map<String,Object>)context.getUserContext()).get(CONTEXT_LOADER);
+						BDIV3XModel	cmodel	= (BDIV3XModel)loader.loadCapabilityModel(subcap.getFile(), model.getAllImports(),
+							rid, context.getClassLoader(), new Object[]{rid, root}).getModelInfo();
+						subcaps.put(subcap.getName(), cmodel);
+					}
+					catch(Exception e)
+					{
+						throw new RuntimeException(e);
+					}
+				}
+				SBDIModel.mergeSubcapabilities(model, subcaps);
 				
 				return null;
 			}
@@ -481,7 +519,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			{
 				return 1;
 			}
-		}), 
+		};
+		
+		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(BDIV3XModel.class, capaproc), 
 			new MappingInfo(comptype, null, null, 
 				new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},  

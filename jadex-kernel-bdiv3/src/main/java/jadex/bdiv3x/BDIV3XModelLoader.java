@@ -33,20 +33,29 @@ public class BDIV3XModelLoader extends AbstractModelLoader
 	public  BDIV3XModelLoader()
 	{
 		super(new String[]{FILE_EXTENSION_AGENT, FILE_EXTENSION_CAPABILITY});
-		this.reader = new BDIV3XMLReader();
+		this.reader = new BDIV3XMLReader(this);
 	}
 
 	//-------- methods --------
 	
 	/**
-	 *  Load a BPMN model.
+	 *  Load an agent model.
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
 	public CacheableKernelModel loadAgentModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		// todo: capability models? 
 		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_AGENT, imports, clkey, classloader, context);
+	}
+	
+	/**
+	 *  Load a capability model.
+	 *  @param name	The filename or logical name (resolved via imports and extensions).
+	 *  @param imports	The imports, if any.
+	 */
+	public CacheableKernelModel loadCapabilityModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
+	{
+		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, clkey, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------

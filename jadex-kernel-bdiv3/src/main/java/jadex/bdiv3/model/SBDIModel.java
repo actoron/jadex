@@ -18,9 +18,9 @@ import java.util.Map;
 public class SBDIModel
 {
 	/**
-	 *  Add elements from subcapabilities into model.
+	 *  Add elements from sub capabilities into model.
 	 *  @param bdimodel	The model.
-	 *  @param capas	The subcapabilities.
+	 *  @param capas	The sub capabilities.
 	 */
 	public static void mergeSubcapabilities(IBDIModel bdimodel, Map<String, IBDIModel> capas)
 	{

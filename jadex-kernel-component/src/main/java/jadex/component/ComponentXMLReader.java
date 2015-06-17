@@ -70,7 +70,13 @@ public class ComponentXMLReader
 	//-------- constants --------
 	
 	/** Key for error entries in read context. */
-	public static final String CONTEXT_ENTRIES = "entries";
+	public static final String CONTEXT_ENTRIES = "context_entries";
+	
+	/** Key for resource identifier in read context. */
+	public static final String CONTEXT_RID = "context_rid";
+	
+	/** Key for root identifier in read context. */
+	public static final String CONTEXT_ROOT = "context_root";
 	
 	//-------- attributes --------
 	
@@ -190,16 +196,27 @@ public class ComponentXMLReader
 	//-------- methods --------
 	
 	/**
+	 *  Create the context for a read operation.
+	 */
+	public Map<String, Object>	createContext()
+	{
+		Map<String, Object>	context	= new HashMap<String, Object>();
+		return context;
+	}
+	
+	/**
 	 *  Read properties from xml.
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
 	public CacheableKernelModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root) throws Exception
 	{
-		Map	user	= new HashMap();
-		MultiCollection<Tuple, String>	report	= new MultiCollection<Tuple, String>(new IndexMap().getAsMap(), LinkedHashSet.class);
-		user.put(CONTEXT_ENTRIES, report);
-		ModelInfo mi = (ModelInfo)reader.read(manager, handler, rinfo.getInputStream(), classloader, user);
+		Map<String, Object>	context	= createContext();
+		MultiCollection<Tuple, String>	entries	= new MultiCollection<Tuple, String>(new IndexMap().getAsMap(), LinkedHashSet.class);
+		context.put(CONTEXT_ENTRIES, entries);
+		context.put(CONTEXT_RID, rid);
+		context.put(CONTEXT_ROOT, root);
+		ModelInfo mi = (ModelInfo)reader.read(manager, handler, rinfo.getInputStream(), classloader, context);
 		CacheableKernelModel ret = new CacheableKernelModel(mi);
 		
 		if(mi!=null)
@@ -218,11 +235,11 @@ public class ComponentXMLReader
 
 			if(!mi.checkName())
 			{
-				report.add(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Name '"+mi.getName()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
+				entries.add(new Tuple(new Object[]{new StackElement(new QName("component"), ret)}), "Name '"+mi.getName()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
 			}
 			if(!mi.checkPackage())
 			{
-				report.add(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Package '"+mi.getPackage()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
+				entries.add(new Tuple(new Object[]{new StackElement(new QName("component"), ret)}), "Package '"+mi.getPackage()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
 			}
 		}
 		ret.setLastModified(rinfo.getLastModified());
@@ -239,10 +256,10 @@ public class ComponentXMLReader
 //			throw new RuntimeException("Model error: "+errtext);
 //		}
 		
-		if(report.size()>0)
+		if(entries.size()>0)
 		{
 //			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
-			mi.setReport(buildReport(mi.getFullName(), mi.getFilename(), report));
+			mi.setReport(buildReport(mi.getFullName(), mi.getFilename(), entries));
 		}
 		return ret;
 	}

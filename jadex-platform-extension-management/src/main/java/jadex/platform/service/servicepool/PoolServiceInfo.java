@@ -49,6 +49,14 @@ public class PoolServiceInfo
 	/**
 	 *  Create a new PoolServiceInfo.
 	 */
+	public PoolServiceInfo(Class<?> workermodel, Class<?> servicetype)
+	{
+		this(workermodel.getName()+".class", servicetype, null, null);
+	}
+	
+	/**
+	 *  Create a new PoolServiceInfo.
+	 */
 	public PoolServiceInfo(String workermodel, Class<?> servicetype, PublishInfo publishinfo)
 	{
 		this(workermodel, servicetype, null, publishinfo, null, null);
