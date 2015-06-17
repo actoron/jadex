@@ -15,7 +15,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Property for the overall execution time of a method or a service.
+ *  Property for the overall latency a service call.
+ *  
+ *  Computes endtime-starttime-methodexetime
+ *  
+ *  The local method execution time is measured locally and
+ *  stored as non-functional property in the call context.
  */
 public class LatencyProperty extends TimedProperty
 {
