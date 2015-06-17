@@ -1,7 +1,7 @@
 package jadex.bdi.examples.marsworld_classic.producer;
 
 import jadex.bdi.examples.marsworld_classic.Target;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
 /**

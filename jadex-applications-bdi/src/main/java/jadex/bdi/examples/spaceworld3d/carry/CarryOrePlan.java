@@ -2,8 +2,8 @@ package jadex.bdi.examples.spaceworld3d.carry;
 
 import jadex.bdi.examples.spaceworld3d.producer.ProduceOreTask;
 import jadex.bdi.examples.spaceworld3d.sentry.AnalyzeTargetTask;
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;

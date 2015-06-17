@@ -70,14 +70,25 @@ public class REventbase extends RElement implements IEventbase
 		return new RMessageEvent(mevent, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, getAgent());
 	}
 
-//	/**
-//	 *  Create a reply to a message event.
-//	 *  @param event	The received message event.
-//	 *  @param msgeventtype	The reply message event type.
-//	 *  @return The reply event.
-//	 */
-//	public IMessageEvent createReply(IMessageEvent event, String msgeventtype);
-	
+	/**
+	 *  Create a reply to a message event.
+	 *  @param event	The received message event.
+	 *  @param msgeventtype	The reply message event type.
+	 *  @return The reply event.
+	 */
+	public IMessageEvent createReply(IMessageEvent event, String msgeventtype)
+	{
+		if(event==null)
+			throw new IllegalArgumentException("Event must not null");
+		if(msgeventtype==null)
+			throw new IllegalArgumentException("The message event type must not null");
+		
+		MMessageEvent mevent = getCapability().getMCapability().getMessageEvent(msgeventtype);
+		if(mevent==null)
+			throw new RuntimeException("Message event not found: "+msgeventtype);
+		Map<String, Object> rep = event.getMessageType().createReply((Map<String, Object>)event.getMessage());
+		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent());
+	}
 	
 	/**
 	 *  Create a new intenal event.

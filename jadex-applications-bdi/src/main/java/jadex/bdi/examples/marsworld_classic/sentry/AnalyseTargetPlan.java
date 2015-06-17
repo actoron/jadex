@@ -2,8 +2,8 @@ package jadex.bdi.examples.marsworld_classic.sentry;
 
 import jadex.bdi.examples.marsworld_classic.RequestProduction;
 import jadex.bdi.examples.marsworld_classic.Target;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.fipa.SFipa;
@@ -48,10 +48,13 @@ public class AnalyseTargetPlan extends Plan
 		if(target.getOreCapacity()>0)
 			callProductionAgent(target);
 
-		startAtomic();
+		// todo:?!
+//		startAtomic();
+		
 		getBeliefbase().getBeliefSet("analysed_targets").addFact(target);
 		getBeliefbase().getBeliefSet("my_targets").removeFact(target);
-		endAtomic();
+		
+//		endAtomic();
 	}
 
 	/**
@@ -65,7 +68,7 @@ public class AnalyseTargetPlan extends Plan
 
 		// Search for Production_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)SServiceProvider.getService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IDF	df	= (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		IDFServiceDescription sd = df.createDFServiceDescription("service_produce", null, null);
 		IDFComponentDescription dfadesc = df.createDFComponentDescription(null, sd);
 
