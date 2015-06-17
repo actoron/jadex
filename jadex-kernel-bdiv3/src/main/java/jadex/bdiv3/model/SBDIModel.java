@@ -9,8 +9,10 @@ import jadex.rules.eca.EventType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Helper methods for pojo BDI and BDI V3X models.
@@ -51,16 +53,16 @@ public class SBDIModel
 //					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
 //					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
 //				}
-				List<String> events = convertEvents(name, bel.getBeliefEvents(), bdimodel);
+				Set<String> events = convertEvents(name, bel.getBeliefEvents(), bdimodel);
 				
 				MBelief	bel2;
-				if(bel.getField()!=null)
+				if(bel.getGetter()==null)
 				{
-					bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+					bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 				}
 				else
 				{
-					bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+					bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 					bel2.setSetter(bel.getSetter());
 				}
 				bel2.setName(name+MElement.CAPABILITY_SEPARATOR+bel.getName());
@@ -88,7 +90,7 @@ public class SBDIModel
 				MGoal goal2	= new MGoal(name+MElement.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
 					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
 					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), goal.getParameters(),
-					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), new ArrayList<String>(goal.getTriggerGoals())); // clone params?
+					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), goal.getTriggerGoals()!=null ? new ArrayList<String>(goal.getTriggerGoals()) : null); // clone params?
 						
 				// Convert goal condition events
 				if(goal.getConditions()!=null)
@@ -184,15 +186,23 @@ public class SBDIModel
 	/**
 	 * 
 	 */
-	protected static List<String> convertEvents(String name, Collection<String> evs, IBDIModel bdimodel)
+	protected static Set<String> convertEvents(String name, Set<String> evs, IBDIModel bdimodel)
 	{
-		List<String>	events	= new ArrayList<String>();
-		for(String event: evs)
+		Set<String>	ret;
+		if(evs!=null)
 		{
-			String	mapped	= name+MElement.CAPABILITY_SEPARATOR+event;
-			events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
+			ret	= new LinkedHashSet<String>();
+			for(String event: evs)
+			{
+				String	mapped	= name+MElement.CAPABILITY_SEPARATOR+event;
+				ret.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
+			}			
 		}
-		return events;
+		else
+		{
+			ret	= null;
+		}
+		return ret;
 	}
 	
 	/**

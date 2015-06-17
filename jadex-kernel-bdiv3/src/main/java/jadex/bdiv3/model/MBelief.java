@@ -18,8 +18,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +51,7 @@ public class MBelief extends MElement
 	protected Boolean multi;
 	
 	/** The events this belief depends on. */
-	protected Collection<String> beliefevents;
+	protected Set<String> beliefevents;
 	
 	/** The raw events. */
 	protected Collection<EventType> rawevents;
@@ -85,7 +86,7 @@ public class MBelief extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] beliefevents, Collection<EventType> rawevents)
+	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, Set<String> beliefevents, Collection<EventType> rawevents)
 	{
 		super(target!=null? target.getName(): null);
 		this.ftarget = target;
@@ -94,18 +95,11 @@ public class MBelief extends MElement
 			this.evaluationmode = MParameter.EvaluationMode.PULL;
 //		this.dynamic = dynamic;
 		this.updaterate	= updaterate;
-		this.beliefevents = new HashSet<String>();
-		if(beliefevents!=null)
-		{
-			for(String ev: beliefevents)
-			{
-				this.beliefevents.add(ev);
-			}
-		}
+		this.beliefevents = beliefevents;
 		this.rawevents = rawevents;
 
 		// Set to push if user specified event dependencies (not if only deduced from an expression)
-		if(this.beliefevents.size()>0 || (this.rawevents!=null && this.rawevents.size()>0))
+		if(this.beliefevents!=null && this.beliefevents.size()>0 || this.rawevents!=null && this.rawevents.size()>0)
 			this.evaluationmode = MParameter.EvaluationMode.PUSH;
 		
 //		System.out.println("bel: "+(target!=null?target.getName():"")+" "+dynamic);
@@ -114,9 +108,17 @@ public class MBelief extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, String[] events, Collection<EventType> rawevents)
+	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] beliefevents, Collection<EventType> rawevents)
 	{
-		this((FieldInfo)null, impl, dynamic, updaterate, events, rawevents);
+		this(target, impl, dynamic, updaterate, new LinkedHashSet<String>(Arrays.asList(beliefevents)), rawevents);
+	}
+	
+	/**
+	 *  Create a new belief.
+	 */
+	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, Set<String> beliefevents, Collection<EventType> rawevents)
+	{
+		this((FieldInfo)null, impl, dynamic, updaterate, beliefevents, rawevents);
 		
 		if(target.getName().startsWith("get"))
 		{
@@ -137,6 +139,15 @@ public class MBelief extends MElement
 		name = name.substring(0, 1).toLowerCase()+name.substring(1);
 	}
 	
+	/**
+	 *  Create a new belief.
+	 */
+	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, String[] beliefevents, Collection<EventType> rawevents)
+	{
+		this(target, impl, dynamic, updaterate, new LinkedHashSet<String>(Arrays.asList(beliefevents)), rawevents);
+	}
+	
+
 //	/**
 //	 *  Get the target.
 //	 *  @return The target.
@@ -321,6 +332,11 @@ public class MBelief extends MElement
 				{
 					multi = Boolean.FALSE;
 				}
+			}
+			else
+			{
+				// default for xml
+				multi = Boolean.FALSE;
 			}
 		}
 		return multi;
@@ -662,7 +678,7 @@ public class MBelief extends MElement
 	 *  Get the events.
 	 *  @return The events.
 	 */
-	public Collection<String> getBeliefEvents()
+	public Set<String> getBeliefEvents()
 	{
 		return beliefevents;
 	}
