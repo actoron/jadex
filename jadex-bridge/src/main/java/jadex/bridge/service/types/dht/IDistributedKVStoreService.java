@@ -123,7 +123,6 @@ public interface IDistributedKVStoreService
 	/**
 	 * Gets the initialized flag.
 	 */
-	@Excluded
 	public boolean isInitialized();
 	
 }
