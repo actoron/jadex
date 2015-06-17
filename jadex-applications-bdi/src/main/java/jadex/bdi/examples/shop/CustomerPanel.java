@@ -1,11 +1,11 @@
 package jadex.bdi.examples.shop;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IBeliefListener;
-import jadex.bdi.runtime.IBeliefSetListener;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IBeliefListener;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -14,9 +14,11 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.rules.eca.ChangeInfo;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -168,8 +170,10 @@ public class CustomerPanel extends JPanel
 			@Classname("initialMoney")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				final Object mon = bia.getBeliefbase().getBelief("money").getFact();
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				RCapability capa = bdif.getCapability();
+				final Object mon = capa.getBeliefbase().getBelief("money").getFact();
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -187,16 +191,18 @@ public class CustomerPanel extends JPanel
 			@Classname("money")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.getBeliefbase().getBelief("money").addBeliefListener(new IBeliefListener()
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				RCapability capa = bdif.getCapability();
+				capa.getBeliefbase().getBelief("money").addBeliefListener(new BeliefAdapter<Object>()
 				{
-					public void beliefChanged(final AgentEvent ae)
+					public void beliefChanged(final jadex.rules.eca.ChangeInfo<Object> info) 
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
 							{
-								money.setText(df.format(ae.getValue()));
+								money.setText(df.format(info.getValue()));
 							}
 						});
 					}
@@ -245,43 +251,46 @@ public class CustomerPanel extends JPanel
 			@Classname("inventory")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				RCapability capa = bdif.getCapability();
 				try
 				{
-					bia.getBeliefbase().getBeliefSet("inventory").addBeliefSetListener(new IBeliefSetListener()
+					// Hack, as long as we do not have a specific XML feature interface
+					capa.getBeliefbase().getBeliefSet("inventory").addBeliefSetListener(new BeliefAdapter<Object>()
 					{
-						public void factRemoved(final AgentEvent ae)
+						public void factRemoved(final ChangeInfo<Object> info)
 						{
 							SwingUtilities.invokeLater(new Runnable()
 							{
 								public void run()
 								{
-									invlist.remove(ae.getValue());
+									invlist.remove(info.getValue());
 									invmodel.fireTableDataChanged();
 								}
 							});
 						}
 						
-						public void factChanged(final AgentEvent ae)
+						public void factChanged(final ChangeInfo<Object> info)
 						{
 							SwingUtilities.invokeLater(new Runnable()
 							{
 								public void run()
 								{
-									invlist.remove(ae.getValue());
-									invlist.add(ae.getValue());
+									invlist.remove(info.getValue());
+									invlist.add(info.getValue());
 									invmodel.fireTableDataChanged();
 								}
 							});
 						}
 						
-						public void factAdded(final AgentEvent ae)
+						public void factAdded(final ChangeInfo<Object> info) 
 						{
 							SwingUtilities.invokeLater(new Runnable()
 							{
 								public void run()
 								{
-									invlist.add(ae.getValue());
+									invlist.add(info.getValue());
 									invmodel.fireTableDataChanged();
 								}
 							});
@@ -319,35 +328,64 @@ public class CustomerPanel extends JPanel
 						@Classname("buy")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-							final IGoal buy = bia.getGoalbase().createGoal("buy");
+							// Hack, as long as we do not have a specific XML feature interface
+							IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+							RCapability capa = bdif.getCapability();
+							final IGoal buy = capa.getGoalbase().createGoal("buy");
 							buy.getParameter("name").setValue(name);
 							buy.getParameter("shop").setValue(shop);
 							buy.getParameter("price").setValue(price);
-							buy.addGoalListener(new IGoalListener()
+//							buy.addGoalListener(new IGoalListener()
+//							{
+//								public void goalFinished(AgentEvent ae)
+//								{
+//									// Update number of available items
+//									refresh(shop);
+//									if(!buy.isSucceeded())
+//									{
+//										final String text = SUtil.wrapText("Item could not be bought. "+buy.getException().getMessage());
+//										SwingUtilities.invokeLater(new Runnable()
+//										{
+//											public void run()
+//											{
+//												JOptionPane.showMessageDialog(SGUI.getWindowParent(CustomerPanel.this), text, "Buy problem", JOptionPane.INFORMATION_MESSAGE);
+//											}
+//										});
+//									}
+//								}
+//								
+//								public void goalAdded(AgentEvent ae)
+//								{
+//								}
+//							});
+							capa.getGoalbase().dispatchTopLevelGoal(buy).addResultListener(new IResultListener<Object>()
 							{
-								public void goalFinished(AgentEvent ae)
+								public void exceptionOccurred(Exception exception)
+								{
+									refresh(shop);
+									printErr();
+								}
+								
+								public void resultAvailable(Object result)
 								{
 									// Update number of available items
 									refresh(shop);
 									if(!buy.isSucceeded())
-									{
-										final String text = SUtil.wrapText("Item could not be bought. "+buy.getException().getMessage());
-										SwingUtilities.invokeLater(new Runnable()
-										{
-											public void run()
-											{
-												JOptionPane.showMessageDialog(SGUI.getWindowParent(CustomerPanel.this), text, "Buy problem", JOptionPane.INFORMATION_MESSAGE);
-											}
-										});
-									}
+										printErr();
 								}
 								
-								public void goalAdded(AgentEvent ae)
+								protected void printErr()
 								{
+									final String text = SUtil.wrapText("Item could not be bought. "+buy.getException().getMessage());
+									SwingUtilities.invokeLater(new Runnable()
+									{
+										public void run()
+										{
+											JOptionPane.showMessageDialog(SGUI.getWindowParent(CustomerPanel.this), text, "Buy problem", JOptionPane.INFORMATION_MESSAGE);
+										}
+									});
 								}
 							});
-							bia.getGoalbase().dispatchTopLevelGoal(buy);
 							return IFuture.DONE;
 						}
 					});

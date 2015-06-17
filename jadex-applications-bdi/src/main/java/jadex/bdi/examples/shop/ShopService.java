@@ -1,11 +1,13 @@
 package jadex.bdi.examples.shop;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -19,7 +21,7 @@ public class ShopService implements IShopService
 	
 	/** The component. */
 	@ServiceComponent
-	protected IBDIInternalAccess comp;
+	protected IInternalAccess comp;
 	
 	/** The shop name. */
 	protected String name;
@@ -63,24 +65,38 @@ public class ShopService implements IShopService
 	{
 		final Future<ItemInfo> ret = new Future<ItemInfo>();
 		
-		final IGoal sell = comp.getGoalbase().createGoal("sell");
+		// Hack, as long as we do not have a specific XML feature interface
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)comp.getComponentFeature(IBDIAgentFeature.class);
+		RCapability capa = bdif.getCapability();
+		
+		final IGoal sell = capa.getGoalbase().createGoal("sell");
 		sell.getParameter("name").setValue(item);
 		sell.getParameter("price").setValue(Double.valueOf(price));
-		sell.addGoalListener(new IGoalListener()
+//		sell.addGoalListener(new IGoalListener()
+//		{
+//			public void goalFinished(AgentEvent ae)
+//			{
+//				if(sell.isSucceeded())
+//					ret.setResult((ItemInfo)sell.getParameter("result").getValue());
+//				else
+//					ret.setException(sell.getException());
+//			}
+//			
+//			public void goalAdded(AgentEvent ae)
+//			{
+//			}
+//		});
+		IFuture<Void> fut = capa.getGoalbase().dispatchTopLevelGoal(sell);
+		fut.addResultListener(new ExceptionDelegationResultListener<Void, ItemInfo>(ret)
 		{
-			public void goalFinished(AgentEvent ae)
+			public void customResultAvailable(Void result)
 			{
 				if(sell.isSucceeded())
 					ret.setResult((ItemInfo)sell.getParameter("result").getValue());
 				else
 					ret.setException(sell.getException());
 			}
-			
-			public void goalAdded(AgentEvent ae)
-			{
-			}
 		});
-		comp.getGoalbase().dispatchTopLevelGoal(sell);
 		
 		return ret;
 	}
@@ -91,8 +107,12 @@ public class ShopService implements IShopService
 	 */	
 	public IFuture<ItemInfo[]> getCatalog()
 	{
+		// Hack, as long as we do not have a specific XML feature interface
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)comp.getComponentFeature(IBDIAgentFeature.class);
+		RCapability capa = bdif.getCapability();
+		
 		final Future<ItemInfo[]> ret = new Future<ItemInfo[]>();
-		ret.setResult((ItemInfo[])comp.getBeliefbase().getBeliefSet("catalog").getFacts());
+		ret.setResult((ItemInfo[])capa.getBeliefbase().getBeliefSet("catalog").getFacts());
 		return ret;
 	}
 
@@ -104,5 +124,4 @@ public class ShopService implements IShopService
 	{
 		return name;
 	}
-	
 }

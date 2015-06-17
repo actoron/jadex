@@ -66,6 +66,11 @@ public interface IGoal extends IParameterElement // needed for xml version of BD
 	 */
 	public boolean isFinished();
 	
+	/**
+	 *  Get the exception (after goal has failed).
+	 */
+	public Exception getException();
+	
 //	/**
 //	 *  Get the parent of the goal.
 //	 */
