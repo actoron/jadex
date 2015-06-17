@@ -54,6 +54,8 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
+//		System.out.println("Select app cands for: "+element.getId());
+		
 //		if(element!=null && element.toString().indexOf("GoH")!=-1)
 //			System.out.println("find applicable candidates: "+element);
 		final Future<Void> ret = new Future<Void>();
@@ -64,19 +66,25 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("find applicable candidates 2: "+element+" "+apl);
 				if(apl.isEmpty())
 				{
+//					System.out.println("find applicable candidates 2a: "+element.getId()+" "+apl);
 					element.setState(RProcessableElement.State.NOCANDIDATES);
 					element.planFinished(ia, null);
 //					element.reason(ia);
 				}
 				else
 				{
+//					System.out.println("find applicable candidates 2b: "+element.getId()+" "+apl);
 					element.setState(RProcessableElement.State.APLAVAILABLE);
 					ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
 				}
 				ret.setResult(null);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				super.exceptionOccurred(exception);
 			}
 		}));
 		

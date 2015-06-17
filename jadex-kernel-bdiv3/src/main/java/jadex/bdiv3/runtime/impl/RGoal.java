@@ -411,8 +411,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		
 		if(GoalLifecycleState.DROPPING.equals(lifecyclestate))
 		{
-//			if(getId().indexOf("cleanup")!=-1)
-//				System.out.println("dropping achievecleanup: "+lifecyclestate+" "+processingstate);
+//			if(getId().indexOf("getoneeuro")!=-1)
+//				System.out.println("dropping getoneeuro: "+lifecyclestate+" "+processingstate+" "+getId());
 			
 //			if(getId().indexOf("cleanup")!=-1)
 //				System.out.println("dropping: "+getId());
@@ -626,7 +626,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //			if(rplan.getModelElement().getName().indexOf("seen")!=-1)
 //				System.out.println("hhhhhhhhhhhhhggg");
 			
-			System.out.println("plan fini: "+rplan);
+//			System.out.println("plan fini: "+rplan);
 			
 			// Find parameter mappings for xml agents
 			// todo: goal-goal mappings

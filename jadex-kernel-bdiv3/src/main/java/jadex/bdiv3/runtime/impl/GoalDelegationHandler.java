@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
@@ -75,6 +76,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
+//		System.out.println("gloaldelehandler: "+SUtil.arrayToString(args));
 		String goalname = goalnames.get(method.getName());
 		
 		if(goalname==null)
@@ -192,6 +194,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 			}
 		});
 		
+//		System.out.println("gloaldelehandler disp: "+((RGoal)fgoal).getId());
 		((IBDIAgentFeature)bdif).dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -202,10 +205,12 @@ public class GoalDelegationHandler  implements InvocationHandler
 				// Do not set goal itself as result of service call but null then
 				// Use setResultIfUndo as it could be a terminable future
 				
+//				System.out.println("gloaldelehandler end"+SUtil.arrayToString(args));
 				ret.setResultIfUndone(fgoal==result? null: result);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+//				System.out.println("gloaldelehandler endex"+SUtil.arrayToString(args));
 				ret.setExceptionIfUndone(exception);
 			}
 		});

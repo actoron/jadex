@@ -7,10 +7,12 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.dht.IDistributedKVStoreDebugService;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingApplicationService;
+import jadex.bridge.service.types.dht.IRingApplicationService.State;
 import jadex.bridge.service.types.dht.RingNodeEvent;
 import jadex.bridge.service.types.dht.StoreEntry;
 import jadex.commons.future.DefaultResultListener;
@@ -18,6 +20,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 
@@ -35,13 +38,14 @@ import java.util.logging.Logger;
  * Service that allows storing of key/value pairs in a DHT ring.
  */
 @Service
-public class DistributedKVStoreService implements IDistributedKVStoreService
+public class DistributedKVStoreService implements IDistributedKVStoreService, IDistributedKVStoreDebugService
 {
+	
+	/** Delay in ms between two stabilize runs **/
+	protected static final long	CHECK_STORED_DATA_DELAY		= 60 * 1000;
+	
 	/** Map that stores the actual data. Key -> StoreEntry **/
 	protected Map<String, StoreEntry>	keyMap;
-	
-	/** Map that stores the actual data. ID -> StoreEntry **/
-//	protected Map<IID, StoreEntry>	idMap;
 	
 	/** The local Ring Node  to access the DHT Ring. **/
 	protected IRingApplicationService ring;
@@ -59,7 +63,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	protected boolean	initialized;
 	
 	/** The execution Feature of the agent. **/
-	private IExecutionFeature executor;
+	protected IExecutionFeature executor;
 	
 	/**
 	 * Constructor.
@@ -67,7 +71,6 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	public DistributedKVStoreService()
 	{
 		this.keyMap = new HashMap<String, StoreEntry>();
-//		this.idMap = new HashMap<IID, StoreEntry>();
 		this.logger = Logger.getLogger(this.getClass().getName());
 	}
 	
@@ -149,7 +152,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 			@Override
 			public IFuture<IID> execute(IInternalAccess ia)
 			{
-				logger.log(Level.INFO, "store for " + key);
+				log("store for " + key);
 				final Future<IID> ret = new Future<IID>();
 				ring.findSuccessor(hash).addResultListener(new DefaultResultListener<IFinger>()
 				{
@@ -171,7 +174,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 								@Override
 								public void resultAvailable(IDistributedKVStoreService result)
 								{
-									logger.log(Level.INFO, myId + ": Storing key: " + key + "(hash: " + ID.get(key) + ")" + " in: " + nodeId);
+									log("Storing key: " + key + "(hash: " + ID.get(key) + ")" + " in: " + nodeId);
 									
 									IFuture<IID> publish;
 									if (addToCollection) {
@@ -201,7 +204,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @param addToCollection If true, the value will be added to the collection stored 
 	 * @return the ID of the local node.
 	 */
-	protected IFuture<IID> storeLocal(String key, Object value, boolean addToCollection) {
+	private IFuture<IID> storeLocal(String key, Object value, boolean addToCollection) {
 		IID hash = ID.get(key);
 		return storeLocal(hash, key, value, addToCollection);
 	}
@@ -221,12 +224,12 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 //			logger.log(Level.WARNING, myId + ": storeLocal called even if i do not feel responsible for: " + hash + ". My successor is " + ring.getSuccessor().get().getNodeId());
 //		}
 		
-		return executor.scheduleStep(new IComponentStep<IID>()
-		{
-
-			@Override
-			public IFuture<IID> execute(IInternalAccess ia)
-			{
+//		return executor.scheduleStep(new IComponentStep<IID>()
+//		{
+//
+//			@Override
+//			public IFuture<IID> execute(IInternalAccess ia)
+//			{
 				StoreEntry entry = keyMap.get(key);
 				if (entry == null) {
 					entry = new StoreEntry(hash, key, addToCollection ? new ArrayList() : value);
@@ -246,13 +249,13 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 						logger.warning("Replaced a collection instead of adding a value for key: " + key);
 					}
 				}
-				logger.log(Level.INFO, myId + ": Stored key: " + key + "(hash: " + hash +")" + " locally.");
+				log("Stored key: " + key + "(hash: " + hash +")" + " locally.");
 //				System.out.println(myId + ": Stored key: " + key + "(hash: " + hash +")" + " locally.");
 				//		System.out.println(keyMap.size());
 				//		idMap.put(hash, entry);
 				return ring.getId();
-			}
-		});
+//			}
+//		});
 		
 	}
 
@@ -266,7 +269,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 		final Future<IID> ret = new Future<IID>();
 //		final IExecutionFeature execFeature = agent.getComponentFeature(IExecutionFeature.class);
 		final IID id = ID.get(key);
-		logger.log(Level.INFO, "lookupResponsibleStore for " + key);
+		log("lookupResponsibleStore for " + key);
 		ring.findSuccessor(id).addResultListener(new ExceptionDelegationResultListener<IFinger, IID>(ret)
 		{
 
@@ -287,7 +290,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @param key Requested key.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<Object> lookup(String key) {
+	public IFuture<?> lookup(String key) {
 		return lookup(key, ID.get(key));
 	}
 
@@ -298,7 +301,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @param idHash The hashed key to find the corresponding node.
 	 * @return The retrieved value or null, if none.
 	 */
-	public IFuture<Object> lookup(final String key, final IID idHash)
+	public IFuture<?> lookup(final String key, final IID idHash)
 	{
 //		final Future<Object> ret = new Future<Object>();
 		if (!initialized) {
@@ -313,12 +316,12 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 			@Override
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
-				logger.log(Level.INFO, "lookup for " + key);
+				log("lookup for " + key);
 				final Future<Object> fut = new Future<Object>();
 				// faster local lookup: check if key is saved locally.
 				StoreEntry storeEntry = keyMap.get(key);
 				if (storeEntry != null && idHash.equals(storeEntry.getIdHash())) {
-					logger.info(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
+					log("retrieving from local map: "  +key+ " (hash: " + idHash +")");
 					fut.setResult(storeEntry.getValue());
 					return fut;
 				}
@@ -334,7 +337,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 						{
 							// use local access
 							
-							logger.info(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
+							log("retrieving from local map: "  +key+ " (hash: " + idHash +")");
 //							if(!isResponsibleFor(idHash))
 //							{
 //								logger.log(Level.WARNING, myId + ": lookupLocal called even if i do not feel responsible for: " + idHash + ". My successor is " + ring.getSuccessor().get().getNodeId());
@@ -349,7 +352,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 								fut.setResult(null);
 							}
 						} else {
-							logger.log(Level.INFO, myId + ": retrieving key: " +key+" (hash: " + idHash + ") from successor: " + finger.getNodeId());
+							log("retrieving key: " +key+" (hash: " + idHash + ") from successor: " + finger.getNodeId());
 							//	final IComponentIdentifier providerId = result.getSid().getProviderId();
 							executor.scheduleStep(new IComponentStep<Object>()
 							{
@@ -366,7 +369,8 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 									{
 										public void resultAvailable(IDistributedKVStoreService result)
 										{
-											IFuture<Object> value = result.lookup(key, idHash);
+											@SuppressWarnings("unchecked")
+											IFuture<Object> value = (IFuture<Object>)result.lookup(key, idHash);
 											value.addResultListener(new DefaultResultListener<Object>()
 												{
 												
@@ -448,22 +452,48 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	@Override
 	public IFuture<Void> pushEntries(Collection<StoreEntry> entries)
 	{
+		IFinger predec = ring.getPredecessor().get();
+//		log("pushEntries received. Current predecessor: " + (predec != null ? predec.getNodeId() : null));
+		log("pushEntries received with " + entries.size() + " entries.");
+		final Collection<StoreEntry> collForPredec = new ArrayList<StoreEntry>();
+		boolean responsible = true;
 		for(final StoreEntry storeEntry : entries)
 		{
-			// when i receive a push, it means my successor is not responsible for this data.
-		    // I do not care if i am responsible, instead, i periodically check if my predecessor is.
-			// TODO: periodically check if predec is responsible for data i hold.
-			if (storeEntry.getValue() instanceof Collection) {
-				// respect existing local collection instead of replacing it as whole.
-				Collection collection = (Collection)storeEntry.getValue();
-				for(Object singleValue : collection)
-				{
-//					store(storeEntry.getIdHash(), storeEntry.getKey(), singleValue, true);
-					storeLocal(storeEntry.getIdHash(), storeEntry.getKey(), singleValue, true);
+			responsible = true;
+			if (predec != null && !predec.getNodeId().equals(myId)) {
+				if (storeEntry.getIdHash().isInInterval(myId, predec.getNodeId(), false, true)) {
+					// this entry belongs to my predecessor
+					responsible = false;
+					collForPredec.add(storeEntry);
 				}
-			} else {
-//				store(storeEntry.getIdHash(), storeEntry.getKey(), storeEntry.getValue(), false);
-				storeLocal(storeEntry.getIdHash(), storeEntry.getKey(), storeEntry.getValue(), false);
+			}
+			// When i receive a push, it means my successor is not responsible for this data.
+			// This means either i am responsible, or the data should be passed on to my predecessor.
+			if (responsible) {
+//				System.out.println("Saving locally");
+				if (storeEntry.getValue() instanceof Collection) {
+					// respect existing local collection instead of replacing it as whole.
+					Collection collection = (Collection)storeEntry.getValue();
+					for(Object singleValue : collection)
+					{
+						storeLocal(storeEntry.getIdHash(), storeEntry.getKey(), singleValue, true);
+					}
+				} else {
+					storeLocal(storeEntry.getIdHash(), storeEntry.getKey(), storeEntry.getValue(), false);
+				}
+			}
+			
+			// predec case: asynchronously push to predecessor
+			if (!collForPredec.isEmpty()) {
+				getStoreService(predec).addResultListener(new DefaultResultListener<IDistributedKVStoreService>()
+				{
+					public void resultAvailable(IDistributedKVStoreService result)
+					{
+						result.pushEntries(collForPredec);
+					}
+					
+					// dont care about exceptions, as data has to be periodically refreshed anyways.
+				});
 			}
 		}
 		return Future.DONE;
@@ -483,16 +513,6 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 //	}
 
 	/**
-	 * Returns the local ring node.
-	 * 
-	 * @return The local ringnode.
-	 */
-//	public IFuture<IRingApplicationService> getRingService()
-//	{
-//		return new Future<IRingApplicationService>(ring);
-//	}
-	
-	/**
 	 * Lookup the storage service for a given finger.
 	 * @param finger
 	 * @return {@link IDistributedKVStoreService}
@@ -501,6 +521,85 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 		IFuture<IDistributedKVStoreService> searchService = SServiceProvider.getService(agent, finger.getSid().getProviderId(), IDistributedKVStoreService.class);
 		return searchService;
 	}
+	
+	
+	
+	@Override
+	public void disableSchedules()
+	{
+		checkDataStep = new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return Future.DONE;
+			}
+		};
+	}
+	
+	/**
+	 * Check all entries for validity and move them to another node, if necessary.
+	 * @return Void
+	 */
+	public IFuture<Void> checkData()
+	{
+		final Future<Void> ret = new Future<Void>();
+		if (ring.getState() == State.JOINED) {
+			final IFinger predec = ring.getPredecessor().get();
+			if (predec != null && !predec.getNodeId().equals(myId)) {
+				final Collection<StoreEntry> collForPredec = new ArrayList<StoreEntry>();
+				
+				Iterator<StoreEntry> it = keyMap.values().iterator();
+				while(it.hasNext())
+				{
+					StoreEntry storeEntry = it.next();
+					// check responsibility for this entry
+					if (storeEntry.getIdHash().isInInterval(myId, predec.getNodeId(), false, true)) {
+						// this entry belongs to my predecessor
+						collForPredec.add(storeEntry);
+						it.remove();
+					}
+				}
+				if (!collForPredec.isEmpty()) {
+					getStoreService(predec).addResultListener(new ExceptionDelegationResultListener<IDistributedKVStoreService, Void>(ret)
+					{
+						public void customResultAvailable(IDistributedKVStoreService result) {
+							log("checkData moving " + collForPredec.size() + " items to predecessor: " + predec.getNodeId());
+							result.pushEntries(collForPredec).addResultListener(new ExceptionDelegationResultListener<Void,Void>(ret)
+							{
+								public void customResultAvailable(Void result) {
+									log("checkData moved " + collForPredec.size() + " items to predecessor: " + predec.getNodeId());
+									ret.setResult(null);
+								};
+								public void exceptionOccurred(Exception exception) {
+									// re-add temporarily?
+									exception.printStackTrace();
+									log("Could not move " + collForPredec.size() + " items to predecessor: " + predec.getNodeId());
+								};
+							});
+						};
+					});
+				} else {
+					ret.setResult(null);
+				}
+			} else {
+				ret.setResult(null);
+			}
+		} else {
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+
+	protected IComponentStep<Void> checkDataStep = new RepetitiveComponentStep<Void>(CHECK_STORED_DATA_DELAY)
+	{
+
+		@Override
+		public IFuture<Void> customExecute(IInternalAccess ia)
+		{
+			return checkData();
+		}
+	};
 	
 	/**
 	 * Called upon events received from the ring service.
@@ -511,25 +610,30 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 		switch(event.type)
 		{
 			case JOIN:
+				agent.getExternalAccess().scheduleStep(checkDataStep, CHECK_STORED_DATA_DELAY);
 				break;
 			case SUCCESSOR_CHANGE:
 				// move data with id in (predecessor, myId] from successor,
 				// so get everything < myId.
 				final IFinger successor = event.newFinger;
-				getStoreService(successor).addResultListener(new DefaultResultListener<IDistributedKVStoreService>()
-				{
-					public void resultAvailable(final IDistributedKVStoreService sucStore)
+				if (!successor.getNodeId().equals(myId)) {
+					getStoreService(successor).addResultListener(new DefaultResultListener<IDistributedKVStoreService>()
 					{
-						sucStore.pullEntries(myId).addResultListener(new DefaultResultListener<Collection<StoreEntry>>()
+						public void resultAvailable(final IDistributedKVStoreService sucStore)
 						{
-							public void resultAvailable(Collection<StoreEntry> result)
+							sucStore.pullEntries(myId).addResultListener(new DefaultResultListener<Collection<StoreEntry>>()
 							{
-//								System.out.println("I am: " + myId + ", got " + result.size() + " entries from " + successor.getNodeId());
-								pushEntries(result).get();
-							}
-						});
-					}
-				});
+								public void resultAvailable(Collection<StoreEntry> result)
+								{
+	//								System.out.println("I am: " + myId + ", got " + result.size() + " entries from " + successor.getNodeId());
+									if (!result.isEmpty()) {
+										pushEntries(result).get();
+									}
+								}
+							});
+						}
+					});
+				}
 				break;
 			case PART:
 				break;
@@ -539,59 +643,60 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 					// So between join and stabilize, i could have stored keys that belong to my predecessor
 					// - or to any other node i didn't know before.
 					
-					executor.scheduleStep(new IComponentStep<Void>()
-					{
-
-						@Override
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							final Future<Void> ret = new Future<Void>();
-							final Set<StoreEntry> entries = new LinkedHashSet<StoreEntry>();
-							
-							Iterator<StoreEntry> it = keyMap.values().iterator();
-//							System.out.println(myId + ": Got " + keyMap.size() + " entries in total.");
-			
-							while(it.hasNext())
-							{
-								StoreEntry entry = (StoreEntry)it.next();
-								if (entry.getIdHash().isInInterval(myId, event.newFinger.getNodeId(), false, true)) {
-									entries.add(entry);
-									it.remove();
-								}
-							}
-							
-							getStoreService(event.newFinger).addResultListener(new ExceptionDelegationResultListener<IDistributedKVStoreService, Void>(ret)
-							{
-			
-								@Override
-								public void customResultAvailable(IDistributedKVStoreService predec)
-								{
-//									System.out.println("I am: " + myId + ", pushing " + entries.size() + " entries to " + event.newFinger.getNodeId());
-									predec.pushEntries(entries).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
-									{
-			
-										@Override
-										public void customResultAvailable(Void result)
-										{
-											ret.setResult(null);
-										}
-										
-										@Override
-										public void exceptionOccurred(Exception exception)
-										{
-											super.exceptionOccurred(exception);
-											// re-add local entries.
-											for(StoreEntry e : entries)
-											{
-												keyMap.put(e.getKey(), e);
-											}
-										}
-									});
-								}
-							});
-							return ret;
-						}
-					});
+//					executor.scheduleStep(new IComponentStep<Void>()
+//					{
+//
+//						@Override
+//						public IFuture<Void> execute(IInternalAccess ia)
+//						{
+//							final Future<Void> ret = new Future<Void>();
+//							final Set<StoreEntry> entries = new LinkedHashSet<StoreEntry>();
+//							
+//							Iterator<StoreEntry> it = keyMap.values().iterator();
+////							System.out.println(myId + ": Got " + keyMap.size() + " entries in total.");
+//			
+//							while(it.hasNext())
+//							{
+//								StoreEntry entry = (StoreEntry)it.next();
+//								if (entry.getIdHash().isInInterval(myId, event.newFinger.getNodeId(), false, true)) {
+//									entries.add(entry);
+//									it.remove();
+//								}
+//							}
+//							
+//							getStoreService(event.newFinger).addResultListener(new ExceptionDelegationResultListener<IDistributedKVStoreService, Void>(ret)
+//							{
+//			
+//								@Override
+//								public void customResultAvailable(IDistributedKVStoreService predec)
+//								{
+////									System.out.println("I am: " + myId + ", pushing " + entries.size() + " entries to " + event.newFinger.getNodeId());
+//									predec.pushEntries(entries).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+//									{
+//			
+//										@Override
+//										public void customResultAvailable(Void result)
+//										{
+//											ret.setResult(null);
+//										}
+//										
+//										@Override
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											super.exceptionOccurred(exception);
+//											// re-add local entries.
+//											System.err.println("Couldn't push entries.");
+//											for(StoreEntry e : entries)
+//											{
+//												keyMap.put(e.getKey(), e);
+//											}
+//										}
+//									});
+//								}
+//							});
+//							return ret;
+//						}
+//					});
 					
 				}
 				break;
@@ -600,5 +705,9 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 			default:
 				break;
 		}
+	}
+	
+	protected void log(String message) {
+		logger.log(Level.INFO, myId + ": " + message);
 	}
 }

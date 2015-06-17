@@ -14,7 +14,7 @@ public interface IID extends Comparable<IID>
 	 * @param end End of interval.
 	 * @return true, if this Id is inside the specified interval, else false.
 	 */
-	public boolean isInInterval(IID id, IID key);
+	public boolean isInInterval(IID start, IID end);
 
 	/**
 	 * Check whether this ID is in the given interval.
@@ -25,7 +25,7 @@ public interface IID extends Comparable<IID>
 	 * @param rightOpen If true, the end value is included in the interval.
 	 * @return true, if this Id is inside the specified interval, else false.
 	 */
-	public boolean isInInterval(IID id, IID iid, boolean leftOpen, boolean rightOpen);
+	public boolean isInInterval(IID start, IID end, boolean leftOpen, boolean rightOpen);
 
 	/**
 	 * Check whether this ID is in the given closed interval.

@@ -285,8 +285,8 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		else
 		{
 			// todo: throw goal failed exception for goal listeners
+//			System.out.println("No applicable plan found for: "+element.getId());
 			element.planFinished(ia, null);
-//			System.out.println("No applicable plan found.");
 		}
 		
 		return ret;

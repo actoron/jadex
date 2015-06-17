@@ -214,4 +214,13 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	{
 		return undone;
 	}
+	
+	/**
+	 *  Get the result count.
+	 *  @return The result count.
+	 */
+	public int getResultCount()
+	{
+		return results.size();
+	}
 }
