@@ -800,49 +800,32 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	 */
 	IComponentStep<Void> stabilizeRetryStep = new IComponentStep<Void>()
 	{
-
-		@Override
 		public IFuture<Void> execute(IInternalAccess ia)
 		{
-			return ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-			{
-
-				@Override
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					return stabilize();
-				}
-			}, STABILIZE_DELAY);
+			return stabilize();
 		}
 	};
 	
 	/**
 	 * Component step to execute a stabilize run.
 	 */
-	IComponentStep<Void> stabilizeStep = new IComponentStep<Void>()
+	IComponentStep<Void> stabilizeStep = new RepetitiveComponentStep<Void>(STABILIZE_DELAY)
 	{
-
-		@Override
-		public IFuture<Void> execute(IInternalAccess ia)
+		public IFuture<Void> customExecute(IInternalAccess ia)
 		{
-			IFuture<Void> stabilize = stabilize();
-			ia.getExternalAccess().scheduleStep(stabilizeStep, STABILIZE_DELAY);
-			return stabilize;
+			return stabilize();
 		}
 	};
 	
 	/**
 	 * Component step to execute a fixfingers run.
 	 */
-	IComponentStep<Void> fixStep = new IComponentStep<Void>()
+	IComponentStep<Void> fixStep = new RepetitiveComponentStep<Void>(FIX_DELAY)
 	{
-
-		@Override
-		public IFuture<Void> execute(IInternalAccess ia)
+		public IFuture<Void> customExecute(IInternalAccess ia)
 		{
 //			log("fixfingers");
 			fixFingers();
-			ia.getExternalAccess().scheduleStep(fixStep, FIX_DELAY);
 			return Future.DONE;
 		}
 	};
@@ -891,7 +874,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 				{
 					if (state == State.JOINED) {
 						// since we're still in the ring, retry with the given step.
-//						log("Retrying: " + name +".");
+						log("Retrying: " + name +".");
 						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(RETRY_OTHER_DELAY, tryAgainStep).addResultListener(new DefaultResultListener<E>() {
 
 							@Override
@@ -904,7 +887,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 						});
 					} else {
 						// we have left the ring, don't retry.
-//						log("Not trying: " + name +" again, state is unjoined.");
+						log("Not trying: " + name +" again, state is unjoined.");
 						// instead, search for other ringnodes to re-join
 						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(RETRY_SEARCH_DELAY, searchStep);
 						// and pass the exception to the delegation future.

@@ -184,7 +184,7 @@ public class RingNodePlatformTest extends TestCase
 		
 //		timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
 //		System.out.println("timeout is: " + timeout2);
-		stabilize(new IRingNodeDebugService[]{rn1, rn2}).get();
+		stabilize(new IRingNodeDebugService[]{rn1, rn2}).get(); //stabilize is not retrieed here!! 
 //		stabilize(new IDebugRingNode[]{rn1, rn2});
 		
 		System.out.println(rn1.getFingerTableString().get());
@@ -316,6 +316,7 @@ public class RingNodePlatformTest extends TestCase
 			@Override
 			public void exceptionOccurredIfUndone(Exception exception)
 			{
+//				resultAvailable(null);
 //				if(exception instanceof UnjoinedException)
 //				{
 //					System.out.println("initiate re-join");
