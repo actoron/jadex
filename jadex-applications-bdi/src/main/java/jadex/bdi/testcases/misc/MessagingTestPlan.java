@@ -1,10 +1,9 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.planlib.messaging.EmailAccount;
-import jadex.bdi.planlib.messaging.IMAccount;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.service.types.email.EmailAccount;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
@@ -23,18 +24,23 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.ChangeInfo;
+import jadex.rules.eca.IAction;
+import jadex.rules.eca.ICondition;
+import jadex.rules.eca.IEvent;
+import jadex.rules.eca.IRule;
+import jadex.rules.eca.Rule;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -120,11 +126,41 @@ public abstract class Plan
 	 */
 	public void	dispatchSubgoalAndWait(IGoal goal)
 	{
+		dispatchSubgoalAndWait(goal, -1);
+	}
+	
+	/**
+	 *  Dispatch a new top-level goal.
+	 *  @param goal The new goal.
+	 */
+	public void	dispatchSubgoalAndWait(IGoal goal, long timeout)
+	{
 		dispatchSubgoal(goal);
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
-		ret.get();
+		ret.get(timeout);
+	}
+	
+	/**
+	 *  Wait for a goal to be finished.
+	 *  @param goal The goal.
+	 */
+	public void waitForGoal(IGoal goal)
+	{
+		waitForGoal(goal, -1);
+	}
+	
+	/**
+	 *  Wait for a goal to be finished.
+	 *  @param goal The goal.
+	 */
+	public void waitForGoal(IGoal goal, long timeout)
+	{
+		RGoal rgoal = (RGoal)goal;
+		Future<Void> ret = new Future<Void>();
+		rgoal.addListener(new DelegationResultListener<Void>(ret));
+		ret.get(timeout);
 	}
 	
 	/**
@@ -759,6 +795,50 @@ public abstract class Plan
 		{
 			bdif.removeBeliefListener(belname, lis);
 		}
+	}
+	
+	/**
+	 *  Wait for a condition.
+	 *  @param name The name of the condition.
+	 */
+	public void waitForCondition(String name)
+	{
+		final IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		final MCondition mcond = bdif.getCapability().getMCapability().getCondition(name);
+		if(mcond==null)
+			throw new RuntimeException("Unknown condition: "+name);
+		final Future<Void> ret = new Future<Void>();
+		Rule<Void> rule = new Rule<Void>("plan_condition_"+rplan.getId()+"_"+mcond.getName(), new ICondition()
+		{
+			public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+			{
+				UnparsedExpression uexp = mcond.getExpression();
+				Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), 
+					getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+				return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
+			}
+		}, new IAction<Void>()
+		{
+			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+			{
+				// Remove rule and continue after wait
+				bdif.getRuleSystem().getRulebase().removeRule(rule.getName());
+				ret.setResult(null);
+				return IFuture.DONE;
+			}
+		});
+		rule.setEvents(mcond.getEvents());
+		bdif.getRuleSystem().getRulebase().addRule(rule);
+		ret.get();
+	}
+	
+	/**
+	 *  Wait for ever (is aborted on goal success/failure).
+	 */
+	public void waitForEver()
+	{
+		Future<Void> ret = new Future<Void>();
+		ret.get();
 	}
 	 
 	/**

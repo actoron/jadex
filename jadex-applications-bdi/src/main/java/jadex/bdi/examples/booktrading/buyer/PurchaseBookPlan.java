@@ -2,10 +2,8 @@ package jadex.bdi.examples.booktrading.buyer;
 
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
-import jadex.bdi.planlib.protocols.NegotiationRecord;
-import jadex.bdi.planlib.protocols.ParticipantProposal;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -40,7 +38,7 @@ public class PurchaseBookPlan extends Plan
 
 		// Find available seller agents.
 //		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get();
-		IDF	df	= (IDF)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("dfservice").get();
+		IDF	df	= (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("dfservice").get();
 		IDFServiceDescription	service	= df.createDFServiceDescription(null, "service_seller", null);
 		IDFComponentDescription	desc	= df.createDFComponentDescription(null, service);
 		IGoal df_search = createGoal("df_search");

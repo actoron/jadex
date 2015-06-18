@@ -1,15 +1,17 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Service call interceptor that starts BDI reasoning.
@@ -17,12 +19,12 @@ import jadex.commons.future.IFuture;
 public class BDIReasoningInterceptor implements IServiceInvocationInterceptor
 {
 	/** The internal access. */
-	protected IBDIInternalAccess ia;
+	protected IInternalAccess ia;
 	
 	/**
 	 *  Create a new interceptor.
 	 */
-	public BDIReasoningInterceptor(IBDIInternalAccess ia)
+	public BDIReasoningInterceptor(IInternalAccess ia)
 	{
 		this.ia = ia;
 	}
@@ -43,10 +45,32 @@ public class BDIReasoningInterceptor implements IServiceInvocationInterceptor
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		final Future<Void> ret = new Future<Void>();
-		final IGoal g = ia.getGoalbase().createGoal("reasoncall");
-		g.addGoalListener(new IGoalListener()
+		// Hack, as long as we do not have a specific XML feature interface
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+		RCapability capa = bdif.getCapability();
+		final IGoal g = capa.getGoalbase().createGoal("reasoncall");
+//		g.addGoalListener(new IGoalListener()
+//		{
+//			public void goalFinished(AgentEvent ae)
+//			{
+//				if(g.isSucceeded() && ((Boolean)g.getParameter("execute").getValue()).booleanValue())
+//				{
+//					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//				else
+//				{
+//					ret.setException(new ServiceInvalidException(sic.getMethod().getName()));
+//				}
+//			}
+//			
+//			public void goalAdded(AgentEvent ae)
+//			{
+//			}
+//		});
+		IFuture<Void> fut = capa.getGoalbase().dispatchTopLevelGoal(g);
+		fut.addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void goalFinished(AgentEvent ae)
+			public void customResultAvailable(Void result)
 			{
 				if(g.isSucceeded() && ((Boolean)g.getParameter("execute").getValue()).booleanValue())
 				{
@@ -57,12 +81,7 @@ public class BDIReasoningInterceptor implements IServiceInvocationInterceptor
 					ret.setException(new ServiceInvalidException(sic.getMethod().getName()));
 				}
 			}
-			
-			public void goalAdded(AgentEvent ae)
-			{
-			}
 		});
-		ia.getGoalbase().dispatchTopLevelGoal(g);
 		return ret;
 	}
 }

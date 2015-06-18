@@ -19,7 +19,7 @@ public abstract class RFinishableElement extends RProcessableElement
 	protected Exception exception;
 	
 	/** The listeners. */
-	protected List<IResultListener<Void>>	listeners;
+	protected List<IResultListener<Void>> listeners;
 	
 	//-------- constructors --------
 	
@@ -33,9 +33,9 @@ public abstract class RFinishableElement extends RProcessableElement
 	
 	//-------- methods --------
 	
-
 	/**
-	 *  Add a new listener.
+	 *  Add a new listener to get notified when the goal is finished.
+	 *  @param listener The listener.
 	 */
 	public void addListener(IResultListener<Void> listener)
 	{
@@ -113,7 +113,6 @@ public abstract class RFinishableElement extends RProcessableElement
 		}
 	}
 	
-	
 	/**
 	 *  Test if element is succeeded.
 	 */
@@ -123,4 +122,13 @@ public abstract class RFinishableElement extends RProcessableElement
 	 *  Test if element is failed.
 	 */
 	public abstract boolean	isFailed();
+	
+	/**
+	 *  Test if goal is finished.
+	 *  @return True, if is finished.
+	 */
+	public boolean isFinished()
+	{
+		return isSucceeded() || isFailed();
+	}
 }

@@ -4,7 +4,10 @@ import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.Vision;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -141,9 +144,11 @@ public class EnvironmentGui	extends JFrame
 					@Classname("end")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-						IGoal goal = bia.getGoalbase().createGoal("end_agent");
-						bia.getGoalbase().dispatchTopLevelGoal(goal);
+						// Hack, as long as we do not have a specific XML feature interface
+						IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+						RCapability capa = bdif.getCapability();
+						IGoal goal = capa.getGoalbase().createGoal("end_agent");
+						capa.getGoalbase().dispatchTopLevelGoal(goal);
 						return IFuture.DONE;
 					}
 				});
@@ -165,7 +170,6 @@ public class EnvironmentGui	extends JFrame
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 //				bia.addComponentListener(new TerminationAdapter()
 //				{
 //					public void componentTerminated()
@@ -180,7 +184,7 @@ public class EnvironmentGui	extends JFrame
 //					}
 //				});
 				
-				bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -224,13 +228,15 @@ public class EnvironmentGui	extends JFrame
 			@Classname("env")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				RCapability capa = bdif.getCapability();
+				final Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 				
 				options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
 				roundcnt = new JLabel("0");
 				final JTextField roundtimetf = new JTextField(5);
-				final Object rt = bia.getBeliefbase().getBelief("roundtime").getFact();
+				final Object rt = capa.getBeliefbase().getBelief("roundtime").getFact();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -251,8 +257,10 @@ public class EnvironmentGui	extends JFrame
 							@Classname("roundtime")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-								bia.getBeliefbase().getBelief("roundtime").setFact(val);
+								// Hack, as long as we do not have a specific XML feature interface
+								IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+								RCapability capa = bdif.getCapability();
+								capa.getBeliefbase().getBelief("roundtime").setFact(val);
 								return IFuture.DONE;
 							}
 						});
@@ -317,13 +325,15 @@ public class EnvironmentGui	extends JFrame
 			@Classname("roundcnt")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				RCapability capa = bdif.getCapability();
+				final Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 				
 				options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
 				roundcnt = new JLabel("0");
 				final JTextField roundtimetf = new JTextField(5);
-				final Object rt = bia.getBeliefbase().getBelief("roundtime").getFact();
+				final Object rt = capa.getBeliefbase().getBelief("roundtime").getFact();
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -343,8 +353,10 @@ public class EnvironmentGui	extends JFrame
 							@Classname("rt")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-								bia.getBeliefbase().getBelief("roundtime").setFact(val);
+								// Hack, as long as we do not have a specific XML feature interface
+								IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+								RCapability capa = bdif.getCapability();
+								capa.getBeliefbase().getBelief("roundtime").setFact(val);
 								return IFuture.DONE;
 							}
 						});
@@ -492,8 +504,10 @@ public class EnvironmentGui	extends JFrame
 			@Classname("dummy")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				RCapability capa = bdif.getCapability();
+				final Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 				env.addPropertyChangeListener(new PropertyChangeListener()
 				{
 					// Hack!!! Dummy creature required for world size.

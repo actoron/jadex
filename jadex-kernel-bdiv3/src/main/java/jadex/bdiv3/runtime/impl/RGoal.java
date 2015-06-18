@@ -442,7 +442,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	}
 	
 	/**
-	 * 
+	 *  Abort the child plans.
 	 */
 	protected void abortPlans()
 	{
@@ -453,7 +453,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	}
 	
 	/**
-	 * 
+	 *  Get the model element.
 	 */
 	public MGoal getMGoal()
 	{
@@ -461,7 +461,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	}
 	
 	/**
-	 * 
+	 *  Test if the element is succeeded.
 	 */
 	public boolean isSucceeded()
 	{
@@ -469,20 +469,20 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	}
 	
 	/**
-	 * 
+	 *  Test if the element is failed.
 	 */
 	public boolean isFailed()
 	{
 		return GoalProcessingState.FAILED.equals(processingstate);
 	}
 	
-	/**
-	 * 
-	 */
-	public boolean isFinished()
-	{
-		return isSucceeded() || isFailed();
-	}
+//	/**
+//	 * 
+//	 */
+//	public boolean isFinished()
+//	{
+//		return isSucceeded() || isFailed();
+//	}
 
 //	/**
 //	 *  Add a rule.

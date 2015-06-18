@@ -3,9 +3,11 @@ package jadex.bdi.examples.hunterprey_classic.environment;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IBeliefListener;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -102,8 +104,10 @@ public class ObserverGui	extends EnvironmentGui
 			@Classname("highscore")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				String hs = (String)bia.getBeliefbase().getBelief("highscore").getFact();
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				RCapability capa = bdif.getCapability();
+				String hs = (String)capa.getBeliefbase().getBelief("highscore").getFact();
 				BufferedReader reader = null;
 				try
 				{
@@ -193,13 +197,15 @@ public class ObserverGui	extends EnvironmentGui
 			@Classname("update")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.getBeliefbase().getBelief("vision").addBeliefListener(new IBeliefListener()
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				final RCapability capa = bdif.getCapability();
+				capa.getBeliefbase().getBelief("vision").addBeliefListener(new BeliefAdapter<Object>()
 				{
-					public void beliefChanged(AgentEvent ae)
+					public void beliefChanged(ChangeEvent ae)
 					{
 						final Vision vision = (Vision)ae.getValue(); 
-						Creature me = (Creature)bia.getBeliefbase().getBelief("my_self").getFact();
+						Creature me = (Creature)capa.getBeliefbase().getBelief("my_self").getFact();
 						if(vision!=null)
 						{
 							// Update map and creature list from vision.

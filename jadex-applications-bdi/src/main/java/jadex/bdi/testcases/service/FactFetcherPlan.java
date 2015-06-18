@@ -20,7 +20,7 @@ public class FactFetcherPlan extends Plan
 	{	
 		TestReport tr = new TestReport("#1", "Tests if own service can be found.");
 		
-		Collection services = (Collection)SServiceProvider.getLocalServices(getInterpreter(), 
+		Collection services = (Collection)SServiceProvider.getLocalServices(getAgent(), 
 			IBeliefGetter.class, RequiredServiceInfo.SCOPE_LOCAL);
 //		System.out.println("Found: "+services);
 		if(services!=null)
