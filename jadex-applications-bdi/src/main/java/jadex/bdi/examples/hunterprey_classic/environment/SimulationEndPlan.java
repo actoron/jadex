@@ -8,23 +8,28 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 
-public class SimulationEndPlan extends Plan {
+
+/**
+ * 
+ */
+public class SimulationEndPlan extends Plan
+{
 
 	public void body()
 	{
-		Environment en = (Environment) getBeliefbase().getBelief("environment").getFact();
+		Environment en = (Environment)getBeliefbase().getBelief("environment").getFact();
 		Creature[] creatures = en.getCreatures();
-		IGoal[]	destroy	= new IGoal[creatures.length];
-		for(int i=0; i<creatures.length; i++)
+		IGoal[] destroy = new IGoal[creatures.length];
+		for(int i = 0; i < creatures.length; i++)
 		{
-//			System.out.println(creatures[i].getAID());
+			// System.out.println(creatures[i].getAID());
 			en.removeCreature(creatures[i]);
 			destroy[i] = createGoal("cms_destroy_component");
 			destroy[i].getParameter("componentidentifier").setValue(creatures[i].getAID());
 			dispatchSubgoal(destroy[i]);
 		}
-		
-		for(int i=0; i<creatures.length; i++)
+
+		for(int i = 0; i < creatures.length; i++)
 		{
 			try
 			{
@@ -35,11 +40,10 @@ public class SimulationEndPlan extends Plan {
 				gfe.printStackTrace();
 			}
 		}
-		
-//		// kill via gui		
 
-		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getService(getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		// // kill via gui
+
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		cms.destroyComponent(getScope().getComponentIdentifier().getParent());
 	}
 }

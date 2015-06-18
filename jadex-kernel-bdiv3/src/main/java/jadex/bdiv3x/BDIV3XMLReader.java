@@ -393,7 +393,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			{
 				if(object instanceof MBelief || object instanceof MGoal || object instanceof MPlan || object instanceof MMessageEvent || object instanceof MInternalEvent 
 					|| object instanceof MCapabilityReference || object instanceof MElementRef
-					|| (object instanceof UnparsedExpression && pathname[pathname.length-1].getLocalPart().equals("expression"))) // hack for bdi expressions
+					|| (object instanceof UnparsedExpression && pathname[pathname.length-1].getLocalPart().equals("expression")) // hack for bdi expressions
+					|| (object instanceof MCondition && pathname[pathname.length-1].getLocalPart().equals("condition")))
 				{
 					parent	= ((BDIV3XModel)parent).getCapability();
 				}
@@ -552,6 +553,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expression")}), new AccessInfo(new QName(uri, "expression"), "expression")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expressionref")}), new AccessInfo(new QName(uri, "expressionref"), "expression")),
+//					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expression")}), new AccessInfo(new QName(uri, "expression"), "expression")),
+//					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expressionref")}), new AccessInfo(new QName(uri, "expressionref"), "expression")),
 			
 			}), new LinkingInfo(capalinker));
 		

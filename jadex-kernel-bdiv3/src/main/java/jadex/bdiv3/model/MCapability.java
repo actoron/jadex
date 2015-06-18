@@ -40,7 +40,7 @@ public class MCapability extends MElement
 	//-------- additional xml properties --------
 
 	/** The subcapabilities. */
-	protected List<MCapabilityReference>	subcapabilities;
+	protected List<MCapabilityReference> subcapabilities;
 	
 	/** The internal events. */
 	protected List<MInternalEvent> ievents;
@@ -50,6 +50,9 @@ public class MCapability extends MElement
 	
 	/** The goal/service publications. */
 	protected Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs = new HashMap<ClassInfo, List<Tuple2<MGoal, String>>>();
+	
+	/** The expressions. */
+	protected List<MCondition> conditions;
 	
 	/**
 	 *	Bean Constructor. 
@@ -592,6 +595,77 @@ public class MCapability extends MElement
 		return ret;
 	}
 
+	
+	/**
+	 *  Get the conditions.
+	 *  @return The conditions.
+	 */
+	public List<UnparsedExpression> getConditions()
+	{
+		return conditions==null? Collections.EMPTY_LIST: conditions;
+	}
+
+	/**
+	 *  Set the conditions.
+	 *  @param conditions The conditions to set.
+	 */
+	public void setConditions(List<MCondition> conditions)
+	{
+		this.conditions = conditions;
+	}
+
+	/**
+	 *  Add a condition.
+	 */
+	public void addCondition(MCondition condition)
+	{
+		if(conditions==null)
+			conditions = new ArrayList<MCondition>();
+		conditions.add(condition);
+	}
+	
+	/**
+	 *  Test if a condition is contained.
+	 */
+	public boolean hasCondition(String name)
+	{
+		boolean ret = false;
+		
+		if(conditions!=null && name!=null)
+		{
+			for(MCondition bel: conditions)
+			{
+				ret = name.equals(bel.getName());
+				if(ret)
+					break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a condition.
+	 */
+	public MCondition getCondition(String name)
+	{
+		MCondition ret = null;
+		
+		if(conditions!=null && name!=null)
+		{
+			for(MCondition bel: conditions)
+			{
+				if(name.equals(bel.getName()))
+				{
+					ret = bel;
+					break;
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 *  Get the elementrefs.
 	 *  @return The elementrefs

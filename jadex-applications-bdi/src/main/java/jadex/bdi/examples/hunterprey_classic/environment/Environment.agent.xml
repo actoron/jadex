@@ -266,10 +266,6 @@
 	<expressions>
 		<condition name="notasks" language="jcl">
 			$beliefbase.environment.getTaskSize()==0
-			
-			// ?rbel_env	= (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-			// ?mbel_env	= (mbelief (melement_has_name "environment"))
-			// ?env	= (Environment (taskSize 0))
 		</condition>
 	</expressions>
 

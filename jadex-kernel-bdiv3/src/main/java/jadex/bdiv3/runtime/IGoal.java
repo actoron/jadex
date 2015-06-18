@@ -1,11 +1,12 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3x.runtime.IFinishableElement;
 import jadex.bdiv3x.runtime.IParameterElement;
 
 /**
  *  Interface for a bdi goal.
  */
-public interface IGoal extends IParameterElement // needed for xml version of BDI
+public interface IGoal extends IParameterElement, IFinishableElement// needed for xml version of BDI
 {
 	//-------- goal states --------
 	
@@ -50,26 +51,6 @@ public interface IGoal extends IParameterElement // needed for xml version of BD
 	 *  @return The processingState.
 	 */
 	public GoalProcessingState getProcessingState();
-	
-	/**
-	 *  Test if goal is succeeded.
-	 */
-	public boolean isSucceeded();
-	
-	/**
-	 *  Test if goal is failed.
-	 */
-	public boolean isFailed();
-	
-	/**
-	 *  Test if goal is finished.
-	 */
-	public boolean isFinished();
-	
-	/**
-	 *  Get the exception (after goal has failed).
-	 */
-	public Exception getException();
 	
 //	/**
 //	 *  Get the parent of the goal.
