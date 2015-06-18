@@ -2,13 +2,14 @@ package jadex.bdi.examples.marsworld.sentry;
 
 import jadex.application.EnvironmentService;
 import jadex.bdi.examples.marsworld.RequestProduction;
-import jadex.bdi.examples.marsworld.carry.O;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.AbstractTask;
@@ -41,15 +42,14 @@ public class AnalyzeTargetPlan extends Plan
 		try
 		{
 			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			SyncResultListener	res	= new SyncResultListener();
 			Map<String, Object> props = new HashMap<String, Object>();
 			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
 			Object	taskid	= space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
-			space.addTaskListener(taskid, myself.getId(), res);
-
-			res.waitForResult();
+			Future<Void> res = new Future<Void>();
+			space.addTaskListener(taskid, myself.getId(), new DelegationResultListener<Void>(res));
+			res.get();
 //			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
 			if(((Number)target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue()>0)
 				callProducerAgent(target);
@@ -71,7 +71,9 @@ public class AnalyzeTargetPlan extends Plan
 //		System.out.println("Calling some Production Agent...");
 
 		// Todo: multiple spaces by name...
-		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getInterpreter()).get();
+		
+		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();
+//		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getInterpreter()).get();
 //			((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
 
 		Group group = agrs.getGroup("mymarsteam");

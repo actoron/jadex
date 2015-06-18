@@ -1,6 +1,6 @@
 package jadex.bdi.examples.spaceworld3d.movement;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.math.IVector3;

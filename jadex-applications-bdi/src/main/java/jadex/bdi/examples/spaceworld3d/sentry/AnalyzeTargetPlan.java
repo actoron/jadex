@@ -1,16 +1,17 @@
 package jadex.bdi.examples.spaceworld3d.sentry;
 
+import jadex.application.EnvironmentService;
 import jadex.bdi.examples.spaceworld3d.RequestProduction;
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
-import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -41,15 +42,15 @@ public class AnalyzeTargetPlan extends Plan
 		try
 		{
 			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			SyncResultListener	res	= new SyncResultListener();
-			Map props = new HashMap();
+			Map<String, Object> props = new HashMap<String, Object>();
 			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
 			Object	taskid	= space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
-			space.addTaskListener(taskid, myself.getId(), res);
-
-			res.waitForResult();
+			Future<Void> fut = new Future<Void>();
+			space.addTaskListener(taskid, myself.getId(), new DelegationResultListener<Void>(fut));
+			fut.get();
+			
 //			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
 			if(((Number)target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue()>0)
 				callProducerAgent(target);
@@ -71,7 +72,7 @@ public class AnalyzeTargetPlan extends Plan
 //		System.out.println("Calling some Production Agent...");
 
 		// Todo: multiple spaces by name...
-		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getInterpreter()).get();
+		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();
 //			((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
 
 		Group group = agrs.getGroup("mymarsteam");

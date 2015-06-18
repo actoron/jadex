@@ -1,14 +1,13 @@
 package jadex.bdi.examples.spaceworld3d.producer;
 
-import jadex.bdi.runtime.IChangeEvent;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.application.EnvironmentService;
+import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
-import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
@@ -23,11 +22,11 @@ public class InformNewTargetPlan extends Plan
 	 */
 	public void body()
 	{
-		IChangeEvent	reason	= (IChangeEvent)getReason();
+		ChangeEvent	reason	= (ChangeEvent)getReason();
 		ISpaceObject	target	= (ISpaceObject)reason.getValue();
 		
 		// Todo: multiple spaces by name...
-		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getInterpreter()).get();
+		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();
 //			((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");

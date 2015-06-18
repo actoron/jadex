@@ -1,12 +1,14 @@
 package jadex.bdi.examples.disastermanagement.firebrigade;
 
 import jadex.bdi.examples.disastermanagement.IClearChemicalsService;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
@@ -22,7 +24,7 @@ public class ClearChemicalsService implements IClearChemicalsService
 	
 	/** The agent. */
 	@ServiceComponent
-	protected IBDIInternalAccess agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -33,11 +35,15 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 */
 	public ITerminableFuture<Void> clearChemicals(final ISpaceObject disaster)
 	{
+		// Hack, as long as we do not have a specific XML feature interface
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		final RCapability capa = bdif.getCapability();
+		
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{
 			public void terminated(Exception reason)
 			{
-				IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("clear_chemicals");
+				IGoal[] goals = (IGoal[])capa.getGoalbase().getGoals("clear_chemicals");
 				for(int i=0; i<goals.length; i++)
 				{
 //					System.out.println("Dropping: "+goals[i]);
@@ -46,25 +52,39 @@ public class ClearChemicalsService implements IClearChemicalsService
 			}
 		});
 		
-		IGoal[] exgoals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
+		IGoal[] exgoals = (IGoal[])capa.getGoalbase().getGoals("extinguish_fire");
 		if(exgoals.length>0)
 		{
 			ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
 		}
 		else
 		{
-			IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("clear_chemicals");
+			IGoal[] goals = (IGoal[])capa.getGoalbase().getGoals("clear_chemicals");
 			if(goals.length>0)
 			{
 				ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
 			}
 			else
 			{
-				final IGoal clearchem = agent.getGoalbase().createGoal("clear_chemicals");
+				final IGoal clearchem = capa.getGoalbase().createGoal("clear_chemicals");
 				clearchem.getParameter("disaster").setValue(disaster);
-				clearchem.addGoalListener(new IGoalListener()
+//				clearchem.addGoalListener(new IGoalListener()
+//				{
+//					public void goalFinished(AgentEvent ae)
+//					{
+//						if(clearchem.isSucceeded())
+//							ret.setResult(null);
+//						else
+//							ret.setException(new RuntimeException("Goal failure."));
+//					}
+//					
+//					public void goalAdded(AgentEvent ae)
+//					{
+//					}
+//				});
+				capa.getGoalbase().dispatchTopLevelGoal(clearchem).addResultListener(new IResultListener<Object>()
 				{
-					public void goalFinished(AgentEvent ae)
+					public void resultAvailable(Object result)
 					{
 						if(clearchem.isSucceeded())
 							ret.setResult(null);
@@ -72,11 +92,11 @@ public class ClearChemicalsService implements IClearChemicalsService
 							ret.setException(new RuntimeException("Goal failure."));
 					}
 					
-					public void goalAdded(AgentEvent ae)
+					public void exceptionOccurred(Exception exception)
 					{
+						ret.setException(exception);
 					}
 				});
-				agent.getGoalbase().dispatchTopLevelGoal(clearchem);
 			}
 		}
 		

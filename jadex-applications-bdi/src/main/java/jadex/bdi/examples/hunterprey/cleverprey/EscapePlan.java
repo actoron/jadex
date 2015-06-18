@@ -2,6 +2,8 @@ package jadex.bdi.examples.hunterprey.cleverprey;
 
 import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -29,14 +31,14 @@ public class EscapePlan extends Plan
 
 		String	move	= MoveAction.getAvoidanceDirection(env,
 			(IVector2)myself.getProperty(Space2D.PROPERTY_POSITION), hunters);
-		SyncResultListener srl	= new SyncResultListener();
-		Map params = new HashMap();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 		params.put(MoveAction.PARAMETER_DIRECTION, move);
-		env.performSpaceAction("move", params, srl);
+		Future<Void> ret = new Future<Void>();
+		env.performSpaceAction("move", params, new DelegationResultListener<Void>(ret));
 		try
 		{
-			srl.waitForResult();
+			ret.get();
 		}
 		catch(RuntimeException e)
 		{

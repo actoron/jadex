@@ -1,12 +1,11 @@
 package jadex.bdi.examples.disastermanagement.commander;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IBeliefSet;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public abstract class HandleForcesPlan extends Plan
 		while(true)
 		{
 			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-			Collection forces = (Collection)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(servicename).get();
+			Collection forces = (Collection)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(servicename).get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 							
@@ -52,20 +51,32 @@ public abstract class HandleForcesPlan extends Plan
 						IGoal sendforce = createGoal("send_rescueforce");
 						sendforce.getParameter("disaster").setValue(disaster);
 						sendforce.getParameter("rescueforce").setValue(force);
-						dispatchSubgoal(sendforce);
-						sendforce.addGoalListener(new IGoalListener()
+						dispatchSubgoal(sendforce).addResultListener(new IResultListener<Void>()
 						{
-							public void goalFinished(AgentEvent ae)
+							public void resultAvailable(Void result)
 							{
 								// The plans ensure that the force is guaranteed to be not duty when the goal is finished.
 								getParameterSet("units").removeValue(force);
 								busy.removeFact(provid);
 							}
 							
-							public void goalAdded(AgentEvent ae)
+							public void exceptionOccurred(Exception exception)
 							{
 							}
 						});
+//						sendforce.addGoalListener(new IGoalListener()
+//						{
+//							public void goalFinished(AgentEvent ae)
+//							{
+//								// The plans ensure that the force is guaranteed to be not duty when the goal is finished.
+//								getParameterSet("units").removeValue(force);
+//								busy.removeFact(provid);
+//							}
+//							
+//							public void goalAdded(AgentEvent ae)
+//							{
+//							}
+//						});
 					}
 				}
 			}

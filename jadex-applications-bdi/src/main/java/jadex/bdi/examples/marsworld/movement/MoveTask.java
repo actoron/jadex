@@ -1,6 +1,8 @@
 package jadex.bdi.examples.marsworld.movement;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -82,7 +84,7 @@ public class MoveTask extends AbstractTask
 		
 		// Process vision at new location.
 		double	vision	= ((Number)obj.getProperty(PROPERTY_VISION)).doubleValue();
-		final Set objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
+		final Set<ISpaceObject> objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
 		if(objects!=null)
 		{
 			agent.scheduleStep(new IComponentStep<Void>()
@@ -90,15 +92,18 @@ public class MoveTask extends AbstractTask
 				@Classname("add")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					for(Iterator it=objects.iterator(); it.hasNext(); )
+					// Hack, as long as we do not have a specific XML feature interface
+					IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+					RCapability capa = bdif.getCapability();
+					
+					for(Iterator<ISpaceObject> it=objects.iterator(); it.hasNext(); )
 					{
 						final ISpaceObject so = (ISpaceObject)it.next();
 						if(so.getType().equals("target"))
 						{
-							if(!bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
+							if(!capa.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
 							{
-								bia.getBeliefbase().getBeliefSet("my_targets").addFact(so);
+								capa.getBeliefbase().getBeliefSet("my_targets").addFact(so);
 							}
 //							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
 							
