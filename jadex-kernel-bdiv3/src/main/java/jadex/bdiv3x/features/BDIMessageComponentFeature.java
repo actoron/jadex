@@ -6,6 +6,7 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
@@ -269,7 +270,7 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 			{
 				Object pvalue = msg.get(param.getName());
 				Object mvalue = SJavaParser.parseExpression(param.getDefaultValue(), getComponent().getModel().getAllImports(), 
-					getComponent().getClassLoader()).getValue(getComponent().getFetcher());
+					getComponent().getClassLoader()).getValue(RBeliefbase.getFetcher(getComponent(), msgevent));
 //				Object pvalue = RExpression.evaluateExpression(params[i].getDefaultValue(), scope.getExpressionParameters());
 //				Object mvalue = getValue(params[i].getName(), scope);
 				match	= pvalue==null && mvalue==null || pvalue!=null && mvalue!=null && pvalue.equals(mvalue);
@@ -375,9 +376,7 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 			{
 				exparams.put("$messagemap", msg);
 				IParsedExpression exp = SJavaParser.parseExpression(matchexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
-				SimpleValueFetcher fet = new SimpleValueFetcher(getComponent().getFetcher());
-				fet.setValues(exparams);
-				match = ((Boolean)exp.getValue(fet)).booleanValue();
+				match = ((Boolean)exp.getValue(RBeliefbase.getFetcher(getComponent(), msgevent, exparams))).booleanValue();
 			}
 			catch(Exception e)
 			{

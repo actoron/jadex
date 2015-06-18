@@ -2,6 +2,7 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MProcessableElement;
+import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bridge.IInternalAccess;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public abstract class RProcessableElement extends RParameterElement
 	 */
 	public RProcessableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent, Map<String, Object> vals)
 	{
-		super(modelelement, agent, vals, agent.getFetcher());
+		super(modelelement, agent, vals, RBeliefbase.getFetcher(agent, modelelement));
 		this.pojoelement = pojoelement;
 		this.state = State.INITIAL;
 	}

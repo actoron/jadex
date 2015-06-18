@@ -101,7 +101,7 @@ public class RExpressionbase extends RElement implements IExpressionbase
 		{
 			super(null, agent);
 			this.uexp = uexp;
-			this.fetcher = fetcher==null? agent.getFetcher(): fetcher;
+			this.fetcher = fetcher==null? RBeliefbase.getFetcher(getAgent(), getModelElement()) : fetcher;
 		}
 		
 		/**

@@ -78,7 +78,7 @@ public class MElement
 			int idx = name.lastIndexOf(CAPABILITY_SEPARATOR);
 			if(idx!=-1)
 			{
-				ret = name.substring(0, idx-1);
+				ret = name.substring(0, idx);
 			}
 		}
 		

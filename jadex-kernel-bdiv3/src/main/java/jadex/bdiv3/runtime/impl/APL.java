@@ -15,6 +15,7 @@ import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -246,7 +247,7 @@ public class APL
 						List<MGoal> mgoals = mtrigger.getGoals();
 						if(mgoals!=null && mgoals.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, ia.getFetcher());
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, RBeliefbase.getFetcher(ia, mplan));
 							precandidates.addAll(cands);
 						}
 					}
@@ -255,7 +256,7 @@ public class APL
 						List<MServiceCall> msers = mtrigger.getServices();
 						if(msers!=null && msers.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, ia.getFetcher());
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, RBeliefbase.getFetcher(ia, mplan));
 							precandidates.addAll(cands);
 						}
 					}
@@ -264,7 +265,7 @@ public class APL
 						List<MMessageEvent> msgs = mtrigger.getMessageEvents();
 						if(msgs!=null && msgs.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, ia.getFetcher());
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, RBeliefbase.getFetcher(ia, mplan));
 							precandidates.addAll(cands);
 						}
 					}
@@ -352,7 +353,7 @@ public class APL
 		boolean	valid	= true;
 		MPlan mplan = mplaninfo.getMPlan();
 		
-		SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ia.getFetcher());
+		SimpleValueFetcher	fetcher	= new SimpleValueFetcher(RBeliefbase.getFetcher(ia, mplan, mplaninfo.getBinding()));
 		if(element instanceof RGoal)
 		{
 			fetcher.setValue("$goal", element);
@@ -364,13 +365,6 @@ public class APL
 		else if(element instanceof RServiceCall)
 		{
 			fetcher.setValue("$call", element);
-		}
-		if(mplaninfo.getBinding()!=null)
-		{
-			for(Map.Entry<String, Object> entry: mplaninfo.getBinding().entrySet())
-			{
-				fetcher.setValue(entry.getKey(), entry.getValue());
-			}
 		}
 		
 		// chack match expression
@@ -692,7 +686,7 @@ public class APL
 		List<Map<String, Object>> ret = null;
 		
 		if(fetcher==null)
-			fetcher = agent.getFetcher();
+			fetcher = RBeliefbase.getFetcher(agent, melem);
 		
 		Map<String, Object> bindingparams	= null;
 		List<MParameter> params	= melem.getParameters();

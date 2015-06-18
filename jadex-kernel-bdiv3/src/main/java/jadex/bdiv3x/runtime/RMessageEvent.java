@@ -1,5 +1,6 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
@@ -35,7 +36,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		this.mt = mt;
 		
 		// Must be done after msg has been assigned :-(
-		super.initParameters(null, agent.getFetcher());
+		super.initParameters(null, RBeliefbase.getFetcher(agent, modelelement));
 	}
 	
 	/**
@@ -51,7 +52,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameter createParameter(MParameter modelelement, IInternalAccess agent)
 	{
-		return new RParam(modelelement, modelelement.getName(), agent, getModelElement().getName());
+		return new RParam(modelelement, modelelement.getName(), agent, getModelElement());
 	}
 	
 	/**
@@ -67,7 +68,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent)
 	{
-		return new RParamSet(modelelement, modelelement.getName(), agent, getModelElement().getName());
+		return new RParamSet(modelelement, modelelement.getName(), agent, getModelElement());
 	}
 	
 	/**
@@ -122,7 +123,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(!super.hasParameter(name))
 		{
 			MParameter mp = getMMessageEvent().getParameter(name);
-			param = new RParam(mp, name, getAgent(), getModelElement().getName());
+			param = new RParam(mp, name, getAgent(), getModelElement());
 			addParameter(param);
 		}
 		else
@@ -147,7 +148,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(!super.hasParameterSet(name))
 		{
 			MParameter mp = getMMessageEvent().getParameter(name);
-			paramset = new RParamSet(mp, name, getAgent(), getModelElement().getName());
+			paramset = new RParamSet(mp, name, getAgent(), getModelElement());
 			addParameterSet(paramset);
 		}
 		else
@@ -222,9 +223,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParam(MParameter modelelement, String name, IInternalAccess agent, String pename)
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, MElement owner)
 		{
-			super(modelelement, name, agent, agent.getFetcher(), pename);
+			super(modelelement, name, agent, RBeliefbase.getFetcher(agent, owner), owner.getName());
 		}
 		
 		/**
@@ -267,9 +268,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, String pename)
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, MElement owner)
 		{
-			super(modelelement, name, agent, agent.getFetcher(), pename);
+			super(modelelement, name, agent, RBeliefbase.getFetcher(agent, owner), owner.getName());
 		}
 		
 		/**

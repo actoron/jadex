@@ -628,6 +628,15 @@ public class MBelief extends MElement
 	}
 
 	/**
+	 *  Set the value.
+	 *  @return The value
+	 */
+	public void	setDefaultFacts(List<UnparsedExpression> facts)
+	{
+		this.facts	= facts;
+	}
+
+	/**
 	 *  The value to set.
 	 *  @param value The value to set
 	 */
