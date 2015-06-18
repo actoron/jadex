@@ -1,12 +1,5 @@
-/*
- * Created on Sep 20, 2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 package jadex.bdi.examples.hunterprey.ldahunter.potentialfield;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -62,7 +55,6 @@ public class PotentialFrame extends JFrame
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 //				bia.addComponentListener(new TerminationAdapter()
 //				{
 //					public void componentTerminated()
@@ -77,7 +69,7 @@ public class PotentialFrame extends JFrame
 //					}
 //				});
 				
-				bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

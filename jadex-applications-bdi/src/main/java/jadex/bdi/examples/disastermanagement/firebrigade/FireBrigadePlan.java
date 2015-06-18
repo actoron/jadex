@@ -1,6 +1,6 @@
 package jadex.bdi.examples.disastermanagement.firebrigade;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;

@@ -2,6 +2,8 @@ package jadex.bdi.examples.hunterprey.dumbprey;
 
 import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -38,12 +40,12 @@ public class DumbPreyPlan extends Plan
 				// Perform eat action.
 				try
 				{
-					SyncResultListener srl	= new SyncResultListener();
-					Map params = new HashMap();
+					Map<String, Object> params = new HashMap<String, Object>();
 					params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 					params.put(ISpaceAction.OBJECT_ID, food);
-					env.performSpaceAction("eat", params, srl);
-					srl.waitForResult();
+					Future<Void> fut = new Future<Void>();
+					env.performSpaceAction("eat", params, new DelegationResultListener<Void>(fut));
+					fut.get();
 				}
 				catch(RuntimeException e)
 				{
@@ -84,12 +86,12 @@ public class DumbPreyPlan extends Plan
 				// Perform move action.
 				try
 				{
-					SyncResultListener srl	= new SyncResultListener();
-					Map params = new HashMap();
+					Map<String, Object> params = new HashMap<String, Object>();
 					params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 					params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
-					env.performSpaceAction("move", params, srl);
-					srl.waitForResult();
+					Future<Void> fut = new Future<Void>();
+					env.performSpaceAction("move", params, new DelegationResultListener<Void>(fut));
+					fut.get();
 				}
 				catch(RuntimeException e)
 				{

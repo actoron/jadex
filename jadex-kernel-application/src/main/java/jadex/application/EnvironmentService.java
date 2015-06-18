@@ -125,7 +125,7 @@ public class EnvironmentService	implements IEnvironmentService
 	/**
 	 *	Get a space for a component.
 	 */
-	public static IFuture<Object>	getSpace(IInternalAccess component, final String name)
+	public static IFuture<Object> getSpace(IInternalAccess component, final String name)
 	{
 		final Future<Object>	ret	= new Future<Object>();
 		

@@ -1,16 +1,15 @@
 package jadex.bdi.examples.marsworld.producer;
 
+import jadex.application.EnvironmentService;
 import jadex.bdi.examples.marsworld.RequestCarry;
 import jadex.bdi.examples.marsworld.RequestProduction;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
-import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -67,7 +66,8 @@ public class ProducerPlan extends Plan
 	protected void callCarryAgent(ISpaceObject target)
 	{
 		// Todo: multiple spaces by name...
-		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getInterpreter()).get();
+		
+		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();
 //			((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
 
 		Group group = agrs.getGroup("mymarsteam");

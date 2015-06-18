@@ -5,6 +5,8 @@ import jadex.bdi.examples.spaceworld3d.sentry.AnalyzeTargetTask;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -38,16 +40,16 @@ public class CarryOrePlan extends Plan
 	
 			// Load ore at the target.
 			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("move.myself").getFact();
-			SyncResultListener	res	= new SyncResultListener();
 //			myself.addTask(new LoadOreTask(target, true, res));
-			Map props = new HashMap();
+			Map<String, Object> props = new HashMap<String, Object>();
 			props.put(LoadOreTask.PROPERTY_TARGET, target);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.TRUE);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			Object	taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
-			env.addTaskListener(taskid, myself.getId(), res);
+			Future<Void> fut = new Future<Void>();
+			env.addTaskListener(taskid, myself.getId(), new DelegationResultListener<Void>(fut));
+			fut.get();
 			
-			res.waitForResult();
 //			System.out.println("Loaded ore at target: "+getAgentName()+", "+ore+" ore loaded.");
 			// Todo: use return value to determine finished state?
 			finished	= ((Number)target.getProperty(ProduceOreTask.PROPERTY_CAPACITY)).intValue()==0;
@@ -61,15 +63,14 @@ public class CarryOrePlan extends Plan
 			dispatchSubgoalAndWait(go_home);
 	
 			// Unload ore at the homebase.
-			res	= new SyncResultListener();
-			props = new HashMap();
+			props = new HashMap<String, Object>();
 			props.put(LoadOreTask.PROPERTY_TARGET, homebase);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.FALSE);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
-			env.addTaskListener(taskid, myself.getId(), res);
+			env.addTaskListener(taskid, myself.getId(), new DelegationResultListener<Void>(fut));
+			fut.get();
 //			myself.addTask(new LoadOreTask(homebase, false, res));
-			res.waitForResult();
 //			System.out.println("Unloaded ore at homebase: "+getAgentName()+", "+ore+" ore unloaded.");
 		}
 	}

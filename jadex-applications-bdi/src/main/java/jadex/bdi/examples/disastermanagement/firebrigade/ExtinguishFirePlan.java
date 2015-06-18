@@ -2,9 +2,11 @@ package jadex.bdi.examples.disastermanagement.firebrigade;
 
 import jadex.bdi.examples.disastermanagement.DisasterType;
 import jadex.bdi.examples.disastermanagement.ExtinguishFireTask;
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -36,13 +38,13 @@ public class ExtinguishFirePlan extends Plan
 		
 		// Extinguish fire
 		myself.setProperty("state", "extinguishing_fire");
-		Map props = new HashMap();
+		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(ExtinguishFireTask.PROPERTY_DISASTER, disaster);
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		Object taskid = space.createObjectTask(ExtinguishFireTask.PROPERTY_TYPENAME, props, myself.getId());
-		SyncResultListener	res	= new SyncResultListener();
-		space.addTaskListener(taskid, myself.getId(), res);
-		res.waitForResult();
+		Future<Void> fut = new Future<Void>();
+		space.addTaskListener(taskid, myself.getId(), new DelegationResultListener<Void>(fut));
+		fut.get();
 	}
 	
 	/**

@@ -2,12 +2,14 @@ package jadex.bdi.examples.disastermanagement.ambulance;
 
 import jadex.bdi.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
@@ -23,7 +25,7 @@ public class TreatVictimsService implements ITreatVictimsService
 	
 	/** The agent. */
 	@ServiceComponent
-	protected IBDIInternalAccess agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -34,13 +36,17 @@ public class TreatVictimsService implements ITreatVictimsService
 	 */
 	public ITerminableFuture<Void> treatVictims(final ISpaceObject disaster)
 	{
-		final IGoal tv = (IGoal)agent.getGoalbase().createGoal("treat_victims");
+		// Hack, as long as we do not have a specific XML feature interface
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		final RCapability capa = bdif.getCapability();
+		
+		final IGoal tv = (IGoal)capa.getGoalbase().createGoal("treat_victims");
 		
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{
 			public boolean checkTermination(Exception reason)
 			{
-				ISpaceObject myself	= (ISpaceObject)agent.getBeliefbase().getBelief("myself").getFact();
+				ISpaceObject myself	= (ISpaceObject)capa.getBeliefbase().getBelief("myself").getFact();
 				return !((Boolean)myself.getProperty(DeliverPatientTask.PROPERTY_PATIENT)).booleanValue();
 			}
 			
@@ -51,9 +57,28 @@ public class TreatVictimsService implements ITreatVictimsService
 		});
 		
 		tv.getParameter("disaster").setValue(disaster);
-		tv.addGoalListener(new IGoalListener()
+//		tv.addGoalListener(new IGoalListener()
+//		{
+//			public void goalFinished(AgentEvent ae)
+//			{
+//				if(tv.isSucceeded())
+//				{
+//					ret.setResultIfUndone(null);
+//				}
+//				else
+//				{
+//					ret.setExceptionIfUndone(
+//						tv.getException()!=null ? tv.getException() : new RuntimeException("aborted"));
+//				}
+//			}
+//			
+//			public void goalAdded(AgentEvent ae)
+//			{
+//			}
+//		});
+		capa.getGoalbase().dispatchTopLevelGoal(tv).addResultListener(new IResultListener<Object>()
 		{
-			public void goalFinished(AgentEvent ae)
+			public void resultAvailable(Object result)
 			{
 				if(tv.isSucceeded())
 				{
@@ -66,11 +91,11 @@ public class TreatVictimsService implements ITreatVictimsService
 				}
 			}
 			
-			public void goalAdded(AgentEvent ae)
+			public void exceptionOccurred(Exception exception)
 			{
+				ret.setException(exception);
 			}
 		});
-		agent.getGoalbase().dispatchTopLevelGoal(tv);
 		
 		return ret;
 	}

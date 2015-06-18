@@ -1,8 +1,9 @@
 package jadex.bdi.examples.marsworld.movement;
 
-import jadex.bdi.examples.marsworld.carry.O;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -33,18 +34,18 @@ public class MoveToLocationPlan extends Plan
 		IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 		
 		Object rtaskid = space.createObjectTask(RotationTask.PROPERTY_TYPENAME, props, myself.getId());
-		SyncResultListener	res	= new SyncResultListener();
-		space.addTaskListener(rtaskid, myself.getId(), res);
-		res.waitForResult();
+		Future<Void> ret = new Future<Void>();
+		space.addTaskListener(rtaskid, myself.getId(), new DelegationResultListener<Void>(ret));
+		ret.get();
 		
 		Object mtaskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
-		res	= new SyncResultListener();
-		space.addTaskListener(mtaskid, myself.getId(), res);
-		res.waitForResult();
+		ret = new Future<Void>();
+		space.addTaskListener(mtaskid, myself.getId(), new DelegationResultListener<Void>(ret));
+		ret.get();
 	}
 	
-	@Override
-	public void failed() {
+	public void failed() 
+	{
 		super.failed();
 		System.out.println("failed: "+getException());
 		getException().printStackTrace();
