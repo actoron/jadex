@@ -171,6 +171,7 @@ public class Reader extends AReader
 	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, XMLStreamReader parser, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		ReadContextDesktop readcontext = new ReadContextDesktop(tipmanager, handler, parser, StaxXMLReporterWrapper.fromXMLReporter(factory.getXMLReporter()), callcontext, classloader);
+		AReadContext	oldcontext	= READ_CONTEXT.get();
 		READ_CONTEXT.set(readcontext);
 		try
 		{
@@ -218,7 +219,7 @@ public class Reader extends AReader
 		}
 		finally
 		{
-			READ_CONTEXT.set(null);
+			READ_CONTEXT.set(oldcontext);
 			parser.close();
 		}
 

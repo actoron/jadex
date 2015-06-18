@@ -675,6 +675,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					for(String name: names)
 					{
 						// todo: capa scoping?!
+						name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
 						if(mcapa.getMessageEvent(name)==null)
 							throw new RuntimeException("Message event not found: "+name);
 						mtr.addMessageEvent(mcapa.getMessageEvent(name));
@@ -687,6 +688,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					for(String name: names)
 					{
 						// todo: capa scoping?!
+						name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
 						if(mcapa.getInternalEvent(name)==null)
 							throw new RuntimeException("Internal event not found: "+name);
 						mtr.addInternalEvent(mcapa.getInternalEvent(name));
@@ -699,6 +701,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					for(String name: names)
 					{
 						// todo: capa scoping?!
+						name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
 						if(mcapa.getGoal(name)==null)
 							throw new RuntimeException("Goal not found: "+name);
 						mtr.addGoal(mcapa.getGoal(name));
@@ -711,6 +714,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					for(String name: names)
 					{
 						// todo: capa scoping?!
+						name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
 						if(mcapa.getGoal(name)==null)
 							throw new RuntimeException("GoalFinished not found: "+name);
 						mtr.addGoalFinished(mcapa.getGoal(name));
@@ -762,17 +766,20 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factadded")))
 				{
 					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
-					mtrig.addFactAdded((String)object);
+					String	name	= ((String)object).replace(".", MElement.CAPABILITY_SEPARATOR);
+					mtrig.addFactAdded(name);
 				}
 				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factremoved")))
 				{
 					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
-					mtrig.addFactRemoved((String)object);
+					String	name	= ((String)object).replace(".", MElement.CAPABILITY_SEPARATOR);
+					mtrig.addFactRemoved(name);
 				}
 				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factchanged")))
 				{
 					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
-					mtrig.addFactChangeds((String)object);
+					String	name	= ((String)object).replace(".", MElement.CAPABILITY_SEPARATOR);
+					mtrig.addFactChangeds(name);
 				}
 				else
 				{
