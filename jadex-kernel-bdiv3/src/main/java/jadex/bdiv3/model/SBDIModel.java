@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3x.BDIV3XModel;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -47,12 +48,6 @@ public class SBDIModel
 			
 			for(MBelief bel: capa.getCapability().getBeliefs())
 			{
-//				List<String>	events	= new ArrayList<String>();
-//				for(String event: bel.getEvents())
-//				{
-//					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
-//					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
-//				}
 				Set<String> events = convertEvents(name, bel.getBeliefEvents(), bdimodel);
 				
 				MBelief	bel2;
@@ -66,7 +61,12 @@ public class SBDIModel
 					bel2.setSetter(bel.getSetter());
 				}
 				bel2.setName(name+MElement.CAPABILITY_SEPARATOR+bel.getName());
-				
+				bel2.setDefaultFact(bel.getDefaultFact());
+				bel2.setDefaultFacts(bel.getDefaultFacts());
+				bel2.setDescription(bel.getDescription());
+				bel2.setEvaluationMode(bel.getEvaluationMode());
+				bel2.setMulti(bel.isMulti(null));
+				bel2.setClazz(new ClassInfo(bel.getClazz().getType(null)));
 				bdimodel.getCapability().addBelief(bel2);
 			}
 			
@@ -103,6 +103,8 @@ public class SBDIModel
 							MCondition ccond = new MCondition(cond.getName(), convertEventTypes(name, cond.getEvents(), bdimodel));
 							ccond.setConstructorTarget(cond.getConstructorTarget());
 							ccond.setMethodTarget(cond.getMethodTarget());
+							ccond.setExpression(cond.getExpression());
+							ccond.setDescription(cond.getDescription());
 							goal2.addCondition(type, ccond);
 						}
 					}

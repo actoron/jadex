@@ -497,7 +497,7 @@ public class ReflectNode	extends ExpressionNode
 				// Determine class.
 				if(type!=STATIC_FIELD && ref==null)
 				{
-					throw new RuntimeException("Cannot reference nonstatic field of null value: "+this+", "+type_or_value.getValue(fetcher));
+					throw new NullPointerException("Cannot reference nonstatic field of null value: "+this+", "+type_or_value.getValue(fetcher));
 				}
 				else if(clazz==null)
 				{

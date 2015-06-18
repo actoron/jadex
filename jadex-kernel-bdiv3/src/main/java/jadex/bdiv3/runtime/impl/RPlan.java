@@ -18,6 +18,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
@@ -166,9 +167,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				RParameterElement rpe = (RParameterElement)reason;
 				if(svf==null)
 				{
-					svf	= new SimpleValueFetcher(ia.getFetcher());
+					svf	= new SimpleValueFetcher(RBeliefbase.getFetcher(ia, mplan));
+					svf.setValue(rpe instanceof RGoal ? "$goal" : "$event", rpe);
 				}
-				svf.setValue(rpe instanceof RGoal ? "$goal" : "$event", rpe);
 				
 				for(MParameter mparam: mplan.getParameters())
 				{
@@ -202,7 +203,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			}
 		}
 		
-		final RPlan rplan = new RPlan(mplan, candidate, ia, mappingvals, svf!=null ? svf : ia.getFetcher()); //mappingvals==null? new RPlan(mplan, candidate, ia): 
+		final RPlan rplan = new RPlan(mplan, candidate, ia, mappingvals, svf!=null ? svf : RBeliefbase.getFetcher(ia, mplan)); //mappingvals==null? new RPlan(mplan, candidate, ia): 
 //		rplan.setInternalAccess(ia);
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);

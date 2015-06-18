@@ -31,6 +31,7 @@ import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
+import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -156,7 +157,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							{
 								UnparsedExpression	fact	= ibel.getFacts().get(0);	// pojo initial beliefs are @NameValue, thus exactly one fact.
 								MBelief mbel = bdimodel.getCapability().getBelief(ibel.getName());
-								Object val = SJavaParser.parseExpression(fact, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+								Object val = SJavaParser.parseExpression(fact, component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mbel));
 								mbel.setValue(component, val);
 							}
 							catch(RuntimeException e)
@@ -196,7 +197,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						// if not found, try expression
 						else
 						{
-							Object o = SJavaParser.parseExpression(igoal.getName(), component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+							Object o = SJavaParser.parseExpression(igoal.getName(), component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mgoal));
 							if(o instanceof Class)
 							{
 								gcl = (Class<?>)o;
@@ -412,7 +413,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						{
 							// reevaluate the belief on change events
 							Object value = SJavaParser.parseExpression(mbel.getDefaultFact(), 
-								component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+								component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mbel));
 							// save the value
 							mbel.setValue(component, value);
 							// throw change event
@@ -462,7 +463,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										{
 											// reevaluate the belief on change events
 											Object value = SJavaParser.parseExpression(mbel.getDefaultFact(), 
-												component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+												component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mbel));
 											// save the value 
 											// change event is automatically thrown
 											mbel.setValue(component, value);
@@ -536,7 +537,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 												IParameter param = goal.getParameter(mparam.getName());
 												// reevaluate the belief on change events
 												Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-													component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+													component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mgoal));
 												// save the value, automatically throws change event
 												param.setValue(value);
 											}
@@ -545,7 +546,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 												IParameterSet paramset = goal.getParameterSet(mparam.getName());
 												// reevaluate the belief on change events
 												Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-													component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+													component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mgoal));
 												// save the value, automatically throws change event
 												if(SReflect.isIterable(value))
 												{
@@ -594,7 +595,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 															IParameter param = goal.getParameter(mparam.getName());
 															// reevaluate the belief on change events
 															Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-																component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+																component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mgoal));
 															// save the value, automatically throws change event
 															param.setValue(value);
 														}
@@ -808,7 +809,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					else
 					{
 						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-							new EvaluateExpressionCondition(component, cond, null), new IAction<Void>()
+							new EvaluateExpressionCondition(component, cond, mgoal, null), new IAction<Void>()
 						{
 							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 							{
@@ -890,7 +891,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else
 									{
-										if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+										if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
 											if(!goal.isFinished())
 											{
@@ -955,7 +956,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else
 									{
-										if(!evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+										if(!evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
 											goal.setLifecycleState(component, RGoal.GoalLifecycleState.SUSPENDED);
 											goal.setState(RProcessableElement.State.INITIAL);
@@ -1006,7 +1007,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else
 									{
-										if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+										if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
 											goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
 										}
@@ -1075,7 +1076,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								}
 								else
 								{
-									if(!goal.isFinished() && evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+									if(!goal.isFinished() && evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 									{
 										goal.targetConditionTriggered(component, event, rule, context);
 									}
@@ -1136,7 +1137,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else
 									{
-										if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+										if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
 											goal.setTriedPlans(null);
 											goal.setApplicablePlanList(null);
@@ -1197,7 +1198,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else // xml expression
 									{
-										if(!evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+										if(!evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
 											goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 										}
@@ -1244,7 +1245,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else // xml expression
 									{
-										if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+										if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
 											goal.targetConditionTriggered(component, event, rule, context);
 										}
@@ -1334,7 +1335,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 						{
 							UnparsedExpression uexp = mcond.getExpression();
-							Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+							Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mplan));
 							return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 						}
 					}, createplan);
@@ -1693,21 +1694,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	 *  Evaluate the condition.
 	 *  @return
 	 */
-	public static boolean evaluateCondition(IInternalAccess agent, MCondition cond, Map<String, Object> vals)
+	public static boolean evaluateCondition(IInternalAccess agent, MCondition cond, MElement owner, Map<String, Object> vals)
 	{
 		boolean ret = false;
 		
 		UnparsedExpression uexp = cond.getExpression();
 		if(uexp.getParsed()==null)
 			SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader());
-		SimpleValueFetcher fet = new SimpleValueFetcher(agent.getFetcher());
-		if(vals!=null)
-		{
-			for(Map.Entry<String, Object> entry: vals.entrySet())
-			{
-				fet.setValue(entry.getKey(), entry.getValue());
-			}
-		}
+		SimpleValueFetcher fet = new SimpleValueFetcher(RBeliefbase.getFetcher(agent, owner, vals));
 		Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
 		if(res instanceof Boolean)
 		{
@@ -1727,20 +1721,22 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	public static class EvaluateExpressionCondition implements ICondition
 	{
 		protected MCondition cond;
+		protected MElement owner;
 		protected IInternalAccess agent;
 		protected Map<String, Object> vals;
 		
-		public EvaluateExpressionCondition(IInternalAccess agent, MCondition cond, Map<String, Object> vals)
+		public EvaluateExpressionCondition(IInternalAccess agent, MCondition cond, MElement owner, Map<String, Object> vals)
 		{
 			this.agent = agent;
 			this.cond = cond;
+			this.owner = owner;
 			this.vals = vals;
 		}
 		
 		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 		{
 //			vals.put("$event", event);
-			boolean res = evaluateCondition(agent, cond, vals);
+			boolean res = evaluateCondition(agent, cond, owner, vals);
 			return new Future<Tuple2<Boolean,Object>>(res? ICondition.TRUE: ICondition.FALSE);
 		}
 	}

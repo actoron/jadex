@@ -27,6 +27,9 @@
 			<fact>20000L</fact>
 		</belief>
 
+		<!-- The testcase reports. -->
+		<beliefset name="reports" class="TestReport" exported="true"/>
+		
 		<!-- The results have to be published by the agent. -->
 		<belief name="testresults" class="Testcase" exported="true" evaluationmode="pull">
 			<fact>new Testcase($beliefbase.testcase_cnt, $beliefbase.reports)</fact>
@@ -50,9 +53,6 @@
 				&amp;&amp; ((Number)$beliefbase.getBelief("testcase_cnt").getFact()).intValue()
 					!=$beliefbase.getBeliefSet("reports").getFacts().length</fact>
 		</belief>
-
-		<!-- The testcase reports. -->
-		<beliefset name="reports" class="TestReport" exported="true"/>
 	</beliefs>
 
 	<goals>

@@ -2,8 +2,8 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MParameter;
-import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
+import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
@@ -21,7 +21,6 @@ import jadex.javaparser.SJavaParser;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -240,6 +239,9 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		/** The publisher. */
 		protected EventPublisher publisher;
 		
+		/** The fetcher. */
+		protected IValueFetcher fetcher;
+		
 		/**
 		 *  Create a new parameter.
 		 *  @param modelelement The model element.
@@ -250,6 +252,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 			super(modelelement, agent);
 			this.name = name!=null? name: modelelement.getName();
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), (MParameter)getModelElement());
+			this.fetcher	= fetcher;
 			if(modelelement!=null)
 				setValue(modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher));
 		}
@@ -301,7 +304,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 			if(uexp!=null && MParameter.EvaluationMode.PULL.equals(eva))
 			{
 				ret = SJavaParser.parseExpression(((MBelief)getModelElement()).getDefaultFact(), 
-					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(fetcher);
 			}
 			return ret;
 		}

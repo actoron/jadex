@@ -6,6 +6,7 @@ import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MConfigBeliefElement;
 import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
@@ -15,10 +16,12 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.RuleSystem;
@@ -40,6 +43,12 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	
 	/** The belief sets. */
 	protected Map<String, IBeliefSet> beliefsets;
+	
+	/** The local belief names (cached on first access). */
+	protected String[]	names;
+	
+	/** The local belief set names (cached on first access). */
+	protected String[]	setnames;
 	
 	/**
 	 *  Create a new beliefbase.
@@ -103,13 +112,13 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 								List<Object>	inivals	= new ArrayList<Object>();
 								for(UnparsedExpression upex: inibel.getFacts())
 								{
-									inivals.add(SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher()));
+									inivals.add(SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getFetcher(getAgent(), inibel)));
 								}
 								inival	= inivals;
 							}
 							else if(!inibel.getFacts().isEmpty())
 							{
-								inival	= SJavaParser.parseExpression(inibel.getFacts().get(0), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());								
+								inival	= SJavaParser.parseExpression(inibel.getFacts().get(0), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getFetcher(getAgent(), inibel));								
 							}
 							hasinival	= true;
 						}
@@ -204,7 +213,20 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public String[] getBeliefNames()
 	{
-		return beliefs==null? SUtil.EMPTY_STRING_ARRAY: beliefs.keySet().toArray(new String[beliefs.size()]);
+		if(names==null && beliefs!=null)
+		{
+			List<String>	lnames	= new ArrayList<String>();
+			for(String name: beliefs.keySet())
+			{
+				if(name.indexOf(MElement.CAPABILITY_SEPARATOR)==-1)
+				{
+					lnames.add(name);
+				}
+			}
+			names	= lnames.toArray(new String[lnames.size()]);
+		}
+		
+		return names;
 	}
 
 	/**
@@ -213,7 +235,20 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public String[] getBeliefSetNames()
 	{
-		return beliefsets==null? SUtil.EMPTY_STRING_ARRAY: beliefsets.keySet().toArray(new String[beliefsets.size()]);
+		if(setnames==null && beliefsets!=null)
+		{
+			List<String>	lnames	= new ArrayList<String>();
+			for(String name: beliefsets.keySet())
+			{
+				if(name.indexOf(MElement.CAPABILITY_SEPARATOR)==-1)
+				{
+					lnames.add(name);
+				}
+			}
+			setnames	= lnames.toArray(new String[lnames.size()]);
+		}
+		
+		return setnames;
 	}
 
 	/**
@@ -365,7 +400,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			String name = getModelElement().getName();
 			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
 			if(modelelement.getDefaultFact()!=null)
-				setFact(SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
+				setFact(SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(getFetcher(getAgent(), getModelElement())));
 		}
 		
 		/**
@@ -419,7 +454,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			if(((MBelief)getModelElement()).getDefaultFact()!=null && MParameter.EvaluationMode.PULL.equals(((MBelief)getModelElement()).getEvaluationMode()))
 			{
 				ret = SJavaParser.parseExpression(((MBelief)getModelElement()).getDefaultFact(), 
-					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getFetcher(getAgent(), getModelElement()));
 			}
 			return ret;
 		}
@@ -519,7 +554,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			List<Object> tmpfacts = new ArrayList<Object>();
 			if(mbel.getDefaultFact()!=null)
 			{
-				Object tmp = SJavaParser.parseExpression(mbel.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+				Object tmp = SJavaParser.parseExpression(mbel.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(getFetcher(getAgent(), getModelElement()));
 				Iterator<?>	it	= SReflect.getIterator(tmp);
 				while(it.hasNext())
 				{
@@ -532,7 +567,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				{
 					for(UnparsedExpression uexp: mbel.getDefaultFacts())
 					{
-						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(getFetcher(getAgent(), getModelElement()));
 						tmpfacts.add(fact);
 					}
 				}
@@ -633,7 +668,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			ret = type!=null? ret = Array.newInstance(SReflect.getWrappedType(type), size): new Object[size];
 			
 			if(facts!=null)
+			{
 				System.arraycopy(facts.toArray(new Object[facts.size()]), 0, ret, 0, facts.size());
+			}
 			
 			return (Object[])ret;
 		}
@@ -709,6 +746,188 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			// In case of push the last saved/evaluated value is returned
 			return MParameter.EvaluationMode.PULL.equals(((MBelief)getModelElement()).getEvaluationMode())? evaluateValues(): facts;
+		}
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get the capability-specific fetcher for an element.
+	 */
+	public static IValueFetcher	getFetcher(final IInternalAccess agent, MElement element)
+	{
+		return getFetcher(agent, element, null);
+	}
+	
+	/**
+	 *  Get the capability-specific fetcher for an element.
+	 *  Also creates a new fetcher, if values are given.
+	 */
+	// Todo: move somewhere else?
+	public static IValueFetcher	getFetcher(final IInternalAccess agent, MElement element, Map<String, Object> values)
+	{
+		IValueFetcher	ret	= agent.getFetcher();
+		
+		if(element!=null && element.getCapabilityName()!=null)	// Todo: some RElements have no MElement (e.g. expression)
+		{
+			final RBeliefbase	beliefbase	= ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getBeliefbase();
+			final String	prefix	= element.getCapabilityName()+MElement.CAPABILITY_SEPARATOR;
+			SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ret);
+			fetcher.setValue("$beliefbase", new BeliefbaseWrapper(beliefbase, prefix));
+			if(values!=null)
+			{
+				fetcher.setValues(values);
+			}
+			ret	= fetcher;
+		}
+		else if(values!=null && !values.isEmpty())
+		{
+			SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ret);
+			fetcher.setValues(values);
+			ret	= fetcher;			
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Prepend capability prefix to belief names.
+	 */
+	public static class BeliefbaseWrapper implements IMapAccess
+	{
+		//-------- attributes --------
+		
+		/** The flat belief base. */
+		protected RBeliefbase	beliefbase;
+		
+		/** The full capability prefix. */
+		protected String	prefix;
+		
+		/** The local belief names (cached on first access). */
+		protected String[]	names;
+		
+		/** The local belief set names (cached on first access). */
+		protected String[]	setnames;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a belief base wrapper.
+		 */
+		public BeliefbaseWrapper(RBeliefbase beliefbase, String prefix)
+		{
+			this.beliefbase	= beliefbase;
+			this.prefix	= prefix;
+		}
+		
+		//-------- IMapAccess methods --------
+		
+		/**
+		 *  Get an object from the map.
+		 *  @param name The name
+		 *  @return The value.
+		 */
+		public Object get(Object name)
+		{
+			return beliefbase.get(prefix+name);
+		}
+		
+		//-------- IBeliefbase methods --------
+		
+	   /**
+		 *  Get a belief for a name.
+		 *  @param name	The belief name.
+		 */
+		public IBelief getBelief(String name)
+		{
+			return beliefbase.getBelief(prefix+name);
+		}
+
+		/**
+		 *  Get a belief set for a name.
+		 *  @param name	The belief set name.
+		 */
+		public IBeliefSet getBeliefSet(String name)
+		{
+			return beliefbase.getBeliefSet(prefix+name);
+		}
+
+		/**
+		 *  Returns <tt>true</tt> if this beliefbase contains a belief with the
+		 *  specified name.
+		 *  @param name the name of a belief.
+		 *  @return <code>true</code> if contained, <code>false</code> is not contained, or
+		 *          the specified name refer to a belief set.
+		 *  @see #containsBeliefSet(java.lang.String)
+		 */
+		public boolean containsBelief(String name)
+		{
+			return beliefbase.containsBelief(prefix+name);
+		}
+
+		/**
+		 *  Returns <tt>true</tt> if this beliefbase contains a belief set with the
+		 *  specified name.
+		 *  @param name the name of a belief set.
+		 *  @return <code>true</code> if contained, <code>false</code> is not contained, or
+		 *          the specified name refer to a belief.
+		 *  @see #containsBelief(java.lang.String)
+		 */
+		public boolean containsBeliefSet(String name)
+		{
+			return beliefbase.containsBeliefSet(prefix+name);
+		}
+
+		/**
+		 *  Returns the names of all beliefs.
+		 *  @return the names of all beliefs.
+		 */
+		public String[] getBeliefNames()
+		{
+			if(names==null && beliefbase.beliefs!=null)
+			{
+				List<String>	lnames	= new ArrayList<String>();
+				for(String name: beliefbase.beliefs.keySet())
+				{
+					if(name.startsWith(prefix))
+					{
+						name	= name.substring(prefix.length());
+						if(name.indexOf(MElement.CAPABILITY_SEPARATOR)==-1)
+						{
+							lnames.add(name);
+						}
+					}
+				}
+				names	= lnames.toArray(new String[lnames.size()]);
+			}
+			
+			return names;
+		}
+
+		/**
+		 *  Returns the names of all belief sets.
+		 *  @return the names of all belief sets.
+		 */
+		public String[] getBeliefSetNames()
+		{
+			if(setnames==null && beliefbase.beliefsets!=null)
+			{
+				List<String>	lnames	= new ArrayList<String>();
+				for(String name: beliefbase.beliefsets.keySet())
+				{
+					if(name.startsWith(prefix))
+					{
+						name	= name.substring(prefix.length());
+						if(name.indexOf(MElement.CAPABILITY_SEPARATOR)==-1)
+						{
+							lnames.add(name);
+						}
+					}
+				}
+				setnames	= lnames.toArray(new String[lnames.size()]);
+			}
+			
+			return setnames;
 		}
 	}
 }

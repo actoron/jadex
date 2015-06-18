@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -609,7 +610,7 @@ public class MParameter extends MElement
 	{
 		long ret = -1;
 		if(updaterate!=null)
-			ret = ((Long)SJavaParser.parseExpression(updaterate, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher())).longValue();
+			ret = ((Long)SJavaParser.parseExpression(updaterate, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(RBeliefbase.getFetcher(agent, this))).longValue();
 		return ret;
 	}
 	
