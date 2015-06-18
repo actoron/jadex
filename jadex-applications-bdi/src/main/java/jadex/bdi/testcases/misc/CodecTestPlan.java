@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 

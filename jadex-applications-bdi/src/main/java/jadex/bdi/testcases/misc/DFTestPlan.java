@@ -1,22 +1,21 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IEvent;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
+import jadex.rules.eca.IEvent;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -40,7 +39,7 @@ public class DFTestPlan extends Plan
 		
 		// Todo: support remote DF agent!?
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(
-			getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_COMPONENT, getComponentIdentifier(), null);
 		IComponentIdentifier da = new BasicComponentIdentifier(SFipa.DF_COMPONENT, getComponentIdentifier());
 		performTests(num, da); // test remotely
@@ -51,14 +50,14 @@ public class DFTestPlan extends Plan
 	 */
 	public int	performInitialTests(int num)
 	{
-		IDFComponentDescription desc = ((IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		IDFComponentDescription desc = ((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 
@@ -122,21 +121,21 @@ public class DFTestPlan extends Plan
 	 */
 	public int performTests(int num, IComponentIdentifier df)
 	{
-		IDFComponentDescription desc = ((IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		IDFComponentDescription desc = ((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 		
 		long olt = getTime()+2000;
 //		desc_clone.setLeaseTime(new Date(olt));
 		
-		IDF dfservice = (IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IDF dfservice = (IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		// Hack! does not clone services
 		IDFComponentDescription desc_clone = dfservice.createDFComponentDescription(desc.getName(), desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), new Date(olt));
 

@@ -1,9 +1,9 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IInternalEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 
 /**

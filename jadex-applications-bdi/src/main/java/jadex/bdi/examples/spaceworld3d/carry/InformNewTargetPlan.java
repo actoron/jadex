@@ -1,14 +1,12 @@
 package jadex.bdi.examples.spaceworld3d.carry;
 
-import jadex.bdi.runtime.IChangeEvent;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.application.EnvironmentService;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
-import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**

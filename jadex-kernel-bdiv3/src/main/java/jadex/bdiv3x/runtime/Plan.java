@@ -126,11 +126,20 @@ public abstract class Plan
 	 */
 	public void	dispatchSubgoalAndWait(IGoal goal)
 	{
+		dispatchSubgoalAndWait(goal, -1);
+	}
+	
+	/**
+	 *  Dispatch a new top-level goal.
+	 *  @param goal The new goal.
+	 */
+	public void	dispatchSubgoalAndWait(IGoal goal, long timeout)
+	{
 		dispatchSubgoal(goal);
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
-		ret.get();
+		ret.get(timeout);
 	}
 	
 	/**
@@ -139,10 +148,19 @@ public abstract class Plan
 	 */
 	public void waitForGoal(IGoal goal)
 	{
+		waitForGoal(goal, -1);
+	}
+	
+	/**
+	 *  Wait for a goal to be finished.
+	 *  @param goal The goal.
+	 */
+	public void waitForGoal(IGoal goal, long timeout)
+	{
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
-		ret.get();
+		ret.get(timeout);
 	}
 	
 	/**
@@ -811,6 +829,15 @@ public abstract class Plan
 		});
 		rule.setEvents(mcond.getEvents());
 		bdif.getRuleSystem().getRulebase().addRule(rule);
+		ret.get();
+	}
+	
+	/**
+	 *  Wait for ever (is aborted on goal success/failure).
+	 */
+	public void waitForEver()
+	{
+		Future<Void> ret = new Future<Void>();
 		ret.get();
 	}
 	 

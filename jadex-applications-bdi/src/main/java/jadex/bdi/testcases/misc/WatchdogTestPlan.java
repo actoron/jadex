@@ -1,13 +1,11 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.planlib.watchdog.ContactData;
-import jadex.bdi.planlib.watchdog.ObservationDescription;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.TimeoutException;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.concurrent.TimeoutException;
 
 import java.util.List;
 import java.util.Map;

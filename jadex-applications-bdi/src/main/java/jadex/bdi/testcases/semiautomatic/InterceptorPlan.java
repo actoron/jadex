@@ -63,7 +63,7 @@ public class InterceptorPlan extends Plan
 	{
 		try
 		{
-			IPrintHelloService ps = (IPrintHelloService)getInterpreter().getComponentFeature(IProvidedServicesFeature.class).getProvidedService("printservice");
+			IPrintHelloService ps = (IPrintHelloService)getAgent().getComponentFeature(IProvidedServicesFeature.class).getProvidedService("printservice");
 			ps.printHello().get();
 		}
 		catch(Exception e)
