@@ -16,7 +16,7 @@ public class Test
 	public static void main(String[] args)
 	{
 		IFuture<String> f = $(getHello(), x -> getWorld(x));
-//		IFuture<String> f = bind(getHello(), Test::getWorld);
+//		IFuture<String> f = $(getHello(), Test::getWorld);
 //		IFuture<String> f = getHello().$(x -> getWorld(x));
 		
 		System.out.println("result is: "+$(f));
