@@ -309,7 +309,21 @@ public class EmailAccount
 	{
 		try 
 		{
-			InputStream	is	= new FileInputStream(filename);
+			readAccount(new FileInputStream(filename));
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Read account data from property file.
+	 */
+	public void readAccount(InputStream	is)
+	{
+		try 
+		{
 			Properties ps = new Properties();
 		    ps.load(is);
 		    is.close();
