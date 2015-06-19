@@ -26,7 +26,7 @@ public class MElement
 	 */
 	public MElement(String name)
 	{
-		this.name = name;
+		setName(name);
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class MElement
 	 */
 	public void setName(String name)
 	{
-		this.name = name;
+		this.name = name!=null ? name.replace(".", CAPABILITY_SEPARATOR) : null;	// Fix XML names on load.
 	}
 	
 	/**
