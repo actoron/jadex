@@ -1,6 +1,6 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3x.BDIV3XModel;
+import jadex.bdiv3x.BDIXModel;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -81,7 +81,7 @@ public class SBDIModel
 			{
 				for(String target: capa.getBeliefMappings().keySet())
 				{
-					((BDIV3XModel)bdimodel).addBeliefMapping(name+MElement.CAPABILITY_SEPARATOR+target, name+MElement.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
+					((BDIXModel)bdimodel).addBeliefMapping(name+MElement.CAPABILITY_SEPARATOR+target, name+MElement.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
 				}
 			}
 			

@@ -5,6 +5,7 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MPlan;
@@ -188,7 +189,7 @@ public class ClassPlanBody extends AbstractPlanBody
 
 						// Pojo specific code.
 						Object pojocapa	= capaname!=null
-							? (ia.getComponentFeature0(IBDIAgentFeature.class) instanceof BDIAgentFeature ? ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname) : null)
+							? (ia.getComponentFeature0(IInternalBDIAgentFeature.class) instanceof BDIAgentFeature ? ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname) : null)
 							: (ia.getComponentFeature0(IPojoComponentFeature.class)!=null ? ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent() : null);
 
 						

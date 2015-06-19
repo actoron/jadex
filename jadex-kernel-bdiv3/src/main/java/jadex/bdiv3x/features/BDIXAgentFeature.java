@@ -1,7 +1,6 @@
 package jadex.bdiv3x.features;
 
 import jadex.bdiv3.annotation.RawEvent;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
@@ -12,9 +11,7 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
-import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
 import jadex.bdiv3.runtime.impl.CapabilityWrapper;
@@ -29,10 +26,15 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
+import jadex.bdiv3x.runtime.IBeliefbase;
+import jadex.bdiv3x.runtime.IExpressionbase;
+import jadex.bdiv3x.runtime.IGoalbase;
 import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.REventbase;
 import jadex.bdiv3x.runtime.RExpressionbase;
 import jadex.bdiv3x.runtime.RGoalbase;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -42,13 +44,19 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -56,9 +64,9 @@ import jadex.commons.SUtil;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
@@ -79,15 +87,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
- * 
+ *  BDI agent feature version for XML agents.
  */
-public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature, IInternalBDIAgentFeature
+public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXAgentFeature, IInternalBDIAgentFeature
 {
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIAgentFeature.class, BDIAgentFeature.class, 
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIXAgentFeature.class, BDIXAgentFeature.class,  
 //		new Class[]{IMicroLifecycleFeature.class}, null);
-		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class});
+		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class}, new Class<?>[]{IInternalBDIAgentFeature.class});
 	
 	/** The bdi model. */
 	protected IBDIModel bdimodel;
@@ -110,7 +119,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Factory method constructor for instance level.
 	 */
-	public BDIAgentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	public BDIXAgentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 		
@@ -217,9 +226,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			System.out.println("createEv: "+val+" "+agent+" "+belname);
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		
-		MBelief mbel = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getBelief(belname);
+		MBelief mbel = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIXAgentFeature.class)).getBDIModel().getCapability().getBelief(belname);
 		
-		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIXAgentFeature.class)).getRuleSystem();
 		rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, oldval, info)));
 		
 		publishToolBeliefEvent(agent, mbel);
@@ -785,138 +794,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 		
 	/**
-	 *  Get the goals of a given type as pojos.
-	 *  @param clazz The pojo goal class.
-	 *  @return The currently instantiated goals of that type.
-	 */
-	public <T> Collection<T> getGoals(Class<T> clazz)
-	{
-		Collection<RGoal>	rgoals	= getCapability().getGoals(clazz);
-		List<T>	ret	= new ArrayList<T>();
-		for(RProcessableElement rgoal: rgoals)
-		{
-			ret.add((T)rgoal.getPojoElement());
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Get the current goals as api representation.
-	 *  @return All currently instantiated goals.
-	 */
-	public Collection<IGoal> getGoals()
-	{
-		return (Collection)getCapability().getGoals();
-	}
-	
-	/**
-	 *  Get the goal api representation for a pojo goal.
-	 *  @param goal The pojo goal.
-	 *  @return The api goal.
-	 */
-	public IGoal getGoal(Object goal)
-	{
-		return getCapability().getRGoal(goal);
-	}
-
-	/**
-	 *  Dispatch a pojo goal wait for its result.
-	 *  @param goal The pojo goal.
-	 *  @return The goal result.
-	 */
-	public <T, E> IFuture<E> dispatchTopLevelGoal(final T goal)
-	{
-		final Future<E> ret = new Future<E>();
-		
-		final RGoal rgoal;
-		MGoal mgoal;
-		if(goal instanceof RGoal)
-		{
-			rgoal = (RGoal)goal;
-			mgoal = rgoal.getMGoal();
-		}
-		else
-		{
-			mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
-			if(mgoal==null)
-				throw new RuntimeException("Unknown goal type: "+goal);
-			rgoal = new RGoal(getComponent(), mgoal, goal, null);
-		}
-		rgoal.addListener(new ExceptionDelegationResultListener<Void, E>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				Object res = RGoal.getGoalResult(rgoal, ((ModelInfo)bdimodel).getClassLoader());
-//				Object res = RGoal.getGoalResult(goal, mgoal, ((ModelInfo)bdimodel).getClassLoader());
-				ret.setResult((E)res);
-			}
-		});
-
-//		System.out.println("adopt goal");
-		RGoal.adoptGoal(rgoal, getComponent());
-		
-		return ret;
-	}
-	
-	/**
-	 *  Drop a pojo goal.
-	 *  @param goal The pojo goal.
-	 */
-	public void dropGoal(Object goal)
-	{
-		for(RGoal rgoal: getCapability().getGoals(goal.getClass()))
-		{
-			if(goal.equals(rgoal.getPojoElement()))
-			{
-				rgoal.drop();
-			}
-		}
-	}
-
-	/**
-	 *  Dispatch a pojo plan and wait for its result.
-	 *  @param plan The pojo plan or plan name.
-	 *  @return The plan result.
-	 */
-	public <T, E> IFuture<E> adoptPlan(T plan)
-	{
-		return adoptPlan(plan, null);
-	}
-	
-	/**
-	 *  Dispatch a goal wait for its result.
-	 *  @param plan The pojo plan or plan name.
-	 *  @param args The plan arguments.
-	 *  @return The plan result.
-	 */
-	public <T, E> IFuture<E> adoptPlan(T plan, Object[] args)
-	{
-		final Future<E> ret = new Future<E>();
-		MPlan mplan = bdimodel.getCapability().getPlan(plan instanceof String? (String)plan: plan.getClass().getName());
-		if(mplan==null)
-			throw new RuntimeException("Plan model not found for: "+plan);
-		
-		final RPlan rplan = RPlan.createRPlan(mplan, plan, null, getComponent(), null);
-		rplan.addPlanListener(new IPlanListener<E>()
-		{
-			public void planFinished(E result)
-			{
-				if(rplan.getException()!=null)
-				{
-					ret.setException(rplan.getException());
-				}
-				else
-				{
-					ret.setResult(result);
-				}
-			}
-		});
-		rplan.setReason(new ChangeEvent(null, null, args, null));
-		RPlan.executePlan(rplan, getComponent());
-		return ret;
-	}
-	
-	/**
 	 *  Add a belief listener.
 	 *  @param name The belief name.
 	 *  @param listener The belief listener.
@@ -1057,7 +934,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				capaname = melement.getName().substring(0, idx);
 			}
 		}
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)component.getComponentFeature(IBDIXAgentFeature.class);
 		Object capa = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(); // todo
 //		Object capa = capaname!=null ? bdif.getCapabilityObject(capaname): component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 //			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
@@ -1371,7 +1248,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
 		
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		MBelief mbel = ((MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
+		MBelief mbel = ((MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIXAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
 		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
 		{
 			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
@@ -1673,9 +1550,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Get the feature from the agent.
 	 */
-	public static IBDIAgentFeature	getBDIAgentFeature(IInternalAccess agent)
+	public static IBDIXAgentFeature	getBDIAgentFeature(IInternalAccess agent)
 	{
-		return agent.getComponentFeature(IBDIAgentFeature.class);
+		return agent.getComponentFeature(IBDIXAgentFeature.class);
 	}
 	
 	/**
@@ -1725,4 +1602,148 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		throw new UnsupportedOperationException();
 //		return eventadders;
 	}
+	
+	// ICapability interface
+	
+	/**
+	 *  Get the scope.
+	 *  Method with IExternalAccess return value included
+	 *  for compatibility with IInternalAccess. 
+	 *  @return The scope.
+	 */
+	public IExternalAccess getExternalAccess()
+	{
+		return getComponent().getExternalAccess();
+	}
+
+	/**
+	 *  Get the belief base.
+	 *  @return The belief base.
+	 */
+	public IBeliefbase getBeliefbase()
+	{
+		return capa.getBeliefbase();
+	}
+
+	/**
+	 *  Get the goal base.
+	 *  @return The goal base.
+	 */
+	public IGoalbase getGoalbase()
+	{
+		return capa.getGoalbase();
+	}
+
+	/**
+	 * Get the expression base.
+	 * @return The expression base.
+	 */
+	public IExpressionbase getExpressionbase()
+	{
+		return capa.getExpressionbase();
+	}
+
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger()
+	{
+		return getComponent().getLogger();
+	}
+
+	/**
+	 * Get the agent model.
+	 * @return The agent model.
+	 */
+	public IModelInfo getAgentModel()
+	{
+		return getComponent().getModel();
+	}
+
+	/**
+	 * Get the capability model.
+	 * @return The capability model.
+	 */
+	public IModelInfo getModel()
+	{
+		return getComponent().getModel();
+	}
+
+	/**
+	 * Get the agent name.
+	 * @return The agent name.
+	 */
+	public String getAgentName()
+	{
+		return getComponent().getComponentIdentifier().getLocalName();
+	}
+
+	/**
+	 * Get the configuration name.
+	 * @return The configuration name.
+	 */
+	public String getConfigurationName()
+	{
+		return getComponent().getConfiguration();
+	}
+
+	/**
+	 * Get the agent identifier.
+	 * @return The agent identifier.
+	 */
+	public IComponentIdentifier	getComponentIdentifier()
+	{
+		return getComponent().getComponentIdentifier();
+	}
+
+	/**
+	 * Get the component description.
+	 * @return The component description.
+	 */
+	public IComponentDescription	getComponentDescription()
+	{
+		return getComponent().getComponentDescription();
+	}
+
+	/**
+	 *  Get the current time.
+	 *  The time unit depends on the currently running clock implementation.
+	 *  For the default system clock, the time value adheres to the time
+	 *  representation as used by {@link System#currentTimeMillis()}, i.e.,
+	 *  the value of milliseconds passed since 0:00 'o clock, January 1st, 1970, UTC.
+	 *  For custom simulation clocks, arbitrary representations can be used.
+	 *  @return The current time.
+	 */
+	public long getTime()
+	{
+		return SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+	}
+
+	/**
+	 *  Get the classloader.
+	 *  @return The classloader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return getComponent().getClassLoader();
+	}
+	
+	/**
+	 *  Kill the agent.
+	 */
+	public IFuture<Map<String, Object>> killAgent()
+	{
+		return getComponent().killComponent();
+	}
+	
+	/**
+	 *  Subscribe to monitoring events.
+	 *  @param filter An optional filter.
+	 */
+//	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm)
+	{
+		return getComponent().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
+	}	
 }

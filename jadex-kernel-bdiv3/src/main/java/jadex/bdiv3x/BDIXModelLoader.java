@@ -10,7 +10,7 @@ import jadex.kernelbase.CacheableKernelModel;
 /**
  *  Loader for application files.
  */
-public class BDIV3XModelLoader extends AbstractModelLoader
+public class BDIXModelLoader extends AbstractModelLoader
 {
 	//-------- constants --------
 	
@@ -23,17 +23,17 @@ public class BDIV3XModelLoader extends AbstractModelLoader
 	//-------- attributes --------
 	
 	/** The xml reader. */
-	protected BDIV3XMLReader reader;
+	protected BDIXMLReader reader;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new BPMN model loader.
 	 */
-	public  BDIV3XModelLoader()
+	public  BDIXModelLoader()
 	{
 		super(new String[]{FILE_EXTENSION_AGENT, FILE_EXTENSION_CAPABILITY});
-		this.reader = new BDIV3XMLReader(this);
+		this.reader = new BDIXMLReader(this);
 	}
 
 	//-------- methods --------

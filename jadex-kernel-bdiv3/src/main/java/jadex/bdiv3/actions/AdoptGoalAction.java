@@ -3,7 +3,6 @@ package jadex.bdiv3.actions;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.annotation.GoalParent;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
@@ -113,7 +112,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 				}
 			}
 			
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().addGoal(goal);
+			ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().addGoal(goal);
 			goal.setLifecycleState(ia, RGoal.GoalLifecycleState.ADOPTED);
 			ret.setResult(null);
 		}

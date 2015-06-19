@@ -1,7 +1,6 @@
 package jadex.bdiv3.features.impl;
 
 import jadex.bdiv3.actions.ExecutePlanStepAction;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -32,7 +31,7 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 		
 		// Evaluate conditions in addition to executing steps.
 		boolean	again = false;
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = getComponent().getComponentFeature(IInternalBDIAgentFeature.class);
 		boolean inited = ((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited();
 		if(inited && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable())
 		{

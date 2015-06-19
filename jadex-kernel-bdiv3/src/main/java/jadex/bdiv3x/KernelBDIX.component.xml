@@ -6,7 +6,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-component-2.5.xsd"
-	name="KernelBDIV3X" package="jadex.bdiv3x">
+	name="KernelBDIX" package="jadex.bdiv3x">
 	
 	<imports>
 		<import>jadex.bridge.service.types.factory.*</import>
@@ -21,7 +21,7 @@
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation>
-				new BDIV3XComponentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{"debugger.panels"},new Object[]{"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel"}))
+				new BDIXComponentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{"debugger.panels"},new Object[]{"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel"}))
 			</implementation>
 		</providedservice>
 	</services>

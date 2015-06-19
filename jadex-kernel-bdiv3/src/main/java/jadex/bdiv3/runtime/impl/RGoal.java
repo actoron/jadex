@@ -3,7 +3,6 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
@@ -305,13 +304,13 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		{
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("activating: "+this);
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALINPROCESS, getMGoal().getName()}), this));
+			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALINPROCESS, getMGoal().getName()}), this));
 			publishToolGoalEvent(ChangeEvent.GOALINPROCESS);
 			setState(ia, RProcessableElement.State.UNPROCESSED);
 		}
 		else
 		{
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALNOTINPROCESS, getMGoal().getName()}), this));
+			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALNOTINPROCESS, getMGoal().getName()}), this));
 		}
 		
 		if(GoalProcessingState.SUCCEEDED.equals(processingstate)
@@ -372,12 +371,12 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		
 		if(GoalLifecycleState.ADOPTED.equals(lifecyclestate))
 		{
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALADOPTED, getMGoal().getName()}), this));
+			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALADOPTED, getMGoal().getName()}), this));
 			setLifecycleState(ia, GoalLifecycleState.OPTION);
 		}
 		else if(GoalLifecycleState.ACTIVE.equals(lifecyclestate))
 		{
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALACTIVE, getMGoal().getName()}), this));
+			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALACTIVE, getMGoal().getName()}), this));
 
 			// start means-end reasoning
 			if(onActivate())
@@ -396,7 +395,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //				System.out.println("option: "+ChangeEvent.GOALOPTION+"."+getId());
 			abortPlans();
 			setProcessingState(ia, GoalProcessingState.IDLE);
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALOPTION, getMGoal().getName()}), this));
+			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALOPTION, getMGoal().getName()}), this));
 		}
 		else if(GoalLifecycleState.SUSPENDED.equals(lifecyclestate))
 		{
@@ -406,7 +405,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			
 			abortPlans();
 			setProcessingState(ia, GoalProcessingState.IDLE);
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALSUSPENDED, getMGoal().getName()}), this));
+			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALSUSPENDED, getMGoal().getName()}), this));
 		}
 		
 		if(GoalLifecycleState.DROPPING.equals(lifecyclestate))
@@ -427,7 +426,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		}
 		else if(GoalLifecycleState.DROPPED.equals(lifecyclestate))
 		{
-			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALDROPPED, getMGoal().getName()}), this));
+			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALDROPPED, getMGoal().getName()}), this));
 
 			if(getListeners()!=null)
 			{
@@ -828,12 +827,12 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			// AND case
 			else
 			{
-				MCapability mcapa = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability();
+				MCapability mcapa = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IInternalBDIAgentFeature.class)).getBDIModel().getCapability();
 				
 				String capaname = getMGoal().getCapabilityName();
 				if(capaname!=null)
 				{
-					mcapa = ((BDIModel)((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class)).getBDIModel()).getCapability(capaname);
+					mcapa = ((BDIModel)((IInternalBDIAgentFeature)getAgent().getComponentFeature(IInternalBDIAgentFeature.class)).getBDIModel()).getCapability(capaname);
 				}
 				
 				// No further candidate? Then is considered as succeeded

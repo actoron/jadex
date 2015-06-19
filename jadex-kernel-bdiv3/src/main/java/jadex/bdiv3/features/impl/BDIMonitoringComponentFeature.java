@@ -1,6 +1,5 @@
 package jadex.bdiv3.features.impl;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
@@ -56,7 +55,7 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		}
 		
 		// Goals of this capability.
-		Collection<RGoal> goals = ((IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapability().getGoals();
+		Collection<RGoal> goals = getComponent().getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getGoals();
 		if(goals!=null)
 		{
 			for(RGoal goal: goals)
@@ -70,7 +69,7 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		}
 		
 		// Plans of this capability.
-		Collection<RPlan> plans	= ((IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapability().getPlans();
+		Collection<RPlan> plans	= getComponent().getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getPlans();
 		if(plans!=null)
 		{
 			for(RPlan plan: plans)

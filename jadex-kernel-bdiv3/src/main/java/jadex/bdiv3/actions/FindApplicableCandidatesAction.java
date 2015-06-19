@@ -11,7 +11,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Find applicable candidates action - searches plans for a goal/event.
  */
 public class FindApplicableCandidatesAction implements IConditionalComponentStep<Void>
 {

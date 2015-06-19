@@ -6,7 +6,6 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MInternalEvent;
@@ -20,6 +19,7 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -181,7 +181,7 @@ public abstract class Plan
 	{
 		final Future<IMessageEvent> ret = new Future<IMessageEvent>();
 
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		MMessageEvent mevent = bdif.getBDIModel().getCapability().getMessageEvent(type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addMessageEvent(mevent);
@@ -237,7 +237,7 @@ public abstract class Plan
 	{
 		final Future<IInternalEvent> ret = new Future<IInternalEvent>();
 
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		MInternalEvent mevent = bdif.getBDIModel().getCapability().getInternalEvent(type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addInternalEvent(mevent);
@@ -392,7 +392,7 @@ public abstract class Plan
 	 */
 	protected RCapability getCapability()
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
 	}
 	
 	//-------- legacy --------
@@ -712,7 +712,7 @@ public abstract class Plan
 	public void waitForFactChanged(String belname, long timeout)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IBDIAgentFeature bdif = agent.getComponentFeature(IBDIAgentFeature.class);
+		IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
 		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
 		{
 			public void beliefChanged(ChangeInfo<Object> info)
@@ -720,14 +720,14 @@ public abstract class Plan
 				ret.setResultIfUndone(null);
 			}
 		};
-		bdif.addBeliefListener(belname, lis);
+		bdif.getBeliefbase().getBeliefSet(belname).addBeliefSetListener(lis);
 		try
 		{
 			ret.get(timeout);
 		}
 		finally
 		{
-			bdif.removeBeliefListener(belname, lis);
+			bdif.getBeliefbase().getBeliefSet(belname).removeBeliefSetListener(lis);
 		}
 	}
 	
@@ -745,7 +745,7 @@ public abstract class Plan
 	public Object waitForFactAdded(String belname, long timeout)
 	{
 		final Future<Object> ret = new Future<Object>();
-		IBDIAgentFeature bdif = agent.getComponentFeature(IBDIAgentFeature.class);
+		IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
 		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
 		{
 			public void factAdded(ChangeInfo<Object> info)
@@ -753,14 +753,14 @@ public abstract class Plan
 				ret.setResultIfUndone(info.getValue());
 			}
 		};
-		bdif.addBeliefListener(belname, lis);
+		bdif.getBeliefbase().getBeliefSet(belname).addBeliefSetListener(lis);
 		try
 		{
 			return ret.get(timeout);
 		}
 		finally
 		{
-			bdif.removeBeliefListener(belname, lis);
+			bdif.getBeliefbase().getBeliefSet(belname).removeBeliefSetListener(lis);
 		}
 	}
 	
@@ -778,7 +778,7 @@ public abstract class Plan
 	public Object waitForFactRemoved(String belname, long timeout)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IBDIAgentFeature bdif = agent.getComponentFeature(IBDIAgentFeature.class);
+		IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
 		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
 		{
 			public void factRemoved(ChangeInfo<Object> info)
@@ -786,14 +786,14 @@ public abstract class Plan
 				ret.setResultIfUndone(null);
 			}
 		};
-		bdif.addBeliefListener(belname, lis);
+		bdif.getBeliefbase().getBeliefSet(belname).addBeliefSetListener(lis);
 		try
 		{
 			return ret.get(timeout);
 		}
 		finally
 		{
-			bdif.removeBeliefListener(belname, lis);
+			bdif.getBeliefbase().getBeliefSet(belname).removeBeliefSetListener(lis);
 		}
 	}
 	
@@ -803,7 +803,7 @@ public abstract class Plan
 	 */
 	public void waitForCondition(String name)
 	{
-		final IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		final IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		final MCondition mcond = bdif.getCapability().getMCapability().getCondition(name);
 		if(mcond==null)
 			throw new RuntimeException("Unknown condition: "+name);

@@ -1,7 +1,6 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
@@ -79,7 +78,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		Future<Void> ret = new Future<Void>();
 
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		MCapability	mcapa = (MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement();
+		MCapability	mcapa = (MCapability)ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
 
 		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa);
 		

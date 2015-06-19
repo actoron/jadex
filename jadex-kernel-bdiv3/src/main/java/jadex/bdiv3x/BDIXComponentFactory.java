@@ -4,9 +4,9 @@ import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
 import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
 import jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature;
 import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
-import jadex.bdiv3x.features.BDIAgentFeature;
-import jadex.bdiv3x.features.BDILifecycleAgentFeature;
-import jadex.bdiv3x.features.BDIMessageComponentFeature;
+import jadex.bdiv3x.features.BDIXAgentFeature;
+import jadex.bdiv3x.features.BDIXLifecycleAgentFeature;
+import jadex.bdiv3x.features.BDIXMessageComponentFeature;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -44,13 +44,13 @@ import java.util.Map;
  *  Factory for default contexts.
  *  No special properties supported, yet.
  */
-public class BDIV3XComponentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
+public class BDIXComponentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
 	
 	/** The supported component types (file extensions).
 	 *  Convention used by platform config panel. */
-	public static final String[]	FILETYPES	= new String[]{BDIV3XModelLoader.FILE_EXTENSION_AGENT, BDIV3XModelLoader.FILE_EXTENSION_CAPABILITY};
+	public static final String[]	FILETYPES	= new String[]{BDIXModelLoader.FILE_EXTENSION_AGENT, BDIXModelLoader.FILE_EXTENSION_CAPABILITY};
 	
 	/** The agent file type name. */
 	public static final String	FILETYPE_AGENT = "BDIV3X Agent";
@@ -59,18 +59,18 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	public static final String	FILETYPE_CAPABILITY = "BDIV3X Capability";
 	
 	/** The agent icon. */
-	protected static final LazyResource	ICON_AGENT = new LazyResource(BDIV3XComponentFactory.class, "/jadex/bdiv3x/images/bdi_agent.png");
+	protected static final LazyResource	ICON_AGENT = new LazyResource(BDIXComponentFactory.class, "/jadex/bdiv3x/images/bdi_agent.png");
 	
 	/** The capability icon. */
-	protected static final LazyResource	ICON_CAPABILITY = new LazyResource(BDIV3XComponentFactory.class, "/jadex/bdiv3x/images/bdi_capability.png");
+	protected static final LazyResource	ICON_CAPABILITY = new LazyResource(BDIXComponentFactory.class, "/jadex/bdiv3x/images/bdi_capability.png");
 
 	/** The specific component features for micro agents. */
 	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
 			new ComponentFeatureFactory(IProvidedServicesFeature.class, BDIProvidedServicesComponentFeature.class),
-			BDIAgentFeature.FACTORY, 
-			BDILifecycleAgentFeature.FACTORY,
-			BDIMessageComponentFeature.FACTORY,
+			BDIXAgentFeature.FACTORY, 
+			BDIXLifecycleAgentFeature.FACTORY,
+			BDIXMessageComponentFeature.FACTORY,
 			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
 			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class),
 			new ComponentFeatureFactory(IRequiredServicesFeature.class, BDIRequiredServicesComponentFeature.class)
@@ -79,7 +79,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	//-------- attributes --------
 	
 	/** The application model loader. */
-	protected BDIV3XModelLoader loader;
+	protected BDIXModelLoader loader;
 	
 	/** The provider. */
 	protected IInternalAccess provider;
@@ -100,17 +100,17 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	 *  @param providerid	The platform name.
 	 */
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
-	public BDIV3XComponentFactory(String providerid)
+	public BDIXComponentFactory(String providerid)
 	{
 		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
-		this.loader = new BDIV3XModelLoader();
+		this.loader = new BDIXModelLoader();
 	}
 	
 	/**
 	 *  Create a new component factory.
 	 *  @param provider	The component.
 	 */
-	public BDIV3XComponentFactory(IInternalAccess provider, Map<String, Object> properties)
+	public BDIXComponentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
 		super(provider.getComponentIdentifier(), IComponentFactory.class, properties);
 		this.provider = provider;
@@ -139,7 +139,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 			public void customResultAvailable(Void result)
 			{
 				libservice	= SServiceProvider.getLocalService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				loader = new BDIV3XModelLoader();
+				loader = new BDIXModelLoader();
 				
 				libservicelistener = new ILibraryServiceListener()
 				{
@@ -177,7 +177,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 		{
 			public void customResultAvailable(Void result)
 			{
-				BDIV3XComponentFactory.super.shutdownService()
+				BDIXComponentFactory.super.shutdownService()
 					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
@@ -241,7 +241,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(model.endsWith(BDIV3XModelLoader.FILE_EXTENSION_AGENT) || model.endsWith(BDIV3XModelLoader.FILE_EXTENSION_CAPABILITY));
+		return new Future<Boolean>(model.endsWith(BDIXModelLoader.FILE_EXTENSION_AGENT) || model.endsWith(BDIXModelLoader.FILE_EXTENSION_CAPABILITY));
 	}
 	
 	/**
@@ -252,7 +252,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	 */
 	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(model.endsWith(BDIV3XModelLoader.FILE_EXTENSION_AGENT));
+		return new Future<Boolean>(model.endsWith(BDIXModelLoader.FILE_EXTENSION_AGENT));
 	}
 
 	/**
@@ -305,7 +305,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	 */
 	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<String>(model.toLowerCase().endsWith(BDIV3XModelLoader.FILE_EXTENSION_AGENT)? FILETYPE_AGENT: model.toLowerCase().endsWith(BDIV3XModelLoader.FILE_EXTENSION_CAPABILITY)? FILETYPE_CAPABILITY : null);
+		return new Future<String>(model.toLowerCase().endsWith(BDIXModelLoader.FILE_EXTENSION_AGENT)? FILETYPE_AGENT: model.toLowerCase().endsWith(BDIXModelLoader.FILE_EXTENSION_CAPABILITY)? FILETYPE_CAPABILITY : null);
 	}
 
 	/**

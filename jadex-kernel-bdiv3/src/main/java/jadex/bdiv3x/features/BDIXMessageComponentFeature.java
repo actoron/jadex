@@ -1,7 +1,6 @@
 package jadex.bdiv3x.features;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
@@ -24,7 +23,6 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -36,19 +34,19 @@ import java.util.Map;
 /**
  *  Extension to allow message injection in agent methods.
  */
-public class BDIMessageComponentFeature extends MessageComponentFeature
+public class BDIXMessageComponentFeature extends MessageComponentFeature
 {
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIMessageComponentFeature.class);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIXMessageComponentFeature.class);
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create the feature.
 	 */
-	public BDIMessageComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	public BDIXMessageComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 	}
@@ -84,7 +82,7 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 			
 			MMessageEvent mevent = null;
 			
-			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
+			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIXAgentFeature.class);
 //			List<MMessageEvent> mevents = bdif.getBDIModel().getCapability().getMessageEvents();
 //			for(MMessageEvent mevent: mevents)
 //			{

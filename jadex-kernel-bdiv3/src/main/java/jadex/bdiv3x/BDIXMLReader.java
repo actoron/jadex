@@ -69,7 +69,7 @@ import java.util.StringTokenizer;
 /**
  *  Reader for loading component XML models into a Java representation states.
  */
-public class BDIV3XMLReader extends ComponentXMLReader
+public class BDIXMLReader extends ComponentXMLReader
 {
 	public static final IStringObjectConverter msgtypeconv = new IStringObjectConverter()
 	{
@@ -155,14 +155,14 @@ public class BDIV3XMLReader extends ComponentXMLReader
 	public static final String	CONTEXT_LOADER	= "context_loader";
 	
 	/** The loader for sub capabilities. */
-	protected BDIV3XModelLoader	loader;
+	protected BDIXModelLoader	loader;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new reader.
 	 */
-	public BDIV3XMLReader(BDIV3XModelLoader loader)
+	public BDIXMLReader(BDIXModelLoader loader)
 	{
 		super(getXMLMapping());
 		this.loader	= loader;
@@ -185,7 +185,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 	 */
 	protected String	getModelType(String filename)
 	{
-		return filename.endsWith(BDIV3XModelLoader.FILE_EXTENSION_AGENT) ? BDIV3XComponentFactory.FILETYPE_AGENT : BDIV3XComponentFactory.FILETYPE_CAPABILITY;
+		return filename.endsWith(BDIXModelLoader.FILE_EXTENSION_AGENT) ? BDIXComponentFactory.FILETYPE_AGENT : BDIXComponentFactory.FILETYPE_CAPABILITY;
 	}
 
 	/**
@@ -396,7 +396,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					|| (object instanceof UnparsedExpression && pathname[pathname.length-1].getLocalPart().equals("expression")) // hack for bdi expressions
 					|| (object instanceof MCondition && pathname[pathname.length-1].getLocalPart().equals("condition")))
 				{
-					parent	= ((BDIV3XModel)parent).getCapability();
+					parent	= ((BDIXModel)parent).getCapability();
 				}
 				
 				context.getTopStackElement().getReaderHandler().linkObject(object, parent, linkinfo, pathname, context);
@@ -428,7 +428,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				if(pathname[pathname.length-1].getLocalPart().startsWith("initial") || pathname[pathname.length-1].getLocalPart().startsWith("end"))
 				{
 					String	config	= ((ConfigurationInfo)parent).getName();
-					BDIV3XModel	model	= (BDIV3XModel)context.getStackElement(pathname.length-2).getObject();
+					BDIXModel	model	= (BDIXModel)context.getStackElement(pathname.length-2).getObject();
 					parent	= model.getCapability().getConfiguration(config);
 					if(parent==null)
 					{
@@ -446,7 +446,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				BDIV3XModel model = (BDIV3XModel)context.getRootObject();
+				BDIXModel model = (BDIXModel)context.getRootObject();
 				MCapability mcapa = model.getCapability();
 				
 				if(mcapa.getGoalPublications()!=null)
@@ -501,8 +501,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					{
 						IResourceIdentifier	rid	= (IResourceIdentifier)((Map<String,Object>)context.getUserContext()).get(CONTEXT_RID);
 						IComponentIdentifier	root	= (IComponentIdentifier)((Map<String,Object>)context.getUserContext()).get(CONTEXT_ROOT);
-						BDIV3XModelLoader	loader	= (BDIV3XModelLoader)((Map<String,Object>)context.getUserContext()).get(CONTEXT_LOADER);
-						BDIV3XModel	cmodel	= (BDIV3XModel)loader.loadCapabilityModel(subcap.getFile(), model.getAllImports(),
+						BDIXModelLoader	loader	= (BDIXModelLoader)((Map<String,Object>)context.getUserContext()).get(CONTEXT_LOADER);
+						BDIXModel	cmodel	= (BDIXModel)loader.loadCapabilityModel(subcap.getFile(), model.getAllImports(),
 							rid, context.getClassLoader(), new Object[]{rid, root}).getModelInfo();
 						subcaps.put(subcap.getName(), cmodel);
 					}
@@ -522,7 +522,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}
 		};
 		
-		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(BDIV3XModel.class, capaproc), 
+		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(BDIXModel.class, capaproc), 
 			new MappingInfo(comptype, null, null, 
 				new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},  
@@ -664,7 +664,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				BDIV3XModel model = (BDIV3XModel)context.getRootObject();
+				BDIXModel model = (BDIXModel)context.getRootObject();
 				MCapability mcapa = model.getCapability();
 				
 				MTrigger mtr = (MTrigger)object;
@@ -808,6 +808,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factchanged")), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factremoved")), new ObjectInfo(boc), null, null));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factchanged")), new ObjectInfo(boc), null, null));
 		
@@ -929,7 +932,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			{
 				try
 				{
-					BDIV3XModel model = (BDIV3XModel)context.getRootObject();
+					BDIXModel model = (BDIXModel)context.getRootObject();
 					MCapability mcapa = model.getCapability();
 					AReadContext ar = (AReadContext)context;
 					Map<String, String> rawattrs = ar.getTopStackElement().getRawAttributes();

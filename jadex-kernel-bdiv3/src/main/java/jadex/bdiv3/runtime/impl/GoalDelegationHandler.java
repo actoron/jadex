@@ -82,7 +82,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 		if(goalname==null)
 			throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
 		
-		final IInternalBDIAgentFeature	bdif	= (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		final IInternalBDIAgentFeature	bdif	= agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 		final MGoal mgoal = mcapa.getGoal(goalname);
 		

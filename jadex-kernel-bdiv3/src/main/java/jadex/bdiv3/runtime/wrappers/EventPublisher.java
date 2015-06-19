@@ -145,7 +145,7 @@ public class EventPublisher
 	 */
 	public RuleSystem getRuleSystem()
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
 	}
 
 	/**

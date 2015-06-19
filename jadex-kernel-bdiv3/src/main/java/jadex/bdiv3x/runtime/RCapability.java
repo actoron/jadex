@@ -1,7 +1,6 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3x.features.BDIAgentFeature;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -30,7 +29,7 @@ public class RCapability implements ICapability
 	protected IInternalAccess agent;
 	
 	/** The capa. */
-	protected jadex.bdiv3.runtime.impl.RCapability capa;
+	protected ICapability capa;
 	
 	/**
 	 *  Create a new capability.
@@ -38,7 +37,7 @@ public class RCapability implements ICapability
 	public RCapability(IInternalAccess agent)
 	{
 		this.agent = agent;
-		this.capa = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+		this.capa = agent.getComponentFeature(IBDIXAgentFeature.class);
 	}
 	
 	/**

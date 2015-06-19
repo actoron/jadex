@@ -1,11 +1,11 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
+import jadex.rules.eca.RuleSystem;
 
 /**
  *  Base element for all runtime elements.
@@ -114,7 +114,7 @@ public class RElement
 	 */
 	public RCapability getCapability()
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
 	}
 	
 	/**
@@ -125,7 +125,16 @@ public class RElement
 	{
 		return (MCapability)getCapability().getModelElement();
 	}
-
+	
+	/**
+	 *  get the rule system.
+	 *  @return The rule system
+	 */
+	public RuleSystem getRuleSystem()
+	{
+		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+	}
+	
 	/** 
 	 *  Get the string representation.
 	 */

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  *  Model for BDI v3x agents
  */
-public class BDIV3XModel	extends ModelInfo implements IBDIModel
+public class BDIXModel	extends ModelInfo implements IBDIModel
 {
 	//-------- attributes --------
 	
@@ -27,7 +27,7 @@ public class BDIV3XModel	extends ModelInfo implements IBDIModel
 	/**
 	 *  Create a new model.
 	 */
-	public BDIV3XModel()
+	public BDIXModel()
 	{
 		this.capa	= new MCapability();
 	}

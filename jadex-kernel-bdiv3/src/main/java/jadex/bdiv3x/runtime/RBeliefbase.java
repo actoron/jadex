@@ -1,6 +1,5 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
@@ -13,6 +12,7 @@ import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -484,8 +484,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void addBeliefListener(IBeliefListener<T> listener)
 		{
-			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
-			bdif.addBeliefListener(getName(), listener);
+			IBDIXAgentFeature bdif = getAgent().getComponentFeature(IBDIXAgentFeature.class);
+			bdif.getBeliefbase().getBelief(getName()).addBeliefListener(listener);
 		}
 		
 		/**
@@ -494,8 +494,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void removeBeliefListener(IBeliefListener<T> listener)
 		{
-			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
-			bdif.removeBeliefListener(getName(), listener);
+			IBDIXAgentFeature bdif = getAgent().getComponentFeature(IBDIXAgentFeature.class);
+			bdif.getBeliefbase().getBelief(getName()).removeBeliefListener(listener);
 		}
 	}
 	
@@ -714,7 +714,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			}
 			else
 			{
-				RuleSystem rs = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+				RuleSystem rs = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIXAgentFeature.class)).getRuleSystem();
 				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+getName(), new ChangeInfo<Object>(facts, facts, null)));
 			}
 		}
@@ -725,8 +725,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void addBeliefSetListener(IBeliefListener<T> listener)
 		{
-			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
-			bdif.addBeliefListener(getName(), listener);
+			IBDIXAgentFeature bdif = getAgent().getComponentFeature(IBDIXAgentFeature.class);
+			bdif.getBeliefbase().getBelief(getName()).addBeliefListener(listener);
 		}
 		
 		/**
@@ -735,8 +735,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void removeBeliefSetListener(IBeliefListener<T> listener)
 		{
-			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
-			bdif.removeBeliefListener(getName(), listener);
+			IBDIXAgentFeature bdif = getAgent().getComponentFeature(IBDIXAgentFeature.class);
+			bdif.getBeliefbase().getBelief(getName()).removeBeliefListener(listener);
 		}
 		
 		/**
@@ -770,7 +770,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		
 		if(element!=null && element.getCapabilityName()!=null)	// Todo: some RElements have no MElement (e.g. expression)
 		{
-			final RBeliefbase	beliefbase	= ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getBeliefbase();
+			final RBeliefbase	beliefbase	= ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIXAgentFeature.class)).getCapability().getBeliefbase();
 			final String	prefix	= element.getCapabilityName()+MElement.CAPABILITY_SEPARATOR;
 			SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ret);
 			fetcher.setValue("$beliefbase", new BeliefbaseWrapper(beliefbase, prefix));

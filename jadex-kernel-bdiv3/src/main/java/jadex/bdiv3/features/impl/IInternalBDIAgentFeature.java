@@ -1,26 +1,19 @@
 package jadex.bdiv3.features.impl;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
-import jadex.bdiv3.model.MElement;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.RCapability;
-import jadex.bdiv3.runtime.impl.RPlan;
-import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.commons.IResultCommand;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.RuleSystem;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.Map;
 
 /**
  *  Methods internally called on the BDI agent feature. 
  */
-public interface IInternalBDIAgentFeature extends IBDIAgentFeature
+public interface IInternalBDIAgentFeature
 {
 //	/**
 //	 *  Get the inited.

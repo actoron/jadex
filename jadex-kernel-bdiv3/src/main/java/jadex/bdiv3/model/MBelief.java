@@ -366,7 +366,7 @@ public class MBelief extends MElement
 				? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
 			ret = getValue(((BDIAgentFeature)bdif).getCapabilityObject(capaname), agent.getClassLoader());
 		}
-		else if(bdif instanceof jadex.bdiv3x.features.BDIAgentFeature)
+		else if(bdif instanceof jadex.bdiv3x.features.BDIXAgentFeature)
 		{
 			if(multi)
 			{
@@ -437,7 +437,7 @@ public class MBelief extends MElement
 				? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
 			return setValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), value, agent.getClassLoader());
 		}
-		else if(bdif instanceof jadex.bdiv3x.features.BDIAgentFeature)
+		else if(bdif instanceof jadex.bdiv3x.features.BDIXAgentFeature)
 		{
 			if(multi)
 			{

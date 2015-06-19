@@ -136,7 +136,7 @@ public class APL
 			if(!done)
 			{
 				// Handle waiting plans
-				Collection<RPlan> rplans = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getPlans();
+				Collection<RPlan> rplans = ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getPlans();
 				if(rplans!=null)
 				{
 					for(RPlan rplan: rplans)
@@ -226,7 +226,7 @@ public class APL
 	{
 		final Future<List<Object>> ret = new Future<List<Object>>();
 		
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = ia.getComponentFeature(IInternalBDIAgentFeature.class);
 		
 //		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		
