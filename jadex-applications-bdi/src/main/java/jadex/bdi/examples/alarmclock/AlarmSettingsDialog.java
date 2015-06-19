@@ -1,9 +1,9 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -253,7 +253,7 @@ public class AlarmSettingsDialog extends JDialog
 							@Classname("play")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+								IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 								playing = bia.getGoalbase().createGoal("play_song");
 								playing.getParameter("song").setValue(song);
 								bia.getGoalbase().dispatchTopLevelGoal(playing)

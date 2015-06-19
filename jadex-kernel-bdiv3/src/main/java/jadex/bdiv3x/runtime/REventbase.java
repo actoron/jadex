@@ -1,15 +1,9 @@
 package jadex.bdiv3x.runtime;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RElement;
-import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -17,12 +11,11 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.future.IFuture;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  The event base runtime element.
  */
 public class REventbase extends RElement implements IEventbase
 {

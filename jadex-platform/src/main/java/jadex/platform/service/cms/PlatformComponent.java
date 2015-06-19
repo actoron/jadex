@@ -101,6 +101,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //			System.out.println("feature: "+fac);
 			IComponentFeature	instance	= fac.createInstance(getInternalAccess(), info);
 			features.put((Class<?>)fac.getType(), instance);
+			for(Class<?> ltype: fac.getLookupTypes())
+				features.put(ltype, instance);
 			lfeatures.add(instance);
 		}
 	}

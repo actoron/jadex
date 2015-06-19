@@ -1,6 +1,5 @@
 package jadex.bdi.examples.puzzle;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;

@@ -4,6 +4,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.InternalAccessAdapter;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -44,9 +45,26 @@ public class CapabilityWrapper implements ICapability
 	 *  @param name The belief name.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefListener(final String name, final IBeliefListener listener)
+	public <T> void addBeliefListener(String name, final IBeliefListener<T> listener)
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).addBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, listener);
+		name = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name: name;
+		IBDIAgentFeature bdif = agent.getComponentFeature0(IBDIAgentFeature.class);
+		if(bdif!=null)
+		{
+			bdif.addBeliefListener(name, listener);
+		}
+		else
+		{
+			IBDIXAgentFeature bdixf = agent.getComponentFeature0(IBDIXAgentFeature.class);
+			if(bdixf.getBeliefbase().hasBelief(name))
+			{
+				bdixf.getBeliefbase().getBelief(name).addBeliefListener(listener);
+			}
+			else
+			{
+				bdixf.getBeliefbase().getBeliefSet(name).addBeliefSetListener(listener);
+			}
+		}
 	}
 	
 	/**
@@ -54,9 +72,26 @@ public class CapabilityWrapper implements ICapability
 	 *  @param name The belief name.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefListener(String name, IBeliefListener listener)
+	public <T> void removeBeliefListener(String name, IBeliefListener<T> listener)
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).removeBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, listener);
+		name = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name: name;
+		IBDIAgentFeature bdif = agent.getComponentFeature0(IBDIAgentFeature.class);
+		if(bdif!=null)
+		{
+			bdif.removeBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, listener);
+		}
+		else
+		{
+			IBDIXAgentFeature bdixf = agent.getComponentFeature0(IBDIXAgentFeature.class);
+			if(bdixf.getBeliefbase().hasBelief(name))
+			{
+				bdixf.getBeliefbase().getBelief(name).removeBeliefListener(listener);
+			}
+			else
+			{
+				bdixf.getBeliefbase().getBeliefSet(name).removeBeliefSetListener(listener);
+			}
+		}
 	}
 
 	/**

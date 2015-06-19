@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  The runtime message event.
  */
 public class RMessageEvent extends RProcessableElement implements IMessageEvent 
 {

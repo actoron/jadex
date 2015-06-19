@@ -32,6 +32,9 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	/** The successors. */
 	protected Set<Class<?>> sucs;
 	
+	/** The lookup types. */
+	protected Class<?>[] lookuptypes;
+	
 	//-------- constructors --------
 	
 	/**
@@ -52,9 +55,25 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	/**
 	 *  Create a new feature factory.
 	 */
+	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] lookuptypes)
+	{
+		this(type, impl, null, null, lookuptypes);
+	}
+	
+	/**
+	 *  Create a new feature factory.
+	 */
 	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs)
 	{
-		this(type, impl, pres, sucs, true);
+		this(type, impl, pres, sucs, true, null);
+	}
+	
+	/**
+	 *  Create a new feature factory.
+	 */
+	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs, Class<?>[] lookuptypes)
+	{
+		this(type, impl, pres, sucs, true, lookuptypes);
 	}
 	
 	/**
@@ -62,10 +81,19 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	 */
 	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs, boolean autoaddlast)
 	{
+		this(type, impl, pres, sucs, autoaddlast, null);
+	}
+	
+	/**
+	 *  Create a new feature factory.
+	 */
+	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs, boolean autoaddlast, Class<?>[] lookuptypes)
+	{
 		this.type = type;
 		this.impl = impl;
 		this.pres = pres==null? null: (Set)SUtil.arrayToSet(pres);
 		this.sucs = sucs==null? null: (Set)SUtil.arrayToSet(sucs);
+		this.lookuptypes = lookuptypes;
 		
 		// automallically add the lifecycle feature as precondition for all (besides itself)
 		if(autoaddlast)
@@ -148,11 +176,29 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	}
 
 	/**
+	 *  Get the lookuptypes.
+	 *  @return The lookuptypes
+	 */
+	public Class<?>[] getLookupTypes()
+	{
+		return lookuptypes==null? SUtil.EMPTY_CLASS_ARRAY: lookuptypes;
+	}
+
+	/**
+	 *  The lookuptypes to set.
+	 *  @param lookuptypes The lookuptypes to set
+	 */
+	public void setLookupTypes(Class<?>[] lookuptypes)
+	{
+		this.lookuptypes = lookuptypes;
+	}
+
+	/**
 	 *  Create an instance of the feature.
 	 *  @param access	The access of the component.
 	 *  @param info	The creation info.
 	 */
-	public IComponentFeature	createInstance(IInternalAccess access, ComponentCreationInfo info)
+	public IComponentFeature createInstance(IInternalAccess access, ComponentCreationInfo info)
 	{
 		try
 		{

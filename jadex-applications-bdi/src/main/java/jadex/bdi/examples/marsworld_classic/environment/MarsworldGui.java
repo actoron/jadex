@@ -5,9 +5,9 @@ import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Homebase;
 import jadex.bdi.examples.marsworld_classic.Location;
 import jadex.bdi.examples.marsworld_classic.Target;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -185,9 +185,7 @@ public class MarsworldGui	extends JFrame
 			@Classname("env")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				// Hack, as long as we do not have a specific XML feature interface
-				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-				RCapability capa = bdif.getCapability();
+				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
 				final Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 		
 				// On what thread?

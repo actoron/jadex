@@ -1,6 +1,5 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.runtime.impl.RCapability;
@@ -16,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  The expression base runtime element.
  */
 public class RExpressionbase extends RElement implements IExpressionbase
 {
@@ -41,7 +40,7 @@ public class RExpressionbase extends RElement implements IExpressionbase
 	{
 		if(expressions==null || !expressions.containsKey(name))
 		{
-			RCapability rcapa = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+			RCapability rcapa = agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
 			MCapability mcapa = (MCapability)rcapa.getModelElement();
 			UnparsedExpression uexp = mcapa.getExpression(name);
 			if(uexp==null)

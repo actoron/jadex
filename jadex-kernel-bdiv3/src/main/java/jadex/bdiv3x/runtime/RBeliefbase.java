@@ -59,7 +59,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	}
 	
 	/**
-	 *  
+	 *  Init the beliefbase.
 	 */
 	public void init()
 	{	
@@ -181,6 +181,24 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		return beliefsets.get(name);
 	}
 
+	/**
+	 *  Test if has a belief.
+	 *  @param True, if has belief.
+	 */
+	public boolean hasBelief(String name)
+	{
+		return beliefs==null? false: beliefs.containsKey(name);
+	}
+
+	/**
+	 *  Test if has a belief set.
+	 *  @param True, if has belief set.
+	 */
+	public boolean hasBeliefSet(String name)
+	{
+		return beliefsets==null? false: beliefsets.containsKey(name);
+	}
+	
 	/**
 	 *  Returns <tt>true</tt> if this beliefbase contains a belief with the
 	 *  specified name.

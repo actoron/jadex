@@ -1,7 +1,7 @@
 package jadex.bdi.benchmarks;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -38,10 +38,10 @@ public class MessageGui extends JFrame
 			@Classname("addListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIAgentFeature bdif = ia.getComponentFeature(IBDIAgentFeature.class);
+				IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
 //				bia.getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
 //				((BDIAgentFeature)bdif).getCapability().getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
-				bdif.addBeliefListener("sent", new BeliefAdapter<Object>()
+				bdif.getBeliefbase().getBelief("sent").addBeliefListener(new BeliefAdapter<Object>()
 				{
 					public void beliefChanged(jadex.rules.eca.ChangeInfo<Object> info) 
 					{
@@ -50,7 +50,7 @@ public class MessageGui extends JFrame
 				});
 				
 //				bia.getBeliefbase().getBelief("received").addBeliefListener(new IBeliefListener()
-				bdif.addBeliefListener("received", new BeliefAdapter<Object>()
+				bdif.getBeliefbase().getBelief("received").addBeliefListener(new BeliefAdapter<Object>()
 				{
 					public void beliefChanged(jadex.rules.eca.ChangeInfo<Object> info) 
 					{

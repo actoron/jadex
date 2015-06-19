@@ -5,7 +5,7 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 
 /**
- * 
+ *  The runtime internal event.
  */
 public class RInternalEvent extends RProcessableElement implements IInternalEvent 
 {

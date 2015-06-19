@@ -1,9 +1,9 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
@@ -45,9 +45,7 @@ public class BDIReasoningInterceptor implements IServiceInvocationInterceptor
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		final Future<Void> ret = new Future<Void>();
-		// Hack, as long as we do not have a specific XML feature interface
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-		RCapability capa = bdif.getCapability();
+		IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
 		final IGoal g = capa.getGoalbase().createGoal("reasoncall");
 //		g.addGoalListener(new IGoalListener()
 //		{

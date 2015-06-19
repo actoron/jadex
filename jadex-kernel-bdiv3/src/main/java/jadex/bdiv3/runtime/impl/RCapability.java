@@ -5,6 +5,7 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.IDeliberationStrategy;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.REventbase;
 import jadex.bdiv3x.runtime.RExpressionbase;
@@ -631,4 +632,29 @@ public class RCapability extends RElement
 		String pname = getNamePart(name);
 		return capa!=null? capa.replace(MElement.CAPABILITY_SEPARATOR, ".")+"."+pname: pname;
 	}
+	
+	//-------- extra methods for simple access from bdi and bdix kernels --------
+	
+//	/**
+//	 *  Drop a pojo goal.
+//	 *  @param goal The pojo goal.
+//	 */
+//	public void dropGoal(Object goal)
+//	{
+//		if(goal instanceof IGoal)
+//		{
+//			((IGoal)goal).drop();
+//		}
+//		else
+//		{
+//			for(RGoal rgoal: getCapability().getGoals(goal.getClass()))
+//			{
+//				if(goal.equals(rgoal.getPojoElement()))
+//				{
+//					rgoal.drop();
+//					break;
+//				}
+//			}
+//		}
+//	}
 }

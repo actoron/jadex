@@ -5,14 +5,13 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
-import jadex.bdiv3.model.MPlanParameter;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
@@ -189,13 +188,23 @@ public class GoalDelegationHandler  implements InvocationHandler
 			public void terminate(Exception reason, IResultListener<Void> terminate)
 			{
 //				System.out.println("terminated call: "+fgoal);
-				((IBDIAgentFeature)bdif).dropGoal(fgoal);
+				IBDIAgentFeature bf = agent.getComponentFeature0(IBDIAgentFeature.class);
+				if(bf!=null)
+				{
+					bf.dropGoal(fgoal);
+				}
+				else
+				{
+					((IGoal)fgoal).drop();
+				}
+//				((IBDIAgentFeature)bdif).dropGoal(fgoal);
 				super.terminate(reason, terminate);
 			}
 		});
 		
 //		System.out.println("gloaldelehandler disp: "+((RGoal)fgoal).getId());
-		((IBDIAgentFeature)bdif).dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
+		
+		IResultListener<Object> lis = new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -213,8 +222,19 @@ public class GoalDelegationHandler  implements InvocationHandler
 //				System.out.println("gloaldelehandler endex"+SUtil.arrayToString(args));
 				ret.setExceptionIfUndone(exception);
 			}
-		});
-	
+		};
+		
+		IBDIAgentFeature bf = agent.getComponentFeature0(IBDIAgentFeature.class);
+		if(bf!=null)
+		{
+			bf.dispatchTopLevelGoal(goal).addResultListener(lis);
+		}
+		else
+		{
+			IBDIXAgentFeature bfx = agent.getComponentFeature0(IBDIXAgentFeature.class);
+			bfx.getGoalbase().dispatchTopLevelGoal((IGoal)goal).addResultListener(lis);
+		}
+		
 		return ret;
 	}
 	

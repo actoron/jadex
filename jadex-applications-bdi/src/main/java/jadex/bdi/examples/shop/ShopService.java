@@ -1,9 +1,9 @@
 package jadex.bdi.examples.shop;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -65,9 +65,7 @@ public class ShopService implements IShopService
 	{
 		final Future<ItemInfo> ret = new Future<ItemInfo>();
 		
-		// Hack, as long as we do not have a specific XML feature interface
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)comp.getComponentFeature(IBDIAgentFeature.class);
-		RCapability capa = bdif.getCapability();
+		IBDIXAgentFeature capa = comp.getComponentFeature(IBDIXAgentFeature.class);
 		
 		final IGoal sell = capa.getGoalbase().createGoal("sell");
 		sell.getParameter("name").setValue(item);
@@ -107,9 +105,7 @@ public class ShopService implements IShopService
 	 */	
 	public IFuture<ItemInfo[]> getCatalog()
 	{
-		// Hack, as long as we do not have a specific XML feature interface
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)comp.getComponentFeature(IBDIAgentFeature.class);
-		RCapability capa = bdif.getCapability();
+		IBDIXAgentFeature capa = comp.getComponentFeature(IBDIXAgentFeature.class);
 		
 		final Future<ItemInfo[]> ret = new Future<ItemInfo[]>();
 		ret.setResult((ItemInfo[])capa.getBeliefbase().getBeliefSet("catalog").getFacts());

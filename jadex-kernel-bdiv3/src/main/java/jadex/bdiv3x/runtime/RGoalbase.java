@@ -1,18 +1,20 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.Collection;
 
 /**
- * 
+ *  The goalbase runtime element.
  */
 public class RGoalbase extends RElement implements IGoalbase
 {
@@ -83,9 +85,23 @@ public class RGoalbase extends RElement implements IGoalbase
 	 *  Dispatch a new top-level goal.
 	 *  @param goal The new goal.
 	 */
-	public <T>	IFuture<T>	dispatchTopLevelGoal(IGoal goal)
+	public <T>	IFuture<T>	dispatchTopLevelGoal(final IGoal goal)
 	{
-		return agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
+		final Future<T> ret = new Future<T>();
+		
+		goal.addListener(new ExceptionDelegationResultListener<Void, T>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				Object res = RGoal.getGoalResult((RGoal)goal, agent.getClassLoader());
+				ret.setResult((T)res);
+			}
+		});
+
+//		System.out.println("adopt goal");
+		RGoal.adoptGoal((RGoal)goal, getAgent());
+	
+		return ret;
 	}
 
 	/**

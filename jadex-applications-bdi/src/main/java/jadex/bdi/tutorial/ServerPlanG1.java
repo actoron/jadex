@@ -1,8 +1,8 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
@@ -140,11 +140,10 @@ public class ServerPlanG1 extends Plan	implements Runnable
 					@Classname("translate")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIAgentFeature bdif = ia.getComponentFeature(IBDIAgentFeature.class);
-						// HACK! todo: how should API be exposed?
-						IGoal goal = ((IInternalBDIAgentFeature)bdif).getCapability().getGoalbase().createGoal("translate");
+						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IGoal goal = bia.getGoalbase().createGoal("translate");
 						goal.getParameter("client").setValue(client);
-						bdif.dispatchTopLevelGoal(goal);
+						bia.getGoalbase().dispatchTopLevelGoal(goal);
 						return IFuture.DONE;
 					}
 				});

@@ -1,6 +1,5 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
@@ -332,7 +331,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	 */
 	protected RuleSystem getRuleSystem()
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
 	}
 	
 	/**
@@ -340,7 +339,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	 */
 	protected RCapability getCapability()
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
 	}
 	
 	/**

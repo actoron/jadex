@@ -3,6 +3,7 @@ package jadex.bdi.examples.alarmclock;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -72,7 +73,7 @@ public class OptionDialog extends JDialog
 			@Classname("create")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 				final Settings orig_sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
 				final Settings sets = (Settings)orig_sets.clone();
 				
@@ -254,7 +255,7 @@ public class OptionDialog extends JDialog
 											@Classname("alarms")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+												IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 												bia.getBeliefbase().getBelief("settings").setFact(ns);
 												bia.getBeliefbase().getBeliefSet("alarms").removeFacts();
 												bia.getBeliefbase().getBeliefSet("alarms").addFacts(ns.getAlarms());

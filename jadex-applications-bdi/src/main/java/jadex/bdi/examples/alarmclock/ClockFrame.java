@@ -3,6 +3,7 @@ package jadex.bdi.examples.alarmclock;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -185,7 +186,7 @@ public class ClockFrame extends JFrame
 					@Classname("settings")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 						final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
 						
 						if(sets.isAutosave())
@@ -382,7 +383,7 @@ public class ClockFrame extends JFrame
 				@Classname("refresh")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+					IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
 					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
 					fut.addResultListener(new SwingDefaultResultListener<IClockService>(ClockFrame.this)

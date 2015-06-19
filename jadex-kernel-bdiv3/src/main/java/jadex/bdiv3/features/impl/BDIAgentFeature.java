@@ -95,7 +95,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * 
+ *  The bdi agent feature implementation for pojo agents.
  */
 public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature, IInternalBDIAgentFeature
 {
@@ -116,9 +116,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/** The event adders. */
 	protected Map<EventType, IResultCommand<IFuture<Void>, PropertyChangeEvent>> eventadders 
 		= new HashMap<EventType, IResultCommand<IFuture<Void>,PropertyChangeEvent>>();
-	
-//	/** Is the agent inited and allowed to execute rules? */
-//	protected boolean	inited;
 	
 	//-------- constructors --------
 	
@@ -1621,6 +1618,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			if(goal.equals(rgoal.getPojoElement()))
 			{
 				rgoal.drop();
+				break;
 			}
 		}
 	}

@@ -20,23 +20,32 @@ public interface IComponentFeatureFactory
 	
 	/**
 	 *  Get the predecessors, i.e. features that should be inited first.
+	 *  @return The predecessors.
 	 */
 	public Set<Class<?>>	getPredecessors();
 	
 	/**
 	 *  Get the successors, i.e. features that should be inited after this feature.
+	 *  @return The successors.
 	 */
 	public Set<Class<?>>	getSuccessors();
 	
 	/**
 	 *  Get the user interface type of the feature.
+	 *  @return The type.
 	 */
 	public Class<?>	getType();
+	
+	/**
+	 *  Get lookup types. Allows for fetching a feature via a different interface.
+	 *  @return The lookup types.
+	 */
+	public Class<?>[] getLookupTypes();
 	
 	/**
 	 *  Create an instance of the feature.
 	 *  @param access	The access of the component.
 	 *  @param info	The creation info.
 	 */
-	public IComponentFeature	createInstance(IInternalAccess access, ComponentCreationInfo info);
+	public IComponentFeature createInstance(IInternalAccess access, ComponentCreationInfo info);
 }

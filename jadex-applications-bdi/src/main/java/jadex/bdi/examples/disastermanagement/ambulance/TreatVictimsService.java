@@ -2,10 +2,10 @@ package jadex.bdi.examples.disastermanagement.ambulance;
 
 import jadex.bdi.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -36,8 +36,7 @@ public class TreatVictimsService implements ITreatVictimsService
 	 */
 	public ITerminableFuture<Void> treatVictims(final ISpaceObject disaster)
 	{
-		// Hack, as long as we do not have a specific XML feature interface
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 		final RCapability capa = bdif.getCapability();
 		
 		final IGoal tv = (IGoal)capa.getGoalbase().createGoal("treat_victims");

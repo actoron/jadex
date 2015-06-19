@@ -39,7 +39,7 @@ public interface IInternalAccess
 	 *  @param feature	The type of the feature.
 	 *  @return The feature instance.
 	 */
-	public <T> T	getComponentFeature(Class<? extends T> type);
+	public <T> T getComponentFeature(Class<? extends T> type);
 	
 	/**
 	 *  Get a feature of the component without throwing exception if not present.

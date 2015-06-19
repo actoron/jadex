@@ -20,6 +20,18 @@ public interface IBeliefbase extends IElement
 	 *  @param name	The belief set name.
 	 */
 	public IBeliefSet getBeliefSet(String name);
+	
+	/**
+	 *  Test if has a belief.
+	 *  @param True, if has belief.
+	 */
+	public boolean hasBelief(String name);
+
+	/**
+	 *  Test if has a belief set.
+	 *  @param True, if has belief set.
+	 */
+	public boolean hasBeliefSet(String name);
 
 	/**
 	 *  Returns <tt>true</tt> if this beliefbase contains a belief with the
