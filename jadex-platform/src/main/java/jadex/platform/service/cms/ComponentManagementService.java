@@ -1710,16 +1710,16 @@ public class ComponentManagementService implements IComponentManagementService
 			final PlatformComponent adapter = (PlatformComponent)components.get(cid);
 			if(adapter!=null)
 			{
-				if(stepinfo!=null)
-				{
-					CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
-					if(desc!=null)
-					{
-						desc.setStepInfo(stepinfo);
-					}
-				}
+//				if(stepinfo!=null)
+//				{
+//					CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+//					if(desc!=null)
+//					{
+//						desc.setStepInfo(stepinfo);
+//					}
+//				}
 				
-				((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class)).doStep()
+				((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class)).doStep(stepinfo)
 					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 			}
 			else

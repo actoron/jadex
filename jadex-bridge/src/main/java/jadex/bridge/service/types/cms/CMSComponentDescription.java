@@ -489,23 +489,23 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		this.monitoring = monitoring;
 	}
 	
-	/**
-	 *  Get the stepinfo.
-	 *  @return The stepinfo.
-	 */
-	public String getStepInfo()
-	{
-		return stepinfo;
-	}
-
-	/**
-	 *  Set the stepinfo.
-	 *  @param stepinfo The stepinfo to set.
-	 */
-	public void setStepInfo(String stepinfo)
-	{
-		this.stepinfo = stepinfo;
-	}
+//	/**
+//	 *  Get the stepinfo.
+//	 *  @return The stepinfo.
+//	 */
+//	public String getStepInfo()
+//	{
+//		return stepinfo;
+//	}
+//
+//	/**
+//	 *  Set the stepinfo.
+//	 *  @param stepinfo The stepinfo to set.
+//	 */
+//	public void setStepInfo(String stepinfo)
+//	{
+//		this.stepinfo = stepinfo;
+//	}
 	
 	/**
 	 *  Test if it is a system component.

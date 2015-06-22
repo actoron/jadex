@@ -21,8 +21,6 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CMSComponentDescription;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -276,25 +274,25 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
 		
 		ProcessThread thread = null;
-		String stepinfo = null;
-		if(getComponent().getComponentDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
-		{
-			CMSComponentDescription desc = (CMSComponentDescription)getComponent().getComponentDescription();
-			stepinfo = desc.getStepInfo();
-			if(stepinfo!=null)
-			{
-				desc.setStepInfo(null);
-			}
-		}
-		
-		if(stepinfo!=null)
-		{
-			thread = bcf.getTopLevelThread().getThread(stepinfo);
-			if(thread.isWaiting())
-			{
-				thread = null;
-			}
-		}
+//		String stepinfo = null;
+//		if(getComponent().getComponentDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+//		{
+//			CMSComponentDescription desc = (CMSComponentDescription)getComponent().getComponentDescription();
+//			stepinfo = desc.getStepInfo();
+//			if(stepinfo!=null)
+//			{
+//				desc.setStepInfo(null);
+//			}
+//		}
+//		
+//		if(stepinfo!=null)
+//		{
+//			thread = bcf.getTopLevelThread().getThread(stepinfo);
+//			if(thread.isWaiting())
+//			{
+//				thread = null;
+//			}
+//		}
 		
 		if(thread==null)
 		{

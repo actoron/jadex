@@ -26,7 +26,7 @@ public interface IInternalExecutionFeature
 	/**
 	 *  Do a step of a suspended component.
 	 */
-	public IFuture<Void> doStep();
+	public IFuture<Void> doStep(String stepinfo);
 
 	/**
 	 *  Block the current thread and allow execution on other threads.

@@ -90,7 +90,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	protected Map<Object, Executor>	blocked; 
 	
 	/** The flag for a requested step (true when a step is allowed in stepwise execution). */
-	protected boolean	dostep;
+//	protected boolean	dostep;
+	protected String stepinfo;
 	
 	/** The future to be informed, when the requested step is finished. */
 	protected Future<Void> stepfuture;
@@ -559,7 +560,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Do a step of a suspended component.
 	 */
-	public IFuture<Void> doStep()
+	public IFuture<Void> doStep(String stepinfo)
 	{
 		Future<Void> ret = new Future<Void>();
 		synchronized(this)
@@ -568,13 +569,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getComponentIdentifier()));
 			}
-			else if(dostep || stepfuture!=null)
+			else if(stepinfo!=null || stepfuture!=null)
 			{
 				ret.setException(new RuntimeException("Only one step allowed at a time."));
 			}
-			
-			this.dostep	= true;		
-			this.stepfuture = ret;
+			else
+			{
+//				this.dostep	= true;		
+				this.stepfuture = ret;
+				this.stepinfo = stepinfo;
+			}
 		}
 		
 		wakeup();
@@ -950,9 +954,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					isteps	= null;
 				}
 			}
-			else if(steps!=null && (IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || dostep))
+			else if(steps!=null && (IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || stepinfo!=null))
 			{
-				dostep	= false;
+//				dostep	= false;
+				stepinfo = null;
 				step	= steps.remove(0);
 				if(steps.isEmpty())
 				{
@@ -1122,11 +1127,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		
 		boolean	cycle	= false;
-		if(IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || dostep || stepfuture!=null)
+		if(IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || stepinfo!=null || stepfuture!=null)
 		{
 			try
 			{
-				dostep	= false;
+//				dostep	= false;
+				stepinfo = null;
 				cycle	= executeCycle();
 			}
 			catch(Exception e)
@@ -1143,7 +1149,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		Future<Void>	stepfut	= null;
 		synchronized(this)
 		{
-			if(stepfuture!=null && !dostep)
+			if(stepfuture!=null && stepinfo==null)
 			{
 				stepfut	= stepfuture;
 				stepfuture	= null;
