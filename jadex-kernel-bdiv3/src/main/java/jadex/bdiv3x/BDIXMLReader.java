@@ -511,7 +511,7 @@ public class BDIXMLReader extends ComponentXMLReader
 						throw new RuntimeException(e);
 					}
 				}
-				SBDIModel.mergeSubcapabilities(model, subcaps);
+				SBDIModel.mergeSubcapabilities(model, subcaps, context.getClassLoader());
 				
 				return null;
 			}

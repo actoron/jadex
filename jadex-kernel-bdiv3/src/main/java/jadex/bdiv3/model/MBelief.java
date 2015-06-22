@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +111,7 @@ public class MBelief extends MElement
 	 */
 	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] beliefevents, Collection<EventType> rawevents)
 	{
-		this(target, impl, dynamic, updaterate, new LinkedHashSet<String>(Arrays.asList(beliefevents)), rawevents);
+		this(target, impl, dynamic, updaterate, beliefevents!=null ? new LinkedHashSet<String>(Arrays.asList(beliefevents)) : null, rawevents);
 	}
 	
 	/**
@@ -144,7 +145,7 @@ public class MBelief extends MElement
 	 */
 	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, String[] beliefevents, Collection<EventType> rawevents)
 	{
-		this(target, impl, dynamic, updaterate, new LinkedHashSet<String>(Arrays.asList(beliefevents)), rawevents);
+		this(target, impl, dynamic, updaterate, beliefevents!=null ? new LinkedHashSet<String>(Arrays.asList(beliefevents)) : null, rawevents);
 	}
 	
 
@@ -689,17 +690,23 @@ public class MBelief extends MElement
 	 */
 	public Set<String> getBeliefEvents()
 	{
-		return beliefevents;
+		if(beliefevents!=null)
+		{
+			return beliefevents;
+		}
+		else
+		{
+			return Collections.emptySet();
+		}
 	}
 
 	/**
 	 *  Set the events.
 	 *  @param events The events to set.
 	 */
-	public void setBeliefEvents(Collection<String> events)
+	public void setBeliefEvents(Set<String> events)
 	{
-		this.beliefevents.clear();
-		this.beliefevents.addAll(events);
+		this.beliefevents	= events;
 	}
 	
 	/**

@@ -25,7 +25,7 @@ public class SBDIModel
 	 *  @param bdimodel	The model.
 	 *  @param capas	The sub capabilities.
 	 */
-	public static void mergeSubcapabilities(IBDIModel bdimodel, Map<String, IBDIModel> capas)
+	public static void mergeSubcapabilities(IBDIModel bdimodel, Map<String, IBDIModel> capas, ClassLoader cl)
 	{
 		// Add elements from capabilities.
 		for(Map.Entry<String, IBDIModel> entry: capas.entrySet())
@@ -65,8 +65,8 @@ public class SBDIModel
 				bel2.setDefaultFacts(bel.getDefaultFacts());
 				bel2.setDescription(bel.getDescription());
 				bel2.setEvaluationMode(bel.getEvaluationMode());
-				bel2.setMulti(bel.isMulti(null));
-				bel2.setClazz(new ClassInfo(bel.getClazz().getType(null)));
+				bel2.setMulti(bel.isMulti(cl));
+				bel2.setClazz(bel.getClazz()!=null ? new ClassInfo(bel.getClazz().getType(cl)) : null);
 				bdimodel.getCapability().addBelief(bel2);
 			}
 			

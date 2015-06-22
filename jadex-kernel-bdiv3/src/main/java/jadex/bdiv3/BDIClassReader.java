@@ -266,7 +266,7 @@ public class BDIClassReader extends MicroClassReader
 			}
 		}
 		
-		SBDIModel.mergeSubcapabilities(bdimodel, capas);
+		SBDIModel.mergeSubcapabilities(bdimodel, capas, cl);
 		
 		for(Class<?> clazz: agtcls)
 		{

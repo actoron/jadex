@@ -18,6 +18,7 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -662,7 +663,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				if(tododyn.remove(name))
 				{
 					MBelief mbel = model.getCapability().getBelief(name);
-					mbel.getBeliefEvents().addAll(evs);
+					Set<String>	bevs	= new LinkedHashSet<String>(mbel.getBeliefEvents());
+					bevs.addAll(evs);
+					mbel.setBeliefEvents(bevs);
 					
 					MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
 						+SUtil.firstToUpperCase(name), Type.getMethodDescriptor(Type.VOID_TYPE), null, null);
