@@ -49,6 +49,15 @@ public class MElement
 	}
 	
 	/**
+	 *  Set the flat name, i.e. do not replay separator chars.
+	 *  @param name The name to set.
+	 */
+	public void setFlatName(String name)
+	{
+		this.name = name;
+	}
+	
+	/**
 	 *  Get the description.
 	 *  @return The description.
 	 */
