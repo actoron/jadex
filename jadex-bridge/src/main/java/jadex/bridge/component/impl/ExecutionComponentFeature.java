@@ -470,7 +470,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Add to parent and wake up parent.
 			if(parenta==null)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
