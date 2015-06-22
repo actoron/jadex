@@ -26,13 +26,16 @@ public class Test
     {
 //		IFuture<String> f = $(getHello(), Test::getWorld);
 //		IFuture<String> f = getHello().$(x -> getWorld(x));
-        IFuture<String> f = $(getHello(), x -> getWorld(x));
-        IIntermediateFuture<String> inf = $$(getABC(), x -> getD(x));
+//        IFuture<String> f = $(getHello(), x -> getWorld(x));
+//        IIntermediateFuture<String> inf = $$(getABC(), x -> getD(x));
 
-        test(Test::abc);
+        IIntermediateFuture<String> inf2 = $$$(getABC(), x -> getE(x));
         
-        System.out.println("result is: "+$(f));
-        System.out.println("result is: "+$(inf));
+//        test(Test::abc);
+        
+//        System.out.println("result is: "+$(f));
+//        System.out.println("result is: "+$(inf));
+        System.out.println("result is: "+$(inf2));
     }
 
     public static void abc(String a)
@@ -64,6 +67,16 @@ public class Test
     {
         Future<String> ret = new Future<>();
         ret.setResult(arg+"_1");
+        return ret;
+    }
+    
+    public static IIntermediateFuture<String> getE(String arg)
+    {
+        IntermediateFuture<String> ret = new IntermediateFuture<>();
+        ret.addIntermediateResult(arg+"_1");
+        ret.addIntermediateResult(arg+"_2");
+        ret.addIntermediateResult(arg+"_3");
+        ret.setFinished();
         return ret;
     }
 
@@ -258,6 +271,81 @@ public class Test
 //        return ret;
 //    }
 
+    /**
+	 *  Implements async loop and applies a an async multi-function to each element.
+	 *  @param function The function.
+	 *  @return True result intermediate future.
+	 */
+	public static <R, E> IIntermediateFuture<R> $$$(IIntermediateFuture<E> orig, final IResultCommand<IIntermediateFuture<R>, E> function)
+    {
+        final IntermediateFuture<R> ret = new IntermediateFuture<R>();
+
+        orig.addIntermediateResultListener(new IIntermediateResultListener<E>()
+        {
+        	boolean fin = false;
+        	int cnt = 0;
+        	int num = 0;
+        	
+            public void resultAvailable(Collection<E> result)
+            {
+                for(E v: result)
+                {
+                    intermediateResultAvailable(v);
+                }
+                finished();
+            }
+
+            public void intermediateResultAvailable(E result)
+            {
+            	cnt++;
+                IIntermediateFuture<R> res = function.execute(result);
+                res.addResultListener(new IIntermediateResultListener<R>()
+                {
+                    public void intermediateResultAvailable(R result)
+                    {
+                    	ret.addIntermediateResult(result);
+                    }
+                    
+                    public void finished()
+                    {
+                    	if(++num==cnt && fin)
+                    	{
+                    		ret.setFinished();
+                    	}
+                    }
+                    
+                    public void resultAvailable(Collection<R> result)
+                    {
+                    	for(R r: result)
+                        {
+                            intermediateResultAvailable(r);
+                        }
+                        finished();
+                    }
+                    
+                    public void exceptionOccurred(Exception exception)
+                    {
+                    	ret.setExceptionIfUndone(exception);
+                    }
+                });
+            }
+
+            public void finished()
+            {
+            	fin = true;
+            	if(num==cnt)
+            		ret.setFinished();
+            }
+
+            public void exceptionOccurred(Exception exception)
+            {
+                ret.setException(exception);
+            }
+        });
+
+        return ret;
+    }
+    
     public static <T> T $(IFuture<T> fut)
     {
         return fut.get();

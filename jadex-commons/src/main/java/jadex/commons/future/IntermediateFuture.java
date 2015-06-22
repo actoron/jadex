@@ -875,7 +875,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
                     
                     public void finished()
                     {
-                    	if(fin && ++num==cnt)
+                    	if(++num==cnt && fin)
                     	{
                     		ret.setFinished();
                     	}
@@ -900,6 +900,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
             public void finished()
             {
             	fin = true;
+            	if(num==cnt)
+            		ret.setFinished();
             }
 
             public void exceptionOccurred(Exception exception)
