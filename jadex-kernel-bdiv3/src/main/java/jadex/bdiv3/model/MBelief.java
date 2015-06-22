@@ -93,7 +93,7 @@ public class MBelief extends MElement
 		this.ftarget = target;
 		this.impl = impl;
 		if(dynamic)
-			this.evaluationmode = MParameter.EvaluationMode.PULL;
+			this.evaluationmode = updaterate>0 ? MParameter.EvaluationMode.POLLING : MParameter.EvaluationMode.PULL;
 //		this.dynamic = dynamic;
 		this.updaterate	= updaterate;
 		this.beliefevents = beliefevents;

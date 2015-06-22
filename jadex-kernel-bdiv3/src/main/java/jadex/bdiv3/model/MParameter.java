@@ -73,7 +73,8 @@ public class MParameter extends MElement
 	{
 		STATIC("static"),
 		PUSH("push"),
-		PULL("pull");
+		PULL("pull"),
+		POLLING("polling");
 		
 		protected String str;
 		
