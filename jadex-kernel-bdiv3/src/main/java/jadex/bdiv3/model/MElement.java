@@ -26,7 +26,8 @@ public class MElement
 	 */
 	public MElement(String name)
 	{
-		setName(name);
+		this.name	= name; // Do not replay name for POJOs (hack?)
+//		setName(name);
 	}
 
 	/**
