@@ -81,11 +81,14 @@ public class RCapability implements ICapability
 //	 */
 //	public IPlanbase getPlanbase();
 
-//	/**
-//	 *  Get the event base.
-//	 *  @return The event base.
-//	 */
-//	public IEventbase getEventbase();
+	/**
+	 *  Get the event base.
+	 *  @return The event base.
+	 */
+	public IEventbase getEventbase()
+	{
+		return capa.getEventbase();
+	}
 
 	/**
 	 * Get the expression base.

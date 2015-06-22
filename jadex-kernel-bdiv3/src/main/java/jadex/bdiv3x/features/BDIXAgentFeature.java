@@ -27,6 +27,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bdiv3x.runtime.IBeliefbase;
+import jadex.bdiv3x.runtime.IEventbase;
 import jadex.bdiv3x.runtime.IExpressionbase;
 import jadex.bdiv3x.runtime.IGoalbase;
 import jadex.bdiv3x.runtime.RBeliefbase;
@@ -1623,6 +1624,15 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	public IBeliefbase getBeliefbase()
 	{
 		return capa.getBeliefbase();
+	}
+	
+	/**
+	 *  Get the event base.
+	 *  @return The event base.
+	 */
+	public IEventbase getEventbase()
+	{
+		return capa.getEventbase();
 	}
 
 	/**
