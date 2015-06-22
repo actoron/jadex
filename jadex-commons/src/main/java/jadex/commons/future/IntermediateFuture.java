@@ -1,6 +1,8 @@
 package jadex.commons.future;
 
 
+import jadex.commons.IResultCommand;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,8 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
-import org.junit.rules.Timeout;
 
 /**
  *  Default implementation of an intermediate future.
@@ -775,4 +775,139 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		}
 	}
 	
+	//-------- java 8 extensions --------
+	
+	/**
+	 *  Implements async loop and applies a an async function to each element.
+	 *  @param function The function.
+	 *  @return True result intermediate future.
+	 */
+	public <R> IIntermediateFuture<R> $$(final IResultCommand<IFuture<R>, E> function)
+    {
+       return $$(function, null);
+    }
+	
+	/**
+	 *  Implements async loop and applies a an async function to each element.
+	 *  @param function The function.
+	 *  @return True result intermediate future.
+	 */
+	public <R> IIntermediateFuture<R> $$(final IResultCommand<IFuture<R>, E> function, Class<?> futuretype)
+    {
+        final IntermediateFuture<R> ret = futuretype==null? new IntermediateFuture<R>(): (IntermediateFuture)getFuture(futuretype);
+
+        this.addIntermediateResultListener(new IIntermediateResultListener<E>()
+        {
+            public void resultAvailable(Collection<E> result)
+            {
+                for(E v: result)
+                {
+                    intermediateResultAvailable(v);
+                }
+                finished();
+            }
+
+            public void intermediateResultAvailable(E result)
+            {
+                IFuture<R> res = function.execute(result);
+                res.addResultListener(new IResultListener<R>()
+                {
+                    public void resultAvailable(R result)
+                    {
+                        ret.addIntermediateResult(result);
+                    }
+
+                    public void exceptionOccurred(Exception exception)
+                    {
+                        ret.setExceptionIfUndone(exception);
+                    }
+                });
+            }
+
+            public void finished()
+            {
+                ret.setFinished();
+            }
+
+            public void exceptionOccurred(Exception exception)
+            {
+                ret.setException(exception);
+            }
+        });
+
+        return ret;
+    }
+	
+	/**
+	 *  Implements async loop and applies a an async multi-function to each element.
+	 *  @param function The function.
+	 *  @return True result intermediate future.
+	 */
+	public <R> IIntermediateFuture<R> $$$(final IResultCommand<IIntermediateFuture<R>, E> function)
+    {
+        final IntermediateFuture<R> ret = new IntermediateFuture<R>();
+
+        this.addIntermediateResultListener(new IIntermediateResultListener<E>()
+        {
+        	boolean fin = false;
+        	int cnt = 0;
+        	int num = 0;
+        	
+            public void resultAvailable(Collection<E> result)
+            {
+                for(E v: result)
+                {
+                    intermediateResultAvailable(v);
+                }
+                finished();
+            }
+
+            public void intermediateResultAvailable(E result)
+            {
+            	cnt++;
+                IIntermediateFuture<R> res = function.execute(result);
+                res.addResultListener(new IIntermediateResultListener<R>()
+                {
+                    public void intermediateResultAvailable(R result)
+                    {
+                    	ret.addIntermediateResult(result);
+                    }
+                    
+                    public void finished()
+                    {
+                    	if(fin && ++num==cnt)
+                    	{
+                    		ret.setFinished();
+                    	}
+                    }
+                    
+                    public void resultAvailable(Collection<R> result)
+                    {
+                    	for(R r: result)
+                        {
+                            intermediateResultAvailable(r);
+                        }
+                        finished();
+                    }
+                    
+                    public void exceptionOccurred(Exception exception)
+                    {
+                    	ret.setExceptionIfUndone(exception);
+                    }
+                });
+            }
+
+            public void finished()
+            {
+            	fin = true;
+            }
+
+            public void exceptionOccurred(Exception exception)
+            {
+                ret.setException(exception);
+            }
+        });
+
+        return ret;
+    }
 }

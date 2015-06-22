@@ -1,5 +1,7 @@
 package jadex.commons.future;
 
+import jadex.commons.IResultCommand;
+
 
 /**
  * Interface for futures. Similar to Java Future interface but adds a listener
@@ -94,5 +96,29 @@ public interface IFuture<E>
 	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener);
 
 
-
+	//-------- java8 extensions --------
+	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @return Future of the result of the second async call.
+	 */
+//		public <T> IFuture<T> $(final Function<E, IFuture<T>> function);
+	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function);
+	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param futuretype The type of the return future.
+	 *  @return Future of the result of the second async call.
+	 */
+	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function, Class<?> futuretype);
+	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param ret The 
+	 *  @return Future of the result of the second async call (=ret).
+	 */
+	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function, Class<?> futuretype, final Future<T> ret);
 }

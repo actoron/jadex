@@ -1,6 +1,8 @@
 package jadex.commons.future;
 
 
+import jadex.commons.IResultCommand;
+
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
@@ -102,4 +104,27 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 *        <code>null</code> enables default exception logging.
 	 */
     public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener, IFunctionalExceptionListener exceptionListener);
+
+    //-------- java 8 extensions --------
+    
+    /**
+	 *  Implements async loop and applies a an async function to each element.
+	 *  @param function The function.
+	 *  @return True result intermediate future.
+	 */
+	public <R> IIntermediateFuture<R> $$(final IResultCommand<IFuture<R>, E> function);
+	
+	/**
+	 *  Implements async loop and applies a an async function to each element.
+	 *  @param function The function.
+	 *  @return True result intermediate future.
+	 */
+	public <R> IIntermediateFuture<R> $$(final IResultCommand<IFuture<R>, E> function, Class<?> futuretype);
+	
+	/**
+	 *  Implements async loop and applies a an async multi-function to each element.
+	 *  @param function The function.
+	 *  @return True result intermediate future.
+	 */
+	public <R> IIntermediateFuture<R> $$$(final IResultCommand<IIntermediateFuture<R>, E> function);
 }

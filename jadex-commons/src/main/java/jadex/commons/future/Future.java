@@ -4,6 +4,7 @@ package jadex.commons.future;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
@@ -11,13 +12,11 @@ import jadex.commons.concurrent.TimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -714,4 +713,84 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	{
 		return listener!=null;
 	}
+	
+	//-------- java8 extensions --------
+	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @return Future of the result of the second async call.
+	 */
+	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function)
+    {
+        return $(function, null);
+    }
+	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param futuretype The type of the return future.
+	 *  @return Future of the result of the second async call.
+	 */
+	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function, Class<?> futuretype)
+    {
+		final Future<T> ret = getFuture(futuretype);
+
+        this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
+        {
+        	public void customResultAvailable(E result)
+        	{
+        		 IFuture<T> res = function.execute(result);
+                 res.addResultListener(new DelegationResultListener<T>(ret));
+        	}	
+        });
+
+        return ret;
+    }
+	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param ret The 
+	 *  @return Future of the result of the second async call (=ret).
+	 */
+	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function, Class<?> futuretype, final Future<T> ret)
+    {
+        this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
+        {
+        	public void customResultAvailable(E result)
+        	{
+        		 IFuture<T> res = function.execute(result);
+                 res.addResultListener(new DelegationResultListener<T>(ret));
+        	}	
+        });
+        return ret;
+    }
+	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param futuretype The type of the result future (cannot be automatically determined).
+	 *  @return Future of the result of the second async call.
+	 */
+	public <T> Future<T> getFuture(Class<?> futuretype)
+    {
+		Future<T> ret;
+		if(futuretype==null)
+		{
+			ret = new Future<T>();
+		}	
+		else
+		{
+			try
+			{
+				ret = (Future<T>)futuretype.newInstance();
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		return ret;
+    }
 }

@@ -1,5 +1,6 @@
 package monads;
 
+import jadex.commons.IResultCommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalResultListener;
@@ -71,25 +72,16 @@ public class Test
     	function.resultAvailable((R)"hsa");
     }
     
-    public static <V, R> IFuture<R> $(IFuture<V> orig, final Function<V, IFuture<R>> function)
+//    public static <V, R> IFuture<R> $(IFuture<V> orig, final Function<V, IFuture<R>> function)
+    public static <V, R> IFuture<R> $(IFuture<V> orig, final IResultCommand<IFuture<R>, V> function)
     {
         Future<R> ret = new Future<>();
 
-        System.out.println(function);
-        
-        Type type = ((Class<?>)function.getClass().getGenericInterfaces()[0]).getDeclaredMethods()[0].getGenericReturnType();
-
-        if(type instanceof ParameterizedType) 
-        {
-            Type actualType = ((ParameterizedType) type).getActualTypeArguments()[0];
-            System.out.println(actualType);
-        }
-        
         orig.addResultListener(new IResultListener<V>()
         {
             public void resultAvailable(V result)
             {
-                IFuture<R> res = function.apply(result);
+                IFuture<R> res = function.execute(result);
                 res.addResultListener(new DelegationResultListener<R>(ret));
             }
 
@@ -147,6 +139,52 @@ public class Test
 
         return ret;
     }
+    
+//    public static <V, R> IIntermediateFuture<R> $$(IIntermediateFuture<V> orig, final Function<V, IFuture<R>> function)
+//    {
+//        IntermediateFuture<R> ret = new IntermediateFuture<>();
+//
+//        orig.addIntermediateResultListener(new IIntermediateResultListener<V>()
+//        {
+//            public void resultAvailable(Collection<V> result)
+//            {
+//                for(V v: result)
+//                {
+//                    intermediateResultAvailable(v);
+//                }
+//                finished();
+//            }
+//
+//            public void intermediateResultAvailable(V result)
+//            {
+//                IFuture<R> res = function.apply(result);
+//                res.addResultListener(new IResultListener<R>()
+//                {
+//                    public void resultAvailable(R result)
+//                    {
+//                        ret.addIntermediateResult(result);
+//                    }
+//
+//                    public void exceptionOccurred(Exception exception)
+//                    {
+//                        ret.setExceptionIfUndone(exception);
+//                    }
+//                });
+//            }
+//
+//            public void finished()
+//            {
+//                ret.setFinished();
+//            }
+//
+//            public void exceptionOccurred(Exception exception)
+//            {
+//                ret.setException(exception);
+//            }
+//        });
+//
+//        return ret;
+//    }
 
 //    public static <V, R> IIntermediateFuture<R> $$(IIntermediateFuture<V> orig, final Function<V, R> function)
 //    {
