@@ -117,6 +117,7 @@ public class APL
 					try
 					{
 						candidates = (List<Object>)m.invoke(pojo, new Object[0]);
+						done = true;
 					}
 					catch(InvocationTargetException e)
 					{

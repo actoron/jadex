@@ -7,7 +7,6 @@ import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.Direction;
@@ -21,31 +20,24 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Goal instance implementation.
