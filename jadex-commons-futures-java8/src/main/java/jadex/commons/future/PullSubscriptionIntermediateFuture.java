@@ -12,28 +12,21 @@ import jadex.commons.ICommand;
  *  The future can be supplied with a command that
  *  gets executed if terminate is called.
  */
-public class PullIntermediateFuture<E> extends TerminableIntermediateFuture<E> 
-	implements IPullIntermediateFuture<E>
+public class PullSubscriptionIntermediateFuture<E> extends SubscriptionIntermediateFuture<E> 
+	implements IPullSubscriptionIntermediateFuture<E>
 {
 	//-------- attributes --------
 	
 	/** The pull command. */
-	protected ICommand<PullIntermediateFuture<E>> pullcmd;
+	protected ICommand<PullSubscriptionIntermediateFuture<E>> pullcmd;
 	
 	//-------- constructors --------
 
 	/**
-	 *  Create a new future.
-	 */
-	public PullIntermediateFuture()
-	{
-	}
-	
-	/**
 	 *  Create a future that is already done (failed).
 	 *  @param exception	The exception.
 	 */
-	public PullIntermediateFuture(Exception exception)
+	public PullSubscriptionIntermediateFuture(Exception exception)
 	{
 		super(exception);
 	}
@@ -42,7 +35,7 @@ public class PullIntermediateFuture<E> extends TerminableIntermediateFuture<E>
 	 *  Create a new future.
 	 *  @param terminate The runnable to be executed in case of termination.
 	 */
-	public PullIntermediateFuture(ICommand<PullIntermediateFuture<E>> pullcmd)
+	public PullSubscriptionIntermediateFuture(ICommand<PullSubscriptionIntermediateFuture<E>> pullcmd)
 	{
 		this.pullcmd = pullcmd;
 	}
@@ -51,7 +44,7 @@ public class PullIntermediateFuture<E> extends TerminableIntermediateFuture<E>
 	 *  Create a new future.
 	 *  @param terminate The runnable to be executed in case of termination.
 	 */
-	public PullIntermediateFuture(ICommand<PullIntermediateFuture<E>> pullcmd,
+	public PullSubscriptionIntermediateFuture(ICommand<PullSubscriptionIntermediateFuture<E>> pullcmd,
 		ITerminationCommand termcom)
 	{
 		super(termcom);
@@ -68,4 +61,5 @@ public class PullIntermediateFuture<E> extends TerminableIntermediateFuture<E>
 		pullcmd.execute(this);
 	}
 }
+
 

@@ -23,13 +23,6 @@ public class PullIntermediateFuture<E> extends TerminableIntermediateFuture<E>
 	//-------- constructors --------
 
 	/**
-	 *  Create a new future.
-	 */
-	public PullIntermediateFuture()
-	{
-	}
-	
-	/**
 	 *  Create a future that is already done (failed).
 	 *  @param exception	The exception.
 	 */
