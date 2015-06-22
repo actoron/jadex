@@ -734,7 +734,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public <T> IFuture<T> $(final Function<E, IFuture<T>> function, Class<?> futuretype)
     {
-		Future<T> ret = getFuture(futuretype);
+		final Future<T> ret = getFuture(futuretype);
 
         this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
         {
@@ -751,9 +751,10 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	/**
 	 *  Sequential execution of async methods via implicit delegation.
 	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param ret The 
 	 *  @return Future of the result of the second async call.
 	 */
-	public <T> IFuture<T> $(final Function<E, IFuture<T>> function, Class<?> futuretype, Future<T> ret)
+	public <T> IFuture<T> $(final Function<E, IFuture<T>> function, Class<?> futuretype, final Future<T> ret)
     {
         this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
         {
