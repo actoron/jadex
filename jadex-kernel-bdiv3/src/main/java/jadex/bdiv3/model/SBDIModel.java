@@ -48,40 +48,67 @@ public class SBDIModel
 			
 			for(MBelief bel: capa.getCapability().getBeliefs())
 			{
-				Set<String> events = convertEvents(name, bel.getBeliefEvents(), bdimodel);
+				String	belname	= name+MElement.CAPABILITY_SEPARATOR+bel.getName();
 				
-				MBelief	bel2;
-				if(bel.getGetter()==null)
+				// Mapped (abstract) belief.
+				if(bdimodel.getBeliefMappings().containsKey(belname))
 				{
-					bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+					// ignore (only use mapping from bdimodel).
+					// Todo: merge settings? update rate etc.
 				}
+				
+				// Copy concrete belief.
 				else
 				{
-					bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
-					bel2.setSetter(bel.getSetter());
+					Set<String> events = convertEvents(name, bel.getBeliefEvents(), bdimodel);
+					
+					MBelief	bel2;
+					if(bel.getGetter()==null)
+					{
+						bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+					}
+					else
+					{
+						bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+						bel2.setSetter(bel.getSetter());
+					}
+					bel2.setName(belname);
+					bel2.setDefaultFact(bel.getDefaultFact());
+					bel2.setDefaultFacts(bel.getDefaultFacts());
+					bel2.setDescription(bel.getDescription());
+					bel2.setEvaluationMode(bel.getEvaluationMode());
+					bel2.setMulti(bel.isMulti(cl));
+					bel2.setClazz(bel.getClazz()!=null ? new ClassInfo(bel.getClazz().getType(cl)) : null);
+					bdimodel.getCapability().addBelief(bel2);
 				}
-				bel2.setName(name+MElement.CAPABILITY_SEPARATOR+bel.getName());
-				bel2.setDefaultFact(bel.getDefaultFact());
-				bel2.setDefaultFacts(bel.getDefaultFacts());
-				bel2.setDescription(bel.getDescription());
-				bel2.setEvaluationMode(bel.getEvaluationMode());
-				bel2.setMulti(bel.isMulti(cl));
-				bel2.setClazz(bel.getClazz()!=null ? new ClassInfo(bel.getClazz().getType(cl)) : null);
-				bdimodel.getCapability().addBelief(bel2);
 			}
 			
 			if(bdimodel instanceof BDIModel)
 			{
 				for(String target: capa.getBeliefMappings().keySet())
 				{
-					((BDIModel)bdimodel).addBeliefMapping(name+MElement.CAPABILITY_SEPARATOR+target, name+MElement.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
+					String	source	= name+MElement.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target);
+					// Resolve transitive reference.
+					if(bdimodel.getBeliefMappings().containsKey(source))
+					{
+						source	= bdimodel.getBeliefMappings().get(source);
+						assert !bdimodel.getBeliefMappings().containsKey(source);
+					}
+					((BDIModel)bdimodel).addBeliefMapping(name+MElement.CAPABILITY_SEPARATOR+target, source);
 				}
 			}
 			else
 			{
 				for(String target: capa.getBeliefMappings().keySet())
 				{
-					((BDIXModel)bdimodel).addBeliefMapping(name+MElement.CAPABILITY_SEPARATOR+target, name+MElement.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
+					String	source	= name+MElement.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target);
+					// Resolve transitive reference.
+					if(bdimodel.getBeliefMappings().containsKey(source))
+					{
+						source	= bdimodel.getBeliefMappings().get(source);
+						assert !bdimodel.getBeliefMappings().containsKey(source);
+					}
+					((BDIXModel)bdimodel).addBeliefMapping(name+MElement.CAPABILITY_SEPARATOR+target, source);
 				}
 			}
 			

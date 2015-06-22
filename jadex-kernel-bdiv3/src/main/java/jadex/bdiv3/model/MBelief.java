@@ -4,6 +4,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IBelief;
 import jadex.bdiv3x.runtime.IBeliefSet;
 import jadex.bridge.ClassInfo;
@@ -430,16 +431,19 @@ public class MBelief extends MElement
 	{
 		boolean ret = false;
 		
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
 		
-		if(bdif instanceof BDIAgentFeature)
+		// Pojo
+		if(agent.getComponentFeature0(IBDIAgentFeature.class)!=null)
 		{
 			String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 				? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
 			return setValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), value, agent.getClassLoader());
 		}
-		else if(bdif instanceof jadex.bdiv3x.features.BDIXAgentFeature)
+		
+		// Xml
+		else 
 		{
+			IInternalBDIAgentFeature	bdif	= (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIXAgentFeature.class);
 			if(multi)
 			{
 				IBeliefSet rbelset = bdif.getCapability().getBeliefbase().getBeliefSet(getName());
