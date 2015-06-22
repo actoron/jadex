@@ -786,7 +786,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	{
 		IValueFetcher	ret	= agent.getFetcher();
 		
-		if(element!=null && element.getCapabilityName()!=null)	// Todo: some RElements have no MElement (e.g. expression)
+		// Todo: some RElements have no MElement (e.g. expression)
+		if(element!=null && element.getCapabilityName()!=null && agent.getComponentFeature0(IBDIXAgentFeature.class)!=null)	
 		{
 			final RBeliefbase	beliefbase	= ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIXAgentFeature.class)).getCapability().getBeliefbase();
 			final String	prefix	= element.getCapabilityName()+MElement.CAPABILITY_SEPARATOR;
