@@ -34,8 +34,7 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 */
 	public ITerminableFuture<Void> extinguishFire(final ISpaceObject disaster)
 	{
-		IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
-		final RCapability capa = bdif.getCapability();
+		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
 
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{

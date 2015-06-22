@@ -195,7 +195,7 @@ public class ObserverGui	extends EnvironmentGui
 			@Classname("update")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				final IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
 				capa.getBeliefbase().getBelief("vision").addBeliefListener(new BeliefAdapter<Object>()
 				{
 					public void beliefChanged(ChangeEvent ae)

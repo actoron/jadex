@@ -35,9 +35,7 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 */
 	public ITerminableFuture<Void> clearChemicals(final ISpaceObject disaster)
 	{
-		// Hack, as long as we do not have a specific XML feature interface
-		IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
-		final RCapability capa = bdif.getCapability();
+		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
 		
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{

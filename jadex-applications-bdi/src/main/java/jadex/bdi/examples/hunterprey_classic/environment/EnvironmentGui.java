@@ -345,9 +345,7 @@ public class EnvironmentGui	extends JFrame
 							@Classname("rt")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								// Hack, as long as we do not have a specific XML feature interface
-								IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-								RCapability capa = bdif.getCapability();
+								IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
 								capa.getBeliefbase().getBelief("roundtime").setFact(val);
 								return IFuture.DONE;
 							}

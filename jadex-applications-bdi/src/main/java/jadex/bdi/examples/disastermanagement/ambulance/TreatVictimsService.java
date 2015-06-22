@@ -36,8 +36,7 @@ public class TreatVictimsService implements ITreatVictimsService
 	 */
 	public ITerminableFuture<Void> treatVictims(final ISpaceObject disaster)
 	{
-		IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
-		final RCapability capa = bdif.getCapability();
+		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
 		
 		final IGoal tv = (IGoal)capa.getGoalbase().createGoal("treat_victims");
 		
