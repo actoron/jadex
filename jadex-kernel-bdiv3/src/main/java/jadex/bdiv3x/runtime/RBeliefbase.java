@@ -12,6 +12,7 @@ import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
+import jadex.bdiv3x.BDIXModel;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -459,6 +460,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 //			this.value = value;
 //			publisher.observeValue(value);
 //			publisher.publishToolBeliefEvent();
+			
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, value);
+			}
 		}
 
 		/**
@@ -609,6 +618,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public void addFact(Object fact)
 		{
 			internalGetValues().add(fact);
+			
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, internalGetValues());
+			}
 		}
 
 		/**
@@ -618,6 +635,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public void removeFact(Object fact)
 		{
 			internalGetValues().remove(fact);
+			
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, internalGetValues());
+			}
 		}
 
 		/**
@@ -640,6 +665,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public void removeFacts()
 		{
 			internalGetValues().clear();
+			
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, internalGetValues());
+			}
 		}
 
 		/**
@@ -734,6 +767,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			{
 				RuleSystem rs = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIXAgentFeature.class)).getRuleSystem();
 				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+getName(), new ChangeInfo<Object>(facts, facts, null)));
+			}
+
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, internalGetValues());
 			}
 		}
 		

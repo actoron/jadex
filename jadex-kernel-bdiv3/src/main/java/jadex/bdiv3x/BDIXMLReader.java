@@ -29,6 +29,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -59,6 +60,7 @@ import jadex.xml.reader.IObjectLinker;
 import jadex.xml.stax.QName;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -512,6 +514,45 @@ public class BDIXMLReader extends ComponentXMLReader
 					}
 				}
 				SBDIModel.mergeSubcapabilities(model, subcaps, context.getClassLoader());
+				
+				// Handle references and add arguments / results
+				for(MBelief mbel: model.getCapability().getBeliefs().toArray(new MBelief[model.getCapability().getBeliefs().size()]))	// Iterate over array to allow removal during iteration.
+				{
+					// Remove reference and add mapping instead.
+					MBelief	resolved	= mbel;
+					String	ref	= mbel.getRef();
+					if(ref!=null)
+					{
+						// Flatten transitive reference.
+						if(model.getBeliefMappings().containsKey(ref))
+						{
+							ref	= model.getBeliefMappings().get(ref);
+						}
+						
+						model.addBeliefMapping(ref, mbel.getName());
+						model.getCapability().removeBelief(mbel);
+						// Todo: merge settings? update rate etc.
+						
+						// Resolve to real belief.
+						resolved	= model.getCapability().getBelief(ref);
+					}
+					
+					if(mbel.isExported())
+					{
+						// Add default value (from potentially wrong capability) only as description.
+						String	desc	= resolved.getDescription()!=null ? resolved.getDescription()+": "+findBeliefDefaultValue(model, resolved, null) : ""+findBeliefDefaultValue(model, resolved, null);
+						model.addArgument(new Argument(mbel.getName(), desc, resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, null));
+					}
+					
+					if(mbel.isResult())
+					{
+						// Add default value (from potentially wrong capability) only as description.
+						String	desc	= resolved.getDescription()!=null ? resolved.getDescription()+": "+findBeliefDefaultValue(model, resolved, null) : ""+findBeliefDefaultValue(model, resolved, null);
+						model.addResult(new Argument(mbel.getName(), desc, resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, null));
+						
+						model.addResultMapping(ref, mbel.getName());
+					}
+				}
 				
 				return null;
 			}
@@ -1244,5 +1285,71 @@ public class BDIXMLReader extends ComponentXMLReader
 		{
 			return 0;
 		}
+	}
+
+	/**
+	 *  Find the belief/ref value.
+	 *  Returns the expression text of the default value.
+	 */
+	// Todo: other kernels provide object values!? 
+	protected static String	findBeliefDefaultValue(BDIXModel model, MBelief mbel, String configname)
+	{
+		List<UnparsedExpression>	facts	= null;
+		
+		// Search initial value in configuration.
+		MConfiguration	config	= configname!=null 
+			? model.getCapability().getConfiguration(configname) : model.getConfigurations().length>0
+			? model.getCapability().getConfiguration(model.getConfigurations()[0].getName()) : null;
+		if(config!=null && config.getInitialBeliefs()!=null)
+		{
+			MConfigBeliefElement	inibel	= null;
+			for(MConfigBeliefElement cbel: config.getInitialBeliefs())
+			{
+				if(cbel.getName().equals(mbel.getName()))
+				{
+					inibel	= cbel;
+					break;
+				}
+			}
+			
+			if(inibel!=null)
+			{
+				inibel.getFacts();
+			}
+		}
+
+		if(facts==null)
+		{
+			// todo: unify fact/facts in mbel and configbel
+			facts	= mbel.isMulti(null) ? mbel.getDefaultFacts() : mbel.getDefaultFact()!=null ? Collections.singletonList(mbel.getDefaultFact()) : null;
+		}
+		
+		String ret = null;
+
+		if(facts!=null)
+		{
+			if(mbel.isMulti(null))
+			{
+				for(UnparsedExpression fact: facts)
+				{
+					if(ret==null)
+					{
+						ret	= "[";
+					}
+					else
+					{
+						ret	+= ", ";
+					}
+					ret	+= fact.getValue();
+				}
+				ret	+= "]";
+			}
+			else if(facts.size()>0)
+			{
+				ret	= facts.get(0).getValue();
+			}
+		}
+		
+		return ret;
 	}
 }

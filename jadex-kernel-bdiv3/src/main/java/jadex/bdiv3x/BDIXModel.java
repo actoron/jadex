@@ -22,6 +22,10 @@ public class BDIXModel	extends ModelInfo implements IBDIModel
 	/** The belief mappings. */
 	protected Map<String, String> beliefmappings;
 	
+	/** The result mappings <belief->result>. */
+	// Cached for speed.
+	protected Map<String, String> resultmappings;
+	
 	//-------- constructors --------
 	
 	/**
@@ -89,5 +93,36 @@ public class BDIXModel	extends ModelInfo implements IBDIModel
 			beliefmappings = new LinkedHashMap<String, String>();
 		}
 		beliefmappings.put(target, source);
+	}
+	
+	/**
+	 *  Get the result mappings (belief->result).
+	 */
+	public Map<String, String> getResultMappings()
+	{
+		Map<String, String>	ret;
+		if(resultmappings==null)
+		{
+			ret	= Collections.emptyMap();
+		}
+		else
+		{
+			ret	= resultmappings;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Add a result mapping.
+	 *  @param belief The belief name (fully qualified). 
+	 *  @param result The result name.
+	 */
+	public void addResultMapping(String belief, String result)
+	{
+		if(resultmappings==null)
+		{
+			resultmappings = new LinkedHashMap<String, String>();
+		}
+		resultmappings.put(belief, result);
 	}
 }

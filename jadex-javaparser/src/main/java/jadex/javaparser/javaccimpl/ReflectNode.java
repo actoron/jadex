@@ -448,7 +448,7 @@ public class ReflectNode	extends ExpressionNode
 					ref	= type_or_value.getValue(fetcher);
 					if(ref==null)
 					{
-						throw new RuntimeException("Cannot invoke nonstatic method on null value: "+this);
+						throw new NullPointerException("Cannot invoke nonstatic method on null value: "+this);
 					}
 					else if(clazz==null)
 					{

@@ -252,7 +252,7 @@ public class MBelief extends MElement
 	 */
 	public boolean isResult()
 	{
-		return exported;
+		return result;
 	}
 
 	/**
@@ -279,7 +279,8 @@ public class MBelief extends MElement
 	 */
 	public void setRef(String reference)
 	{
-		this.ref = reference;
+		this.ref = reference!=null ? reference.replace(".", CAPABILITY_SEPARATOR) : null;	// Fix XML names on load.
+
 	}
 	
 	/**
