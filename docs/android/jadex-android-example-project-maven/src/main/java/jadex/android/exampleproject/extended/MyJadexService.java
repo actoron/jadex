@@ -10,6 +10,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ISuspendable;
+import jadex.commons.future.ThreadSuspendable;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -140,10 +143,14 @@ public class MyJadexService extends JadexPlatformService
 				if (listener != null) {
 					listener.onHelloWorldAgentStarted(result.toString());
 				}
-				
 				System.out.println("calling Agent");
 				IAgentInterface agent = getsService(IAgentInterface.class);
 				agent.callAgent("Hello Agent!");
+				
+				System.out.println("Getting string");
+				IFuture<String> string = agent.getString();
+				String string2 = string.get();
+				System.out.println(string2);
 				
 			}
 		});
