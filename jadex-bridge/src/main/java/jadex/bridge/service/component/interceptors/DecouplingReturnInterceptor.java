@@ -79,7 +79,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							}
 							else
 							{
-								caller.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+								caller.getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{

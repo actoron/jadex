@@ -623,7 +623,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void> setProperties(Properties props)
 	{
 		final boolean	exe	= props.getBooleanProperty("executing");
-		return access.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
+		return access.getExternalAccess().scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

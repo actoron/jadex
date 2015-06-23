@@ -295,7 +295,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
 		if(mon!=null)
 		{
-			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -331,7 +331,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
 		if(mon!=null)
 		{
-			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

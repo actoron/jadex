@@ -95,7 +95,7 @@ public class SRemoteGui
 //		{
 //			System.err.println("ea is null in remote gui!!!");
 //		}
-		return ea.scheduleImmediate(new IComponentStep<Object[]>()
+		return ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Object[]>()
 		{
 			@Classname("getServiceInfos")
 			public IFuture<Object[]> execute(final IInternalAccess ia)
@@ -1079,7 +1079,7 @@ public class SRemoteGui
 	 */
 	public static IFuture<Boolean>	isTestcase(final String model, IExternalAccess access, final IResourceIdentifier rid)
 	{
-		return access.scheduleImmediate(new IComponentStep<Boolean>()
+		return access.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Boolean>()
 		{
 			@Classname("isTestcase")
 			public IFuture<Boolean> execute(final IInternalAccess ia)
@@ -1385,7 +1385,7 @@ public class SRemoteGui
 	 */
 	public static IFuture<Boolean>	matchModel(final String path, final String model, IExternalAccess exta)
 	{
-		return exta.scheduleImmediate(new IComponentStep<Boolean>()
+		return exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Boolean>()
 		{
 			@Classname("matchModel")
 			public IFuture<Boolean> execute(IInternalAccess ia)
@@ -1410,7 +1410,7 @@ public class SRemoteGui
 	 */
 	public static IFuture<Void>	logWarning(final String msg, IExternalAccess exta)
 	{
-		return exta.scheduleImmediate(new IComponentStep<Void>()
+		return exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			@Classname("logWarning")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -1426,7 +1426,7 @@ public class SRemoteGui
 	 */
 	public static void redirectInput(IExternalAccess access, final String txt)
 	{
-		access.scheduleImmediate(new IComponentStep<Void>()
+		access.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			@Classname("redir")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -1445,7 +1445,7 @@ public class SRemoteGui
 	
 	public static void addConsoleListener(IExternalAccess platformaccess, final String id, final IRemoteChangeListener rcl)
 	{
-		platformaccess.scheduleImmediate(new IComponentStep<Void>()
+		platformaccess.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			@Classname("installListener")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -1460,7 +1460,7 @@ public class SRemoteGui
 	
 	public static void removeConsoleListener(IExternalAccess platformaccess, final String id)
 	{
-		platformaccess.scheduleImmediate(new IComponentStep<Void>()
+		platformaccess.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			@Classname("removeListener")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -1500,7 +1500,7 @@ public class SRemoteGui
 		 */
 		public void changeOccurred(final ChangeEvent event)
 		{
-			instance.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
+			instance.getExternalAccess().scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

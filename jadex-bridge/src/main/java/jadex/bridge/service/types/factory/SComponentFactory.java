@@ -583,7 +583,7 @@ public class SComponentFactory
 	{
 		final Future<Object> ret = new Future<Object>();
 		
-		exta.scheduleImmediate(new IComponentStep<Object>()
+		exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Object>()
 		{
 			@Classname("getProperty")
 			public IFuture<Object> execute(final IInternalAccess ia)

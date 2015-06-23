@@ -2,12 +2,10 @@ package jadex.bdiv3.features.impl;
 
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.runtime.impl.RPlan;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.commons.future.IFuture;
 
 /**
  *  BDI execution feature adds rule engine behavior to the cycle.

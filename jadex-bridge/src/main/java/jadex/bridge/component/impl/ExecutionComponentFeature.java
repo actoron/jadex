@@ -8,11 +8,13 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
@@ -26,8 +28,13 @@ import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -45,14 +52,15 @@ import jadex.commons.future.ThreadLocalTransferHelper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 /**
@@ -66,13 +74,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	// Hack!!! Non-final to be setable from Starter 
 	public static boolean DEBUG = false;
 	
+	/** Constant for step event. */
+	public static final String TYPE_STEP = "step";
+	
 	//-------- attributes --------
 	
 	/** The component steps. */
-	protected List<StepInfo> steps;
+	protected TreeSet<StepInfo> steps;
 	
-	/** The immediate component steps. */
-	protected List<StepInfo> isteps;
+	/** The stepcnt - used to keep insertion order of same priority elements in the queue. */
+	protected int stepcnt;
 	
 	/** The current timer. */
 	protected List<ITimer> timers = new ArrayList<ITimer>();
@@ -90,7 +101,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	protected Map<Object, Executor>	blocked; 
 	
 	/** The flag for a requested step (true when a step is allowed in stepwise execution). */
-//	protected boolean	dostep;
 	protected String stepinfo;
 	
 	/** The future to be informed, when the requested step is finished. */
@@ -163,6 +173,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
+		return scheduleStep(IExecutionFeature.STEP_PRIORITY_NOMRAL, step);
+	}
+	
+	/**
+	 *  Execute a component step.
+	 *  @param step The component step.
+	 *  @param priority The step priority (0 is default).
+	 */
+	public <T>	IFuture<T> scheduleStep(int priority, IComponentStep<T> step)
+	{
 		final Future<T> ret = createStepFuture(step);
 		
 		synchronized(this)
@@ -176,9 +196,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				if(steps==null)
 				{
-					steps	= new LinkedList<StepInfo>();
+					steps = new TreeSet<StepInfo>();
 				}
-				steps.add(new StepInfo(step, ret, new ThreadLocalTransferHelper(true)));
+				int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+				addStep(new StepInfo(step, ret, new ThreadLocalTransferHelper(true), prio, stepcnt++));
+				
+//				System.out.println("steps: "+steps);
 				
 				if(DEBUG)
 				{
@@ -198,49 +221,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		return ret;
 	}
-	
-	/**
-	 *  Execute an immediate component step,
-	 *  i.e., the step is executed also when the component is currently suspended.
-	 */
-	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step)
-	{
-		final Future<T> ret = createStepFuture(step);
-		
-		synchronized(this)
-		{
-			// Todo: synchronize with last step!
-			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()))
-			{
-				ret.setException(new ComponentTerminatedException(getComponent().getComponentIdentifier()));
-			}
-			else
-			{
-				if(isteps==null)
-				{
-					isteps	= new LinkedList<StepInfo>();
-				}
-				isteps.add(new StepInfo(step, ret, new ThreadLocalTransferHelper(true)));
-				
-				if(DEBUG)
-				{
-					if(stepadditions==null)
-					{
-						stepadditions	= new HashMap<IComponentStep<?>, Exception>();
-					}
-					stepadditions.put(step, new DebugException(step.toString()));
-				}
-			}
-		}
 
-		if(!ret.isDone())
-		{
-			wakeup();
-		}
-		
-		return ret;
-	}
-	
 	/**
 	 *  Wait for some time and execute a component step afterwards.
 	 */
@@ -258,23 +239,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		final Future<T> ret = new Future<T>();
 		
-		if(delay==0)
-			System.out.println("sched start");
-		
 //		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 		{
 			public void customResultAvailable(IClockService cs)
 			{
-				if(delay==0)
-					System.out.println("sched mid");
 				ITimedObject	to	= new ITimedObject()
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						if(delay==0)
-							System.out.println("sched end");
 						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 					}
 					
@@ -569,7 +543,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getComponentIdentifier()));
 			}
-			else if(stepinfo!=null || stepfuture!=null)
+			else if(this.stepinfo!=null || stepfuture!=null)
 			{
 				ret.setException(new RuntimeException("Only one step allowed at a time."));
 			}
@@ -946,23 +920,59 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		final StepInfo step;
 		synchronized(this)
 		{
-			if(isteps!=null)
+			if(steps!=null && steps.size()>0) 
 			{
-				step	= isteps.remove(0);
-				if(isteps.isEmpty())
+//				if(getComponent().getComponentIdentifier().getName().indexOf("Pojo")!=-1)
+//					System.out.println("executing");
+				StepInfo si = steps.first();
+				if(si.getPriority()>=STEP_PRIORITY_IMMEDIATE)
 				{
-					isteps	= null;
+					// remove the element
+					step = removeStep();
 				}
-			}
-			else if(steps!=null && (IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || stepinfo!=null))
-			{
-//				dostep	= false;
-				stepinfo = null;
-				step	= steps.remove(0);
-				if(steps.isEmpty())
+				else
 				{
-					steps	= null;
+					if((IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState())))
+					{
+						step = removeStep();
+					}
+					else if(stepfuture!=null)
+					{
+						boolean found = false;
+						StepInfo tmp = null;
+						if(stepinfo!=null)
+						{
+							// search for right step via stepinfo
+							for(StepInfo sti: steps)
+							{
+								if(stepinfo.equals(""+sti.getStepCount()))
+								{
+									tmp = sti;
+									steps.remove(sti);
+									publishStepEvent(sti, IMonitoringEvent.EVENT_TYPE_DISPOSAL);
+									found = true;
+									break;
+								}
+							}
+							if(!found)
+								getComponent().getLogger().warning("Step not found with id: "+stepinfo+"\n");
+							
+							stepinfo = null;
+						}
+						
+						if(!found)
+							tmp = removeStep();
+						step = tmp;
+					}
+					else
+					{
+						step = null;
+					}
 				}
+//				if(steps.isEmpty())
+//				{
+//					steps	= null;
+//				}
 			}
 			else
 			{
@@ -974,6 +984,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(step!=null)
 		{
+//			if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
+//				getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//			{
+//				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
+//					getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
+//					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+//				// null was step.getCause()
+//			}
+			
 			IFuture<?>	stepfut	= null;
 			Throwable ex = null;
 			try
@@ -985,6 +1004,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					step.getTransfer().afterSwitch();
 					stepfut	= step.getStep().execute(component);
+//					if(getComponent().getComponentIdentifier().getName().indexOf("Pojo")!=-1)
+//						System.out.println("executed: "+step.getStep());
 				}
 				else
 				{
@@ -1052,7 +1073,22 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				try
 				{
-					stepfut.addResultListener(new DelegationResultListener(step.getFuture()));
+					stepfut.addResultListener(new DelegationResultListener(step.getFuture())
+					{
+						public void customResultAvailable(Object result)
+						{
+							if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
+								getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+							{
+								getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
+									getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+									+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+								// null was step.getCause()
+							}
+							
+							super.customResultAvailable(result);
+						}
+					});
 		
 					if(DEBUG && !step.getFuture().hasResultListener())
 					{
@@ -1118,7 +1154,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			synchronized(this)
 			{
-				hasstep	= isteps!=null || steps!=null;
+				hasstep	= steps!=null && steps.size()>0;
 			}
 		}
 		else
@@ -1127,12 +1163,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		
 		boolean	cycle	= false;
-		if(IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || stepinfo!=null || stepfuture!=null)
+		if(IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || stepfuture!=null)
 		{
 			try
 			{
-//				dostep	= false;
-				stepinfo = null;
 				cycle	= executeCycle();
 			}
 			catch(Exception e)
@@ -1234,6 +1268,146 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		catch(Exception e)
 		{
 			throw new RuntimeException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a new step.
+	 */
+	protected void addStep(StepInfo step)
+	{
+		if(steps==null)
+			steps	= new TreeSet<StepInfo>();
+		steps.add(step);
+		
+		publishStepEvent(step, IMonitoringEvent.EVENT_TYPE_CREATION);
+	}
+	
+	/**
+	 *  Remove a new step.
+	 */
+	protected StepInfo removeStep()
+	{
+		assert steps!=null && !steps.isEmpty();
+		StepInfo ret = steps.pollFirst();
+		
+		publishStepEvent(ret, IMonitoringEvent.EVENT_TYPE_DISPOSAL);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Publish a step event.
+	 */
+	public void publishStepEvent(StepInfo step, String type)
+	{
+		if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
+			&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		{
+			MonitoringEvent event = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+			// null was step.getCause()
+			event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
+			event.setProperty("details", getStepDetails(step));
+			event.setProperty("id", step.getStepCount());
+			getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL);
+		}
+	}
+	
+	/**
+	 *  Get the details of a step.
+	 */
+	public Object getStepDetails(StepInfo step)
+	{
+		Object	ret;
+		
+//		if(step instanceof MicroAgent.ExecuteWaitForStep)
+//		{
+//			MicroAgent.ExecuteWaitForStep waitForStep = (MicroAgent.ExecuteWaitForStep) step;
+//			if(waitForStep.getComponentStep() instanceof ITransferableStep)
+//			{
+//				ret = ((ITransferableStep) waitForStep.getComponentStep()).getTransferableObject();
+//				return ret;
+//			}
+//		}
+		
+		StringBuffer buf = new StringBuffer();
+
+		buf.append("Class = ").append(step.getStep().getClass().getName()).append("\n");
+		buf.append("Priority = ").append(step.getPriority()).append("\n");
+		buf.append("Id = ").append(step.getStepCount()).append("\n");
+			
+		Field[] fields = step.getStep().getClass().getDeclaredFields();
+		for(int i = 0; i < fields.length; i++) 
+		{
+			String valtext = null;
+			try 
+			{
+				fields[i].setAccessible(true);
+				Object val = fields[i].get(step.getStep());
+				valtext = val == null ? "null" : val.toString();
+			} 
+			catch (Exception e) 
+			{
+				valtext = e.getMessage();
+			}
+
+			if(valtext != null) 
+			{
+				buf.append("\n");
+				buf.append(fields[i].getName()).append(" = ").append(valtext);
+			}
+		}
+
+		ret = buf.toString();
+			
+		return ret;
+	}
+	
+	/**
+	 *  Get the current steps.
+	 *  @return The current steps.
+	 */
+	public synchronized List<StepInfo> getCurrentSteps()
+	{
+		List<StepInfo> ret = null;
+		
+		if(steps!=null && steps.size()>0)
+		{
+			ret = new ArrayList<StepInfo>(steps);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the current state as events.
+	 */
+	public List<IMonitoringEvent> getCurrentStateEvents()
+	{
+		List<IMonitoringEvent> ret = null;
+		
+		IExecutionFeature exef = getComponent().getComponentFeature0(IExecutionFeature.class);
+		if(exef instanceof ExecutionComponentFeature)
+		{
+			List<StepInfo> steps = ((ExecutionComponentFeature)exef).getCurrentSteps();
+			if(steps!=null)
+			{
+				ret = new ArrayList<IMonitoringEvent>();
+				for(StepInfo step: steps)
+				{
+					if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE)
+					{
+						MonitoringEvent event = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+						// null was step.getCause()
+						event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
+						event.setProperty("details", getStepDetails(step));
+						event.setProperty("id", step.getStepCount());
+						ret.add(event);
+					}
+				}
+			}
 		}
 		
 		return ret;
@@ -1361,7 +1535,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Info struct for steps.
 	 */
-	public static class StepInfo
+	public static class StepInfo implements Comparable<StepInfo>
 	{
 		/** The component step. */
 		protected IComponentStep<?> step; 
@@ -1372,19 +1546,30 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		/** The service call. */
 		protected ThreadLocalTransferHelper transfer;
 		
-//		/** The cause. */
-//		protected Cause cause;
-
+		/** The priority. */
+		protected int priority;
+		
+		/** The number of the step (preserve insert order of same prio). */
+		protected int stepcnt;
+		
+//		/**
+//		 *  Create a new StepInfo. 
+//		 */
+//		public StepInfo(IComponentStep<?> step, Future<?> future, ThreadLocalTransferHelper transfer, int stepcnt)
+//		{
+//			this(step, future, transfer, step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): 0, stepcnt);
+//		}
+		
 		/**
 		 *  Create a new StepInfo. 
 		 */
-		public StepInfo(IComponentStep<?> step, Future<?> future, ThreadLocalTransferHelper transfer)//ServiceCall call, Cause cause)
+		public StepInfo(IComponentStep<?> step, Future<?> future, ThreadLocalTransferHelper transfer, int priority, int stepcnt)
 		{
 			this.step = step;
 			this.future = future;
 			this.transfer = transfer;
-//			this.call = call;
-//			this.cause = cause;
+			this.priority = priority;
+			this.stepcnt = stepcnt;
 		}
 
 		/**
@@ -1440,41 +1625,60 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			this.transfer = transfer;
 		}
+
+		/**
+		 *  Get the priority.
+		 *  @return The priority
+		 */
+		public int getPriority()
+		{
+			return priority;
+		}
+
+		/**
+		 *  The priority to set.
+		 *  @param priority The priority to set
+		 */
+		public void setPriority(int priority)
+		{
+			this.priority = priority;
+		}
 		
-//		/**
-//		 *  Get the call.
-//		 *  @return The call.
-//		 */
-//		public ServiceCall getCall()
-//		{
-//			return call;
-//		}
-//
-//		/**
-//		 *  Set the call.
-//		 *  @param call The call to set.
-//		 */
-//		public void setCall(ServiceCall call)
-//		{
-//			this.call = call;
-//		}
-//
-//		/**
-//		 *  Get the cause.
-//		 *  @return The cause.
-//		 */
-//		public Cause getCause()
-//		{
-//			return cause;
-//		}
-//
-//		/**
-//		 *  Set the cause.
-//		 *  @param cause The cause to set.
-//		 */
-//		public void setCause(Cause cause)
-//		{
-//			this.cause = cause;
-//		}
+		/**
+		 *  Get the stepcnt.
+		 *  @return The stepcnt
+		 */
+		public int getStepCount()
+		{
+			return stepcnt;
+		}
+
+		/**
+		 *  The stepcnt to set.
+		 *  @param stepcnt The stepcnt to set
+		 */
+		public void setStepCount(int stepcnt)
+		{
+			this.stepcnt = stepcnt;
+		}
+
+		/**
+		 *  Compare two steps.
+		 */
+		public int compareTo(StepInfo o)
+		{
+			int ret = o.getPriority()-getPriority();
+			if(ret==0)
+				ret = getStepCount()-o.getStepCount();
+			return ret;
+		}
+
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return "StepInfo(priority=" + priority + ")";
+		}
 	}
 }

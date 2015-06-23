@@ -167,7 +167,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 		final Object mon = this;
 //		final Exception ex	= new TimeoutException();
 		
-		exta.scheduleStep(new IComponentStep<Void>()
+		exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{

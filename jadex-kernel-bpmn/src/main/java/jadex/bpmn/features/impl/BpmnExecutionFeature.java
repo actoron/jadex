@@ -200,7 +200,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
 //		System.out.println("adding bpmn step: "+step);
-		return super.scheduleImmediate(step);
+		return scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, step);
 	}
 	
 	/**
@@ -274,6 +274,9 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
 		
 		ProcessThread thread = null;
+		
+		// Selects step according to stepinfo, is thread id :-(
+		
 //		String stepinfo = null;
 //		if(getComponent().getComponentDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
 //		{

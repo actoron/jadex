@@ -88,7 +88,7 @@ public class MicroDebuggerPanel	implements IDebuggerPanel
 	 */
 	public String getStepInfo()
 	{
-		return null;
+		return micropanel.getStepInfo();
 	}
 	
 	/**

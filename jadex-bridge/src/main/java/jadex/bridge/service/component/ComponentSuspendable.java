@@ -84,7 +84,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 //		Thread.dumpStack();
 		if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
-			agent.getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

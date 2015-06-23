@@ -1,10 +1,12 @@
 package jadex.bridge.component.impl;
 
 import jadex.bridge.BulkMonitoringEvent;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
@@ -322,6 +324,10 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	public List<IMonitoringEvent> getCurrentStateEvents()
 	{
-		return null;
+		List<IMonitoringEvent> ret = null;
+		IExecutionFeature exef = getComponent().getComponentFeature0(IExecutionFeature.class);
+		if(exef instanceof ExecutionComponentFeature)
+			ret = ((ExecutionComponentFeature)exef).getCurrentStateEvents();
+		return ret;
 	}
 }

@@ -11,16 +11,33 @@ import jadex.commons.future.IResultListener;
  */
 public interface IExecutionFeature
 {
+	/** Constant for first normal step level. */
+	public static final int STEP_PRIORITY_NOMRAL = 0;
+
+	/** Constant for first immediate step level. */
+	public static final int STEP_PRIORITY_IMMEDIATE = 100;
+	
 	/**
 	 *  Execute a component step.
+	 *  @param step The component step.
 	 */
 	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step);
 	
 	/**
-	 *  Execute an immediate component step,
-	 *  i.e., the step is executed also when the component is currently suspended.
+	 *  Execute a component step.
+	 *  @param step The component step.
+	 *  @param priority The step priority.
+	 *  The priority x>STEP_PRIORITY_IMMEDIATE being immediate steps,
+	 *  i.e. all steps with prio x>=STEP_PRIORITY_IMMEDIATE are always executed (even when suspended).
+	 *  Default steps get prio STEP_PRIORITY_NOMRAL (not immediate). 
 	 */
-	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step);
+	public <T>	IFuture<T> scheduleStep(int priority, IComponentStep<T> step);
+	
+//	/**
+//	 *  Execute an immediate component step,
+//	 *  i.e., the step is executed also when the component is currently suspended.
+//	 */
+//	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step);
 	
 	/**
 	 *  Wait for some time and execute a component step afterwards.

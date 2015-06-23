@@ -2,7 +2,6 @@ package jadex.tools.debugger.micro;
 
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
@@ -56,7 +55,7 @@ public class MicroAgentViewPanel extends JPanel
 	protected JTextArea step;
 	
 	/** The last displayed step. */
-	protected Object laststep;
+	protected IMonitoringEvent laststep;
 	
 	/** The list for the history. */
 	protected DefaultListModel history;
@@ -331,6 +330,8 @@ public class MicroAgentViewPanel extends JPanel
 			{
 				try
 				{
+//					System.out.println("ev: "+event);
+					
 					// todo: hide decomposing bulk events
 					if(event instanceof BulkMonitoringEvent)
 					{
@@ -344,49 +345,51 @@ public class MicroAgentViewPanel extends JPanel
 							}
 						}
 					}
-					
-//					if("initialState".equals(event.getType()))
-//					{
-//						Object[] scpy = (Object[])((Object[])event.getValue())[0];
-//						Object[] hcpy = (Object[])((Object[])event.getValue())[1];
-//					
-//						steps.removeAllElements();
-//						for(int i=0; i<scpy.length; i++)
-//							steps.addElement(scpy[i]);
-//						
-//						history.removeAllElements();
-//						for(int i=0; i<hcpy.length; i++)
-//							history.addElement(hcpy[i]);
-//						
-//						if(steps.size()>0)
-//							sl.setSelectedIndex(0);
-//					}
-					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION) && event.getType().endsWith("step"))//MicroAgentInterpreter.TYPE_STEP))
+					else
 					{
-						steps.addElement(event);
-						if(laststep==null && steps.size()==1)
+	//					if("initialState".equals(event.getType()))
+	//					{
+	//						Object[] scpy = (Object[])((Object[])event.getValue())[0];
+	//						Object[] hcpy = (Object[])((Object[])event.getValue())[1];
+	//					
+	//						steps.removeAllElements();
+	//						for(int i=0; i<scpy.length; i++)
+	//							steps.addElement(scpy[i]);
+	//						
+	//						history.removeAllElements();
+	//						for(int i=0; i<hcpy.length; i++)
+	//							history.addElement(hcpy[i]);
+	//						
+	//						if(steps.size()>0)
+	//							sl.setSelectedIndex(0);
+	//					}
+						if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION) && event.getType().endsWith("step"))//MicroAgentInterpreter.TYPE_STEP))
 						{
-							sl.setSelectedIndex(0);
-						}
-					}
-					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL) && event.getType().endsWith("step"))//MicroAgentInterpreter.TYPE_STEP))
-					{
-	//					steps.removeElementAt(((Integer)event.getValue()).intValue());
-						for(int i=0; i<steps.size(); i++)
-						{
-							IMonitoringEvent tmp = (IMonitoringEvent)steps.get(i);
-							if(event.getProperty("sourcename").equals(tmp.getProperty("sourcename")))
+							steps.addElement(event);
+							if(laststep==null && steps.size()==1)
 							{
-								steps.removeElementAt(i);
-								break;
+								sl.setSelectedIndex(0);
 							}
 						}
-						if(hon.isSelected())
+						else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL) && event.getType().endsWith("step"))//MicroAgentInterpreter.TYPE_STEP))
 						{
-							history.addElement(event);
-							hl.ensureIndexIsVisible(history.size()-1);
-							hl.invalidate();
-							hl.repaint();
+		//					steps.removeElementAt(((Integer)event.getValue()).intValue());
+							for(int i=0; i<steps.size(); i++)
+							{
+								IMonitoringEvent tmp = (IMonitoringEvent)steps.get(i);
+								if(event.getProperty("sourcename").equals(tmp.getProperty("sourcename")))
+								{
+									steps.removeElementAt(i);
+									break;
+								}
+							}
+							if(hon.isSelected())
+							{
+								history.addElement(event);
+								hl.ensureIndexIsVisible(history.size()-1);
+								hl.invalidate();
+								hl.repaint();
+							}
 						}
 					}
 				}
@@ -442,7 +445,7 @@ public class MicroAgentViewPanel extends JPanel
 	 */
 	public String getStepInfo()
 	{
-		return null;
+		return laststep!=null? ""+laststep.getProperties().get("id"): null;
 	}
 	
 	/**

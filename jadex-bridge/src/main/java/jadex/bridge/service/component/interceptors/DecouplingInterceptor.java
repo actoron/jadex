@@ -248,7 +248,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //				System.out.println("decouple: "+Thread.currentThread());
 //			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), to, rt))
 //				.addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
-			ea.scheduleStep(new InvokeMethodStep(sic))
+			ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new InvokeMethodStep(sic))
 				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		

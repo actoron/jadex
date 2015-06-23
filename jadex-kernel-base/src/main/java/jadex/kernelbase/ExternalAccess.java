@@ -465,16 +465,45 @@ public class ExternalAccess implements IExternalAccess
 	}
 	
 	/**
-	 *  Execute some code on the component's thread.
-	 *  Unlike scheduleStep(), the action will also be executed
-	 *  while the component is suspended.
-	 *  @param action	Code to be executed on the component's thread.
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public <T>	IFuture<T> scheduleImmediate(final IComponentStep<T> step)
+	public <T> IFuture<T> scheduleStep(int priority, final IComponentStep<T> step)
 	{
-		return ia.getComponentFeature(IExecutionFeature.class).scheduleImmediate(step);
+		if(step==null)
+		{
+			throw new NullPointerException("No step. Maybe decoding error?");
+		}
+		
+		Method	m	= SReflect.getMethod(step.getClass(), "execute", new Class[]{IInternalAccess.class});
+		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(m.getReturnType(), new FutureFunctionality((Logger)null)) : new Future<T>();
+		
+		if(!valid)
+		{
+			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+		}
+		else
+		{
+			IFuture<T>	fut	= ia.getComponentFeature(IExecutionFeature.class).scheduleStep(priority, step);
+			FutureFunctionality.connectDelegationFuture(ret, fut);
+		}
+		
+		return ret;
 	}
+	
+//	/**
+//	 *  Execute some code on the component's thread.
+//	 *  Unlike scheduleStep(), the action will also be executed
+//	 *  while the component is suspended.
+//	 *  @param action	Code to be executed on the component's thread.
+//	 *  @return The result of the step.
+//	 */
+//	public <T>	IFuture<T> scheduleImmediate(final IComponentStep<T> step)
+//	{
+//		return ia.getComponentFeature(IExecutionFeature.class).scheduleImmediate(step);
+//	}
 	
 	/**
 	 *  Schedule a step of the component.
@@ -494,16 +523,15 @@ public class ExternalAccess implements IExternalAccess
 		else
 		{
 			SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new DelegationResultListener(ret)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IClockService cs)
 				{
-					IClockService cs = (IClockService)result;
 					cs.createTimer(delay, new ITimedObject()
 					{
 						public void timeEventOccurred(long currenttime)
 						{
-							scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+							scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
 						}
 					});
 				}
@@ -514,14 +542,13 @@ public class ExternalAccess implements IExternalAccess
 	}
 	
 	/**
-	 *  Execute some code on the component's thread.
-	 *  Unlike scheduleStep(), the action will also be executed
-	 *  while the component is suspended.
-	 *  @param action	Code to be executed on the component's thread.
+	 *  Schedule a step of the component.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the component.
 	 *  @param delay The delay to wait before step should be done.
 	 *  @return The result of the step.
 	 */
-	public <T> IFuture<T> scheduleImmediate(final IComponentStep<T> step, final long delay)
+	public <T>	IFuture<T> scheduleStep(final int priority, final IComponentStep<T> step, final long delay)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -532,16 +559,15 @@ public class ExternalAccess implements IExternalAccess
 		else
 		{
 			SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new DelegationResultListener(ret)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IClockService cs)
 				{
-					IClockService cs = (IClockService)result;
 					cs.createTimer(delay, new ITimedObject()
 					{
 						public void timeEventOccurred(long currenttime)
 						{
-							scheduleImmediate(step).addResultListener(new DelegationResultListener(ret));
+							scheduleStep(step, priority).addResultListener(new DelegationResultListener<T>(ret));
 						}
 					});
 				}
@@ -550,6 +576,43 @@ public class ExternalAccess implements IExternalAccess
 		
 		return ret;
 	}
+	
+//	/**
+//	 *  Execute some code on the component's thread.
+//	 *  Unlike scheduleStep(), the action will also be executed
+//	 *  while the component is suspended.
+//	 *  @param action	Code to be executed on the component's thread.
+//	 *  @param delay The delay to wait before step should be done.
+//	 *  @return The result of the step.
+//	 */
+//	public <T> IFuture<T> scheduleImmediate(final IComponentStep<T> step, final long delay)
+//	{
+//		final Future<T> ret = new Future<T>();
+//		
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else
+//		{
+//			SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+//			{
+//				public void customResultAvailable(IClockService cs)
+//				{
+//					cs.createTimer(delay, new ITimedObject()
+//					{
+//						public void timeEventOccurred(long currenttime)
+//						{
+//							scheduleImmediate(step).addResultListener(new DelegationResultListener<T>(ret));
+//						}
+//					});
+//				}
+//			}));
+//		}
+//		
+//		return ret;
+//	}
 	
 	// todo: move to external feature!?
 	/**
@@ -569,7 +632,7 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

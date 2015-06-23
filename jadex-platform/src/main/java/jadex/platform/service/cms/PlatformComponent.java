@@ -117,7 +117,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		// Run init on component thread (hack!!! requires that execution feature works before its init)
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		return exe.scheduleImmediate(new IComponentStep<Void>()
+		return exe.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -152,7 +152,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IFuture<Void>	shutdown()
 	{
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		return exe.scheduleImmediate(new IComponentStep<Void>()
+		return exe.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
