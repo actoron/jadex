@@ -56,7 +56,7 @@ public class CapabilityWrapper implements ICapability
 		else
 		{
 			IBDIXAgentFeature bdixf = agent.getComponentFeature0(IBDIXAgentFeature.class);
-			if(bdixf.getBeliefbase().hasBelief(name))
+			if(bdixf.getBeliefbase().containsBelief(name))
 			{
 				bdixf.getBeliefbase().getBelief(name).addBeliefListener(listener);
 			}
@@ -83,7 +83,7 @@ public class CapabilityWrapper implements ICapability
 		else
 		{
 			IBDIXAgentFeature bdixf = agent.getComponentFeature0(IBDIXAgentFeature.class);
-			if(bdixf.getBeliefbase().hasBelief(name))
+			if(bdixf.getBeliefbase().containsBelief(name))
 			{
 				bdixf.getBeliefbase().getBelief(name).removeBeliefListener(listener);
 			}

@@ -279,7 +279,7 @@ public class MBelief extends MElement
 	 */
 	public void setRef(String reference)
 	{
-		this.ref = reference!=null ? reference.replace(".", CAPABILITY_SEPARATOR) : null;	// Fix XML names on load.
+		this.ref = internalName(reference);
 
 	}
 	
