@@ -9,6 +9,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.SResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class ClientMain  {
 				IComponentManagementService cms = getCMS(access).get();
 				System.out.println("Got cms");
 				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = cms.createComponent("CDClient", ClientAgent.class.getName() + ".class", null);
-				fut2.addResultListener(cid -> System.out.println("Client Agent created"));
+				fut2.addTuple2ResultListener(cid -> System.out.println("Client Agent created"), SResultListener.ignoreResults());
 				return Future.getEmptyFuture();
 			});
 		});
@@ -78,7 +79,7 @@ public class ClientMain  {
 
 	private IFuture<IComponentManagementService> getCMS(IExternalAccess access)
 	{
-		return access.scheduleStep(ia -> SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		return access.scheduleStep(ia -> SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 
 }
