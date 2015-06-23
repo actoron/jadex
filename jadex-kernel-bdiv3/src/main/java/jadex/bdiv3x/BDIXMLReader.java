@@ -527,8 +527,8 @@ public class BDIXMLReader extends ComponentXMLReader
 				new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},  
 				new SubobjectInfo[]{
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefref")}), new AccessInfo(new QName(uri, "beliefref"), "elementRef")),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefsetref")}), new AccessInfo(new QName(uri, "beliefsetref"), "elementRef")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefref")}), new AccessInfo(new QName(uri, "beliefref"), "belief")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefsetref")}), new AccessInfo(new QName(uri, "beliefsetref"), "belief")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "belief")}), new AccessInfo(new QName(uri, "belief"), "belief")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefset")}), new AccessInfo(new QName(uri, "beliefset"), "belief")),
 		
@@ -569,49 +569,60 @@ public class BDIXMLReader extends ComponentXMLReader
 //			}), null, new OAVObjectReaderHandler());
 //				
 //		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, 
-			new IPostProcessor()
+		AttributeInfo[]	belattrs	= new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+			new AttributeInfo(new AccessInfo("argument", "exported")),
+			new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
+		};
+		IPostProcessor	belproc	= new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
 			{
-				public Object postProcess(IContext context, Object object)
-				{
-					MBelief mbel = (MBelief)object;
-					mbel.setMulti(false);
-					return mbel;
-				}
-				
-				public int getPass()
-				{
-					return 0;
-				}
-			}),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("argument", "exported")),
-				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
-			}, new SubobjectInfo[]{
+				MBelief mbel = (MBelief)object;
+				mbel.setMulti(false);
+				return mbel;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		};
+		IPostProcessor	belsetproc	= new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				MBelief mbel = (MBelief)object;
+				mbel.setMulti(true);
+				return mbel;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		};
+
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, belproc),
+			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
 			}), null));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(MBelief.class, 
-			new IPostProcessor()
-			{
-				public Object postProcess(IContext context, Object object)
-				{
-					MBelief mbel = (MBelief)object;
-					mbel.setMulti(true);
-					return mbel;
-				}
-				
-				public int getPass()
-				{
-					return 0;
-				}
-			}), 
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("argument", "exported")),
-				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
-			}, new SubobjectInfo[]{
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(MBelief.class, belsetproc), 
+			new MappingInfo(null, belattrs, new SubobjectInfo[]{
+				// because there is only MBelief the facts expression is stored as default fact
+				// and multiple facts are added to a list
+				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFacts")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "facts"), "defaultFact"))
+			}), null));//, new OAVObjectReaderHandler()));	
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MBelief.class, belproc),
+			new MappingInfo(null, belattrs, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
+			}), null));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(MBelief.class, belsetproc), 
+			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				// because there is only MBelief the facts expression is stored as default fact
 				// and multiple facts are added to a list
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFacts")),
@@ -619,27 +630,6 @@ public class BDIXMLReader extends ComponentXMLReader
 			}), null));//, new OAVObjectReaderHandler()));	
 		
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MElementRef.class),	null, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(MElementRef.class),	null, null));
-//		
-//		TypeInfo ti_belset = new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(OAVBDIMetaModel.beliefset_type, tepost), 
-//			new MappingInfo(null, new AttributeInfo[]{
-//			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.typedelement_has_classname)),
-//			new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AccessInfo.IGNORE_WRITE))
-//			}, 
-//			new SubobjectInfo[]{
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "facts"), OAVBDIMetaModel.beliefset_has_factsexpression)),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), OAVBDIMetaModel.beliefset_has_facts))
-//			}), null, new OAVObjectReaderHandler());
-//		
-//		typeinfos.add(ti_belset);
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(OAVBDIMetaModel.beliefsetreference_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "fact")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(ti_expression)));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "facts")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(ti_expression)));
-//		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "plan")), new ObjectInfo(MPlan.class), 
 			new MappingInfo(null, "description", null, null,
 			new SubobjectInfo[]{

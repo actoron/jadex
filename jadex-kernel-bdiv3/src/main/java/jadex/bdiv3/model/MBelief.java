@@ -72,9 +72,15 @@ public class MBelief extends MElement
 	/** The type (if explicitly specified). */
 	protected ClassInfo clazz;
 	
-	/** The exported flag. */
+	/** The exported / argument flag. */
 	protected boolean exported;
 	
+	/** The result flag. */
+	protected boolean result;
+	
+	/** The reference. */
+	protected String ref;
+
 	/** The direction. */
 	protected EvaluationMode evaluationmode = EvaluationMode.STATIC;
 	
@@ -238,6 +244,42 @@ public class MBelief extends MElement
 	public void setExported(boolean exported)
 	{
 		this.exported = exported;
+	}
+	
+	/**
+	 *  Get the result flag.
+	 *  @return The result flag.
+	 */
+	public boolean isResult()
+	{
+		return exported;
+	}
+
+	/**
+	 *  Set the result flag.
+	 *  @param result The result to set.
+	 */
+	public void setResult(boolean result)
+	{
+		this.result = result;
+	}
+	
+	/**
+	 *  Get the reference. For belief references.
+	 *  @return The reference.
+	 */
+	public String getRef()
+	{
+		return ref;
+	}
+
+	/**
+	 *  Set the reference.
+	 *  @param reference The reference to set.
+	 */
+	public void setRef(String reference)
+	{
+		this.ref = reference;
 	}
 	
 	/**
