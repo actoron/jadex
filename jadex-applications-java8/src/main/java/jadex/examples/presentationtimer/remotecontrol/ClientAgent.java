@@ -3,6 +3,8 @@ package jadex.examples.presentationtimer.remotecontrol;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -42,7 +44,7 @@ public class ClientAgent
 		System.out.println("Client Agent created");
 	}
 
-	@AgentService(name = "cds")
+//	@AgentService(name = "cds")
 	public void injectService(ICountdownService cds)
 	{
 		System.out.println("Service injected: " + cds);
@@ -68,36 +70,52 @@ public class ClientAgent
 
 	private ISubscriptionIntermediateFuture<ICountdownService> searchCdServices()
 	{
-		IIntermediateFuture<ICountdownService> searchServices = access.getServiceContainer().searchServices(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL);
-		searchServices.addResultListener(new IntermediateDefaultResultListener<ICountdownService>()
-		{
+		IIntermediateFuture<ICountdownService> searchServices = access.getComponentFeature(IRequiredServicesFeature.class).searchServices(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+		searchServices.addIntermediateResultListener(cdService -> {
+			subscription.addIntermediateResult(cdService);
+		}, finished -> {
+			System.out.println("Search finished. Re-scheduling search.");
 
-			@Override
-			public void intermediateResultAvailable(ICountdownService result)
+			access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 			{
-				super.intermediateResultAvailable(result);
-				subscription.addIntermediateResult(result);
-			}
 
-			@Override
-			public void finished()
-			{
-				super.finished();
-				System.out.println("Search finished. Re-scheduling search.");
-
-				access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-
-					@Override
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						searchCdServices();
-						return Future.DONE;
-					}
-				}, 10000);
-			}
-
+					searchCdServices();
+					return Future.DONE;
+				}
+			}, 10000);
 		});
+//		searchServices.addResultListener(new IntermediateDefaultResultListener<ICountdownService>()
+//		{
+//
+//			@Override
+//			public void intermediateResultAvailable(ICountdownService result)
+//			{
+//				super.intermediateResultAvailable(result);
+//				subscription.addIntermediateResult(result);
+//			}
+//
+//			@Override
+//			public void finished()
+//			{
+//				super.finished();
+//				System.out.println("Search finished. Re-scheduling search.");
+//
+//				access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+//				{
+//
+//					@Override
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						searchCdServices();
+//						return Future.DONE;
+//					}
+//				}, 10000);
+//			}
+//
+//		});
 		return subscription;
 
 	}

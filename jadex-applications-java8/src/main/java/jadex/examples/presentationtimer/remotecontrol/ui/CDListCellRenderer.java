@@ -1,6 +1,7 @@
 package jadex.examples.presentationtimer.remotecontrol.ui;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.examples.presentationtimer.common.State;
 
@@ -86,7 +87,12 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 			
 			IComponentIdentifier providerId = sih.getServiceIdentifier().getProviderId();
 			String platformName = providerId.getName();
-			String[] addr = providerId.getAddresses();
+			String[] addr;
+			if (providerId instanceof ITransportComponentIdentifier) {
+				addr = ((ITransportComponentIdentifier)providerId).getAddresses();
+			} else {
+				addr = new String[0];
+			}
 			this.platformLabel.setText(platformName);
 			this.platformAddresses.setText(formatAddrs(addr));
 		}
@@ -138,7 +144,7 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 	}
 
 	private String formatAddrs(String[] addr) {
-		StringBuilder stringBuilder = new StringBuilder(addr[0]);
+		StringBuilder stringBuilder = new StringBuilder("");
 		for (String string : addr) {
 			stringBuilder.append("\n");
 			stringBuilder.append(string);
