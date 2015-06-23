@@ -22,61 +22,10 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 		this.service = service;
 	}
 
-	public boolean isPlatformRunning(IComponentIdentifier platformId)
-	{
-		return service.isPlatformRunning(platformId);
-	}
-
+	@Override
 	public IFuture<IExternalAccess> startJadexPlatform()
 	{
 		return service.startJadexPlatform(service.getPlatformKernels());
-	}
-
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
-	{
-		return service.startJadexPlatform(kernels);
-	}
-
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
-	{
-		return service.startJadexPlatform(kernels, platformId);
-	}
-
-	public final IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
-	{
-		return service.startJadexPlatform(kernels, platformId, options);
-	}
-
-	public void shutdownJadexPlatforms()
-	{
-		service.shutdownJadexPlatforms();
-	}
-
-	public void shutdownJadexPlatform(IComponentIdentifier platformId)
-	{
-		service.shutdownJadexPlatform(platformId);
-	}
-
-	public IFuture<IComponentIdentifier> startComponent(IComponentIdentifier platformId, String name, Class<?> clazz)
-	{
-		return service.startComponent(platformId, name, clazz);
-	}
-
-	public IFuture<IComponentIdentifier> startComponent(IComponentIdentifier platformId, String name, Class<?> clazz,
-			CreationInfo creationInfo)
-	{
-		return service.startComponent(platformId, name, clazz, creationInfo);
-	}
-
-	public IFuture<IComponentIdentifier> startComponent(IComponentIdentifier platformId, String name, String modelPath)
-	{
-		return service.startComponent(platformId, name, modelPath);
-	}
-
-	public IFuture<IComponentIdentifier> startComponent(IComponentIdentifier platformId, String name, String modelPath,
-			CreationInfo creationInfo)
-	{
-		return service.startComponent(platformId, name, modelPath, creationInfo);
 	}
 
 	public void shutdownJadexPlatform()
@@ -117,34 +66,9 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 		return service.isPlatformRunning();
 	}
 
-	public IExternalAccess getExternalPlatformAccess(IComponentIdentifier platformId)
+	public IExternalAccess getPlatformAccess()
 	{
-		return service.getExternalPlatformAccess(platformId);
-	}
-
-	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformId)
-	{
-		return service.getCMS(platformId);
-	}
-
-	public IFuture<IMessageService> getMS(IComponentIdentifier platformId)
-	{
-		return service.getMS(platformId);
-	}
-
-	public <S> S getsService(IComponentIdentifier platformId, Class<S> serviceClazz)
-	{
-		return service.getsService(platformId, serviceClazz);
-	}
-
-	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz)
-	{
-		return service.getService(platformId, serviceClazz);
-	}
-
-	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz, String scope)
-	{
-		return service.getService(platformId, serviceClazz, scope);
+		return getExternalPlatformAccess();
 	}
 
 	public String getPlatformName()

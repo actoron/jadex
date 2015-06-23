@@ -2,14 +2,17 @@ package jadex.android;
 
 import jadex.android.exception.JadexAndroidError;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
+import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
+import jadex.bridge.service.types.platform.IJadexPlatformInterface;
 import jadex.bridge.service.types.platform.IJadexPlatformManager;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
@@ -41,7 +44,7 @@ import android.view.Window;
  * 
  * @author Julian Kalinowski
  */
-public class JadexAndroidActivity extends Activity implements ServiceConnection
+public class JadexAndroidActivity extends Activity implements ServiceConnection, IJadexPlatformInterface
 {
 	private Intent serviceIntent;
 	private IJadexPlatformBinder platformService;
@@ -122,7 +125,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		this.platformName = name;
 	}
 
-	protected boolean isPlatformRunning()
+	public boolean isPlatformRunning()
 	{
 		if (platformService != null) {
 			return platformService.isPlatformRunning(platformId);
@@ -131,17 +134,47 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		}
 	}
 	
-	protected IExternalAccess getPlatformAccess() {
+	public IComponentIdentifier getPlatformId() {
+		checkIfJadexIsRunning("getPlatformId");
+		return platformId;
+	};
+	
+	
+	
+	public IExternalAccess getPlatformAccess() {
 		checkIfJadexIsRunning("getPlatformAccess()");
 		return platformService.getExternalPlatformAccess(platformId);
 	}
 	
+	public IExternalAccess getExternalPlatformAccess()
+	{
+		return getPlatformAccess();
+	}
+
 	/**
 	 * Gets the platform service.
 	 * @return PlatformService binder
 	 */
 	protected IJadexPlatformBinder getPlatformService() {
 		return platformService;
+	}
+	
+	public <S> S getsService(Class<S> serviceClazz)
+	{
+		checkIfJadexIsRunning("getsService()");
+		return platformService.getsService(serviceClazz);
+	}
+
+	public <S> IFuture<S> getService(Class<S> serviceClazz)
+	{
+		checkIfJadexIsRunning("getService()");
+		return platformService.getService(serviceClazz);
+	}
+
+	public <S> IFuture<S> getService(Class<S> serviceClazz, String scope)
+	{
+		checkIfJadexIsRunning("getService()");
+		return platformService.getService(serviceClazz, scope);
 	}
 
 	protected boolean isPlatformRunning(IComponentIdentifier platformId)
@@ -187,32 +220,49 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		return startComponent(name, modelPath);
 	}
 	
-	/**
-	 * Starts a Component.
-	 * 
-	 * @param name
-	 *            Name of the Component created
-	 * @param modelPath
-	 *            Path to the Component
-	 * @return IFuture<IComponentIdentifier>
-	 */
-	protected IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath)
+	public IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath)
 	{
 		checkIfJadexIsRunning("startComponent()");
 		return platformService.startComponent(name, modelPath);
 	}
 	
-	protected void registerEventReceiver(IEventReceiver<?> rec)
+	public IFuture<IComponentIdentifier> startComponent(String name, String modelPath, CreationInfo creationInfo)
+	{
+		checkIfJadexIsRunning("startComponent()");
+		return platformService.startComponent(name, modelPath, creationInfo);
+	}
+
+	public IFuture<IComponentIdentifier> startComponent(String name, Class< ? > clazz, CreationInfo creationInfo)
+	{
+		checkIfJadexIsRunning("startComponent()");
+		return platformService.startComponent(name, clazz, creationInfo);
+	}
+
+	public IFuture<IComponentIdentifier> startComponent(String name, Class< ? > clazz)
+	{
+		checkIfJadexIsRunning("startComponent()");
+		return platformService.startComponent(name, clazz);
+	}
+
+	public void registerEventReceiver(IEventReceiver<?> rec)
 	{
 		checkIfJadexIsRunning("registerEventReceiver");
 		platformService.registerEventReceiver(rec);
 	}
 
-	protected boolean unregisterEventReceiver(IEventReceiver<?> rec)
+	public boolean unregisterEventReceiver(IEventReceiver<?> rec)
 	{
 		checkIfJadexIsRunning("unregisterEventReceiver");
 		return platformService.unregisterEventReceiver(rec);
 	}
+	
+	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassError
+	{
+		checkIfJadexIsRunning("dispatchEvent");
+		return platformService.dispatchEvent(event);
+	}
+	
+	
 
 	/**
 	 * Sends a FIPA Message to the specified receiver. The Sender is
@@ -363,7 +413,5 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	public void shutdownJadexPlatform(IComponentIdentifier platformID) {
 		platformService.shutdownJadexPlatform(platformID);
 	}
-	
-	
 
 }

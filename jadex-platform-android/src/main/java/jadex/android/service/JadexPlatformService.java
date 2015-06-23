@@ -14,7 +14,6 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -192,6 +191,11 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	public IExternalAccess getExternalPlatformAccess()
 	{
 		return getExternalPlatformAccess(platformId);
+	}
+	
+	public IExternalAccess getPlatformAccess()
+	{
+		return getExternalPlatformAccess();
 	}
 
 	public <S> S getsService(Class<S> serviceClazz)
