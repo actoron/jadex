@@ -45,7 +45,7 @@ public class MElement
 	 */
 	public void setName(String name)
 	{
-		this.name = name!=null ? name.replace(".", CAPABILITY_SEPARATOR) : null;	// Fix XML names on load.
+		this.name = internalName(name);
 	}
 	
 	/**
@@ -135,5 +135,14 @@ public class MElement
 			ret = getName()!=null? getName().equals(other.getName()): super.equals(obj);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Convert a name to internal form for capability separator.
+	 */
+	public static String	internalName(String name)
+	{
+		// Fix XML names on load.
+		return name!=null ? name.replace(".", CAPABILITY_SEPARATOR) : null;
 	}
 }

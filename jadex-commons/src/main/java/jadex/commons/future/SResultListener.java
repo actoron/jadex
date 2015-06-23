@@ -84,8 +84,7 @@ public class SResultListener {
      * @return {@link IResultListener}
      */
 	public static <E> IResultListener<E> delegate(final Future<E> delegate) {
-//		return delegate(delegate, false);
-		return new DelegationResultListener<E>(delegate);
+		return delegate(delegate, false);
 	}
 	
 	/**
@@ -96,7 +95,7 @@ public class SResultListener {
      * @return {@link IResultListener}
      */
 	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone) {
-		return delegate(delegate, undone);
+		return new DelegationResultListener<E>(delegate, undone);
 	}
 	
 	/**
@@ -123,7 +122,6 @@ public class SResultListener {
 		return new DelegationResultListener<E>(delegate, undone, customResultListener);
 	}
 	
-    
 	/**
      * Creates an {@link IResultListener} that delegates exceptions to a given Future
      * and results to a given SuccessListener.

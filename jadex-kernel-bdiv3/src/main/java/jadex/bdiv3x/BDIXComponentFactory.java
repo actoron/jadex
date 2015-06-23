@@ -5,11 +5,13 @@ import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
 import jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature;
 import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
 import jadex.bdiv3x.features.BDIXAgentFeature;
+import jadex.bdiv3x.features.BDIXArgumentsResultsComponentFeature;
 import jadex.bdiv3x.features.BDIXLifecycleAgentFeature;
 import jadex.bdiv3x.features.BDIXMessageComponentFeature;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -67,6 +69,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	/** The specific component features for micro agents. */
 	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
+			new ComponentFeatureFactory(IArgumentsResultsFeature.class, BDIXArgumentsResultsComponentFeature.class),
 			new ComponentFeatureFactory(IProvidedServicesFeature.class, BDIProvidedServicesComponentFeature.class),
 			BDIXAgentFeature.FACTORY, 
 			BDIXLifecycleAgentFeature.FACTORY,

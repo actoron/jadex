@@ -12,6 +12,7 @@ import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
+import jadex.bdiv3x.BDIXModel;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -163,11 +164,40 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 *  Get a belief for a name.
 	 *  @param name	The belief name.
 	 */
+	public IBelief getBelief0(String name)
+	{
+		IBelief	ret	= beliefs.get(name);
+		if(ret==null)
+		{
+			ret	= beliefs.get(MElement.internalName(name));
+		}
+		return ret;
+	}
+
+	/**
+	 *  Get a belief set for a name.
+	 *  @param name	The belief set name.
+	 */
+	public IBeliefSet getBeliefSet0(String name)
+	{
+		IBeliefSet	ret	= beliefsets.get(name);
+		if(ret==null)
+		{
+			ret	= beliefsets.get(MElement.internalName(name));
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get a belief for a name.
+	 *  @param name	The belief name.
+	 */
 	public IBelief getBelief(String name)
 	{
-		if(beliefs==null || !beliefs.containsKey(name))
+		IBelief	ret	= getBelief0(name);
+		if(ret==null)
 			throw new RuntimeException("Belief not found: "+name);
-		return beliefs.get(name);
+		return ret;
 	}
 
 	/**
@@ -176,29 +206,12 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public IBeliefSet getBeliefSet(String name)
 	{
-		if(beliefsets==null || !beliefsets.containsKey(name))
-			throw new RuntimeException("Beliefset not found: "+name);
-		return beliefsets.get(name);
+		IBeliefSet	ret	= getBeliefSet0(name);
+		if(ret==null)
+			throw new RuntimeException("Belief set not found: "+name);
+		return ret;
 	}
 
-	/**
-	 *  Test if has a belief.
-	 *  @param True, if has belief.
-	 */
-	public boolean hasBelief(String name)
-	{
-		return beliefs==null? false: beliefs.containsKey(name);
-	}
-
-	/**
-	 *  Test if has a belief set.
-	 *  @param True, if has belief set.
-	 */
-	public boolean hasBeliefSet(String name)
-	{
-		return beliefsets==null? false: beliefsets.containsKey(name);
-	}
-	
 	/**
 	 *  Returns <tt>true</tt> if this beliefbase contains a belief with the
 	 *  specified name.
@@ -209,7 +222,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public boolean containsBelief(String name)
 	{
-		return beliefs==null? false: beliefs.containsKey(name);
+		return getBelief0(name)!=null;
 	}
 
 	/**
@@ -222,7 +235,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public boolean containsBeliefSet(String name)
 	{
-		return beliefsets==null? false: beliefsets.containsKey(name);
+		return getBeliefSet0(name)!=null;
 	}
 
 	/**
@@ -459,6 +472,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 //			this.value = value;
 //			publisher.observeValue(value);
 //			publisher.publishToolBeliefEvent();
+			
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, value);
+			}
 		}
 
 		/**
@@ -609,6 +630,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public void addFact(Object fact)
 		{
 			internalGetValues().add(fact);
+			
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, internalGetValues());
+			}
 		}
 
 		/**
@@ -618,6 +647,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public void removeFact(Object fact)
 		{
 			internalGetValues().remove(fact);
+			
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, internalGetValues());
+			}
 		}
 
 		/**
@@ -640,6 +677,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public void removeFacts()
 		{
 			internalGetValues().clear();
+			
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, internalGetValues());
+			}
 		}
 
 		/**
@@ -734,6 +779,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			{
 				RuleSystem rs = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIXAgentFeature.class)).getRuleSystem();
 				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+getName(), new ChangeInfo<Object>(facts, facts, null)));
+			}
+
+			// Push to result, if any.
+			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			{
+				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					.getResults().put(result, internalGetValues());
 			}
 		}
 		

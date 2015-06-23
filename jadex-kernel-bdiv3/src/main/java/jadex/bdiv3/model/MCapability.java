@@ -98,6 +98,17 @@ public class MCapability extends MElement
 	}
 	
 	/**
+	 *  Remove a belief.
+	 */
+	public void removeBelief(MBelief belief)
+	{
+		if(beliefs!=null)
+		{
+			beliefs.remove(belief);
+		}
+	}
+	
+	/**
 	 *  Test if a belief is contained.
 	 */
 	public boolean hasBelief(String name)

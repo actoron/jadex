@@ -29,6 +29,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -59,6 +60,7 @@ import jadex.xml.reader.IObjectLinker;
 import jadex.xml.stax.QName;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -513,6 +515,45 @@ public class BDIXMLReader extends ComponentXMLReader
 				}
 				SBDIModel.mergeSubcapabilities(model, subcaps, context.getClassLoader());
 				
+				// Handle references and add arguments / results
+				for(MBelief mbel: model.getCapability().getBeliefs().toArray(new MBelief[model.getCapability().getBeliefs().size()]))	// Iterate over array to allow removal during iteration.
+				{
+					// Remove reference and add mapping instead.
+					MBelief	resolved	= mbel;
+					String	ref	= mbel.getRef();
+					if(ref!=null)
+					{
+						// Flatten transitive reference.
+						if(model.getBeliefMappings().containsKey(ref))
+						{
+							ref	= model.getBeliefMappings().get(ref);
+						}
+						
+						model.addBeliefMapping(ref, mbel.getName());
+						model.getCapability().removeBelief(mbel);
+						// Todo: merge settings? update rate etc.
+						
+						// Resolve to real belief.
+						resolved	= model.getCapability().getBelief(ref);
+					}
+					
+					if(mbel.isExported())
+					{
+						// Add default value (from potentially wrong capability) only as description.
+						String	desc	= resolved.getDescription()!=null ? resolved.getDescription()+": "+findBeliefDefaultValue(model, resolved, null) : ""+findBeliefDefaultValue(model, resolved, null);
+						model.addArgument(new Argument(mbel.getName(), desc, resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, null));
+					}
+					
+					if(mbel.isResult())
+					{
+						// Add default value (from potentially wrong capability) only as description.
+						String	desc	= resolved.getDescription()!=null ? resolved.getDescription()+": "+findBeliefDefaultValue(model, resolved, null) : ""+findBeliefDefaultValue(model, resolved, null);
+						model.addResult(new Argument(mbel.getName(), desc, resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, null));
+						
+						model.addResultMapping(ref, mbel.getName());
+					}
+				}
+				
 				return null;
 			}
 			
@@ -527,8 +568,8 @@ public class BDIXMLReader extends ComponentXMLReader
 				new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},  
 				new SubobjectInfo[]{
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefref")}), new AccessInfo(new QName(uri, "beliefref"), "elementRef")),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefsetref")}), new AccessInfo(new QName(uri, "beliefsetref"), "elementRef")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefref")}), new AccessInfo(new QName(uri, "beliefref"), "belief")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefsetref")}), new AccessInfo(new QName(uri, "beliefsetref"), "belief")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "belief")}), new AccessInfo(new QName(uri, "belief"), "belief")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefset")}), new AccessInfo(new QName(uri, "beliefset"), "belief")),
 		
@@ -569,49 +610,60 @@ public class BDIXMLReader extends ComponentXMLReader
 //			}), null, new OAVObjectReaderHandler());
 //				
 //		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, 
-			new IPostProcessor()
+		AttributeInfo[]	belattrs	= new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+			new AttributeInfo(new AccessInfo("argument", "exported")),
+			new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
+		};
+		IPostProcessor	belproc	= new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
 			{
-				public Object postProcess(IContext context, Object object)
-				{
-					MBelief mbel = (MBelief)object;
-					mbel.setMulti(false);
-					return mbel;
-				}
-				
-				public int getPass()
-				{
-					return 0;
-				}
-			}),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("argument", "exported")),
-				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
-			}, new SubobjectInfo[]{
+				MBelief mbel = (MBelief)object;
+				mbel.setMulti(false);
+				return mbel;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		};
+		IPostProcessor	belsetproc	= new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				MBelief mbel = (MBelief)object;
+				mbel.setMulti(true);
+				return mbel;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		};
+
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, belproc),
+			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
 			}), null));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(MBelief.class, 
-			new IPostProcessor()
-			{
-				public Object postProcess(IContext context, Object object)
-				{
-					MBelief mbel = (MBelief)object;
-					mbel.setMulti(true);
-					return mbel;
-				}
-				
-				public int getPass()
-				{
-					return 0;
-				}
-			}), 
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("argument", "exported")),
-				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
-			}, new SubobjectInfo[]{
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(MBelief.class, belsetproc), 
+			new MappingInfo(null, belattrs, new SubobjectInfo[]{
+				// because there is only MBelief the facts expression is stored as default fact
+				// and multiple facts are added to a list
+				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFacts")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "facts"), "defaultFact"))
+			}), null));//, new OAVObjectReaderHandler()));	
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MBelief.class, belproc),
+			new MappingInfo(null, belattrs, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
+			}), null));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(MBelief.class, belsetproc), 
+			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				// because there is only MBelief the facts expression is stored as default fact
 				// and multiple facts are added to a list
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFacts")),
@@ -619,27 +671,6 @@ public class BDIXMLReader extends ComponentXMLReader
 			}), null));//, new OAVObjectReaderHandler()));	
 		
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MElementRef.class),	null, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(MElementRef.class),	null, null));
-//		
-//		TypeInfo ti_belset = new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(OAVBDIMetaModel.beliefset_type, tepost), 
-//			new MappingInfo(null, new AttributeInfo[]{
-//			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.typedelement_has_classname)),
-//			new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AccessInfo.IGNORE_WRITE))
-//			}, 
-//			new SubobjectInfo[]{
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "facts"), OAVBDIMetaModel.beliefset_has_factsexpression)),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), OAVBDIMetaModel.beliefset_has_facts))
-//			}), null, new OAVObjectReaderHandler());
-//		
-//		typeinfos.add(ti_belset);
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(OAVBDIMetaModel.beliefsetreference_type),
-//			null, null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "fact")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(ti_expression)));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "facts")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(ti_expression)));
-//		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "plan")), new ObjectInfo(MPlan.class), 
 			new MappingInfo(null, "description", null, null,
 			new SubobjectInfo[]{
@@ -1254,5 +1285,71 @@ public class BDIXMLReader extends ComponentXMLReader
 		{
 			return 0;
 		}
+	}
+
+	/**
+	 *  Find the belief/ref value.
+	 *  Returns the expression text of the default value.
+	 */
+	// Todo: other kernels provide object values!? 
+	protected static String	findBeliefDefaultValue(BDIXModel model, MBelief mbel, String configname)
+	{
+		List<UnparsedExpression>	facts	= null;
+		
+		// Search initial value in configuration.
+		MConfiguration	config	= configname!=null 
+			? model.getCapability().getConfiguration(configname) : model.getConfigurations().length>0
+			? model.getCapability().getConfiguration(model.getConfigurations()[0].getName()) : null;
+		if(config!=null && config.getInitialBeliefs()!=null)
+		{
+			MConfigBeliefElement	inibel	= null;
+			for(MConfigBeliefElement cbel: config.getInitialBeliefs())
+			{
+				if(cbel.getName().equals(mbel.getName()))
+				{
+					inibel	= cbel;
+					break;
+				}
+			}
+			
+			if(inibel!=null)
+			{
+				inibel.getFacts();
+			}
+		}
+
+		if(facts==null)
+		{
+			// todo: unify fact/facts in mbel and configbel
+			facts	= mbel.isMulti(null) ? mbel.getDefaultFacts() : mbel.getDefaultFact()!=null ? Collections.singletonList(mbel.getDefaultFact()) : null;
+		}
+		
+		String ret = null;
+
+		if(facts!=null)
+		{
+			if(mbel.isMulti(null))
+			{
+				for(UnparsedExpression fact: facts)
+				{
+					if(ret==null)
+					{
+						ret	= "[";
+					}
+					else
+					{
+						ret	+= ", ";
+					}
+					ret	+= fact.getValue();
+				}
+				ret	+= "]";
+			}
+			else if(facts.size()>0)
+			{
+				ret	= facts.get(0).getValue();
+			}
+		}
+		
+		return ret;
 	}
 }
