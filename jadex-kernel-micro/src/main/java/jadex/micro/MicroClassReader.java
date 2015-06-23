@@ -150,8 +150,13 @@ public class MicroClassReader
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
 		
-		String src = cma.getProtectionDomain()!=null
-			? SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation()) + File.separator: "/";
+		// in robolectric testcases, location is null
+		URL sourceLocation = (cma.getProtectionDomain()!=null 
+			&& cma.getProtectionDomain().getCodeSource().getLocation() != null) 
+			? cma.getProtectionDomain().getCodeSource().getLocation() : null;
+			
+		String src = (sourceLocation != null) 
+			? SUtil.convertURLToString(sourceLocation) + File.separator : "/";
 //			: ('/' + cma.getPackage().getName().replace('.', '/') + '/');
 //		modelinfo.setFilename(src+File.separatorChar+model);
 		modelinfo.setFilename(src+SReflect.getClassName(cma).replace('.', cma.getProtectionDomain()!=null? File.separatorChar: '/')+".class");
@@ -166,8 +171,8 @@ public class MicroClassReader
 			URL url	= null;
 			try
 			{
-				url	= cma.getProtectionDomain()!=null
-					? cma.getProtectionDomain().getCodeSource().getLocation()
+				url	= (sourceLocation != null) 
+					? sourceLocation 
 					: new URL("file://" + cma.getPackage().getName().replace('.', '/') + '/');
 			}
 			catch(MalformedURLException e)
