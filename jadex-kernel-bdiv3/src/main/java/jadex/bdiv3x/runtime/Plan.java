@@ -712,7 +712,7 @@ public abstract class Plan
 	public void waitForFactChanged(String belname, long timeout)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
 		{
 			public void beliefChanged(ChangeInfo<Object> info)
@@ -720,14 +720,14 @@ public abstract class Plan
 				ret.setResultIfUndone(null);
 			}
 		};
-		bdif.getBeliefbase().getBeliefSet(belname).addBeliefSetListener(lis);
+		bdif.addBeliefListener(belname, lis);
 		try
 		{
 			ret.get(timeout);
 		}
 		finally
 		{
-			bdif.getBeliefbase().getBeliefSet(belname).removeBeliefSetListener(lis);
+			bdif.removeBeliefListener(belname, lis);
 		}
 	}
 	
