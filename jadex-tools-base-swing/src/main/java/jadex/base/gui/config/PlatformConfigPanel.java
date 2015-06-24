@@ -1,5 +1,6 @@
 package jadex.base.gui.config;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.SBootstrapLoader;
@@ -230,19 +231,19 @@ public class PlatformConfigPanel	extends JPanel
 							classpath.setProperties(props.getSubproperty("Classpath"));
 						}
 						
-						if(props.getStringProperty(Starter.CONFIGURATION_FILE)!=null)
+						if(props.getStringProperty(PlatformConfiguration.CONFIGURATION_FILE)!=null)
 						{
-							factory.setSelectedItem(props.getStringProperty(Starter.COMPONENT_FACTORY));
-							model.setSelectedItem(props.getStringProperty(Starter.CONFIGURATION_FILE));
+							factory.setSelectedItem(props.getStringProperty(PlatformConfiguration.COMPONENT_FACTORY));
+							model.setSelectedItem(props.getStringProperty(PlatformConfiguration.CONFIGURATION_FILE));
 							
 							loadModel(model, factory, config)
 								.addResultListener(new SwingDefaultResultListener<Void>(PlatformConfigPanel.this)
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(props.getProperty(Starter.CONFIGURATION_NAME)!=null)
+									if(props.getProperty(PlatformConfiguration.CONFIGURATION_NAME)!=null)
 									{
-										config.setSelectedItem(props.getStringProperty(Starter.CONFIGURATION_NAME));
+										config.setSelectedItem(props.getStringProperty(PlatformConfiguration.CONFIGURATION_NAME));
 									}
 									
 									Property[]	argprops	= props.getProperties("argument");
@@ -268,12 +269,12 @@ public class PlatformConfigPanel	extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				Properties	props	= new Properties();
-				props.addProperty(new Property(Starter.COMPONENT_FACTORY, (String)factory.getSelectedItem()));
-				props.addProperty(new Property(Starter.CONFIGURATION_FILE, (String)model.getSelectedItem()));
+				props.addProperty(new Property(PlatformConfiguration.COMPONENT_FACTORY, (String)factory.getSelectedItem()));
+				props.addProperty(new Property(PlatformConfiguration.CONFIGURATION_FILE, (String)model.getSelectedItem()));
 				
 				if(config.isEnabled())
 				{
-					props.addProperty(new Property(Starter.CONFIGURATION_NAME, (String)config.getSelectedItem()));					
+					props.addProperty(new Property(PlatformConfiguration.CONFIGURATION_NAME, (String)config.getSelectedItem()));					
 				}
 				
 				if(argmodel!=null)
@@ -313,15 +314,15 @@ public class PlatformConfigPanel	extends JPanel
 			{
 				List<String>	args	= new ArrayList<String>();
 				
-				args.add("-"+Starter.COMPONENT_FACTORY);
+				args.add("-"+PlatformConfiguration.COMPONENT_FACTORY);
 				args.add((String)factory.getSelectedItem());
 				
-				args.add("-"+Starter.CONFIGURATION_FILE);
+				args.add("-"+PlatformConfiguration.CONFIGURATION_FILE);
 				args.add((String)model.getSelectedItem());
 				
 				if(config.isEnabled())
 				{
-					args.add("-"+Starter.CONFIGURATION_NAME);
+					args.add("-"+PlatformConfiguration.CONFIGURATION_NAME);
 					args.add((String)config.getSelectedItem());					
 				}
 				

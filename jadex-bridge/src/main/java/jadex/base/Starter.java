@@ -20,6 +20,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
+import jadex.bridge.service.search.DistributedServiceRegistry;
 import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
@@ -45,7 +46,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,140 +61,7 @@ import java.util.logging.Logger;
  */
 public class Starter
 {
-	//-------- platform data keys --------
-	
-	/** Flag if copying parameters for local service calls is allowed. */
-	public static final String DATA_PARAMETERCOPY = "parametercopy";
 
-	/**  Flag if local timeouts should be realtime (instead of clock dependent). */
-	public static final String DATA_REALTIMETIMEOUT = "realtimetimeout";
-	
-	/** The local service registry data key. */
-	public static final String DATA_SERVICEREGISTRY = "serviceregistry";
-	
-	/** The transport address book data key. */
-	public static final String DATA_ADDRESSBOOK = "addressbook";
-	
-	/** Constant for local default timeout name. */
-	public static final String DATA_DEFAULT_LOCAL_TIMEOUT = "default_local_timeout";
-
-	/** Constant for remote default timeout name. */
-	public static final String DATA_DEFAULT_REMOTE_TIMEOUT = "default_remote_timeout";
-	
-	/** Global platform data. */
-	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
-	
-	//-------- constants --------
-
-	/** The default platform configuration. */
-//	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/Platform.component.xml";
-	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/PlatformAgent.class";
-
-	/** The default component factory to be used for platform component. */
-//	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
-	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.micro.MicroAgentFactory";
-
-	/** The configuration file argument. */
-	public static final String CONFIGURATION_FILE = "conf";
-	
-	/** The configuration name argument. */
-	public static final String CONFIGURATION_NAME = "configname";
-	
-	/** The platform name argument. */
-	public static final String PLATFORM_NAME = "platformname";
-
-	/** The component factory classname argument. */
-	public static final String COMPONENT_FACTORY = "componentfactory";
-	
-	/** The platform component implementation classname argument. */
-	public static final String PLATFORM_COMPONENT = "platformcomponent";
-	
-	/** The autoshutdown flag argument. */
-	public static final String AUTOSHUTDOWN = "autoshutdown";
-
-	/** The monitoring flag argument. */
-	public static final String MONITORING = "monitoring";
-
-	/** The welcome flag argument. */
-	public static final String WELCOME = "welcome";
-
-	/** The component flag argument (for starting an additional component). */
-	public static final String COMPONENT = "component";
-	
-	/** The persist flag argument. */
-	public static final String PERSIST = "persist";
-
-	/** The default timeout argument. */
-	public static final String DEFTIMEOUT = "deftimeout";
-	
-	/** The debug futures flag argument. */
-	public static final String DEBUGFUTURES = "debugfutures";
-	
-	/** The debug futures services argument. */
-	public static final String DEBUGSERVICES = "debugservices";
-	
-	/** The debug futures services argument. */
-	public static final String DEBUGSTEPS = "debugsteps";
-	
-	/** The stack compaction disable flag argument. */
-	public static final String NOSTACKCOMPACTION = "nostackcompaction";
-	
-	/** The opengl disable flag argument. */
-	public static final String OPENGL = "opengl";
-	
-	/** The argument key, where program arguments are stored for later retrieval. */
-	public static final String PROGRAM_ARGUMENTS = "programarguments";
-
-	
-	/** The reserved platform parameters. */
-	public static final Set<String> RESERVED;
-	
-	
-	/** Constant for remote default timeout. */
-	private static long DEFAULT_REMOTE = SReflect.isAndroid() ? 60000 : 30000;;
-
-	/** Constant for local default timeout. */
-	private static long DEFAULT_LOCAL = SReflect.isAndroid() ? 60000 : 30000;
-
-	static
-	{
-		// Set deftimeout from environment, if set.
-		String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
-		if(dtoprop!=null)
-		{
-			System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
-		}
-		else
-		{
-			dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
-		}
-		if(dtoprop!=null)
-		{
-			DEFAULT_LOCAL = Long.parseLong(dtoprop);
-			DEFAULT_REMOTE = Long.parseLong(dtoprop);
-			System.out.println("Setting jadex_deftimeout: "+dtoprop);
-		}
-		
-		RESERVED = new HashSet<String>();
-		RESERVED.add(CONFIGURATION_FILE);
-		RESERVED.add(CONFIGURATION_NAME);
-		RESERVED.add(PLATFORM_NAME);
-		RESERVED.add(COMPONENT_FACTORY);
-		RESERVED.add(PLATFORM_COMPONENT);
-		RESERVED.add(AUTOSHUTDOWN);
-		RESERVED.add(MONITORING);
-		RESERVED.add(WELCOME);
-		RESERVED.add(COMPONENT);
-		RESERVED.add(DATA_PARAMETERCOPY);
-		RESERVED.add(DATA_REALTIMETIMEOUT);
-		RESERVED.add(PERSIST);
-		RESERVED.add(DEBUGFUTURES);
-		RESERVED.add(DEBUGSERVICES);
-		RESERVED.add(DEBUGSTEPS);
-		RESERVED.add(NOSTACKCOMPACTION);
-		RESERVED.add(OPENGL);
-		RESERVED.add(DEFTIMEOUT);
-	}
 	
 //	/** The shutdown in progress flag. */
 //	protected static boolean	shutdown;
@@ -330,13 +197,8 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(Map<String, String> args)
 	{
-		final Map<String, Object> cmdargs = new HashMap<String, Object>();	// Starter arguments (required for instantiation of root component)
-		final Map<String, Object> compargs = new HashMap<String, Object>();	// Arguments of root component (platform)
-		final List<String> components = new ArrayList<String>();	// Additional components to start
-
-		processArgs(args, cmdargs, compargs, components);
-		
-		return createPlatform(args, cmdargs, compargs, components);
+		PlatformConfiguration config = PlatformConfiguration.processArgs(args);
+		return createPlatform(config);
 	}
 	
 	/**
@@ -346,13 +208,8 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(String[] args)
 	{
-		final Map<String, Object> cmdargs = new HashMap<String, Object>();	// Starter arguments (required for instantiation of root component)
-		final Map<String, Object> compargs = new HashMap<String, Object>();	// Arguments of root component (platform)
-		final List<String> components = new ArrayList<String>();	// Additional components to start
-
-		processArgs(args, cmdargs, compargs, components);
-
-		return createPlatform(args, cmdargs, compargs, components);
+		PlatformConfiguration config = PlatformConfiguration.processArgs(args);
+		return createPlatform(config);
 	}
 	
 	/**
@@ -360,8 +217,11 @@ public class Starter
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final Object args, final Map<String, Object> cmdargs, final Map<String, Object> compargs, final List<String> components)
+	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config)
 	{
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+//		final Object args, final Map<String, Object> cmdargs, final Map<String, Object> compargs, final List<String> components
+		
 		// Fix below doesn't work. WLAN address is missing :-(
 //		// ANDROID: Selector.open() causes an exception in a 2.2
 //		// emulator due to IPv6 addresses, see:
@@ -401,19 +261,14 @@ public class Starter
 		
 			// Load the platform (component) model.
 			final ClassLoader cl = Starter.class.getClassLoader();
-			final String configfile = (String)cmdargs.get(CONFIGURATION_FILE)!=null? 
-				(String)cmdargs.get(CONFIGURATION_FILE): FALLBACK_PLATFORM_CONFIGURATION;
-			String cfclname = (String)cmdargs.get(COMPONENT_FACTORY)!=null? 
-				(String)cmdargs.get(COMPONENT_FACTORY): FALLBACK_COMPONENT_FACTORY;
+			final String configfile = config.getConfigurationName();
+			String cfclname = config.getComponentFactoryName();
 			Class<?> cfclass = SReflect.classForName(cfclname, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
 			final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
-			
-			compargs.put(COMPONENT_FACTORY, cfac);
-			
-			compargs.put(PROGRAM_ARGUMENTS, args);
+			rootConfig.setValue(RootComponentConfiguration.COMPONENT_FACTORY, cfac);
 			
 			// Hack: what to use as rid? should not have dependency to standalone.
 //			final ResourceIdentifier rid = new ResourceIdentifier(null, 
@@ -429,7 +284,7 @@ public class Starter
 			}
 			else
 			{
-				Object	pc = getArgumentValue(PLATFORM_COMPONENT, model, cmdargs, compargs);
+				Object	pc = config.getArgumentValue(PlatformConfiguration.PLATFORM_COMPONENT, model);
 				if(pc==null)
 				{
 					ret.setException(new RuntimeException("No platform component class found."));
@@ -438,11 +293,11 @@ public class Starter
 				{
 					Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
 					final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
-					compargs.put("platformaccess", component);
+					rootConfig.setValue(RootComponentConfiguration.PLATFORM_ACCESS, component);
 //					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
 					
 					// Build platform name.
-					Object pfname = getArgumentValue(PLATFORM_NAME, model, cmdargs, compargs);
+					Object pfname = config.getArgumentValue(PlatformConfiguration.PLATFORM_NAME, model);
 					final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
 					if(IComponentIdentifier.LOCAL.get()==null)
 						IComponentIdentifier.LOCAL.set(cid);
@@ -457,8 +312,8 @@ public class Starter
 					Cause cause = sc==null? null: sc.getCause();
 					assert cause!=null;
 					
-					Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
-					Object tmpmoni = getArgumentValue(MONITORING, model, cmdargs, compargs);
+					Boolean autosd = (Boolean)config.getArgumentValue(PlatformConfiguration.AUTOSHUTDOWN, model);
+					Object tmpmoni = config.getArgumentValue(PlatformConfiguration.MONITORING, model);
 					PublishEventLevel moni = PublishEventLevel.OFF;
 					if(tmpmoni instanceof Boolean)
 					{
@@ -477,30 +332,36 @@ public class Starter
 						autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(),
 						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
 					
-					putPlatformValue(cid, DATA_REALTIMETIMEOUT, getArgumentValue(DATA_REALTIMETIMEOUT, model, cmdargs, compargs));
-					putPlatformValue(cid, DATA_PARAMETERCOPY, getArgumentValue(DATA_PARAMETERCOPY, model, cmdargs, compargs));
-					putPlatformValue(cid, DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
-					putPlatformValue(cid, DATA_ADDRESSBOOK, new TransportAddressBook());
-					Long to = (Long)cmdargs.remove(DEFTIMEOUT);
-					putPlatformValue(cid, DATA_DEFAULT_LOCAL_TIMEOUT, to!=null? to: DEFAULT_LOCAL);
-					putPlatformValue(cid, DATA_DEFAULT_REMOTE_TIMEOUT, to!=null? to: DEFAULT_REMOTE);
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getArgumentValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, model));
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getArgumentValue(PlatformConfiguration.DATA_PARAMETERCOPY, model));
 					
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, null, null);
+					if (Boolean.TRUE.equals(config.getArgumentValue(PlatformConfiguration.DHT, model))) {
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess()));
+					} else {
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
+					}
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());
+
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
+					
+					Map<String, Object> rootArgs = rootConfig.getArgs();
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, rootArgs, desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
-					initRescueThread(cid, compargs);	// Required for bootstrapping init.
+					initRescueThread(cid, rootArgs);	// Required for bootstrapping init.
 
 					component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
-							startComponents(0, components, component.getInternalAccess())
+							startComponents(0, config.getComponents(), component.getInternalAccess())
 								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
+									if(Boolean.TRUE.equals(config.getArgumentValue(PlatformConfiguration.WELCOME, model)))
 									{
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");
@@ -598,192 +459,6 @@ public class Starter
 		return new BasicComponentIdentifier(platformname);
 	}
 	
-	/**
-	 *  Create the platform.
-	 *  @param args The command line arguments.
-	 *  @return The external access of the root component.
-	 */
-	protected static void processArgs(Map<String, String> args, Map<String, Object> cmdargs, Map<String, Object> compargs, List<String> components)
-	{
-		if(args!=null)
-		{
-			for(Map.Entry<String, String> entry: args.entrySet())
-			{
-				processArg(entry.getKey(), entry.getValue(), cmdargs, compargs, components);
-			}
-		}
-	}
-	
-	/**
-	 *  Create the platform.
-	 *  @param args The command line arguments.
-	 *  @return The external access of the root component.
-	 */
-	protected static void processArgs(String[] args, Map<String, Object> cmdargs, Map<String, Object> compargs, List<String> components)
-	{
-		if(args!=null)
-		{
-			for(int i=0; args!=null && i<args.length; i+=2)
-			{
-				processArg(args[i], args[i+1], cmdargs, compargs, components);
-			}
-		}
-	}
-	
-	/**
-	 *  @param cmdargs Starter arguments (required for instantiation of root component)
-	 *  @param compargs Arguments of root component (platform)
-	 *  @param components Additional components to start.
-	 *  @param 
-	 */
-	protected static void processArg(String okey, String val, Map<String, Object> cmdargs, Map<String, Object> compargs, List<String> components)
-	{
-		String key = okey.startsWith("-")? okey.substring(1): okey;
-		Object value = val;
-		if(!RESERVED.contains(key))
-		{
-			try
-			{
-				value = SJavaParser.evaluateExpression(val, null);
-			}
-			catch(Exception e)
-			{
-				System.out.println("Argument parse exception using as string: "+key+" \""+val+"\"");
-			}
-			compargs.put(key, value);
-		}
-		else if(COMPONENT.equals(key))
-		{
-			components.add((String)val);
-		}
-		else if(DEBUGFUTURES.equals(key) && "true".equals(val))
-		{
-			Future.DEBUG = true;
-		}
-		else if(DEBUGSERVICES.equals(key) && "true".equals(val))
-		{
-			MethodInvocationInterceptor.DEBUG = true;
-		}
-		else if(DEBUGSTEPS.equals(key) && "true".equals(val))
-		{
-			ExecutionComponentFeature.DEBUG = true;
-		}
-		else if(DEFTIMEOUT.equals(key))
-		{
-			value = SJavaParser.evaluateExpression(val, null);
-//				BasicService.DEFTIMEOUT	= ((Number)val).longValue();
-			long to	= ((Number)value).longValue();
-//			setLocalDefaultTimeout(platform, to);
-//			setRemoteDefaultTimeout(platform, to);
-			cmdargs.put(DEFTIMEOUT, to);
-			
-//			BasicService.setRemoteDefaultTimeout(to);
-//			BasicService.setLocalDefaultTimeout(to);
-//			System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
-		}
-		else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
-		{
-			Future.NO_STACK_COMPACTION	= true;
-		}
-		else if(OPENGL.equals(key) && "false".equals(val))
-		{
-			Class<?> p2d = SReflect.classForName0("jadex.extension.envsupport.observer.perspective.Perspective2D", Starter.class.getClassLoader());
-			if(p2d!=null)
-			{
-				try
-				{
-					p2d.getField("OPENGL").set(null, Boolean.FALSE);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-		else
-		{
-			cmdargs.put(key, val);
-		}
-	}
-	
-	/**
-	 *  Get an argument value from the command line or the model.
-	 *  Also puts parsed value into component args to be available at instance.
-	 */
-	protected static Object getArgumentValue(String name, IModelInfo model, Map<String, Object> cmdargs, Map<String, Object> compargs)
-	{
-		String	configname	= getConfigurationName(model, cmdargs);
-		ConfigurationInfo	config	= configname!=null
-			? model.getConfiguration(configname) 
-			: model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
-		
-		Object val = cmdargs.get(name);
-		if(val==null)
-		{
-			boolean	found	= false;
-			if(config!=null)
-			{
-				UnparsedExpression[]	upes	= config.getArguments();
-				for(int i=0; !found && i<upes.length; i++)
-				{
-					if(name.equals(upes[i].getName()))
-					{
-						found	= true;
-						val	= upes[i];
-					}
-				}
-			}
-			if(!found)
-			{
-				 IArgument	arg	= model.getArgument(name);
-				 if(arg!=null)
-				 {
-					val	= arg.getDefaultValue(); 
-				 }
-			}
-			val	= SJavaParser.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
-//			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
-		}
-		else if(val instanceof String)
-		{
-			// Try to parse value from command line.
-			try
-			{
-				Object newval	= SJavaParser.evaluateExpression((String)val, null);
-				if(newval!=null)
-				{
-					val	= newval;
-				}
-			}
-			catch(RuntimeException e)
-			{
-			}
-		}
-		compargs.put(name, val);
-		return val;
-	}
-
-	/**
-	 * Get the configuration name.
-	 */
-	protected static String	getConfigurationName(IModelInfo model,	Map<String, Object> cmdargs)
-	{
-		String	configname	= (String)cmdargs.get(CONFIGURATION_NAME);
-		if(configname==null)
-		{
-			Object	val	= null;
-			IArgument	arg	= model.getArgument(CONFIGURATION_NAME);
-			if(arg!=null)
-			{
-				val	= arg.getDefaultValue();
-			}
-			val	= SJavaParser.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
-//			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
-			configname	= val!=null ? val.toString() : null;
-		}
-		return configname;
-	}
-
 	/**
 	 *  Loop for starting components.
 	 *  @param i Number to start.
@@ -1014,24 +689,6 @@ public class Starter
 	}
 	
 	/**
-	 *  Check if the real time timeout flag is set for a platform.
-	 */
-	public static synchronized boolean	isRealtimeTimeout(IComponentIdentifier platform)
-	{
-		// Hack!!! Should default to false?
-		return !Boolean.FALSE.equals(getPlatformValue(platform, DATA_REALTIMETIMEOUT));
-	}
-	
-	/**
-	 *  Check if the parameter copy flag is set for a platform.
-	 */
-	public static synchronized boolean	isParameterCopy(IComponentIdentifier platform)
-	{
-		// not equals false to make true the default.
-		return !Boolean.FALSE.equals(getPlatformValue(platform, DATA_PARAMETERCOPY));
-	}
-
-	/**
 	 *  Create a proxy for the remote platform.
 	 */
 	public static IFuture<IComponentIdentifier>	createProxy(IExternalAccess local, final IExternalAccess remote)
@@ -1065,121 +722,72 @@ public class Starter
 		
 		return ret;
 	}
+
 	
-	/**
-	 *  Get a global platform value.
-	 *  @param platform The platform name.
-	 *  @param key The key.
-	 *  @return The value.
-	 */
-	public static synchronized Object getPlatformValue(IComponentIdentifier platform, String key)
-	{
-		Object ret = null;
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		if(mem!=null)
-			ret = mem.get(key);
-		return ret;
-	}
-	
-	/**
-	 *  Get a global platform value.
-	 *  @param platform The platform name.
-	 *  @param key The key.
-	 *  @param value The value.
-	 */
-	public static synchronized void putPlatformValue(IComponentIdentifier platform, String key, Object value)
-	{
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		if(mem==null)
-		{
-			mem = new HashMap<String, Object>();
-			platformmem.put(platform, mem);
-		}
-		mem.put(key, value);
-	}
-	
-	/**
-	 *  Get a global platform value.
-	 *  @param platform The platform name.
-	 *  @param key The key.
-	 *  @return The value.
-	 */
-	public static synchronized boolean hasPlatformValue(IComponentIdentifier platform, String key)
-	{
-		boolean ret = false;
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		if(mem!=null)
-			ret = mem.containsKey(key);
-		return ret;
-	}
-	
-	/**
-	 *  Get a global platform value.
-	 *  @param platform The platform name.
-	 *  @param key The key.
-	 *  @param value The value.
-	 */
-	public static synchronized void removePlatformMemory(IComponentIdentifier platform)
-	{
-		platformmem.remove(platform.getRoot());
-	}
 	
 	/**
 	 *  Get the remote default timeout.
 	 */
-	public static synchronized long getRemoteDefaultTimeout(IComponentIdentifier platform)
+	public static long getRemoteDefaultTimeout(IComponentIdentifier platform)
 	{
-		if(platform==null)
-			return DEFAULT_REMOTE;
-		
-		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue(): DEFAULT_REMOTE;
+		return PlatformConfiguration.getRemoteDefaultTimeout(platform);
 	}
-
+	
 	/**
 	 *  Get the scaled remote default timeout.
 	 */
-	public static synchronized long	getScaledRemoteDefaultTimeout(IComponentIdentifier platform, double scale)
+	public static long	getScaledRemoteDefaultTimeout(IComponentIdentifier platform, double scale) 
 	{
-		long ret = getRemoteDefaultTimeout(platform);
-		return ret==-1 ? -1 : (long)(ret*scale);
+		return PlatformConfiguration.getScaledRemoteDefaultTimeout(platform, scale);
 	}
-
+	
 	/**
 	 *  Get the local default timeout.
 	 */
-	public static synchronized long getLocalDefaultTimeout(IComponentIdentifier platform)
+	public static long getLocalDefaultTimeout(IComponentIdentifier platform)
 	{
-		if(platform==null)
-			return DEFAULT_LOCAL;
-		
-		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue(): DEFAULT_LOCAL;
+		return PlatformConfiguration.getLocalDefaultTimeout(platform);
 	}
 
 	/**
 	 *  Get the scaled local default timeout.
 	 */
-	public static synchronized long getScaledLocalDefaultTimeout(IComponentIdentifier platform, double scale)
+	public static long getScaledLocalDefaultTimeout(IComponentIdentifier platform, double scale)
 	{
-		long ret = getLocalDefaultTimeout(platform);
-		return ret==-1 ? -1 : (long)(ret*scale);
+		return PlatformConfiguration.getScaledLocalDefaultTimeout(platform, scale);
 	}
-
+	
 	/**
 	 *  Set the remote default timeout.
 	 */
-	public static synchronized void setRemoteDefaultTimeout(IComponentIdentifier platform, long timeout)
+	public static void setRemoteDefaultTimeout(IComponentIdentifier platform, long timeout) 
 	{
-		putPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT, timeout);
+		PlatformConfiguration.setRemoteDefaultTimeout(platform, timeout);
 	}
-
+	
 	/**
 	 *  Set the local default timeout.
 	 */
-	public static synchronized void setLocalDefaultTimeout(IComponentIdentifier platform, long timeout)
+	public static void setLocalDefaultTimeout(IComponentIdentifier platform, long timeout)
 	{
-		putPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT, timeout);
+		PlatformConfiguration.setLocalDefaultTimeout(platform, timeout);
 	}
+
+	/**
+	 *  Check if the real time timeout flag is set for a platform.
+	 */
+	public static boolean	isRealtimeTimeout(IComponentIdentifier platform)
+	{
+		return PlatformConfiguration.isRealtimeTimeout(platform);
+	}
+
+	/**
+	 *  Check if the parameter copy flag is set for a platform.
+	 */
+	public static boolean	isParameterCopy(IComponentIdentifier platform)
+	{
+		return PlatformConfiguration.isParameterCopy(platform);
+	}
+	
 }
 

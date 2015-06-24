@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.address;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -166,7 +167,7 @@ public class TransportAddressBook
 	 */
 	public static TransportAddressBook getAddressBook(IComponentIdentifier platform)
 	{
-		return (TransportAddressBook)Starter.getPlatformValue(platform, Starter.DATA_ADDRESSBOOK);
+		return (TransportAddressBook)PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_ADDRESSBOOK);
 	}
 	
 	/**

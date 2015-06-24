@@ -1,5 +1,7 @@
 package jadex.platform.service.autoupdate;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -549,7 +551,7 @@ public class UpdateAgent implements IUpdateService
 								// Set program args according to the original ones
 								// Will change the argument with the update agent to have the creator cid
 								
-								String[] oldargs = (String[])args.get(Starter.PROGRAM_ARGUMENTS);
+								String[] oldargs = (String[])args.get(RootComponentConfiguration.PROGRAM_ARGUMENTS);
 								List<String> newargs = new ArrayList<String>();
 								
 								if(oldargs!=null)

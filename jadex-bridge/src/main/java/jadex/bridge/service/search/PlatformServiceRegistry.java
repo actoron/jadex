@@ -1,6 +1,6 @@
 package jadex.bridge.service.search;
 
-import jadex.base.Starter;
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -897,7 +897,7 @@ public class PlatformServiceRegistry
 	 */
 	public static PlatformServiceRegistry getRegistry(IComponentIdentifier platform)
 	{
-		return (PlatformServiceRegistry)Starter.getPlatformValue(platform, Starter.DATA_SERVICEREGISTRY);
+		return (PlatformServiceRegistry)PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_SERVICEREGISTRY);
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package jadex.platform.service.cms;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
@@ -1936,7 +1937,7 @@ public class ComponentManagementService implements IComponentManagementService
 			if(cid.getRoot().equals(cid))
 			{
 //				System.out.println("removed: "+cid);
-				Starter.removePlatformMemory(cid);
+				PlatformConfiguration.removePlatformMemory(cid);
 			}
 //		}
 //		catch(Throwable t)
