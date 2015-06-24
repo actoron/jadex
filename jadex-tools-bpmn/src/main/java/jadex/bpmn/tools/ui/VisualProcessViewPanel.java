@@ -21,6 +21,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -489,7 +490,7 @@ public class VisualProcessViewPanel extends JPanel
 			add(tmp2, BorderLayout.CENTER);
 			
 			// Asynchronously load the visual model (maybe from remote).
-			access.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<String>()
+			access.scheduleStep(new ImmediateComponentStep<String>()
 			{
 				@Classname("loadModel")
 				public IFuture<String> execute(IInternalAccess ia)

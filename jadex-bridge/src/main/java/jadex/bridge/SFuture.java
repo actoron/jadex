@@ -123,7 +123,7 @@ public class SFuture
 	{
 		if(to>0)
 		{
-			ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+			ea.scheduleStep(new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

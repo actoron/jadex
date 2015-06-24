@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IServiceIdentifier;
@@ -276,7 +277,7 @@ public class SecurityService implements ISecurityService
 											{
 												public IFuture<Void> setProperties(final Properties props)
 												{
-													return access.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+													return access.scheduleStep(new ImmediateComponentStep<Void>()
 													{
 														public IFuture<Void> execute(IInternalAccess ia)
 														{
@@ -366,7 +367,7 @@ public class SecurityService implements ISecurityService
 												
 												public IFuture<Properties> getProperties()
 												{
-													return access.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Properties>()
+													return access.scheduleStep(new ImmediateComponentStep<Properties>()
 													{
 														public IFuture<Properties> execute(IInternalAccess ia)
 														{

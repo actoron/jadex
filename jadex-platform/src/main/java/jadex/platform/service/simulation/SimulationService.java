@@ -2,6 +2,7 @@ package jadex.platform.service.simulation;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -623,7 +624,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void> setProperties(Properties props)
 	{
 		final boolean	exe	= props.getBooleanProperty("executing");
-		return access.getExternalAccess().scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+		return access.getExternalAccess().scheduleStep(new ImmediateComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

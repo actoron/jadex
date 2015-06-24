@@ -250,7 +250,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			
 			// initiate a step to reevaluate the conditions
 			((IInternalExecutionFeature)getComponent().getComponentFeature(IExecutionFeature.class)).wakeup();
-//			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep()
+//			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep()
 //			{
 //				public IFuture execute(IInternalAccess ia)
 //				{

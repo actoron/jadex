@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.FeatureNotAvailableException;
 import jadex.bridge.component.IComponentFeature;
@@ -117,7 +118,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		// Run init on component thread (hack!!! requires that execution feature works before its init)
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		return exe.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+		return exe.scheduleStep(new ImmediateComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -135,7 +136,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IFuture<Void>	body()
 	{
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		return exe.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+		return exe.scheduleStep(new ImmediateComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -152,7 +153,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IFuture<Void>	shutdown()
 	{
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		return exe.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+		return exe.scheduleStep(new ImmediateComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

@@ -39,6 +39,7 @@ import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -290,7 +291,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			public void invokeLater(final Runnable action)
 			{
 				getComponent().getComponentFeature(IExecutionFeature.class)
-					.scheduleImmediate(new IComponentStep<Void>()
+					.scheduleStep(new ImmediateComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -1061,7 +1062,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			Thread.dumpStack();
 
 			IFuture<Void>	fut	= getComponent().getComponentFeature(IExecutionFeature.class)
-				.scheduleImmediate(new IComponentStep<Void>()
+				.scheduleStep(new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -1115,7 +1116,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public <T> IFuture<T> scheduleImmediate(final IComponentStep<T> step, final Object scope)
 	{
-		return getComponent().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<T>()
+		return getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<T>()
 		{
 			public IFuture<T> execute(IInternalAccess ia)
 			{

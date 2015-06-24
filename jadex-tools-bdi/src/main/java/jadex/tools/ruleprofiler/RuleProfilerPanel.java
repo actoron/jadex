@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -109,7 +110,7 @@ public class RuleProfilerPanel	extends JPanel
 						{
 							tmp	= new Profiler(null);
 							final IProfiler prof	= tmp;
-							((ElementFlyweight)result).getInterpreter().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+							((ElementFlyweight)result).getInterpreter().getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
