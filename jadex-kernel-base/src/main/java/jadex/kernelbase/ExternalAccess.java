@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -632,7 +633,7 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

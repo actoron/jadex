@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -583,7 +584,7 @@ public class SComponentFactory
 	{
 		final Future<Object> ret = new Future<Object>();
 		
-		exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Object>()
+		exta.scheduleStep(new ImmediateComponentStep<Object>()
 		{
 			@Classname("getProperty")
 			public IFuture<Object> execute(final IInternalAccess ia)

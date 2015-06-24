@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.future.IFuture;
@@ -65,7 +66,7 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 			// Hack!!!
 			final IInternalAccess bdii = ((ExternalAccess)access).getInternalAccess();
 			// Open tool on introspected agent thread as required for copy state constructor (hack!!!)
-			bdii.getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+			bdii.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

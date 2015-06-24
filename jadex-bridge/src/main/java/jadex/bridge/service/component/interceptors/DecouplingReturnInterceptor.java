@@ -3,6 +3,7 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
@@ -79,7 +80,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							}
 							else
 							{
-								caller.getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+								caller.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
