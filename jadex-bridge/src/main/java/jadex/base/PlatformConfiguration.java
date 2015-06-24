@@ -104,6 +104,9 @@ public class PlatformConfiguration
 	/** Flag to enable or disable dht features (service discovery). **/
 	public static final String DHT = "dht";
 	
+	/** Flag to enable or disable dht providing features (service discovery). **/
+	public static final String DHT_PROVIDE = "providedht";
+	
 	/** The reserved platform parameters. Those are (usually) not handled by the root component. */
 	public static final Set<String> RESERVED;
 	
@@ -155,6 +158,7 @@ public class PlatformConfiguration
 		RESERVED.add(OPENGL);
 		RESERVED.add(DEFTIMEOUT);
 		RESERVED.add(DHT);
+		RESERVED.add(DHT_PROVIDE);
 	}
 
 	private Map<String, Object>	cmdargs;

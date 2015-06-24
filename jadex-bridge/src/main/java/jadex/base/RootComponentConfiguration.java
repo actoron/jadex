@@ -17,7 +17,7 @@ public class RootComponentConfiguration
 	public static final String	PLATFORM_ACCESS	= "platformaccess";
 
 	/** Flag to enable or disable dht providing features (service discovery). **/
-	public static final String DHT_PROVIDE = "providedht";
+	public static final String DHT_PROVIDE = PlatformConfiguration.DHT_PROVIDE;
 	
 
 	// ----- arguments handled by starter AND root component -----

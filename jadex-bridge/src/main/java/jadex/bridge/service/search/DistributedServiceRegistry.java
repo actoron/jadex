@@ -1,5 +1,6 @@
 package jadex.bridge.service.search;
 
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -40,12 +41,17 @@ public class DistributedServiceRegistry extends PlatformServiceRegistry
 	private IInternalAccess	access;
 	private Map<ClassInfo, IService>	delayed;
 	private IComponentStep<Void>	publishDelayedStep;
+	private boolean	provideOnly;
 
-	public DistributedServiceRegistry(final IInternalAccess access)
+	public DistributedServiceRegistry(final IInternalAccess access, final boolean provideOnly)
 	{
 		this.access = access;
+		this.provideOnly = provideOnly;
 		this.delayed = new HashMap<ClassInfo, IService>();
 		System.out.println("Distributed mode");
+		if (provideOnly) {
+			System.out.println("Provider mode: Only publishing ring services in DHT");
+		}
 		final IComponentStep<Void> publishStep = new IComponentStep<Void>()
 		{
 
@@ -83,7 +89,9 @@ public class DistributedServiceRegistry extends PlatformServiceRegistry
 				} else {
 					System.out.println("No delayed services.. error!?");
 				}
-				access.getComponentFeature(IExecutionFeature.class).waitForDelay(PUBLISH_DELAY, publishStep);
+				if (!provideOnly) {
+					access.getComponentFeature(IExecutionFeature.class).waitForDelay(PUBLISH_DELAY, publishStep);
+				}
 			}
 		}, 10000);
 	}
@@ -107,35 +115,37 @@ public class DistributedServiceRegistry extends PlatformServiceRegistry
 	public synchronized void addService(final ClassInfo key, final IService service)
 	{
 //		System.out.println("AddService called: " + key.getTypeName());
-		if (isValid(kvService)) {
-			System.out.println("Publishing service to DHT: " + key.getTypeName());
-			kvService.publish(key.getTypeName(), service.getServiceIdentifier()).addResultListener(new InvalidateServiceListener<Void>());
-		} else {
-			delayed.put(key, service);
-			if (publishDelayedStep == null) {
-				publishDelayedStep = new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
+		if (!provideOnly || key.getTypeName().startsWith("jadex.bridge.service.types.dht.")) {
+			if (isValid(kvService)) {
+				System.out.println("Publishing service to DHT: " + key.getTypeName());
+				kvService.publish(key.getTypeName(), service.getServiceIdentifier()).addResultListener(new InvalidateServiceListener<Void>());
+			} else {
+				delayed.put(key, service);
+				if (publishDelayedStep == null) {
+					publishDelayedStep = new IComponentStep<Void>()
 					{
-						if (!delayed.isEmpty()) {
-							if (isValid(kvService)) {
-								Set<Entry<ClassInfo,IService>> entrySet = delayed.entrySet();
-								
-								for(Entry<ClassInfo, IService> entry : entrySet)
-								{
-									System.out.println("(Delayed) Publishing service to DHT: " + entry.getKey().getTypeName());
-									kvService.publish(entry.getKey().getTypeName(), entry.getValue().getServiceIdentifier()).addResultListener(new InvalidateServiceListener<Void>());
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							if (!delayed.isEmpty()) {
+								if (isValid(kvService)) {
+									Set<Entry<ClassInfo,IService>> entrySet = delayed.entrySet();
+									
+									for(Entry<ClassInfo, IService> entry : entrySet)
+									{
+										System.out.println("(Delayed) Publishing service to DHT: " + entry.getKey().getTypeName());
+										kvService.publish(entry.getKey().getTypeName(), entry.getValue().getServiceIdentifier()).addResultListener(new InvalidateServiceListener<Void>());
+									}
+									
+									delayed.clear();
+									publishDelayedStep = null;
+								} else {
+									access.getExternalAccess().scheduleStep(publishDelayedStep, 5000);
 								}
-								
-								delayed.clear();
-								publishDelayedStep = null;
-							} else {
-								access.getExternalAccess().scheduleStep(publishDelayedStep, 5000);
 							}
+							return Future.DONE;
 						}
-						return Future.DONE;
-					}
-				};
+					};
+				}
 			}
 		}
 		super.addService(key, service);
@@ -147,41 +157,45 @@ public class DistributedServiceRegistry extends PlatformServiceRegistry
 		final TerminableIntermediateFuture<T> myret = new TerminableIntermediateFuture<T>();
 		ITerminableIntermediateFuture<T> ret = myret;
 		
-//		IDistributedServiceRegistryService kvService = getKvService().get();
-		if (isValid(kvService) && !caller.getName().contains("diststore")) {
-			System.out.println("Searching in DHT for: " + type + ", caller: " + caller.getName());
-			IFuture<Collection<ServiceRegistration>> lookup = kvService.lookup(type.getName());
-			lookup.addResultListener(new InvalidateServiceListener<Collection<ServiceRegistration>>()
-			{
-	
-				@Override
-				public void resultAvailable(Collection<ServiceRegistration> regs)
+		if (!provideOnly) {
+	//		IDistributedServiceRegistryService kvService = getKvService().get();
+			if (isValid(kvService) && !caller.getName().contains("diststore")) {
+				System.out.println("Searching in DHT for: " + type + ", caller: " + caller.getName());
+				IFuture<Collection<ServiceRegistration>> lookup = kvService.lookup(type.getName());
+				lookup.addResultListener(new InvalidateServiceListener<Collection<ServiceRegistration>>()
 				{
-					System.out.println("services found in dht store: " + type.getName() + ":");
-					if (regs!= null) {
-						
-						for(ServiceRegistration reg : regs)
-						{
-							IServiceIdentifier sid = reg.getSid();
-							System.out.println("\t" + sid.getServiceName() + " on component: " + sid.getProviderId());
+		
+					@Override
+					public void resultAvailable(Collection<ServiceRegistration> regs)
+					{
+						System.out.println("services found in dht store: " + type.getName() + ":");
+						if (regs!= null) {
+							
+							for(ServiceRegistration reg : regs)
+							{
+								IServiceIdentifier sid = reg.getSid();
+								System.out.println("\t" + sid.getServiceName() + " on component: " + sid.getProviderId());
+							}
+							
+							TerminableIntermediateFuture<T> serviceProxies = getServiceProxies(regs, type, caller);
+							serviceProxies.addResultListener(new IntermediateDelegationResultListener<T>(myret));
+						} else {
+							myret.setResult(Collections.EMPTY_SET);
 						}
-						
-						TerminableIntermediateFuture<T> serviceProxies = getServiceProxies(regs, type, caller);
-						serviceProxies.addResultListener(new IntermediateDelegationResultListener<T>(myret));
-					} else {
-						myret.setResult(Collections.EMPTY_SET);
 					}
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					super.exceptionOccurred(exception);
-					myret.setException(exception);
-				}
-			});
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurred(exception);
+						myret.setException(exception);
+					}
+				});
+			} else {
+				System.out.println("Fallback for bootstrapping...");
+				ret = super.searchRemoteServices(caller, type, filter);
+			}
 		} else {
-			System.out.println("Fallback for bootstrapping...");
 			ret = super.searchRemoteServices(caller, type, filter);
 		}
 //		ret = super.searchRemoteServices(caller, type, filter);

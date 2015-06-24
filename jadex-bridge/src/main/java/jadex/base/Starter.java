@@ -335,8 +335,12 @@ public class Starter
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getArgumentValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, model));
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getArgumentValue(PlatformConfiguration.DATA_PARAMETERCOPY, model));
 					
-					if (Boolean.TRUE.equals(config.getArgumentValue(PlatformConfiguration.DHT, model))) {
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess()));
+					if (Boolean.TRUE.equals(config.getArgumentValue(PlatformConfiguration.DHT_PROVIDE, model))) {
+						boolean provideonly = true;
+						if (Boolean.TRUE.equals(config.getArgumentValue(PlatformConfiguration.DHT, model))) {
+							provideonly = false;
+						}
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess(), provideonly));
 					} else {
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
 					}

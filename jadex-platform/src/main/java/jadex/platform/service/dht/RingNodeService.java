@@ -18,11 +18,9 @@ import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.bridge.service.types.dht.RingNodeEvent;
 import jadex.commons.DebugException;
-import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -52,6 +50,9 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 
 	/** Delay in ms between two stabilize runs **/
 	protected static final long	STABILIZE_DELAY		= 60 * 1000;
+	
+	/** Delay in ms between two stabilize runs **/
+	protected static final long	VERIFY_DELAY		= 120 * 1000;
 
 	/** Delay in ms to wait before restarting the search for other ring nodes **/
 	protected static final long	RETRY_SEARCH_DELAY	= 30 * 1000;
@@ -122,12 +123,35 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		init(ID.get(agent.getComponentIdentifier()));
 
 		agent.getExternalAccess().scheduleStep(searchStep);
+		
+		agent.getExternalAccess().scheduleStep(verifyStateStep, VERIFY_DELAY);
 	}
+	
+	/** Component step to search for other ringnodes. **/
+	IComponentStep<Void> verifyStateStep = new IComponentStep<Void>()
+	{
+
+		public IFuture<Void> execute(IInternalAccess ia)
+		{
+			if (state == State.JOINED) {
+				log("Periodic Verify: State is JOINED");
+				if (fingertable.getSelf().equals(fingertable.getSuccessor())) {
+					log("But successor is me :( rescheduling search.");
+					agent.getExternalAccess().scheduleStep(searchStep);
+				}
+				return Future.DONE;
+			} else {
+				log("Periodic Verify: State is UNJOINED, rescheduling search.");
+				agent.getExternalAccess().scheduleStep(searchStep);
+			}
+			return Future.DONE;
+		}
+		
+	};
 	
 	/** Component step to search for other ringnodes. **/
 	IComponentStep<Void> searchStep = new IComponentStep<Void>()
 	{
-		@Override
 		public IFuture<Void> execute(IInternalAccess ia)
 		{
 			if (state == State.JOINED) {
