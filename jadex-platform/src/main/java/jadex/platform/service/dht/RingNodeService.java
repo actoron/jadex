@@ -225,7 +225,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			@Override
 			public void predecessorChanged(IFinger oldFinger, IFinger newFinger)
 			{
-				if (myId.equals(newFinger.getNodeId()) && myId.equals(fingertable.getSuccessor().getNodeId())) {
+				if (newFinger == null || myId.equals(newFinger.getNodeId()) && myId.equals(fingertable.getSuccessor().getNodeId())) {
 					setState(State.UNJOINED);
 				} else {
 					setState(State.JOINED);
