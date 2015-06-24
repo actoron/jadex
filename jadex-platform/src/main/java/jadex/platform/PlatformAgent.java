@@ -33,6 +33,7 @@ import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
 import jadex.platform.service.df.DirectoryFacilitatorAgent;
+import jadex.platform.service.dht.DistributedServiceRegistryAgent;
 import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
@@ -131,7 +132,8 @@ import java.util.logging.Level;
 	@Argument(name="settings", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="context", clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
-	@Argument(name="address", clazz=boolean.class, defaultvalue="true")
+	@Argument(name="address", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="providedht", clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
@@ -168,6 +170,7 @@ import java.util.logging.Level;
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
+	@ComponentType(name="distregistry", clazz=DistributedServiceRegistryAgent.class),
 })
 
 @ProvidedServices({
@@ -279,6 +282,7 @@ import java.util.logging.Level;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
+		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.providedht? 1 : 0"),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
@@ -356,7 +360,8 @@ import java.util.logging.Level;
 		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
-		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0")
+		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
+		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.providedht? 1 : 0"),
 	})
 })
 @Agent

@@ -64,19 +64,19 @@ public class RingNodePlatformTest extends TestCase
 //					"-relaytransport", "false",
 //					"-deftimeout", Long.toString(timeout),
 //					"-logging", "true",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			"-niotcptransport", "true", "-relaytransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 //			"-component", "jadex/platform/service/dht/RingAgent.class"
 			}).get(timeout);
 				
 		platform2 = Starter.createPlatform(new String[]{"-platformname", pid,
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			"-niotcptransport", "true", "-relaytransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 	//					"-relaytransport", "false",
 	//					"-deftimeout", Long.toString(timeout),
 	//					"-logging", "true",
 		}).get(timeout);
 			
 		platform3 = Starter.createPlatform(new String[]{"-platformname", pid,
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			"-niotcptransport", "true", "-relaytransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 	//					"-relaytransport", "false",
 	//					"-deftimeout", Long.toString(timeout),
 	//					"-logging", "true",
@@ -180,11 +180,28 @@ public class RingNodePlatformTest extends TestCase
 		System.out.println("killing platform of node: " + iid);
 		platform3.killComponent().get();
 		
+//		try
+//		{
+//			Thread.sleep(1000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+		
 		System.out.println("platform killed");
 		
 //		timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
 //		System.out.println("timeout is: " + timeout2);
-		stabilize(new IRingNodeDebugService[]{rn1, rn2}).get(); //stabilize is not retrieed here!! 
+		try {
+			stabilize(new IRingNodeDebugService[]{rn1, rn2}).get();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			stabilize(new IRingNodeDebugService[]{rn1, rn2}).get();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 //		stabilize(new IDebugRingNode[]{rn1, rn2});
 		
 		System.out.println(rn1.getFingerTableString().get());
