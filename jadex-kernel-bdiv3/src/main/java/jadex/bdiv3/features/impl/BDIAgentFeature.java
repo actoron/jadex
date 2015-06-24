@@ -45,6 +45,7 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -248,13 +249,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			observeValue(rs, val, getComponent(), ev2, mbel);
 			
 			// initiate a step to reevaluate the conditions
-			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep()
-			{
-				public IFuture execute(IInternalAccess ia)
-				{
-					return IFuture.DONE;
-				}
-			});
+			((IInternalExecutionFeature)getComponent().getComponentFeature(IExecutionFeature.class)).wakeup();
+//			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep()
+//			{
+//				public IFuture execute(IInternalAccess ia)
+//				{
+//					return IFuture.DONE;
+//				}
+//			});
 		}
 		catch(Exception e)
 		{

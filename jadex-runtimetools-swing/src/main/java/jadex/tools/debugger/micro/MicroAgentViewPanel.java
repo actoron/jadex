@@ -61,17 +61,17 @@ public class MicroAgentViewPanel extends JPanel
 	protected DefaultListModel history;
 	
 	/** The breakpoint panel. */
-	protected IBreakpointPanel	bpp;
+//	protected IBreakpointPanel	bpp;
 
 	//------- constructors --------
 	
 	/**
 	 *  Create an agenda panel.
 	 */
-	public MicroAgentViewPanel(final IExternalAccess agent, IBreakpointPanel bpp)
+	public MicroAgentViewPanel(final IExternalAccess agent, IBreakpointPanel bpp, boolean verticallayout)
 	{
 		this.agent = agent;
-		this.bpp = bpp;
+//		this.bpp = bpp;
 		
 		steps = new DefaultListModel();
 		final JList sl = new JList(steps);
@@ -97,8 +97,6 @@ public class MicroAgentViewPanel extends JPanel
 		ur.add(sp);
 		ur.setBorder(BorderFactory.createTitledBorder("History"));
 
-		JSplitPanel up = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT, ul, ur);
-		up.setDividerLocation(0.5);
 		
 //		OAVTypeModel javatm = OAVJavaType.java_type_model.getDirectTypeModel();
 //		javatm.setClassLoader(instance.getClassLoader());
@@ -367,9 +365,7 @@ public class MicroAgentViewPanel extends JPanel
 						{
 							steps.addElement(event);
 							if(laststep==null && steps.size()==1)
-							{
 								sl.setSelectedIndex(0);
-							}
 						}
 						else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL) && event.getType().endsWith("step"))//MicroAgentInterpreter.TYPE_STEP))
 						{
@@ -377,12 +373,18 @@ public class MicroAgentViewPanel extends JPanel
 							for(int i=0; i<steps.size(); i++)
 							{
 								IMonitoringEvent tmp = (IMonitoringEvent)steps.get(i);
-								if(event.getProperty("sourcename").equals(tmp.getProperty("sourcename")))
+								if(event.getProperty("id").equals(tmp.getProperty("id")))
 								{
 									steps.removeElementAt(i);
+									if(laststep!=null && laststep.getProperty("id").equals(tmp.getProperty("id")))
+										laststep = null;
 									break;
 								}
 							}
+							
+							if(laststep==null)
+								sl.setSelectedIndex(0);
+							
 							if(hon.isSelected())
 							{
 								history.addElement(event);
@@ -417,21 +419,43 @@ public class MicroAgentViewPanel extends JPanel
 				history.removeAllElements();
 			}
 		});
-						
+				
 		JPanel buts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		buts.add(hon);
 		buts.add(clear);
 		down.add(buts, BorderLayout.SOUTH);
 		
-		JSplitPanel tmp = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
-		tmp.setDividerLocation(0.7);
-		tmp.add(up);
-		tmp.add(down);
-		tmp.setDividerLocation(200); // Hack?!
-		tmp.setOneTouchExpandable(true);
-		
-		setLayout(new BorderLayout());
-		add(tmp, BorderLayout.CENTER);
+		if(!verticallayout)
+		{
+			JSplitPanel up = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT, ul, ur);
+			up.setDividerLocation(0.5);
+			
+			JSplitPanel tmp = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
+			tmp.setDividerLocation(0.7);
+			tmp.add(up);
+			tmp.add(down);
+			tmp.setDividerLocation(200); // Hack?!
+			tmp.setOneTouchExpandable(true);
+			
+			setLayout(new BorderLayout());
+			add(tmp, BorderLayout.CENTER);
+		}
+		else
+		{
+			JSplitPanel up = new JSplitPanel(JSplitPane.VERTICAL_SPLIT, ul, ur);
+			up.setDividerLocation(0.5);
+			up.setOneTouchExpandable(true);
+			
+			JSplitPanel tmp = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
+			tmp.setDividerLocation(1.0);
+			tmp.add(up);
+			tmp.add(down);
+//			tmp.setDividerLocation(200); // Hack?!
+			tmp.setOneTouchExpandable(true);
+			
+			setLayout(new BorderLayout());
+			add(tmp, BorderLayout.CENTER);
+		}
 		
 		// Hack to inialize the panel.
 //		listener.changeOccurred(null);

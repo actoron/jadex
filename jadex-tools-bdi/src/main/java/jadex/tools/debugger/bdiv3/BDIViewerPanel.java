@@ -18,6 +18,8 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.tools.debugger.micro.MicroAgentViewPanel;
+import jadex.tools.debugger.micro.MicroDebuggerPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -337,7 +339,12 @@ public class BDIViewerPanel extends JPanel
 		sp2.setOneTouchExpandable(true);
 		sp2.setDividerLocation(0.7);
 		this.setLayout(new BorderLayout());
-		this.add(sp2, BorderLayout.CENTER);
+		
+		JSplitPanel	sp3	= new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT, sp2, new MicroAgentViewPanel(access, null, true));
+		sp3.setDividerLocation(0.8);
+		sp3.setOneTouchExpandable(true);
+		
+		this.add(sp3, BorderLayout.CENTER);
 		JButton	hide	= new JButton("Hide...");
 		JButton	show	= new JButton("Show All");
 		hide.setPreferredSize(show.getPreferredSize());
@@ -554,6 +561,7 @@ public class BDIViewerPanel extends JPanel
 					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_PLAN);
 			}
 		}, true, PublishEventLevel.FINE);
+		
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void exceptionOccurred(Exception exception)

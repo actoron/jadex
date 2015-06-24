@@ -14,7 +14,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
-import jadex.rules.eca.annotations.Event;
 
 /**
  *  Hello World with goal driven print out.
@@ -49,8 +48,9 @@ public class HelloWorldBDI
 		/**
 		 *  Create a new goal whenever sayhello belief is changed.
 		 */
-		@GoalCreationCondition
-		public HelloGoal(@Event("sayhello") String text)
+		@GoalCreationCondition(beliefs="sayhello")
+//		public HelloGoal(@Event("sayhello") String text) 
+		public HelloGoal(String text) 
 		{
 			this.text = text;
 		}

@@ -43,7 +43,7 @@ public class MicroDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
-		this.micropanel	= new MicroAgentViewPanel(access, bpp);
+		this.micropanel	= new MicroAgentViewPanel(access, bpp, false);
 	}
 
 	/**

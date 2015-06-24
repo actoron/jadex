@@ -93,7 +93,7 @@ public class SFuture
 		if(to>0)
 		{
 			final long w = (long)(to*factor);
-			IComponentStep<Void> step = new IComponentStep<Void>()
+			IComponentStep<Void> step = new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -123,7 +123,7 @@ public class SFuture
 	{
 		if(to>0)
 		{
-			ea.scheduleStep(new IComponentStep<Void>()
+			ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

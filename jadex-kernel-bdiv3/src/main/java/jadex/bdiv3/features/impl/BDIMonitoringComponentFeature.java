@@ -36,7 +36,9 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 	 */
 	public List<IMonitoringEvent> getCurrentStateEvents()
 	{
-		List<IMonitoringEvent> ret = new ArrayList<IMonitoringEvent>();
+		List<IMonitoringEvent> ret = super.getCurrentStateEvents();
+		if(ret==null)
+			ret = new ArrayList<IMonitoringEvent>();
 		
 		// Already gets merged beliefs (including subcapas).
 		IBDIModel bdimodel = (IBDIModel)getComponent().getModel().getRawModel();
