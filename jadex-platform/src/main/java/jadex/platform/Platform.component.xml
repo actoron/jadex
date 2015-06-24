@@ -171,6 +171,8 @@
 		<argument name="context" class="boolean">true</argument>
 		<!-- Flag if address component and service should be started.  -->
 		<argument name="address" class="boolean">true</argument>
+		<!-- Flag if dht storage ring should be provided. -->
+		<argument name="providedht" class="boolean">false</argument>
 	</arguments>
 	
 	<componenttypes>
@@ -207,6 +209,7 @@
 		<componenttype filename="jadex/platform/service/settings/Settings.component.xml" name="settings"/>
 		<componenttype filename="jadex/platform/service/context/Context.component.xml" name="context"/>
 		<componenttype filename="jadex/platform/service/address/TransportAddressAgent.class" name="address"/>
+		<componenttype filename="jadex/platform/service/dht/DistributedServiceRegistryAgent.class" name="distregistry"/>
 	</componenttypes>
 	
 	<services>
@@ -370,6 +373,7 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
+				<component name="distregistry" type="distregistry" daemon="true" number="Boolean.TRUE.equals($args.providedht)? 1: 0"/>
 			</components>
 		</configuration>
 		
@@ -461,6 +465,7 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
+				<component name="distregistry" type="distregistry" daemon="true" number="Boolean.TRUE.equals($args.providedht)? 1: 0"/>
 			</components>
 		</configuration>
 		
