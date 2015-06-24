@@ -433,7 +433,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public static void	clearAWT()
 	{
-		if(!SReflect.isAndroid())
+		if(SReflect.HAS_GUI)
 		{
 			SNonAndroid.clearAWT();
 		}
