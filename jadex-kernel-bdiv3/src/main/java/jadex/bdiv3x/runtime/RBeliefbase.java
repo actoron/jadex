@@ -166,10 +166,18 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public IBelief getBelief0(String name)
 	{
-		IBelief	ret	= beliefs.get(name);
-		if(ret==null)
+		IBelief	ret;
+		if(beliefs!=null)
 		{
-			ret	= beliefs.get(MElement.internalName(name));
+			ret	= beliefs.get(name);
+			if(ret==null)
+			{
+				ret	= beliefs.get(MElement.internalName(name));
+			}
+		}
+		else
+		{
+			ret	= null;
 		}
 		return ret;
 	}
@@ -180,10 +188,18 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public IBeliefSet getBeliefSet0(String name)
 	{
-		IBeliefSet	ret	= beliefsets.get(name);
-		if(ret==null)
+		IBeliefSet	ret;
+		if(beliefsets!=null)
 		{
-			ret	= beliefsets.get(MElement.internalName(name));
+			ret	= beliefsets.get(name);
+			if(ret==null)
+			{
+				ret	= beliefsets.get(MElement.internalName(name));
+			}
+		}
+		else
+		{
+			ret	= null;
 		}
 		return ret;
 	}

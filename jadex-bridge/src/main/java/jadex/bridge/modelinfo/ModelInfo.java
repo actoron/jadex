@@ -946,8 +946,8 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public boolean checkName()
 	{
-		boolean	check	= true;
-		if(filename!=null)
+		boolean	check	= name!=null;
+		if(check && filename!=null)
 		{
 			String	test	= filename;
 			int index	= Math.max(test.lastIndexOf("\\"), test.lastIndexOf("/"));

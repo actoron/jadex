@@ -28,12 +28,12 @@
 		<beliefref name="testresults"  result="true">
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
+		<belief name="string" class="String"/>
 		<belief name="length" class="int" evaluationmode="push">
-			<fact language="jcl">
-				$beliefbase.string.length()
+			<fact>
+				$beliefbase.string!=null ? $beliefbase.string.length() : 0
 			</fact>
 		</belief>
-		<belief name="string" class="String"/>
 	</beliefs>
 
 	<plans>

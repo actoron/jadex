@@ -403,7 +403,7 @@ public class MBelief extends MElement
 	{
 		Object ret = null;
 		
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		
 		if(bdif instanceof BDIAgentFeature)
 		{
@@ -633,7 +633,7 @@ public class MBelief extends MElement
 	{
 		// The default value must not null, when a basic type is declared.
 		// Hence a new default value is created.
-		if(fact==null && facts==null && getClazz()!=null && clazz!=null)
+		if(!isMulti(null) && fact==null && facts==null && clazz!=null)
 		{
 			if(clazz.getTypeName()=="boolean")
 				fact = new UnparsedExpression(null, "false");

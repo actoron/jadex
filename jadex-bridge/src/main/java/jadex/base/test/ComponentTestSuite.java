@@ -263,28 +263,30 @@ public class ComponentTestSuite extends TestSuite
 				}
 				catch(final RuntimeException e)
 				{
-//					System.out.println("Exception: "+abspath);
-					BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
+					if(broken)
 					{
-						public String getErrorText()
+						BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
 						{
-							StringWriter	sw	= new StringWriter();
-							e.printStackTrace(new PrintWriter(sw));
-							return "Error loading model: "+sw.toString();
-						}
-						
-						public String getErrorHTML()
-						{
-							return getErrorText();
-						}
-						
-						public Map<String, String> getDocuments()
-						{
-							return null;
-						}
-					});
-					test.setName(abspath);
-					addTest(test);
+							public String getErrorText()
+							{
+								StringWriter	sw	= new StringWriter();
+								e.printStackTrace(new PrintWriter(sw));
+								return "Error loading model: "+sw.toString();
+							}
+							
+							public String getErrorHTML()
+							{
+								return getErrorText();
+							}
+							
+							public Map<String, String> getDocuments()
+							{
+								return null;
+							}
+						});
+						test.setName(abspath);
+						addTest(test);
+					}
 				}
 			}
 		}

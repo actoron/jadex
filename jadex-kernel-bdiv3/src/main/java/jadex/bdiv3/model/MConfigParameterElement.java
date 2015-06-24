@@ -3,7 +3,9 @@ package jadex.bdiv3.model;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Initial / end goals and plans.
@@ -12,41 +14,17 @@ public class MConfigParameterElement	extends MElement
 {
 	//-------- attributes --------
 	
-	/** The referenced element name. */
-	protected String ref;
-
 	/** The parameters. */
-	protected List<UnparsedExpression> parameters;
+	protected Map<String, List<UnparsedExpression>> parameters;
 
 	//-------- methods --------
 	
 	/**
-	 *  Get the parameters.
-	 *  @return The parameters.
-	 */
-	public List<UnparsedExpression> getParameters()
-	{
-		return parameters;
-	}
-	
-	/**
 	 *  Get a parameter by name.
 	 */
-	public UnparsedExpression getParameter(String name)
+	public List<UnparsedExpression> getParameters(String name)
 	{
-		UnparsedExpression ret = null;
-		if(parameters!=null && name!=null)
-		{
-			for(UnparsedExpression param: parameters)
-			{
-				if(param.getName().equals(name))
-				{
-					ret = param;
-					break;
-				}
-			}
-		}
-		return ret;
+		return parameters!=null ? parameters.get(name) : null;
 	}
 	
 	/**
@@ -54,18 +32,9 @@ public class MConfigParameterElement	extends MElement
 	 */
 	public boolean hasParameter(String name)
 	{
-		return getParameter(name)!=null;
+		return parameters!=null && parameters.containsKey(name);
 	}
 
-	/**
-	 *  Set the parameters.
-	 *  @param parameters The parameters to set.
-	 */
-	public void setParameters(List<UnparsedExpression> parameters)
-	{
-		this.parameters = parameters;
-	}
-	
 	/**
 	 *  Add a parameter.
 	 *  @param parameter The parameter.
@@ -73,8 +42,15 @@ public class MConfigParameterElement	extends MElement
 	public void addParameter(UnparsedExpression parameter)
 	{
 		if(parameters==null)
-			parameters = new ArrayList<UnparsedExpression>();
-		this.parameters.add(parameter);
+		{
+			parameters = new LinkedHashMap<String, List<UnparsedExpression>>();
+		}
+		List<UnparsedExpression>	params	=  parameters.get(parameter.getName());
+		if(params==null)
+		{
+			params	= new ArrayList<UnparsedExpression>();
+			parameters.put(parameter.getName(), params);
+		}
+		params.add(parameter);
 	}
-
 }

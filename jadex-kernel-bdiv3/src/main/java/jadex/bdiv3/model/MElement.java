@@ -1,5 +1,7 @@
 package jadex.bdiv3.model;
 
+import jadex.commons.SReflect;
+
 /**
  *  Base element for model elements.
  */
@@ -135,6 +137,14 @@ public class MElement
 			ret = getName()!=null? getName().equals(other.getName()): super.equals(obj);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Create a string representation.
+	 */
+	public String	toString()
+	{
+		return SReflect.getUnqualifiedClassName(getClass())+"("+getName()+")";
 	}
 	
 	/**

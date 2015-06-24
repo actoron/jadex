@@ -418,8 +418,12 @@ public class Reader extends AReader
 						{
 							for(AttributeInfo attrinfo: attrinfos)
 							{
-								if(rawattrs.containsKey(attrinfo.getAccessInfo().getXmlObjectName().getLocalPart()) && attrinfo.isIgnoreRead())
+								boolean	contains	= rawattrs.containsKey(attrinfo.getAccessInfo().getXmlObjectName().getLocalPart());
+								boolean ignore	= attrinfo.isIgnoreRead();
+								if(contains && ignore)
+								{
 									atcnt--;
+								}
 							}
 						}
 					}
