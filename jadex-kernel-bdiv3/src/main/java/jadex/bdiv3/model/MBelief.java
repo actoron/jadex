@@ -633,7 +633,7 @@ public class MBelief extends MElement
 	{
 		// The default value must not null, when a basic type is declared.
 		// Hence a new default value is created.
-		if(!isMulti(null) && fact==null && facts==null && clazz!=null)
+		if(fact==null && facts==null && clazz!=null && !isMulti(null))
 		{
 			if(clazz.getTypeName()=="boolean")
 				fact = new UnparsedExpression(null, "false");

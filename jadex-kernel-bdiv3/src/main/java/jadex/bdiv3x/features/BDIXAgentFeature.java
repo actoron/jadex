@@ -1250,7 +1250,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		MBelief mbel = ((MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIXAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
-		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
+		if(mbel!=null && mbel.isMulti(null))
 		{
 			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
 			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
