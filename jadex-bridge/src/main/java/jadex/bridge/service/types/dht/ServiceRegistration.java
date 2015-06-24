@@ -10,7 +10,7 @@ import java.util.Calendar;
 public class ServiceRegistration
 {
 	/** Lease time in ms */
-	public static final int LEASE_TIME = 60 * 1000;
+	public static final int LEASE_TIME = 120 * 1000;
 	
 	/** The sid */
 	private IServiceIdentifier sid;

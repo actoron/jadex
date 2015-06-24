@@ -200,7 +200,11 @@ public class Fingertable {
 				log("resetting finger " + i + " to " + selfFinger);
 				Finger oldFinger = fingers[i].clone();
 				fingers[i].set(selfFinger);
-				listener.fingerChanged(i, oldFinger, selfFinger);
+				if (i == 0) {
+					listener.successorChanged(oldFinger, selfFinger);
+				} else {
+					listener.fingerChanged(i, oldFinger, selfFinger);
+				}
 			}
 		}
 

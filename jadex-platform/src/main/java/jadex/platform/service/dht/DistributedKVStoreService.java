@@ -174,7 +174,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 								@Override
 								public void resultAvailable(IDistributedKVStoreService result)
 								{
-									log("Storing key: " + key + "(hash: " + ID.get(key) + ")" + " in: " + nodeId);
+									log("Storing key: " + key + "(hash: " + hash + ")" + " in: " + nodeId);
 									
 									IFuture<IID> publish;
 									if (addToCollection) {
@@ -185,6 +185,10 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 //										IFuture<IID> publish = result.publish(key, value);
 									publish.addResultListener(new DelegationResultListener<IID>(ret));
 								}
+								
+								public void exceptionOccurred(Exception exception) {
+									log("Failed to store key: " + key + "(hash: " + hash + ")" + " in: " + nodeId);
+								};
 							});
 						}
 					}
@@ -372,15 +376,20 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 											@SuppressWarnings("unchecked")
 											IFuture<Object> value = (IFuture<Object>)result.lookup(key, idHash);
 											value.addResultListener(new DefaultResultListener<Object>()
-												{
-												
+											{
+											
 												@Override
 												public void resultAvailable(Object result)
 												{
 													ret.setResult(result);
 												}
-												});
+											});
 										}
+										
+										public void exceptionOccurred(Exception exception) {
+											log("failed to retrieve key: " +key+" (hash: " + idHash + ") from successor: " + finger.getNodeId());
+											ret.setException(exception);
+										};
 									});
 									return ret;
 								}
@@ -452,7 +461,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	@Override
 	public IFuture<Void> pushEntries(Collection<StoreEntry> entries)
 	{
-		IFinger predec = ring.getPredecessor().get();
+		final IFinger predec = ring.getPredecessor().get();
 //		log("pushEntries received. Current predecessor: " + (predec != null ? predec.getNodeId() : null));
 		log("pushEntries received with " + entries.size() + " entries.");
 		final Collection<StoreEntry> collForPredec = new ArrayList<StoreEntry>();
@@ -493,6 +502,11 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 					}
 					
 					// dont care about exceptions, as data has to be periodically refreshed anyways.
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						log("pushEntries: could not pass data to " + predec.getNodeId() + ", as it is unavailable.");
+					}
 				});
 			}
 		}
@@ -519,6 +533,18 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	 */
 	public IFuture<IDistributedKVStoreService> getStoreService(IFinger finger) {
 		IFuture<IDistributedKVStoreService> searchService = SServiceProvider.getService(agent, finger.getSid().getProviderId(), IDistributedKVStoreService.class);
+		searchService.addResultListener(new IResultListener<IDistributedKVStoreService>()
+		{
+			public void resultAvailable(IDistributedKVStoreService result)
+			{
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				// TODO: on exceptions, invalidate finger.
+			}
+		});
 		return searchService;
 	}
 	
@@ -572,11 +598,16 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 								};
 								public void exceptionOccurred(Exception exception) {
 									// re-add temporarily?
-									exception.printStackTrace();
 									log("Could not move " + collForPredec.size() + " items to predecessor: " + predec.getNodeId());
 								};
 							});
 						};
+						
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							log("Could not move " + collForPredec.size() + " items to predecessor: " + predec.getNodeId());
+						}
 					});
 				} else {
 					ret.setResult(null);

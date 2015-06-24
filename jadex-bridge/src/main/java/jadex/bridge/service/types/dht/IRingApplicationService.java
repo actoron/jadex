@@ -25,7 +25,7 @@ public interface IRingApplicationService
 	 * 
 	 * @return finger entry of the successor.
 	 */
-	@Timeout(TIMEOUT)
+//	@Timeout(TIMEOUT)
 	IFuture<IFinger> getSuccessor();
 	
 	/**
@@ -33,7 +33,7 @@ public interface IRingApplicationService
 	 * 
 	 * @return finger entry of the successor.
 	 */
-	@Timeout(TIMEOUT)
+//	@Timeout(TIMEOUT)
 	IFuture<IFinger> getPredecessor();
 
 	/**
@@ -50,7 +50,7 @@ public interface IRingApplicationService
 	 * 
 	 * @return own ID.
 	 */
-	@Timeout(TIMEOUT)
+//	@Timeout(TIMEOUT)
 	IFuture<IID> getId();
 
 	/**

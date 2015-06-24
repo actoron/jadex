@@ -100,8 +100,9 @@ public class AwarenessInfo
 		
 		// fill in platform properties (todo: only fill in for some infos?)
 		this.properties	= new HashMap<String, String>();
-		properties.put(PROPERTY_JADEXVERSION, VersionInfo.getInstance().getVersion());
-		properties.put(PROPERTY_JADEXDATE, String.valueOf(VersionInfo.getInstance().getDate().getTime()));
+		VersionInfo versionInfo = VersionInfo.getInstance();
+		properties.put(PROPERTY_JADEXVERSION, versionInfo.getVersion());
+		properties.put(PROPERTY_JADEXDATE, String.valueOf(versionInfo.getDate() != null ? versionInfo.getDate().getTime() : 0));
 		for(String prop: SYSTEM_PROPERTIES)
 		{
 			properties.put(prop, System.getProperty(prop));
