@@ -1,6 +1,7 @@
 package jadex.bdiv3.features.impl;
 
 import jadex.bdiv3.model.IBDIModel;
+import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.commons.IResultCommand;
 import jadex.commons.beans.PropertyChangeEvent;
@@ -62,4 +63,18 @@ public interface IInternalBDIAgentFeature
 //	 *  @return The capability pojo.
 //	 */
 //	public Object	getCapabilityObject(String name);
+	
+	/**
+	 *  Add a belief listener.
+	 *  @param name The belief name.
+	 *  @param listener The belief listener.
+	 */
+	public void addBeliefListener(String name, IBeliefListener<?> listener);
+	
+	/**
+	 *  Remove a belief listener.
+	 *  @param name The belief name.
+	 *  @param listener The belief listener.
+	 */
+	public void removeBeliefListener(String name, IBeliefListener<?> listener);
 }

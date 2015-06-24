@@ -539,8 +539,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void addBeliefListener(IBeliefListener<T> listener)
 		{
-			IBDIXAgentFeature bdif = getAgent().getComponentFeature(IBDIXAgentFeature.class);
-			bdif.getBeliefbase().getBelief(getName()).addBeliefListener(listener);
+			IInternalBDIAgentFeature bdif = getAgent().getComponentFeature(IInternalBDIAgentFeature.class);
+			bdif.addBeliefListener(getName(), listener);
 		}
 		
 		/**
@@ -549,8 +549,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void removeBeliefListener(IBeliefListener<T> listener)
 		{
-			IBDIXAgentFeature bdif = getAgent().getComponentFeature(IBDIXAgentFeature.class);
-			bdif.getBeliefbase().getBelief(getName()).removeBeliefListener(listener);
+			IInternalBDIAgentFeature bdif = getAgent().getComponentFeature(IInternalBDIAgentFeature.class);
+			bdif.removeBeliefListener(getName(), listener);
 		}
 	}
 	
@@ -812,8 +812,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void addBeliefSetListener(IBeliefListener<T> listener)
 		{
-			IBDIXAgentFeature bdif = getAgent().getComponentFeature(IBDIXAgentFeature.class);
-			bdif.getBeliefbase().getBelief(getName()).addBeliefListener(listener);
+			IInternalBDIAgentFeature bdif = getAgent().getComponentFeature(IInternalBDIAgentFeature.class);
+			bdif.addBeliefListener(getName(), listener);
 		}
 		
 		/**
@@ -822,8 +822,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void removeBeliefSetListener(IBeliefListener<T> listener)
 		{
-			IBDIXAgentFeature bdif = getAgent().getComponentFeature(IBDIXAgentFeature.class);
-			bdif.getBeliefbase().getBelief(getName()).removeBeliefListener(listener);
+			IInternalBDIAgentFeature bdif = getAgent().getComponentFeature(IInternalBDIAgentFeature.class);
+			bdif.removeBeliefListener(getName(), listener);
 		}
 		
 		/**
