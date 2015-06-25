@@ -321,7 +321,6 @@ public class PlatformConfiguration
 	 * Set the persist flag.
 	 * @param value
 	 */
-	// TODO unused?
 	public void setPersist(boolean value) {
 		setCmdArg(PERSIST, value);
 	}
