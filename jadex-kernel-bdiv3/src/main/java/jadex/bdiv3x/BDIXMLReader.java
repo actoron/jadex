@@ -872,6 +872,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				expost.postProcess(context, object);
 				MCondition cond = new MCondition();
 				cond.setExpression((UnparsedExpression)object);
+				cond.setName(cond.getExpression().getName());
 				
 				AReadContext ar	= (AReadContext)context;
 				MElement pe	= null;
