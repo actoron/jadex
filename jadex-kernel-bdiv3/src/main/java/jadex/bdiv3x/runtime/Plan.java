@@ -391,9 +391,8 @@ public abstract class Plan
 //	}
 	
 	/**
-	 *  Send a message and wait for the result.
+	 *  Send a message and wait until it is sent.
 	 *  @param me	The message event.
-	 *  @return The filter to wait for an answer.
 	 */
 	public IFuture<Void> sendMessage(IMessageEvent me)
 	{
