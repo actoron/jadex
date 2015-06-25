@@ -19,7 +19,6 @@ import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.tools.debugger.micro.MicroAgentViewPanel;
-import jadex.tools.debugger.micro.MicroDebuggerPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

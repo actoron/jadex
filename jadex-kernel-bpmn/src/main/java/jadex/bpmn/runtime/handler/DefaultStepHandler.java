@@ -50,6 +50,17 @@ public class DefaultStepHandler implements IStepHandler
 //			System.out.println("Event: "+activity+" "+thread+" "+event);
 		}
 		
+		// Cancel handlers
+		if(activity instanceof MSubProcess)
+		{
+			ICancelable cancelable = (CompositeCancelable)thread.getWaitInfo();
+			if(cancelable!=null)
+			{
+				cancelable.cancel();
+				thread.setWaitInfo(null);
+			}
+		}
+		
 		// Timer occurred flow
 		if(AbstractEventIntermediateTimerActivityHandler.TIMER_EVENT.equals(event))
 		{
@@ -220,20 +231,25 @@ public class DefaultStepHandler implements IStepHandler
 			}
 			else
 			{
-				if(ex instanceof RuntimeException)
-				{
-					throw (RuntimeException)ex;
-				}
-				else
-				{
-					throw new RuntimeException("Unhandled exception in process: "+activity, ex);
-				}
+				// If component scope and exception terminate the component
+				instance.killComponent(ex);
+				
+				// Does not work because components now tolerate exceptions in steps
+//				if(ex instanceof RuntimeException)
+//				{
+//					throw (RuntimeException)ex;
+//				}
+//				else
+//				{
+//					throw new RuntimeException("Unhandled exception in process: "+activity, ex);
+//				}
 			}
 		}
 			
 		// Perform step settings, i.e. set next edge/activity or remove thread.
 		if(next instanceof MSequenceEdge)
 		{
+			// Sets the edge as well as the next activity
 			thread.setLastEdge((MSequenceEdge)next);
 			if(instance.getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
@@ -242,6 +258,7 @@ public class DefaultStepHandler implements IStepHandler
 		}
 		else if(next instanceof MActivity)
 		{
+			// Set the activity and the last edge to null
 			thread.setActivity((MActivity)next);
 			if(instance.getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
@@ -259,6 +276,19 @@ public class DefaultStepHandler implements IStepHandler
 		else
 		{
 			throw new UnsupportedOperationException("Unknown outgoing element type: "+next);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void cancelMe(MActivity activity, IInternalAccess instance, ProcessThread thread, Object event)
+	{
+		if(activity instanceof MSubProcess)
+		{
+			ICancelable cancelable = (CompositeCancelable)thread.getWaitInfo();
+			if(cancelable!=null)
+				cancelable.cancel();
 		}
 	}
 }

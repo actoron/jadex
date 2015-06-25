@@ -9,6 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>S1_ProvidedServices</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="h+5zbIZCq1kqcVgt">
@@ -169,10 +170,10 @@
       <jadex:dataFlow id="CD5FbioCR+Q1fJXy" sourceRef="EIIUyDRP37T+GbVt" sourceParam="param0" targetRef="dXojUkOKANVBrm25" targetParam="returnparam">
         <jadex:dataFlowValueMapping>param0+param1</jadex:dataFlowValueMapping>
       </jadex:dataFlow>
+      <jadex:dataFlow id="kbJosNYbUy5svUwk" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="CM2YXVq9jNbjX/vx" targetParam="returnparam"/>
       <jadex:dataFlow id="yFWtiNqxE549bNnW" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="/09zsgGkEnkWC1wR" targetParam="cnt">
         <jadex:dataFlowValueMapping>cnt+1</jadex:dataFlowValueMapping>
       </jadex:dataFlow>
-      <jadex:dataFlow id="kbJosNYbUy5svUwk" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="CM2YXVq9jNbjX/vx" targetParam="returnparam"/>
       <jadex:dataFlow id="ccNv2FkqQgUnxFfC" sourceRef="HSjAxDflhY3JYSiV" sourceParam="text" targetRef="m5vdqhI00xqP2LF7" targetParam="returnparam"/>
     </semantic:extensionElements>
   </semantic:process>

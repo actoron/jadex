@@ -70,7 +70,7 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 					}
 				}
 				else if(MBpmnModel.EVENT_START_SIGNAL.equals(act.getActivityType())
-					&& act.getName().startsWith(info.getName()+"."))
+					&& act.getName()!=null && act.getName().startsWith(info.getName()+"."))
 				{
 					events.add(act.getName().substring(info.getName().length()+1), act);
 				}

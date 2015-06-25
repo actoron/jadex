@@ -22,11 +22,11 @@ public class EventEndErrorActivityHandler extends DefaultActivityHandler
 	protected void doExecute(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		Exception ex = null;
-		if (thread.getPropertyValue("exception", activity) instanceof Exception)
+		if(thread.getPropertyValue("exception", activity) instanceof Exception)
 		{
 			ex = (Exception)thread.getPropertyValue("exception", activity);
 		}
-		else if (thread.getPropertyValue("exception", activity) instanceof UnparsedExpression)
+		else if(thread.getPropertyValue("exception", activity) instanceof UnparsedExpression)
 		{
 			UnparsedExpression excexp = (UnparsedExpression) thread.getPropertyValue("exception", activity);
 			IValueFetcher fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());

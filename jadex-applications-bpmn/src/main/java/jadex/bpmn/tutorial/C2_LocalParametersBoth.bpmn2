@@ -8,7 +8,8 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
-    <jadex:modelname>C2_LocalParameters</jadex:modelname>
+    <jadex:modelname>C2_LocalParametersBoth</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="RhSLHEmBDfq6lfyZ">

@@ -84,9 +84,13 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 				((IntermediateFuture)ret).setFinished();
 			}
 		}
-		else
+		else if(ret!=null)
 		{
 			ret.setResult(res);
+		}
+		else
+		{
+			thread.getInstance().getLogger().warning("Cannot return value from service call, no future found: "+activity);
 		}
 	}
 }

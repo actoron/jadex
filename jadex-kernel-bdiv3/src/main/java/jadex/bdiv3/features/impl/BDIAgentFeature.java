@@ -239,6 +239,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				publishToolBeliefEvent(getComponent(), mbel);
 //					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
 				rs.addEvent(new jadex.rules.eca.Event(ev1, new ChangeInfo<Object>(val, oldval, null)));
+				
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				if(((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited())
 					rs.processAllEvents(); 

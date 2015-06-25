@@ -922,7 +922,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			if(steps!=null && steps.size()>0) 
 			{
-//				if(getComponent().getComponentIdentifier().getName().indexOf("Pojo")!=-1)
+//				if(getComponent().getComponentIdentifier().getName().indexOf("Hello")!=-1)
 //					System.out.println("executing");
 				StepInfo si = steps.first();
 				if(si.getPriority()>=STEP_PRIORITY_IMMEDIATE)
@@ -1003,13 +1003,19 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(valid)
 				{
 					step.getTransfer().afterSwitch();
+					if(getComponent().getComponentIdentifier().getName().indexOf("Execute")!=-1)
+						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getComponentDescription().getState());
 					stepfut	= step.getStep().execute(component);
-//					if(getComponent().getComponentIdentifier().getName().indexOf("Pojo")!=-1)
-//						System.out.println("executed: "+step.getStep());
 				}
 				else
 				{
-					ex = new RuntimeException("Step invalid.");
+					ex = new RuntimeException("Step invalid.")
+					{
+						public void printStackTrace() 
+						{
+							super.printStackTrace();
+						}
+					};
 				}
 			}
 			catch(Throwable t)

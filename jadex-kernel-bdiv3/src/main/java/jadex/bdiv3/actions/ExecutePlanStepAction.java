@@ -14,7 +14,7 @@ import jadex.commons.future.IResultListener;
 // todo: allow using multi-step plans
 
 /**
- * 
+ *  Action for executing a plan step. 
  */
 public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 {

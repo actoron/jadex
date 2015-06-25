@@ -5,6 +5,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bridge.ClassInfo;
@@ -21,6 +22,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -153,7 +155,18 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				if(timer!=null)
 				{
-					getBpmnFeature(instance).getActivityHandler(timer).execute(timer, instance, thread);
+					final IActivityHandler th = getBpmnFeature(instance).getActivityHandler(timer);
+					th.execute(timer, instance, thread);
+					
+					thread.setWaitInfo(new ICancelable()
+					{
+						public IFuture<Void> cancel()
+						{
+							th.cancel(activity, instance, thread);
+							thread.setWaitInfo(null);
+							return IFuture.DONE;
+						}
+					});
 				}
 				else
 				{

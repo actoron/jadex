@@ -30,13 +30,16 @@ public class BpmnMonitoringComponentFeature extends MonitoringComponentFeature
 	 */
 	public List<IMonitoringEvent> getCurrentStateEvents()
 	{
+		List<IMonitoringEvent> ret = super.getCurrentStateEvents();
+		if(ret==null)
+			ret = new ArrayList<IMonitoringEvent>();
+		
 		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
 
-		final List<IMonitoringEvent>	events	= new ArrayList<IMonitoringEvent>();
 		for(Iterator<ProcessThread> it= bcf.getTopLevelThread().getAllThreads().iterator(); it.hasNext(); )
 		{
-			events.add(bcf.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, it.next()));
+			ret.add(bcf.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, it.next()));
 		}
-		return events;
+		return ret;
 	}
 }

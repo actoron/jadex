@@ -8,9 +8,9 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
-    <jadex:modelname>ForLoop</jadex:modelname>
+    <jadex:modelname>ForLoopModern</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
     </jadex:imports>

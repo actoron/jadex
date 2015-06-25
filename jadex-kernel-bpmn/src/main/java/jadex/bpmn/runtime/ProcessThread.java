@@ -18,6 +18,7 @@ import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler.SubprocessResultHandler;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -30,6 +31,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
@@ -129,20 +131,14 @@ public class ProcessThread	implements ITaskContext
 	public ProcessThread(String id, MActivity activity, ProcessThread parent, IInternalAccess instance)
 	{
 		this.id	= parent!=null? parent.getNextChildId(): null;
-		this.activity	= activity;
+//		this.activity	= activity;
 		this.parent = parent;
 		this.instance = instance;
+		
+		setActivity(activity);
 	}
 	
 	//-------- methods --------
-	
-	/**
-	 * 
-	 */
-	protected IInternalBpmnComponentFeature getBpmnFeature(IInternalAccess ia)
-	{
-		return (IInternalBpmnComponentFeature)ia.getComponentFeature(IBpmnComponentFeature.class);
-	}
 	
 	/**
 	 *  Get the model.
@@ -182,6 +178,11 @@ public class ProcessThread	implements ITaskContext
 		// Clear edge and resulthandler on each transition
 		this.edge	= null;
 		this.resulthandler = null;
+		
+		if(activity!=null)
+			scheduleExecution();
+//		else
+//			System.out.println("activity to null: "+getId());
 	}
 	
 	/**
@@ -257,9 +258,7 @@ public class ProcessThread	implements ITaskContext
 //		System.out.println("Set waiting thread: "+getId()+" "+waiting);
 		this.waiting = waiting;
 		if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-		{	
 			getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
-		}
 	}
 	
 	/**
@@ -267,15 +266,38 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setNonWaiting()
 	{
+//		boolean waswaiting = waiting;
+		
 		this.waiting = false;
 //		this.waitinfo = null;
 		this.cancelinfo = null;
 		this.waitfilter = null;
 		if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-		{	
 			getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
-		}
+
+//		if(waswaiting)
+//			scheduleExecution();
+		
 //		System.out.println("Thread: "+ComponentIdentifier.LOCAL.get()+", "+getId()+" "+waiting);
+	}
+	
+	/**
+	 *  Schedule notification of this thread.
+	 */
+	protected void scheduleExecution()
+	{
+		getInstance().getComponentFeature(IExecutionFeature.class).scheduleStep(new ExecuteProcessThread(this)).addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// nop, can happen when step is invalid
+				// todo: use StepInvalidException?!
+			}
+		});
 	}
 	
 	/**
@@ -1545,6 +1567,14 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void notifyFinished()
 	{
+	}
+	
+	/**
+	 *  Get the bpmn feature.
+	 */
+	protected IInternalBpmnComponentFeature getBpmnFeature(IInternalAccess ia)
+	{
+		return (IInternalBpmnComponentFeature)ia.getComponentFeature(IBpmnComponentFeature.class);
 	}
 	
 	/**

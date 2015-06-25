@@ -9,24 +9,16 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.runtime.IActivityHandler;
+import jadex.bpmn.runtime.ExecuteProcessThread;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
-import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.IFilter;
 import jadex.commons.Tuple3;
 import jadex.commons.future.IFuture;
 
@@ -58,7 +50,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 	/**
 	 *  Execute the main activity of the feature.
 	 */
-	public IFuture<Void> init()
+	public IFuture<Void> body()
 	{
 		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
@@ -146,7 +138,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
             	}
             	else
             	{
-                    ProcessThread    thread    = new ProcessThread(mact, bcf.getTopLevelThread(), getComponent());
+                    ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getComponent());
                     thread.setOrCreateParameterValue("$event", trigger.getThirdEntity());
                     bcf.getTopLevelThread().addThread(thread);
             	}
@@ -162,45 +154,46 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
             }
         } 
         
-        return IFuture.DONE;
-	}
-	
-	/**
-	 *  Execute the main activity of the feature.
-	 */
-	public IFuture<Void> body()
-	{
         started = true;
-		
-//		// Use step in case agent is started as suspended.
-//		// Todo: Better to create steps directly as they immediately appear in debugger!? 
-////		scheduleStep(new IComponentStep<Void>()
-////		{
-////			public IFuture<Void> execute(IInternalAccess ia)
-////			{
-//				// Create initial thread(s). 
-//				List startevents	= model.getStartActivities(pool, lane);
-//				for(int i=0; startevents!=null && i<startevents.size(); i++)
-//				{
-//					ProcessThread thread = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
-//					context.addThread(thread);
-//				}
-//				started = true;
-////				return IFuture.DONE;
-////			}
-////		});
         
         return IFuture.DONE;
 	}
 	
 	/**
-	 *  Reschedule steps to immediate to allow debugger
-	 *  step on bpmn actions only.
+	 *  Add a check to ensure that no thread gets scheduled twice.
 	 */
-	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
+	protected void addStep(StepInfo step)
 	{
-//		System.out.println("adding bpmn step: "+step);
-		return scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, step);
+		if(DEBUG)
+		{
+			if(step.getStep() instanceof ExecuteProcessThread)
+			{
+				ProcessThread thread = ((ExecuteProcessThread)step.getStep()).getThread();
+				synchronized(this)
+				{
+					if(steps!=null)
+					{
+						for(StepInfo si: steps)
+						{
+							if(si.getStep() instanceof ExecuteProcessThread)
+							{
+								if(thread.equals(((ExecuteProcessThread)si.getStep()).getThread()))
+								{
+									throw new RuntimeException("Internal error, must not schedule thread twice");
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		super.addStep(step);
+		
+//		synchronized(this)
+//		{
+//			System.out.println("steps: "+steps);
+//		}
 	}
 	
 	/**
@@ -215,27 +208,27 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 		
 		BpmnComponentFeature bcf = (BpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
 
-		if(!bcf.isFinished() && bcf.isReady())
-		{
-			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-			{
-				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
-					getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
-					IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
-					System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-			}
-			
-//			executeStep(pool, lane);
-			executeStep(null, null);
-			
-			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-			{
-				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
-					getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
-					IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
-					System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-			}
-		}
+//		if(!bcf.isFinished() && bcf.isReady())
+//		{
+//			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//			{
+//				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
+//					getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
+//					IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
+//					System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+//			}
+//			
+////			executeStep(pool, lane);
+//			executeStep(null, null);
+//			
+//			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//			{
+//				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
+//					getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
+//					IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
+//					System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+//			}
+//		}
 		
 //		System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
 		
@@ -255,131 +248,131 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 		
 		return !bcf.isFinished() && bcf.isReady();
 	}
-	
-	/**
-	 *  Execute one step of the process.
-	 *  @param pool	The pool to be executed or null for any.
-	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
-	 */
-	public void executeStep(String pool, String lane)
-	{
-//		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
-		
-		BpmnComponentFeature bcf = (BpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
-
-		if(bcf.isFinished(pool, lane))
-			throw new UnsupportedOperationException("Cannot execute a finished process: "+this);
-		
-		if(!bcf.isReady(pool, lane))
-			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
-		
-		ProcessThread thread = null;
-		
-		// Selects step according to stepinfo, is thread id :-(
-		
-//		String stepinfo = null;
-//		if(getComponent().getComponentDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+//	
+//	/**
+//	 *  Execute one step of the process.
+//	 *  @param pool	The pool to be executed or null for any.
+//	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+//	 */
+//	public void executeStep(String pool, String lane)
+//	{
+////		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+//		
+//		BpmnComponentFeature bcf = (BpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+//
+//		if(bcf.isFinished(pool, lane))
+//			throw new UnsupportedOperationException("Cannot execute a finished process: "+this);
+//		
+//		if(!bcf.isReady(pool, lane))
+//			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
+//		
+//		ProcessThread thread = null;
+//		
+//		// Selects step according to stepinfo, is thread id :-(
+//		
+////		String stepinfo = null;
+////		if(getComponent().getComponentDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+////		{
+////			CMSComponentDescription desc = (CMSComponentDescription)getComponent().getComponentDescription();
+////			stepinfo = desc.getStepInfo();
+////			if(stepinfo!=null)
+////			{
+////				desc.setStepInfo(null);
+////			}
+////		}
+////		
+////		if(stepinfo!=null)
+////		{
+////			thread = bcf.getTopLevelThread().getThread(stepinfo);
+////			if(thread.isWaiting())
+////			{
+////				thread = null;
+////			}
+////		}
+//		
+//		if(thread==null)
 //		{
-//			CMSComponentDescription desc = (CMSComponentDescription)getComponent().getComponentDescription();
-//			stepinfo = desc.getStepInfo();
-//			if(stepinfo!=null)
-//			{
-//				desc.setStepInfo(null);
-//			}
+//			thread = bcf.getTopLevelThread().getExecutableThread(pool, lane);
 //		}
 //		
-//		if(stepinfo!=null)
+//		// Thread may be null when external entry has not changed waiting state of any active plan. 
+//		if(thread!=null)
 //		{
-//			thread = bcf.getTopLevelThread().getThread(stepinfo);
-//			if(thread.isWaiting())
+////			if("End".equals(thread.getActivity().getName()))
+////				System.out.println("end: "+thread);
+//			// Update parameters based on edge inscriptions and initial values.
+//			thread.updateParametersBeforeStep(getComponent());
+//			
+//			// Find handler and execute activity.
+//			IActivityHandler handler = (IActivityHandler)bcf.getActivityHandler(thread.getActivity());
+////			IActivityHandler handler = (IActivityHandler)activityhandlers.get(thread.getActivity().getActivityType());
+//			if(handler==null)
+//				throw new UnsupportedOperationException("No handler for activity: "+thread);
+//
+////			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity()+" "+thread.getActivity().getId());
+//			MActivity act = thread.getActivity();
+//			
+////			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
+//			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 //			{
-//				thread = null;
+//				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(bcf.createActivityEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()), PublishTarget.TOALL);
 //			}
+//			
+////			thread = handler.execute(act, this, thread);
+//			handler.execute(act, getComponent(), thread);
+//
+//			// Moved to StepHandler
+////			thread.updateParametersAfterStep(act, this);
+//			
+//			// Check if thread now waits for a message and there is at least one in the message queue.
+//			// Todo: check if thread directly or indirectly (multiple events!) waits for a message event before checking waitqueue
+//			List<Object> messages = bcf.getMessages();
+//			if(thread.isWaiting() && messages.size()>0 /*&& MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 
+//				&& (thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)==null 
+//					|| EventIntermediateMessageActivityHandler.MODE_RECEIVE.equals(thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)))*/)
+//			{
+//				boolean processed = false;
+//				for(int i=0; i<messages.size() && !processed; i++)
+//				{
+//					Object message = messages.get(i);
+//					IFilter<Object> filter = thread.getWaitFilter();
+//					if(filter!=null && filter.filter(message))
+//					{
+//						processed = true;
+//						messages.remove(i);
+////						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+System.identityHashCode(message)+", "+message);
+//						bcf.notify(thread.getActivity(), thread, message);
+//					}
+//				}
+//			}
+//			List<IConnection> streams = bcf.getStreams();
+//			if(thread.isWaiting() && streams.size()>0) 
+//			{
+//				boolean processed = false;
+//				for(int i=0; i<streams.size() && !processed; i++)
+//				{
+//					Object stream = streams.get(i);
+//					IFilter<Object> filter = thread.getWaitFilter();
+//					if(filter!=null && filter.filter(stream))
+//					{
+//						processed = true;
+//						streams.remove(i);
+//						bcf.notify(thread.getActivity(), thread, stream);
+////						System.out.println("Dispatched from stream: "+messages.size()+" "+message);
+//					}
+//				}
+//			}
+//			
+//			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getActivity()!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//			{
+//				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(bcf.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+//			}
+////			notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
 //		}
-		
-		if(thread==null)
-		{
-			thread = bcf.getTopLevelThread().getExecutableThread(pool, lane);
-		}
-		
-		// Thread may be null when external entry has not changed waiting state of any active plan. 
-		if(thread!=null)
-		{
-//			if("End".equals(thread.getActivity().getName()))
-//				System.out.println("end: "+thread);
-			// Update parameters based on edge inscriptions and initial values.
-			thread.updateParametersBeforeStep(getComponent());
-			
-			// Find handler and execute activity.
-			IActivityHandler handler = (IActivityHandler)bcf.getActivityHandler(thread.getActivity());
-//			IActivityHandler handler = (IActivityHandler)activityhandlers.get(thread.getActivity().getActivityType());
-			if(handler==null)
-				throw new UnsupportedOperationException("No handler for activity: "+thread);
-
-//			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity()+" "+thread.getActivity().getId());
-			MActivity act = thread.getActivity();
-			
-//			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
-			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-			{
-				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(bcf.createActivityEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()), PublishTarget.TOALL);
-			}
-			
-//			thread = handler.execute(act, this, thread);
-			handler.execute(act, getComponent(), thread);
-
-			// Moved to StepHandler
-//			thread.updateParametersAfterStep(act, this);
-			
-			// Check if thread now waits for a message and there is at least one in the message queue.
-			// Todo: check if thread directly or indirectly (multiple events!) waits for a message event before checking waitqueue
-			List<Object> messages = bcf.getMessages();
-			if(thread.isWaiting() && messages.size()>0 /*&& MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 
-				&& (thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)==null 
-					|| EventIntermediateMessageActivityHandler.MODE_RECEIVE.equals(thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)))*/)
-			{
-				boolean processed = false;
-				for(int i=0; i<messages.size() && !processed; i++)
-				{
-					Object message = messages.get(i);
-					IFilter<Object> filter = thread.getWaitFilter();
-					if(filter!=null && filter.filter(message))
-					{
-						processed = true;
-						messages.remove(i);
-//						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+System.identityHashCode(message)+", "+message);
-						bcf.notify(thread.getActivity(), thread, message);
-					}
-				}
-			}
-			List<IConnection> streams = bcf.getStreams();
-			if(thread.isWaiting() && streams.size()>0) 
-			{
-				boolean processed = false;
-				for(int i=0; i<streams.size() && !processed; i++)
-				{
-					Object stream = streams.get(i);
-					IFilter<Object> filter = thread.getWaitFilter();
-					if(filter!=null && filter.filter(stream))
-					{
-						processed = true;
-						streams.remove(i);
-						bcf.notify(thread.getActivity(), thread, stream);
-//						System.out.println("Dispatched from stream: "+messages.size()+" "+message);
-					}
-				}
-			}
-			
-			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getActivity()!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-			{
-				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(bcf.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
-			}
-//			notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
-		}
-	}
+//	}
 	
 	/**
-	 * 
+	 *  Get the model.
 	 */
 	protected MBpmnModel getModel()
 	{

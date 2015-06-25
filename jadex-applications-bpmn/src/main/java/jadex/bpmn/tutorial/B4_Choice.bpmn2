@@ -8,6 +8,8 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
+    <jadex:modelname>B4_Choice</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="yT7Z17sIj8orYBB4">

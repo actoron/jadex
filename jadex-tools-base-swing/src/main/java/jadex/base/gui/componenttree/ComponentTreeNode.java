@@ -316,7 +316,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			propcomp	= new ComponentProperties();
 		}
 		propcomp.setDescription(desc);
-		System.out.println(desc.getName()+" "+getClass().getName());
+//		System.out.println(desc.getName()+" "+getClass().getName());
 		return propcomp;
 	}
 

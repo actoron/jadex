@@ -48,6 +48,7 @@ import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.tools.debugger.micro.MicroAgentViewPanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -486,8 +487,12 @@ public class VisualProcessViewPanel extends JPanel
 //			tmp.add(tmp2);
 //			tmp.setDividerLocation(200); // Hack?!
 			
+			JSplitPanel	sp	= new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT, tmp2, new MicroAgentViewPanel(access, null, true));
+			sp.setDividerLocation(0.8);
+			sp.setOneTouchExpandable(true);
+			
 			setLayout(new BorderLayout());
-			add(tmp2, BorderLayout.CENTER);
+			add(sp, BorderLayout.CENTER);
 			
 			// Asynchronously load the visual model (maybe from remote).
 			access.scheduleStep(new ImmediateComponentStep<String>()

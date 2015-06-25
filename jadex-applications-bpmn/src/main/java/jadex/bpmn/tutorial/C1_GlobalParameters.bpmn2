@@ -8,6 +8,8 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
+    <jadex:modelname>C1_GlobalParameters</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:contextvariables>
       <jadex:contextvariable name="customer" type="java.lang.String">

@@ -8,6 +8,8 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
+    <jadex:modelname>D3_MessageReceival2</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="X9il1f1dIc+YBBQB">

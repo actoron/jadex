@@ -111,7 +111,6 @@ public class DataOutputEncodingContext extends AbstractEncodingContext
 	 */
 	public void writeClass(Class<?> clazz)
 	{
-
 		if(!isIgnoreNextClassWrite())
 		{
 			Integer classid = classidcache.get(clazz);

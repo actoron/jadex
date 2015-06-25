@@ -9,6 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>S2_RequiredServices</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:requiredservices>
       <jadex:requiredservice name="aser" interface="jadex.bpmn.testcases.IAService" scope="platform" dynamic="false" create="false"/>
