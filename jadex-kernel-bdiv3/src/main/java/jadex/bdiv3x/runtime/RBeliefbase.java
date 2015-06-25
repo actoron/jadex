@@ -480,7 +480,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 //			if(getName().equals("myself"))
 //				System.out.println("belief set val: "+value);
-			Object oldvalue = value;
+			Object oldvalue = this.value;
 			this.value = value;
 			publisher.entryChanged(oldvalue, value, -1);
 //			publisher.unobserveValue(this.value);
@@ -789,7 +789,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			if(fact!=null)
 			{
-				facts.entryChanged(null, fact, facts.indexOf(fact));
+				facts.entryChanged(fact, fact, facts.indexOf(fact));
 			}
 			else
 			{

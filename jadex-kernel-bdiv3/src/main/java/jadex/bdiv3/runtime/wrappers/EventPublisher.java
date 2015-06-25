@@ -228,8 +228,11 @@ public class EventPublisher
 	 */
 	public void entryChanged(Object oldvalue, Object newvalue, int index)
 	{
-		unobserveValue(oldvalue);
-		observeValue(newvalue);
+		if(oldvalue!=newvalue)
+		{
+			unobserveValue(oldvalue);
+			observeValue(newvalue);
+		}
 		getRuleSystem().addEvent(new Event(getChangeEvent(), new ChangeInfo<Object>(newvalue, oldvalue,  index>-1? Integer.valueOf(index): null)));
 		publishToolBeliefEvent();
 	}
