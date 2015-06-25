@@ -1,6 +1,6 @@
 package jadex.bdi.examples.booktrading.common;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -71,24 +71,7 @@ public class Gui extends JFrame
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				System.out.println("booktrading2: "+agent.getComponentIdentifier());
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//				bia.addComponentListener(new TerminationAdapter()
-//				{
-//					public void componentTerminated()
-//					{
-////						System.out.println("booktrading3: "+agent.getComponentIdentifier());
-//						SwingUtilities.invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-////								System.out.println("booktrading4: "+agent.getComponentIdentifier());
-//								dispose();
-//							}
-//						});
-//					}
-//				});
-				
-				bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

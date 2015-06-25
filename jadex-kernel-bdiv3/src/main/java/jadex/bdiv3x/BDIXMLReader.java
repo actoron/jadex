@@ -37,7 +37,6 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
@@ -872,6 +871,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				expost.postProcess(context, object);
 				MCondition cond = new MCondition();
 				cond.setExpression((UnparsedExpression)object);
+				cond.setName(cond.getExpression().getName());
 				
 				AReadContext ar	= (AReadContext)context;
 				MElement pe	= null;

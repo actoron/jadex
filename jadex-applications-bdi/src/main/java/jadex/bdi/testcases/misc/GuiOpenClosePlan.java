@@ -1,15 +1,14 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.IFuture;
-//import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.event.ActionEvent;
@@ -56,9 +55,9 @@ public class GuiOpenClosePlan extends Plan
 						@Classname("closed")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-							IInternalEvent	event	= scope.getEventbase().createInternalEvent("gui_closed");
-							scope.getEventbase().dispatchInternalEvent(event);
+							IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+							IInternalEvent	event	= bia.getEventbase().createInternalEvent("gui_closed");
+							bia.getEventbase().dispatchInternalEvent(event);
 							dispatched	= true;
 							return IFuture.DONE;
 						}

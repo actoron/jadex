@@ -51,6 +51,12 @@ public interface IGoal extends IParameterElement, IFinishableElement// needed fo
 	 *  @return The processingState.
 	 */
 	public GoalProcessingState getProcessingState();
+
+	/**
+	 *  Test if the goal is in lifecyclestate 'active'.
+	 */
+	// legacy v2 method.
+	public boolean isActive();
 	
 //	/**
 //	 *  Get the parent of the goal.

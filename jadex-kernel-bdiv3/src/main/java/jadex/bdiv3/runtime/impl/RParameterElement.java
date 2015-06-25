@@ -286,7 +286,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void setValue(Object value)
 		{
-			Object oldvalue = value;
+			Object oldvalue = this.value;
 			this.value = value;
 			publisher.entryChanged(oldvalue, value, -1);
 		}

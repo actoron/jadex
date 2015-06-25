@@ -1,5 +1,6 @@
 package jadex.bdi.examples.blackjack.manager;
 
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentStep;
@@ -86,7 +87,7 @@ public class ManagerGuiUpdatePlan extends Plan
 			@Classname("guidispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 				final JFrame gui = (JFrame)bia.getBeliefbase().getBelief("GUI").getFact();
 				if(gui!=null)
 				{
@@ -101,16 +102,5 @@ public class ManagerGuiUpdatePlan extends Plan
 				return IFuture.DONE;
 			}
 		});
-//		getExternalAccess().getBeliefbase().getBeliefFact("GUI").addResultListener(new SwingDefaultResultListener(gui)
-//		{
-//			public void customResultAvailable(Object source, Object result)
-//			{
-//				final JFrame gui = (JFrame)result;
-//				if(gui!=null)
-//				{
-//					gui.dispose();
-//				}
-//			}
-//		});
 	}
 }

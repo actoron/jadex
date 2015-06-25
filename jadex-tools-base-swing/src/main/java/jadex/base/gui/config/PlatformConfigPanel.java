@@ -1,6 +1,7 @@
 package jadex.base.gui.config;
 
 import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.SBootstrapLoader;
@@ -241,9 +242,9 @@ public class PlatformConfigPanel	extends JPanel
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(props.getProperty(PlatformConfiguration.CONFIGURATION_NAME)!=null)
+									if(props.getProperty(RootComponentConfiguration.CONFIGURATION_NAME)!=null)
 									{
-										config.setSelectedItem(props.getStringProperty(PlatformConfiguration.CONFIGURATION_NAME));
+										config.setSelectedItem(props.getStringProperty(RootComponentConfiguration.CONFIGURATION_NAME));
 									}
 									
 									Property[]	argprops	= props.getProperties("argument");
@@ -274,7 +275,7 @@ public class PlatformConfigPanel	extends JPanel
 				
 				if(config.isEnabled())
 				{
-					props.addProperty(new Property(PlatformConfiguration.CONFIGURATION_NAME, (String)config.getSelectedItem()));					
+					props.addProperty(new Property(RootComponentConfiguration.CONFIGURATION_NAME, (String)config.getSelectedItem()));					
 				}
 				
 				if(argmodel!=null)
@@ -322,7 +323,7 @@ public class PlatformConfigPanel	extends JPanel
 				
 				if(config.isEnabled())
 				{
-					args.add("-"+PlatformConfiguration.CONFIGURATION_NAME);
+					args.add("-"+RootComponentConfiguration.CONFIGURATION_NAME);
 					args.add((String)config.getSelectedItem());					
 				}
 				

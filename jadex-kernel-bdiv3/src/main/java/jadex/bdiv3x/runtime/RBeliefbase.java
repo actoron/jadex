@@ -473,29 +473,29 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		}
 		
 		/**
-		 *  Set a value of a parameter.
-		 *  @param value The new value.
+		 *  Set a fact of a belief.
+		 *  Only changes the belief, if the new value is not equal to the old value.
+		 *  @param value The new fact.
+		 *  @return True, if the value was changed.
 		 */
-		public void setFact(Object value)
+		public boolean setFact(Object value)
 		{
-//			if(getName().equals("myself"))
-//				System.out.println("belief set val: "+value);
-			Object oldvalue = value;
-			this.value = value;
-			publisher.entryChanged(oldvalue, value, -1);
-//			publisher.unobserveValue(this.value);
-//			publisher.getRuleSystem().addEvent(new Event(publisher.getChangeEvent(), new ChangeInfo<Object>(value, this.value, null)));
-//			this.value = value;
-//			publisher.observeValue(value);
-//			publisher.publishToolBeliefEvent();
-			
-			// Push to result, if any.
-			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
-			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			boolean	changed	= !SUtil.equals(this.value, value);
+			if(changed)
 			{
-				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
-					.getResults().put(result, value);
+				Object oldvalue = this.value;
+				this.value = value;
+				publisher.entryChanged(oldvalue, value, -1);
+				
+				// Push to result, if any.
+				String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+				if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+				{
+					getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+						.getResults().put(result, value);
+				}
 			}
+			return changed;
 		}
 
 		/**
@@ -789,7 +789,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			if(fact!=null)
 			{
-				facts.entryChanged(null, fact, facts.indexOf(fact));
+				facts.entryChanged(fact, fact, facts.indexOf(fact));
 			}
 			else
 			{

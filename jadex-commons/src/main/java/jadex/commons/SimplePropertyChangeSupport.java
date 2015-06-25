@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class SimplePropertyChangeSupport	implements Serializable
 {
-	private List	listener;
+	private List<PropertyChangeListener>	listeners;
 
 	private Object		source;
 
@@ -25,7 +25,7 @@ public class SimplePropertyChangeSupport	implements Serializable
 		{
 			throw new NullPointerException();
 		}
-		listener = new ArrayList();
+		listeners = new ArrayList<PropertyChangeListener>();
 		source = sourceBean;
 	}
 
@@ -37,7 +37,12 @@ public class SimplePropertyChangeSupport	implements Serializable
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener listener)
 	{
-		this.listener.add(listener);
+		if(this.listeners.contains(listener))
+		{
+			System.out.println("dreck");
+		}
+		
+		this.listeners.add(listener);
 	}
 
 	/**
@@ -48,7 +53,7 @@ public class SimplePropertyChangeSupport	implements Serializable
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener listener)
 	{
-		this.listener.remove(listener);
+		this.listeners.remove(listener);
 	}
 
 	/**
@@ -71,9 +76,9 @@ public class SimplePropertyChangeSupport	implements Serializable
 		PropertyChangeEvent evt = new PropertyChangeEvent(source, propertyName,
 				oldValue, newValue);
 
-		for(int i = 0; i < listener.size(); i++)
+		for(int i = 0; i < listeners.size(); i++)
 		{
-			PropertyChangeListener oneListener = (PropertyChangeListener)listener.get(i);
+			PropertyChangeListener oneListener = (PropertyChangeListener)listeners.get(i);
 			oneListener.propertyChange(evt);
 		}
 	}
@@ -114,9 +119,9 @@ public class SimplePropertyChangeSupport	implements Serializable
 		{
 			return;
 		}
-		for(int i = 0; i < listener.size(); i++)
+		for(int i = 0; i < listeners.size(); i++)
 		{
-			PropertyChangeListener oneListener = (PropertyChangeListener)listener
+			PropertyChangeListener oneListener = (PropertyChangeListener)listeners
 					.get(i);
 			oneListener.propertyChange(evt);
 		}

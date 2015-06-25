@@ -2,6 +2,7 @@ package jadex.bdi.testcases.goals;
 
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 
@@ -23,7 +24,7 @@ public class GoalConditionsPlan	extends Plan
 		{
 			report.setFailed("Goal already exists");
 		}
-		else if(getPlanbase().getPlans().length!=1)
+		else if(getCapability().getPlans().size()!=1)
 		{
 			report.setFailed("Wrong planbase contents");
 		}
@@ -37,7 +38,7 @@ public class GoalConditionsPlan	extends Plan
 		{
 			report.setFailed("Goal does not exist");
 		}
-		else if(getPlanbase().getPlans().length!=1)
+		else if(getCapability().getPlans().size()!=1)
 		{
 			report.setFailed("Wrong planbase contents");
 		}
@@ -48,7 +49,7 @@ public class GoalConditionsPlan	extends Plan
 		IGoal goal = getGoalbase().getGoals("test")[0];
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
 		report	= new TestReport("trigger_context", "Triggering goal context", true, null);	
-		if(!OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION.equals(goal.getLifecycleState()))
+		if(goal.getLifecycleState()!=GoalLifecycleState.OPTION)
 		{
 			report.setFailed("Goal not option: "+goal.getLifecycleState());
 		}
@@ -67,7 +68,7 @@ public class GoalConditionsPlan	extends Plan
 		}
 		catch(GoalFailureException gfe){}
 		report	= new TestReport("trigger_drop", "Triggering goal drop condition", true, null);
-		if(!OAVBDIRuntimeModel.GOALLIFECYCLESTATE_DROPPED.equals(goal.getLifecycleState()))
+		if(goal.getLifecycleState()!=GoalLifecycleState.DROPPED)
 		{	
 			report.setFailed("Goal not dropped: "+goal.getLifecycleState());
 		}
@@ -96,7 +97,7 @@ public class GoalConditionsPlan	extends Plan
 		{
 			report.setFailed("Goal does not exist");
 		}
-		else if(!OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED.equals(goal.getLifecycleState()))
+		else if(goal.getLifecycleState()!=GoalLifecycleState.OPTION)
 		{
 			report.setFailed("Goal not option: "+goal.getLifecycleState());
 		}

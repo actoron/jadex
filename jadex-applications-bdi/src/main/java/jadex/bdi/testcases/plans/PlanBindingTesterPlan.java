@@ -1,8 +1,8 @@
 package jadex.bdi.testcases.plans;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 
 /**

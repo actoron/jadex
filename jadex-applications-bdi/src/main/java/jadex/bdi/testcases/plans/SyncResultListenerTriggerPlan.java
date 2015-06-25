@@ -1,6 +1,7 @@
 package jadex.bdi.testcases.plans;
 
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.future.Future;
 
 /**
  *  Testing waiting for sync results.
@@ -16,7 +17,7 @@ public class SyncResultListenerTriggerPlan extends Plan
 		waitFor(10);
 
 		// Set result of listener.
-		SyncResultListener	listener	= (SyncResultListener)getBeliefbase().getBelief("listener").getFact();
-		listener.resultAvailable("success");
+		Future<Object>	listener	= (Future<Object>)getBeliefbase().getBelief("listener").getFact();
+		listener.setResult("success");
 	}
 }

@@ -7,6 +7,7 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -17,6 +18,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -258,7 +260,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("players")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 				final Player[] players = (Player[])bia.getBeliefbase().getBeliefSet("players").getFacts();
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -287,23 +289,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//				bia.addComponentListener(new TerminationAdapter()
-//				{
-//					public void componentTerminated()
-//					{
-//						SwingUtilities.invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-//								ManagerFrame.this.dispose();
-//								cmsuh.dispose();
-//							}
-//						});
-//					}
-//				});
-				
-				bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -487,34 +473,23 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final Future<Void>	ret	= new Future<Void>();
-				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 				final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
 				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 				start.getParameter("name").setValue("BlackjackDealer");
 				start.getParameter("parent").setValue(ia.getComponentIdentifier().getParent());
-				start.addGoalListener(new IGoalListener()
+				bia.getGoalbase().dispatchTopLevelGoal(start)
+					.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 				{
-					public void goalFinished(AgentEvent ae)
-					{
-						if(start.isSucceeded())
-						{
-							IComponentIdentifier dealer = (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
-							bia.getLogger().info("local DealerAgent started: "+dealer);
-							//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
-							bia.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
-							ret.setResult(null);
-						}
-						else
-						{
-							ret.setException(start.getException()!=null ? start.getException() : new RuntimeException("Dealer not created"));
-						}
-					}
-					
-					public void goalAdded(AgentEvent ae)
-					{
+					public void customResultAvailable(Object result)
+					{						
+						IComponentIdentifier dealer = (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
+						bia.getLogger().info("local DealerAgent started: "+dealer);
+						//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
+						bia.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
+						ret.setResult(null);
 					}
 				});
-				bia.getGoalbase().dispatchTopLevelGoal(start);
 				return ret;
 			}
 		}).addResultListener(new SwingDefaultResultListener<Void>()	// Add listener for automatic error dialog.
@@ -574,37 +549,12 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 */
 	protected void stopLocalDealer()
 	{
-//		agent.scheduleStep(new IComponentStep()
-//		{
-//			public Object execute(IInternalAccess ia)
-//			{
-//				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//				final IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
-//				if(dealer!=null)
-//				{
-//					agent.scheduleStep(new IComponentStep()
-//					{
-//						public Object execute(IInternalAccess ia)
-//						{
-//							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//							IGoal destroy = bia.getGoalbase().createGoal("cms_destroy_component");
-//							destroy.getParameter("componentidentifier").setValue(dealer);
-//							bia.getGoalbase().dispatchTopLevelGoal(destroy);
-//							bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
-//							return null;
-//						}
-//					});
-//				}
-//				return null;
-//			}
-//		});
-		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("destroy")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 				IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
 				if(dealer!=null)
 				{
@@ -616,26 +566,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				return IFuture.DONE;
 			}
 		});
-//		agent.getBeliefbase().getBeliefFact("localDealerAID").addResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//				final IComponentIdentifier dealer = (IComponentIdentifier)result;
-//				if(dealer!=null)
-//				{
-//					agent.getGoalbase().createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
-//					{
-//						public void resultAvailable(Object source, Object result)
-//						{
-//							IEAGoal destroy = (IEAGoal)result;
-//							destroy.setParameterValue("componentidentifier", dealer);
-//							agent.dispatchTopLevelGoalAndWait(destroy);
-//							agent.getBeliefbase().setBeliefFact("localDealerAID", null);
-//						}
-//					});
-//				}
-//			}
-//		});
 	}
 
 	/**
@@ -817,51 +747,36 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				@Classname("start")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
+					final Future<Void>	ret	= new Future<Void>();
 					try
 					{
-						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 						bia.getLogger().info("starting playerAgent: "+player.getName());
 						
 						final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
 						start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
 						start.getParameter("name").setValue(player.getName());
 						start.getParameter("parent").setValue(ia.getComponentIdentifier().getParent());
-						Map args = new HashMap();
+						Map<String, Object> args = new HashMap<String, Object>();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
 						start.getParameter("arguments").setValue(args);
-						start.addGoalListener(new IGoalListener()
+						bia.getGoalbase().dispatchTopLevelGoal(start)
+							.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 						{
-							public void goalFinished(AgentEvent ae)
+							public void customResultAvailable(Object result)
 							{
 								IComponentIdentifier playerid = (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
 								player.setAgentID(playerid);
-							}
-							
-							public void goalAdded(AgentEvent ae)
-							{
+								ret.setResult(null);
 							}
 						});
-						bia.getGoalbase().dispatchTopLevelGoal(start);
-//						addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
-//						{
-//							public void customResultAvailable(Object source, Object result)
-//							{
-//								start.getParameterValue("componentidentifier").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
-//								{
-//									public void customResultAvailable(Object source, Object result)
-//									{
-//										IComponentIdentifier playerid = (IComponentIdentifier)result;
-//										player.setAgentID(playerid);
-//									}
-//								});
-//							}
-//						});
 					}
 					catch(RuntimeException e)
 					{
+						ret.setException(e);
 					}
-					return IFuture.DONE;
+					return ret;
 				}
 			});
 //			agent.getGoalbase().createGoal("cms_create_component").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
@@ -917,23 +832,13 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				@Classname("stop")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 					IGoal destroy = bia.getGoalbase().createGoal("cms_destroy_component");
 					destroy.getParameter("componentidentifier").setValue(player.getAgentID());
 					bia.getGoalbase().dispatchTopLevelGoal(destroy);
 					return IFuture.DONE;
 				}
 			});
-//			agent.getGoalbase().createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					IEAGoal destroy = (IEAGoal)result;
-//					destroy.setParameterValue("componentidentifier", player.getAgentID());
-//					agent.dispatchTopLevelGoalAndWait(destroy);
-//					player.setAgentID(null);
-//				}
-//			});
 		}
 	}
 }

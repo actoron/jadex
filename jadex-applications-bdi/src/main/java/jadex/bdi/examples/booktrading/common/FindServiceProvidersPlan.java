@@ -1,6 +1,6 @@
 package jadex.bdi.examples.booktrading.common;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.service.component.IRequiredServicesFeature;

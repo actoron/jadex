@@ -2,6 +2,7 @@ package jadex.bdi.testcases.goals;
 
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.concurrent.TimeoutException;
@@ -38,7 +39,7 @@ public class MaintainTestPlan extends Plan
 		getBeliefbase().getBelief("context").setFact(Boolean.FALSE);
 		// Wait for goal to be suspended.
 		waitFor(100);
-		if(OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED.equals(maintain.getLifecycleState()))
+		if(maintain.getLifecycleState()==GoalLifecycleState.SUSPENDED)
 			report.setSucceeded(true);
 		else
 			report.setReason("Goal should be suspended, but was: "+maintain.getLifecycleState());
@@ -51,7 +52,7 @@ public class MaintainTestPlan extends Plan
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
 		// Wait for goal to be reactivated.
 		waitFor(100);
-		if(OAVBDIRuntimeModel.GOALLIFECYCLESTATE_ACTIVE.equals(maintain.getLifecycleState()))
+		if(maintain.getLifecycleState()==GoalLifecycleState.ACTIVE)
 			report.setSucceeded(true);
 		else
 			report.setReason("Goal should be active, but was: "+maintain.getLifecycleState());

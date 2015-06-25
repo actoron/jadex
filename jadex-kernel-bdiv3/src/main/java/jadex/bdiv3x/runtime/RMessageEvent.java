@@ -1,11 +1,11 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,17 +42,26 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	/**
 	 *  Create the parameters from model spec.
 	 */
-	public void initParameters(Map<String, Object> vals)
+	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher)
 	{
 		// do nothing
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, IValueFetcher fetcher)
+	{
+		return new RParam(modelelement, modelelement.getName(), agent, fetcher, getModelElement().getName());
 	}
 	
 	/**
 	 * 
 	 */
-	public IParameter createParameter(MParameter modelelement, IInternalAccess agent)
+	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, IValueFetcher fetcher)
 	{
-		return new RParam(modelelement, modelelement.getName(), agent, getModelElement());
+		return new RParamSet(modelelement, modelelement.getName(), agent, fetcher, getModelElement().getName());
 	}
 	
 	/**
@@ -61,14 +70,6 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, Object value)
 	{
 		return new RParam(modelelement, modelelement.getName(), agent, value, getModelElement().getName());
-	}
-	
-	/**
-	 * 
-	 */
-	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent)
-	{
-		return new RParamSet(modelelement, modelelement.getName(), agent, getModelElement());
 	}
 	
 	/**
@@ -123,7 +124,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(!super.hasParameter(name))
 		{
 			MParameter mp = getMMessageEvent().getParameter(name);
-			param = new RParam(mp, name, getAgent(), getModelElement());
+			param = new RParam(mp, name, getAgent(), RBeliefbase.getFetcher(getAgent(), getModelElement()), getModelElement().getName());
 			addParameter(param);
 		}
 		else
@@ -148,7 +149,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(!super.hasParameterSet(name))
 		{
 			MParameter mp = getMMessageEvent().getParameter(name);
-			paramset = new RParamSet(mp, name, getAgent(), getModelElement());
+			paramset = new RParamSet(mp, name, getAgent(), RBeliefbase.getFetcher(getAgent(), getModelElement()), getModelElement().getName());
 			addParameterSet(paramset);
 		}
 		else
@@ -223,9 +224,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParam(MParameter modelelement, String name, IInternalAccess agent, MElement owner)
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, IValueFetcher fetcher,  String pename)
 		{
-			super(modelelement, name, agent, RBeliefbase.getFetcher(agent, owner), owner.getName());
+			super(modelelement, name, agent, fetcher, pename);
 		}
 		
 		/**
@@ -268,9 +269,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, MElement owner)
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, IValueFetcher fetcher, String pename)
 		{
-			super(modelelement, name, agent, RBeliefbase.getFetcher(agent, owner), owner.getName());
+			super(modelelement, name, agent, fetcher, pename);
 		}
 		
 		/**

@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.plans;
 
-import jadex.bdi.runtime.ICandidateInfo;
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.Plan;
 
 /**

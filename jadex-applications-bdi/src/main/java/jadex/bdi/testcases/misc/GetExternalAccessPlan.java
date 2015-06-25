@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -62,7 +62,7 @@ public class GetExternalAccessPlan extends Plan
 					@Classname("test")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 						Object fact = bia.getBeliefbase().getBelief("test").getFact();
 						gotexta[1]	= "testfact".equals(fact);
 						return IFuture.DONE;

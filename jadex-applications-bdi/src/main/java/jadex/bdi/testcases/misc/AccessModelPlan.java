@@ -1,6 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
+import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3x.runtime.Plan;
@@ -37,7 +38,7 @@ public class AccessModelPlan extends Plan
 		tr = new TestReport("#2", "Test accessing a plan model.");
 		try
 		{
-			MPlan mplan = ((MPlanbase)getPlanbase().getModelElement()).getPlan("accessmodel_plan");
+			MPlan mplan = ((IBDIModel)getAgent().getModel()).getCapability().getPlan("accessmodel_plan");
 			if(mplan!=null)
 				tr.setSucceeded(true);
 			else

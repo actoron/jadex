@@ -1,11 +1,6 @@
 package jadex.bdi.examples.helloworld;
 
 import jadex.base.Starter;
-import jadex.bdi.IDynamicBDIFactory;
-import jadex.bdi.model.editable.IMEBelief;
-import jadex.bdi.model.editable.IMECapability;
-import jadex.bdi.model.editable.IMEConfiguration;
-import jadex.bdi.model.editable.IMEPlan;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;

@@ -17,14 +17,14 @@ public class MicroStepPlan extends Plan
 	{
 		TestReport tr = new TestReport("#1", "Testing micro steps. There are 3 conditions a, b, and(a,b) that should trigger immediately.");
 		getLogger().info("Testing micro steps. There are 3 conditions a, b, and(a,b) that should trigger immediately.");
-		int plan_cnt1 = getPlanbase().getPlans().length;
+		int plan_cnt1 = getCapability().getPlans().size();
 		getLogger().info("Plan: Setting a to true.");
 		getBeliefbase().getBelief("a").setFact(Boolean.TRUE);
-		int plan_cnt2 = getPlanbase().getPlans().length;
+		int plan_cnt2 = getCapability().getPlans().size();
 		getLogger().info("Plan: a is now true.");
 		getLogger().info("Plan: Setting b to true.");
 		getBeliefbase().getBelief("b").setFact(Boolean.TRUE);
-		int plan_cnt3 = getPlanbase().getPlans().length;
+		int plan_cnt3 = getCapability().getPlans().size();
 		getLogger().info("Plan: b is now true.");
 		getLogger().info("Step 1 finished.");
 		if(plan_cnt1<plan_cnt2 && plan_cnt2<plan_cnt3)
@@ -66,13 +66,13 @@ public class MicroStepPlan extends Plan
 		tr = new TestReport("#3", "Testing atomic step. There are 3 conditions a, b, and(a,b) that should trigger after the plan step has finished.");
 		getLogger().info("\nTesting atomic step. There are 3 conditions a, b, and(a,b) that should trigger after the plan step has finished.");
 		getLogger().info("Plan: Setting a to true.");
-		plan_cnt1 = getPlanbase().getPlans().length;
+		plan_cnt1 = getCapability().getPlans().size();
 		getBeliefbase().getBelief("a").setFact(Boolean.TRUE);
-		plan_cnt2 = getPlanbase().getPlans().length;
+		plan_cnt2 = getCapability().getPlans().size();
 		getLogger().info("Plan: a is now true.");
 		getLogger().info("Plan: Setting b to true.");
 		getBeliefbase().getBelief("b").setFact(Boolean.TRUE);
-		plan_cnt3 = getPlanbase().getPlans().length;
+		plan_cnt3 = getCapability().getPlans().size();
 		getLogger().info("Plan: b is now true.");
 		getLogger().info("Step 3 finished.");
 		if(plan_cnt1==plan_cnt2 && plan_cnt2==plan_cnt3)

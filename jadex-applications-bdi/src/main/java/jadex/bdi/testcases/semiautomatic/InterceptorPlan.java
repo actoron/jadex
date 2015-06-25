@@ -2,7 +2,6 @@ package jadex.bdi.testcases.semiautomatic;
 
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 
 /**
  *  Plan that adds a reasoning interceptor to the service and invokes it.

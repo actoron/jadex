@@ -1,7 +1,6 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.IDynamicBDIFactory;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
