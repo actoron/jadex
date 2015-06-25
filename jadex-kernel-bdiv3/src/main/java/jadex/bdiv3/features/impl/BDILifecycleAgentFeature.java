@@ -565,9 +565,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									component.getModel().getAllImports(), component.getClassLoader()).getValue(RBeliefbase.getFetcher(component, mbel));
 								// save the value
 								mbel.setValue(component, value);
-								// throw change event
-								BDIAgentFeature.createChangeEvent(value, oldval, null, component, mbel.getName());
-								oldval = value;
+//								oldval = value;	// not needed for xml
 							}
 							return IFuture.DONE;
 						}

@@ -10,9 +10,11 @@ public interface IBelief extends IElement
 {
 	/**
 	 *  Set a fact of a belief.
+	 *  Only changes the belief, if the new value is not equal to the old value.
 	 *  @param fact The new fact.
+	 *  @return True, if the value was changed.
 	 */
-	public void setFact(Object fact);
+	public boolean setFact(Object fact);
 
 	/**
 	 *  Get the fact of a belief.
