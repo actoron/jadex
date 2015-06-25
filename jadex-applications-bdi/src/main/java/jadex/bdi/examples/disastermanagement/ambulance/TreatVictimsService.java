@@ -2,9 +2,7 @@ package jadex.bdi.examples.disastermanagement.ambulance;
 
 import jadex.bdi.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;

@@ -1,7 +1,5 @@
 package jadex.bdi.examples.marsworld.movement;
 
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
-import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;

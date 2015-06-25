@@ -368,8 +368,30 @@ public abstract class Plan
 		return getExpressionbase().createExpression(exp);
 	}
 	
+//	/**
+//	 *  Send a message and wait for the answer.
+//	 *  @param me The message event.
+//	 *  @return The result event.
+//	 */
+//	public IMessageEvent sendMessageAndWait(IMessageEvent me)
+//	{
+//		return sendMessageAndWait(me, -1);
+//	}
+//
+//	/**
+//	 *  Send a message and wait for the answer.
+//	 *  Adds a reply_with entry if not present, for tracking the conversation.
+//	 *  @param me The message event.
+//	 *  @param timeout The timeout.
+//	 *  @return The result event.
+//	 */
+//	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout)
+//	{
+//		todo...
+//	}
+	
 	/**
-	 *  Send a message after some delay.
+	 *  Send a message and wait for the result.
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
@@ -533,7 +555,7 @@ public abstract class Plan
 //	 */
 //	public IPlanbase getPlanbase()
 //	{
-//		throw new UnsupportedOperationException();
+//		getCapability().getPlanbase();
 //	}
 
 	/**

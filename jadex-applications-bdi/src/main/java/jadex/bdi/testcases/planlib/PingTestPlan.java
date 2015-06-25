@@ -1,10 +1,9 @@
 package jadex.bdi.testcases.planlib;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.TimeoutException;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 
 import java.util.List;
 import java.util.Map;

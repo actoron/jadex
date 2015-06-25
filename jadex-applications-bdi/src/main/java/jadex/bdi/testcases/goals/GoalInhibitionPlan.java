@@ -2,6 +2,7 @@ package jadex.bdi.testcases.goals;
 
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.concurrent.TimeoutException;
 
@@ -34,13 +35,13 @@ public class GoalInhibitionPlan extends Plan
 		IGoal[]	docnts	= getGoalbase().getGoals("docnt");
 		if(docnts.length==1)
 		{
-			if(OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION.equals(docnts[0].getLifecycleState()))
+			if(docnts[0].getLifecycleState()==GoalLifecycleState.OPTION)
 			{
 				report.setSucceeded(true);
 			}
 			else
 			{
-				report.setReason("Wrong lifecycle state (expected "+OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION+"): "+docnts[0].getLifecycleState());
+				report.setReason("Wrong lifecycle state (expected "+GoalLifecycleState.OPTION+"): "+docnts[0].getLifecycleState());
 			}
 		}
 		else

@@ -1,8 +1,8 @@
 package jadex.bdi.testcases.plans;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.TimeoutException;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  Test time waitFor() methods.

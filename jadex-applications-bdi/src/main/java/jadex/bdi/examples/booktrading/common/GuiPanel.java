@@ -1,10 +1,9 @@
 package jadex.bdi.examples.booktrading.common;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IBeliefSetListener;
-import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IBeliefListener;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -17,6 +16,7 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Binding;
+import jadex.rules.eca.ChangeInfo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -261,74 +261,59 @@ public class GuiPanel extends JPanel
 			@Classname("refresh")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.getBeliefbase().getBeliefSet("orders").addBeliefSetListener(new IBeliefSetListener()
+				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				bia.getBeliefbase().getBeliefSet("orders").addBeliefSetListener(new IBeliefListener<Object>()
 				{
-					public void factChanged(AgentEvent ae)
+					public void beliefChanged(ChangeInfo<Object> info)
 					{
-		//				System.out.println("Changed: "+ae.getValue());
 						refresh();
 					}
 					
-					public void factAdded(AgentEvent ae)
+					public void factAdded(ChangeInfo<Object> info)
 					{
-		//				System.out.println("Added: "+ae.getValue());
 						refresh();
 					}
-					
-					public void factRemoved(AgentEvent ae)
+
+					public void factRemoved(ChangeInfo<Object> info)
 					{
-		//				System.out.println("Removed: "+ae.getValue());
+						refresh();
+					}
+
+					public void factChanged(ChangeInfo<Object> info)
+					{
 						refresh();
 					}
 				});
 				return IFuture.DONE;
 			}
 		});
-//		agent.getBeliefbase().addBeliefSetListener("orders", new IBeliefSetListener()
-//		{
-//			public void factChanged(AgentEvent ae)
-//			{
-////				System.out.println("Changed: "+ae.getValue());
-//				refresh();
-//			}
-//			
-//			public void factAdded(AgentEvent ae)
-//			{
-////				System.out.println("Added: "+ae.getValue());
-//				refresh();
-//			}
-//			
-//			public void factRemoved(AgentEvent ae)
-//			{
-////				System.out.println("Removed: "+ae.getValue());
-//				refresh();
-//			}
-//		});
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("refreshDetails")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.getBeliefbase().getBeliefSet("negotiation_reports").addBeliefSetListener(new IBeliefSetListener()
+				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				bia.getBeliefbase().getBeliefSet("negotiantion_reports").addBeliefSetListener(new IBeliefListener<Object>()
 				{
-					public void factAdded(AgentEvent ae)
+					public void beliefChanged(ChangeInfo<Object> info)
 					{
-//								System.out.println("a fact was added");
+						refreshDetails();
+					}
+					
+					public void factAdded(ChangeInfo<Object> info)
+					{
 						refreshDetails();
 					}
 
-					public void factRemoved(AgentEvent ae)
+					public void factRemoved(ChangeInfo<Object> info)
 					{
-//								System.out.println("a fact was removed");
 						refreshDetails();
 					}
 
-					public void factChanged(AgentEvent ae)
+					public void factChanged(ChangeInfo<Object> info)
 					{
-						//System.out.println("belset changed");
+						refreshDetails();
 					}
 				});
 				return IFuture.DONE;
@@ -393,7 +378,7 @@ public class GuiPanel extends JPanel
 											@Classname("add")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+												IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 												IGoal purchase = bia.getGoalbase().createGoal(goalname);
 												purchase.getParameter("order").setValue(order);
 												bia.getGoalbase().dispatchTopLevelGoal(purchase);
@@ -458,7 +443,7 @@ public class GuiPanel extends JPanel
 						@Classname("remove")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+							IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 							IGoal[] goals = bia.getGoalbase().getGoals(goalname);
 							for(int i=0; i<goals.length; i++)
 							{
@@ -545,7 +530,7 @@ public class GuiPanel extends JPanel
 												@Classname("drop")
 												public IFuture<Void> execute(IInternalAccess ia)
 												{
-													IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+													IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 													IGoal[] goals = bia.getGoalbase().getGoals(goalname);
 													for(int i=0; i<goals.length; i++)
 													{
@@ -638,7 +623,7 @@ public class GuiPanel extends JPanel
 			@Classname("ref")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 				final Object[] aorders = bia.getBeliefbase().getBeliefSet("orders").getFacts();
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -692,7 +677,7 @@ public class GuiPanel extends JPanel
 				@Classname("refD")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 					IExpression exp = bia.getExpressionbase().getExpression("search_reports");
 					final List res = (List)exp.execute("$order", order);
 					

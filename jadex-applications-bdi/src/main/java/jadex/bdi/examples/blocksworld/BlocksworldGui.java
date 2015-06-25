@@ -1,9 +1,6 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;

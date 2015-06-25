@@ -467,6 +467,15 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		return GoalProcessingState.FAILED.equals(processingstate);
 	}
 	
+	/**
+	 *  Test if the goal is in lifecyclestate 'active'.
+	 */
+	// legacy v2 method.
+	public boolean isActive()
+	{
+		return lifecyclestate==GoalLifecycleState.ACTIVE;
+	}
+	
 //	/**
 //	 * 
 //	 */

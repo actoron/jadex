@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.plans;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bdiv3x.runtime.Plan;
 
 /**

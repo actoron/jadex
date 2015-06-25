@@ -1,11 +1,6 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.IDynamicBDIFactory;
-import jadex.bdi.model.editable.IMEBelief;
-import jadex.bdi.model.editable.IMECapability;
-import jadex.bdi.model.editable.IMEConfiguration;
-import jadex.bdi.model.editable.IMEPlan;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.IRequiredServicesFeature;

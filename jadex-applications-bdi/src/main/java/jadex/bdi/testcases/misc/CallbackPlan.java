@@ -1,7 +1,6 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;

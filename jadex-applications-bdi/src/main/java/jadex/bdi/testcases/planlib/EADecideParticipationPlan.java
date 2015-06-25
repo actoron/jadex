@@ -1,6 +1,5 @@
 package jadex.bdi.testcases.planlib;
 
-import jadex.bdi.planlib.protocols.AuctionDescription;
 import jadex.bdiv3x.runtime.Plan;
 
 

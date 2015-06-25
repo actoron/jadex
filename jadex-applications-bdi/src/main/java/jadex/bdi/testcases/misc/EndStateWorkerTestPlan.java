@@ -21,11 +21,13 @@ public class EndStateWorkerTestPlan extends Plan
 				found	= true;
 				reports[i].setSucceeded(true);
 				
-				// Hack!!! Use beliefset.modified(fact?)
-				startAtomic();
-				getBeliefbase().getBeliefSet("reports").removeFact(reports[i]);				
-				getBeliefbase().getBeliefSet("reports").addFact(reports[i]);
-				endAtomic();
+//				// Hack!!! Use beliefset.modified(fact?)
+//				startAtomic();
+//				getBeliefbase().getBeliefSet("reports").removeFact(reports[i]);				
+//				getBeliefbase().getBeliefSet("reports").addFact(reports[i]);
+//				endAtomic();
+				
+				getBeliefbase().getBeliefSet("reports").modified(reports[i]);
 			}
 		}
 		if(!found)

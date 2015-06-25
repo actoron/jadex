@@ -1,13 +1,11 @@
 package jadex.bdi.examples.booktrading.serviceimpl.seller;
 
 import jadex.bdi.examples.booktrading.serviceimpl.IBuyBookService;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -21,7 +19,7 @@ public class BuyBookService implements IBuyBookService
 	
 	/** The agent. */
 	@ServiceComponent
-	IBDIInternalAccess	agent;
+	protected IBDIXAgentFeature	agent;
 	
 	//-------- IBuyBookService interface --------
 	
@@ -35,25 +33,14 @@ public class BuyBookService implements IBuyBookService
 		final Future<Integer>	ret	= new Future<Integer>();
 		final IGoal	goal	= agent.getGoalbase().createGoal("cnp_make_proposal");
 		goal.getParameter("cfp").setValue(title);
-		goal.addGoalListener(new IGoalListener()
+		agent.getGoalbase().dispatchTopLevelGoal(goal)
+			.addResultListener(new ExceptionDelegationResultListener<Object, Integer>(ret)
 		{
-			public void goalFinished(AgentEvent ae)
+			public void customResultAvailable(Object result)
 			{
-				if(goal.isSucceeded())
-				{
-					ret.setResult((Integer)goal.getParameter("proposal").getValue());
-				}
-				else
-				{
-					ret.setException(goal.getException()!=null ? goal.getException() : new GoalFailureException());
-				}
-			}
-			
-			public void goalAdded(AgentEvent ae)
-			{
+				ret.setResult((Integer)goal.getParameter("proposal").getValue());
 			}
 		});
-		agent.getGoalbase().dispatchTopLevelGoal(goal);
 		return ret;
 	}
 
@@ -69,25 +56,14 @@ public class BuyBookService implements IBuyBookService
 		final IGoal	goal	= agent.getGoalbase().createGoal("cnp_execute_task");
 		goal.getParameter("cfp").setValue(title);
 		goal.getParameter("proposal").setValue(Integer.valueOf(price));
-		goal.addGoalListener(new IGoalListener()
+		agent.getGoalbase().dispatchTopLevelGoal(goal)
+			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
-			public void goalFinished(AgentEvent ae)
+			public void customResultAvailable(Object result)
 			{
-				if(goal.isSucceeded())
-				{
-					ret.setResult(null);
-				}
-				else
-				{
-					ret.setException(goal.getException()!=null ? goal.getException() : new GoalFailureException());
-				}
-			}
-			
-			public void goalAdded(AgentEvent ae)
-			{
+				ret.setResult(null);
 			}
 		});
-		agent.getGoalbase().dispatchTopLevelGoal(goal);
 		return ret;
 	}
 

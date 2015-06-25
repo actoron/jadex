@@ -1,8 +1,8 @@
 package jadex.bdi.testcases.plans;
 
 import jadex.base.test.TestReport;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bdiv3x.runtime.PlanFailureException;
 
 /**
  *  This plan increments a belief in time intervals.
