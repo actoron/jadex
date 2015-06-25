@@ -2,6 +2,8 @@ package jadex.android.service;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.commons.Logger;
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -27,6 +29,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import android.util.Log;
 
@@ -46,7 +49,9 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
 			// +
 			" -autoshutdown false" + " -saveonexit true" + " -gui false" + " -chat false";
-
+	
+	private PlatformConfiguration defaultConfiguration;
+	
 	// --------- attributes -----------
 	private Map<IComponentIdentifier, IExternalAccess> runningPlatforms;
 
@@ -70,7 +75,25 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		runningPlatforms = new HashMap<IComponentIdentifier, IExternalAccess>();
 		platformClassLoaders = new HashMap<String, ClassLoader>();
 		platformRIDs = new HashMap<String, IResourceIdentifier>();
+		defaultConfiguration = createDefaultConfiguration();
 		instance = this;
+	}
+
+	private PlatformConfiguration createDefaultConfiguration()
+	{
+		PlatformConfiguration config = new PlatformConfiguration();
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+		rootConfig.setLoggingLevel(Level.INFO);
+		rootConfig.setWsPublish(false);
+		rootConfig.setRsPublish(false);
+		rootConfig.setBinaryMessages(true);
+		config.setConfigurationFile("jadex.platform.PlatformAgent");
+		rootConfig.setAutoShutdown(false);
+		rootConfig.setSaveOnExit(true);
+		rootConfig.setGui(false);
+		rootConfig.setChat(false);
+		
+		return config;
 	}
 
 	/**
