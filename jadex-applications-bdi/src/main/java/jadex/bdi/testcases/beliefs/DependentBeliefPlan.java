@@ -16,6 +16,7 @@ public class DependentBeliefPlan extends Plan
 	{
 		TestReport tr = new TestReport("#1", "Test dependent belief.");
 		getBeliefbase().getBelief("my_value").setFact("magic");
+		waitFor(10);	// todo: microplansteps or immediate rule execution
 		if(getBeliefbase().getBelief("react_on_value").getFact().equals("magic"))
 		{
 			tr.setSucceeded(true);
@@ -30,6 +31,7 @@ public class DependentBeliefPlan extends Plan
 
 		tr = new TestReport("#2", "Test dependent belief set.");
 		getBeliefbase().getBeliefSet("my_values").removeFact(Integer.valueOf(1));
+		waitFor(10);	// todo: microplansteps or immediate rule execution
 		if(getBeliefbase().getBelief("react_on_values").getFact().equals("magic"))
 		{
 			tr.setSucceeded(true);
