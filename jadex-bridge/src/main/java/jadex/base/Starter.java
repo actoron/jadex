@@ -13,10 +13,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
@@ -44,14 +41,11 @@ import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -220,6 +214,13 @@ public class Starter
 	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config)
 	{
 		RootComponentConfiguration rootConfig = config.getRootConfig();
+		
+		// pass configuration parameters to static fields:
+		MethodInvocationInterceptor.DEBUG = config.getDebugServices();
+		ExecutionComponentFeature.DEBUG = config.getDebugSteps();
+		Future.NO_STACK_COMPACTION	= config.getNoStackCompaction();
+		Future.DEBUG = config.getDebugFutures();
+		
 //		final Object args, final Map<String, Object> cmdargs, final Map<String, Object> compargs, final List<String> components
 		
 		// Fix below doesn't work. WLAN address is missing :-(
@@ -261,8 +262,8 @@ public class Starter
 		
 			// Load the platform (component) model.
 			final ClassLoader cl = Starter.class.getClassLoader();
-			final String configfile = config.getConfigurationName();
-			String cfclname = config.getComponentFactoryName();
+			final String configfile = config.getConfigurationFile();
+			String cfclname = config.getComponentFactory();
 			Class<?> cfclass = SReflect.classForName(cfclname, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
@@ -284,7 +285,7 @@ public class Starter
 			}
 			else
 			{
-				Object	pc = config.getArgumentValue(PlatformConfiguration.PLATFORM_COMPONENT, model);
+				Object	pc = config.getArgumentValue(RootComponentConfiguration.PLATFORM_COMPONENT, model);
 				if(pc==null)
 				{
 					ret.setException(new RuntimeException("No platform component class found."));
@@ -297,7 +298,7 @@ public class Starter
 //					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
 					
 					// Build platform name.
-					Object pfname = config.getArgumentValue(PlatformConfiguration.PLATFORM_NAME, model);
+					Object pfname = config.getArgumentValue(RootComponentConfiguration.PLATFORM_NAME, model);
 					final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
 					if(IComponentIdentifier.LOCAL.get()==null)
 						IComponentIdentifier.LOCAL.set(cid);
@@ -312,7 +313,7 @@ public class Starter
 					Cause cause = sc==null? null: sc.getCause();
 					assert cause!=null;
 					
-					Boolean autosd = (Boolean)config.getArgumentValue(PlatformConfiguration.AUTOSHUTDOWN, model);
+					Boolean autosd = (Boolean)config.getArgumentValue(RootComponentConfiguration.AUTOSHUTDOWN, model);
 					Object tmpmoni = config.getArgumentValue(PlatformConfiguration.MONITORING, model);
 					PublishEventLevel moni = PublishEventLevel.OFF;
 					if(tmpmoni instanceof Boolean)
@@ -365,7 +366,7 @@ public class Starter
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(config.getArgumentValue(PlatformConfiguration.WELCOME, model)))
+									if(Boolean.TRUE.equals(config.getArgumentValue(RootComponentConfiguration.WELCOME, model)))
 									{
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");
