@@ -189,11 +189,11 @@ public class Starter
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(Map<String, String> args)
-	{
-		PlatformConfiguration config = PlatformConfiguration.processArgs(args);
-		return createPlatform(config);
-	}
+//	public static IFuture<IExternalAccess> createPlatform(Map<String, String> args)
+//	{
+//		PlatformConfiguration config = PlatformConfiguration.processArgs(args);
+//		return createPlatform(config);
+//	}
 	
 	/**
 	 *  Create the platform.
@@ -269,8 +269,7 @@ public class Starter
 			// after loading the first component model.
 			final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
-			rootConfig.setValue(RootComponentConfiguration.COMPONENT_FACTORY, cfac);
-			
+			rootConfig.setComponentFactory(cfac);
 			// Hack: what to use as rid? should not have dependency to standalone.
 //			final ResourceIdentifier rid = new ResourceIdentifier(null, 
 //				"net.sourceforge.jadex:jadex-standalone-launch:2.1");
@@ -294,7 +293,7 @@ public class Starter
 				{
 					Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
 					final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
-					rootConfig.setValue(RootComponentConfiguration.PLATFORM_ACCESS, component);
+					rootConfig.setPlatformAccess(component);
 //					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
 					
 					// Build platform name.

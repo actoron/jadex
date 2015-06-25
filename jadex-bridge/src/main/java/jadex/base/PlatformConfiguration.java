@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Configuration of the platform setup. 
+ */
 public class PlatformConfiguration
 {
 	//-------- platform data keys --------
@@ -178,7 +181,7 @@ public class PlatformConfiguration
 	 * (which can be a Map or a String array).
 	 * @param args
 	 */
-	public PlatformConfiguration(Object args)
+	public PlatformConfiguration(String[] args)
 	{
 		this();
 		rootconfig.setProgramArguments(args);
@@ -318,11 +321,10 @@ public class PlatformConfiguration
 	 * Set the persist flag.
 	 * @param value
 	 */
+	// TODO unused?
 	public void setPersist(boolean value) {
-		// TODO unused?
 		setCmdArg(PERSIST, value);
 	}
-	
 	/**
 	 * Get the persist flag.
 	 * @return boolean
@@ -678,18 +680,18 @@ public class PlatformConfiguration
 	 *  @param args The command line arguments.
 	 *  @return PlatformConfiguration
 	 */
-	public static PlatformConfiguration processArgs(Map<String, String> args)
-	{
-		PlatformConfiguration config = new PlatformConfiguration(args);
-		if(args!=null)
-		{
-			for(Map.Entry<String, String> entry: args.entrySet())
-			{
-				parseArg(entry.getKey(), entry.getValue(), config);
-			}
-		}
-		return config;
-	}
+//	public static PlatformConfiguration processArgs(Map<String, String> args)
+//	{
+//		PlatformConfiguration config = new PlatformConfiguration(args);
+//		if(args!=null)
+//		{
+//			for(Map.Entry<String, String> entry: args.entrySet())
+//			{
+//				parseArg(entry.getKey(), entry.getValue(), config);
+//			}
+//		}
+//		return config;
+//	}
 	
 	/**
 	 *  Create the platform.

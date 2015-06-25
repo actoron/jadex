@@ -1,9 +1,15 @@
 package jadex.base;
 
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+/**
+ * Configuration of the root platform component. 
+ */
 public class RootComponentConfiguration
 {
 	/** ======== Arguments used by starter unless supplied from command line. ======== **/
@@ -174,12 +180,27 @@ public class RootComponentConfiguration
 	/** Flag if dht storage ring should be provided. **/
 	public static final String DHT_PROVIDE = PlatformConfiguration.DHT_PROVIDE; // class: boolean default: false
 	
-	
-	
-	// ----- arguments handled by starter AND root component -----
+	/**
+	 * Kernel names enum.
+	 */
+	public enum KERNEL {
+		component,
+		micro,
+		bpmn,
+		v3,
+		bdi,
+		bdibpmn
+	}
 
+	/** All configured parameters as map. **/
 	private Map<String, Object>	rootargs;
 	
+	/** The activated kernels. **/
+	private KERNEL[]	kernels;
+	
+	/**
+	 * Create a new configuration.
+	 */
 	public RootComponentConfiguration()
 	{
 		rootargs = new HashMap<String, Object>();	// Arguments of root component (platform)
@@ -194,59 +215,662 @@ public class RootComponentConfiguration
 		rootargs = new HashMap<String, Object>(source.rootargs);
 	}
 
-	public void setProgramArguments(Object args)
+	/**
+	 * Set a value in the root component configuration
+	 * @param key a key from the constants in this class.
+	 * @param val the value
+	 */
+	public void setValue(String key, Object val)
 	{
-		rootargs.put(PROGRAM_ARGUMENTS, args);
+		rootargs.put(key, val);
 	}
-
-	public void setValue(String name, Object val)
-	{
-		rootargs.put(name, val);
+	
+	/**
+	 * Returns a value of a given configuration parameter.
+	 * @param key the key
+	 * @return the value
+	 */
+	public Object getValue(String key) {
+		return rootargs.get(key);
 	}
 
 	public Map<String, Object> getArgs()
 	{
 		return rootargs;
 	}
-
-	public void setLoggingLevel(Level level)
+	
+	/**
+	 * Set program arguments to be available at runtime.
+	 * @param args
+	 */
+	protected void setProgramArguments(String[] args)
 	{
-		setValue(LOGGING_LEVEL, level);
+		rootargs.put(PROGRAM_ARGUMENTS, args);
+	}
+	
+//	// internal
+//	public  boolean getWELCOME()
+//	{
+//		return Boolean.TRUE.equals(getValue(WELCOME));
+//	}
+//	public  void setWELCOME(boolean value)
+//	{
+//		setValue(WELCOME, value);
+//	}
+
+	//	// internal
+//	public  IPlatformComponentAccess getPlatformAccess()
+//	{
+//		return (IPlatformComponentAccess)getValue(PLATFORM_ACCESS);
+//	}
+	/**
+	 * Set the platform access.
+	 * @param value
+	 */
+	protected  void setPlatformAccess(IPlatformComponentAccess value)
+	{
+		setValue(PLATFORM_ACCESS, value);
+	}
+//
+//	// internal
+//	public  IComponentFactory getComponentFactory()
+//	{
+//		return (IComponentFactory)getValue(COMPONENT_FACTORY);
+//	}
+	/**
+	 * Set the component factory.
+	 * @param value
+	 */
+	protected  void setComponentFactory(IComponentFactory value)
+	{
+		setValue(COMPONENT_FACTORY, value);
 	}
 
-	public void setWsPublish(boolean value)
+
+	// individual getters/setters
+
+	public  String getPlatformName()
 	{
-		setValue(WSPUBLISH, value);
+		return (String)getValue(PLATFORM_NAME);
 	}
 
-	public void setRsPublish(boolean value)
+	public  void setPlatformName(String value)
 	{
-		setValue(RSPUBLISH, value);
+		setValue(PLATFORM_NAME, value);
 	}
 
-	public void setBinaryMessages(boolean value)
+	public  String getConfigurationName()
 	{
-		setValue(BINARYMESSAGES, value);
+		return (String)getValue(CONFIGURATION_NAME);
+	}
+	public  void setConfigurationName(String value)
+	{
+		setValue(CONFIGURATION_NAME, value);
 	}
 
-	public void setAutoShutdown(boolean value)
+	public  boolean getAutoShutdown()
+	{
+		return Boolean.TRUE.equals(getValue(AUTOSHUTDOWN));
+	}
+	public  void setAutoShutdown(boolean value)
 	{
 		setValue(AUTOSHUTDOWN, value);
 	}
 
-	public void setSaveOnExit(boolean value)
+	public  Class getPlatformComponent()
 	{
-		setValue(SAVEONEXIT, value);
+		return (Class)getValue(PLATFORM_COMPONENT);
+	}
+	public  void setPlatformComponent(Class value)
+	{
+		setValue(PLATFORM_COMPONENT, value);
 	}
 
-	public void setGui(boolean value)
+	public  boolean getGui()
+	{
+		return Boolean.TRUE.equals(getValue(GUI));
+	}
+	public  void setGui(boolean value)
 	{
 		setValue(GUI, value);
 	}
 
-	public void setChat(boolean value)
+	public  boolean getCli()
+	{
+		return Boolean.TRUE.equals(getValue(CLI));
+	}
+	public  void setCli(boolean value)
+	{
+		setValue(CLI, value);
+	}
+
+	public  boolean getCliConsole()
+	{
+		return Boolean.TRUE.equals(getValue(CLICONSOLE));
+	}
+	public  void setCliConsole(boolean value)
+	{
+		setValue(CLICONSOLE, value);
+	}
+
+	public  boolean getSaveOnExit()
+	{
+		return Boolean.TRUE.equals(getValue(SAVEONEXIT));
+	}
+	public  void setSaveOnExit(boolean value)
+	{
+		setValue(SAVEONEXIT, value);
+	}
+
+	public  String getJccPlatforms()
+	{
+		return (String)getValue(JCCPLATFORMS);
+	}
+
+	public  void setJccPlatforms(String value)
+	{
+		setValue(JCCPLATFORMS, value);
+	}
+
+	public  boolean getLogging()
+	{
+		return Boolean.TRUE.equals(getValue(LOGGING));
+	}
+	public  void setLogging(String value)
+	{
+		setValue(LOGGING, value);
+	}
+
+	public  Level getLoggingLevel()
+	{
+		return (Level)getValue(LOGGING_LEVEL);
+	}
+
+	public  void setLoggingLevel(Level value)
+	{
+		setValue(LOGGING_LEVEL, value);
+	}
+
+	public  boolean getSimulation()
+	{
+		return Boolean.TRUE.equals(getValue(SIMULATION));
+	}
+
+	public  void setSimulation(String value)
+	{
+		setValue(SIMULATION, value);
+	}
+
+	public  boolean getAsyncExecution()
+	{
+		return Boolean.TRUE.equals(getValue(ASYNCEXECUTION));
+	}
+
+	public  void setAsyncExecution(boolean value)
+	{
+		setValue(ASYNCEXECUTION, value);
+	}
+
+	public  boolean getPersist()
+	{
+		return Boolean.TRUE.equals(getValue(PERSIST));
+	}
+	public  void setPersist(boolean value)
+	{
+		setValue(PERSIST, value);
+	}
+
+	public  boolean getUniqueIds()
+	{
+		return Boolean.TRUE.equals(getValue(UNIQUEIDS));
+	}
+	public  void setUniqueIds(boolean value)
+	{
+		setValue(UNIQUEIDS, value);
+	}
+
+	public  boolean getThreadpoolDefer()
+	{
+		return Boolean.TRUE.equals(getValue(THREADPOOLDEFER));
+	}
+	public  void setThreadpoolDefer(boolean value)
+	{
+		setValue(THREADPOOLDEFER, value);
+	}
+
+	public  String getLibPath()
+	{
+		return (String)getValue(LIBPATH);
+	}
+	public  void setLibPath(String value)
+	{
+		setValue(LIBPATH, value);
+	}
+
+	public  ClassLoader getBaseClassloader()
+	{
+		return (ClassLoader)getValue(BASECLASSLOADER);
+	}
+
+	public  void setBaseClassloader(ClassLoader value)
+	{
+		setValue(BASECLASSLOADER, value);
+	}
+
+	public  boolean getChat()
+	{
+		return Boolean.TRUE.equals(getValue(CHAT));
+	}
+	public  void setChat(boolean value)
 	{
 		setValue(CHAT, value);
+	}
+
+	public  boolean getAwareness()
+	{
+		return Boolean.TRUE.equals(getValue(AWARENESS));
+	}
+	public  void setAwareness(boolean value)
+	{
+		setValue(AWARENESS, value);
+	}
+
+	public  String getAwaMechanisms()
+	{
+		return (String)getValue(AWAMECHANISMS);
+	}
+	public  void setAwaMechanisms(String value)
+	{
+		setValue(AWAMECHANISMS, value);
+	}
+
+	public  long setAwaDelay()
+	{
+		return (Long)getValue(AWADELAY);
+	}
+	public  void getAwaDelay(long value)
+	{
+		setValue(AWADELAY, value);
+	}
+
+	public  String getAwaIncludes()
+	{
+		return (String)getValue(AWAINCLUDES);
+	}
+
+	public  void setAwaIncludes(String value)
+	{
+		setValue(AWAINCLUDES, value);
+	}
+
+	public  String getAwaExcludes()
+	{
+		return (String)getValue(AWAEXCLUDES);
+	}
+
+	public  void setAwaExcludes(String value)
+	{
+		setValue(AWAEXCLUDES, value);
+	}
+
+	public  boolean getBinaryMessages()
+	{
+		return Boolean.TRUE.equals(getValue(BINARYMESSAGES));
+	}
+	public  void setBinaryMessages(boolean value)
+	{
+		setValue(BINARYMESSAGES, value);
+	}
+
+	public  boolean getStrictCom()
+	{
+		return Boolean.TRUE.equals(getValue(STRICTCOM));
+	}
+	public  void setStrictCom(boolean value)
+	{
+		setValue(STRICTCOM, value);
+	}
+
+	public  boolean getUsePass()
+	{
+		return Boolean.TRUE.equals(getValue(USEPASS));
+	}
+	public  void setUsePass(boolean value)
+	{
+		setValue(USEPASS, value);
+	}
+
+	public  boolean getPrintPass()
+	{
+		return Boolean.TRUE.equals(getValue(PRINTPASS));
+	}
+	public  void getPrintPass(boolean value)
+	{
+		setValue(PRINTPASS, value);
+	}
+
+	public  boolean getTrustedLan()
+	{
+		return Boolean.TRUE.equals(getValue(TRUSTEDLAN));
+	}
+	public  void setTrustedLan(boolean value)
+	{
+		setValue(TRUSTEDLAN, value);
+	}
+
+	public  String getNetworkName()
+	{
+		return (String)getValue(NETWORKNAME);
+	}
+
+	public  void setNetworkName(String value)
+	{
+		setValue(NETWORKNAME, value);
+	}
+
+	public  String getNetworkPass()
+	{
+		return (String)getValue(NETWORKPASS);
+	}
+	public  void setNetworkPass(String value)
+	{
+		setValue(NETWORKPASS, value);
+	}
+
+	public  Map getVirtualNames()
+	{
+		return (Map)getValue(VIRTUALNAMES);
+	}
+	public  void setVirtualNames(Map value)
+	{
+		setValue(VIRTUALNAMES, value);
+	}
+
+	public  long getValidityDuration()
+	{
+		return (Long)getValue(VALIDITYDURATION);
+	}
+	public  void setValidityDuration(long value)
+	{
+		setValue(VALIDITYDURATION, value);
+	}
+
+	public  boolean getLocalTransport()
+	{
+		return Boolean.TRUE.equals(getValue(LOCALTRANSPORT));
+	}
+	public  void setLocalTransport(boolean value)
+	{
+		setValue(LOCALTRANSPORT, value);
+	}
+
+	public  boolean getTcpTransport()
+	{
+		return Boolean.TRUE.equals(getValue(TCPTRANSPORT));
+	}
+	public  void setTcpTransport(boolean value)
+	{
+		setValue(TCPTRANSPORT, value);
+	}
+
+	public  int getTcpPort()
+	{
+		return (Integer)getValue(TCPPORT);
+	}
+	public  void setTcpPorT(int value)
+	{
+		setValue(TCPPORT, value);
+	}
+
+	public  boolean getNioTcpTransport()
+	{
+		return Boolean.TRUE.equals(getValue(NIOTCPTRANSPORT));
+	}
+	public  void setNioTcpTransport(boolean value)
+	{
+		setValue(NIOTCPTRANSPORT, value);
+	}
+
+	public  int getNioTcpPort()
+	{
+		return (Integer)getValue(NIOTCPPORT);
+	}
+	public  void setNioTcpPort(int value)
+	{
+		setValue(NIOTCPPORT, value);
+	}
+
+	public  boolean getRelayTransport()
+	{
+		return Boolean.TRUE.equals(getValue(RELAYTRANSPORT));
+	}
+	public  void setRelayTransport(boolean value)
+	{
+		setValue(RELAYTRANSPORT, value);
+	}
+
+	public  String getRelayAddress()
+	{
+		return (String)getValue(RELAYADDRESS);
+	}
+	public  void setRelayAddress(String value)
+	{
+		setValue(RELAYADDRESS, value);
+	}
+
+	public  boolean getRelaySecurity()
+	{
+		return Boolean.TRUE.equals(getValue(RELAYSECURITY));
+	}
+	public  void setRelaySecurity(boolean value)
+	{
+		setValue(RELAYSECURITY, value);
+	}
+
+	public  boolean getSSLTCPTRANSPORT()
+	{
+		return Boolean.TRUE.equals(getValue(SSLTCPTRANSPORT));
+	}
+	public  void setSslTcpTransport(boolean value)
+	{
+		setValue(SSLTCPTRANSPORT, value);
+	}
+
+	public  boolean getSslTcpPort()
+	{
+		return Boolean.TRUE.equals(getValue(SSLTCPPORT));
+	}
+	public  void setSslTcpPort(boolean value)
+	{
+		setValue(SSLTCPPORT, value);
+	}
+
+	public  boolean getWsPublish()
+	{
+		return Boolean.TRUE.equals(getValue(WSPUBLISH));
+	}
+	public  void setWsPublish(boolean value)
+	{
+		setValue(WSPUBLISH, value);
+	}
+
+	public  boolean getRsPublish()
+	{
+		return Boolean.TRUE.equals(getValue(RSPUBLISH));
+	}
+	public  void setRsPublish(boolean value)
+	{
+		setValue(RSPUBLISH, value);
+	}
+
+	public  KERNEL[] getKernels()
+	{
+		return kernels;
+	}
+	public  void setKernels(KERNEL... value)
+	{
+		kernels = value;
+//		String[] oldVal = new String[kernels.length];
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < kernels.length; i++)
+		{
+			sb.append(kernels[i].name());
+			sb.append(",");
+		}
+		setValue(KERNELS, sb.toString());
+	}
+
+	public  boolean getMavenDependencies()
+	{
+		return Boolean.TRUE.equals(getValue(MAVEN_DEPENDENCIES));
+	}
+	public  void setMavenDependencies(boolean value)
+	{
+		setValue(MAVEN_DEPENDENCIES, value);
+	}
+
+	public  boolean getMonitoringComp()
+	{
+		return Boolean.TRUE.equals(getValue(MONITORINGCOMP));
+	}
+	public  void setMonitoringComp(boolean value)
+	{
+		setValue(MONITORINGCOMP, value);
+	}
+
+	public  boolean getSensors()
+	{
+		return Boolean.TRUE.equals(getValue(SENSORS));
+	}
+	public  void setSensors(boolean value)
+	{
+		setValue(SENSORS, value);
+	}
+
+	public  String getThreadpoolClass()
+	{
+		return (String)getValue(THREADPOOLCLASS);
+	}
+	public  void setThreadpoolClass(String value)
+	{
+		setValue(THREADPOOLCLASS, value);
+	}
+
+	public  String getContextServiceClass()
+	{
+		return (String)getValue(CONTEXTSERVICECLASS);
+	}
+	public  void setContextServiceClass(String value)
+	{
+		setValue(CONTEXTSERVICECLASS, value);
+	}
+
+	public  boolean getDf()
+	{
+		return Boolean.TRUE.equals(getValue(DF));
+	}
+	public  void setDf(boolean value)
+	{
+		setValue(DF, value);
+	}
+
+	public  boolean getClock()
+	{
+		return Boolean.TRUE.equals(getValue(CLOCK));
+	}
+	public  void setClock(boolean value)
+	{
+		setValue(CLOCK, value);
+	}
+
+	public  boolean getMessage()
+	{
+		return Boolean.TRUE.equals(getValue(MESSAGE));
+	}
+	public  void setMessage(boolean value)
+	{
+		setValue(MESSAGE, value);
+	}
+
+	public  boolean getSimul()
+	{
+		return Boolean.TRUE.equals(getValue(SIMUL));
+	}
+	public  void setSimul(boolean value)
+	{
+		setValue(SIMUL, value);
+	}
+
+	public  boolean getFiletransfer()
+	{
+		return Boolean.TRUE.equals(getValue(FILETRANSFER));
+	}
+	public  void setFiletransfer(boolean value)
+	{
+		setValue(FILETRANSFER, value);
+	}
+
+	public  boolean getMarshal()
+	{
+		return Boolean.TRUE.equals(getValue(MARSHAL));
+	}
+	public  void setMarshal(boolean value)
+	{
+		setValue(MARSHAL, value);
+	}
+
+	public  boolean getSecurity()
+	{
+		return Boolean.TRUE.equals(getValue(SECURITY));
+	}
+	public  void setSecurity(boolean value)
+	{
+		setValue(SECURITY, value);
+	}
+	
+	public  boolean getLibrary()
+	{
+		return Boolean.TRUE.equals(getValue(LIBRARY));
+	}
+	public  void setLibrary(boolean value)
+	{
+		setValue(LIBRARY, value);
+	}
+
+	public  boolean getSettings()
+	{
+		return Boolean.TRUE.equals(getValue(SETTINGS));
+	}
+	public  void setSettings(boolean value)
+	{
+		setValue(SETTINGS, value);
+	}
+
+	public  boolean getContext()
+	{
+		return Boolean.TRUE.equals(getValue(CONTEXT));
+	}
+	public  void setContext(boolean value)
+	{
+		setValue(CONTEXT, value);
+	}
+
+	public  boolean getAddress()
+	{
+		return Boolean.TRUE.equals(getValue(ADDRESS));
+	}
+	public  void setAddress(boolean value)
+	{
+		setValue(ADDRESS, value);
+	}
+
+	public  boolean getDhtProvide()
+	{
+		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
+	}
+	public  void setDhtProvide(boolean value)
+	{
+		setValue(DHT_PROVIDE, value);
 	}
 	
 	
