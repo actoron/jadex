@@ -65,6 +65,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +127,9 @@ public class VisualProcessViewPanel extends JPanel
 	/** The change listener. */
 	protected ISubscriptionIntermediateFuture<IMonitoringEvent> sub;
 	
+	/** The map of currently active steps (thread id -> step id). */
+	protected Map<String, String> threadstosteps;
+	
 	//------- constructors --------
 	
 	/**
@@ -141,6 +145,7 @@ public class VisualProcessViewPanel extends JPanel
 			this.ptmodel = new ProcessThreadModel();
 			this.hmodel	= new HistoryModel();
 			this.modelcontainer = new ModelContainer(null);
+			this.threadstosteps = new HashMap<String, String>();
 			
 //			BpmnStylesheetSelections sheet = new BpmnStylesheetSelections();
 			mxStylesheet sheet = (mxStylesheet) styleclass.newInstance();
@@ -283,6 +288,7 @@ public class VisualProcessViewPanel extends JPanel
 						VElement elem = (VElement)cell;
 //						System.out.println("Cell: "+ve.getBpmnElement()); 
 						
+						// Determine the thread that should be executed
 						if(elem!=null && elem.getBpmnElement()!=null)
 						{
 							String id = elem.getBpmnElement().getId();
@@ -325,6 +331,7 @@ public class VisualProcessViewPanel extends JPanel
 									}
 								}
 								threads.getSelectionModel().removeListSelectionListener(sellistener);
+								// Set the thread that should be executed in the table
 								threads.setRowSelectionInterval(sel, sel);
 								threads.getSelectionModel().addListSelectionListener(sellistener);
 							}
@@ -365,6 +372,20 @@ public class VisualProcessViewPanel extends JPanel
 			sorter.setTableHeader(header);
 //			threads.getColumnModel().setColumnMargin(10);
 		    threads.getSelectionModel().addListSelectionListener(sellistener);
+		    
+		    threads.addMouseListener(new MouseAdapter()
+			{
+		    	public void mouseClicked(MouseEvent e)
+		    	{
+		    		int[] sels = threads.getSelectedRows();
+		    		 // Step when double click on thread in table
+					if(sels.length>0 && e.getClickCount()==2 && getStepInfo()!=null)
+					{
+						doStep();
+					}
+		    	}
+			});
+		
 	
 			sorter = new TableSorter(hmodel);
 			this.history = new JTable(sorter);
@@ -437,6 +458,27 @@ public class VisualProcessViewPanel extends JPanel
 //							historyinfos.add(0, (ProcessThreadInfo)event.getProperty("details"));
 						}
 					}
+					// 
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION) && event.getType().endsWith("step"))
+					{
+						Map<String, String> det = (Map<String, String>)event.getProperty("details");
+						if(det!=null && det.containsKey("threadid"))
+						{
+							String threadid = det.get("threadid");
+							String stepid = (String)det.get("Id");
+							threadstosteps.put(threadid, stepid);
+						}
+					}
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL) && event.getType().endsWith("step"))
+					{
+						Map<String, String> det = (Map<String, String>)event.getProperty("details");
+						if(det!=null && det.containsKey("threadid"))
+						{
+							String threadid = det.get("threadid");
+							threadstosteps.remove(threadid);
+						}
+					}
+					
 	//				System.out.println("ti: "+threadinfos.size()+" "+cce.getSourceName()+" "+cce.getSourceType()+" "+cce.getEventType());
 					updateViews();
 				}
@@ -490,6 +532,7 @@ public class VisualProcessViewPanel extends JPanel
 			JSplitPanel	sp	= new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT, tmp2, new MicroAgentViewPanel(access, null, true));
 			sp.setDividerLocation(0.8);
 			sp.setOneTouchExpandable(true);
+			sp.setResizeWeight(1);
 			
 			setLayout(new BorderLayout());
 			add(sp, BorderLayout.CENTER);
@@ -987,6 +1030,7 @@ public class VisualProcessViewPanel extends JPanel
 		{
 			ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
 			ret = pti.getThreadId();
+			ret = threadstosteps.get(ret);
 		}
 		return ret;
 	}

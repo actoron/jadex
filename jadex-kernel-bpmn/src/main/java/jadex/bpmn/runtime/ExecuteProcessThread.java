@@ -23,6 +23,9 @@ public class ExecuteProcessThread implements IConditionalComponentStep<Void>
 	/** The process thread. */
 	protected ProcessThread thread;
 
+	/** The thread id. Needed for bpmn debugger. */
+	protected String threadid;
+	
 	/**
 	 *  Create a new step.
 	 *  @param thread The thread.
@@ -30,6 +33,7 @@ public class ExecuteProcessThread implements IConditionalComponentStep<Void>
 	public ExecuteProcessThread(ProcessThread thread)
 	{
 		this.thread = thread;
+		this.threadid = thread.getId();
 		
 //		System.out.println("created step for: "+thread.getId()+" "+thread.getActivity());
 	}
@@ -69,8 +73,8 @@ public class ExecuteProcessThread implements IConditionalComponentStep<Void>
 		MActivity act = thread.getActivity();
 		
 //		notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
-		if(thread.getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-			thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(bcf.createActivityEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()), PublishTarget.TOALL);
+//		if(thread.getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//			thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(bcf.createActivityEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()), PublishTarget.TOALL);
 		
 //		thread = handler.execute(act, this, thread);
 		handler.execute(act, thread.getInstance(), thread);

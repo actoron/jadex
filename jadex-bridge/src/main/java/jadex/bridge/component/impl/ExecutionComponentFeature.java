@@ -9,6 +9,7 @@ import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IPriorityComponentStep;
+import jadex.bridge.ITransferableStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -57,6 +58,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -790,7 +792,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			Thread.currentThread().setContextClassLoader(component.getClassLoader());
 			
 			// Process listener notifications from old component thread.
-			boolean notifexecuted	= false;
+//			boolean notifexecuted	= false;
 			if(notifications!=null)
 			{
 				FutureHelper.addStackedListeners(notifications);
@@ -798,10 +800,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				// Todo: termination and exception!?
 //				try
-				{
+//				{
 					FutureHelper.notifyStackedListeners();
-					notifexecuted	= true;
-				}
+//					notifexecuted	= true;
+//				}
 //				catch(Exception e)
 //				{
 //					fatalError(e);
@@ -1324,25 +1326,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Get the details of a step.
 	 */
-	public Object getStepDetails(StepInfo step)
+	public Map<String, String> getStepDetails(StepInfo step)
 	{
-		Object	ret;
+		Map<String, String>	ret = new LinkedHashMap<String, String>();
 		
-//		if(step instanceof MicroAgent.ExecuteWaitForStep)
-//		{
-//			MicroAgent.ExecuteWaitForStep waitForStep = (MicroAgent.ExecuteWaitForStep) step;
-//			if(waitForStep.getComponentStep() instanceof ITransferableStep)
-//			{
-//				ret = ((ITransferableStep) waitForStep.getComponentStep()).getTransferableObject();
-//				return ret;
-//			}
-//		}
+		ret.put("Class", step.getStep().getClass().getName());
+		ret.put("Priority", ""+step.getPriority());
+		ret.put("Id", ""+step.getStepCount());
 		
-		StringBuffer buf = new StringBuffer();
-
-		buf.append("Class = ").append(step.getStep().getClass().getName()).append("\n");
-		buf.append("Priority = ").append(step.getPriority()).append("\n");
-		buf.append("Id = ").append(step.getStepCount()).append("\n");
+		if(step.getStep() instanceof ITransferableStep)
+		{
+			Map<String, String> det = ((ITransferableStep)step.getStep()).getTransferableObject();
+			if(det!=null)
+				ret.putAll(det);
+		}
 			
 		Field[] fields = step.getStep().getClass().getDeclaredFields();
 		for(int i = 0; i < fields.length; i++) 
@@ -1361,12 +1358,39 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 
 			if(valtext != null) 
 			{
-				buf.append("\n");
-				buf.append(fields[i].getName()).append(" = ").append(valtext);
+				ret.put(fields[i].getName(), valtext);
 			}
 		}
-
-		ret = buf.toString();
+		
+//		StringBuffer buf = new StringBuffer();
+//
+//		buf.append("Class = ").append(step.getStep().getClass().getName()).append("\n");
+//		buf.append("Priority = ").append(step.getPriority()).append("\n");
+//		buf.append("Id = ").append(step.getStepCount()).append("\n");
+//			
+//		Field[] fields = step.getStep().getClass().getDeclaredFields();
+//		for(int i = 0; i < fields.length; i++) 
+//		{
+//			String valtext = null;
+//			try 
+//			{
+//				fields[i].setAccessible(true);
+//				Object val = fields[i].get(step.getStep());
+//				valtext = val == null ? "null" : val.toString();
+//			} 
+//			catch (Exception e) 
+//			{
+//				valtext = e.getMessage();
+//			}
+//
+//			if(valtext != null) 
+//			{
+//				buf.append("\n");
+//				buf.append(fields[i].getName()).append(" = ").append(valtext);
+//			}
+//		}
+//
+//		ret = buf.toString();
 			
 		return ret;
 	}

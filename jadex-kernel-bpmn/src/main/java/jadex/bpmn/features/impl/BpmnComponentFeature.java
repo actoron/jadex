@@ -660,11 +660,11 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 //				System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 				step(activity, getComponent(), thread, event);
 				thread.setNonWaiting();
-				if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null
-					&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-				{
-					getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
-				}
+//				if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null
+//					&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//				{
+//					getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+//				}
 			}
 			else
 			{

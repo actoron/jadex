@@ -17,6 +17,10 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -137,7 +141,27 @@ public class MicroAgentViewPanel extends JPanel
 					{
 //						if(laststep!=null)
 //							step.removeJavaRootObject(laststep);
-						step.setText(cce.getProperty("details").toString());
+
+						Object det = cce.getProperty("details");
+						if(det instanceof Map)
+						{
+							StringBuilder sb = new StringBuilder();
+						    Iterator<Entry> iter = ((Map)det).entrySet().iterator();
+					        while(iter.hasNext()) 
+					        {
+					            Entry entry = iter.next();
+					            sb.append(entry.getKey());
+					            sb.append(" = ");
+					            sb.append(entry.getValue());
+					            if(iter.hasNext()) 
+					                sb.append('\n');
+					        }
+					        det = sb.toString();
+//							det = Arrays.toString(((Map)det).entrySet().toArray());
+//							det = ((String)det).replaceAll(",", "\n");
+						}
+						
+						step.setText(det.toString());
 						laststep = cce;
 					}
 				}

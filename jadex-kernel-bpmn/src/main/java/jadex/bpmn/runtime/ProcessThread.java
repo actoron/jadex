@@ -183,6 +183,9 @@ public class ProcessThread	implements ITaskContext
 			scheduleExecution();
 //		else
 //			System.out.println("activity to null: "+getId());
+		
+		if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
 	}
 	
 	/**

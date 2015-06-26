@@ -136,7 +136,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IFuture<Void>	body()
 	{
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		return exe.scheduleStep(new ImmediateComponentStep<Void>()
+		return exe.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
