@@ -18,7 +18,6 @@ public class ComponentPropertyActivity extends SubActivity
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-
 		PropertyItem[] props = (PropertyItem[]) getIntent().getSerializableExtra(ComponentViewer.EXTRA_PROPERTIES);
 
 		ListView listView = new ListView(getContext());

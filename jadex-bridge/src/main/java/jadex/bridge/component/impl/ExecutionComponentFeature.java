@@ -19,6 +19,7 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -56,6 +57,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -86,6 +88,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/** The stepcnt - used to keep insertion order of same priority elements in the queue. */
 	protected int stepcnt;
+	
+	/** The id of the step at which the execution was stopped because of a breakpoint. */
+	protected int bpstepid = -1;
 	
 	/** The current timer. */
 	protected List<ITimer> timers = new ArrayList<ITimer>();
@@ -817,34 +822,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				}
 
 			}
-	
-			// Todo: breakpoints
-//			// Suspend when breakpoint is triggered.
-//			// Necessary because component wakeup could be called anytime even if is at breakpoint..
-//			boolean	breakpoint_triggered	= false;
-//			if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
-//			{
-//				if(component.isAtBreakpoint(desc.getBreakpoints()))
-//				{
-//					breakpoint_triggered	= true;
-//					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>(logger)
-//					{
-//						public void resultAvailable(IComponentManagementService cms)
-//						{
-//							cms.suspendComponent(desc.getName());
-//						}
-//						
-//						public void exceptionOccurred(Exception exception)
-//						{
-//							if(!(exception instanceof ComponentTerminatedException))
-//							{
-//								super.exceptionOccurred(exception);
-//							}
-//						}
-//					});
-//				}
-//			}
-//			
+			
 //			boolean	again	= false;
 //			if(!breakpoint_triggered && !extexecuted  && !notifexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
 //			{
@@ -919,29 +897,46 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			}				
 //		}	
 			
-		final StepInfo step;
+		StepInfo stepi = null;
+		boolean priostep = false;
+		boolean	breakpoint_triggered = false;
+		
 		synchronized(this)
-		{
+		{			
 			if(steps!=null && steps.size()>0) 
 			{
 //				if(getComponent().getComponentIdentifier().getName().indexOf("Hello")!=-1)
 //					System.out.println("executing");
 				StepInfo si = steps.first();
-				if(si.getPriority()>=STEP_PRIORITY_IMMEDIATE)
+				priostep = si.getPriority()>=STEP_PRIORITY_IMMEDIATE;
+		
+				// Suspend when breakpoint is triggered.
+				// Necessary because component wakeup could be called anytime even if is at breakpoint..
+				if(!priostep && stepfuture==null && !IComponentDescription.STATE_SUSPENDED.equals(getComponent().getComponentDescription().getState())
+					&& getComponent().getComponentDescription().getBreakpoints().length>0)
+				{
+					if(isAtBreakpoint(getComponent().getComponentDescription().getBreakpoints()))
+					{
+						breakpoint_triggered = true;
+					}
+				}		
+		
+//				if(getComponent().getComponentIdentifier().getName().indexOf("Hello")!=-1)
+//					System.out.println("executing");
+				if(priostep)
 				{
 					// remove the element
-					step = removeStep();
+					stepi = removeStep();
 				}
-				else
+				else if(!breakpoint_triggered)
 				{
 					if((IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState())))
 					{
-						step = removeStep();
+						stepi = removeStep();
 					}
 					else if(stepfuture!=null)
 					{
 						boolean found = false;
-						StepInfo tmp = null;
 						if(stepinfo!=null)
 						{
 							// search for right step via stepinfo
@@ -949,7 +944,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 							{
 								if(stepinfo.equals(""+sti.getStepCount()))
 								{
-									tmp = sti;
+									stepi = sti;
 									steps.remove(sti);
 									publishStepEvent(sti, IMonitoringEvent.EVENT_TYPE_DISPOSAL);
 									found = true;
@@ -963,27 +958,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						}
 						
 						if(!found)
-							tmp = removeStep();
-						step = tmp;
-					}
-					else
-					{
-						step = null;
+							stepi = removeStep();
 					}
 				}
-//				if(steps.isEmpty())
-//				{
-//					steps	= null;
-//				}
 			}
-			else
-			{
-				step	= null;
-			}
+		}
+		final StepInfo step = stepi;
+		
+		if(breakpoint_triggered)
+		{
+			IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			cms.suspendComponent(getComponent().getComponentDescription().getName());
 		}
 		
 		boolean	hasstep;
-		
 		if(step!=null)
 		{
 //			if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
@@ -1440,6 +1428,61 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Test if the agent's execution is currently at one of the
+	 *  given breakpoints. If yes, the agent will be suspended by
+	 *  the platform.
+	 *  Available breakpoints can be specified in the
+	 *  micro agent meta info.
+	 *  @param breakpoints	An array of breakpoints.
+	 *  @return True, when some breakpoint is triggered.
+	 */
+	public boolean isAtBreakpoint(String[] breakpoints)
+	{
+		boolean ret = false;
+		if(steps!=null && steps.size()>0)
+		{
+			
+			if(steps.first().getStepCount()==bpstepid)
+			{
+				bpstepid = -1;
+			}
+			else
+			{
+				ret = testIfBreakpoint(breakpoints);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Kernel specific test if the step is a breakpoint.
+	 */
+	public boolean testIfBreakpoint(String[] breakpoints)
+	{
+		boolean ret = false;
+		try
+		{
+//			System.out.println("testing: "+steps.first().getStep().getClass());
+			Method m = steps.first().getStep().getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+			Breakpoint bp = m.getAnnotation(Breakpoint.class);
+			if(bp!=null)
+			{
+				Set<String>	bps	= new HashSet<String>(Arrays.asList(breakpoints));
+				String bpname = bp.value();
+				// todo: support wildcard matching
+				ret = bps.contains(bpname);
+				if(ret)
+					bpstepid = steps.first().getStepCount();
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		return ret;
 	}
 	

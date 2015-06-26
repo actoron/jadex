@@ -17,13 +17,17 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple3;
 import jadex.commons.future.IFuture;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -402,4 +406,24 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 //			rplan.afterBlock();
 //		}
 //	}
+	
+	/**
+	 *  Kernel specific test if the step is a breakpoint.
+	 */
+	public boolean testIfBreakpoint(String[] breakpoints)
+	{
+		boolean	isatbreakpoint	= false;
+		Set<String>	bps	= new HashSet<String>(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
+		
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+
+		for(Iterator<ProcessThread> it = bcf.getTopLevelThread().getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
+		{
+			ProcessThread	pt	= it.next();
+			
+			isatbreakpoint	= bps.contains(pt.getActivity().getId());
+		}
+		
+		return isatbreakpoint;
+	}
 }

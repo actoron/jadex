@@ -49,11 +49,22 @@ public interface IInternalExecutionFeature
 	
 	/**
 	 *  Add a synchronous subcomponent that will run on its parent's thread.
+	 *  @param sub The subcomponent.
 	 */
 	public void addSubcomponent(IInternalExecutionFeature sub);
 
 	/**
 	 *  Remove a synchronous subcomponent.
+	 *  @param sub The subcomponent.
 	 */
 	public void removeSubcomponent(IInternalExecutionFeature sub);
+	
+//	/**
+//	 *  Test if the component's execution is currently at one of the
+//	 *  given breakpoints. If yes, the component will be suspended by
+//	 *  the platform.
+//	 *  @param breakpoints	An array of breakpoints.
+//	 *  @return True, when some breakpoint is triggered.
+//	 */
+//	public abstract boolean isAtBreakpoint(String[] breakpoints);
 }

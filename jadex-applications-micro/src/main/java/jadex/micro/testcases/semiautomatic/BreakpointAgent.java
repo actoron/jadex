@@ -3,16 +3,13 @@ package jadex.micro.testcases.semiautomatic;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.Breakpoint;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 /**
  *  A simple agent showing how to use breakpoints in the micro kernel.
@@ -20,11 +17,8 @@ import java.util.HashSet;
 @Description("A simple agent showing how to use breakpoints in the micro kernel.")
 @Breakpoints(value={"hop", "step", "jump"})
 @Agent
-public class BreakpointAgent
+public class BreakpointAgent 
 {
-	/** The current step. */
-	protected String	step;
-	
 	/** The agent. */
 	@Agent
 	protected IInternalAccess agent;
@@ -35,29 +29,32 @@ public class BreakpointAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		step	= "hop";	// first step
+//		step	= "hop";	// first step
 		
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{			
+			@Breakpoint("hop")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("Current step: "+step);
+				System.out.println("Current step: hop");
 				
-				step	= "step";	// second step
+//				step	= "step";	// second step
 
 				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
-				{			
+				{		
+					@Breakpoint("step")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						System.out.println("Current step: "+step);
+						System.out.println("Current step: step");
 
-						step	= "jump";	// third step
+//						step	= "jump";	// third step
 						
 						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 						{			
+							@Breakpoint("jump")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								System.out.println("Current step: "+step);
+								System.out.println("Current step: jump");
 
 								agent.killComponent();
 								
@@ -76,14 +73,13 @@ public class BreakpointAgent
 		return new Future<Void>(); // never kill?!
 	}
 	
-	/**
-	 *  Return true, when a breakpoint was hit.
-	 */
-	@AgentBreakpoint
-	public boolean isAtBreakpoint(String[] breakpoints)
-	{
-		return new HashSet(Arrays.asList(breakpoints)).contains(step);
-	}
+//	/**
+//	 *  Return true, when a breakpoint was hit.
+//	 */
+//	public boolean isAtBreakpoint(String[] breakpoints)
+//	{
+//		return new HashSet(Arrays.asList(breakpoints)).contains(step);
+//	}
 	
 //	/**
 //	 *  Add the 'testresults' marking this agent as a testcase. 
@@ -94,3 +90,4 @@ public class BreakpointAgent
 //			null, null, null, new String[]{"hop", "step", "jump"}, null);
 //	}
 }
+
