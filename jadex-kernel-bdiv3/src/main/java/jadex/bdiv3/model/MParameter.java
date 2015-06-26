@@ -144,10 +144,10 @@ public class MParameter extends MElement
 	protected UnparsedExpression updaterate;
 	
 	/** The events this belief depends on. */
-	protected Collection<String> beliefevents;
+	protected Set<String> beliefevents;
 	
 	/** The raw events. */
-	protected Collection<EventType> rawevents;
+	protected Set<EventType> rawevents;
 	
 	/** Cached aggregated events. */
 	protected List<EventType> allevents;
@@ -619,7 +619,7 @@ public class MParameter extends MElement
 	 *  Get the rawevents.
 	 *  @return The rawevents.
 	 */
-	public Collection<EventType> getRawEvents()
+	public Set<EventType> getRawEvents()
 	{
 		return rawevents;
 	}
@@ -637,7 +637,7 @@ public class MParameter extends MElement
 	 *  Get the events.
 	 *  @return The events.
 	 */
-	public Collection<String> getBeliefEvents()
+	public Set<String> getBeliefEvents()
 	{
 		return beliefevents;
 	}
@@ -646,10 +646,9 @@ public class MParameter extends MElement
 	 *  Set the events.
 	 *  @param events The events to set.
 	 */
-	public void setBeliefEvents(Collection<String> events)
+	public void setBeliefEvents(Set<String> events)
 	{
-		this.beliefevents.clear();
-		this.beliefevents.addAll(events);
+		this.beliefevents	= events;
 	}
 	
 	/**

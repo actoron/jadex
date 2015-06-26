@@ -479,6 +479,8 @@ public class BDIXMLReader extends ComponentXMLReader
 					}
 				}
 				
+				SBDIModel.replaceReferences(model);
+				
 				// Load subcapabilities.
 				Map<String, IBDIModel>	subcaps	= new LinkedHashMap<String, IBDIModel>();
 				for(MCapabilityReference subcap: model.getCapability().getCapabilities())
@@ -502,23 +504,15 @@ public class BDIXMLReader extends ComponentXMLReader
 				// Handle references and add arguments / results
 				for(MBelief mbel: model.getCapability().getBeliefs().toArray(new MBelief[model.getCapability().getBeliefs().size()]))	// Iterate over array to allow removal during iteration.
 				{
-					// Remove reference and add mapping instead.
+					// Resolve reference and remove MElement.
 					MBelief	resolved	= mbel;
-					String	ref	= mbel.getRef();
-					if(ref!=null)
+					if(model.getBeliefReferences().containsKey(mbel.getName()))
 					{
-						// Flatten transitive reference.
-						if(model.getBeliefMappings().containsKey(ref))
-						{
-							ref	= model.getBeliefMappings().get(ref);
-						}
-						
-						model.addBeliefMapping(ref, mbel.getName());
 						model.getCapability().removeBelief(mbel);
 						// Todo: merge settings? update rate etc.
 						
 						// Resolve to real belief.
-						resolved	= model.getCapability().getBelief(ref);
+						resolved	= model.getCapability().getBelief(model.getBeliefReferences().get(mbel.getName()));
 					}
 					
 					if(mbel.isExported())
@@ -534,7 +528,7 @@ public class BDIXMLReader extends ComponentXMLReader
 						String	desc	= resolved.getDescription()!=null ? resolved.getDescription()+": "+findBeliefDefaultValue(model, resolved, null) : ""+findBeliefDefaultValue(model, resolved, null);
 						model.addResult(new Argument(mbel.getName(), desc, resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, null));
 						
-						model.addResultMapping(ref, mbel.getName());
+						model.addResultMapping(resolved.getName(), mbel.getName());
 					}
 				}
 				

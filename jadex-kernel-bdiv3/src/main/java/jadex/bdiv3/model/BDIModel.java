@@ -113,23 +113,23 @@ public class BDIModel extends MicroModel	implements IBDIModel
 	}
 	
 	/**
-	 *  Add a belief mapping.
-	 *  @param target The target belief in the subcapability. 
-	 *  @param source The source belief.
+	 *  Add a belief reference (abstract/reference name -> concrete belief name).
+	 *  @param reference The fully qualified abstract / reference belief name. 
+	 *  @param concrete The fully qualified concrete belief name.
 	 */
-	public void addBeliefMapping(String target, String source)
+	public void addBeliefReference(String reference, String concrete)
 	{
 		if(beliefmappings==null)
 		{
 			beliefmappings = new LinkedHashMap<String, String>();
 		}
-		beliefmappings.put(target, source);
+		beliefmappings.put(reference, concrete);
 	}
 	
 	/**
-	 *  Get the belief mappings (target->source).
+	 *  Get the fully qualified belief references (abstract/reference name -> concrete belief name).
 	 */
-	public Map<String, String> getBeliefMappings()
+	public Map<String, String> getBeliefReferences()
 	{
 		Map<String, String>	ret;
 		if(beliefmappings==null)

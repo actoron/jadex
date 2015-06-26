@@ -672,7 +672,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 //			System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
 		BDIModel bdimodel = (BDIModel)component.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel();
-		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
+		String	belname	= bdimodel.getBeliefReferences().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
 			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
@@ -706,7 +706,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 //			System.out.println("setAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
 		BDIModel bdimodel = (BDIModel)component.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel();
-		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
+		String	belname	= bdimodel.getBeliefReferences().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
 			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
@@ -1176,7 +1176,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				// For abstract belief find corresponding mapping.
 				else
 				{
-					Map<String, String>	map	= bdimodel.getBeliefMappings();
+					Map<String, String>	map	= bdimodel.getBeliefReferences();
 					for(String target: map.keySet())
 					{
 						if(source.equals(map.get(target)))
@@ -1678,7 +1678,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public void addBeliefListener(String name, final IBeliefListener listener)
 	{
-		String fname = bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
+		String fname = bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
 		
 		List<EventType> events = new ArrayList<EventType>();
 		addBeliefEvents(getComponent(), events, fname);
@@ -1730,7 +1730,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		name	= bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
+		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		getRuleSystem().getRulebase().removeRule(rulename);
 	}
@@ -1901,9 +1901,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					{
 						source	= capaname + MElement.CAPABILITY_SEPARATOR + source;
 					}
-					if(bdif.getBDIModel().getBeliefMappings().containsKey(source))
+					if(bdif.getBDIModel().getBeliefReferences().containsKey(source))
 					{
-						source	= bdif.getBDIModel().getBeliefMappings().get(source);
+						source	= bdif.getBDIModel().getBeliefReferences().get(source);
 					}
 					
 					if(event!=null && event.getSource()!=null && event.getSource().equals(source))

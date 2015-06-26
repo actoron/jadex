@@ -21,7 +21,7 @@ public interface IBDIModel
 	public MCapability getCapability();
 	
 	/**
-	 *  Get the belief mappings (target->source).
+	 *  Get the fully qualified belief references (abstract/reference name -> concrete belief name).
 	 */
-	public Map<String, String> getBeliefMappings();
+	public Map<String, String> getBeliefReferences();
 }

@@ -643,7 +643,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				// For abstract belief find corresponding mapping.
 				else
 				{
-					Map<String, String>	map	= bdimodel.getBeliefMappings();
+					Map<String, String>	map	= bdimodel.getBeliefReferences();
 					for(String target: map.keySet())
 					{
 						if(source.equals(map.get(target)))
@@ -801,7 +801,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public void addBeliefListener(String name, final IBeliefListener listener)
 	{
-		String fname = bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
+		String fname = bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
 		
 		List<EventType> events = new ArrayList<EventType>();
 		addBeliefEvents(getComponent(), events, fname);
@@ -853,7 +853,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		name	= bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
+		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		getRuleSystem().getRulebase().removeRule(rulename);
 	}
@@ -1024,9 +1024,9 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 					{
 						source	= capaname + MElement.CAPABILITY_SEPARATOR + source;
 					}
-					if(bdif.getBDIModel().getBeliefMappings().containsKey(source))
+					if(bdif.getBDIModel().getBeliefReferences().containsKey(source))
 					{
-						source	= bdif.getBDIModel().getBeliefMappings().get(source);
+						source	= bdif.getBDIModel().getBeliefReferences().get(source);
 					}
 					
 					if(event!=null && event.getSource()!=null && event.getSource().equals(source))

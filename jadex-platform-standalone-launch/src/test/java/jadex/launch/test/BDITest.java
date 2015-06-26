@@ -66,7 +66,7 @@ public class BDITest	extends	ComponentTestSuite
 				
 				SReflect.isAndroid() ? "GUICloser" : NOEXCLUDE
 			},
-			true, false, false);
+			true, true, false);
 	}
 	
 	/**
