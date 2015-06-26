@@ -1003,8 +1003,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(valid)
 				{
 					step.getTransfer().afterSwitch();
-					if(getComponent().getComponentIdentifier().getName().indexOf("Execute")!=-1)
-						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getComponentDescription().getState());
+//					if(getComponent().getComponentIdentifier().getName().indexOf("Execute")!=-1)
+//						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getComponentDescription().getState());
 					stepfut	= step.getStep().execute(component);
 				}
 				else

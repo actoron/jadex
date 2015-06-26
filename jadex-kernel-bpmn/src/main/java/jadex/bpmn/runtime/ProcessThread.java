@@ -268,6 +268,10 @@ public class ProcessThread	implements ITaskContext
 	{
 //		boolean waswaiting = waiting;
 		
+		// Canel waiting elements like a timer
+		if(cancelinfo!=null)
+			cancelinfo.cancel();
+		
 		this.waiting = false;
 //		this.waitinfo = null;
 		this.cancelinfo = null;

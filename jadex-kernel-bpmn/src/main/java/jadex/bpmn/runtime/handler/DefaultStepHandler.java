@@ -34,7 +34,12 @@ public class DefaultStepHandler implements IStepHandler
 	{
 		assert instance.getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
-//		System.out.println(instance.getComponentIdentifier().getLocalName()+": step "+activity+", data "+thread.getData());
+//		System.out.println("stephandler: "+thread.getId()+" "+instance.getComponentIdentifier().getLocalName()+": step "+activity+", data "+thread.getData());
+		
+//		if("Participant_1".equals(instance.getComponentIdentifier().getLocalName()))
+//		{
+//			Thread.dumpStack();
+//		}
 		
 //		// Hack!!! Should be in interpreter/thread?
 		thread.updateParametersAfterStep(activity, instance);
@@ -50,16 +55,17 @@ public class DefaultStepHandler implements IStepHandler
 //			System.out.println("Event: "+activity+" "+thread+" "+event);
 		}
 		
-		// Cancel handlers
-		if(activity instanceof MSubProcess)
-		{
-			ICancelable cancelable = (CompositeCancelable)thread.getWaitInfo();
-			if(cancelable!=null)
-			{
-				cancelable.cancel();
-				thread.setWaitInfo(null);
-			}
-		}
+		// For subprocesses not called
+//		// Cancel handlers
+//		if(activity instanceof MSubProcess)
+//		{
+//			ICancelable cancelable = (CompositeCancelable)thread.getWaitInfo();
+//			if(cancelable!=null)
+//			{
+//				cancelable.cancel();
+//				thread.setWaitInfo(null);
+//			}
+//		}
 		
 		// Timer occurred flow
 		if(AbstractEventIntermediateTimerActivityHandler.TIMER_EVENT.equals(event))
@@ -276,19 +282,6 @@ public class DefaultStepHandler implements IStepHandler
 		else
 		{
 			throw new UnsupportedOperationException("Unknown outgoing element type: "+next);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	protected void cancelMe(MActivity activity, IInternalAccess instance, ProcessThread thread, Object event)
-	{
-		if(activity instanceof MSubProcess)
-		{
-			ICancelable cancelable = (CompositeCancelable)thread.getWaitInfo();
-			if(cancelable!=null)
-				cancelable.cancel();
 		}
 	}
 }

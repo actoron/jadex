@@ -23,6 +23,7 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		//boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
+//		System.out.println("send message acticity: "+instance.getComponentIdentifier().getLocalName()+" "+thread.getId()+" "+activity);
 		
 //		boolean service = thread.hasPropertyValue("iface") || thread.hasPropertyValue("returnparam");
 		boolean service = activity.hasProperty(MActivity.ISSERVICE);// || activity.hasParameter(MActivity.RETURNPARAM);

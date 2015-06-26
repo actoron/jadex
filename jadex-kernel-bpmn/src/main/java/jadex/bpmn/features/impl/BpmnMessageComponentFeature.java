@@ -65,6 +65,8 @@ public class BpmnMessageComponentFeature extends MessageComponentFeature
 		{
 			boolean	ret	= super.invokeHandlers(message);
 			
+//			System.out.println("rec msg: "+message);
+			
 			if(!ret)
 			{
 				IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
@@ -80,7 +82,7 @@ public class BpmnMessageComponentFeature extends MessageComponentFeature
 						IFilter<Object> filter = pt.getWaitFilter();
 						if(filter!=null && filter.filter(message))
 						{
-//							System.out.println("Dispatched to thread: "+System.identityHashCode(message)+", "+pt);
+//							System.out.println("Dispatched to thread: "+getComponent().getComponentIdentifier().getLocalName()+" "+System.identityHashCode(message)+", "+pt);
 							bcf.notify(pt.getActivity(), pt, message);
 //							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
 							processed = true;
@@ -92,7 +94,7 @@ public class BpmnMessageComponentFeature extends MessageComponentFeature
 				{
 					bcf.getMessages().add(message);
 //					messages.add(message);
-//					System.out.println("Dispatched to waitqueue: "+message);
+//					System.out.println("Dispatched to waitqueue: "+getComponent().getComponentIdentifier().getLocalName()+" "+message);
 				}
 			}
 			

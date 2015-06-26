@@ -59,6 +59,8 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	{
 		//boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
 		
+//		System.out.println("send message acticity2: "+activity);
+		
 		if(activity.isThrowing())
 		{
 			sendMessage(activity, instance, thread);
@@ -83,7 +85,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		MessageType mt = mtname!=null? ms.getMessageType(mtname): ms.getMessageType("fipa");
 		
 		Map<String, Object> msg;
-		
+				
 		if(thread.hasPropertyValue(PROPERTY_MESSAGE))
 		{
 			msg = (Map<String, Object>)thread.getPropertyValue(PROPERTY_MESSAGE);
@@ -106,7 +108,6 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 					Object rec = it.next();
 					if(rec instanceof String)
 					{
-//										newrecs.add(cms.createComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent(), null));
 						newrecs.add(new BasicComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent()));
 					}
 					else if(rec instanceof IComponentIdentifier)
@@ -119,7 +120,6 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 			{
 				if(recs instanceof String)
 				{
-//									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
 					newrecs.add(new BasicComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent()));
 				}
 				else if(recs instanceof IComponentIdentifier)
@@ -168,6 +168,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		}
 		
 		thread.setWaiting(true);
+//		System.out.println("send message to: "+msg.get(ri));
 		ms.sendMessage(msg, mt, instance.getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, codecids)
 			.addResultListener(new IResultListener<Void>()
 		{

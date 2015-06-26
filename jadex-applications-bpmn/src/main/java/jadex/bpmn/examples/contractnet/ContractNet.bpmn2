@@ -18,10 +18,6 @@
       <jadex:import>jadex.bridge.*</jadex:import>
     </jadex:imports>
     <jadex:arguments>
-      <jadex:argument name="timeout" type="long">
-        <jadex:description>The message timeout</jadex:description>
-        <jadex:value>10000</jadex:value>
-      </jadex:argument>
       <jadex:argument name="participants" type="String[]">
         <jadex:description>The participant names</jadex:description>
       </jadex:argument>
@@ -36,6 +32,10 @@
       </jadex:argument>
       <jadex:argument name="erp" type="String">
         <jadex:description>The subprocess of the participant to execute the request.</jadex:description>
+      </jadex:argument>
+      <jadex:argument name="timeout" type="long">
+        <jadex:description>The message timeout</jadex:description>
+        <jadex:value>1000000</jadex:value>
       </jadex:argument>
     </jadex:arguments>
     <jadex:contextvariables>
@@ -286,7 +286,7 @@
     <semantic:sequenceFlow sourceRef="_AhyfYVavEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA" id="_mSCYilavEd-1RJ7RXx1qjA">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
-      <jadex:dataFlow id="0WzC5fzPbyvOGKls" sourceRef="_oPQXUVaoEd-1RJ7RXx1qjA" sourceParam="proposals" targetRef="_pv3uIVarEd-1RJ7RXx1qjA" targetParam="accepted"/>
+      <jadex:dataFlow id="mTomSfzLA0PGeYh+" sourceRef="_oPQXUVaoEd-1RJ7RXx1qjA" sourceParam="accepted" targetRef="_pv3uIVarEd-1RJ7RXx1qjA" targetParam="accepted"/>
     </semantic:extensionElements>
   </semantic:process>
   <semantic:process name="Participant" id="_mTY88VT6Ed-32983CGnnJA">
@@ -618,10 +618,10 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_3S3gcVaoEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="0WzC5fzPbyvOGKls">
-      </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="eaMqI01HizBqx2PI">
       </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="mTomSfzLA0PGeYh+">
+      </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="_3XYM-lT7Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_3piJalT6Ed-32983CGnnJA">

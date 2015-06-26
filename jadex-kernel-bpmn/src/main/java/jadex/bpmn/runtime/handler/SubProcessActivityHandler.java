@@ -22,7 +22,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -72,6 +71,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				final String itername = proc.getPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR).getValue();
 				Object val = thread.getParameterValue(itername);
 				final Iterator<Object> it = SReflect.getIterator(val);
+		
+//				System.out.println("parallel: "+thread.getInstance().getComponentIdentifier().getLocalName()+" "+thread.getId()+" "+activity+" "+it.hasNext()+" "+val);
 				
 				// If empty parallel activity (i.e. no items at all) continue process.
 				if(!it.hasNext())
@@ -120,6 +121,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					}
 				};
 				
+				// After all subthreads have finished set wait to false and continue main
 				if(!cmd.execute(null).booleanValue())
 				{
 					wait = false;
@@ -156,17 +158,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				if(timer!=null)
 				{
 					final IActivityHandler th = getBpmnFeature(instance).getActivityHandler(timer);
+					// handler sets timer as waitinfo (should maybe add cancelables)
 					th.execute(timer, instance, thread);
-					
-					thread.setWaitInfo(new ICancelable()
-					{
-						public IFuture<Void> cancel()
-						{
-							th.cancel(activity, instance, thread);
-							thread.setWaitInfo(null);
-							return IFuture.DONE;
-						}
-					});
 				}
 				else
 				{
@@ -175,7 +168,9 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			}
 			else
 			{
+				// Restart the main thread and step
 				thread.setNonWaiting();
+				
 				getBpmnFeature(instance).step(activity, instance, thread, null);				
 			}
 		}

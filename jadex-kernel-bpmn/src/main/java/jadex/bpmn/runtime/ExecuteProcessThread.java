@@ -41,7 +41,10 @@ public class ExecuteProcessThread implements IConditionalComponentStep<Void>
 	public boolean isValid()
 	{
 		// Can be set to null when thread is removed (e.g. termination of component)
-		return thread.getActivity()!=null && !thread.isWaiting();
+		boolean ret = thread.getActivity()!=null && !thread.isWaiting();
+//		if(!ret)
+//			System.out.println("not exe: "+thread.getInstance().getComponentIdentifier().getLocalName()+" "+thread);
+		return ret;
 	}
 	
 	/**
@@ -78,6 +81,7 @@ public class ExecuteProcessThread implements IConditionalComponentStep<Void>
 		// Check if thread now waits for a message and there is at least one in the message queue.
 		// Todo: check if thread directly or indirectly (multiple events!) waits for a message event before checking waitqueue
 		List<Object> messages = bcf.getMessages();
+//		System.out.println("messsages: "+messages);
 		if(thread.isWaiting() && messages.size()>0 /*&& MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 
 			&& (thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)==null 
 				|| EventIntermediateMessageActivityHandler.MODE_RECEIVE.equals(thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)))*/)
@@ -91,7 +95,7 @@ public class ExecuteProcessThread implements IConditionalComponentStep<Void>
 				{
 					processed = true;
 					messages.remove(i);
-//					System.out.println("Dispatched from waitqueue: "+messages.size()+" "+System.identityHashCode(message)+", "+message);
+					System.out.println("Dispatched from waitqueue: "+messages.size()+" "+System.identityHashCode(message)+", "+message);
 					bcf.notify(thread.getActivity(), thread, message);
 				}
 			}
