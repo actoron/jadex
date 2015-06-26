@@ -253,7 +253,7 @@ public class BDIClassReader extends MicroClassReader
 							{
 								throw new RuntimeException("No such belief for mapping from "+source+" to "+fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target);
 							}
-							bdimodel.addBeliefMapping(fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping
+							bdimodel.addBeliefReference(fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping (inner abstract reference -> outer concrete belief)
 						}
 						
 						bdimodel.addSubcapability(new FieldInfo(fields[i]), cap);

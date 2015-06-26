@@ -169,10 +169,15 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		IBelief	ret;
 		if(beliefs!=null)
 		{
-			ret	= beliefs.get(name);
+			ret	= ((IBDIModel)getAgent().getModel()).getBeliefReferences().containsKey(name)
+				? beliefs.get(((IBDIModel)getAgent().getModel()).getBeliefReferences().get(name))
+				: beliefs.get(name);
 			if(ret==null)
 			{
-				ret	= beliefs.get(MElement.internalName(name));
+				name	= MElement.internalName(name);
+				ret	= ((IBDIModel)getAgent().getModel()).getBeliefReferences().containsKey(name)
+					? beliefs.get(((IBDIModel)getAgent().getModel()).getBeliefReferences().get(name))
+					: beliefs.get(name);
 			}
 		}
 		else
@@ -191,10 +196,15 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		IBeliefSet	ret;
 		if(beliefsets!=null)
 		{
-			ret	= beliefsets.get(name);
+			ret	= ((IBDIModel)getAgent().getModel()).getBeliefReferences().containsKey(name)
+				? beliefsets.get(((IBDIModel)getAgent().getModel()).getBeliefReferences().get(name))
+				: beliefsets.get(name);
 			if(ret==null)
 			{
-				ret	= beliefsets.get(MElement.internalName(name));
+				name	= MElement.internalName(name);
+				ret	= ((IBDIModel)getAgent().getModel()).getBeliefReferences().containsKey(name)
+					? beliefsets.get(((IBDIModel)getAgent().getModel()).getBeliefReferences().get(name))
+					: beliefsets.get(name);
 			}
 		}
 		else
