@@ -22,12 +22,12 @@ public class ResultPlan extends Plan
 	/** The belief name for storing the result. */
 	protected String	belief;
 	
-	//-------- constructors --------
+	//-------- methods --------
 
 	/**
-	 *  Create a new result plan.
+	 *  The plan body.
 	 */
-	public ResultPlan()
+	public void body()
 	{
 		if(hasParameter("wait"))
 			wait	= ((Number)getParameter("wait").getValue()).longValue();
@@ -37,15 +37,7 @@ public class ResultPlan extends Plan
 			value	= getParameter("value").getValue();
 		if(hasParameter("belief"))
 			belief	= (String)getParameter("belief").getValue();
-	}
-
-	//-------- methods --------
-
-	/**
-	 *  The plan body.
-	 */
-	public void body()
-	{
+		
 		if(wait>-1)
 			waitFor(wait);
 		
