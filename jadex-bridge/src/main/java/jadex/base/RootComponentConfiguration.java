@@ -249,14 +249,14 @@ public class RootComponentConfiguration
 	}
 	
 //	// internal
-//	public  boolean getWELCOME()
-//	{
-//		return Boolean.TRUE.equals(getValue(WELCOME));
-//	}
-//	public  void setWELCOME(boolean value)
-//	{
-//		setValue(WELCOME, value);
-//	}
+	public  boolean getWelcome()
+	{
+		return Boolean.TRUE.equals(getValue(WELCOME));
+	}
+	public  void setWelcome(boolean value)
+	{
+		setValue(WELCOME, value);
+	}
 
 	//	// internal
 //	public  IPlatformComponentAccess getPlatformAccess()
@@ -289,428 +289,465 @@ public class RootComponentConfiguration
 
 	// individual getters/setters
 
-	public  String getPlatformName()
+	public String getPlatformName()
 	{
 		return (String)getValue(PLATFORM_NAME);
 	}
 
-	public  void setPlatformName(String value)
+	public void setPlatformName(String value)
 	{
 		setValue(PLATFORM_NAME, value);
 	}
 
-	public  String getConfigurationName()
+	public String getConfigurationName()
 	{
 		return (String)getValue(CONFIGURATION_NAME);
 	}
-	public  void setConfigurationName(String value)
+
+	public void setConfigurationName(String value)
 	{
 		setValue(CONFIGURATION_NAME, value);
 	}
 
-	public  boolean getAutoShutdown()
+	public boolean getAutoShutdown()
 	{
 		return Boolean.TRUE.equals(getValue(AUTOSHUTDOWN));
 	}
-	public  void setAutoShutdown(boolean value)
+
+	public void setAutoShutdown(boolean value)
 	{
 		setValue(AUTOSHUTDOWN, value);
 	}
 
-	public  Class getPlatformComponent()
+	public Class getPlatformComponent()
 	{
 		return (Class)getValue(PLATFORM_COMPONENT);
 	}
-	public  void setPlatformComponent(Class value)
+
+	public void setPlatformComponent(Class value)
 	{
 		setValue(PLATFORM_COMPONENT, value);
 	}
 
-	public  boolean getGui()
+	public boolean getGui()
 	{
 		return Boolean.TRUE.equals(getValue(GUI));
 	}
-	public  void setGui(boolean value)
+
+	public void setGui(boolean value)
 	{
 		setValue(GUI, value);
 	}
 
-	public  boolean getCli()
+	public boolean getCli()
 	{
 		return Boolean.TRUE.equals(getValue(CLI));
 	}
-	public  void setCli(boolean value)
+
+	public void setCli(boolean value)
 	{
 		setValue(CLI, value);
 	}
 
-	public  boolean getCliConsole()
+	public boolean getCliConsole()
 	{
 		return Boolean.TRUE.equals(getValue(CLICONSOLE));
 	}
-	public  void setCliConsole(boolean value)
+
+	public void setCliConsole(boolean value)
 	{
 		setValue(CLICONSOLE, value);
 	}
 
-	public  boolean getSaveOnExit()
+	public boolean getSaveOnExit()
 	{
 		return Boolean.TRUE.equals(getValue(SAVEONEXIT));
 	}
-	public  void setSaveOnExit(boolean value)
+
+	public void setSaveOnExit(boolean value)
 	{
 		setValue(SAVEONEXIT, value);
 	}
 
-	public  String getJccPlatforms()
+	public String getJccPlatforms()
 	{
 		return (String)getValue(JCCPLATFORMS);
 	}
 
-	public  void setJccPlatforms(String value)
+	public void setJccPlatforms(String value)
 	{
 		setValue(JCCPLATFORMS, value);
 	}
 
-	public  boolean getLogging()
+	public boolean getLogging()
 	{
 		return Boolean.TRUE.equals(getValue(LOGGING));
 	}
-	public  void setLogging(String value)
+
+	public void setLogging(String value)
 	{
 		setValue(LOGGING, value);
 	}
 
-	public  Level getLoggingLevel()
+	public Level getLoggingLevel()
 	{
 		return (Level)getValue(LOGGING_LEVEL);
 	}
 
-	public  void setLoggingLevel(Level value)
+	public void setLoggingLevel(Level value)
 	{
 		setValue(LOGGING_LEVEL, value);
 	}
 
-	public  boolean getSimulation()
+	public boolean getSimulation()
 	{
 		return Boolean.TRUE.equals(getValue(SIMULATION));
 	}
 
-	public  void setSimulation(String value)
+	public void setSimulation(String value)
 	{
 		setValue(SIMULATION, value);
 	}
 
-	public  boolean getAsyncExecution()
+	public boolean getAsyncExecution()
 	{
 		return Boolean.TRUE.equals(getValue(ASYNCEXECUTION));
 	}
 
-	public  void setAsyncExecution(boolean value)
+	public void setAsyncExecution(boolean value)
 	{
 		setValue(ASYNCEXECUTION, value);
 	}
 
-	public  boolean getPersist()
+	public boolean getPersist()
 	{
 		return Boolean.TRUE.equals(getValue(PERSIST));
 	}
-	public  void setPersist(boolean value)
+
+	public void setPersist(boolean value)
 	{
 		setValue(PERSIST, value);
 	}
 
-	public  boolean getUniqueIds()
+	public boolean getUniqueIds()
 	{
 		return Boolean.TRUE.equals(getValue(UNIQUEIDS));
 	}
-	public  void setUniqueIds(boolean value)
+
+	public void setUniqueIds(boolean value)
 	{
 		setValue(UNIQUEIDS, value);
 	}
 
-	public  boolean getThreadpoolDefer()
+	public boolean getThreadpoolDefer()
 	{
 		return Boolean.TRUE.equals(getValue(THREADPOOLDEFER));
 	}
-	public  void setThreadpoolDefer(boolean value)
+
+	public void setThreadpoolDefer(boolean value)
 	{
 		setValue(THREADPOOLDEFER, value);
 	}
 
-	public  String getLibPath()
+	public String getLibPath()
 	{
 		return (String)getValue(LIBPATH);
 	}
-	public  void setLibPath(String value)
+
+	public void setLibPath(String value)
 	{
 		setValue(LIBPATH, value);
 	}
 
-	public  ClassLoader getBaseClassloader()
+	public ClassLoader getBaseClassloader()
 	{
 		return (ClassLoader)getValue(BASECLASSLOADER);
 	}
 
-	public  void setBaseClassloader(ClassLoader value)
+	public void setBaseClassloader(ClassLoader value)
 	{
 		setValue(BASECLASSLOADER, value);
 	}
 
-	public  boolean getChat()
+	public boolean getChat()
 	{
 		return Boolean.TRUE.equals(getValue(CHAT));
 	}
-	public  void setChat(boolean value)
+
+	public void setChat(boolean value)
 	{
 		setValue(CHAT, value);
 	}
 
-	public  boolean getAwareness()
+	public boolean getAwareness()
 	{
 		return Boolean.TRUE.equals(getValue(AWARENESS));
 	}
-	public  void setAwareness(boolean value)
+
+	public void setAwareness(boolean value)
 	{
 		setValue(AWARENESS, value);
 	}
 
-	public  String getAwaMechanisms()
+	public String getAwaMechanisms()
 	{
 		return (String)getValue(AWAMECHANISMS);
 	}
-	public  void setAwaMechanisms(String value)
+
+	public void setAwaMechanisms(String value)
 	{
 		setValue(AWAMECHANISMS, value);
 	}
 
-	public  long setAwaDelay()
+	public long setAwaDelay()
 	{
 		return (Long)getValue(AWADELAY);
 	}
-	public  void getAwaDelay(long value)
+
+	public void getAwaDelay(long value)
 	{
 		setValue(AWADELAY, value);
 	}
 
-	public  String getAwaIncludes()
+	public String getAwaIncludes()
 	{
 		return (String)getValue(AWAINCLUDES);
 	}
 
-	public  void setAwaIncludes(String value)
+	public void setAwaIncludes(String value)
 	{
 		setValue(AWAINCLUDES, value);
 	}
 
-	public  String getAwaExcludes()
+	public String getAwaExcludes()
 	{
 		return (String)getValue(AWAEXCLUDES);
 	}
 
-	public  void setAwaExcludes(String value)
+	public void setAwaExcludes(String value)
 	{
 		setValue(AWAEXCLUDES, value);
 	}
 
-	public  boolean getBinaryMessages()
+	public boolean getBinaryMessages()
 	{
 		return Boolean.TRUE.equals(getValue(BINARYMESSAGES));
 	}
-	public  void setBinaryMessages(boolean value)
+
+	public void setBinaryMessages(boolean value)
 	{
 		setValue(BINARYMESSAGES, value);
 	}
 
-	public  boolean getStrictCom()
+	public boolean getStrictCom()
 	{
 		return Boolean.TRUE.equals(getValue(STRICTCOM));
 	}
-	public  void setStrictCom(boolean value)
+
+	public void setStrictCom(boolean value)
 	{
 		setValue(STRICTCOM, value);
 	}
 
-	public  boolean getUsePass()
+	public boolean getUsePass()
 	{
 		return Boolean.TRUE.equals(getValue(USEPASS));
 	}
-	public  void setUsePass(boolean value)
+
+	public void setUsePass(boolean value)
 	{
 		setValue(USEPASS, value);
 	}
 
-	public  boolean getPrintPass()
+	public boolean getPrintPass()
 	{
 		return Boolean.TRUE.equals(getValue(PRINTPASS));
 	}
-	public  void getPrintPass(boolean value)
+
+	public void setPrintPass(boolean value)
 	{
 		setValue(PRINTPASS, value);
 	}
 
-	public  boolean getTrustedLan()
+	public boolean getTrustedLan()
 	{
 		return Boolean.TRUE.equals(getValue(TRUSTEDLAN));
 	}
-	public  void setTrustedLan(boolean value)
+
+	public void setTrustedLan(boolean value)
 	{
 		setValue(TRUSTEDLAN, value);
 	}
 
-	public  String getNetworkName()
+	public String getNetworkName()
 	{
 		return (String)getValue(NETWORKNAME);
 	}
 
-	public  void setNetworkName(String value)
+	public void setNetworkName(String value)
 	{
 		setValue(NETWORKNAME, value);
 	}
 
-	public  String getNetworkPass()
+	public String getNetworkPass()
 	{
 		return (String)getValue(NETWORKPASS);
 	}
-	public  void setNetworkPass(String value)
+
+	public void setNetworkPass(String value)
 	{
 		setValue(NETWORKPASS, value);
 	}
 
-	public  Map getVirtualNames()
+	public Map getVirtualNames()
 	{
 		return (Map)getValue(VIRTUALNAMES);
 	}
-	public  void setVirtualNames(Map value)
+
+	public void setVirtualNames(Map value)
 	{
 		setValue(VIRTUALNAMES, value);
 	}
 
-	public  long getValidityDuration()
+	public long getValidityDuration()
 	{
 		return (Long)getValue(VALIDITYDURATION);
 	}
-	public  void setValidityDuration(long value)
+
+	public void setValidityDuration(long value)
 	{
 		setValue(VALIDITYDURATION, value);
 	}
 
-	public  boolean getLocalTransport()
+	public boolean getLocalTransport()
 	{
 		return Boolean.TRUE.equals(getValue(LOCALTRANSPORT));
 	}
-	public  void setLocalTransport(boolean value)
+
+	public void setLocalTransport(boolean value)
 	{
 		setValue(LOCALTRANSPORT, value);
 	}
 
-	public  boolean getTcpTransport()
+	public boolean getTcpTransport()
 	{
 		return Boolean.TRUE.equals(getValue(TCPTRANSPORT));
 	}
-	public  void setTcpTransport(boolean value)
+
+	public void setTcpTransport(boolean value)
 	{
 		setValue(TCPTRANSPORT, value);
 	}
 
-	public  int getTcpPort()
+	public int getTcpPort()
 	{
 		return (Integer)getValue(TCPPORT);
 	}
-	public  void setTcpPorT(int value)
+
+	public void setTcpPorT(int value)
 	{
 		setValue(TCPPORT, value);
 	}
 
-	public  boolean getNioTcpTransport()
+	public boolean getNioTcpTransport()
 	{
 		return Boolean.TRUE.equals(getValue(NIOTCPTRANSPORT));
 	}
-	public  void setNioTcpTransport(boolean value)
+
+	public void setNioTcpTransport(boolean value)
 	{
 		setValue(NIOTCPTRANSPORT, value);
 	}
 
-	public  int getNioTcpPort()
+	public int getNioTcpPort()
 	{
 		return (Integer)getValue(NIOTCPPORT);
 	}
-	public  void setNioTcpPort(int value)
+
+	public void setNioTcpPort(int value)
 	{
 		setValue(NIOTCPPORT, value);
 	}
 
-	public  boolean getRelayTransport()
+	public boolean getRelayTransport()
 	{
 		return Boolean.TRUE.equals(getValue(RELAYTRANSPORT));
 	}
-	public  void setRelayTransport(boolean value)
+
+	public void setRelayTransport(boolean value)
 	{
 		setValue(RELAYTRANSPORT, value);
 	}
 
-	public  String getRelayAddress()
+	public String getRelayAddress()
 	{
 		return (String)getValue(RELAYADDRESS);
 	}
-	public  void setRelayAddress(String value)
+
+	public void setRelayAddress(String value)
 	{
 		setValue(RELAYADDRESS, value);
 	}
 
-	public  boolean getRelaySecurity()
+	public boolean getRelaySecurity()
 	{
 		return Boolean.TRUE.equals(getValue(RELAYSECURITY));
 	}
-	public  void setRelaySecurity(boolean value)
+
+	public void setRelaySecurity(boolean value)
 	{
 		setValue(RELAYSECURITY, value);
 	}
 
-	public  boolean getSSLTCPTRANSPORT()
+	public boolean getSSLTCPTRANSPORT()
 	{
 		return Boolean.TRUE.equals(getValue(SSLTCPTRANSPORT));
 	}
-	public  void setSslTcpTransport(boolean value)
+
+	public void setSslTcpTransport(boolean value)
 	{
 		setValue(SSLTCPTRANSPORT, value);
 	}
 
-	public  boolean getSslTcpPort()
+	public boolean getSslTcpPort()
 	{
 		return Boolean.TRUE.equals(getValue(SSLTCPPORT));
 	}
-	public  void setSslTcpPort(boolean value)
+
+	public void setSslTcpPort(boolean value)
 	{
 		setValue(SSLTCPPORT, value);
 	}
 
-	public  boolean getWsPublish()
+	public boolean getWsPublish()
 	{
 		return Boolean.TRUE.equals(getValue(WSPUBLISH));
 	}
-	public  void setWsPublish(boolean value)
+
+	public void setWsPublish(boolean value)
 	{
 		setValue(WSPUBLISH, value);
 	}
 
-	public  boolean getRsPublish()
+	public boolean getRsPublish()
 	{
 		return Boolean.TRUE.equals(getValue(RSPUBLISH));
 	}
-	public  void setRsPublish(boolean value)
+
+	public void setRsPublish(boolean value)
 	{
 		setValue(RSPUBLISH, value);
 	}
 
-	public  KERNEL[] getKernels()
+	public KERNEL[] getKernels()
 	{
 		return kernels;
 	}
-	public  void setKernels(KERNEL... value)
+
+	public void setKernels(KERNEL... value)
 	{
 		kernels = value;
-//		String[] oldVal = new String[kernels.length];
+		// String[] oldVal = new String[kernels.length];
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < kernels.length; i++)
 		{
@@ -720,159 +757,175 @@ public class RootComponentConfiguration
 		setValue(KERNELS, sb.toString());
 	}
 
-	public  boolean getMavenDependencies()
+	public boolean getMavenDependencies()
 	{
 		return Boolean.TRUE.equals(getValue(MAVEN_DEPENDENCIES));
 	}
-	public  void setMavenDependencies(boolean value)
+
+	public void setMavenDependencies(boolean value)
 	{
 		setValue(MAVEN_DEPENDENCIES, value);
 	}
 
-	public  boolean getMonitoringComp()
+	public boolean getMonitoringComp()
 	{
 		return Boolean.TRUE.equals(getValue(MONITORINGCOMP));
 	}
-	public  void setMonitoringComp(boolean value)
+
+	public void setMonitoringComp(boolean value)
 	{
 		setValue(MONITORINGCOMP, value);
 	}
 
-	public  boolean getSensors()
+	public boolean getSensors()
 	{
 		return Boolean.TRUE.equals(getValue(SENSORS));
 	}
-	public  void setSensors(boolean value)
+
+	public void setSensors(boolean value)
 	{
 		setValue(SENSORS, value);
 	}
 
-	public  String getThreadpoolClass()
+	public String getThreadpoolClass()
 	{
 		return (String)getValue(THREADPOOLCLASS);
 	}
-	public  void setThreadpoolClass(String value)
+
+	public void setThreadpoolClass(String value)
 	{
 		setValue(THREADPOOLCLASS, value);
 	}
 
-	public  String getContextServiceClass()
+	public String getContextServiceClass()
 	{
 		return (String)getValue(CONTEXTSERVICECLASS);
 	}
-	public  void setContextServiceClass(String value)
+
+	public void setContextServiceClass(String value)
 	{
 		setValue(CONTEXTSERVICECLASS, value);
 	}
 
-	public  boolean getDf()
+	public boolean getDf()
 	{
 		return Boolean.TRUE.equals(getValue(DF));
 	}
-	public  void setDf(boolean value)
+
+	public void setDf(boolean value)
 	{
 		setValue(DF, value);
 	}
 
-	public  boolean getClock()
+	public boolean getClock()
 	{
 		return Boolean.TRUE.equals(getValue(CLOCK));
 	}
-	public  void setClock(boolean value)
+
+	public void setClock(boolean value)
 	{
 		setValue(CLOCK, value);
 	}
 
-	public  boolean getMessage()
+	public boolean getMessage()
 	{
 		return Boolean.TRUE.equals(getValue(MESSAGE));
 	}
-	public  void setMessage(boolean value)
+
+	public void setMessage(boolean value)
 	{
 		setValue(MESSAGE, value);
 	}
 
-	public  boolean getSimul()
+	public boolean getSimul()
 	{
 		return Boolean.TRUE.equals(getValue(SIMUL));
 	}
-	public  void setSimul(boolean value)
+
+	public void setSimul(boolean value)
 	{
 		setValue(SIMUL, value);
 	}
 
-	public  boolean getFiletransfer()
+	public boolean getFiletransfer()
 	{
 		return Boolean.TRUE.equals(getValue(FILETRANSFER));
 	}
-	public  void setFiletransfer(boolean value)
+
+	public void setFiletransfer(boolean value)
 	{
 		setValue(FILETRANSFER, value);
 	}
 
-	public  boolean getMarshal()
+	public boolean getMarshal()
 	{
 		return Boolean.TRUE.equals(getValue(MARSHAL));
 	}
-	public  void setMarshal(boolean value)
+
+	public void setMarshal(boolean value)
 	{
 		setValue(MARSHAL, value);
 	}
 
-	public  boolean getSecurity()
+	public boolean getSecurity()
 	{
 		return Boolean.TRUE.equals(getValue(SECURITY));
 	}
-	public  void setSecurity(boolean value)
+
+	public void setSecurity(boolean value)
 	{
 		setValue(SECURITY, value);
 	}
-	
-	public  boolean getLibrary()
+
+	public boolean getLibrary()
 	{
 		return Boolean.TRUE.equals(getValue(LIBRARY));
 	}
-	public  void setLibrary(boolean value)
+
+	public void setLibrary(boolean value)
 	{
 		setValue(LIBRARY, value);
 	}
 
-	public  boolean getSettings()
+	public boolean getSettings()
 	{
 		return Boolean.TRUE.equals(getValue(SETTINGS));
 	}
-	public  void setSettings(boolean value)
+
+	public void setSettings(boolean value)
 	{
 		setValue(SETTINGS, value);
 	}
 
-	public  boolean getContext()
+	public boolean getContext()
 	{
 		return Boolean.TRUE.equals(getValue(CONTEXT));
 	}
-	public  void setContext(boolean value)
+
+	public void setContext(boolean value)
 	{
 		setValue(CONTEXT, value);
 	}
 
-	public  boolean getAddress()
+	public boolean getAddress()
 	{
 		return Boolean.TRUE.equals(getValue(ADDRESS));
 	}
-	public  void setAddress(boolean value)
+
+	public void setAddress(boolean value)
 	{
 		setValue(ADDRESS, value);
 	}
 
-	public  boolean getDhtProvide()
+	public boolean getDhtProvide()
 	{
 		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
 	}
-	public  void setDhtProvide(boolean value)
+
+	public void setDhtProvide(boolean value)
 	{
 		setValue(DHT_PROVIDE, value);
 	}
-	
-	
+
 
 }

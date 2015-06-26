@@ -47,93 +47,95 @@ import jadex.platform.service.simulation.SimulationAgent;
 import java.util.Map;
 import java.util.logging.Level;
 
+import static jadex.base.RootComponentConfiguration.*;
+
 /**
  *	Basic standalone platform services provided as a micro agent. 
  */
 @Arguments(
 {
-	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
-	@Argument(name="configname", clazz=String.class, defaultvalue="\"auto\""),
-	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
-	@Argument(name="platformcomponent", clazz=Class.class, defaultvalue="jadex.platform.service.cms.PlatformComponent.class"),
-	@Argument(name="welcome", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="programarguments", clazz=String[].class),
+	@Argument(name=PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
+	@Argument(name=CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
+	@Argument(name=AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
+	@Argument(name=PLATFORM_COMPONENT, clazz=Class.class, defaultvalue="jadex.platform.service.cms.PlatformComponent.class"),
+	@Argument(name=WELCOME, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=PROGRAM_ARGUMENTS, clazz=String[].class),
 	
-	@Argument(name="gui", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="cli", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="cliconsole", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="jccplatforms", clazz=String.class, defaultvalue="null"),
-	@Argument(name="logging", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="logging_level", clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
-	@Argument(name="simulation", clazz=Boolean.class),
-	@Argument(name="asyncexecution", clazz=Boolean.class),
-	@Argument(name="threadpooldefer", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=GUI, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=CLI, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=CLICONSOLE, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=SAVEONEXIT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=JCCPLATFORMS, clazz=String.class, defaultvalue="null"),
+	@Argument(name=LOGGING, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=LOGGING_LEVEL, clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
+	@Argument(name=SIMULATION, clazz=Boolean.class),
+	@Argument(name=ASYNCEXECUTION, clazz=Boolean.class),
+	@Argument(name=THREADPOOLDEFER, clazz=boolean.class, defaultvalue="true"),
 	
-	@Argument(name="persist", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="uniqueids", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=PERSIST, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
 	
-	@Argument(name="libpath", clazz=String.class),
-	@Argument(name="baseclassloader", clazz=ClassLoader.class),
+	@Argument(name=LIBPATH, clazz=String.class),
+	@Argument(name=BASECLASSLOADER, clazz=ClassLoader.class),
 
-	@Argument(name="chat", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=CHAT, clazz=boolean.class, defaultvalue="true"),
 	
-	@Argument(name="awareness", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="awamechanisms", clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay, Local\""),
-	@Argument(name="awadelay", clazz=long.class, defaultvalue="20000"),
-	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
-	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\""),
+	@Argument(name=AWARENESS, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay, Local\""),
+	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
+	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
+	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
 
-	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="strictcom", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),
 	
-	@Argument(name="usepass", clazz=Boolean.class),
-	@Argument(name="printpass", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="trustedlan", clazz=Boolean.class),
-	@Argument(name="networkname", clazz=String.class),
-	@Argument(name="networkpass", clazz=String.class),
-	@Argument(name="virtualnames", clazz=Map.class),
-	@Argument(name="validityduration", clazz=long.class),
+	@Argument(name=USEPASS, clazz=Boolean.class),
+	@Argument(name=PRINTPASS, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=TRUSTEDLAN, clazz=Boolean.class),
+	@Argument(name=NETWORKNAME, clazz=String.class),
+	@Argument(name=NETWORKPASS, clazz=String.class),
+	@Argument(name=VIRTUALNAMES, clazz=Map.class),
+	@Argument(name=VALIDITYDURATION, clazz=long.class),
 
-	@Argument(name="localtransport", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="tcptransport", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="tcpport", clazz=int.class, defaultvalue="9876"),
-	@Argument(name="niotcptransport", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="niotcpport", clazz=int.class, defaultvalue="8765"),
-	@Argument(name="relaytransport", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="relayaddress", clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
-	@Argument(name="relaysecurity", clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
-	@Argument(name="ssltcptransport", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="ssltcpport", clazz=int.class, defaultvalue="44334"),
+	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="9876"),
+	@Argument(name=NIOTCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=NIOTCPPORT, clazz=int.class, defaultvalue="8765"),
+	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
+	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
+	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=SSLTCPPORT, clazz=int.class, defaultvalue="44334"),
 
-	@Argument(name="wspublish", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=WSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 	
-	@Argument(name="rspublish", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=RSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 
-	@Argument(name="kernels", clazz=String.class, defaultvalue="\"multi\""),
+	@Argument(name=KERNELS, clazz=String.class, defaultvalue="\"multi\""),
 	
-	@Argument(name="maven_dependencies", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=MAVEN_DEPENDENCIES, clazz=boolean.class, defaultvalue="false"),
 		
-	@Argument(name="sensors", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=SENSORS, clazz=boolean.class, defaultvalue="false"),
 	
-	@Argument(name="threadpoolclass", clazz=String.class, defaultvalue="null"),
+	@Argument(name=THREADPOOLCLASS, clazz=String.class, defaultvalue="null"),
 
-	@Argument(name="contextserviceclass", clazz=String.class, defaultvalue="null"),
+	@Argument(name=CONTEXTSERVICECLASS, clazz=String.class, defaultvalue="null"),
 	
-	@Argument(name="monitoringcomp", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="df", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="clock", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="message", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="simul", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="filetransfer", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="marshal", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="security", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="library", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="settings", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="context", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=MONITORINGCOMP, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=DF, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=CLOCK, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=MESSAGE, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=SIMUL, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=FILETRANSFER, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=MARSHAL, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=SECURITY, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=LIBRARY, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=SETTINGS, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
-	@Argument(name="address", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="providedht", clazz=boolean.class, defaultvalue="false")
+	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=DHT_PROVIDE, clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
