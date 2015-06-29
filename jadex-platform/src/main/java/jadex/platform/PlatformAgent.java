@@ -285,7 +285,7 @@ import static jadex.base.RootComponentConfiguration.*;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.providedht? 1 : 0"),
+		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.dhtprovide? 1 : 0"),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
@@ -364,7 +364,7 @@ import static jadex.base.RootComponentConfiguration.*;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.providedht? 1 : 0"),
+		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.dhtprovide? 1 : 0"),
 	})
 })
 @Agent

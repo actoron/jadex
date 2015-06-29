@@ -1,25 +1,32 @@
 package jadex.platform;
 
-import static org.junit.Assert.*;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import jadex.base.PlatformConfiguration;
 import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.commons.SReflect;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
 public class PlatformConfigurationTest
 {
 	@Test
-	public void tester() {
+	public void testParametersEquivalence() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		PlatformConfiguration config = new PlatformConfiguration();
 		RootComponentConfiguration rootConfig = config.getRootConfig();
 		config.setPlatformName("testcases_*");
@@ -30,22 +37,56 @@ public class PlatformConfigurationTest
 		rootConfig.setPrintPass(false);
 		long timeout = Starter.getLocalDefaultTimeout(null);
 		
-		IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(config).get(timeout);
-		IModelInfo defmodel = platform.getModel();
+		
+		// only load model
+		Class<?> cfclass = SReflect.classForName(PlatformConfiguration.FALLBACK_COMPONENT_FACTORY, this.getClass().getClassLoader());
+		final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
+			.newInstance(new Object[]{"rootid"});
+		final IModelInfo defmodel	= cfac.loadModel(PlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION, null, null).get();	// No execution yet, can only work if method is synchronous.
+		
+		// start whole platfrom
+//		IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(config).get(timeout);
+//		IModelInfo defmodel = platform.getModel();
 		
 		IArgument[] arguments = defmodel.getArguments();
 		
-		HashMap<String,String> staticFieldContents = getStaticFieldContents(RootComponentConfiguration.class);
+		HashMap<String,Field> staticFieldContents = getStaticFieldContents(RootComponentConfiguration.class);
+		Map<String, Method> setters = getSettersByName(RootComponentConfiguration.class, staticFieldContents.keySet());
 		
-		for(IArgument iArgument : arguments)
+		for(IArgument argument : arguments)
 		{
-			assertTrue("RootComponentConfiguration should contain parameter: " + iArgument.getName(),staticFieldContents.values().contains(iArgument.getName()));
+			String name = argument.getName();
+			// those don't have to be in the root component configuration
+			if (!(name.equals(PlatformConfiguration.PLATFORM_NAME)
+				|| name.equals(PlatformConfiguration.AUTOSHUTDOWN)
+				|| name.equals(PlatformConfiguration.CONFIGURATION_NAME)
+				|| name.equals(PlatformConfiguration.PLATFORM_COMPONENT))) {
+				Field field = staticFieldContents.get(name);
+				assertTrue("RootComponentConfiguration should contain parameter: " + name,field != null);
+				
+				// this parameter does not have a getter
+				if (!name.equals(RootComponentConfiguration.PROGRAM_ARGUMENTS)) {
+					String prettyName = makePrettyName(name);
+					Method method = setters.get(prettyName);
+					assertNotNull("No setter for: " + prettyName, method);
+					Class< ? > setterParamType = method.getParameterTypes()[0];
+					Class< ? > modelParamType = argument.getClazz().getType(this.getClass().getClassLoader());
+					if (SReflect.isBasicType(setterParamType) && !SReflect.isBasicType(modelParamType)) {
+						setterParamType = SReflect.getWrappedType(setterParamType);
+					}
+					// this parameter has another parameter type in config object
+					if (!name.equals(RootComponentConfiguration.KERNELS)) {
+						assertEquals("Field " + name + " has not the same type.", modelParamType, setterParamType);
+					}
+				}
+				
+			}
 		}
 		
-		for(String argument: staticFieldContents.values())
+		for(String argument: staticFieldContents.keySet())
 		{
 			boolean contains = false;
-			// those dont have to be in the agent model:
+			// those dont have to be in the agent model
 			if (!(argument.equals(RootComponentConfiguration.COMPONENT_FACTORY) 
 				|| argument.equals(RootComponentConfiguration.PLATFORM_ACCESS)))
 			{
@@ -62,9 +103,39 @@ public class PlatformConfigurationTest
 		
 	}
 
-	private HashMap<String, String> getStaticFieldContents(Class<RootComponentConfiguration> class1)
+	private Map<String,Method> getSettersByName(Class<RootComponentConfiguration> class1, Set<String> names)
 	{
-		HashMap<String,String> hashMap = new HashMap<String, String>();
+		HashSet<String> myNames = new HashSet<String>();
+		for(String string : names)
+		{
+			myNames.add(makePrettyName(string));
+		}
+		System.out.println(myNames);
+		HashMap<String,Method> hashMap = new HashMap<String, Method>();
+		Method[] methods = class1.getMethods();
+		
+		for(Method method : methods)
+		{
+			String name = method.getName();
+			if (name.startsWith("set")) {
+				name = name.substring(3);
+				String prettyName = makePrettyName(name);
+				if (myNames.contains(prettyName)) {
+					hashMap.put(prettyName, method);
+				}
+			}
+		}
+		return hashMap;
+	}
+
+	private String makePrettyName(String name)
+	{
+		return name.toLowerCase().replace("_", "");
+	}
+
+	private HashMap<String, Field> getStaticFieldContents(Class<RootComponentConfiguration> class1)
+	{
+		HashMap<String,Field> hashMap = new HashMap<String, Field>();
 		Field[] fields = class1.getFields();
 		for(Field field : fields)
 		{
@@ -72,7 +143,7 @@ public class PlatformConfigurationTest
 				if(String.class.isAssignableFrom(field.getType())) {
 					try
 					{
-						hashMap.put(field.getName(), (String)field.get(null));
+						hashMap.put((String)field.get(null), field);
 					}
 					catch(IllegalArgumentException e)
 					{
