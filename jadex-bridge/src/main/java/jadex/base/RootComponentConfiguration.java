@@ -12,28 +12,17 @@ import java.util.logging.Level;
  */
 public class RootComponentConfiguration
 {
-	/** ======== Arguments used by starter unless supplied from command line. ======== **/
-	
-	/** The name of the platform component (null for auto generation). To use a custom prefix name 
-	      and an auto generated postfix the name should end with _* (3 digits) or with _ and an arbitrary number of +, e.g. _++++.  **/	
-	public static final String PLATFORM_NAME = "platformname"; // class: String default: "jadex"
-	/** The configuration to use. **/	
-	public static final String CONFIGURATION_NAME = "configname"; // class: String default: "auto"
-	/** Automatically shut down the platform when no user agents are running anymore. **/	
-	public static final String AUTOSHUTDOWN = "autoshutdown"; // class: boolean default: false
-	/** Tell the starter to use the default platform component implementation (usually no need to change). **/	
-	public static final String PLATFORM_COMPONENT = "platformcomponent"; // class: Class default: jadex.platform.service.cms.PlatformComponent.class
 	/** Tell starter to print welcome message. **/
 	public static final String WELCOME = "welcome"; // class: boolean default: true
-	/** The saved program arguments. **/
-	public static final String PROGRAM_ARGUMENTS = "programarguments"; // class: String[] default: emptyvalue
 	
 	// ----- arguments set by starter for root or platform component -----
-	
+
 	/** The IPlatformComponentAccess instance **/
 	public static final String	PLATFORM_ACCESS	= "platformaccess";
 	/** The component factory instance. */
 	public static final String	COMPONENT_FACTORY	= PlatformConfiguration.COMPONENT_FACTORY;
+	/** The saved program arguments. **/
+	public static final String PROGRAM_ARGUMENTS = "programarguments"; // class: String[] default: emptyvalue
 	
 	/** ======== Arguments used by platform components. ======== **/
 	
@@ -245,7 +234,7 @@ public class RootComponentConfiguration
 	 */
 	protected void setProgramArguments(String[] args)
 	{
-		rootargs.put(PROGRAM_ARGUMENTS, args);
+		setValue(PROGRAM_ARGUMENTS, args);
 	}
 	
 //	// internal
@@ -288,46 +277,6 @@ public class RootComponentConfiguration
 
 
 	// individual getters/setters
-
-	public String getPlatformName()
-	{
-		return (String)getValue(PLATFORM_NAME);
-	}
-
-	public void setPlatformName(String value)
-	{
-		setValue(PLATFORM_NAME, value);
-	}
-
-	public String getConfigurationName()
-	{
-		return (String)getValue(CONFIGURATION_NAME);
-	}
-
-	public void setConfigurationName(String value)
-	{
-		setValue(CONFIGURATION_NAME, value);
-	}
-
-	public boolean getAutoShutdown()
-	{
-		return Boolean.TRUE.equals(getValue(AUTOSHUTDOWN));
-	}
-
-	public void setAutoShutdown(boolean value)
-	{
-		setValue(AUTOSHUTDOWN, value);
-	}
-
-	public Class getPlatformComponent()
-	{
-		return (Class)getValue(PLATFORM_COMPONENT);
-	}
-
-	public void setPlatformComponent(Class value)
-	{
-		setValue(PLATFORM_COMPONENT, value);
-	}
 
 	public boolean getGui()
 	{
@@ -384,7 +333,7 @@ public class RootComponentConfiguration
 		return Boolean.TRUE.equals(getValue(LOGGING));
 	}
 
-	public void setLogging(String value)
+	public void setLogging(boolean value)
 	{
 		setValue(LOGGING, value);
 	}

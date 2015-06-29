@@ -1,5 +1,7 @@
 package jadex.examples.presentationtimer.display;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -68,11 +70,9 @@ public class Main {
 		jadexArgs.put("welcome", "false");
 		jadexArgs.put("cli", "false");
 		jadexArgs.put("extensions", "null");
-		jadexArgs.put("cli", "false");
 		jadexArgs.put("awareness", "true");
 		jadexArgs.put("conf", "jadex.platform.PlatformAgent");
 		jadexArgs.put("chat", "false");
-		jadexArgs.put("relaysecurity", "true");
 //		jadexArgs.put("binarymessages", "true");
 //		jadexArgs.put("kernels", "\"micro, bdiv3, component\"");
 //		jadexArgs.put("relayaddress", "\"http://relay1.activecomponents.org/\"");
@@ -85,9 +85,28 @@ public class Main {
 		jadexArgs.put("relaysecurity", "false");
 		jadexArgs.put("networkname", "jadexnetwork");
 		jadexArgs.put("networkpass", "laxlax");
+		
+		PlatformConfiguration config = new PlatformConfiguration();
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+
+		config.setPlatformName("presentationtimer-*");
+		rootConfig.setGui(false);
+		rootConfig.setWelcome(false);
+		rootConfig.setCli(false);
+		rootConfig.setAwareness(true);
+		config.setConfigurationFile("jadex.platform.PlatformAgent");
+		rootConfig.setChat(false);
+		rootConfig.setRelaySecurity(false);
+		rootConfig.setAwaMechanisms("relay");
+		rootConfig.setLogging(false);
+		
+		rootConfig.setNetworkName("jadexnetwork");
+		rootConfig.setNetworkPass("laxlax");
+		
 
 
-		IFuture<IExternalAccess> fut = Starter.createPlatform(jadexArgs);
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(jadexArgs);
+		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 		fut.addResultListener(access -> {
 			IComponentManagementService cms = getCMS(access).get();

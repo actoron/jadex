@@ -1,5 +1,6 @@
 package jadex.platform;
 
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -54,10 +55,10 @@ import static jadex.base.RootComponentConfiguration.*;
  */
 @Arguments(
 {
-	@Argument(name=PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
-	@Argument(name=CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
-	@Argument(name=AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
-	@Argument(name=PLATFORM_COMPONENT, clazz=Class.class, defaultvalue="jadex.platform.service.cms.PlatformComponent.class"),
+	@Argument(name=PlatformConfiguration.PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
+	@Argument(name=PlatformConfiguration.CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
+	@Argument(name=PlatformConfiguration.AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
+	@Argument(name=PlatformConfiguration.PLATFORM_COMPONENT, clazz=Class.class, defaultvalue="jadex.platform.service.cms.PlatformComponent.class"),
 	@Argument(name=WELCOME, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=PROGRAM_ARGUMENTS, clazz=String[].class),
 	
@@ -208,10 +209,10 @@ import static jadex.base.RootComponentConfiguration.*;
 @Configurations(
 {
 	@Configuration(name="auto", arguments={
-		@NameValue(name="tcpport", value="0"),
-		@NameValue(name="niotcpport", value="0"),
-		@NameValue(name="ssltcpport", value="0"),
-		@NameValue(name="platformname", value="null")
+		@NameValue(name=TCPPORT, value="0"),
+		@NameValue(name=NIOTCPPORT, value="0"),
+		@NameValue(name=SSLTCPPORT, value="0"),
+		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
 //		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 //		@Component(name="marshal", type="marshal", daemon=Boolean3.TRUE, number="$args.marshal? 1 : 0"),

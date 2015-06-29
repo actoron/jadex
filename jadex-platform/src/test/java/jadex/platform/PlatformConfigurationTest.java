@@ -22,11 +22,11 @@ public class PlatformConfigurationTest
 	public void tester() {
 		PlatformConfiguration config = new PlatformConfiguration();
 		RootComponentConfiguration rootConfig = config.getRootConfig();
-		rootConfig.setPlatformName("testcases_*");
+		config.setPlatformName("testcases_*");
 		rootConfig.setGui(false);
 		rootConfig.setSaveOnExit(false);
 		rootConfig.setWelcome(false);
-		rootConfig.setAutoShutdown(false);
+		config.setAutoShutdown(false);
 		rootConfig.setPrintPass(false);
 		long timeout = Starter.getLocalDefaultTimeout(null);
 		

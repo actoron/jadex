@@ -1,5 +1,6 @@
 package jadex.launch.test;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IArgument;

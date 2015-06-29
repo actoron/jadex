@@ -1,5 +1,7 @@
 package jadex.examples.presentationtimer.remotecontrol;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -60,8 +62,26 @@ public class ClientMain  {
 
 		// jadexArgs.put("ssltcptransport", "true");
 		jadexArgs.put("relaysecurity", "false");
+		
+		PlatformConfiguration config = new PlatformConfiguration();
+		RootComponentConfiguration rootConfig = config.getRootConfig();
 
-		IFuture<IExternalAccess> fut = Starter.createPlatform(jadexArgs);
+		config.setPlatformName("presentationtimer-*");
+		rootConfig.setGui(false);
+		rootConfig.setWelcome(false);
+		rootConfig.setCli(false);
+		rootConfig.setAwareness(true);
+		config.setConfigurationFile("jadex.platform.PlatformAgent");
+		rootConfig.setChat(false);
+		rootConfig.setRelaySecurity(false);
+		rootConfig.setAwaMechanisms("relay");
+		rootConfig.setLogging(false);
+		
+		rootConfig.setNetworkName("jadexnetwork");
+		rootConfig.setNetworkPass("laxlax");
+
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(jadexArgs);
+		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 		fut.addResultListener(access -> {
 

@@ -88,7 +88,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		rootConfig.setRsPublish(false);
 		rootConfig.setBinaryMessages(true);
 		config.setConfigurationFile("jadex.platform.PlatformAgent");
-		rootConfig.setAutoShutdown(false);
+		config.setAutoShutdown(false);
 		rootConfig.setSaveOnExit(true);
 		rootConfig.setGui(false);
 		rootConfig.setChat(false);
