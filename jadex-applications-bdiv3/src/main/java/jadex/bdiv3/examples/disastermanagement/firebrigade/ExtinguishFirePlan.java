@@ -56,7 +56,7 @@ public class ExtinguishFirePlan
 		
 		// Extinguish fire
 		myself.setProperty("state", "extinguishing_fire");
-		Map props = new HashMap();
+		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(ExtinguishFireTask.PROPERTY_DISASTER, disaster);
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
 		Object taskid = space.createObjectTask(ExtinguishFireTask.PROPERTY_TYPENAME, props, myself.getId());

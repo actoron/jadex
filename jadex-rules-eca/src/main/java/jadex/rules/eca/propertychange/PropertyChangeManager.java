@@ -87,9 +87,22 @@ public abstract class PropertyChangeManager
 		return events.remove(index);
 	}
 	
+	/**
+	 *  Get the number of events. 
+	 *  @return The number of events.
+	 */
+	public int getSize()
+	{
+		return events.size();
+	}
 	
 	// ---- Helper -----
 	
+	/**
+	 *  Create a property change listener.
+	 *  @param eventadder The event adder element.
+	 *  @return
+	 */
 	protected jadex.commons.beans.PropertyChangeListener createPCL(final IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
 	{
 		return new jadex.commons.beans.PropertyChangeListener()

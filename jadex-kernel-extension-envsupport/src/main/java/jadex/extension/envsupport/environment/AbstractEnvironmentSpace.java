@@ -2534,7 +2534,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 */
 	public void componentRemoved(final IComponentDescription desc)
 	{
-		System.out.println("comp removed: "+desc.getName());
+//		System.out.println("comp removed: "+desc.getName());
 		
 //		getComponentType(cid)
 //			.addResultListener(new DefaultResultListener()

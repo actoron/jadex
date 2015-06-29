@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.commons.future.IFuture;
 
 /**
  *  BDI execution feature adds rule engine behavior to the cycle.
@@ -35,7 +36,9 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 		boolean inited = ((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited();
 		if(inited && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable())
 		{
-			bdif.getRuleSystem().processAllEvents();
+			IFuture<Void> fut = bdif.getRuleSystem().processAllEvents();
+			if(!fut.isDone())
+				getComponent().getLogger().warning("No async actions allowed.");
 			again = true;
 		}
 		

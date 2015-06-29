@@ -110,7 +110,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	{
 		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		createStartBehavior().startBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability());
-		inited	= true;
 		return super.body();
 	}
 	
@@ -184,6 +183,15 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		return inited;
 	}
 
+	/**
+	 *  The inited to set.
+	 *  @param inited The inited to set
+	 */
+	public void setInited(boolean inited)
+	{
+		this.inited = inited;
+	}
+	
 	// for xml
 	
 	/**
@@ -1764,6 +1772,12 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //					rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED, ChangeEvent.GOALOPTION}));
 				rulesystem.getRulebase().addRule(rule);
 			}
+			
+			// Init must be set to true before init writes to ensure that new events
+			// are executed and not processed as init writes
+			IInternalBDILifecycleFeature bdil = (IInternalBDILifecycleFeature)component.getComponentFeature(ILifecycleComponentFeature.class);
+			bdil.setInited(true);
+//			System.out.println("inited: "+component.getComponentIdentifier());
 			
 			// perform init write fields (after injection of bdiagent)
 			BDIAgentFeature.performInitWrites(component);

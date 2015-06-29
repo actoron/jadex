@@ -4,6 +4,7 @@ import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -46,6 +47,9 @@ public class RuleSystem
 	/** The PropertyChangeManager to add/remove handlers and manage events */
 	protected PropertyChangeManager pcman;
 	
+	/** The execution mode (direct vs queue). */
+	protected boolean queueevents = true;
+	
 	//-------- constructors --------
 	
 	/**
@@ -53,10 +57,19 @@ public class RuleSystem
 	 */
 	public RuleSystem(Object context)
 	{
+		this(context, true);
+	}
+	
+	/**
+	 *  Create a new rule system.
+	 */
+	public RuleSystem(Object context, boolean queueevents)
+	{
 		this.context = context;
 		this.rulebase = new Rulebase();
 		this.rules = new IdentityHashMap<Object, Tuple2<Object, IRule<?>[]>>(); // objects may change
 		this.pcman = PropertyChangeManager.createInstance();
+		this.queueevents = queueevents;
 	}
 
 	//-------- methods --------
@@ -359,7 +372,7 @@ public class RuleSystem
 	}
 	
 	/**
-	 * 
+	 *  Process a given rule set.
 	 */
 	protected IFuture<Void> processRules(final IRule<?>[] rules, final int i, final IEvent event, final IntermediateFuture<RuleEvent> res)
 	{
@@ -498,32 +511,91 @@ public class RuleSystem
 	 *  Process events until the event queue is empty or max
 	 *  events have been processed.
 	 */
-	public void processAllEvents()
+	public IFuture<Void> processAllEvents()
 	{
-		processAllEvents(-1);
-	}
-	
-	/**
-	 *  Process events until the event queue is empty or max
-	 *  events have been processed.
-	 *  @return True if was aborted due to reaching max events.
-	 */
-	public boolean processAllEvents(int max)
-	{
-		int i=0;
+//		return processAllEvents(-1);
+
+		final Future<Void> ret = new Future<Void>();
 		
-		for(i=0; pcman.hasEvents() && (max==-1 || i<max); i++)
+		final int[] opencalls = new int[1];
+		
+		while(pcman.hasEvents())
 		{
-			processEvent();
+			opencalls[0]++;
+			
+			processEvent().addResultListener(new IResultListener<Collection<RuleEvent>>()
+			{
+				Exception ex = null;
+				public void resultAvailable(Collection<RuleEvent> result)
+				{
+					proceed();
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ex = exception;
+					proceed();
+				}
+				
+				protected void proceed()
+				{
+					// When all events have been processed and no opencalls
+					if(--opencalls[0]==0 && pcman.getSize()==0)
+					{
+						if(ex==null)
+						{
+							ret.setResult(null);
+						}
+						else
+						{
+							ret.setException(ex);
+						}
+					}
+				}
+			});
 		}
 		
-		return i==max;
+		return ret;
 	}
+	
+//	/**
+//	 *  Process events until the event queue is empty or max
+//	 *  events have been processed.
+//	 *  @return True if was aborted due to reaching max events.
+//	 */
+//	public boolean processAllEvents(int max)
+//	{
+//		int i=0;
+//		
+//		for(i=0; pcman.hasEvents() && (max==-1 || i<max); i++)
+//		{
+//			processEvent();
+//		}
+//		
+//		return i==max;
+//	}
+	
+//	/**
+//	 *  Process events until the event queue is empty or max
+//	 *  events have been processed.
+//	 *  @return True if was aborted due to reaching max events.
+//	 */
+//	public boolean processAllEvents(int max)
+//	{
+//		int i=0;
+//		
+//		for(i=0; pcman.hasEvents() && (max==-1 || i<max); i++)
+//		{
+//			processEvent();
+//		}
+//		
+//		return i==max;
+//	}
 	
 	/**
 	 *  Add an event.
 	 */
-	public void addEvent(IEvent event)
+	public IFuture<Void> addEvent(IEvent event)
 	{
 //		if(event.getType().toString().indexOf("factchanged.myself")!=-1)
 //			System.out.println("added: "+event.getType()+" "+event.getContent());
@@ -535,7 +607,29 @@ public class RuleSystem
 //		if(event.getType().getType(0).indexOf("factadded")!=-1 && event.getType().getType(1).indexOf("wastebins")!=-1)
 //			System.out.println("add event: "+event);
 
+		final Future<Void> ret;
+		
 		pcman.addEvent(event);
+		
+		if(!queueevents)
+		{
+//			ret = processAllEvents();
+			// If actions add further events they will be processed as well
+			ret = new Future<Void>();
+			processEvent().addResultListener(new ExceptionDelegationResultListener<Collection<RuleEvent>, Void>(ret)
+			{
+				public void customResultAvailable(Collection<RuleEvent> result)
+				{
+					ret.setResult(null);
+				}
+			});
+		}
+		else
+		{
+			 ret = (Future<Void>)IFuture.DONE;
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -544,6 +638,24 @@ public class RuleSystem
 	public boolean isEventAvailable()
 	{
 		return pcman.hasEvents();
+	}
+
+	/**
+	 *  Get the queueevents.
+	 *  @return The queueevents
+	 */
+	public boolean isQueueEvents()
+	{
+		return queueevents;
+	}
+
+	/**
+	 *  The queueevents to set.
+	 *  @param queueevents The queueevents to set
+	 */
+	public void setQueueEvents(boolean queueevents)
+	{
+		this.queueevents = queueevents;
 	}
 }
 

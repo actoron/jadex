@@ -131,7 +131,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		ASMBDIClassGenerator.checkEnhanced(pojo.getClass());
 		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();
 		this.capa = new RCapability(bdimodel.getCapability(), component);
-		this.rulesystem = new RuleSystem(pojo);
+		this.rulesystem = new RuleSystem(pojo, false);
 	}
 
 	/**
@@ -241,7 +241,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				rs.addEvent(new jadex.rules.eca.Event(ev1, new ChangeInfo<Object>(val, oldval, null)));
 				
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
-				if(((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited())
+				if(rs.isQueueEvents() && ((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited())
 					rs.processAllEvents(); 
 			}
 			
@@ -414,16 +414,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-			synchronized(initwrites)
-			{
-				List<Object[]> inits = initwrites.get(agent);
-				if(inits==null)
-				{
-					inits = new ArrayList<Object[]>();
-					initwrites.put(agent, inits);
-				}
-				inits.add(new Object[]{val, belname});
-			}
+			addInitWrite(agent, belname, val);
 		}
 	}
 	
@@ -431,7 +422,26 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	protected final static Map<Object, List<Object[]>> initwrites = new HashMap<Object, List<Object[]>>();
 	
 	/**
-	 * 
+	 *  Add an init write.
+	 */
+	protected static void addInitWrite(IInternalAccess agent, String belname, Object val)
+	{
+//		System.out.println("iniw start");
+		synchronized(initwrites)
+		{
+			List<Object[]> inits = initwrites.get(agent);
+			if(inits==null)
+			{
+				inits = new ArrayList<Object[]>();
+				initwrites.put(agent, inits);
+			}
+			inits.add(new Object[]{val, belname});
+		}
+//		System.out.println("iniw end");
+	}
+	
+	/**
+	 *  Perform the writes of the init.
 	 */
 	public static void performInitWrites(IInternalAccess agent)
 	{
@@ -537,7 +547,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(val, oldval, Integer.valueOf(index))); // todo: index
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
-				rs.processAllEvents(); 
+				if(rs.isQueueEvents())
+					rs.processAllEvents(); 
 			}
 		}
 	}
@@ -758,12 +769,26 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			System.out.println("createEv: "+val+" "+agent+" "+belname);
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		
-		MBelief mbel = agent.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel().getCapability().getBelief(belname);
-		
-		RuleSystem rs = agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
-		rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, oldval, info)));
-		
-		publishToolBeliefEvent(agent, mbel);
+		try
+		{
+		if(((IInternalBDILifecycleFeature)agent.getComponentFeature(ILifecycleComponentFeature.class)).isInited())
+		{
+			MBelief mbel = agent.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel().getCapability().getBelief(belname);
+			
+			RuleSystem rs = agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+			rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, oldval, info)));
+			
+			publishToolBeliefEvent(agent, mbel);
+		}
+		else
+		{
+			addInitWrite(agent, belname, val);
+		}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -991,7 +1016,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(val, oldval, Integer.valueOf(index)));
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
-				rs.processAllEvents(); 
+				if(rs.isQueueEvents())
+					rs.processAllEvents(); 
 			}
 		}
 	}

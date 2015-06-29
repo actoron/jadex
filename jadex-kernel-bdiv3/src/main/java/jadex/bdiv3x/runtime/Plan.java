@@ -447,30 +447,30 @@ public abstract class Plan
 		return new jadex.bdiv3x.runtime.RCapability(agent);
 	}
 	
-//	/**
-//	 *  Start an atomic transaction.
-//	 *  All possible side-effects (i.e. triggered conditions)
-//	 *  of internal changes (e.g. belief changes)
-//	 *  will be delayed and evaluated after endAtomic() has been called.
-//	 *  @see #endAtomic()
-//	 */
-//	public void	startAtomic()
-//	{
-//		throw new UnsupportedOperationException();
-//	}
-//
-//	/**
-//	 *  End an atomic transaction.
-//	 *  Side-effects (i.e. triggered conditions)
-//	 *  of all internal changes (e.g. belief changes)
-//	 *  performed after the last call to startAtomic()
-//	 *  will now be evaluated and performed.
-//	 *  @see #startAtomic()
-//	 */
-//	public void	endAtomic()
-//	{
-//		throw new UnsupportedOperationException();
-//	}
+	/**
+	 *  Start an atomic transaction.
+	 *  All possible side-effects (i.e. triggered conditions)
+	 *  of internal changes (e.g. belief changes)
+	 *  will be delayed and evaluated after endAtomic() has been called.
+	 *  @see #endAtomic()
+	 */
+	public void	startAtomic()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  End an atomic transaction.
+	 *  Side-effects (i.e. triggered conditions)
+	 *  of all internal changes (e.g. belief changes)
+	 *  performed after the last call to startAtomic()
+	 *  will now be evaluated and performed.
+	 *  @see #startAtomic()
+	 */
+	public void	endAtomic()
+	{
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 *  Dispatch a new subgoal.

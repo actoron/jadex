@@ -44,7 +44,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	{
 		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		createStartBehavior().startBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability());
-		inited	= true;
+//		inited	= true;
 		return super.body();
 	}
 	
@@ -63,6 +63,15 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	public boolean isInited()
 	{
 		return inited;
+	}
+	
+	/**
+	 *  The inited to set.
+	 *  @param inited The inited to set
+	 */
+	public void setInited(boolean inited)
+	{
+		this.inited = inited;
 	}
 	
 	/**

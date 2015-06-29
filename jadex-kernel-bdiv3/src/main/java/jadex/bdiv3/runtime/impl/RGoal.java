@@ -363,8 +363,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		
 		if(GoalLifecycleState.ADOPTED.equals(lifecyclestate))
 		{
-			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALADOPTED, getMGoal().getName()}), this));
 			setLifecycleState(ia, GoalLifecycleState.OPTION);
+			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALADOPTED, getMGoal().getName()}), this));
 		}
 		else if(GoalLifecycleState.ACTIVE.equals(lifecyclestate))
 		{
