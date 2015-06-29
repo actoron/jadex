@@ -284,7 +284,10 @@ public class Starter
 			}
 			else
 			{
-				Object	pc = config.getArgumentValue(RootComponentConfiguration.PLATFORM_COMPONENT, model);
+				config.setPlatformModel(model);
+				Class pc = config.getPlatformComponent();
+//				Object	pc = config.getValue(RootComponentConfiguration.PLATFORM_COMPONENT);
+//				rootConfig.setValue(RootComponentConfiguration.PLATFORM_COMPONENT, pc);
 				if(pc==null)
 				{
 					ret.setException(new RuntimeException("No platform component class found."));
@@ -297,7 +300,9 @@ public class Starter
 //					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
 					
 					// Build platform name.
-					Object pfname = config.getArgumentValue(RootComponentConfiguration.PLATFORM_NAME, model);
+					String pfname = config.getPlatformName();
+//					Object pfname = config.getValue(RootComponentConfiguration.PLATFORM_NAME);
+//					rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
 					final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
 					if(IComponentIdentifier.LOCAL.get()==null)
 						IComponentIdentifier.LOCAL.set(cid);
@@ -312,32 +317,23 @@ public class Starter
 					Cause cause = sc==null? null: sc.getCause();
 					assert cause!=null;
 					
-					Boolean autosd = (Boolean)config.getArgumentValue(RootComponentConfiguration.AUTOSHUTDOWN, model);
-					Object tmpmoni = config.getArgumentValue(PlatformConfiguration.MONITORING, model);
-					PublishEventLevel moni = PublishEventLevel.OFF;
-					if(tmpmoni instanceof Boolean)
-					{
-						moni = ((Boolean)tmpmoni).booleanValue()? PublishEventLevel.FINE: PublishEventLevel.OFF;
-					}
-					else if(tmpmoni instanceof String)
-					{
-						moni = PublishEventLevel.valueOf((String)tmpmoni);
-					}
-					else if(tmpmoni instanceof PublishEventLevel)
-					{
-						moni = (PublishEventLevel)tmpmoni;
-					}
+					Boolean autosd = config.getAutoShutdown();
+//					Boolean autosd = (Boolean)config.getValue(RootComponentConfiguration.AUTOSHUTDOWN);
+//					rootConfig.setValue(RootComponentConfiguration.AUTOSHUTDOWN, autosd);
+					PublishEventLevel monitoring = config.getMonitoring();
 	
 					final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
-						autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(),
+						autosd!=null ? autosd.booleanValue() : false, false, false, monitoring, model.getFullName(),
 						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
 					
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getArgumentValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, model));
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getArgumentValue(PlatformConfiguration.DATA_PARAMETERCOPY, model));
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
+//					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
+//					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 					
-					if (Boolean.TRUE.equals(config.getArgumentValue(PlatformConfiguration.DHT_PROVIDE, model))) {
+					if (config.getDhtProvide()) {
 						boolean provideonly = true;
-						if (Boolean.TRUE.equals(config.getArgumentValue(PlatformConfiguration.DHT, model))) {
+						if (config.getDht()) {
 							provideonly = false;
 						}
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess(), provideonly));
@@ -349,12 +345,11 @@ public class Starter
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
 					
-					Map<String, Object> rootArgs = rootConfig.getArgs();
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, rootArgs, desc, null, null);
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, rootConfig.getArgs(), desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
-					initRescueThread(cid, rootArgs);	// Required for bootstrapping init.
+					initRescueThread(cid, rootConfig);	// Required for bootstrapping init.
 
 					component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
@@ -365,7 +360,7 @@ public class Starter
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(config.getArgumentValue(RootComponentConfiguration.WELCOME, model)))
+									if(Boolean.TRUE.equals(config.getValue(RootComponentConfiguration.WELCOME)))
 									{
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");
@@ -570,15 +565,15 @@ public class Starter
 	/**
 	 *  Init the rescue thread for a platform..
 	 */
-	public synchronized static void initRescueThread(IComponentIdentifier cid, Map<String, Object> compargs)
+	public synchronized static void initRescueThread(IComponentIdentifier cid, RootComponentConfiguration rootConfig)
 	{
 		IThreadPool	tp	= null;
-		if(compargs.get("threadpoolclass")!=null)
+		if(rootConfig.getThreadpoolClass()!=null)
 		{
 			try
 			{
 				tp	= (IThreadPool)SReflect.classForName(
-					(String)compargs.get("threadpoolclass"), Starter.class.getClassLoader()).newInstance();
+					rootConfig.getThreadpoolClass(), Starter.class.getClassLoader()).newInstance();
 			}
 			catch(Exception e)
 			{

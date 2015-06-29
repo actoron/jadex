@@ -21,6 +21,18 @@ import java.util.Set;
  */
 public class PlatformConfiguration
 {
+	/** ======== Arguments used by starter. ======== **/
+	
+	/** The name of the platform component (null for auto generation). To use a custom prefix name 
+	      and an auto generated postfix the name should end with _* (3 digits) or with _ and an arbitrary number of +, e.g. _++++.  **/	
+	public static final String PLATFORM_NAME = "platformname"; // class: String default: "jadex"
+	/** The configuration to use. **/	
+	public static final String CONFIGURATION_NAME = "configname"; // class: String default: "auto"
+	/** Automatically shut down the platform when no user agents are running anymore. **/	
+	public static final String AUTOSHUTDOWN = "autoshutdown"; // class: boolean default: false
+	/** Tell the starter to use the default platform component implementation (usually no need to change). **/	
+	public static final String PLATFORM_COMPONENT = "platformcomponent"; // class: Class default: jadex.platform.service.cms.PlatformComponent.class
+	
 	//-------- platform data keys --------
 	
 	/** Flag if copying parameters for local service calls is allowed. */
@@ -126,11 +138,11 @@ public class PlatformConfiguration
 		
 		RESERVED = new HashSet<String>();
 		RESERVED.add(CONFIGURATION_FILE);
-		RESERVED.add(RootComponentConfiguration.CONFIGURATION_NAME);
-		RESERVED.add(RootComponentConfiguration.PLATFORM_NAME);
+		RESERVED.add(CONFIGURATION_NAME);
+		RESERVED.add(PLATFORM_NAME);
 		RESERVED.add(COMPONENT_FACTORY);
-		RESERVED.add(RootComponentConfiguration.PLATFORM_COMPONENT);
-		RESERVED.add(RootComponentConfiguration.AUTOSHUTDOWN);
+		RESERVED.add(PLATFORM_COMPONENT);
+		RESERVED.add(AUTOSHUTDOWN);
 		RESERVED.add(MONITORING);
 		RESERVED.add(RootComponentConfiguration.WELCOME);
 		RESERVED.add(COMPONENT);
@@ -155,6 +167,11 @@ public class PlatformConfiguration
 	private Long defaultTimeout;
 	/** Configuration of the root component. **/
 	private RootComponentConfiguration	rootconfig;
+	
+	/** Platform model. Used to extract default values. */
+	private IModelInfo	model;
+	/** Name of the configured configuration **/
+	private ConfigurationInfo	configurationInfo;
 
 
 	/**
@@ -197,24 +214,106 @@ public class PlatformConfiguration
 	}
 	
 	/**
+	 * Sets the platform model to extract configuration values from it.
+	 * @param model
+	 */
+	public void setPlatformModel(IModelInfo model)
+	{
+		this.model = model;
+		configurationInfo = getConfigurationInfo(model);
+	}
+	
+	/**
 	 * Generic setter for cmd args.
 	 * @param key
 	 * @param value
 	 */
-	public void setCmdArg(String key, Object value) {
+	public void setValue(String key, Object value) {
 		this.cmdargs.put(key, value);
 	}
 	
 	/**
-	 * Generic getter for cmd args.
+	 * Generic getter for configuration parameters.
+	 * Retrieves values in 3 stages:
+	 * 1. From given command line arguments.
+	 * 2. From given model configuration ("auto", "fixed", ...)
+	 * 3. From model default values. 
+	 * 
+	 * For retrieval from model, setPlatformModel has to be called before.
 	 * @param key
 	 * @return
 	 */
-	public Object getCmdArg(String key) {
-		return this.cmdargs.get(key);
+	public Object getValue(String key) {
+		
+		Object val = cmdargs.get(key);
+		if(val==null && model != null && configurationInfo != null)
+		{
+			val = getArgumentValueFromModel(key);
+		}
+		else if(val instanceof String)
+		{
+			// Try to parse value from command line.
+			try
+			{
+				Object newval	= SJavaParser.evaluateExpression((String)val, null);
+				if(newval!=null)
+				{
+					val	= newval;
+				}
+			}
+			catch(RuntimeException e)
+			{
+			}
+		}
+		
+		return val;
 	}
 	
 	// ---- getter/setter for individual properties ----
+	
+	/** Get the platform name. */
+	public String getPlatformName()
+	{
+		return (String)getValue(PLATFORM_NAME);
+	}
+	/** Set the platform name. */
+	public void setPlatformName(String value)
+	{
+		setValue(PLATFORM_NAME, value);
+	}
+
+	/** Get the configuration name. */
+	public String getConfigurationName()
+	{
+		return (String)getValue(CONFIGURATION_NAME);
+	}
+	/** Set the configuration name. */
+	public void setConfigurationName(String value)
+	{
+		setValue(CONFIGURATION_NAME, value);
+	}
+
+	/** Get autoshutdown flag. */
+	public boolean getAutoShutdown()
+	{
+		return Boolean.TRUE.equals(getValue(AUTOSHUTDOWN));
+	}
+	/** Set autoshutdown flag. */
+	public void setAutoShutdown(boolean value)
+	{
+		setValue(AUTOSHUTDOWN, value);
+	}
+	
+	/** Get platform component. */
+	public Class getPlatformComponent()
+	{
+		return (Class)getValue(PLATFORM_COMPONENT);
+	}
+	/** Set platform component. */
+	public void setPlatformComponent(Class value)
+	{
+		setValue(PLATFORM_COMPONENT, value);
+	}
 	
 	/**
 	 * Set the default timeout.
@@ -290,7 +389,7 @@ public class PlatformConfiguration
 	 */
 	public void setConfigurationFile(String value)
 	{
-		setCmdArg(CONFIGURATION_FILE, value);
+		setValue(CONFIGURATION_FILE, value);
 	}
 	/**
 	 * Get the main configuration file, e.g. path to PlatformAgent.
@@ -307,14 +406,14 @@ public class PlatformConfiguration
 	 * @param level
 	 */
 	public void setMonitoring(PublishEventLevel level) {
-		setCmdArg(MONITORING, level);
+		setValue(MONITORING, level);
 	}
 	/**
 	 * Get the monitoring level.
 	 * @return
 	 */
-	public Object getMonitoring() {
-		return getCmdArg(MONITORING);
+	public PublishEventLevel getMonitoring() {
+		return (PublishEventLevel)getValue(MONITORING);
 	}
 	
 	/**
@@ -322,14 +421,14 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setPersist(boolean value) {
-		setCmdArg(PERSIST, value);
+		setValue(PERSIST, value);
 	}
 	/**
 	 * Get the persist flag.
 	 * @return boolean
 	 */
 	public boolean getPersist() {
-		return (Boolean)getCmdArg(PERSIST);
+		return (Boolean)getValue(PERSIST);
 	}
 	
 	/**
@@ -337,14 +436,14 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setDebugFutures(boolean value) {
-		setCmdArg(DEBUGFUTURES, value);
+		setValue(DEBUGFUTURES, value);
 	}
 	/**
 	 * Get the debug futures flag.
 	 * @return
 	 */
 	public boolean getDebugFutures() {
-		return Boolean.TRUE.equals(getCmdArg(DEBUGFUTURES));
+		return Boolean.TRUE.equals(getValue(DEBUGFUTURES));
 	}
 	
 	/**
@@ -352,14 +451,14 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setDebugServices(boolean value) {
-		setCmdArg(DEBUGSERVICES, value);
+		setValue(DEBUGSERVICES, value);
 	}
 	/**
 	 * Get the debug services flag.
 	 * @return
 	 */
 	public boolean getDebugServices() {
-		return Boolean.TRUE.equals(getCmdArg(DEBUGSERVICES));
+		return Boolean.TRUE.equals(getValue(DEBUGSERVICES));
 	}
 	
 	/**
@@ -367,14 +466,14 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setDebugSteps(boolean value) {
-		setCmdArg(DEBUGSTEPS, value);
+		setValue(DEBUGSTEPS, value);
 	}
 	/**
 	 * Get the debug steps flag.
 	 * @return
 	 */
 	public boolean getDebugSteps() {
-		return Boolean.TRUE.equals(getCmdArg(DEBUGSTEPS));
+		return Boolean.TRUE.equals(getValue(DEBUGSTEPS));
 	}
 	
 	/**
@@ -382,14 +481,14 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setNoStackCompaction(boolean value) {
-		setCmdArg(NOSTACKCOMPACTION, value);
+		setValue(NOSTACKCOMPACTION, value);
 	}
 	/**
 	 * Get the no stack compaction flag.
 	 * @return
 	 */
 	public boolean getNoStackCompaction() {
-		return Boolean.TRUE.equals(getCmdArg(NOSTACKCOMPACTION));
+		return Boolean.TRUE.equals(getValue(NOSTACKCOMPACTION));
 	}
 	
 	/**
@@ -397,7 +496,7 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setOpenGl(boolean value) {
-		setCmdArg(OPENGL, value);
+		setValue(OPENGL, value);
 		Class<?> p2d = SReflect.classForName0("jadex.extension.envsupport.observer.perspective.Perspective2D", Starter.class.getClassLoader());
 		if(p2d!=null)
 		{
@@ -416,7 +515,7 @@ public class PlatformConfiguration
 	 * @return
 	 */
 	public boolean getOpenGl() {
-		return Boolean.TRUE.equals(getCmdArg(OPENGL));
+		return Boolean.TRUE.equals(getValue(OPENGL));
 	}
 	
 	/**
@@ -424,14 +523,14 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setDht(boolean value) {
-		setCmdArg(DHT, value);
+		setValue(DHT, value);
 	}
 	/**
 	 * Get the DHT flag.
 	 * @return
 	 */
 	public boolean getDht() {
-		return Boolean.TRUE.equals(getCmdArg(DHT));
+		return Boolean.TRUE.equals(getValue(DHT));
 	}
 	
 	/**
@@ -439,14 +538,14 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setDhtProvide(boolean value) {
-		setCmdArg(DHT_PROVIDE, value);
+		setValue(DHT_PROVIDE, value);
 	}
 	/**
 	 * Get the provide DHT flag.
 	 * @return
 	 */
 	public boolean getDhtProvide() {
-		return Boolean.TRUE.equals(getCmdArg(DHT_PROVIDE));
+		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
 	}
 	
 	/**
@@ -583,49 +682,21 @@ public class PlatformConfiguration
 		return !Boolean.FALSE.equals(getPlatformValue(platform, PlatformConfiguration.DATA_PARAMETERCOPY));
 	}
 	
-	/**
-	 *  Get an argument value from the command line or the model.
-	 *  Also puts parsed value into component args to be available at instance.
-	 */
-	public Object getArgumentValue(String name, IModelInfo model)
-	{
-		
-		Object val = cmdargs.get(name);
-		if(val==null)
-		{
-			val = getArgumentValueFromModel(name, model);
-		}
-		else if(val instanceof String)
-		{
-			// Try to parse value from command line.
-			try
-			{
-				Object newval	= SJavaParser.evaluateExpression((String)val, null);
-				if(newval!=null)
-				{
-					val	= newval;
-				}
-			}
-			catch(RuntimeException e)
-			{
-			}
-		}
-		rootconfig.setValue(name, val);
-		return val;
-	}
+	/**  Puts parsed value into component args to be available at instance. */
+//	public void putArgumentValue(String name, Object val)
+//	{
+//		rootconfig.setValue(name, val);
+//	}
 
-	private Object getArgumentValueFromModel(String name, IModelInfo model)
+	private Object getArgumentValueFromModel(String name)
 	{
 		Object val = null;
-		String	configname	= getConfigurationName(model);
-		ConfigurationInfo	compConfig	= configname!=null
-			? model.getConfiguration(configname) 
-				: model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
 				
 		boolean	found	= false;
-		if(compConfig!=null)
+		// first try to get the value from choosen configuration
+		if(configurationInfo!=null)
 		{
-			UnparsedExpression[]	upes	= compConfig.getArguments();
+			UnparsedExpression[]	upes	= configurationInfo.getArguments();
 			for(int i=0; !found && i<upes.length; i++)
 			{
 				if(name.equals(upes[i].getName()))
@@ -635,6 +706,7 @@ public class PlatformConfiguration
 				}
 			}
 		}
+		// if this fails, get default value.
 		if(!found)
 		{
 			 IArgument	arg	= model.getArgument(name);
@@ -651,13 +723,13 @@ public class PlatformConfiguration
 	/**
 	 * Get the configuration name.
 	 */
-	public String	getConfigurationName(IModelInfo model)
+	private ConfigurationInfo	getConfigurationInfo(IModelInfo model)
 	{
-		String	configname	= (String)cmdargs.get(RootComponentConfiguration.CONFIGURATION_NAME);
+		String	configname	= (String)cmdargs.get(CONFIGURATION_NAME);
 		if(configname==null)
 		{
 			Object	val	= null;
-			IArgument	arg	= model.getArgument(RootComponentConfiguration.CONFIGURATION_NAME);
+			IArgument	arg	= model.getArgument(CONFIGURATION_NAME);
 			if(arg!=null)
 			{
 				val	= arg.getDefaultValue();
@@ -666,7 +738,12 @@ public class PlatformConfiguration
 //			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
 			configname	= val!=null ? val.toString() : null;
 		}
-		return configname;
+		
+		ConfigurationInfo	compConfig	= configname!=null
+			? model.getConfiguration(configname) 
+				: model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
+				
+		return compConfig;
 	}
 
 	
@@ -716,6 +793,7 @@ public class PlatformConfiguration
 		Object value = val;
 		if(!RESERVED.contains(key))
 		{
+			// if not reserved, value is parsed and written to root config.
 			try
 			{
 				value = SJavaParser.evaluateExpression(val, null);
@@ -762,12 +840,28 @@ public class PlatformConfiguration
 		else if(OPENGL.equals(key) && "false".equals(val))
 		{
 			config.setOpenGl(false);
-			
 		}
-		// TODO Monitoring parse code here instead of starter?
+		else if (MONITORING.equals(key)) 
+		{
+			Object tmpmoni = config.getValue(PlatformConfiguration.MONITORING);
+			PublishEventLevel moni = PublishEventLevel.OFF;
+			if(tmpmoni instanceof Boolean)
+			{
+				moni = ((Boolean)tmpmoni).booleanValue()? PublishEventLevel.FINE: PublishEventLevel.OFF;
+			}
+			else if(tmpmoni instanceof String)
+			{
+				moni = PublishEventLevel.valueOf((String)tmpmoni);
+			}
+			else if(tmpmoni instanceof PublishEventLevel)
+			{
+				moni = (PublishEventLevel)tmpmoni;
+			}
+			config.setMonitoring(moni);
+		}
 		else
 		{
-			config.cmdargs.put(key, value);
+			config.setValue(key, value);
 		}
 	}
 }
