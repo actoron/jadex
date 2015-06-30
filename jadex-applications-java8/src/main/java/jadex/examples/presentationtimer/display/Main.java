@@ -4,9 +4,7 @@ import jadex.base.PlatformConfiguration;
 import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -16,7 +14,6 @@ import jadex.commons.future.ITuple2Future;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -56,56 +53,16 @@ public class Main {
 	
 	
 	public void init() {
-		
-//		public static final String KERNEL_COMPONENT = "component";
-//		public static final String KERNEL_MICRO = "micro";
-//		public static final String KERNEL_BPMN = "bpmn";
-//		public static final String KERNEL_BDIV3 = "v3";
-//		public static final String KERNEL_BDI = "bdi";
-//		public static final String KERNEL_BDIBPMN = "bdibpmn";
-		
-		HashMap<String, String> jadexArgs = new HashMap<String, String>();
-		jadexArgs.put("platformname", "presentationtimer-*");
-		jadexArgs.put("gui", "false");
-		jadexArgs.put("welcome", "false");
-		jadexArgs.put("cli", "false");
-		jadexArgs.put("extensions", "null");
-		jadexArgs.put("awareness", "true");
-		jadexArgs.put("conf", "jadex.platform.PlatformAgent");
-		jadexArgs.put("chat", "false");
-//		jadexArgs.put("binarymessages", "true");
-//		jadexArgs.put("kernels", "\"micro, bdiv3, component\"");
-//		jadexArgs.put("relayaddress", "\"http://relay1.activecomponents.org/\"");
-//		jadexArgs.put("relayaddress", "\"http://www0.activecomponents.org/relay\"");
-//		jadexArgs.put("relayaddress", "\"http://localhost:8080/\"");
-		jadexArgs.put("awamechanisms", "\"relay\"");
-		jadexArgs.put("logging", "false");
-		
-//		jadexArgs.put("ssltcptransport", "true");
-		jadexArgs.put("relaysecurity", "false");
-		jadexArgs.put("networkname", "jadexnetwork");
-		jadexArgs.put("networkpass", "laxlax");
-		
-		PlatformConfiguration config = new PlatformConfiguration();
+		PlatformConfiguration config = PlatformConfiguration.getMinimalRelayAwareness();
 		RootComponentConfiguration rootConfig = config.getRootConfig();
 
 		config.setPlatformName("presentationtimer-*");
-		rootConfig.setGui(false);
-		rootConfig.setWelcome(false);
-		rootConfig.setCli(false);
-		rootConfig.setAwareness(true);
-		config.setConfigurationFile("jadex.platform.PlatformAgent");
-		rootConfig.setChat(false);
-		rootConfig.setRelaySecurity(false);
-		rootConfig.setAwaMechanisms("relay");
-		rootConfig.setLogging(false);
 		
 		rootConfig.setNetworkName("jadexnetwork");
 		rootConfig.setNetworkPass("laxlax");
 		
-
-
-//		IFuture<IExternalAccess> fut = Starter.createPlatform(jadexArgs);
+//		config.setDht(true);
+		
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 		fut.addResultListener(access -> {

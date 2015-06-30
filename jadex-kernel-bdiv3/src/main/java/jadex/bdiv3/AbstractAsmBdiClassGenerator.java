@@ -7,6 +7,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.eca.EventType;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -434,6 +435,40 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			}
 		}
 		return isinner;
+	}
+	
+	/**
+	 * Returns whether a class is already enhanced.
+	 * @param clazz
+	 * @return true, if already enhanced, else false.
+	 */
+	public static boolean isEnhanced(Class<?> clazz)
+	{
+		boolean isEnhanced = false;
+		try {
+//			Field field = clazz.getField("__agent");
+			Field field = clazz.getField("__globalname");
+			isEnhanced = true;
+		} catch (NoSuchFieldException ex) {
+		}
+		return isEnhanced;
+	}
+	
+	/**
+	 *  Check if a bdi agent class was enhanced.
+	 *  @throws RuntimeException if was not enhanced.
+	 */
+	public static void checkEnhanced(Class<?> clazz)
+	{
+		// check if agentclass is bytecode enhanced
+		try
+		{
+			clazz.getField("__agent");
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + " This may happen if the class is accessed directly in application code before loadModel() was called.");
+		}
 	}
 
 }

@@ -1,5 +1,6 @@
 package jadex.maven;
 
+import jadex.bdiv3.AbstractAsmBdiClassGenerator;
 import jadex.bdiv3.ByteKeepingASMBDIClassGenerator;
 import jadex.bdiv3.KernelBDIV3Agent;
 import jadex.bdiv3.MavenBDIModelLoader;
@@ -16,6 +17,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -106,6 +108,16 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	 */
 	protected Boolean removeAndroidIncompatible;
 	
+	
+	/**
+	 * Enable in-place mode.
+	 * Tries to enhance the classes directly inside the output dir. 
+	 * (necessary to work with eclipse build system)
+	 * This does not affect dependency handling.
+	 * @parameter default-value="false"
+	 */
+	protected Boolean inPlace;
+	
 	private IOFileFilter bdiFileFilter = new IOFileFilter()
 	{
 		private List<String> kernelTypes = getBDIKernelTypes();
@@ -134,7 +146,6 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	private MavenBDIModelLoader modelLoader;
 	private ByteKeepingASMBDIClassGenerator gen;
 
-	@SuppressWarnings("resource")
 	public void execute() throws MojoExecutionException, MojoFailureException
 	{
 		getLog().info("Generating BDI V3 Agents...");
@@ -143,9 +154,15 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		gen = new ByteKeepingASMBDIClassGenerator();
 		modelLoader.setGenerator(gen);
 		
-		File outputDirectory = new File(buildDirectory, "bdi-generated");
-		File tmpDirectory = new File(buildDirectory, "bdi-generated-deps");
-		
+		File outputDirectory; 
+		File tmpDirectory;
+		if (inPlace) {
+			getLog().info("Trying to enhance classes in-place...");
+			outputDirectory = new File(buildDirectory, "classes");
+		} else {
+			outputDirectory = new File(buildDirectory, "bdi-generated");
+		}
+		tmpDirectory = new File(buildDirectory, "bdi-generated-deps");
 		
 		try
 		{
@@ -404,10 +421,12 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		{inputUrl}, originalCl);
 		Collection<File> allClasses = FileUtils.listFiles(inputDirectory, null, true);
 		
+		URLClassLoader tempLoader = new URLClassLoader(new URL[]{inputUrl}, inputCl);
+		
 		for (File bdiFile : allClasses)
 		{
 			gen.clearRecentClassBytes();
-			List<Class<?>> classes = null;
+//			List<Class<?>> classes = null;
 			BDIModel model = null;
 
 			String relativePath = ResourceUtils
@@ -416,9 +435,18 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			if (bdiFileFilter.accept(bdiFile))
 			{
 				String agentClassName = relativePath.replace(File.separator, ".").replace(".class", "");
-
+				
+				if (inPlace) {
+					Class<?> loadClass = tempLoader.loadClass(agentClassName);
+					if (AbstractAsmBdiClassGenerator.isEnhanced(loadClass)) {
+						getLog().info("Already enhanced: " + relativePath);
+						continue;
+					}
+					tempLoader.close();
+				}
+				
 				getLog().debug("Loading Model: " + relativePath);
-
+				
 				try
 				{
 					model = (BDIModel) modelLoader.loadModel(relativePath, imports, inputCl, inputCl, new Object[]
@@ -498,7 +526,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 //		inputCl.close();
 //		outputCl.close();
 	}
-	
+
 	private void removeAndroidIncompatible(File path) throws IOException {
 		@SuppressWarnings("unchecked")
 		Collection<File> allFiles = FileUtils.listFiles(path, new FileFileFilter() {

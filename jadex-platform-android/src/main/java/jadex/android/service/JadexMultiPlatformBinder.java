@@ -123,7 +123,7 @@ public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatf
 
 	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
 	{
-		return startJadexPlatform(kernels, platformId, "");
+		return service.startJadexPlatform(kernels, platformId);
 	}
 
 	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)

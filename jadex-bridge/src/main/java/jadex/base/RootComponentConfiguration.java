@@ -178,7 +178,19 @@ public class RootComponentConfiguration
 		bpmn,
 		v3,
 		bdi,
-		bdibpmn
+		bdibpmn,
+		multi
+	}
+	
+	/**
+	 * Discovery names enum.
+	 */
+	public enum AWAMECHANISM {
+		broadcast,
+		multicast,
+		message,
+		relay,
+		local
 	}
 
 	/** All configured parameters as map. **/
@@ -186,6 +198,9 @@ public class RootComponentConfiguration
 	
 	/** The activated kernels. **/
 	private KERNEL[]	kernels;
+
+	/** The activated awareness machanisms. **/
+	private AWAMECHANISM[]	awamechanisms;
 	
 	/**
 	 * Create a new configuration.
@@ -438,14 +453,23 @@ public class RootComponentConfiguration
 		setValue(AWARENESS, value);
 	}
 
-	public String getAwaMechanisms()
+	public AWAMECHANISM[] getAwaMechanisms()
 	{
-		return (String)getValue(AWAMECHANISMS);
+		return awamechanisms;
 	}
 
-	public void setAwaMechanisms(String value)
+	public void setAwaMechanisms(AWAMECHANISM... values)
 	{
-		setValue(AWAMECHANISMS, value);
+		awamechanisms = values;
+		StringBuilder sb = new StringBuilder();
+		String semi = "";
+		for(int i = 0; i < values.length; i++)
+		{
+			sb.append(semi);
+			sb.append(values[i].name());
+			semi = ",";
+		}
+		setValue(AWAMECHANISMS, sb.toString());
 	}
 
 	public long getAwaDelay()
@@ -593,7 +617,7 @@ public class RootComponentConfiguration
 		return (Integer)getValue(TCPPORT);
 	}
 
-	public void setTcpPorT(int value)
+	public void setTcpPort(int value)
 	{
 		setValue(TCPPORT, value);
 	}
@@ -698,10 +722,12 @@ public class RootComponentConfiguration
 		kernels = value;
 		// String[] oldVal = new String[kernels.length];
 		StringBuilder sb = new StringBuilder();
+		String semi = "";
 		for(int i = 0; i < kernels.length; i++)
 		{
+			sb.append(semi);
 			sb.append(kernels[i].name());
-			sb.append(",");
+			semi = ",";
 		}
 		setValue(KERNELS, sb.toString());
 	}

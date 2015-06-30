@@ -1,5 +1,7 @@
 package jadex.base;
 
+import jadex.base.RootComponentConfiguration.AWAMECHANISM;
+import jadex.base.RootComponentConfiguration.KERNEL;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -15,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * Configuration of the platform setup. 
@@ -115,8 +118,6 @@ public class PlatformConfiguration
 	/** Constant for local default timeout. */
 	private static long DEFAULT_LOCAL_TIMEOUT = SReflect.isAndroid() ? 60000 : 30000;
 	
-
-
 	static
 	{
 		// Set deftimeout from environment, if set.
@@ -184,6 +185,137 @@ public class PlatformConfiguration
 		components = new ArrayList<String>();	// Additional components to start
 	}
 	
+	/**
+	 * Returns a PlatformConfiguration with the default parameters.
+	 * @return
+	 */
+	public static PlatformConfiguration getDefault()
+	{
+		PlatformConfiguration config = new PlatformConfiguration();
+//		config.setPlatformName("jadex");
+		config.setPlatformName(null);
+		config.setConfigurationName("auto");
+		config.setAutoShutdown(false);
+		config.setPlatformComponent(SReflect.classForName0("jadex.platform.service.cms.PlatformComponent", null));
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+		rootConfig.setWelcome(true);
+		rootConfig.setGui(true);
+		rootConfig.setCliConsole(true);
+		rootConfig.setSaveOnExit(true);
+		rootConfig.setJccPlatforms(null);
+		rootConfig.setLogging(false);
+		rootConfig.setLoggingLevel(Level.SEVERE);
+		rootConfig.setThreadpoolDefer(true);
+		rootConfig.setPersist(false);
+		rootConfig.setUniqueIds(true);
+		
+		rootConfig.setChat(true);
+		
+		rootConfig.setAwareness(true);
+		rootConfig.setAwaMechanisms(AWAMECHANISM.broadcast, AWAMECHANISM.multicast, AWAMECHANISM.message, AWAMECHANISM.relay, AWAMECHANISM.local);
+		rootConfig.setAwaDelay(20000);
+		rootConfig.setAwaIncludes("");
+		rootConfig.setAwaExcludes("");
+		
+		rootConfig.setBinaryMessages(true);
+		rootConfig.setStrictCom(false);
+		rootConfig.setPrintPass(true);
+		
+		rootConfig.setLocalTransport(true);
+		rootConfig.setTcpTransport(false);
+		rootConfig.setTcpPort(0);
+		rootConfig.setNioTcpTransport(true);
+		rootConfig.setNioTcpPort(0);
+		rootConfig.setRelayTransport(true);
+//		rootConfig.setRelayAddress("jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS");
+//			rootConfig.setRelaySecurity(true);
+		rootConfig.setSslTcpTransport(false);
+		rootConfig.setSslTcpPort(0);
+		
+		rootConfig.setWsPublish(false);
+		rootConfig.setRsPublish(false);
+		rootConfig.setKernels(KERNEL.multi);
+		rootConfig.setMavenDependencies(false);
+		rootConfig.setSensors(false);
+		rootConfig.setThreadpoolClass(null);
+		rootConfig.setContextServiceClass(null);
+		
+		rootConfig.setMonitoringComp(true);
+		rootConfig.setDf(true);
+		rootConfig.setClock(true);
+		rootConfig.setMessage(true);
+		rootConfig.setSimul(true);
+		rootConfig.setFiletransfer(true);
+		rootConfig.setMarshal(true);
+		rootConfig.setSecurity(true);
+		rootConfig.setLibrary(true);
+		rootConfig.setSettings(true);
+		rootConfig.setContext(true);
+		rootConfig.setAddress(true);
+		rootConfig.setDhtProvide(false);
+		return config;
+	}
+	
+	/**
+	 * Returns a minimal platform configuration without any network connectivity.
+	 * @return
+	 */
+	public static PlatformConfiguration getMinimal()
+	{
+		PlatformConfiguration config = getDefault();
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+		rootConfig.setWelcome(false);
+		rootConfig.setGui(false);
+		rootConfig.setCliConsole(false);
+		
+		rootConfig.setChat(false);
+		
+		rootConfig.setAwareness(false);
+		rootConfig.setAwaMechanisms();
+		
+		rootConfig.setLocalTransport(true); // needed by message
+		rootConfig.setNioTcpTransport(false);
+		rootConfig.setRelayTransport(false);
+		rootConfig.setSslTcpTransport(false);
+		
+		rootConfig.setKernels(KERNEL.micro);
+//		rootConfig.setThreadpoolClass(null);
+//		rootConfig.setContextServiceClass(null);
+		
+		rootConfig.setMonitoringComp(false);
+		rootConfig.setDf(false);
+		rootConfig.setClock(true);
+		rootConfig.setMessage(true); // needed by rms
+		rootConfig.setSimul(false);
+		rootConfig.setFiletransfer(false);
+		rootConfig.setMarshal(true);
+		rootConfig.setSecurity(false);
+		rootConfig.setLibrary(true); // needed by micro
+		rootConfig.setSettings(true);
+		rootConfig.setContext(true);
+		rootConfig.setAddress(true);
+		rootConfig.setDhtProvide(false);
+		return config;
+	}
+	
+	/**
+	 * Returns a minimal platform configuration that communicates via relay.
+	 * @return
+	 */
+	public static PlatformConfiguration getMinimalRelayAwareness()
+	{
+		PlatformConfiguration config = getMinimal();
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+		
+		rootConfig.setAwareness(true);
+		rootConfig.setAwaMechanisms(AWAMECHANISM.relay);
+		rootConfig.setRelayTransport(true);
+		
+		rootConfig.setKernels(KERNEL.micro);
+		
+		return config;
+	}
+
 	/**
 	 * Copy constructor.
 	 */
@@ -538,14 +670,16 @@ public class PlatformConfiguration
 	 * @param value
 	 */
 	public void setDhtProvide(boolean value) {
-		setValue(DHT_PROVIDE, value);
+//		setValue(DHT_PROVIDE, value);
+		rootconfig.setDhtProvide(value);
 	}
 	/**
 	 * Get the provide DHT flag.
 	 * @return
 	 */
 	public boolean getDhtProvide() {
-		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
+//		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
+		return rootconfig.getDhtProvide();
 	}
 	
 	/**

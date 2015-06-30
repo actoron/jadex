@@ -75,5 +75,12 @@ public class MyAgent	implements IAgentInterface
 	{
 		showAndroidMessage("I was called with: " + message);
 	}
+
+	@Override
+	public IFuture<String> getString()
+	{
+		Future<String> future = new Future<String>("stringFromAgent");
+		return future;
+	}
 	
 }

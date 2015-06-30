@@ -1104,22 +1104,5 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		m.setAccessible(true);
 //		m.invoke(null, new Object[]{new String[0]});
 	}
-	
-	/**
-	 *  Check if a bdi agent class was enhanced.
-	 *  @throws RuntimeException if was not enhanced.
-	 */
-	public static void checkEnhanced(Class<?> clazz)
-	{
-		// check if agentclass is bytecode enhanced
-		try
-		{
-			clazz.getField("__agent");
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + " This may happen if the class is accessed directly in application code before loadModel() was called.");
-		}
-	}
 
 }

@@ -3,6 +3,7 @@ package jadex.android.service;
 import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
+import jadex.android.commons.Logger;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -13,7 +14,6 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -62,7 +62,6 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		
 		int size = kernelList.size();
 		platformKernels = kernelList.toArray(new String[size]);
-		System.out.println("Starting with " + Arrays.toString(platformKernels));
 	}
 
 	@Override
@@ -175,6 +174,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	
 	final protected IFuture<IExternalAccess> startPlatform()
 	{
+		Logger.i("Starting with " + Arrays.toString(platformKernels));
 		return startJadexPlatform(platformKernels, platformName, platformOptions);
 	}
 	
@@ -191,6 +191,11 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	public IExternalAccess getExternalPlatformAccess()
 	{
 		return getExternalPlatformAccess(platformId);
+	}
+	
+	public IExternalAccess getPlatformAccess()
+	{
+		return getExternalPlatformAccess();
 	}
 
 	public <S> S getsService(Class<S> serviceClazz)
