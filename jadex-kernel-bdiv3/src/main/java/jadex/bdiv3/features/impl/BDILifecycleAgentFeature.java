@@ -1501,7 +1501,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 				
 				// context condition
-				
+								
 				final MethodInfo mi = mplan.getBody().getContextConditionMethod(component.getClassLoader());
 				if(mi!=null)
 				{
@@ -1517,7 +1517,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						events.add(BDIAgentFeature.createEventType(rawev));
 					}
-					
+				
 					IAction<Void> abortplans = new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
@@ -1549,6 +1549,31 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					Rule<Void> rule = new Rule<Void>("plan_context_abort_"+mplan.getName(), 
 						new PlansExistCondition(mplan, rcapa), abortplans);
 					rule.setEvents(events);
+					rulesystem.getRulebase().addRule(rule);
+				}
+				else if(mplan.getContextCondition()!=null)
+				{
+					final MCondition mcond = mplan.getContextCondition();
+					
+					IAction<Void> abortplans = new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+						{
+							Collection<RPlan> coll = rcapa.getPlans(mplan);
+							
+							for(final RPlan plan: coll)
+							{
+								if(!evaluateCondition(component, mcond, plan.getModelElement(), SUtil.createHashMap(new String[]{"$plan"}, new Object[]{plan})))
+								{
+									plan.abort();
+								}
+							}
+							return IFuture.DONE;
+						}
+					};
+					
+					Rule<Void> rule = new Rule<Void>("plan_context_condition_"+mplan.getName(), new PlansExistCondition(mplan, rcapa), abortplans);
+					rule.setEvents(mcond.getEvents());
 					rulesystem.getRulebase().addRule(rule);
 				}
 			}

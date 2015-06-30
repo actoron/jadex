@@ -18,7 +18,7 @@ public class ContextPlan extends Plan
 
 	/**
 	 * The body method is called on the
-	 * instatiated plan instance from the scheduler.
+	 * instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{

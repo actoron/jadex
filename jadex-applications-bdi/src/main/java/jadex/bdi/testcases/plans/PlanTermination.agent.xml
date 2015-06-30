@@ -44,11 +44,8 @@
 	<plans>
 		<plan name="worker">
 			<body class="ContextPlan"/>
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.context
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				// ?mbelief = (mbelief (melement_has_name "context"))
 			</contextcondition>
 		</plan>
 
@@ -67,7 +64,7 @@
 	</plans>
 
 	<expressions>
-		<condition name="plan_context" language="jcl">
+		<condition name="plan_context">
 			!$beliefbase.context
 		</condition>
 	</expressions>

@@ -2522,10 +2522,17 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public static class PlansExistCondition implements ICondition
 	{
+		/** The mplan. */
 		protected MPlan mplan;
 		
+		/** The capability. */
 		protected RCapability capa;
 		
+		/**
+		 *  Create a new plan exists condition.
+		 *  @param mplan
+		 *  @param capa
+		 */
 		public PlansExistCondition(MPlan mplan, RCapability capa)
 		{
 			this.mplan = mplan;
@@ -2533,7 +2540,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		
 		/**
-		 * 
+		 *  Evaluate the condition.
 		 */
 		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 		{
