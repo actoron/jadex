@@ -291,7 +291,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //			final IBDIAgentFeature bdif = component.getComponentFeature(IBDIAgentFeature.class);
 //			final IInternalBDIAgentFeature ibdif = (IInternalBDIAgentFeature)bdif; 
 //			final IBDIModel bdimodel = ibdif.getBDIModel();
-//			final RuleSystem rulesystem = ibdif.getRuleSystem();
 			
 			// Init bdi configuration
 			String confname = component.getConfiguration();
@@ -1802,6 +1801,10 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			// are executed and not processed as init writes
 			IInternalBDILifecycleFeature bdil = (IInternalBDILifecycleFeature)component.getComponentFeature(ILifecycleComponentFeature.class);
 			bdil.setInited(true);
+			
+			// After init rule execution mode to direct
+			rulesystem.setQueueEvents(false);
+			
 //			System.out.println("inited: "+component.getComponentIdentifier());
 			
 			// perform init write fields (after injection of bdiagent)

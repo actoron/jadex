@@ -71,6 +71,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	 */
 	public void setInited(boolean inited)
 	{
+//		System.out.println("inited: "+getComponent().getComponentIdentifier());
 		this.inited = inited;
 	}
 	
