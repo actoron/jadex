@@ -15,20 +15,6 @@ public class BeliefChangePlan extends Plan
 	/** The new value. */
 	protected Object value;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public BeliefChangePlan()
-	{
-		this.belname = (String)getParameter("beliefname").getValue();
-		if(belname==null)
-			throw new RuntimeException("Beliefname must not null.");
-
-		this.value = getParameter("value").getValue();
-	}
-
 	//-------- methods --------
 
 	/**
@@ -37,7 +23,13 @@ public class BeliefChangePlan extends Plan
 	 */
 	public void body()
 	{
-		getLogger().info("Setting belief: "+belname+" to :"+value);
+		this.belname = (String)getParameter("beliefname").getValue();
+		if(belname==null)
+			throw new RuntimeException("Beliefname must not null.");
+
+		this.value = getParameter("value").getValue();
+		System.out.println("Setting belief: "+belname+" to :"+value);
+//		getLogger().info("Setting belief: "+belname+" to :"+value);
 		getBeliefbase().getBelief(belname).setFact(value);
 	}
 }

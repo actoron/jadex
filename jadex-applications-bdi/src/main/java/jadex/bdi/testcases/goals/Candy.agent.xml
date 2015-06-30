@@ -39,11 +39,8 @@
 
 	<goals>
 		<achievegoal name="testgoal" recalculate="true">
-			<targetcondition language="jcl">
+			<targetcondition>
  				$beliefbase.candyeaten
-
-				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				// ?mbel	= (mbelief (melement_has_name "candyeaten"))
  			</targetcondition>
 		</achievegoal>
 	</goals>

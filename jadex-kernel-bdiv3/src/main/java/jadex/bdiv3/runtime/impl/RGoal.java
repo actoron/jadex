@@ -2,6 +2,7 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
+import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -9,6 +10,7 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MParameter.Direction;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
@@ -714,11 +716,25 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 					{
 						if(getMGoal().getRetryDelay()>-1)
 						{
-							ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this), getMGoal().getRetryDelay());
+							if(getMGoal().isRebuild())
+							{
+								ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(this), getMGoal().getRetryDelay());
+							}
+							else
+							{
+								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this), getMGoal().getRetryDelay());
+							}
 						}
 						else
 						{
-							ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
+							if(getMGoal().isRebuild())
+							{
+								ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(this));
+							}
+							else
+							{
+								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
+							}
 						}
 					}
 					else if(RProcessableElement.State.NOCANDIDATES.equals(getState()))
