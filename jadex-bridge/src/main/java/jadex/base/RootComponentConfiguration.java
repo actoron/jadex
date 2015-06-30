@@ -353,7 +353,7 @@ public class RootComponentConfiguration
 		return Boolean.TRUE.equals(getValue(SIMULATION));
 	}
 
-	public void setSimulation(String value)
+	public void setSimulation(boolean value)
 	{
 		setValue(SIMULATION, value);
 	}
@@ -448,12 +448,12 @@ public class RootComponentConfiguration
 		setValue(AWAMECHANISMS, value);
 	}
 
-	public long setAwaDelay()
+	public long getAwaDelay()
 	{
 		return (Long)getValue(AWADELAY);
 	}
 
-	public void getAwaDelay(long value)
+	public void setAwaDelay(long value)
 	{
 		setValue(AWADELAY, value);
 	}
@@ -658,12 +658,12 @@ public class RootComponentConfiguration
 		setValue(SSLTCPTRANSPORT, value);
 	}
 
-	public boolean getSslTcpPort()
+	public int getSslTcpPort()
 	{
-		return Boolean.TRUE.equals(getValue(SSLTCPPORT));
+		return (Integer)getValue(SSLTCPPORT);
 	}
 
-	public void setSslTcpPort(boolean value)
+	public void setSslTcpPort(int value)
 	{
 		setValue(SSLTCPPORT, value);
 	}

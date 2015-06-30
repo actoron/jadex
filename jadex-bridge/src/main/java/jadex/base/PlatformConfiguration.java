@@ -103,7 +103,7 @@ public class PlatformConfiguration
 	public static final String DHT = "dht";
 	
 	/** Flag to enable or disable dht providing features (service discovery). **/
-	public static final String DHT_PROVIDE = "providedht";
+	public static final String DHT_PROVIDE = "dhtprovide";
 	
 	/** The reserved platform parameters. Those are (usually) not handled by the root component. */
 	public static final Set<String> RESERVED;
@@ -725,7 +725,7 @@ public class PlatformConfiguration
 	 */
 	private ConfigurationInfo	getConfigurationInfo(IModelInfo model)
 	{
-		String	configname	= (String)cmdargs.get(CONFIGURATION_NAME);
+		String	configname	= getConfigurationName();//(String)cmdargs.get(CONFIGURATION_NAME);
 		if(configname==null)
 		{
 			Object	val	= null;
