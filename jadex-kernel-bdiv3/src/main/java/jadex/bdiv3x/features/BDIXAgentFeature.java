@@ -1,5 +1,6 @@
 package jadex.bdiv3x.features;
 
+import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
@@ -126,7 +127,24 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		
 		this.bdimodel = (IBDIModel)getComponent().getModel();
 		this.capa = new RCapability(bdimodel.getCapability(), component);
-		this.rulesystem = new RuleSystem(null, true);
+		this.rulesystem = new RuleSystem(null, true)
+		{
+			public IFuture<Void> addEvent(IEvent event) 
+			{
+				// Implement atomic by changing the rule execution mode
+				RPlan rplan = ExecutePlanStepAction.RPLANS.get();
+				
+				if(rplan!=null && !isQueueEvents() && rplan.isAtomic())
+					setQueueEvents(true);
+				
+				IFuture<Void> ret = super.addEvent(event);
+				
+				if(rplan!=null && !isQueueEvents() && rplan.isAtomic())
+					setQueueEvents(false);
+				
+				return ret;
+			}
+		};
 	}
 
 	/**

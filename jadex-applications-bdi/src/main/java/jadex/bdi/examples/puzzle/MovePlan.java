@@ -50,9 +50,9 @@ public class MovePlan extends Plan
 
 		// Atomic block is required, because a micro plan step occurs when property change event
 		// from the board occurs. This means that no further bean listeners will be notified (e.g gui).
-//		startAtomic();
+		startAtomic();
 		board.move(move);
-//		endAtomic();
+		endAtomic();
 		
 		waitFor(delay);
 		

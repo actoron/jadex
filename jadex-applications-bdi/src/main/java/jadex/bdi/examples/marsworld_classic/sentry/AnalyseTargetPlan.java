@@ -48,13 +48,12 @@ public class AnalyseTargetPlan extends Plan
 		if(target.getOreCapacity()>0)
 			callProductionAgent(target);
 
-		// todo:?!
-//		startAtomic();
+		startAtomic();
 		
 		getBeliefbase().getBeliefSet("analysed_targets").addFact(target);
 		getBeliefbase().getBeliefSet("my_targets").removeFact(target);
 		
-//		endAtomic();
+		endAtomic();
 	}
 
 	/**

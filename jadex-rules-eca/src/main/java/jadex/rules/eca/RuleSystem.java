@@ -607,26 +607,29 @@ public class RuleSystem
 //		if(event.getType().getType(0).indexOf("factadded")!=-1 && event.getType().getType(1).indexOf("wastebins")!=-1)
 //			System.out.println("add event: "+event);
 
-		final Future<Void> ret;
+		final IFuture<Void> ret;
 		
 		pcman.addEvent(event);
 		
 		if(!queueevents)
 		{
-//			ret = processAllEvents();
 			// If actions add further events they will be processed as well
-			ret = new Future<Void>();
-			processEvent().addResultListener(new ExceptionDelegationResultListener<Collection<RuleEvent>, Void>(ret)
-			{
-				public void customResultAvailable(Collection<RuleEvent> result)
-				{
-					ret.setResult(null);
-				}
-			});
+//			ret = new Future<Void>();
+//			processEvent().addResultListener(new ExceptionDelegationResultListener<Collection<RuleEvent>, Void>(ret)
+//			{
+//				public void customResultAvailable(Collection<RuleEvent> result)
+//				{
+//					ret.setResult(null);
+//				}
+//			});
+			
+			// This works also if the mode is changed during execution and some events are in the queue
+			ret = processAllEvents();
 		}
 		else
 		{
-			 ret = (Future<Void>)IFuture.DONE;
+//			 ret = (Future<Void>)IFuture.DONE;
+			 ret = IFuture.DONE;
 		}
 		
 		return ret;

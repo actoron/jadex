@@ -36,10 +36,10 @@ public class UpdateVisionPlan extends Plan
 		IMessageEvent req = (IMessageEvent)getReason();
 		CurrentVision cv = (CurrentVision)req.getParameter(SFipa.CONTENT).getValue();
 		// todo:
-//		startAtomic();
+		startAtomic();
 			getBeliefbase().getBelief("my_self").setFact(null);
 			getBeliefbase().getBelief("my_self").setFact(cv.getCreature());
-//		endAtomic();
+		endAtomic();
 		getBeliefbase().getBelief("vision").setFact(cv.getVision());
 		WorldObject[] seenobs = cv.getVision().getObjects();
 

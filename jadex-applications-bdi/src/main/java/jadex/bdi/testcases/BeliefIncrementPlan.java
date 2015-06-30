@@ -94,11 +94,11 @@ public class BeliefIncrementPlan extends Plan
 			stepcnt = Integer.valueOf(stepcnt.intValue()+values[cnt++%values.length].intValue());
 
 			// Do atomic, to avoid being terminated before latest value is printed.
-//			startAtomic();
+			startAtomic();
 			getBeliefbase().getBelief(beliefname).setFact(stepcnt);
 			//System.out.println(this.getName()+": belief "+beliefname+" changed to: " + stepcnt.intValue());
 			getLogger().info(this+": belief "+beliefname+" changed to: " + stepcnt.intValue());
-//			endAtomic();
+			endAtomic();
 
 			if(rate>0)
 				waitFor(rate);

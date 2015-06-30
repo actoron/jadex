@@ -147,6 +147,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/** The wait cnt for rule names. */
 	protected int cnt;
 	
+	/** The atomic flag. */
+	protected boolean atomic;
+	
 	/**
 	 *  Create a new rplan based on an mplan.
 	 *  
@@ -1731,7 +1734,25 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	}
 	
 	/**
-	 * 
+	 *  Get the atomic.
+	 *  @return The atomic
+	 */
+	public boolean isAtomic()
+	{
+		return atomic;
+	}
+
+	/**
+	 *  The atomic to set.
+	 *  @param atomic The atomic to set
+	 */
+	public void setAtomic(boolean atomic)
+	{
+		this.atomic = atomic;
+	}
+
+	/**
+	 *  Publish a tool event.
 	 */
 	public void publishToolPlanEvent(String evtype)
 	{
@@ -1793,13 +1814,14 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //	}
 	
 	/**
-	 * 
+	 *  Future that overrides addResultListener to keep track
+	 *  of current rplan in RPLANS variable.
 	 */
 	public class BDIFuture<E> extends Future<E>
 	{
 		/**
-		 * 
-		 * @param listener
+		 *  Add a listener
+		 *  @param listener The listener. 
 		 */
 		public void addResultListener(IResultListener<E> listener) 
 		{

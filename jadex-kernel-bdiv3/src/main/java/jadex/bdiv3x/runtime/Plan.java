@@ -456,7 +456,7 @@ public abstract class Plan
 	 */
 	public void	startAtomic()
 	{
-		throw new UnsupportedOperationException();
+		rplan.setAtomic(true);
 	}
 
 	/**
@@ -469,7 +469,11 @@ public abstract class Plan
 	 */
 	public void	endAtomic()
 	{
-		throw new UnsupportedOperationException();
+		rplan.setAtomic(false);
+		
+		// Process events after atomic or is at the end of a step enough?
+//		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+//		bdif.getRuleSystem().processAllEvents();
 	}
 
 	/**

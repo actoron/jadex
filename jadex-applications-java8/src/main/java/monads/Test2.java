@@ -1,7 +1,5 @@
 package monads;
 
-import jadex.bridge.SFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -18,7 +16,6 @@ public class Test2
 {
 	public static void main(String[] args)
 	{
-		
 //		Test.getHello().addResultListener(x -> {
 //			String string = Test.getD(x).get();
 //			Collection<String> collection = Test.getE(string).get();

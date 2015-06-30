@@ -60,12 +60,12 @@ public class EatPlan extends Plan
 			
 			// Move or eat failed, forget food until seen again.
 			// todo:
-//			startAtomic();
+			startAtomic();
 			if(getBeliefbase().getBeliefSet("known_food").containsFact(food))
 				getBeliefbase().getBeliefSet("known_food").removeFact(food);
 			if(getBeliefbase().getBeliefSet("seen_food").containsFact(food))
 				getBeliefbase().getBeliefSet("seen_food").removeFact(food);
-//			endAtomic();
+			endAtomic();
 			
 			fail();
 		}

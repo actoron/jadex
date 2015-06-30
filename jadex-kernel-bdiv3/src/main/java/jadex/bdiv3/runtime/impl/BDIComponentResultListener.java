@@ -15,7 +15,10 @@ import jadex.commons.future.IUndoneResultListener;
 import java.util.logging.Logger;
 
 /**
- * 
+ *  This listener has the purpose to keep the current plan
+ *  in the RPLANS thread local. One problem is that the listener
+ *  calls are not async so that RPLANS have to be resetted after
+ *  the sync listener call.
  */
 public class BDIComponentResultListener<E> implements IResultListener<E>, IUndoneResultListener<E>
 {
@@ -23,7 +26,6 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	protected IResultListener<E> listener;
 	
 	/** The interpreter. */
-//	protected BDIAgentInterpreter interpreter;
 	protected IInternalAccess agent;
 	
 	/** The plan. */

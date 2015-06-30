@@ -71,8 +71,8 @@ public class StackBlocksPlan	extends Plan
 
 //		// This operation has to be performed atomic,
 //		// because it fires bean changes on several affected blocks. 
-//		startAtomic();
+		startAtomic();
 		block.stackOn(target);
-//		endAtomic();
+		endAtomic();
 	}
 }

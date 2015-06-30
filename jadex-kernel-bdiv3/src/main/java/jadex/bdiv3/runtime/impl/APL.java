@@ -578,6 +578,10 @@ public class APL
 		{
 			mplan = (MPlan)cand;
 		}
+		else if(cand instanceof MPlanInfo)
+		{
+			mplan = ((MPlanInfo)cand).getMPlan();
+		}
 //		else if(cand instanceof MGoal)
 //		{
 //			mgoal = (MGoal)cand;
