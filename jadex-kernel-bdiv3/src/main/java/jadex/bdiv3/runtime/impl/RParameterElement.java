@@ -10,6 +10,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.bdiv3x.runtime.IParameterSet;
+import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
@@ -31,7 +32,7 @@ import java.util.Map;
  *  - goal
  *  - plan
  */
-public class RParameterElement extends RElement implements IParameterElement, IMapAccess
+public abstract class RParameterElement extends RElement implements IParameterElement, IMapAccess
 {
 	/** The parameters. */
 	protected Map<String, IParameter> parameters;
@@ -45,7 +46,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	public RParameterElement(MParameterElement melement, IInternalAccess agent, Map<String, Object> vals, IValueFetcher fetcher)
 	{
 		super(melement, agent);
-		initParameters(vals, fetcher);
+		initParameters(vals, wrapFetcher(fetcher));
 	}
 	
 	/**
@@ -84,6 +85,39 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 			}
 		}
 	}
+	
+	/**
+	 *  Wrap the fetcher to include the element itself.
+	 */
+	public IValueFetcher wrapFetcher(final IValueFetcher fetcher)
+	{
+		return new IValueFetcher()
+		{
+			public Object fetchValue(String name)
+			{
+				Object ret = null;
+				if(getFetcherName().equals(name))
+				{
+					ret = RParameterElement.this;
+				}
+				else if(fetcher!=null)
+				{
+					ret = fetcher.fetchValue(name);
+				}
+				else
+				{
+					throw new RuntimeException("Value not found: "+name);
+				}
+				return ret;
+			}
+		};
+	}
+	
+	/**
+	 *  Get the name of the element in the fetcher (e.g. $goal).
+	 *  @return The element name in the fetcher name.
+	 */
+	public abstract String getFetcherName();
 	
 	/**
 	 * 

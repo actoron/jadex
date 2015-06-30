@@ -24,6 +24,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.rules.eca.Event;
@@ -85,6 +86,15 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	}
 
 	//-------- methods --------
+	
+	/**
+	 *  Get the name of the element in the fetcher (e.g. $goal).
+	 *  @return The element name in the fetcher name.
+	 */
+	public String getFetcherName()
+	{
+		return "$goal";
+	}
 	
 	/**
 	 *  Adopt a goal so that the agent tries pursuing it.

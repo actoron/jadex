@@ -36,17 +36,26 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		this.mt = mt;
 		
 		// Must be done after msg has been assigned :-(
-		super.initParameters(null, RBeliefbase.getFetcher(agent, modelelement));
+		super.initParameters(null, wrapFetcher(RBeliefbase.getFetcher(agent, modelelement)));
 	}
 	
 	/**
 	 *  Create the parameters from model spec.
 	 */
+	@Override
 	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher)
 	{
-		// do nothing
+		// do nothing in super constructor init 
 	}
 	
+	/**
+	 *  Get the name of the element in the fetcher (e.g. $goal).
+	 *  @return The element name in the fetcher name.
+	 */
+	public String getFetcherName()
+	{
+		return "$event";
+	}
 	
 	/**
 	 * 

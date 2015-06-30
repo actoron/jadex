@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IValueFetcher;
 
 /**
  *  Runtime element for handling a service call as plan. 
@@ -18,6 +19,15 @@ public class RServiceCall extends RFinishableElement
 	public RServiceCall(MProcessableElement modelelement, InvocationInfo pojoelement, IInternalAccess agent)
 	{
 		super(modelelement, pojoelement, agent, null);
+	}
+	
+	/**
+	 *  Get the name of the element in the fetcher (e.g. $goal).
+	 *  @return The element name in the fetcher name.
+	 */
+	public String getFetcherName()
+	{
+		return "$call";
 	}
 	
 	/**

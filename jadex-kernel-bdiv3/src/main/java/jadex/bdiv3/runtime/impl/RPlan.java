@@ -407,6 +407,15 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		setLifecycleState(PlanLifecycleState.NEW);
 		setProcessingState(PlanProcessingState.READY);
 	}
+	
+	/**
+	 *  Get the name of the element in the fetcher (e.g. $goal).
+	 *  @return The element name in the fetcher name.
+	 */
+	public String getFetcherName()
+	{
+		return "$plan";
+	}
 
 	/**
 	 *  Get the processingState.
