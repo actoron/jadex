@@ -11,6 +11,9 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -27,15 +30,15 @@ public class PlatformConfigurationTest
 {
 	@Test
 	public void testParametersEquivalence() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		PlatformConfiguration config = new PlatformConfiguration();
-		RootComponentConfiguration rootConfig = config.getRootConfig();
-		config.setPlatformName("testcases_*");
-		rootConfig.setGui(false);
-		rootConfig.setSaveOnExit(false);
-		rootConfig.setWelcome(false);
-		config.setAutoShutdown(false);
-		rootConfig.setPrintPass(false);
-		long timeout = Starter.getLocalDefaultTimeout(null);
+//		PlatformConfiguration config = new PlatformConfiguration();
+//		RootComponentConfiguration rootConfig = config.getRootConfig();
+//		config.setPlatformName("testcases_*");
+//		rootConfig.setGui(false);
+//		rootConfig.setSaveOnExit(false);
+//		rootConfig.setWelcome(false);
+//		config.setAutoShutdown(false);
+//		rootConfig.setPrintPass(false);
+//		long timeout = Starter.getLocalDefaultTimeout(null);
 		
 		
 		// only load model
@@ -47,6 +50,8 @@ public class PlatformConfigurationTest
 		// start whole platfrom
 //		IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(config).get(timeout);
 //		IModelInfo defmodel = platform.getModel();
+		
+//		RootComponentConfiguration defaultRootConfig = PlatformConfiguration.getDefault().getRootConfig();
 		
 		IArgument[] arguments = defmodel.getArguments();
 		
@@ -75,9 +80,15 @@ public class PlatformConfigurationTest
 						setterParamType = SReflect.getWrappedType(setterParamType);
 					}
 					// this parameter has another parameter type in config object
-					if (!name.equals(RootComponentConfiguration.KERNELS)) {
+					if (!(name.equals(RootComponentConfiguration.KERNELS)
+						|| name.equals(RootComponentConfiguration.AWAMECHANISMS))) {
 						assertEquals("Field " + name + " has not the same type.", modelParamType, setterParamType);
 					}
+					
+//					Object defValue = defaultRootConfig.getValue(name);
+//					IParsedExpression parseExpression = SJavaParser.parseExpression(argument.getDefaultValue(), null, null);
+//					System.out.println(parseExpression);
+//					assertTrue(name, parseExpression.equals(defValue));
 				}
 				
 			}
@@ -100,6 +111,12 @@ public class PlatformConfigurationTest
 					assertTrue("RootComponentConfiguration contains parameter that is not in platform model: " + argument, contains);
 			}
 		}
+	}
+	
+	@Test
+	public void testMinimalPlatform() {
+		PlatformConfiguration minimal = PlatformConfiguration.getMinimal();
+		Starter.createPlatform(minimal).get();
 		
 	}
 
@@ -110,7 +127,7 @@ public class PlatformConfigurationTest
 		{
 			myNames.add(makePrettyName(string));
 		}
-		System.out.println(myNames);
+//		System.out.println(myNames);
 		HashMap<String,Method> hashMap = new HashMap<String, Method>();
 		Method[] methods = class1.getMethods();
 		

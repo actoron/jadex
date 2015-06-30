@@ -330,13 +330,10 @@ public class Starter
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
-					
-					if (config.getDhtProvide()) {
-						boolean provideonly = true;
-						if (config.getDht()) {
-							provideonly = false;
-						}
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess(), provideonly));
+
+					if (config.getDht() || config.getDhtProvide()) {
+						boolean providedhtonly = !config.getDht();
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess(), providedhtonly));						
 					} else {
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
 					}
