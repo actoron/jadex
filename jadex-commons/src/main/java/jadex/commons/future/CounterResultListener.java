@@ -278,8 +278,8 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	}
 
 	/**
-	 *  Get the number.
-	 *  @return The number.
+	 *  Get the number of results this Listener is waiting for.
+	 *  @return The expected number of results.
 	 */
 	public int getNumber()
 	{
@@ -301,8 +301,8 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	}
 
 	/**
-	 *  Get the cnt.
-	 *  @return The cnt.
+	 *  Get the current number of received results.
+	 *  @return Number of results.
 	 */
 	public int getCnt()
 	{

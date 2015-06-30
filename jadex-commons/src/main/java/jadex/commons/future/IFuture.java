@@ -1,6 +1,8 @@
 package jadex.commons.future;
 
-import jadex.commons.IResultCommand;
+import jadex.commons.functional.BiFunction;
+import jadex.commons.functional.Consumer;
+import jadex.commons.functional.Function;
 
 
 /**
@@ -99,20 +101,102 @@ public interface IFuture<E>
 	//-------- java8 extensions --------
 	
 	/**
-	 *  Sequential execution of async methods via implicit delegation.
-	 *  @param function Function that takes the result of this future as input and delivers future(t). 
-	 *  @return Future of the result of the second async call.
+	 *  Applies a function after the result is available, using the result of this Future as input.
+	 *  @param function Function that takes the result of this future as input and delivers t. 
+	 *  @return Future of the result after the function has been applied.
 	 */
-//		public <T> IFuture<T> $(final Function<E, IFuture<T>> function);
-	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function);
+	public <T> IFuture<T> thenApply(Function<? super E, ? extends T> function);
 	
 	/**
-	 *  Sequential execution of async methods via implicit delegation.
-	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  Applies a function after the result is available, using the result of this Future as input.
+	 *  @param function Function that takes the result of this future as input and delivers t. 
 	 *  @param futuretype The type of the return future.
+	 *  @return Future of the result after the function has been applied.
+	 */
+	public <T> IFuture<T> thenApply(Function<? super E, ? extends T> function, Class<?> futuretype);
+	
+	/**
+	 *  The result of this future is delegated to the given function.
+	 *  The result of the function will be available in the returned future.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
 	 *  @return Future of the result of the second async call.
 	 */
-	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function, Class<?> futuretype);
+	public <T> IFuture<T> thenCompose(Function<? super E, IFuture<T>> function);
+	
+	/**
+	 *  The result of this future is delegated to the given function.
+	 *  The result of the function will be available in the returned future.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param futuretype The type of the return future. If null, a default future is created.
+	 *  @return Future of the result of the second async call.
+	 */
+	public <T> IFuture<T> thenCompose(Function<? super E, IFuture<T>> function, Class<?> futuretype);
+	
+	/**
+	 *  Applies a function consuming the result after it is available.
+	 *  @param consumer Consumer that takes the result of this future as input and consumes it. 
+	 *  @return Future of the result of the second async call.
+	 */
+	public IFuture<Void> thenAccept(Consumer<? super E> consumer);
+	
+	/**
+	 *  Applies a function consuming the result after it is available.
+	 *  @param consumer Consumer that takes the result of this future as input and consumes it. 
+	 *  @param futuretype The type of the return future. If null, a default future is created.
+	 *  @return Future of the second async call (returning void).
+	 */
+	public IFuture<Void> thenAccept(Consumer<? super E> consumer, Class<?> futuretype);
+	
+	/**
+	 *  Combines this and another future and uses the given bifunction to calculate the result.
+	 *  Both future results are passed to the function as input.
+	 *  @param function BiFunction that takes the result of this and given other future as input and produces output. 
+	 *  @param futuretype The type of the return future. If null, a default future is created.
+	 *  @return Future of the second async call.
+	 *  
+	 *  Types: function is: E,U -> V
+	 */
+	public <U,V> IFuture<V> thenCombine(IFuture<U> other, BiFunction<? super E,? super U, ? extends V> function, Class<?> futuretype);
+	
+	/**
+	 *  Combines this and another future and uses the given bifunction to asynchronously calculate the result.
+	 *  Both future results are passed to the function as input.
+	 *  @param function BiFunction that takes the result of this and given other future as input and asynchronously produces output. 
+	 *  @param futuretype The type of the return future. If null, a default future is created.
+	 *  @return Future of the second async call (returning void).
+	 *  
+	 *  Types: function is: E,U -> V
+	 */
+//	public <U,V> IFuture<V> thenCombineAsync(IFuture<U> other, BiFunction<? super E,? super U, IFuture<V>> function, Class<?> futuretype);
+	
+	/**
+	 * The given function will be executed with either of the result of this and the given other future.
+	 * The returned Future will receive the result of the function execution.
+	 * If both futures return results, the first is used to call the function.
+	 * If both futures throw exceptions, the last is passed to the returned future.
+	 * 
+	 * @param other other future
+	 * @param fn function to receive result
+	 * @param futuretype The type of the return future. If null, a default future is created.
+	 * @return Future of the async function execution.
+	 */
+	public <U> IFuture<U> applyToEither(IFuture<E> other, Function<E,U> fn, Class<?> futuretype);
+	
+//	public <U> IFuture<U> applyToEitherAsync(IFuture<? extends E> other, Function<? super E,IFuture<U>> fn);
+	
+	/**
+	 * The given consumer will be executed with either of the result of this and the given other future.
+	 * The returned Future will receive the result of the function execution.
+	 * If both futures return results, the first is used to call the function.
+	 * If both futures throw exceptions, the last is passed to the returned future.
+	 * 
+	 * @param other other future
+	 * @param fn function to receive result
+	 * @param futuretype The type of the return future. If null, a default future is created.
+	 * @return Future of the async function execution.
+	 */
+	public IFuture<Void> acceptEither(IFuture<E> other, Consumer<E> action, Class<?> futuretype);
+	
 	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.
@@ -120,5 +204,5 @@ public interface IFuture<E>
 	 *  @param ret The 
 	 *  @return Future of the result of the second async call (=ret).
 	 */
-	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function, Class<?> futuretype, final Future<T> ret);
+//	public <T> IFuture<T> thenApplyAndDelegate(final Function<E, IFuture<T>> function, Class<?> futuretype, final Future<T> ret);
 }

@@ -78,7 +78,7 @@ public class SResultListener {
     }
     
 	/**
-     * Creates an {@link IResultListener} that delegates all results to a given Future.
+     * Creates an {@link IResultListener} that delegates results and exceptions to a given Future.
      * 
      * @param delegate The future used for success delegation.
      * @return {@link IResultListener}
@@ -88,7 +88,7 @@ public class SResultListener {
 	}
 	
 	/**
-     * Creates an {@link IResultListener} that delegates all results to a given Future.
+     * Creates an {@link IResultListener} that delegates results and exceptions to a given Future.
      * 
      * @param delegate The future used for success delegation.
      * @param undone Flag if undone methods should be used.
@@ -99,7 +99,7 @@ public class SResultListener {
 	}
 	
 	/**
-     * Creates an {@link IResultListener} that delegates all results to a given Future.
+     * Creates an {@link IResultListener} that delegates results and exceptions to a given Future.
      * 
      * @param delegate The future used for success delegation.
      * @param undone Flag if undone methods should be used.
@@ -111,7 +111,7 @@ public class SResultListener {
 	}
 	
 	/**
-     * Creates an {@link IResultListener} that delegates all results to a given Future.
+     * Creates an {@link IResultListener} that delegates results and exceptions to a given Future.
      * 
      * @param delegate The future used for success delegation.
      * @param undone Flag if undone methods should be used.

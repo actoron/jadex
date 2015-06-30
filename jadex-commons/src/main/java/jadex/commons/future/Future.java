@@ -4,12 +4,15 @@ package jadex.commons.future;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.functional.BiFunction;
+import jadex.commons.functional.Consumer;
+import jadex.commons.functional.Function;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -716,23 +719,12 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	//-------- java8 extensions --------
 	
-	/**
-	 *  Sequential execution of async methods via implicit delegation.
-	 *  @param function Function that takes the result of this future as input and delivers future(t). 
-	 *  @return Future of the result of the second async call.
-	 */
-	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function)
+	public <T> IFuture<T> thenApply(final Function<? super E, ? extends T> function)
     {
-        return $(function, null);
+        return thenApply(function, null);
     }
 	
-	/**
-	 *  Sequential execution of async methods via implicit delegation.
-	 *  @param function Function that takes the result of this future as input and delivers future(t). 
-	 *  @param futuretype The type of the return future.
-	 *  @return Future of the result of the second async call.
-	 */
-	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function, Class<?> futuretype)
+    public <T> IFuture<T> thenApply(final Function<? super E, ? extends T> function, Class<?> futuretype)
     {
 		final Future<T> ret = getFuture(futuretype);
 
@@ -740,13 +732,171 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         {
         	public void customResultAvailable(E result)
         	{
-        		 IFuture<T> res = function.execute(result);
-                 res.addResultListener(new DelegationResultListener<T>(ret));
+        		 T res = function.apply(result);
+        		 ret.setResult(res);
         	}	
         });
 
         return ret;
     }
+	
+	public <T> IFuture<T> thenCompose(final Function<? super E, IFuture<T>> function)
+    {
+        return thenCompose(function, null);
+    }
+	
+	public <T> IFuture<T> thenCompose(final Function<? super E, IFuture<T>> function, Class<?> futuretype)
+    {
+		final Future<T> ret = getFuture(futuretype);
+
+        this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
+        {
+        	public void customResultAvailable(E result)
+        	{
+        		 IFuture<T> res = function.apply(result);
+                 res.addResultListener(SResultListener.delegate(ret));
+        	}	
+        });
+
+        return ret;
+    }
+	
+	public IFuture<Void> thenAccept(final Consumer<? super E> consumer)
+    {
+        return thenAccept(consumer, null);
+    }
+	
+	public IFuture<Void> thenAccept(final Consumer<? super E> consumer, Class<?> futuretype)
+    {
+		final Future<Void> ret = getFuture(futuretype);
+
+        this.addResultListener(new ExceptionDelegationResultListener<E, Void>(ret)
+        {
+        	public void customResultAvailable(E result)
+        	{
+        		 consumer.accept(result);
+        		 ret.setResult(null);
+        	}
+        });
+
+        return ret;
+    }
+	
+	public <U,V> IFuture<V> thenCombine(final IFuture<U> other, final BiFunction<? super E,? super U, ? extends V> function, Class<?> futuretype)
+    {
+		final Future<V> ret = getFuture(futuretype);
+
+        this.addResultListener(new ExceptionDelegationResultListener<E, V>(ret)
+        {
+        	public void customResultAvailable(final E e)
+        	{
+        		other.addResultListener(new ExceptionDelegationResultListener<U, V>(ret) {
+        			public void customResultAvailable(U u)
+        			{
+        				ret.setResult(function.apply(e, u));
+        			}
+        		});
+        	}
+        });
+
+        return ret;
+    }
+	
+	public <U> IFuture<U> applyToEither(IFuture<E> other, final Function<E, U> fn, Class<?> futuretype)
+	{
+		final CounterResultListener<Void> exceptionCounter = new CounterResultListener<Void>(2, SResultListener.<Void>ignoreResults());
+		final Future<Void> resultIndicator = new Future<Void>();
+		final Future<U> ret = getFuture(futuretype);
+		IResultListener<E> listener = new IResultListener<E>()
+		{
+
+			public void resultAvailable(E result)
+			{
+				synchronized(resultIndicator) {
+					if (!resultIndicator.isDone()) {
+						resultIndicator.setResult(null);
+						U apply = fn.apply(result);
+						ret.setResult(apply);
+					}
+				}
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				synchronized(exceptionCounter) {
+					exceptionCounter.resultAvailable(null);
+				
+					if (exceptionCounter.getCnt() == 2) {
+						ret.setException(exception);
+					}
+				}
+			}
+		};
+		
+		this.addResultListener(listener);
+		other.addResultListener(listener);
+		
+		return ret;
+	}
+
+	public IFuture<Void> acceptEither(IFuture<E> other, final Consumer<E> action, Class<?> futuretype)
+	{
+		final CounterResultListener<Void> exceptionCounter = new CounterResultListener<Void>(2, SResultListener.<Void>ignoreResults());
+		final Future<Void> resultIndicator = new Future<Void>();
+		final Future<Void> ret = getFuture(futuretype);
+		IResultListener<E> listener = new IResultListener<E>()
+		{
+
+			public void resultAvailable(E result)
+			{
+				synchronized(resultIndicator) {
+					if (!resultIndicator.isDone()) {
+						resultIndicator.setResult(null);
+						action.accept(result);
+						ret.setResult(null);
+					}
+				}
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				synchronized(exceptionCounter) {
+					exceptionCounter.resultAvailable(null);
+				
+					if (exceptionCounter.getCnt() == 2) {
+						ret.setException(exception);
+					}
+				}
+			}
+		};
+		
+		this.addResultListener(listener);
+		other.addResultListener(listener);
+		
+		return ret;
+	}
+	
+	
+//	public <U,V> IFuture<V> thenCombineAsync(final IFuture<U> other, final BiFunction<? super E,? super U, IFuture<V>> function, Class<?> futuretype)
+//    {
+//		final Future<V> ret = getFuture(futuretype);
+//
+//        this.addResultListener(new ExceptionDelegationResultListener<E, V>(ret)
+//        {
+//        	public void customResultAvailable(final E e)
+//        	{
+//        		other.addResultListener(new ExceptionDelegationResultListener<U, V>(ret) {
+//        			public void customResultAvailable(U u)
+//        			{
+//        				IFuture<V> res = function.apply(e, u);
+//        				res.addResultListener(SResultListener.delegate(ret));
+//        			}
+//        		});
+//        	}
+//        });
+//
+//        return ret;
+//    }
 	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.
@@ -754,18 +904,18 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 *  @param ret The 
 	 *  @return Future of the result of the second async call (=ret).
 	 */
-	public <T> IFuture<T> $(final IResultCommand<IFuture<T>, E> function, Class<?> futuretype, final Future<T> ret)
-    {
-        this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
-        {
-        	public void customResultAvailable(E result)
-        	{
-        		 IFuture<T> res = function.execute(result);
-                 res.addResultListener(new DelegationResultListener<T>(ret));
-        	}	
-        });
-        return ret;
-    }
+//	public <T> IFuture<T> thenApplyAndDelegate(final Function<E, IFuture<T>> function, Class<?> futuretype, final Future<T> ret)
+//    {
+//        this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
+//        {
+//        	public void customResultAvailable(E result)
+//        	{
+//        		 IFuture<T> res = function.apply(result);
+//                 res.addResultListener(new DelegationResultListener<T>(ret));
+//        	}	
+//        });
+//        return ret;
+//    }
 	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.

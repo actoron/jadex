@@ -2,6 +2,7 @@ package jadex.commons.future;
 
 
 import jadex.commons.IResultCommand;
+import jadex.commons.functional.Function;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -782,9 +783,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> $$(final IResultCommand<IFuture<R>, E> function)
+	public <R> IIntermediateFuture<R> mapAsync(final Function<E, IFuture<R>> function)
     {
-       return $$(function, null);
+       return mapAsync(function, null);
     }
 	
 	/**
@@ -792,7 +793,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> $$(final IResultCommand<IFuture<R>, E> function, Class<?> futuretype)
+	public <R> IIntermediateFuture<R> mapAsync(final Function<E, IFuture<R>> function, Class<?> futuretype)
     {
         final IntermediateFuture<R> ret = futuretype==null? new IntermediateFuture<R>(): (IntermediateFuture)getFuture(futuretype);
 
@@ -809,7 +810,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 
             public void intermediateResultAvailable(E result)
             {
-                IFuture<R> res = function.execute(result);
+                IFuture<R> res = function.apply(result);
                 res.addResultListener(new IResultListener<R>()
                 {
                     public void resultAvailable(R result)
@@ -843,7 +844,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> $$$(final IResultCommand<IIntermediateFuture<R>, E> function)
+	public <R> IIntermediateFuture<R> flatMapAsync(final Function<E, IIntermediateFuture<R>> function)
     {
         final IntermediateFuture<R> ret = new IntermediateFuture<R>();
 
@@ -865,7 +866,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
             public void intermediateResultAvailable(E result)
             {
             	cnt++;
-                IIntermediateFuture<R> res = function.execute(result);
+                IIntermediateFuture<R> res = function.apply(result);
                 res.addResultListener(new IIntermediateResultListener<R>()
                 {
                     public void intermediateResultAvailable(R result)

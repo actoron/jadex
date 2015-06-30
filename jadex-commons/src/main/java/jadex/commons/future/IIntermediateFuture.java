@@ -2,6 +2,7 @@ package jadex.commons.future;
 
 
 import jadex.commons.IResultCommand;
+import jadex.commons.functional.Function;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
@@ -112,19 +113,19 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> $$(final IResultCommand<IFuture<R>, E> function);
+	public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function);
 	
 	/**
 	 *  Implements async loop and applies a an async function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> $$(final IResultCommand<IFuture<R>, E> function, Class<?> futuretype);
+	public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function, Class<?> futuretype);
 	
 	/**
 	 *  Implements async loop and applies a an async multi-function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> $$$(final IResultCommand<IIntermediateFuture<R>, E> function);
+	public <R> IIntermediateFuture<R> flatMapAsync(Function<E, IIntermediateFuture<R>> function);
 }

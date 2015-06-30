@@ -4,13 +4,13 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SResultListener;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Test2
 {
@@ -26,18 +26,28 @@ public class Test2
 		
 		IIntermediateFuture<String> abc = Test.getABC();
 
-		IIntermediateFuture<Object> res = mapAsync(abc, s -> {return new Future(s+"_");});
+//		IIntermediateFuture<Object> res = mapAsync(abc, s -> {return new Future(s+"_");});
+		IIntermediateFuture<String> res = abc.mapAsync(s -> new Future<String>(s+"_"));
+		
 		System.out.println(res.get());
 		
-		IIntermediateFuture<String> res2 = mapAsync(coll, Test::getWorld);
-		System.out.println(res2.get());
+//		IIntermediateFuture<String> res2 = mapAsync(coll, Test::getWorld);
+		IFuture<List<String>> thenApply = coll.thenApply(c -> {
+			// no async processing in stream design...
+			return c.stream().map(Test::getWorld).map(x -> x.get()).collect(Collectors.toList());
+		});
+		
+		
+		System.out.println(thenApply.get());
 	}
 
 	private static IFuture<Collection<String>> doChainedWork()
 	{
 		IFuture<String> s1 = Test.getHello();
-		IFuture<String> s2 = s1.$(x -> Test.getD(x));
-		IFuture<Collection<String>> s3 = s2.$(f -> Test.getE(f));
+		IFuture<String> s2 = s1.thenCompose(x -> Test.getD(x));
+		IFuture<Collection<String>> s3 = s2.thenCompose(f -> Test.getE(f));
+		
+		s2.thenCompose(s -> new Future(""));
 		return s3;
 	}
 	
@@ -67,58 +77,5 @@ public class Test2
 		return ret;
 	}
 
-	public static <R, E> IIntermediateFuture<R> mapAsync(IIntermediateFuture<E> orig, final Function<E, IFuture<R>> function)
-	{
-		final IntermediateFuture<R> ret = new IntermediateFuture<R>();
-
-		orig.addIntermediateResultListener(new IIntermediateResultListener<E>()
-		{
-			boolean	fin	= false;
-
-			public void resultAvailable(Collection<E> result)
-			{
-				for(E v : result)
-				{
-					intermediateResultAvailable(v);
-				}
-				finished();
-			}
-
-			public void intermediateResultAvailable(E result)
-			{
-				IFuture<R> res = function.apply(result);
-				res.addResultListener(new IResultListener<R>()
-				{
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setExceptionIfUndone(exception);
-					}
-
-					@Override
-					public void resultAvailable(R result)
-					{
-						ret.addIntermediateResult(result);
-					}
-				});
-			}
-
-			public void finished()
-			{
-				ret.setFinished();
-			}
-
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-
-		return ret;
-	}
-
-	public static <T> T $(IFuture<T> fut)
-	{
-		return fut.get();
-	}
 
 }
