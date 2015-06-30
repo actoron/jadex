@@ -17,7 +17,7 @@ public class DynamicBeliefPlan extends Plan
 		TestReport tr = new TestReport("#1", "Change belief string to some value and see how the length belief changes.");
 		getLogger().info("Test 1: Test if dependent belief works.");
 		getBeliefbase().getBelief("string").setFact("test");
-		waitFor(10);	// todo: microplansteps or immediate rule execution
+//		waitFor(10);	// todo: microplansteps or immediate rule execution
 		Integer length = (Integer)getBeliefbase().getBelief("length").getFact();
 		if(length!=null && length.intValue()==4)
 		{

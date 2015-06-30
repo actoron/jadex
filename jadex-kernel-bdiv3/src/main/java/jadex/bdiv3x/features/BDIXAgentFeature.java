@@ -127,7 +127,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		
 		this.bdimodel = (IBDIModel)getComponent().getModel();
 		this.capa = new RCapability(bdimodel.getCapability(), component);
-		this.rulesystem = new RuleSystem(null, true)
+		this.rulesystem = new RuleSystem(null, false)
 		{
 			public IFuture<Void> addEvent(IEvent event) 
 			{
