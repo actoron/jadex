@@ -13,11 +13,10 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -37,17 +36,20 @@ import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * @goal generateBDI
  * @phase compile
  * @requiresProject true
  * @requiresOnline false
- * @requiresDependencyResolution runtime
+ * @requiresDependencyResolution compile+runtime
  * @author Julian Kalinowski
  * 
  */
@@ -114,9 +116,21 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	 * Tries to enhance the classes directly inside the output dir. 
 	 * (necessary to work with eclipse build system)
 	 * This does not affect dependency handling.
-	 * @parameter default-value="false"
+	 * @parameter default-value="true"
 	 */
 	protected Boolean inPlace;
+	
+	/**
+	 * The PluginDescriptor.
+	 * @component
+	 */
+	private PluginDescriptor descriptor;
+	
+	/**
+	 * The BuildContext.
+	 * @component
+	 */
+	private BuildContext buildContext;
 	
 	private IOFileFilter bdiFileFilter = new IOFileFilter()
 	{
@@ -146,39 +160,46 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	private MavenBDIModelLoader modelLoader;
 	private ByteKeepingASMBDIClassGenerator gen;
 
-	public void execute() throws MojoExecutionException, MojoFailureException
+	public GenerateBDIMojo()
 	{
-		getLog().info("Generating BDI V3 Agents...");
-		
 		modelLoader = new MavenBDIModelLoader();
 		gen = new ByteKeepingASMBDIClassGenerator();
 		modelLoader.setGenerator(gen);
+	}
+	
+	public void execute() throws MojoExecutionException, MojoFailureException
+	{
+		if (!inputDirectory.getAbsolutePath().endsWith("/bin/classes")) {
+			buildContext.addMessage(inputDirectory, 0, 0, "For Android projects, <build><directory> must be set to 'bin'!",  BuildContext.SEVERITY_ERROR, null);
+		}
 		
 		File outputDirectory; 
-		File tmpDirectory;
 		if (inPlace) {
 			getLog().info("Trying to enhance classes in-place...");
-			outputDirectory = new File(buildDirectory, "classes");
+			outputDirectory = inputDirectory;
 		} else {
 			outputDirectory = new File(buildDirectory, "bdi-generated");
 		}
-		tmpDirectory = new File(buildDirectory, "bdi-generated-deps");
+		
+		getLog().info("Generating from: " + inputDirectory.toString());
+		getLog().info("Generating to: " + outputDirectory.toString());
 		
 		try
 		{
 
 			if (enhanceDependencies)
 			{
+				File depDirectory = new File(buildDirectory, "bdi-generated-deps");
 				outputDirectory.mkdirs();
-				tmpDirectory.mkdirs();
-				File dummy = new File(tmpDirectory, "dummy.jar");
+				depDirectory.mkdirs();
+				File dummy = new File(depDirectory, "dummy.jar");
 				makeJar(new File[0], dummy);
 		
 				Set<Artifact> relevantCompileArtifacts = getRelevantCompileArtifacts();
 				getLog().info("Found " + relevantCompileArtifacts.size() + " dependencies: " + relevantCompileArtifacts);
 
-				File depOutputDir = new File(tmpDirectory, "alldeps");
-				File allDepsFile = new File(tmpDirectory, "enhanced-dependencies.jar");
+				File depOutputDir = new File(depDirectory, "alldeps");
+				File allDepsFile = new File(depDirectory, "enhanced-dependencies.jar");
 				
 				for (Artifact artifact : relevantCompileArtifacts)
 				{
@@ -213,16 +234,19 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				
 				generateBDI(depOutputDir, depOutputDir);
 				
-				File[] depDirs = tmpDirectory.listFiles();
+				File[] depDirs = depDirectory.listFiles();
 				makeJar(depDirs, allDepsFile);
 				
 				// outputDirectory = inputDirectory;
 			}
-			getLog().info("Enhancing project-own classes...");
-			generateBDI(inputDirectory, outputDirectory);
+			if (buildContext.hasDelta(inputDirectory)) {
+				getLog().info("Enhancing project-own classes in directory: " + inputDirectory);
+				generateBDI(inputDirectory, outputDirectory);
+				getLog().info("Generated BDI V3 Agents successfully!");
+			} else {
+				getLog().info("Everything up to date.");
+			}
 			
-			getLog().info("Generated BDI V3 Agents successfully!");
-
 			project.getBuild().setOutputDirectory(outputDirectory.getPath());
 
 		}
@@ -282,66 +306,6 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		}
 
 		getLog().info("written enhanced: " + outputFile.getName());
-	}
-
-	private File enhanceJar(File in, File outputDir) throws IOException
-	{
-		unzipJar(in, outputDir);
-
-		getLog().info("Enhancing Dependency: " + in.getName());
-		// now the whole jar has been extracted to generated-bdi/jar-name/
-		File outputFile = new File(outputDir.getParent(), in.getName().replace(".jar", ".generated.jar"));
-		JarOutputStream jos = null;
-		try
-		{
-			jos = new JarOutputStream(new FileOutputStream(outputFile));
-			
-			// generate
-			generateBDI(outputDir, outputDir);
-			
-			// strip incompatible
-			if (removeAndroidIncompatible) {
-				removeAndroidIncompatible(outputDir);
-			}
-			
-			// and now re-zip the enhanced jar...
-
-			getLog().debug("Zipping to: " + outputFile);
-			// System.out.println(outputDir.list());
-			Collection<File> allFiles = FileUtils.listFiles(outputDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-			for (File file : allFiles)
-			{
-				String relativePath = ResourceUtils.getRelativePath(file.getPath(), outputDir.getPath(), File.separator);
-				if(!File.separator.equals("/"))
-				{
-					// Zip entries must use '/' as file separator.
-					relativePath	= relativePath.replace(File.separator, "/");
-				}
-				FileInputStream is = new FileInputStream(file);
-				ZipEntry zipEntry = new ZipEntry(relativePath);
-				jos.putNextEntry(zipEntry);
-				copyStreamWithoutClosing(is, jos);
-				jos.closeEntry();
-				is.close();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				jos.close();
-			}
-			catch (IOException e)
-			{
-			}
-		}
-
-		getLog().debug(in.getName() + " rewritten enhanced: " + outputFile.getName());
-		return outputFile;
 	}
 
 	private void unzipJar(File in, File outputDir) throws ZipException, IOException
@@ -412,37 +376,33 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			getLog().info("Found " + allBDIFiles.size() + " BDI V3 Agent classes in " + inputDirectory);
 		}
 		URL inputUrl = inputDirectory.toURI().toURL();
-		getLog().debug("Generating to: " + outputDirectory);
 
-		ClassLoader originalCl = getClass().getClassLoader();
+		setClassRealm();
+		ClassLoader originalCl = descriptor.getClassRealm();
 		URLClassLoader inputCl = new URLClassLoader(new URL[]
 		{inputUrl}, originalCl);
-		URLClassLoader outputCl = new URLClassLoader(new URL[]
-		{inputUrl}, originalCl);
-		Collection<File> allClasses = FileUtils.listFiles(inputDirectory, null, true);
 		
-		URLClassLoader tempLoader = new URLClassLoader(new URL[]{inputUrl}, inputCl);
+		Collection<File> allClasses = FileUtils.listFiles(inputDirectory, null, true);
 		
 		for (File bdiFile : allClasses)
 		{
 			gen.clearRecentClassBytes();
-//			List<Class<?>> classes = null;
 			BDIModel model = null;
 
 			String relativePath = ResourceUtils
 					.getRelativePath(bdiFile.getAbsolutePath(), inputDirectory.getAbsolutePath(), File.separator);
 			
-			if (bdiFileFilter.accept(bdiFile))
+			if (bdiFileFilter.accept(bdiFile) && buildContext.hasDelta(bdiFile))
 			{
 				String agentClassName = relativePath.replace(File.separator, ".").replace(".class", "");
 				
 				if (inPlace) {
-					Class<?> loadClass = tempLoader.loadClass(agentClassName);
+					Class<?> loadClass = inputCl.loadClass(agentClassName);
 					if (AbstractAsmBdiClassGenerator.isEnhanced(loadClass)) {
 						getLog().info("Already enhanced: " + relativePath);
 						continue;
 					}
-					tempLoader.close();
+//					tempLoader.close();
 				}
 				
 				getLog().debug("Loading Model: " + relativePath);
@@ -450,7 +410,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				try
 				{
 					model = (BDIModel) modelLoader.loadModel(relativePath, imports, inputCl, inputCl, new Object[]
-					{rid, null});
+					{rid, null, null});
 				}
 				catch (Throwable t)
 				{
@@ -459,7 +419,8 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 					if (message == null)  {
 						message = t.toString();
 					}
-					getLog().warn("Error loading model: " + agentClassName + ", message was: " + message);
+					getLog().error("Error loading model: " + agentClassName + ", exception was: " + t.toString());
+					buildContext.addMessage(bdiFile, 0, 0, "Error loading model: " + agentClassName, BuildContext.SEVERITY_ERROR, t);
 					// just copy file
 					if (!inputDirectory.equals(outputDirectory))
 					{
@@ -491,7 +452,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 						// write enhanced class
 						File enhancedFile = new File(outputDirectory, path);
 						enhancedFile.getParentFile().mkdirs();
-						DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhancedFile));
+						DataOutputStream dos = new DataOutputStream(buildContext.newFileOutputStream(enhancedFile));
 						dos.write(classBytes);
 						dos.close();
 					}
@@ -525,6 +486,33 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		}
 //		inputCl.close();
 //		outputCl.close();
+	}
+
+	private void setClassRealm()
+	{
+		// collect runtime classpath elements of the user project
+		List<String> classPathElements;
+		try
+		{
+			final ClassRealm realm = descriptor.getClassRealm();
+			classPathElements = project.getRuntimeClasspathElements();
+			classPathElements.addAll(project.getCompileClasspathElements());
+			
+			for (String element : classPathElements)
+			{
+			    File elementFile = new File(element);
+			    realm.addURL(elementFile.toURI().toURL());
+			}
+			
+		}
+		catch(DependencyResolutionRequiredException e1)
+		{
+			e1.printStackTrace();
+		}
+		catch(MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	private void removeAndroidIncompatible(File path) throws IOException {

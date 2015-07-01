@@ -467,7 +467,11 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + " This may happen if the class is accessed directly in application code before loadModel() was called.");
+			if (SReflect.isAndroid()) {
+				throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + ". On Android, this is done during build time by the jadex-android-maven-plugin. Be sure it is included in your pom.xml!");
+			} else {
+				throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + " This may happen if the class is accessed directly in application code before loadModel() was called.");
+			}
 		}
 	}
 

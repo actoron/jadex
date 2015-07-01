@@ -78,7 +78,7 @@
 	</dependencies>
 
 	<build>
-
+		<directory>bin</directory>
 		<plugins>		
 			<plugin>
 				<groupId>net.sourceforge.jadex</groupId>
@@ -90,6 +90,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<inPlace>true</inPlace>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
@@ -133,34 +136,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>net.sourceforge.jadex</groupId>
-										<artifactId>jadex-android-maven-plugin</artifactId>
-										<versionRange>{$project.version}</versionRange>
-										<goals>
-											<goal>generateBDI</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 </project>

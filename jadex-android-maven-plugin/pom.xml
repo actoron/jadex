@@ -17,6 +17,14 @@
   <build>
     <directory>${project.basedir}/build</directory>
     <outputDirectory>${project.build.directory}/classes/main</outputDirectory>
+    
+    <resources>
+      <resource>
+        <directory>META-INF</directory>
+        <targetPath>META-INF</targetPath>
+      </resource>
+    </resources>
+    
     <pluginManagement>
     	<plugins>
     		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
@@ -52,6 +60,11 @@
     </pluginManagement>
   </build>
   <dependencies>
+    <dependency>
+     <groupId>org.sonatype.plexus</groupId>
+     <artifactId>plexus-build-api</artifactId>
+     <version>0.0.7</version>
+   </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
