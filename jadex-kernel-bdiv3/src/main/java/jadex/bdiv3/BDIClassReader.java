@@ -161,9 +161,7 @@ public class BDIClassReader extends MicroClassReader
 //		modelinfo.setName(name+"BDI");
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
-//		modelinfo.setFilename(model);
-		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
-		modelinfo.setFilename(src+File.separator+SReflect.getClassName(cma)+".class");
+		modelinfo.setFilename(getFileName(cma, model));
 //		modelinfo.setStartable(!Modifier.isAbstract(cma.getModifiers()));
 //		modelinfo.setStartable(cma.getName().endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
 		modelinfo.setType(BDIAgentFactory.FILETYPE_BDIAGENT);
@@ -190,6 +188,18 @@ public class BDIClassReader extends MicroClassReader
 		modelinfo.setStartable(!Modifier.isAbstract(genclass.getModifiers()));
 		
 		return ret;
+	}
+
+	/**
+	 * Gets the filename for a class.
+	 * @param cma
+	 * @param model 
+	 * @return filename
+	 */
+	protected String getFileName(Class< ? > cma, String model)
+	{
+		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
+		return src+File.separator+SReflect.getClassName(cma)+".class";
 	}
 	
 	/**
