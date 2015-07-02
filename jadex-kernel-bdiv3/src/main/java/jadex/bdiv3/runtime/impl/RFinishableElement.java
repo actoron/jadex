@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
@@ -26,9 +27,9 @@ public abstract class RFinishableElement extends RProcessableElement
 	/**
 	 *  Create a new element.
 	 */
-	public RFinishableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent, Map<String, Object> vals)
+	public RFinishableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent, Map<String, Object> vals, MConfigParameterElement config)
 	{
-		super(modelelement, pojoelement, agent, vals);
+		super(modelelement, pojoelement, agent, vals, config);
 	}
 	
 	//-------- methods --------

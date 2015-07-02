@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.component.IExecutionFeature;
@@ -279,7 +278,7 @@ public class SServiceProvider
 
 		Collection<T> ret = PlatformServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter);
 		
-		return proxy? createRequiredProxy(component, ret, type): ret;
+		return proxy? createRequiredProxies(component, ret, type): ret;
 	}
 	
 	

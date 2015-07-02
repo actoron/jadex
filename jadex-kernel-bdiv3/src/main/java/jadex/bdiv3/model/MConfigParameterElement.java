@@ -20,11 +20,32 @@ public class MConfigParameterElement	extends MElement
 	//-------- methods --------
 	
 	/**
-	 *  Get a parameter by name.
+	 *  Get the parameters.
+	 */
+	public Map<String, List<UnparsedExpression>> getParameters()
+	{
+		return parameters;
+	}
+	
+	/**
+	 *  Get the parameters by name.
 	 */
 	public List<UnparsedExpression> getParameters(String name)
 	{
 		return parameters!=null ? parameters.get(name) : null;
+	}
+	
+	/**
+	 *  Get a parameter by name.
+	 */
+	public UnparsedExpression getParameter(String name)
+	{
+		List<UnparsedExpression>	ret	= parameters!=null ? parameters.get(name) : null;
+		if(ret!=null && ret.size()!=1)
+		{
+			throw new RuntimeException("Not a single value for parameter: "+name+", "+ret);
+		}
+		return ret!=null ? ret.get(0) : null;
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MParameterElement;
@@ -10,7 +10,6 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.bdiv3x.runtime.IParameterSet;
-import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
@@ -21,6 +20,7 @@ import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,16 +43,16 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 	/**
 	 *  Create a new parameter element.
 	 */
-	public RParameterElement(MParameterElement melement, IInternalAccess agent, Map<String, Object> vals, IValueFetcher fetcher)
+	public RParameterElement(MParameterElement melement, IInternalAccess agent, Map<String, Object> vals, IValueFetcher fetcher, MConfigParameterElement config)
 	{
 		super(melement, agent);
-		initParameters(vals, wrapFetcher(fetcher));
+		initParameters(vals, wrapFetcher(fetcher), config);
 	}
 	
 	/**
 	 *  Create the parameters from model spec.
 	 */
-	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher)
+	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher, MConfigParameterElement config)
 	{
 		List<MParameter> mparams = ((MParameterElement)getModelElement()).getParameters();
 		if(mparams!=null)
@@ -67,7 +67,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 					}
 					else
 					{
-						addParameter(createParameter(mparam, getAgent(), fetcher));
+						addParameter(createParameter(mparam, getAgent(), config!=null ? config.getParameter(mparam.getName()) : null, fetcher));
 					}
 				}
 				else
@@ -78,7 +78,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 					}
 					else
 					{
-						addParameterSet(createParameterSet(mparam, getAgent(), fetcher));
+						addParameterSet(createParameterSet(mparam, getAgent(), config!=null ? config.getParameters(mparam.getName()) : null, fetcher));
 					}
 					
 				}
@@ -122,9 +122,9 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 	/**
 	 * 
 	 */
-	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, IValueFetcher fetcher)
+	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher)
 	{
-		return new RParameter(modelelement, modelelement.getName(), agent, fetcher, getModelElement().getName());
+		return new RParameter(modelelement, modelelement.getName(), agent, inival, fetcher, getModelElement().getName());
 	}
 	
 	/**
@@ -138,9 +138,9 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 	/**
 	 * 
 	 */
-	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, IValueFetcher fetcher)
+	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, List<UnparsedExpression> inivals, IValueFetcher fetcher)
 	{
-		return new RParameterSet(modelelement, modelelement.getName(), agent, fetcher, getModelElement().getName());
+		return new RParameterSet(modelelement, modelelement.getName(), agent, inivals, fetcher, getModelElement().getName());
 	}
 	
 	/**
@@ -270,6 +270,9 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		/** The value. */
 		protected Object value;
 
+		/** The initial value expression (only for push evaluation mode). */
+		protected UnparsedExpression inival;
+		
 		/** The publisher. */
 		protected EventPublisher publisher;
 		
@@ -281,14 +284,19 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameter(MParameter modelelement, String name, IInternalAccess agent, IValueFetcher fetcher, String pename)
+		public RParameter(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher, String pename)
 		{
 			super(modelelement, agent);
 			this.name = name!=null? name: modelelement.getName();
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), (MParameter)getModelElement());
 			this.fetcher	= fetcher;
-			if(modelelement!=null)
-				setValue(modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher));
+			
+			if(modelelement.getEvaluationMode()==EvaluationMode.PULL)
+			{
+				this.inival	= inival;
+			}
+
+			setValue(evaluateValue(inival));
 		}
 		
 		/**
@@ -331,16 +339,16 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public Object	getValue()
 		{
-			Object ret = value;
-			EvaluationMode eva = ((MParameter)getModelElement()).getEvaluationMode();
-			UnparsedExpression uexp = ((MParameter)getModelElement()).getDefaultValue();
-			// In case of push the last evaluated value is returned
-			if(uexp!=null && MParameter.EvaluationMode.PULL.equals(eva))
-			{
-				ret = SJavaParser.parseExpression(((MBelief)getModelElement()).getDefaultFact(), 
-					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(fetcher);
-			}
-			return ret;
+			return ((MParameter)getModelElement()).getEvaluationMode()==EvaluationMode.PULL ? evaluateValue(inival) : value;
+		}
+		
+		/**
+		 *  Evaluate the (initial or default or pull) value.
+		 */
+		protected Object	evaluateValue(UnparsedExpression inival)
+		{
+			UnparsedExpression uexp = inival!=null ? inival : getModelElement()!=null ? ((MParameter)getModelElement()).getDefaultValue() : null;
+			return uexp!=null ? SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(fetcher) : null;
 		}
 	}
 
@@ -354,6 +362,9 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		
 		/** The value. */
 		protected List<Object> values;
+		
+		/** The initial values expression(s) (only for push evaluation mode). */
+		protected List<UnparsedExpression> inivals;
 		
 		/** The fetcher. */
 		protected IValueFetcher fetcher;
@@ -377,42 +388,65 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent, IValueFetcher fetcher, String pename)
+		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals, IValueFetcher fetcher, String pename)
 		{
 			super(modelelement, agent);
 			this.name = name!=null?name: modelelement.getName();
 			this.fetcher = fetcher;
+			if(modelelement.getEvaluationMode()==EvaluationMode.PULL)
+			{
+				this.inivals	= inivals;
+			}
 			
-			setValues(new ListWrapper<Object>(evaluateValues(), getAgent(), ChangeEvent.VALUEADDED+"."+pename+"."+getName(), 
+			setValues(new ListWrapper<Object>(evaluateValues(inivals), getAgent(), ChangeEvent.VALUEADDED+"."+pename+"."+getName(), 
 				ChangeEvent.VALUEREMOVED+"."+pename+"."+getName(), ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), getModelElement()));
 		}
 
 		/**
 		 *  Evaluate the default values.
 		 */
-		protected List<Object> evaluateValues()
+		protected List<Object> evaluateValues(List<UnparsedExpression> inivals)
 		{
 			MParameter mparam = (MParameter)getModelElement();
 			List<Object> tmpvalues = new ArrayList<Object>();
-			if(mparam!=null)
+			if(inivals==null && mparam!=null)
 			{
 				if(mparam.getDefaultValue()!=null)
 				{
-					tmpvalues = (List<Object>)SJavaParser.parseExpression(mparam.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher);
+					inivals	= Collections.singletonList(mparam.getDefaultValue());
 				}
-				else 
+				else
 				{
-					tmpvalues = new ArrayList<Object>();
-					if(mparam.getDefaultValues()!=null)
+					inivals	= mparam.getDefaultValues();
+				}
+			}
+			
+			if(inivals!=null)
+			{
+				if(inivals.size()==1)
+				{
+					Object	tmpvalue	= SJavaParser.parseExpression(inivals.get(0), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher);
+					if(tmpvalue==null || mparam.getClazz()==null || SReflect.isSupertype(mparam.getClazz().getType(agent.getClassLoader(), agent.getModel().getAllImports()), tmpvalue.getClass()))
 					{
-						for(UnparsedExpression uexp: mparam.getDefaultValues())
+						tmpvalues.add(tmpvalue);
+					}
+					else
+					{
+						for(Object tmp: SReflect.getIterable(tmpvalue))
 						{
-							Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher);
-							tmpvalues.add(fact);
+							tmpvalues.add(tmp);
 						}
 					}
 				}
+				else 
+				{
+					for(UnparsedExpression uexp: inivals)
+					{
+						tmpvalues.add(SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fetcher));
+					}
+				}
 			}
+			
 			return tmpvalues;
 		}
 		
@@ -525,7 +559,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		protected List<Object> internalGetValues()
 		{
 			// In case of push the last saved/evaluated value is returned
-			return MParameter.EvaluationMode.PULL.equals(((MParameter)getModelElement()).getEvaluationMode())? evaluateValues(): values;
+			return MParameter.EvaluationMode.PULL.equals(((MParameter)getModelElement()).getEvaluationMode())? evaluateValues(inivals): values;
 		}
 	}
 	

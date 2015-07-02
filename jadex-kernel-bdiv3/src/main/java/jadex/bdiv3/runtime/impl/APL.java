@@ -1,7 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
@@ -430,7 +429,7 @@ public class APL
 				Object pojo = null;
 				if(!Modifier.isStatic(m.getModifiers()))
 				{
-					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia, mplaninfo.getBinding());
+					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia, mplaninfo.getBinding(), null);
 					pojo = rp.getBody().getBody();
 				}
 				

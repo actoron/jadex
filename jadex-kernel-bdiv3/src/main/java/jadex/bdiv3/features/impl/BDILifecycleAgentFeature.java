@@ -444,7 +444,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								throw new RuntimeException("Could not create initial goal: "+igoal);
 							}
 							
-							RGoal rgoal = new RGoal(component, mgoal, goal, null);
+							RGoal rgoal = new RGoal(component, mgoal, goal, null, null, igoal);
 							RGoal.adoptGoal(rgoal, component);
 						}
 					}
@@ -458,8 +458,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							MPlan mplan = bdimodel.getCapability().getPlan(iplan.getName());
 							// todo: allow Java plan constructor calls
 		//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
-						
-							RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null);
+							
+							RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null, iplan);
 							RPlan.executePlan(rplan, component);
 						}
 					}
@@ -976,14 +976,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									{
 										for(Map<String, Object> binding: bindings)
 										{
-											RGoal rgoal = new RGoal(component, mgoal, null, binding);
+											RGoal rgoal = new RGoal(component, mgoal, null, null, binding, null);
 											dispatchTopLevelGoal(rgoal).addResultListener(goallis);
 										}
 									}
 									// No binding: generate one candidate.
 									else
 									{
-										RGoal rgoal = new RGoal(component, mgoal, null, null);
+										RGoal rgoal = new RGoal(component, mgoal, null, null, null, null);
 										dispatchTopLevelGoal(rgoal).addResultListener(goallis);
 									}
 									
@@ -1427,7 +1427,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
-						RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, null);
+						RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, null, null);
 						RPlan.executePlan(rplan, component);
 						return IFuture.DONE;
 					}

@@ -1,9 +1,9 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IValueFetcher;
 
 /**
  *  Runtime element for handling a service call as plan. 
@@ -16,9 +16,9 @@ public class RServiceCall extends RFinishableElement
 	/**
 	 *  Create a new ServiceCall. 
 	 */
-	public RServiceCall(MProcessableElement modelelement, InvocationInfo pojoelement, IInternalAccess agent)
+	public RServiceCall(MProcessableElement modelelement, InvocationInfo pojoelement, IInternalAccess agent, MConfigParameterElement config)
 	{
-		super(modelelement, pojoelement, agent, null);
+		super(modelelement, pojoelement, agent, null, config);
 	}
 	
 	/**

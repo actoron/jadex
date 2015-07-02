@@ -167,7 +167,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 			
 			if(mevent!=null)
 			{
-				RMessageEvent revent = new RMessageEvent(mevent, message.getParameterMap(), message.getMessageType(), getComponent());
+				RMessageEvent revent = new RMessageEvent(mevent, message.getParameterMap(), message.getMessageType(), getComponent(), null);
 				FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
 				getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
 			}
