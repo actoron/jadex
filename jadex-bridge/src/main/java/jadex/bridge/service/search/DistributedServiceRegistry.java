@@ -1,6 +1,14 @@
 package jadex.bridge.service.search;
 
-import jadex.base.PlatformConfiguration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -8,6 +16,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.dht.IDistributedServiceRegistryService;
@@ -24,15 +33,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class DistributedServiceRegistry extends PlatformServiceRegistry
 {
