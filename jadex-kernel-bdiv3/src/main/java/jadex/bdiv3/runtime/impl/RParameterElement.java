@@ -393,7 +393,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			super(modelelement, agent);
 			this.name = name!=null?name: modelelement.getName();
 			this.fetcher = fetcher;
-			if(modelelement.getEvaluationMode()==EvaluationMode.PULL)
+			if(modelelement!=null && modelelement.getEvaluationMode()==EvaluationMode.PULL)
 			{
 				this.inivals	= inivals;
 			}
