@@ -189,7 +189,7 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 *  Called when an exception occurred.
 	 * @param exception The exception.
 	 */
-	public void exceptionOccurred(Exception exception)
+	public final void exceptionOccurred(Exception exception)
 	{
 		boolean	notify	= false;
 		

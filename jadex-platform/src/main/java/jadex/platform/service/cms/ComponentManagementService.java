@@ -21,7 +21,6 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -461,7 +460,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param resultlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, final CreationInfo info, 
+	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, CreationInfo info, 
 		final IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{			
 		if(modelname==null)
@@ -469,11 +468,6 @@ public class ComponentManagementService implements IComponentManagementService
 
 //		if(name!=null && name.indexOf("abc")!=-1)
 //			System.out.println("create compo: "+modelname+" "+info);
-		
-		if(modelname.indexOf("Proxy")!=-1)
-		{
-			System.out.println("CMS1: Creating proxy on "+root+" for "+info.getArguments());
-		}
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
@@ -503,56 +497,21 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
 		{				
-			if(modelname.indexOf("Proxy")!=-1)
-			{
-				System.out.println("CMS3: Creating proxy on "+root+" for "+info.getArguments());
-			}
-			
 			getRemoteCMS(cinfo.getParent()).addResultListener(createResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(inited)
 			{
-				public void customResultAvailable(final IComponentManagementService rcms)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
 					// todo: problem, the call will get a wrong caller due to IComponentIdentidier.LOCAL.get()
 					// will deliver the platform (as this second call is performed by the cms itself)
 					
-					if(modelname.indexOf("Proxy")!=-1)
-					{
-						System.out.println("CMS4: Creating proxy on "+((IService)rcms).getServiceIdentifier().getProviderId()+" for "+info.getArguments());
-					}
-					
-					rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited)
-					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
-							if(modelname.indexOf("Proxy")!=-1)
-							{
-								System.out.println("CMS5: Creating proxy on "+((IService)rcms).getServiceIdentifier().getProviderId()+" for "+info.getArguments());
-							}
-							
-							super.customResultAvailable(result);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							if(modelname.indexOf("Proxy")!=-1)
-							{
-								System.out.println("CMS6: Creating proxy on "+((IService)rcms).getServiceIdentifier().getProviderId()+" for "+info.getArguments()+" "+exception);
-								exception.printStackTrace();
-							}
-							super.exceptionOccurred(exception);
-						}
-					});
+					rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
 				}
 			}));
 		}
 		else
 		{
 	//		System.out.println("create start1: "+model+" "+cinfo.getParent());
-			if(modelname.indexOf("Proxy")!=-1)
-			{
-				System.out.println("CMS2: Creating proxy on "+root+" for "+info.getArguments());
-			}
 			
 			if(name!=null && name.indexOf('@')!=-1)
 			{

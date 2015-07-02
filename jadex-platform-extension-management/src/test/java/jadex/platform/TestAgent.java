@@ -206,7 +206,7 @@ public abstract class TestAgent
 //			"-libpath", url,
 			"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-			"-logging", "true",
+//			"-logging", "true",
 //			"-relaytransport", "false",
 			"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
 			"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
@@ -269,21 +269,11 @@ public abstract class TestAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		if(filename.indexOf("Proxy")!=-1)
-		{
-			System.out.println("0: Creating proxy on "+root+" for "+args);
-		}
-		
 		agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				if(filename.indexOf("Proxy")!=-1)
-				{
-					System.out.println("1: Creating proxy on "+root+" for "+args+" using "+cms);
-				}
-				
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
@@ -296,10 +286,6 @@ public abstract class TestAgent
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
-						if(filename.indexOf("Proxy")!=-1)
-						{
-							System.out.println("2: Created proxy on "+root+" for "+args);
-						}
 						super.customResultAvailable(result);
 					}
 					
@@ -310,16 +296,6 @@ public abstract class TestAgent
 					}
 				}
 				);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				if(filename.indexOf("Proxy")!=-1)
-				{
-					System.out.println("4: Failed to create proxy on "+root+" for "+args);
-					exception.printStackTrace();
-				}
-				super.exceptionOccurred(exception);
 			}
 		});
 		
@@ -463,12 +439,11 @@ public abstract class TestAgent
 		
 		if(cnt<n)
 		{
-			System.out.println("creating platform: "+cnt);
 			createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess exta)
 				{
-					System.out.println("connecting platform: "+cnt+", waiting for "+platforms.size()*2+" proxies");
+					System.out.println("creating platform: "+cnt);
 					CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(platforms.size()*2, new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result) 
@@ -476,21 +451,7 @@ public abstract class TestAgent
 							platforms.add(exta);
 							setupRemotePlatforms(n, cnt+1, platforms).addResultListener(new DelegationResultListener<Void>(ret));
 						}
-					})
-					{
-						public void resultAvailable(IComponentIdentifier result)
-						{
-							System.out.println("Proxy started: "+(getCnt()+1));
-							super.resultAvailable(result);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							System.out.println("Proxy creation failed: "+(getCnt()+1));
-							exception.printStackTrace();
-							super.exceptionOccurred(exception);
-						}
-					};
+					});
 					
 					for(IExternalAccess other: platforms)
 					{
