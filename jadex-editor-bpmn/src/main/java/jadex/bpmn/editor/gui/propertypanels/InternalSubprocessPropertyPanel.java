@@ -4,6 +4,8 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.propertypanels.ActivityParameterTable.ParameterTableModel;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
@@ -45,6 +47,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import com.mxgraph.model.mxICell;
+
 /**
  *  Property panel for task activities.
  */
@@ -56,6 +60,12 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 	/** Parameter table. */
 	protected ActivityParameterTable atable;
 	
+	/** The tab pane. */
+	protected JTabbedPane tabpane;
+	
+	/** The parameter panel. */
+	protected JPanel parameterpanel;
+	
 	/**
 	 *  Creates a new property panel.
 	 *  @param container The model container.
@@ -63,6 +73,15 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 	public InternalSubprocessPropertyPanel(final ModelContainer container, Object selection)
 	{
 		super(null, container);
+		
+		MParameter selectedparameter = null;
+		
+		if (selection instanceof VInParameter || selection instanceof VOutParameter)
+		{
+			selectedparameter = selection instanceof VInParameter? ((VInParameter) selection).getParameter() : ((VOutParameter) selection).getParameter();
+			selection = ((mxICell) selection).getParent();
+			
+		}
 		
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -83,6 +102,13 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 			}
 		});
 		
+		if(selectedparameter != null)
+		{
+			tabpane.setSelectedComponent(parameterpanel);
+			int row = getBpmnTask().getParameters().indexOf(selectedparameter);
+			atable.setRowSelectionInterval(row, row);
+		}
+		
 //		alcbox.actionPerformed(null);
 //		al.actionPerformed(null);
 	}
@@ -92,7 +118,7 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 	 */
 	protected JTabbedPane createTabPanel()
 	{
-		JTabbedPane tabpane = new JTabbedPane();
+		tabpane = new JTabbedPane();
 		tabpane.addTab("Parameters", createParameterPanel());
 		tabpane.insertTab("Task Settings", null, createSubprocessTypePanel(), null, 0);
 		return tabpane;
@@ -103,7 +129,7 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 	 */
 	protected JPanel createParameterPanel()
 	{
-		JPanel parameterpanel = new JPanel(new GridBagLayout());
+		parameterpanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridy = 1;
 		gc.gridheight = 2;

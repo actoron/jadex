@@ -1,5 +1,7 @@
 package jadex.platform.service.cms;
 
+import jadex.bridge.IComponentIdentifier;
+
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -41,7 +43,14 @@ public class CustomLogRecord extends LogRecord
 			// sets super.needToInferCaller to false
 		    inferCaller();
 		}
-		return super.getSourceClassName();
+		String	ret	= super.getSourceClassName();
+		IComponentIdentifier	comp	= IComponentIdentifier.LOCAL.get();
+		if(comp!=null)
+		{
+			ret	= comp + " " +ret;
+		}
+		
+		return ret;
     }
     
     /**

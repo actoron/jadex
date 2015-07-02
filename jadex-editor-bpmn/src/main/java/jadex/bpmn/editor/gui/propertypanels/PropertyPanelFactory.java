@@ -5,7 +5,9 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
@@ -25,6 +27,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
+
+import com.mxgraph.model.mxICell;
 
 /**
  *  Factory for generating appropriate property panels.
@@ -336,6 +340,25 @@ public class PropertyPanelFactory
 			{
 				Tuple2<IFilter<Object>, Constructor<?>> tup = new Tuple2<IFilter<Object>, Constructor<?>>(filter, con);
 				panelconstructors.add(tup);
+				
+				if (TASK.equals(filterkey)  || INTERNAL_SUBPROCESS.equals(filterkey) || EXTERNAL_SUBPROCESS.equals(filterkey))
+				{
+					final IFilter<Object> basefilter = filter;
+					filter = new IFilter<Object>()
+					{
+						public boolean filter(Object obj)
+						{
+							boolean ret = false;
+							if (obj instanceof VInParameter || obj instanceof VOutParameter)
+							{
+								ret = basefilter.filter(((mxICell) obj).getParent());
+							}
+							return ret;
+						}
+					};
+					tup = new Tuple2<IFilter<Object>, Constructor<?>>(filter, con);
+					panelconstructors.add(tup);
+				}
 			}
 			else
 			{

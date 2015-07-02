@@ -17,6 +17,24 @@ public class Primitive extends AbstractVisual2D
 	public static final int PRIMITIVE_TYPE_TEXTUREDRECTANGLE = 4;
 	public static final int PRIMITIVE_TYPE_TRIANGLE			 = 5;
 	
+	/** Left Alignment */
+	public final static int ALIGN_LEFT		= 0;
+	
+	/** Center Alignment */
+	public final static int ALIGN_CENTER 	= 1;
+	
+	/** Right Alignment */
+	public final static int ALIGN_RIGHT 	= 2;
+	
+	/** Top Alignment */
+	public final static int ALIGN_TOP		= 0;
+	
+	/** Middle Alignment */
+	public final static int ALIGN_MIDDLE 	= 1;
+	
+	/** Bottom Alignment */
+	public final static int ALIGN_BOTTOM 	= 2;
+	
 	/** Enable DrawableCombiner position */
 	protected boolean enableDCPos;
 	
@@ -37,6 +55,12 @@ public class Primitive extends AbstractVisual2D
 	
 	/** Primitive type */
 	protected int type;
+	
+	/** Horizontal alignment */
+	protected int halign;
+	
+	/** Vertical alignment */
+	protected int valign;
 	
 	public Primitive()
 	{
@@ -193,6 +217,46 @@ public class Primitive extends AbstractVisual2D
 	public void setColor(Object c)
 	{
 		color_ = c;
+	}
+	
+	/**
+	 *  Gets the vertical alignment.
+	 *  
+	 *  @return The vertical alignment (top, middle, bottom).
+	 */
+	public int getVAlign()
+	{
+		return valign;
+	}
+	
+	/**
+	 *  Sets the vertical alignment.
+	 *  
+	 *  @param valign The vertical alignment (top, middle, bottom).
+	 */
+	public void setVAlign(int valign)
+	{
+		this.valign = valign;
+	}
+	
+	/**
+	 *  Gets the horizontal alignment.
+	 *  
+	 *  @return The horizontal alignment (left, center, right).
+	 */
+	public int getHAlign()
+	{
+		return halign;
+	}
+	
+	/**
+	 *  Sets the horizontal alignment.
+	 *  
+	 *  @param halign The horizontal alignment (left, center, right).
+	 */
+	public void setHAlign(int halign)
+	{
+		this.halign = halign;
 	}
 	
 	/**
