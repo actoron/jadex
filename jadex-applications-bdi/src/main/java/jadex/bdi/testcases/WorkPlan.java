@@ -7,16 +7,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class WorkPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new work plan.
-	 */
-	public WorkPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

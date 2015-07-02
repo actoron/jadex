@@ -11,16 +11,6 @@ import jadex.bridge.fipa.Done;
  */
 public class PickUpWastePlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public PickUpWastePlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//------ methods -------
 
 	/**

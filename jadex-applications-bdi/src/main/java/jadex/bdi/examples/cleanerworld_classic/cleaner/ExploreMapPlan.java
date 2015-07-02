@@ -19,16 +19,6 @@ public class ExploreMapPlan extends Plan
 	/** Random number generator. */
 	protected Random	rnd	= new Random();
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ExploreMapPlan()
-	{
-//		getLogger().info("Created: "+this+" for goal "+getRootGoal());
-	}
-
 	//-------- methods --------
 
 	/**

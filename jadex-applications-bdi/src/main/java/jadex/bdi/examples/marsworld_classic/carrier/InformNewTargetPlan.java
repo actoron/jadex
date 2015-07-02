@@ -23,26 +23,6 @@ public class InformNewTargetPlan extends Plan
 	/** The target. */
 	protected Target target;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 *  todo: make this work via binding
-	 *  problem: Event does only contain string rep of new target
-	 * /
-	public InformNewTargetPlan(Target target)
-	{
-		getLogger().info("Created: "+this);
-		this.target = target;
-	}*/
-
-	/**
-	 *  Create a new plan.
-	 */
-	public InformNewTargetPlan()
-	{
-	}
-
 	//-------- methods --------
 
 	/**

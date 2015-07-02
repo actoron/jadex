@@ -15,7 +15,7 @@ public class ThankYouPlanC4 extends Plan
 	 */
 	public ThankYouPlanC4()
 	{
-		getLogger().info("Created:"+this);
+		System.out.println("Created:"+this);
 	}
 
 	//-------- methods --------

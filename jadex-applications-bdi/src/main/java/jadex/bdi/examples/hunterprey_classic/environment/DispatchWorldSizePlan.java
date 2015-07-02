@@ -9,16 +9,6 @@ import jadex.bridge.fipa.Done;
  */
 public class DispatchWorldSizePlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public DispatchWorldSizePlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//------ methods -------
 
 	/**

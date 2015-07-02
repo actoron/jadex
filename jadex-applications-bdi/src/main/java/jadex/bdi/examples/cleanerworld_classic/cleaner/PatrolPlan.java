@@ -10,17 +10,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class PatrolPlan extends Plan
 {
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public PatrolPlan()
-	{
-//		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

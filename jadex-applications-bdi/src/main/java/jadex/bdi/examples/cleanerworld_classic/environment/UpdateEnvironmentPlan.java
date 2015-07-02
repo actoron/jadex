@@ -22,16 +22,6 @@ import jadex.bridge.service.types.df.IDFServiceDescription;
  */
 public class UpdateEnvironmentPlan extends Plan
 {
-	//-------- conctructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public UpdateEnvironmentPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

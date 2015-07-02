@@ -381,13 +381,17 @@ public class SBDIModel
 	 */
 	protected static List<EventType> convertEventTypes(String capa, Collection<EventType> evs, IBDIModel bdimodel)
 	{
-		List<EventType>	ret	= new ArrayList<EventType>();
-		for(EventType event: evs)
+		List<EventType>	ret	= null;
+		if(evs!=null)
 		{
-			String[]	types	= event.getTypes().clone();
-			String	mapped = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+types[types.length-1] : types[types.length-1];
-			types[types.length-1]	= bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped;
-			ret.add(new EventType(types));
+			ret	= new ArrayList<EventType>();
+			for(EventType event: evs)
+			{
+				String[]	types	= event.getTypes().clone();
+				String	mapped = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+types[types.length-1] : types[types.length-1];
+				types[types.length-1]	= bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped;
+				ret.add(new EventType(types));
+			}
 		}
 		return  ret==null || ret.isEmpty() ? null : ret;
 	}

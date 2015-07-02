@@ -25,7 +25,7 @@ public class AnswerPlan	extends Plan
 	 *  @param num	The number of answers to send.
 	 *  @param delay	The delay between the answers.
 	 */
-	public AnswerPlan()
+	public void	body()
 	{
 		if(hasParameter("number"))
 			this.num	= ((Number)getParameter("number").getValue()).intValue();
@@ -34,15 +34,8 @@ public class AnswerPlan	extends Plan
 
 		if(hasParameter("delay"))
 			this.delay	= ((Number)getParameter("delay").getValue()).longValue();
-	}
 
-	//-------- methods --------
-
-	/**
-	 *  The body of the plan.
-	 */
-	public void	body()
-	{
+		
 		IMessageEvent	event	= (IMessageEvent)getReason();
 		for(int i=1; i<=num; i++)
 		{

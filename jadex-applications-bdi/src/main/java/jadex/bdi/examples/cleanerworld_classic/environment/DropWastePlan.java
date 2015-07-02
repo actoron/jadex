@@ -13,16 +13,6 @@ import jadex.bridge.fipa.Done;
  */
 public class  DropWastePlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public  DropWastePlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//------ methods -------
 
 	/**

@@ -17,11 +17,11 @@ public class RemoveWordPlanE3 extends Plan
 	/**
 	 *  Create a new plan.
 	 *  @param beliefsetname The beliefset name.
-	 */
+	 * /
 	public RemoveWordPlanE3()
 	{
-//		this("egwords");
-	}
+		this("egwords");
+	}*/
 	
 	/**
 	 *  Create a new plan.

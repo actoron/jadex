@@ -8,16 +8,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class ActivityPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ActivityPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

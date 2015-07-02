@@ -18,17 +18,6 @@ public class EnglishGermanTranslationPlanD2 extends Plan
 	/** Query the tuples for a word. */
 	protected IExpression	query_word;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslationPlanD2()
-	{
-		getLogger().info("Created:"+this);
-		this.query_word	= getExpression("query_egword");
-	}
-
 	//-------- methods --------
 
 	/**
@@ -36,6 +25,8 @@ public class EnglishGermanTranslationPlanD2 extends Plan
 	 */
 	public void body()
 	{
+		this.query_word	= getExpression("query_egword");
+		
 		IExpression	query_word = getExpression("query_egword");
 		String	reply;
 		Object	cont;

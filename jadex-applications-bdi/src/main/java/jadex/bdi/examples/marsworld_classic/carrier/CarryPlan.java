@@ -18,21 +18,6 @@ import jadex.bridge.fipa.SFipa;
  */
 public class CarryPlan extends Plan
 {
-	//-------- constructors--------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public CarryPlan()
-	{
-		getLogger().info("Created: "+this);
-		Environment env = ((Environment)getBeliefbase().getBelief("move.environment").getFact());
-		env.setAgentInfo(new AgentInfo(getComponentName(),
-			(String)getBeliefbase().getBelief("move.my_type").getFact(), (Location)getBeliefbase()
-			.getBelief("move.my_home").getFact(), ((Double)getBeliefbase().getBelief("move.my_vision")
-			.getFact()).doubleValue()));
-	}
-
 	//-------- methods --------
 
 	/**
@@ -40,13 +25,18 @@ public class CarryPlan extends Plan
 	 */
 	public void body()
 	{
+		Environment env = ((Environment)getBeliefbase().getBelief("move.environment").getFact());
+		env.setAgentInfo(new AgentInfo(getComponentName(),
+			(String)getBeliefbase().getBelief("move.my_type").getFact(), (Location)getBeliefbase()
+			.getBelief("move.my_home").getFact(), ((Double)getBeliefbase().getBelief("move.my_vision")
+			.getFact()).doubleValue()));
+		
 		while(true)
 		{
 			// Wait for a request to carry.
 			IMessageEvent req = waitForMessageEvent("request_carry");
 
 			Target ot = ((RequestCarry)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
-			Environment env = (Environment)getBeliefbase().getBelief("move.environment").getFact();
 			Target target = env.getTarget(ot.getId());
 			Location dest = target.getLocation();
 

@@ -25,7 +25,7 @@ public class EnglishGermanTranslationPlanF2 extends Plan
 	 */
 	public EnglishGermanTranslationPlanF2()
 	{
-		getLogger().info("Created: "+this);
+		System.out.println("Created: "+this);
 
 		this.wordtable = new HashMap<String, String>();
 		this.wordtable.put("coffee", "Kaffee");

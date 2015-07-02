@@ -12,18 +12,6 @@ public class PrintResultPlan extends Plan
 	/** The result. */
 	protected Object result;
 	
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public PrintResultPlan()
-	{
-//		System.out.println("create: "+getRPlan());
-		this.result = getParameter("result").getValue();
-	}
-	
-	
 	//-------- methods --------
 
 	/**
@@ -31,7 +19,8 @@ public class PrintResultPlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("body: "+getRPlan());
+		this.result = getParameter("result").getValue();
+		
 		getLogger().info(""+result);
 	}
 }

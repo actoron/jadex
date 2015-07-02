@@ -15,16 +15,6 @@ import java.util.List;
  */
 public class LeastSeenWalkPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public LeastSeenWalkPlan()
-	{
-//		getLogger().info("Created: "+this+" for goal "+getRootGoal());
-	}
-
 	//-------- methods --------
 
 	/**
