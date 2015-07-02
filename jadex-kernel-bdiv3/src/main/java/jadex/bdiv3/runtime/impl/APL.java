@@ -101,7 +101,10 @@ public class APL
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(candidates==null || ((MProcessableElement)element.getModelElement()).isRebuild())
+		if(((MProcessableElement)element.getModelElement()).isRebuild())
+			candidates = null;
+		
+		if(candidates==null)
 		{
 			boolean	done	= false;
 
