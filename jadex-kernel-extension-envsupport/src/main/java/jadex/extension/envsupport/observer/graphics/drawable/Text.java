@@ -16,15 +16,6 @@ import java.awt.font.TextLayout;
  */
 public final class Text extends Primitive
 {
-	/** Left Alignment */
-	public final static int ALIGN_LEFT		= 0;
-	
-	/** Center Alignment */
-	public final static int ALIGN_CENTER 	= 1;
-	
-	/** Right Alignment */
-	public final static int ALIGN_RIGHT 	= 2;
-	
 	/** Viewport size (in pixels) on which the base font size is relative to */
 	public final static float BASE_VIEWPORT_SIZE = 300.0f;
 	
@@ -34,21 +25,19 @@ public final class Text extends Primitive
 	/** Lines of text */
 	private String text;
 	
-	/** Text alignment */
-	private int align;
-	
 	/** The condition deciding if the drawable should be drawn. */
 	//private IParsedExpression drawcondition;
 	
 	public Text()
 	{
-		this(null, null, null, null, 0, 0, null);
+		this(null, null, null, null, 0, 0, 0, null);
 	}
 	
-	public Text(Object position, Font baseFont, Color color, String text, int align, int absFlags, IParsedExpression drawcondition)
+	public Text(Object position, Font baseFont, Color color, String text, int halign, int valign, int absFlags, IParsedExpression drawcondition)
 	{
 		super(Primitive.PRIMITIVE_TYPE_TEXT, position, Vector3Double.ZERO.copy(), new Vector2Double(1.0), absFlags, color, drawcondition);
-		this.align = align;
+		setHAlign(halign);
+		setVAlign(valign);
 		if (baseFont == null)
 			baseFont = new Font(null);
 		this.baseFont = baseFont;
@@ -67,10 +56,10 @@ public final class Text extends Primitive
 		return text;
 	}
 	
-	public double getAlignment(TextLayout tl)
+	public double getTextHAlignment(TextLayout tl)
 	{
 		double xAlign = 0.0;
-		switch(align)
+		switch(getHAlign())
 		{
 			case ALIGN_RIGHT:
 				xAlign -= tl.getAdvance();

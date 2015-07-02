@@ -84,7 +84,7 @@
 			</env:avatarmappings>
 			
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D">
+				<env:perspective name="icons" class="Perspective2D" opengl="true">
 					<env:drawable objecttype="disaster" width="0.08" height="0.08">
 						<env:property name="drawsize" dynamic="true">new Vector2Double($object.getProperty("size").intValue()*0.005)</env:property>
 						<env:ellipse layer="1" size="drawsize" abssize="true" color="#FAFA1E99">
@@ -105,7 +105,8 @@
 						<env:texturedrectangle layer="2" height="1" width="1" imagepath="jadex/bdi/examples/disastermanagement/images/earthquake.png">
 							<env:drawcondition>$object.getProperty("type").equals("Earthquake")</env:drawcondition>
 						</env:texturedrectangle>
-						<env:text layer="3" x="0.04" y="-0.02" size="6" font="Arial" abssize="true" text="victims: $victims$\nfire: $fire$\nchemicals: $chemicals$" align="left" color="black"/>
+						<!-- <env:text layer="3" x="0.04" y="-0.02" size="6" font="Arial" abssize="true" text="victims: $victims$\nfire: $fire$\nchemicals: $chemicals$" align="left" valign="middle" color="black"/> -->
+						<env:text layer="3" x="0.04" size="6" font="Arial" abssize="true" text="victims: $victims$\nfire: $fire$\nchemicals: $chemicals$" halign="left" valign="middle" color="black"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="firestation" width="0.1" height="0.1">

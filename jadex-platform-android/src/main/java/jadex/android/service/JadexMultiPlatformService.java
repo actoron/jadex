@@ -5,7 +5,9 @@ import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -19,8 +21,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.ITuple2ResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.future.TupleResult;
 
 import java.util.Collection;
@@ -185,6 +189,7 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
+						ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 						JadexMultiPlatformService.this.onPlatformStarted(result);
 						ret.setResult(result);
 					}
@@ -260,29 +265,74 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		getCMS(platformId)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				ITuple2Future<IComponentIdentifier,Map<String,Object>> fut = cms.createComponent(name, modelPath, creationInfo);
 				
 				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>() {
 
+					IComponentIdentifier cid;
 					@Override
-					public void firstResultAvailable(final IComponentIdentifier result) {
-						// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								ret.setResult(result);
+					public void firstResultAvailable(final IComponentIdentifier cid) {
+						this.cid = cid;
+						// schedule to component to allow suspending
+						cms.getExternalAccess(cid).addResultListener(new  DefaultResultListener<IExternalAccess>()
+						{
+							public void resultAvailable(IExternalAccess access)
+							{
+								access.scheduleStep(new IComponentStep<Void>()
+								{
+
+									@Override
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										ret.setResult(cid);
+										return Future.DONE;
+									}
+									
+								});
 							}
-						}).start();
+						});
+						// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
+//						new Thread(new Runnable() {
+//							@Override
+//							public void run() {
+////								ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+//								ret.setResult(result);
+//							}
+//						}).start();
 					}
 
 					@Override
-					public void secondResultAvailable(Map<String, Object> result) {
+					public void secondResultAvailable(final Map<String, Object> result) {
 						// occurs when execution is terminated.
-						if (terminationListener != null) {
-							terminationListener.resultAvailable(result);
-						}
+//						new Thread(new Runnable() {
+//							@Override
+//							public void run() {
+////								ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+//								if (terminationListener != null) {
+//									terminationListener.resultAvailable(result);
+//								}
+//							}
+//						}).start();
+						cms.getExternalAccess(cid).addResultListener(new  DefaultResultListener<IExternalAccess>()
+						{
+							public void resultAvailable(IExternalAccess access)
+							{
+								access.scheduleStep(new IComponentStep<Void>()
+								{
+
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										if (terminationListener != null) {
+											terminationListener.resultAvailable(result);
+										}
+										return Future.DONE;
+									}
+									
+								});
+							}
+						});
 					}
 
 					@Override

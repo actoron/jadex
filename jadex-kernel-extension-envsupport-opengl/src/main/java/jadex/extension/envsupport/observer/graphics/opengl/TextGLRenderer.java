@@ -89,27 +89,45 @@ public class TextGLRenderer implements IGLRenderer
 		String text = Text.getReplacedText(dc, obj, textP.getText(), vp);
 		String[] lines = text.split("(\n\r?)|(\r)");
 		
+		if (textP.getVAlign() == Primitive.ALIGN_MIDDLE || textP.getVAlign() == Primitive.ALIGN_BOTTOM)
+		{
+			double hadj = 0;
+			for (int i = 0; i < lines.length; ++i)
+			{
+				TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);
+				hadj += tl.getAscent() + tl.getDescent() + tl.getLeading();
+			}
+			if (textP.getVAlign() == Primitive.ALIGN_MIDDLE)
+			{
+				hadj *= 0.5;
+			}
+			yPos += hadj;
+		}
+		
 		for (int i = 0; i < lines.length; ++i)
 		{
 //			System.out.println("hier2");
 			TextLayout tl = new TextLayout(lines[i], font, DUMMY_FRC);
 //			System.out.println("hier2.1");
 			
-			if (i != 0)
-			{
+//			if (i != 0)
+//			{
 //				System.out.println("hier2.2");
-				yPos -= tl.getAscent();
-			}
+//				yPos -= tl.getAscent();
+//			}
+			
+			yPos -= tl.getLeading() + tl.getAscent();
 
 //			System.out.println("hier2.3");
 			tr.beginRendering(canvasSize.getXAsInteger(), canvasSize.getYAsInteger());
 //			System.out.println("vorher: "+SUtil.arrayToString(lines[i])+", "+(xPos + textP.getAlignment(tl))+", "+yPos);
-			tr.draw(lines[i], (int) (xPos + textP.getAlignment(tl)), (int) yPos);
+			tr.draw(lines[i], (int) (xPos + textP.getTextHAlignment(tl)), (int) yPos);
 //			System.out.println("nachher");
 			tr.endRendering();
 			
 //			System.out.println("hier2.6");
-			yPos -= (tl.getDescent() + tl.getLeading());
+//			yPos -= (tl.getDescent() + tl.getLeading());
+			yPos -= (tl.getDescent());
 //			System.out.println("hier2.0");
 		}
 	}

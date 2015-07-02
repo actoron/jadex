@@ -2459,6 +2459,8 @@ public class MEnvSpaceType
 			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attintconv),
 			new AttributeInfo(new AccessInfo("text", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
 			new AttributeInfo(new AccessInfo("align", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("valign", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("halign", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -2494,18 +2496,33 @@ public class MEnvSpaceType
 					// Attributes are probably not the right place for text...
 					text = text.replaceAll("\\\\n", "\n").replaceAll("\\\\\\\\", "\\");
 					
-					String aligntxt = String.valueOf(getProperty(args, "align"));
-					int align = Text.ALIGN_LEFT;
+					String aligntxt = null;
+					if (getProperty(args, "align") != null)
+					{
+						aligntxt = String.valueOf(getProperty(args, "align"));
+					}
+					else
+					{
+						aligntxt = String.valueOf(getProperty(args, "halign"));
+					}
+					int halign = Primitive.ALIGN_LEFT;
 					if (aligntxt.equals("right"))
-						align = Text.ALIGN_RIGHT;
+						halign = Primitive.ALIGN_RIGHT;
 					else if (aligntxt.equals("center"))
-						align = Text.ALIGN_CENTER;
+						halign = Primitive.ALIGN_CENTER;
+					
+					aligntxt = String.valueOf(getProperty(args, "valign"));
+					int valign = Primitive.ALIGN_TOP;
+					if (aligntxt.equals("middle"))
+						valign = Primitive.ALIGN_MIDDLE;
+					else if (aligntxt.equals("bottom"))
+						valign = Primitive.ALIGN_BOTTOM;
 					
 					int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
 					absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
 					
 					IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-					return new Text(position, font, (Color)getProperty(args, "color"), text, align, absFlags, exp);
+					return new Text(position, font, (Color)getProperty(args, "color"), text, halign, valign, absFlags, exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
