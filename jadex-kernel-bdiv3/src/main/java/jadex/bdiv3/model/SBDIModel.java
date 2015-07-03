@@ -347,7 +347,7 @@ public class SBDIModel
 			}
 			if(trigger.getCondition()!=null)
 			{
-				trigger.setCondition(copyCondition(bdimodel, null, trigger.getCondition()));
+				trigger2.setCondition(copyCondition(bdimodel, null, trigger.getCondition()));
 			}
 		}
 		

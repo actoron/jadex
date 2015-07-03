@@ -47,11 +47,8 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.count==1
-					
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 1))
-					// ?mbelief = (mbelief (melement_has_name "count"))
 				</condition>
 			</trigger>
 		</plan>
@@ -65,11 +62,8 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
- 				<condition language="jcl">
+ 				<condition>
  					$beliefbase.count==2
- 					
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 2))
-					// ?mbelief = (mbelief (melement_has_name "count"))
  				</condition>
 			</trigger>
 		</plan>
