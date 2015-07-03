@@ -54,7 +54,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 	 */
 	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher, MConfigParameterElement config)
 	{
-		List<MParameter> mparams = ((MParameterElement)getModelElement()).getParameters();
+		List<MParameter> mparams = getModelElement()!=null ? ((MParameterElement)getModelElement()).getParameters() : null;
 		if(mparams!=null)
 		{
 			for(MParameter mparam: mparams)

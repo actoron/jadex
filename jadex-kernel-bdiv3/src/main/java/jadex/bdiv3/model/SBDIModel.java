@@ -194,28 +194,29 @@ public class SBDIModel
 			List<MConfiguration>	outerconfs	= bdimodel.getCapability().getConfigurations();
 			for(MConfiguration config: capa.getCapability().getConfigurations())
 			{
-				// Copy default config.
-				if(firstconf)
+				// Make sure at least one outer conf exists.
+				if(outerconfs==null || outerconfs.isEmpty())
 				{
-					firstconf	= false;
-					if(outerconfs==null || outerconfs.isEmpty())
-					{
-						bdimodel.getCapability().addConfiguration(new MConfiguration(""));
-						outerconfs	= bdimodel.getCapability().getConfigurations();
-					}
-					
-					// Copy inner default into outer default.
-					copyConfiguration(bdimodel, capaname, config, bdimodel.getCapability().getConfigurations().get(0));
+					bdimodel.getCapability().addConfiguration(new MConfiguration(""));
+					outerconfs	= bdimodel.getCapability().getConfigurations();
 				}
 				
 				// Need to find, which outer configuration(s) use the inner (if any)
 				for(MConfiguration outer: outerconfs)
 				{
-					if(outer.getInitialCapabilities()!=null && outer.getInitialCapabilities().containsKey(capaname) && outer.getInitialCapabilities().get(capaname).equals(config.getName()))
+					// Copy first inner configuration to all outer configurations that do not provide special mapping.
+					boolean	copydef	= firstconf && (outer.getInitialCapabilities()==null || !outer.getInitialCapabilities().containsKey(capaname));
+					
+					// Copy all inner configurations to all outer configurations that do define this special mapping.
+					boolean	copymap	= outer.getInitialCapabilities()!=null && outer.getInitialCapabilities().containsKey(capaname) && outer.getInitialCapabilities().get(capaname).equals(config.getName());
+					
+					if(copydef || copymap)
 					{
 						copyConfiguration(bdimodel, capaname, config, outer);						
 					}
 				}
+				
+				firstconf	= false;
 			}
 			
 			// Todo: non-bdi elements from subcapabilities.
@@ -276,11 +277,12 @@ public class SBDIModel
 	protected static MConfigBeliefElement copyConfigBelief(IBDIModel bdimodel, String capaname, MConfigBeliefElement cbel)
 	{
 		MConfigBeliefElement	cbel2	= new MConfigBeliefElement();
-		cbel2.setName(bdimodel.getBeliefReferences().containsKey(cbel.getName()) ? bdimodel.getBeliefReferences().get(cbel.getName()) : cbel.getName());
+		String	name	= capaname + MElement.CAPABILITY_SEPARATOR + cbel.getName();
+		cbel2.setName(bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name);
 		for(UnparsedExpression fact: SUtil.safeList(cbel.getFacts()))
 		{
-			String	name	= capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : "");
-			UnparsedExpression	fact2	= new UnparsedExpression(name, (String)null, fact.getValue(), fact.getLanguage());
+			String	fname	= capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : "");
+			UnparsedExpression	fact2	= new UnparsedExpression(fname, (String)null, fact.getValue(), fact.getLanguage());
 			fact2.setClazz(fact.getClazz());
 			cbel2.addFact(fact2);
 		}
@@ -294,7 +296,9 @@ public class SBDIModel
 	{
 		MConfigParameterElement	cpel2	= new MConfigParameterElement();
 		// todo: parameter element references
-//		cbel2.setName(bdimodel.getBeliefReferences().containsKey(cpel.getName()) ? bdimodel.getBeliefReferences().get(cpel.getName()) : cpel.getName());
+		String	name	= capaname + MElement.CAPABILITY_SEPARATOR + cpel.getName();
+		cpel2.setName(name);
+//		cpel2.setName(bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name);
 		if(cpel.getParameters()!=null)
 		{
 			for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
