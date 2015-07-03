@@ -1427,8 +1427,22 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
-						RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, null, null);
-						RPlan.executePlan(rplan, component);
+						// Create all binding plans
+						List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mplan, component.getFetcher());
+						if(bindings!=null && bindings.size()>0)
+						{
+							for(Map<String, Object> binding: bindings)
+							{
+								RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, binding, null);
+								RPlan.executePlan(rplan, component);
+							}
+						}
+						else
+						{
+							RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, null, null);
+							RPlan.executePlan(rplan, component);
+						}
+						
 						return IFuture.DONE;
 					}
 				};
