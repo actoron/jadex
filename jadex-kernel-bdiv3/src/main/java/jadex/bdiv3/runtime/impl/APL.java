@@ -658,7 +658,7 @@ public class APL
 	 *  Checks precondition and evaluates bindings (if any).
 	 *  @return apl	returns new apl object in case a null apl is supplied.
 	 */
-	protected static List<MPlanInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan, IValueFetcher fetcher)
+	public static List<MPlanInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan, IValueFetcher fetcher)
 	{
 		List<MPlanInfo> ret = new ArrayList<MPlanInfo>();
 		

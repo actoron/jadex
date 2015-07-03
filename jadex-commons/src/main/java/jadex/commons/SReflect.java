@@ -8,7 +8,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
-import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Array;
