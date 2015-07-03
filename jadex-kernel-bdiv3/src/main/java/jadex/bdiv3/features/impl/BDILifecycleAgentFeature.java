@@ -1241,7 +1241,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								return IFuture.DONE;
 							}
 						});
-						List<EventType> events = new ArrayList<EventType>(cond.getEvents());
+						List<EventType> events = cond.getEvents()==null || cond.getEvents().size()==0? new ArrayList<EventType>(): new ArrayList<EventType>(cond.getEvents());
 						events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
 						rule.setEvents(events);
 						rulesystem.getRulebase().addRule(rule);

@@ -15,6 +15,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
@@ -139,7 +140,18 @@ public abstract class Plan
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
-		ret.get(timeout);
+		try
+		{
+			ret.get(timeout);
+		}
+		catch(GoalFailureException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new GoalFailureException(null, e);
+		}
 	}
 	
 	/**
@@ -160,7 +172,18 @@ public abstract class Plan
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
-		ret.get(timeout);
+		try
+		{
+			ret.get(timeout);
+		}
+		catch(GoalFailureException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new GoalFailureException(null, e);
+		}
 	}
 	
 	/**
