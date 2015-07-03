@@ -2,12 +2,7 @@ package jadex.bdi.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
-import jadex.javaparser.SJavaParser;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Test initial belief values.
@@ -21,33 +16,35 @@ public class BeliefValuePlan extends Plan
 	 */
 	public void body()
 	{
-		TestReport tr = new TestReport("#1", "Test belief default values.");
-		Map<String, Object>	check = new HashMap<String, Object>();
-		check.put("timeout", Long.valueOf(20000));
-		check.put("abel", "agent_initial_bel");
-		check.put("bbel", "capability_initial_bel");
-		check.put("cbel", "capability_default_bel");
-		UnparsedExpression[]	args	= getScope().getAgentModel().getConfiguration(getScope().getConfigurationName()).getArguments();
-		boolean	ok	= args.length==check.size();
-		for(int i=0; ok && i<args.length; i++)
-		{
-			ok	= SUtil.equals(
-				SJavaParser.getParsedValue(args[i], getScope().getAgentModel().getAllImports(), getAgent().getFetcher(), getScope().getClassLoader()),
-				check.get(args[i].getName()));
-		}
-		if(ok)
-		{
-			tr.setSucceeded(true);
-		}
-		else
-		{
-			tr.setFailed("Argument values incorrect: "+SUtil.arrayToString(args)+", "+check);
-		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
+//		TestReport tr = new TestReport("#1", "Test agent_initial_bel default value.");
+//		BDIXModel	model	= (BDIXModel)getScope().getAgentModel();
+//		SBDIModel.findBeliefDefaultValue(model, model.getCapability().getBelief("abel"), configname);
+//		Map<String, Object>	check = new HashMap<String, Object>();
+//		check.put("timeout", Long.valueOf(20000));
+//		check.put("abel", "agent_initial_bel");
+//		check.put("bbel", "capability_initial_bel");
+//		check.put("cbel", "capability_default_bel");
+//		UnparsedExpression[]	args	= getScope().getAgentModel().getConfiguration(getScope().getConfigurationName()).getArguments();
+//		boolean	ok	= args.length==check.size();
+//		for(int i=0; ok && i<args.length; i++)
+//		{
+//			ok	= SUtil.equals(
+//				SJavaParser.getParsedValue(args[i], getScope().getAgentModel().getAllImports(), getAgent().getFetcher(), getScope().getClassLoader()),
+//				check.get(args[i].getName()));
+//		}
+//		if(ok)
+//		{
+//			tr.setSucceeded(true);
+//		}
+//		else
+//		{
+//			tr.setFailed("Argument values incorrect: "+SUtil.arrayToString(args)+", "+check);
+//		}
+//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		
 		
 		
-		tr = new TestReport("#2", "Test initial belief values.");
+		TestReport	tr = new TestReport("#2", "Test initial belief values.");
 
 		String bel_a = (String)getBeliefbase().getBelief("cap_a.bel").getFact();
 		String bel_b = (String)getBeliefbase().getBelief("cap_b.bel").getFact();

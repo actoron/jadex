@@ -73,9 +73,11 @@
 				<initialcapability ref="cap_c" configuration="test_1"/>
 			</capabilities>
 			<beliefs>
+			    <!-- 
 				<initialbelief cref="testcap.testcase_cnt">
 					<fact>2</fact>
 				</initialbelief>
+				 -->
 				<initialbelief cref="cap_a.bel">
 					<fact>"agent_initial_bel"</fact>
 				</initialbelief>

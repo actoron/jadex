@@ -3,8 +3,10 @@ package jadex.bdiv3.model;
 import jadex.bdiv3x.BDIXModel;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SUtil;
 import jadex.rules.eca.EventType;
 
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -97,7 +100,7 @@ public class SBDIModel
 					((BDIModel)bdimodel).addBeliefReference(capaname+MElement.CAPABILITY_SEPARATOR+reference, concrete);
 				}
 			}
-			else
+			else // if(bdimodel instanceof BDIXModel)
 			{
 				for(String reference: capa.getBeliefReferences().keySet())
 				{
@@ -186,7 +189,127 @@ public class SBDIModel
 					plan.getPriority());
 				bdimodel.getCapability().addPlan(plan2);
 			}
+			
+			boolean	firstconf	= true;
+			List<MConfiguration>	outerconfs	= bdimodel.getCapability().getConfigurations();
+			for(MConfiguration config: capa.getCapability().getConfigurations())
+			{
+				// Copy default config.
+				if(firstconf)
+				{
+					firstconf	= false;
+					if(outerconfs==null || outerconfs.isEmpty())
+					{
+						bdimodel.getCapability().addConfiguration(new MConfiguration(""));
+						outerconfs	= bdimodel.getCapability().getConfigurations();
+					}
+					
+					// Copy inner default into outer default.
+					copyConfiguration(bdimodel, capaname, config, bdimodel.getCapability().getConfigurations().get(0));
+				}
+				
+				// Need to find, which outer configuration(s) use the inner (if any)
+				for(MConfiguration outer: outerconfs)
+				{
+					if(outer.getInitialCapabilities()!=null && outer.getInitialCapabilities().containsKey(capaname) && outer.getInitialCapabilities().get(capaname).equals(config.getName()))
+					{
+						copyConfiguration(bdimodel, capaname, config, outer);						
+					}
+				}
+			}
+			
+			// Todo: non-bdi elements from subcapabilities.
+//			capa.getModelInfo().getConfigurations()
+//			capa.getModelInfo().getFeatures()
+//			capa.getModelInfo().getNFProperties()
+//			capa.getModelInfo().getProvidedServices()
+//			capa.getModelInfo().getProperties()
+//			capa.getModelInfo().getRequiredServices()
+//			capa.getModelInfo().getSubcomponentTypes()
 		}
+	}
+	
+	/**
+	 *  Copy an inner configuration into an outer one.
+	 */
+	protected static void	copyConfiguration(IBDIModel bdimodel, String capaname, MConfiguration inner, MConfiguration outer)
+	{
+		for(MConfigBeliefElement cbel: SUtil.safeList(inner.getInitialBeliefs()))
+		{
+			outer.addInitialBelief(copyConfigBelief(bdimodel, capaname, cbel));
+		}
+		for(MConfigBeliefElement cbel: SUtil.safeList(inner.getEndBeliefs()))
+		{
+			outer.addEndBelief(copyConfigBelief(bdimodel, capaname, cbel));
+		}
+		
+		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialEvents()))
+		{
+			outer.addInitialEvent(copyConfigParameterElement(bdimodel, capaname, cpel));
+		}
+		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialGoals()))
+		{
+			outer.addInitialGoal(copyConfigParameterElement(bdimodel, capaname, cpel));
+		}
+		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialPlans()))
+		{
+			outer.addInitialPlan(copyConfigParameterElement(bdimodel, capaname, cpel));
+		}
+		
+		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndEvents()))
+		{
+			outer.addEndEvent(copyConfigParameterElement(bdimodel, capaname, cpel));
+		}
+		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndGoals()))
+		{
+			outer.addEndGoal(copyConfigParameterElement(bdimodel, capaname, cpel));
+		}
+		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndPlans()))
+		{
+			outer.addEndPlan(copyConfigParameterElement(bdimodel, capaname, cpel));
+		}
+	}
+
+	/**
+	 *  Copy a config belief element.
+	 */
+	protected static MConfigBeliefElement copyConfigBelief(IBDIModel bdimodel, String capaname, MConfigBeliefElement cbel)
+	{
+		MConfigBeliefElement	cbel2	= new MConfigBeliefElement();
+		cbel2.setName(bdimodel.getBeliefReferences().containsKey(cbel.getName()) ? bdimodel.getBeliefReferences().get(cbel.getName()) : cbel.getName());
+		for(UnparsedExpression fact: SUtil.safeList(cbel.getFacts()))
+		{
+			String	name	= capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : "");
+			UnparsedExpression	fact2	= new UnparsedExpression(name, (String)null, fact.getValue(), fact.getLanguage());
+			fact2.setClazz(fact.getClazz());
+			cbel2.addFact(fact2);
+		}
+		return cbel2;
+	}
+	
+	/**
+	 *  Copy a config parameter element.
+	 */
+	protected static MConfigParameterElement copyConfigParameterElement(IBDIModel bdimodel, String capaname, MConfigParameterElement cpel)
+	{
+		MConfigParameterElement	cpel2	= new MConfigParameterElement();
+		// todo: parameter element references
+//		cbel2.setName(bdimodel.getBeliefReferences().containsKey(cpel.getName()) ? bdimodel.getBeliefReferences().get(cpel.getName()) : cpel.getName());
+		if(cpel.getParameters()!=null)
+		{
+			for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
+			{
+				for(UnparsedExpression value: param.getValue())
+				{
+					UnparsedExpression	value2	= new UnparsedExpression(value.getName(), (String)null, value.getValue(), value.getLanguage());
+					value2.setClazz(value.getClazz());
+					cpel2.addParameter(value2);
+					// Hack!!! change name after adding.
+					value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
+				}
+			}			
+		}
+		return cpel2;
 	}
 	
 	/**
@@ -270,6 +393,84 @@ public class SBDIModel
 		}
 	}
 
+
+	/**
+	 *  Find the belief/ref value.
+	 *  Returns the expression of the default value.
+	 */
+	public static UnparsedExpression	findBeliefDefaultValue(BDIXModel model, MBelief mbel, String configname)
+	{
+		UnparsedExpression	ret	= null;
+		
+		if(mbel.isMulti(null))
+		{
+			throw new RuntimeException("Method only allowed for single beliefs: "+mbel);
+		}
+		
+		// Search initial value in configuration.
+		MConfiguration	config	= configname!=null 
+			? model.getCapability().getConfiguration(configname) : model.getConfigurations().length>0
+			? model.getCapability().getConfiguration(model.getConfigurations()[0].getName()) : null;
+		if(config!=null && config.getInitialBeliefs()!=null)
+		{
+			MConfigBeliefElement	inibel	= null;
+			for(MConfigBeliefElement cbel: config.getInitialBeliefs())
+			{
+				if(cbel.getName().equals(mbel.getName()))
+				{
+					inibel	= cbel;
+					break;
+				}
+			}
+			
+			if(inibel!=null && inibel.getFacts()!=null && !inibel.getFacts().isEmpty())
+			{
+				ret	= inibel.getFacts().get(0);
+			}
+		}
+		
+		return ret!=null ? ret : mbel.getDefaultFact();
+	}
+		
+	/**
+	 *  Find the beliefset/ref value.
+	 *  Returns the expressions of the default values.
+	 */
+	public static List<UnparsedExpression>	findBeliefSetDefaultValues(BDIXModel model, MBelief mbel, String configname)
+	{
+		List<UnparsedExpression>	ret	= null;
+		
+		if(!mbel.isMulti(null))
+		{
+			throw new RuntimeException("Method only allowed for belief sets: "+mbel);
+		}
+		
+		// Search initial value in configuration.
+		MConfiguration	config	= configname!=null 
+			? model.getCapability().getConfiguration(configname) : model.getConfigurations().length>0
+			? model.getCapability().getConfiguration(model.getConfigurations()[0].getName()) : null;
+		if(config!=null && config.getInitialBeliefs()!=null)
+		{
+			MConfigBeliefElement	inibel	= null;
+			for(MConfigBeliefElement cbel: config.getInitialBeliefs())
+			{
+				if(cbel.getName().equals(mbel.getName()))
+				{
+					inibel	= cbel;
+					break;
+				}
+			}
+			
+			if(inibel!=null)
+			{
+				ret	= inibel.getFacts();
+			}
+		}
+
+		return ret!=null ? ret : mbel.getDefaultFacts();	// Todo: facts expression!?
+	}
+
+	//-------- helper methods --------
 
 	/**
 	 *  Coyp a plan trigger or waitqueue and map the events.

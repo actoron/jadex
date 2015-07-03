@@ -4778,4 +4778,34 @@ public class SUtil
         	}
         }
 	}
+	
+	/**
+	 *  Helper method to allow iterating over possibly null lists.
+	 */
+	public static <T> List<T>	safeList(List<T> list)
+	{
+		if(list!=null)
+		{
+			return list;
+		}
+		else
+		{
+			return Collections.emptyList();
+		}
+	}
+	
+	/**
+	 *  Helper method to allow iterating over possibly null sets.
+	 */
+	public static <T> Set<T>	safeSet(Set<T> set)
+	{
+		if(set!=null)
+		{
+			return set;
+		}
+		else
+		{
+			return Collections.emptySet();
+		}
+	}
 }

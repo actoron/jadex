@@ -1303,34 +1303,16 @@ public class BDIXMLReader extends ComponentXMLReader
 	// Todo: other kernels provide object values!? 
 	protected static String	findBeliefDefaultValue(BDIXModel model, MBelief mbel, String configname)
 	{
-		List<UnparsedExpression>	facts	= null;
+		List<UnparsedExpression>	facts;
 		
-		// Search initial value in configuration.
-		MConfiguration	config	= configname!=null 
-			? model.getCapability().getConfiguration(configname) : model.getConfigurations().length>0
-			? model.getCapability().getConfiguration(model.getConfigurations()[0].getName()) : null;
-		if(config!=null && config.getInitialBeliefs()!=null)
+		if(mbel.isMulti(null))
 		{
-			MConfigBeliefElement	inibel	= null;
-			for(MConfigBeliefElement cbel: config.getInitialBeliefs())
-			{
-				if(cbel.getName().equals(mbel.getName()))
-				{
-					inibel	= cbel;
-					break;
-				}
-			}
-			
-			if(inibel!=null)
-			{
-				inibel.getFacts();
-			}
+			facts	= SBDIModel.findBeliefSetDefaultValues(model, mbel, configname);
 		}
-
-		if(facts==null)
+		else
 		{
-			// todo: unify fact/facts in mbel and configbel
-			facts	= mbel.isMulti(null) ? mbel.getDefaultFacts() : mbel.getDefaultFact()!=null ? Collections.singletonList(mbel.getDefaultFact()) : null;
+			UnparsedExpression	fact	= SBDIModel.findBeliefDefaultValue(model, mbel, configname);
+			facts	= fact!=null ? Collections.singletonList(fact) : null;
 		}
 		
 		String ret = null;
