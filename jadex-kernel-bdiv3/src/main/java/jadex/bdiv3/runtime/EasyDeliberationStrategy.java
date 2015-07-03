@@ -295,7 +295,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 							if(uexp!=null && uexp.getValue()!=null && uexp.getValue().length()>0)
 							{
 								SimpleValueFetcher fet = new SimpleValueFetcher(RBeliefbase.getFetcher(agent, goal.getMGoal()));
-								fet.setValue("$goal", this);
+								fet.setValue("$goal", goal);
 								fet.setValue("$ref", other);
 								
 								try
