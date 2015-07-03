@@ -1,12 +1,5 @@
 package jadex.bridge.service.search;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-
 import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
@@ -43,6 +36,13 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  *  Static helper class for searching services.

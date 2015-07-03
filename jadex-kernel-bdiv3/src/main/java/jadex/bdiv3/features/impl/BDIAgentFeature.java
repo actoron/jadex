@@ -1622,7 +1622,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		final MGoal mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getComponent(), mgoal, goal, null);
+		final RGoal rgoal = new RGoal(getComponent(), mgoal, goal, null, null, null);
 		rgoal.addListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -1677,7 +1677,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		if(mplan==null)
 			throw new RuntimeException("Plan model not found for: "+plan);
 		
-		final RPlan rplan = RPlan.createRPlan(mplan, plan, null, getComponent(), null);
+		final RPlan rplan = RPlan.createRPlan(mplan, plan, null, getComponent(), null, null);
 		rplan.addPlanListener(new IPlanListener<E>()
 		{
 			public void planFinished(E result)

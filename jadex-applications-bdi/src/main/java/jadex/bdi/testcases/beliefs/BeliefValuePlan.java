@@ -14,16 +14,6 @@ import java.util.Map;
  */
 public class BeliefValuePlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new countdown plan.
-	 */
-	public BeliefValuePlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

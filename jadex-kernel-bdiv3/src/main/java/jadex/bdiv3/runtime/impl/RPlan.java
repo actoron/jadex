@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBody;
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
@@ -155,49 +156,46 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  
 	 *  Reason is Object (not RProcessableElement) because it can be also ChangeEvent
 	 */
-	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia, Map<String, Object> binding)
+	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia, Map<String, Object> binding, MConfigParameterElement config)
 	{
 		// Find parameter mappings for xml agents
 		Map<String, Object> mappingvals = binding;
 		SimpleValueFetcher	svf	= null;
 		
-		if(mplan.getParameters()!=null && mplan.getParameters().size()>0)
+		// Todo: service call mappings?
+		if(reason instanceof RParameterElement && mplan.getParameters()!=null && mplan.getParameters().size()>0)
 		{
-			// Todo: service call mappings?
-			if(reason instanceof RParameterElement)
+			RParameterElement rpe = (RParameterElement)reason;
+			if(svf==null)
 			{
-				RParameterElement rpe = (RParameterElement)reason;
-				if(svf==null)
+				svf	= new SimpleValueFetcher(RBeliefbase.getFetcher(ia, mplan));
+				svf.setValue(rpe instanceof RGoal ? "$goal" : "$event", rpe);
+			}
+			
+			for(MParameter mparam: mplan.getParameters())
+			{
+				if(MParameter.Direction.IN.equals(mparam.getDirection()) || MParameter.Direction.INOUT.equals(mparam.getDirection()))
 				{
-					svf	= new SimpleValueFetcher(RBeliefbase.getFetcher(ia, mplan));
-					svf.setValue(rpe instanceof RGoal ? "$goal" : "$event", rpe);
-				}
-				
-				for(MParameter mparam: mplan.getParameters())
-				{
-					if(MParameter.Direction.IN.equals(mparam.getDirection()) || MParameter.Direction.INOUT.equals(mparam.getDirection()))
+					List<String> mappings = rpe instanceof RGoal ? ((MPlanParameter)mparam).getGoalMappings()
+						: rpe instanceof RMessageEvent ? ((MPlanParameter)mparam).getMessageEventMappings() : ((MPlanParameter)mparam).getInternalEventMappings();
+					if(mappings!=null)
 					{
-						List<String> mappings = rpe instanceof RGoal ? ((MPlanParameter)mparam).getGoalMappings()
-							: rpe instanceof RMessageEvent ? ((MPlanParameter)mparam).getMessageEventMappings() : ((MPlanParameter)mparam).getInternalEventMappings();
-						if(mappings!=null)
+						for(String mapping: mappings)
 						{
-							for(String mapping: mappings)
+							if(mapping.startsWith(rpe.getModelElement().getName()))
 							{
-								if(mapping.startsWith(rpe.getModelElement().getName()))
+								String source = mapping.substring(mapping.indexOf(".")+1);
+								if(mappingvals==null)
+									mappingvals = new HashMap<String, Object>();
+								if(mparam.isMulti(null))
 								{
-									String source = mapping.substring(mapping.indexOf(".")+1);
-									if(mappingvals==null)
-										mappingvals = new HashMap<String, Object>();
-									if(mparam.isMulti(null))
-									{
-										mappingvals.put(mparam.getName(), rpe.getParameterSet(source).getValues());
-									}
-									else
-									{
-										mappingvals.put(mparam.getName(), rpe.getParameter(source).getValue());
-									}
-									break;
+									mappingvals.put(mparam.getName(), rpe.getParameterSet(source).getValues());
 								}
+								else
+								{
+									mappingvals.put(mparam.getName(), rpe.getParameter(source).getValue());
+								}
+								break;
 							}
 						}
 					}
@@ -205,7 +203,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			}
 		}
 		
-		final RPlan rplan = new RPlan(mplan, candidate, ia, mappingvals, svf!=null ? svf : RBeliefbase.getFetcher(ia, mplan)); //mappingvals==null? new RPlan(mplan, candidate, ia): 
+		final RPlan rplan = new RPlan(mplan, candidate, ia, mappingvals, svf!=null ? svf : RBeliefbase.getFetcher(ia, mplan), config); //mappingvals==null? new RPlan(mplan, candidate, ia): 
 //		rplan.setInternalAccess(ia);
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);
@@ -400,9 +398,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 *  Create a new plan.
 	 */
-	public RPlan(MPlan mplan, Object candidate, IInternalAccess agent, Map<String, Object> mappingvals, IValueFetcher fetcher)
+	public RPlan(MPlan mplan, Object candidate, IInternalAccess agent, Map<String, Object> mappingvals, IValueFetcher fetcher, MConfigParameterElement config)
 	{
-		super(mplan, agent, mappingvals, fetcher);
+		super(mplan, agent, mappingvals, fetcher, config);
 		this.candidate = candidate;
 		setLifecycleState(PlanLifecycleState.NEW);
 		setProcessingState(PlanProcessingState.READY);
@@ -999,7 +997,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getAgent(), mgoal, goal, null);
+		final RGoal rgoal = new RGoal(getAgent(), mgoal, goal, null, null, null);
 		rgoal.setParent(this);
 		
 		final ResumeCommand<E> rescom = new ResumeCommand<E>(ret, false);

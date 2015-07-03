@@ -5,7 +5,6 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -78,7 +77,7 @@ public class RGoalbase extends RElement implements IGoalbase
 		MGoal mgoal = getCapability().getMCapability().getGoal(type);
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+type);
-		return new RGoal(getAgent(), mgoal, null, null);
+		return new RGoal(getAgent(), mgoal, null, null, null, null);
 	}
 
 	/**

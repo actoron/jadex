@@ -8,6 +8,7 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
+import jadex.commons.collection.LRU;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,8 +17,10 @@ import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -341,7 +344,7 @@ public class NIOTCPTransport implements ITransport
 						hostname = address.substring(schemalen);
 						port = DEFAULT_PORT;
 					}
-					ret	= new InetSocketAddress(hostname, port);
+					ret	= new InetSocketAddress(getAddress(hostname), port);
 				}
 				catch(Exception e)
 				{ 
@@ -350,5 +353,43 @@ public class NIOTCPTransport implements ITransport
 		}
 		
 		return ret;
-	}	
+	}
+	
+	/** Cache for internet addresses to avoid slow lookup. */
+	protected static Map<String, InetAddress>	addresscache	= new LRU<String, InetAddress>();
+	
+	/**
+	 *  
+	 */
+	protected static InetAddress	getAddress(String hostname)
+	{
+		boolean	found	= false;
+		InetAddress	ret	= null;
+		synchronized(addresscache)
+		{
+			found	= addresscache.containsKey(hostname);
+			if(found)
+			{
+				ret	= addresscache.get(hostname);
+			}
+		}
+		
+		if(!found)
+		{
+			try
+			{
+				ret	= InetAddress.getByName(hostname);
+			}
+			catch(UnknownHostException e)
+			{
+			}
+			
+			synchronized(addresscache)
+			{
+				addresscache.put(hostname, ret);
+			}
+		}
+		
+		return ret;
+	}
 }

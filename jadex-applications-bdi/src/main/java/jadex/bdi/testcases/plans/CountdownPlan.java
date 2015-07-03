@@ -7,16 +7,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class CountdownPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new countdown plan.
-	 */
-	public CountdownPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

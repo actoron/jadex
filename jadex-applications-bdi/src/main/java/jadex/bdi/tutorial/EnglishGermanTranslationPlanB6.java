@@ -26,7 +26,7 @@ public class EnglishGermanTranslationPlanB6 extends Plan
 	 */
 	public EnglishGermanTranslationPlanB6()
 	{
-		getLogger().info("Created: "+this);
+		System.out.println("Created: "+this);
 
 		this.wordtable = new HashMap();
 		this.wordtable.put("coffee", "Kaffee");

@@ -26,17 +26,6 @@ public class DealerGameRoundPlayerPlan extends Plan
 	/** The player object. */
 	protected Player	player;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new DealerPlayGameRoundPlan.
-	 */
-	public DealerGameRoundPlayerPlan()
-	{
-		this.timeout = ((Number)getBeliefbase().getBelief("playerwaitmillis").getFact()).longValue();
-		this.player = (Player)getParameter("player").getValue();
-	}
-
 	//-------- methods --------
 	
 	/**
@@ -44,6 +33,9 @@ public class DealerGameRoundPlayerPlan extends Plan
 	 */
 	public void body()
 	{
+		this.timeout = ((Number)getBeliefbase().getBelief("playerwaitmillis").getFact()).longValue();
+		this.player = (Player)getParameter("player").getValue();
+		
 		// Ask player for her bet.
 		getLogger().info("Asking for bet from player: "+player);
 		RequestBet rb = new RequestBet();

@@ -411,6 +411,7 @@ public class BDIXMLReader extends ComponentXMLReader
 		{
 			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
+				boolean	done	= false;
 				if(pathname[pathname.length-1].getLocalPart().startsWith("initial") || pathname[pathname.length-1].getLocalPart().startsWith("end"))
 				{
 					String	config	= ((ConfigurationInfo)parent).getName();
@@ -422,9 +423,19 @@ public class BDIXMLReader extends ComponentXMLReader
 						model.getCapability().addConfiguration(mconf);
 						parent	= mconf;
 					}
+					
+					// initial capabilities.
+					if(object instanceof String)
+					{
+						((MConfiguration)parent).addInitialCapability(context.getStackElement(context.getStackSize()-1).getRawAttributes().get("ref"), (String)object);
+						done	= true;
+					}
 				}
-				
-				context.getTopStackElement().getReaderHandler().linkObject(object, parent, linkinfo, pathname, context);
+
+				if(!done)
+				{
+					context.getTopStackElement().getReaderHandler().linkObject(object, parent, linkinfo, pathname, context);
+				}
 			}
 		};
 		
@@ -1150,9 +1161,7 @@ public class BDIXMLReader extends ComponentXMLReader
 //
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "bindingoptions")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 //			new MappingInfo(ti_expression)));
-//					
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "configurations")), null));
-//		
+		
 		SubobjectInfo[]	configsubs	= new SubobjectInfo[]
 		{
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "initialbelief")}), new AccessInfo("initialbelief", "initialBelief")),
@@ -1171,14 +1180,18 @@ public class BDIXMLReader extends ComponentXMLReader
 			null, new MappingInfo(configtype, null, configsubs), new LinkingInfo(configlinker)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "capability"), new QName(uri, "configurations"), new QName(uri, "configuration")}),
 			null, new MappingInfo(configtype, null, configsubs), new LinkingInfo(configlinker)));
-//				
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialcapability")), new ObjectInfo(OAVBDIMetaModel.initialcapability_type),
-//			null, null, new OAVObjectReaderHandler()));
-
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbelief"), new QName(uri, "fact")}), new ObjectInfo(String.class)));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbeliefset"), new QName(uri, "fact")}), new ObjectInfo(String.class)));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbeliefset"), new QName(uri, "facts")}), new ObjectInfo(String.class)));
 		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialcapability")), new ObjectInfo(new IBeanObjectCreator()
+		{
+			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
+			{
+				return rawattributes.get("configuration");
+			}
+		}), new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("configuration", null, AccessInfo.IGNORE_READ))
+		})));
+
 		MappingInfo	configelementmapping	= new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("ref", "name")),
 			new AttributeInfo(new AccessInfo("cref", "name"))

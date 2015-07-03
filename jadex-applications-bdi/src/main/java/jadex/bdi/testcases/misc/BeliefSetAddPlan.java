@@ -21,12 +21,13 @@ public class BeliefSetAddPlan extends Plan
 	/** The flag for adding values over and over again. */
 	protected boolean loop = true;
 	
-	//-------- constructors --------
+	//-------- methods --------
 
 	/**
-	 *  Create a new plan.
+	 * The body method is called on the
+	 * instatiated plan instance from the scheduler.
 	 */
-	public BeliefSetAddPlan()
+	public void body()
 	{
 		if(hasParameter("beliefsetname"))
 			this.belsetname = (String)getParameter("beliefsetname").getValue();
@@ -39,16 +40,8 @@ public class BeliefSetAddPlan extends Plan
 			this.time = ((Long)getParameter("time").getValue()).longValue();
 		if(hasParameter("loop"))
 			this.loop = ((Boolean)getParameter("loop").getValue()).booleanValue();
-	}
 
-	//-------- methods --------
-
-	/**
-	 * The body method is called on the
-	 * instatiated plan instance from the scheduler.
-	 */
-	public void body()
-	{
+		
 		long cnt = 0;
 		do
 		{

@@ -18,16 +18,6 @@ import java.util.List;
  */
 public class MoveToLocationPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public MoveToLocationPlan()
-	{
-//		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

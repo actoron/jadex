@@ -11,17 +11,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class PickUpWastePlan extends Plan
 {
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public PickUpWastePlan()
-	{
-//		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

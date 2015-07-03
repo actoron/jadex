@@ -60,7 +60,7 @@ public class REventbase extends RElement implements IEventbase
 		MMessageEvent mevent = getCapability().getMCapability().getMessageEvent(type);
 		if(mevent==null)
 			throw new RuntimeException("Message event not found: "+type);
-		return new RMessageEvent(mevent, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, getAgent());
+		return new RMessageEvent(mevent, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, getAgent(), null);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class REventbase extends RElement implements IEventbase
 		if(mevent==null)
 			throw new RuntimeException("Message event not found: "+msgeventtype);
 		Map<String, Object> rep = event.getMessageType().createReply((Map<String, Object>)event.getMessage());
-		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent());
+		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent(), null);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class REventbase extends RElement implements IEventbase
 		MInternalEvent mevent = getCapability().getMCapability().getInternalEvent(type);
 		if(mevent==null)
 			throw new RuntimeException("Internal event not found: "+type);
-		return new RInternalEvent(mevent, getAgent());
+		return new RInternalEvent(mevent, getAgent(), null);
 	}
 
 //	/**

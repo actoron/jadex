@@ -16,16 +16,6 @@ import java.util.List;
  */
 public class ExploreMapPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ExploreMapPlan()
-	{
-//		getLogger().info("Created: "+this+" for goal "+getRootGoal());
-	}
-
 	//-------- methods --------
 
 	/**

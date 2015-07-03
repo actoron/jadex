@@ -8,9 +8,9 @@ import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
-import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MParameter.Direction;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
@@ -26,7 +26,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.rules.eca.Event;
@@ -67,21 +66,9 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, Map<String, Object> vals)
+	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal, Map<String, Object> vals, MConfigParameterElement config)
 	{
-		super(mgoal, goal, agent, vals);
-		this.lifecyclestate = GoalLifecycleState.NEW;
-		this.processingstate = GoalProcessingState.IDLE;
-//		if(mgoal.getName().indexOf("cleanup")!=-1)
-//			System.out.println("created: "+mgoal.getName()+" parent: "+parentplan+" "+vals);
-	}
-	
-	/**
-	 *  Create a new rgoal. 
-	 */
-	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal, Map<String, Object> vals)
-	{
-		super(mgoal, goal, agent, vals);
+		super(mgoal, goal, agent, vals, config);
 		this.parentgoal = parentgoal;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;

@@ -8,16 +8,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class RemoverPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public RemoverPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

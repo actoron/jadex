@@ -11,16 +11,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class LoadBatteryPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public LoadBatteryPlan()
-	{
-//		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

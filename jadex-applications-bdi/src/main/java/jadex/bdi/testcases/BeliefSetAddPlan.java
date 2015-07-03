@@ -18,12 +18,12 @@ public class BeliefSetAddPlan extends Plan
 	/** The wait time (if any). */
 	protected long wait;
 
-	//-------- constructors --------
+	//-------- methods --------
 
 	/**
-	 *  Create a new plan.
+	 * The body method.
 	 */
-	public BeliefSetAddPlan()
+	public void body()
 	{
 		this.belsetname = (String)getParameter("beliefsetname").getValue();
 		if(belsetname==null)
@@ -35,15 +35,7 @@ public class BeliefSetAddPlan extends Plan
 			this.wait	= ((Number)getParameter("wait").getValue()).longValue();
 		else
 			this.wait	= -1;
-	}
-
-	//-------- methods --------
-
-	/**
-	 * The body method.
-	 */
-	public void body()
-	{
+		
 		getLogger().info("waiting for: "+wait);
 		if(wait!=-1)
 			waitFor(wait);

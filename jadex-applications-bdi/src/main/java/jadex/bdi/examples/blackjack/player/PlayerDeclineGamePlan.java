@@ -9,16 +9,6 @@ import jadex.bridge.fipa.SFipa;
  */
 public class PlayerDeclineGamePlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public PlayerDeclineGamePlan()
-	{
-		getLogger().info("created: " + this);
-	}
-
 	//-------- attributes --------
 	
 	/**

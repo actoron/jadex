@@ -10,17 +10,6 @@ import jadex.extension.envsupport.math.Vector2Double;
  */
 public class RandomWalkPlan extends Plan
 {
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public RandomWalkPlan()
-	{
-//		getLogger().info("Created: "+this+" for goal "+getRootGoal());
-	}
-
 	//-------- methods --------
 
 	/**

@@ -1,10 +1,9 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MInternalEvent;
-import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IValueFetcher;
 
 /**
  *  The runtime internal event.
@@ -16,9 +15,9 @@ public class RInternalEvent extends RProcessableElement implements IInternalEven
 	/**
 	 *  Create a new runtime element.
 	 */
-	public RInternalEvent(MInternalEvent modelelement, IInternalAccess agent)
+	public RInternalEvent(MInternalEvent modelelement, IInternalAccess agent, MConfigParameterElement config)
 	{
-		super(modelelement, null, agent);
+		super(modelelement, null, agent, null, config);
 	}
 	
 	/**

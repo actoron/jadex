@@ -14,17 +14,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class DropWastePlan extends Plan
 {
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public DropWastePlan()
-	{
-//		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

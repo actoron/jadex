@@ -15,16 +15,6 @@ import java.util.StringTokenizer;
  */
 public class EnglishGermanTranslationPlanC1 extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslationPlanC1()
-	{
-//		getLogger().info("Created:"+this);
-	}
-
 	//-------- methods  --------
 
 	/**

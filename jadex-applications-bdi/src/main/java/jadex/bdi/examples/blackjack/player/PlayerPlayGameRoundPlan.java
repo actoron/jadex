@@ -26,12 +26,12 @@ public class PlayerPlayGameRoundPlan extends Plan
 	/** The human player interface. */
 	HumanPlayerInterface hpi = null;
 
-	//-------- constructors --------
-
+	//-------- attributes --------
+	
 	/**
-	 *  Create a new plan.
+	 *  Execute a plan.
 	 */
-	public PlayerPlayGameRoundPlan()
+	public void body()
 	{
 		getLogger().info("created: " + this);
 		if(getBeliefbase().containsBelief("gui"))
@@ -44,15 +44,7 @@ public class PlayerPlayGameRoundPlan extends Plan
 			}
 			hpi = (HumanPlayerInterface)gui;
 		}
-	}
-
-	//-------- attributes --------
-	
-	/**
-	 *  Execute a plan.
-	 */
-	public void body()
-	{
+		
 		IMessageEvent	querybet	= (IMessageEvent)getReason();
 		RequestBet rb = (RequestBet)querybet.getParameter(SFipa.CONTENT).getValue();
 		Player me = (Player)getBeliefbase().getBelief("myself").getFact();

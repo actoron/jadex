@@ -15,21 +15,6 @@ public class BeliefSetRemovePlan extends Plan
 	/** The wait time. */
 	protected long time;
 	
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public BeliefSetRemovePlan()
-	{
-		if(hasParameter("beliefsetname"))
-			this.belsetname = (String)getParameter("beliefsetname").getValue();
-		else
-			throw new RuntimeException("Parameter value 'beliefsetname' required.");
-		if(hasParameter("time"))
-			this.time = ((Long)getParameter("time").getValue()).longValue();
-	}
-
 	//-------- methods --------
 
 	/**
@@ -38,6 +23,13 @@ public class BeliefSetRemovePlan extends Plan
 	 */
 	public void body()
 	{
+		if(hasParameter("beliefsetname"))
+			this.belsetname = (String)getParameter("beliefsetname").getValue();
+		else
+			throw new RuntimeException("Parameter value 'beliefsetname' required.");
+		if(hasParameter("time"))
+			this.time = ((Long)getParameter("time").getValue()).longValue();
+
 		while(true)
 		{
 			Object[] vals = getBeliefbase().getBeliefSet(belsetname).getFacts();

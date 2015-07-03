@@ -10,16 +10,6 @@ import jadex.bridge.fipa.Done;
  */
 public class  MovePlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public  MovePlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//------ methods -------
 
 	/**

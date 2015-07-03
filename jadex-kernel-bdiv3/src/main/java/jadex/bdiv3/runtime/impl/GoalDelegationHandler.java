@@ -177,7 +177,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 				}
 			}
 			
-			goal = new RGoal(agent, mgoal, null, vals);
+			goal = new RGoal(agent, mgoal, null, null, vals, null);
 		}
 		
 		final Object fgoal = goal;

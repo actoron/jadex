@@ -18,16 +18,6 @@ public class LeastSeenWalkPlan extends Plan
 	/** Random number generator. */
 	protected Random	rnd	= new Random();
 	
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public LeastSeenWalkPlan()
-	{
-//		getLogger().info("Created: "+this+" for goal "+getRootGoal());
-	}
-
 	//-------- methods --------
 
 	/**

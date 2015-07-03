@@ -1,7 +1,9 @@
 package jadex.bdiv3.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  BDI configuration. The name is used to connect
@@ -32,6 +34,9 @@ public class MConfiguration	extends MElement
 
 	/** The end events. */
 	protected List<MConfigParameterElement> endevents;
+	
+	/** The initial capabilities (capability name->initial configuration name). */
+	protected Map<String, String>	initialcapabilities;
 
 	/**
 	 *	Bean Constructor. 
@@ -294,5 +299,25 @@ public class MConfiguration	extends MElement
 			endevents	= new ArrayList<MConfigParameterElement>();
 		}
 		endevents.add(upex);
+	}
+	
+	/**
+	 *  Get the initial capabilities.
+	 */
+	public Map<String, String>	getInitialCapabilities()
+	{
+		return initialcapabilities;
+	}
+	
+	/**
+	 *  Add an initial capability.
+	 */
+	public void	addInitialCapability(String name, String configuration)
+	{
+		if(initialcapabilities==null)
+		{
+			initialcapabilities	= new LinkedHashMap<String, String>();
+		}
+		initialcapabilities.put(name, configuration);
 	}
 }

@@ -1,9 +1,11 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IValueFetcher;
 
@@ -29,21 +31,21 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	/**
 	 *  Create a new runtime element.
 	 */
-	public RMessageEvent(MMessageEvent modelelement, Map<String, Object> msg, MessageType mt, IInternalAccess agent)
+	public RMessageEvent(MMessageEvent modelelement, Map<String, Object> msg, MessageType mt, IInternalAccess agent, MConfigParameterElement config)
 	{
-		super(modelelement, null, agent);
+		super(modelelement, null, agent, msg, config);
 		this.msg = msg;
 		this.mt = mt;
 		
 		// Must be done after msg has been assigned :-(
-		super.initParameters(null, wrapFetcher(RBeliefbase.getFetcher(agent, modelelement)));
+		super.initParameters(null, wrapFetcher(RBeliefbase.getFetcher(agent, modelelement)), config);
 	}
 	
 	/**
 	 *  Create the parameters from model spec.
 	 */
 	@Override
-	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher)
+	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher, MConfigParameterElement config)
 	{
 		// do nothing in super constructor init 
 	}
@@ -60,22 +62,25 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	/**
 	 * 
 	 */
-	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, IValueFetcher fetcher)
+	@Override
+	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher)
 	{
-		return new RParam(modelelement, modelelement.getName(), agent, fetcher, getModelElement().getName());
+		return new RParam(modelelement, modelelement.getName(), agent, inival, fetcher, getModelElement().getName());
 	}
 	
 	/**
 	 * 
 	 */
-	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, IValueFetcher fetcher)
+	@Override
+	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, List<UnparsedExpression> inivals, IValueFetcher fetcher)
 	{
-		return new RParamSet(modelelement, modelelement.getName(), agent, fetcher, getModelElement().getName());
+		return new RParamSet(modelelement, modelelement.getName(), agent, inivals, fetcher, getModelElement().getName());
 	}
 	
 	/**
 	 * 
 	 */
+	@Override
 	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, Object value)
 	{
 		return new RParam(modelelement, modelelement.getName(), agent, value, getModelElement().getName());
@@ -84,6 +89,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	/**
 	 * 
 	 */
+	@Override
 	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, Object[] values)
 	{
 		return new RParamSet(modelelement, modelelement.getName(), agent, values, getModelElement().getName());
@@ -154,18 +160,12 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(mt.getParameterSet(name)==null)
 			throw new RuntimeException("Unknown parameter set: "+name);
 		
-		IParameterSet paramset;
 		if(!super.hasParameterSet(name))
 		{
-			MParameter mp = getMMessageEvent().getParameter(name);
-			paramset = new RParamSet(mp, name, getAgent(), RBeliefbase.getFetcher(getAgent(), getModelElement()), getModelElement().getName());
-			addParameterSet(paramset);
+			addParameterSet(new RParamSet(null, name, getAgent(), null, RBeliefbase.getFetcher(getAgent(), getModelElement()), getModelElement().getName()));
 		}
-		else
-		{
-			paramset = getParameterSet(name);
-		}
-		return paramset;
+
+		return super.getParameterSet(name);
 	}
 
 	/**
@@ -233,9 +233,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParam(MParameter modelelement, String name, IInternalAccess agent, IValueFetcher fetcher,  String pename)
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher,  String pename)
 		{
-			super(modelelement, name, agent, fetcher, pename);
+			super(modelelement, name, agent, inival, fetcher, pename);
 		}
 		
 		/**
@@ -278,9 +278,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, IValueFetcher fetcher, String pename)
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals, IValueFetcher fetcher, String pename)
 		{
-			super(modelelement, name, agent, fetcher, pename);
+			super(modelelement, name, agent, inivals, fetcher, pename);
 		}
 		
 		/**

@@ -281,7 +281,7 @@
 				    <!-- <jvmFlags>
 				    	<jvmFlag>-XX:MaxPermSize=512m</jvmFlag>
 				    </jvmFlags>-->
-				    <argLine>-ea -Xmx384m -XX:MaxPermSize=128m -XX:+CMSPermGenSweepingEnabled -XX:+CMSClassUnloadingEnabled</argLine>  
+				    <argLine>-ea -Xmx512m -XX:MaxPermSize=128m -XX:+CMSPermGenSweepingEnabled -XX:+CMSClassUnloadingEnabled</argLine>  
 				    <!-- <fork>true</fork>-->
 				    <!-- <argLine>-Xms512m</argLine>
 				    <argLine>-Xmx1024m</argLine>

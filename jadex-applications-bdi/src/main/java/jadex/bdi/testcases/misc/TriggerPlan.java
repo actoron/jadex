@@ -20,17 +20,11 @@ public class TriggerPlan extends Plan
 	 *  @param no	The number, when the plan should be triggered.
 	 *  @param	description	A description of the test case.
 	 */
-	public TriggerPlan()
+	public void body()
 	{
 		this.no	= ((Number)getParameter("number").getValue()).intValue();
 		this.description	= (String)getParameter("description").getValue();
-	}
-	
-	/**
-	 *  The plan code.
-	 */
-	public void body()
-	{
+
 		startAtomic();	// Hack!!! Todo: fix microplanstep semantics in V2
 		TestReport	report	= new TestReport("trigger"+no, description);
 		int	cnt	= ((Number)getBeliefbase().getBelief("cnt").getFact()).intValue();

@@ -22,18 +22,6 @@ public class MovePlan extends Plan
 	/** The deadline. */
 	protected long deadline;
 
-	//-------- constrcutors --------
-
-	/**
-	 *  Create a new move plan.
-	 */
-	public MovePlan()
-	{
-		this.move = (Move)getParameter("move").getValue();
-		this.board = (Board)getParameter("board").getValue();
-		this.deadline = ((Long)getParameter("deadline").getValue()).longValue();
-	}
-
 	//-------- methods --------
 
 	/**
@@ -41,6 +29,10 @@ public class MovePlan extends Plan
 	 */
 	public void body()
 	{
+		this.move = (Move)getParameter("move").getValue();
+		this.board = (Board)getParameter("board").getValue();
+		this.deadline = ((Long)getParameter("deadline").getValue()).longValue();
+
 		// Make the move.
 		board.move(move);
 		

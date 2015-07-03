@@ -12,16 +12,6 @@ import jadex.bridge.fipa.Done;
  */
 public class DispatchCompleteVisionPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public DispatchCompleteVisionPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//------ methods -------
 
 	/**

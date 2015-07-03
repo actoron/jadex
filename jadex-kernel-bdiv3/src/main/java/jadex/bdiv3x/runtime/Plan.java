@@ -52,6 +52,11 @@ import java.util.logging.Logger;
 @jadex.bdiv3.annotation.Plan
 public abstract class Plan
 {
+	public Plan()
+	{
+		// TODO Auto-generated constructor stub
+	}
+	
 	/** The internal access. */
 	@PlanCapability
 	protected IInternalAccess agent;

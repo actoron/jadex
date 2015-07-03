@@ -13,16 +13,6 @@ import jadex.bridge.fipa.SFipa;
  */
 public class PlayerJoinGamePlan extends Plan
 {
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new plan.
-	 */
-	public PlayerJoinGamePlan()
-	{		
-		getLogger().info("created: " + this);
-	}
-
 	//-------- methods --------
 	
 	/**

@@ -10,16 +10,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class FindTargetsPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public FindTargetsPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**

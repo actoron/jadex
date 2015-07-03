@@ -22,8 +22,6 @@ public class MemorizePositionsPlan extends Plan
 	 */
 	public MemorizePositionsPlan()
 	{
-//		getLogger().info("Created: "+this);
-
 		this.forget = 0.01;
 	}
 
