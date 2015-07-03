@@ -36,8 +36,6 @@ public class SBDIModel
 			String capaname = entry.getKey();
 			IBDIModel capa = entry.getValue();
 			
-			capa.getModelInfo().getConfigurations();	// todo!!!
-
 			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
 			{
 				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(capaname+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getScope(), psi.getPublish(), psi.getProperties());
@@ -223,9 +221,7 @@ public class SBDIModel
 //			capa.getModelInfo().getConfigurations()
 //			capa.getModelInfo().getFeatures()
 //			capa.getModelInfo().getNFProperties()
-//			capa.getModelInfo().getProvidedServices()
 //			capa.getModelInfo().getProperties()
-//			capa.getModelInfo().getRequiredServices()
 //			capa.getModelInfo().getSubcomponentTypes()
 		}
 	}
@@ -237,54 +233,102 @@ public class SBDIModel
 	{
 		for(MConfigBeliefElement cbel: SUtil.safeList(inner.getInitialBeliefs()))
 		{
-			outer.addInitialBelief(copyConfigBelief(bdimodel, capaname, cbel));
+			MConfigBeliefElement	cbel2	= copyConfigBelief(bdimodel, capaname, cbel, outer.getInitialBeliefs());
+			if(cbel2!=null)
+			{
+				outer.addInitialBelief(cbel2);
+			}
 		}
 		for(MConfigBeliefElement cbel: SUtil.safeList(inner.getEndBeliefs()))
 		{
-			outer.addEndBelief(copyConfigBelief(bdimodel, capaname, cbel));
+			MConfigBeliefElement	cbel2	= copyConfigBelief(bdimodel, capaname, cbel, outer.getEndBeliefs());
+			if(cbel2!=null)
+			{
+				outer.addEndBelief(cbel2);
+			}
 		}
 		
 		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialEvents()))
 		{
-			outer.addInitialEvent(copyConfigParameterElement(bdimodel, capaname, cpel));
+			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialEvents());
+			if(cpel2!=null)
+			{
+				outer.addInitialEvent(cpel2);
+			}
 		}
 		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialGoals()))
 		{
-			outer.addInitialGoal(copyConfigParameterElement(bdimodel, capaname, cpel));
+			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialGoals());
+			if(cpel2!=null)
+			{
+				outer.addInitialGoal(cpel2);
+			}
 		}
 		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialPlans()))
 		{
-			outer.addInitialPlan(copyConfigParameterElement(bdimodel, capaname, cpel));
+			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialPlans());
+			if(cpel2!=null)
+			{
+				outer.addInitialPlan(cpel2);
+			}
 		}
 		
 		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndEvents()))
 		{
-			outer.addEndEvent(copyConfigParameterElement(bdimodel, capaname, cpel));
+			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndEvents());
+			if(cpel2!=null)
+			{
+				outer.addEndEvent(cpel2);
+			}
 		}
 		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndGoals()))
 		{
-			outer.addEndGoal(copyConfigParameterElement(bdimodel, capaname, cpel));
+			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndGoals());
+			if(cpel2!=null)
+			{
+				outer.addEndGoal(cpel2);
+			}
 		}
 		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndPlans()))
 		{
-			outer.addEndPlan(copyConfigParameterElement(bdimodel, capaname, cpel));
+			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndPlans());
+			if(cpel2!=null)
+			{
+				outer.addEndPlan(cpel2);
+			}
 		}
 	}
 
 	/**
 	 *  Copy a config belief element.
 	 */
-	protected static MConfigBeliefElement copyConfigBelief(IBDIModel bdimodel, String capaname, MConfigBeliefElement cbel)
+	protected static MConfigBeliefElement copyConfigBelief(IBDIModel bdimodel, String capaname, MConfigBeliefElement cbel, List<MConfigBeliefElement> test)
 	{
-		MConfigBeliefElement	cbel2	= new MConfigBeliefElement();
+		// Only copy belief if it does not exist already (outer overrides inner settings).
+		MConfigBeliefElement	cbel2	= null;
 		String	name	= capaname + MElement.CAPABILITY_SEPARATOR + cbel.getName();
-		cbel2.setName(bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name);
-		for(UnparsedExpression fact: SUtil.safeList(cbel.getFacts()))
+		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
+		boolean	found	= false;
+		for(MConfigBeliefElement tbel: SUtil.safeList(test))
 		{
-			String	fname	= capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : "");
-			UnparsedExpression	fact2	= new UnparsedExpression(fname, (String)null, fact.getValue(), fact.getLanguage());
-			fact2.setClazz(fact.getClazz());
-			cbel2.addFact(fact2);
+			if(tbel.getName().equals(name))
+			{
+				found	= true;
+				break;
+			}
+		}
+		
+		if(!found)
+		{
+			cbel2	= new MConfigBeliefElement();
+			cbel2.setName(name);
+			for(UnparsedExpression fact: SUtil.safeList(cbel.getFacts()))
+			{
+				String	fname	= capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : "");
+				UnparsedExpression	fact2	= new UnparsedExpression(fname, (String)null, fact.getValue(), fact.getLanguage());
+				fact2.setClazz(fact.getClazz());
+				cbel2.addFact(fact2);
+			}
 		}
 		return cbel2;
 	}
@@ -292,26 +336,41 @@ public class SBDIModel
 	/**
 	 *  Copy a config parameter element.
 	 */
-	protected static MConfigParameterElement copyConfigParameterElement(IBDIModel bdimodel, String capaname, MConfigParameterElement cpel)
+	protected static MConfigParameterElement copyConfigParameterElement(IBDIModel bdimodel, String capaname, MConfigParameterElement cpel, List<MConfigParameterElement> test)
 	{
-		MConfigParameterElement	cpel2	= new MConfigParameterElement();
-		// todo: parameter element references
+		// Only copy element if it does not exist already (outer overrides inner settings).
+		MConfigParameterElement	cpel2	= null;
 		String	name	= capaname + MElement.CAPABILITY_SEPARATOR + cpel.getName();
-		cpel2.setName(name);
-//		cpel2.setName(bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name);
-		if(cpel.getParameters()!=null)
+		// todo: parameter element references
+//		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
+		boolean	found	= false;
+		for(MConfigParameterElement tpel: SUtil.safeList(test))
 		{
-			for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
+			if(tpel.getName().equals(name))
 			{
-				for(UnparsedExpression value: param.getValue())
+				found	= true;
+				break;
+			}
+		}
+
+		if(!found)
+		{
+			cpel2	= new MConfigParameterElement();
+			cpel2.setName(name);
+			if(cpel.getParameters()!=null)
+			{
+				for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
 				{
-					UnparsedExpression	value2	= new UnparsedExpression(value.getName(), (String)null, value.getValue(), value.getLanguage());
-					value2.setClazz(value.getClazz());
-					cpel2.addParameter(value2);
-					// Hack!!! change name after adding.
-					value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
-				}
-			}			
+					for(UnparsedExpression value: param.getValue())
+					{
+						UnparsedExpression	value2	= new UnparsedExpression(value.getName(), (String)null, value.getValue(), value.getLanguage());
+						value2.setClazz(value.getClazz());
+						cpel2.addParameter(value2);
+						// Hack!!! change name after adding.
+						value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
+					}
+				}			
+			}
 		}
 		return cpel2;
 	}
