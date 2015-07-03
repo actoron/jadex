@@ -39,27 +39,20 @@
 	<goals>
 		<!-- execute plan and abort after some time -->
 		<achievegoal name="testabort">
-			<targetcondition language="jcl">
+			<targetcondition>
 				$beliefbase.count&gt;3
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact > 3))
-				// ?mbelief = (mbelief (melement_has_name "count"))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal succeeds without plan -->
 		<achievegoal name="successgoal">
-			<targetcondition language="jcl">
+			<targetcondition>
 				true
-				
-				// (test (Identity true))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal fails without plan -->
 		<achievegoal name="failuregoal">
-			<targetcondition language="jcl">
+			<targetcondition>
 				false
-				
-				// (test (Identity false))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal succeeds after plan -->
@@ -108,7 +101,7 @@
 	</plans>
 
 	<properties>
-		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+		<property name="logging.level">java.util.logging.Level.INFO</property>
 		<property name="debugging">false</property>
 	</properties>
 

@@ -62,6 +62,9 @@ public class TestAbortPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		*/
 		
+		try
+		{
+		
 		// Dispatch goal and check again (should succeed without plan).
 		getLogger().info("Successful subgoal in abort...");
 		TestReport tr = new TestReport("#3", "Tests successful subgoal in plan abortion.");
@@ -128,5 +131,11 @@ public class TestAbortPlan extends Plan
 			getLogger().info("Goal failed...");
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
+		
+		}
+		catch(Throwable e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

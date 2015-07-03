@@ -84,6 +84,11 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	{
 		NEW, 
 		BODY,
+		
+		PASSING,
+		FAILING,
+		ABORTING,
+		
 		PASSED,
 		FAILED,
 		ABORTED,
@@ -461,6 +466,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public void setLifecycleState(PlanLifecycleState lifecyclestate)
 	{
+//		if(lifecyclestate.equals(PlanLifecycleState.ABORTED))
+//			System.out.println("aborted: "+this);
+		
 		this.lifecyclestate = lifecyclestate;
 		
 		if(PlanLifecycleState.BODY.equals(lifecyclestate))
@@ -759,7 +767,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void abort()
 	{
 //		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("move")!=-1)
-//			System.out.println("abort plan: "+getId()+" "+isFinished());
+			System.out.println("abort plan: "+getId()+" "+isFinished());
 		
 		if(!isFinished())
 		{
@@ -1551,7 +1559,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		// Throw error to exit body method of aborted plan.
 		if(aborted && PlanLifecycleState.BODY.equals(getLifecycleState()))
 		{
-//			System.out.println("aborting after block: "+rplan);
+			System.out.println("aborting after block: "+this);
 			throw new BodyAborted();
 		}
 	}

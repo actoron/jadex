@@ -189,21 +189,25 @@ public abstract class AbstractPlanBody implements IPlanBody
 			if(part==0) 
 			{
 //				System.out.println("body of: "+rplan);
+				rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 				res = invokeBody(guessParameters(getBodyParameterTypes()));
 			}
 			else if(part==1)
 			{
 //				System.out.println("passed of: "+rplan);
+				rplan.setLifecycleState(RPlan.PlanLifecycleState.PASSING);
 				res = invokePassed(guessParameters(getPassedParameterTypes()));
 			}
 			else if(part==2)
 			{
 //				System.out.println("failed of: "+rplan);
+				rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILING);
 				res = invokeFailed(guessParameters(getFailedParameterTypes()));
 			}
 			else if(part==3)
 			{
 //				System.out.println("aborted of: "+rplan);
+				rplan.setLifecycleState(RPlan.PlanLifecycleState.ABORTING);
 				res = invokeAborted(guessParameters(getAbortedParameterTypes()));
 			}
 			
