@@ -37,7 +37,7 @@
 			<parameter name="num" class="int">
 				<bindingoptions>new int[]{1,2,3}</bindingoptions>
 			</parameter>
-			<creationcondition language="jcl">
+			<creationcondition>
  				$beliefbase.create
  			</creationcondition>
 		</performgoal>

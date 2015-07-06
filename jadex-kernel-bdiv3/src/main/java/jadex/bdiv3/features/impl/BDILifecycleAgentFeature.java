@@ -142,7 +142,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	}
 	
 	/**
-	 * 
+	 *  Assemble fitting parameters from context and invoke a boolean method. 
 	 */
 	protected static IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, MElement modelelement, IEvent event, RPlan rplan, IInternalAccess component)
 	{
@@ -291,6 +291,19 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //			final IBDIAgentFeature bdif = component.getComponentFeature(IBDIAgentFeature.class);
 //			final IInternalBDIAgentFeature ibdif = (IInternalBDIAgentFeature)bdif; 
 //			final IBDIModel bdimodel = ibdif.getBDIModel();
+			
+			final IResultListener<Object> goallis = new IResultListener<Object>()
+			{
+				public void resultAvailable(Object result)
+				{
+					component.getLogger().info("Goal succeeded: "+result);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					component.getLogger().info("Goal failed: "+exception);
+				}
+			};
 			
 			// Init bdi configuration
 			String confname = component.getConfiguration();
@@ -444,8 +457,22 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								throw new RuntimeException("Could not create initial goal: "+igoal);
 							}
 							
-							RGoal rgoal = new RGoal(component, mgoal, goal, null, null, igoal);
-							RGoal.adoptGoal(rgoal, component);
+							List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal, null);
+							
+							if(bindings!=null)
+							{
+								for(Map<String, Object> binding: bindings)
+								{
+									RGoal rgoal = new RGoal(component, mgoal, null, null, binding, igoal);
+									dispatchTopLevelGoal(rgoal).addResultListener(goallis);
+								}
+							}
+							// No binding: generate one candidate.
+							else
+							{
+								RGoal rgoal = new RGoal(component, mgoal, null, null, null, igoal);
+								dispatchTopLevelGoal(rgoal).addResultListener(goallis);
+							}
 						}
 					}
 					
@@ -778,19 +805,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 			}
 			
-			final IResultListener<Object> goallis = new IResultListener<Object>()
-			{
-				public void resultAvailable(Object result)
-				{
-					component.getLogger().info("Goal succeeded: "+result);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					component.getLogger().info("Goal failed: "+exception);
-				}
-			};
-			
 			// Observe goal types
 			List<MGoal> goals = bdimodel.getCapability().getGoals();
 			for(final MGoal mgoal: goals)
@@ -968,7 +982,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							{
 								public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 								{
-			//						System.out.println("create: "+context);
+			//						System.out.println("create: "+create);
 									
 									List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal, null);
 									
