@@ -279,7 +279,7 @@ public class SServiceProvider
 		Collection<T> ret = PlatformServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter);
 		
 		// Fixing the bug by changing createRequiredProxy -> createRequiredProxies leads to not compiling the main class
-		return proxy? createRequiredProxy(component, ret, type): ret;
+		return proxy? createRequiredProxies(component, ret, type): ret;
 	}
 	
 	

@@ -52,13 +52,13 @@
 
 	<goals>
 		<performgoal name="test" exclude="never">
-			<creationcondition language="jcl">
+			<creationcondition>
  				$beliefbase.creation
  			</creationcondition>
- 			<contextcondition language="jcl">
+ 			<contextcondition>
  				$beliefbase.context
  			</contextcondition>
-			<dropcondition language="jcl">
+			<dropcondition>
  				$beliefbase.drop
  			</dropcondition>
 		</performgoal>
@@ -78,7 +78,7 @@
 
 	<properties>
 		<!-- <property name="debugging">false</property> -->
-		<!-- <property name="logging.level">java.util.logging.Level.INFO</property>-->
+		<property name="logging.level">java.util.logging.Level.INFO</property>
 	</properties>
 
 	<configurations>

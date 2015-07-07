@@ -16,7 +16,7 @@ import jadex.commons.future.IFuture;
 import java.lang.reflect.Field;
 
 /**
- * 
+ *  Action for adopting a goal.
  */
 public class AdoptGoalAction implements IConditionalComponentStep<Void>
 {
@@ -57,6 +57,15 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	 *  @return The result of the command.
 	 */
 	public IFuture<Void> execute(IInternalAccess ia)
+	{
+		adoptGoal(ia, goal);
+		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	public static void adoptGoal(IInternalAccess agent, RGoal goal)
 	{
 		Future<Void> ret = new Future<Void>();
 		try
@@ -112,14 +121,13 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 				}
 			}
 			
-			ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().addGoal(goal);
-			goal.setLifecycleState(ia, RGoal.GoalLifecycleState.ADOPTED);
+			agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().addGoal(goal);
+			goal.setLifecycleState(agent, RGoal.GoalLifecycleState.ADOPTED);
 			ret.setResult(null);
 		}
 		catch(Exception e)
 		{
 			ret.setException(e);
 		}
-		return ret;
 	}
 }

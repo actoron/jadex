@@ -691,9 +691,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						if(mparam.getEvaluationMode().equals(EvaluationMode.PUSH))
 						{
-							List<EventType> events = mparam.getAllEvents(component);
+							List<EventType> events = mparam.getAllEvents(component).size()==0? new ArrayList<EventType>(): new ArrayList<EventType>(mparam.getAllEvents(component));
+//							System.out.println("evs1: "+events+" "+events.hashCode()+" "+component.getComponentIdentifier());
 							
 							BDIAgentFeature.addExpressionEvents(mparam.getDefaultValue(), events, mgoal);
+//							System.out.println("evs2: "+events+" "+events.hashCode()+" "+component.getComponentIdentifier());
 						
 							// Automatic reevaluation if belief depends on other beliefs
 							if(!events.isEmpty())
@@ -744,6 +746,10 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										return IFuture.DONE;
 									}
 								});
+								
+								if(events.contains(null))
+									System.out.println("hererrerer");
+								
 								rule.setEvents(events);
 								rulesystem.getRulebase().addRule(rule);
 							}

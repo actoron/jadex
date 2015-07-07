@@ -105,6 +105,8 @@ public class MatcherNode
 	 */
 	protected void addRule(EventType type, IRule<?> rule, int i)
 	{
+		if(type==null)
+			throw new IllegalArgumentException("Type must not null");
 		String[] subtypes = type.getTypes();
 		if(i+1==subtypes.length)
 		{

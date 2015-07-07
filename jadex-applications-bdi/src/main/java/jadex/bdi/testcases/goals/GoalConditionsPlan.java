@@ -10,6 +10,8 @@ import jadex.bdiv3x.runtime.Plan;
  *  Plan to test goal conditions.
  *  Note: the planbase content cannot be used here, because micro plansteps
  *  currently do not guarantee that all consequences will be executed (as in old tree agenda).
+ *  
+ *  todo: currently needs some waitFor(10) to execute the consequences before plan continues
  */
 public class GoalConditionsPlan	extends Plan
 {
@@ -33,6 +35,9 @@ public class GoalConditionsPlan	extends Plan
 		
 		// Now triggering goal creation (still no plan due to invalid context).
 		getBeliefbase().getBelief("creation").setFact(Boolean.TRUE);
+
+		waitFor(10); // Hack! Wait for consequences being executed :-(
+		
 		report	= new TestReport("trigger_creation", "Triggering goal creation", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
 		{
@@ -46,12 +51,17 @@ public class GoalConditionsPlan	extends Plan
 		
 		
 		// Now triggering goal context to start plan.		
-		IGoal goal = getGoalbase().getGoals("test")[0];
+		IGoal[] goals = getGoalbase().getGoals("test");
+		IGoal goal = goals.length>0? goals[0]: null;
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
 		report	= new TestReport("trigger_context", "Triggering goal context", true, null);	
-		if(goal.getLifecycleState()!=GoalLifecycleState.OPTION)
+		if(goal==null)
 		{
-			report.setFailed("Goal not option: "+goal.getLifecycleState());
+			report.setFailed("No goal for testing");
+		}
+		else if(goal.getLifecycleState()!=GoalLifecycleState.ACTIVE)
+		{
+			report.setFailed("Goal not active: "+goal.getLifecycleState());
 		}
 //		else if(getPlanbase().getPlans().length!=2)
 //		{
@@ -74,10 +84,14 @@ public class GoalConditionsPlan	extends Plan
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
+		
 		// Now triggering goal creation again (plan will also be created).
 		getBeliefbase().getBelief("drop").setFact(Boolean.FALSE);
 		getBeliefbase().getBelief("creation").setFact(Boolean.FALSE);
 		getBeliefbase().getBelief("creation").setFact(Boolean.TRUE);
+		
+		waitFor(10); // Hack! Wait for consequences being executed :-(
+		
 		goal = getGoalbase().getGoals("test")[0];
 		report	= new TestReport("trigger_creation2", "Triggering goal creation again", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
@@ -90,16 +104,19 @@ public class GoalConditionsPlan	extends Plan
 //		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
+		
 		// Now invalidating goal context to abort plan.
 		getBeliefbase().getBelief("context").setFact(Boolean.FALSE);
+//		waitFor(10); // Hack! Wait for consequences being executed :-(
 		report	= new TestReport("trigger_context2", "Invalidating goal context", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
 		{
 			report.setFailed("Goal does not exist");
 		}
-		else if(goal.getLifecycleState()!=GoalLifecycleState.OPTION)
+		else if(goal.getLifecycleState()!=GoalLifecycleState.SUSPENDED)
 		{
-			report.setFailed("Goal not option: "+goal.getLifecycleState());
+//			report.setFailed("Goal not option: "+goal.getLifecycleState());
+			report.setFailed("Goal not suspended: "+goal.getLifecycleState());
 		}
 //		else if(getPlanbase().getPlans().length!=1)
 //		{
@@ -107,12 +124,18 @@ public class GoalConditionsPlan	extends Plan
 //		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
+		
 		// Now triggering goal context again to restart plan.
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
+//		waitFor(10); // Hack! Wait for consequences being executed :-(
 		report	= new TestReport("trigger_context3", "Triggering goal context again", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
 		{
 			report.setFailed("Goal does not exist");
+		}
+		else if(goal.getLifecycleState()!=GoalLifecycleState.ACTIVE)
+		{
+			report.setFailed("Goal not active: "+goal.getLifecycleState());
 		}
 //		else if(getPlanbase().getPlans().length!=2)
 //		{

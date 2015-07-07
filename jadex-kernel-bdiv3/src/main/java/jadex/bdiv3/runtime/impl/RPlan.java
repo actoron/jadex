@@ -767,7 +767,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void abort()
 	{
 //		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("move")!=-1)
-			System.out.println("abort plan: "+getId()+" "+isFinished());
+//			System.out.println("abort plan: "+getId()+" "+isFinished());
 		
 		if(!isFinished())
 		{
@@ -1077,16 +1077,17 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	
 					addSubgoal(rgoal);
 					
-					getAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal))
-						.addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
+					AdoptGoalAction.adoptGoal(getAgent(), rgoal);
+//					getAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal))
+//						.addResultListener(new IResultListener<Void>()
+//					{
+//						public void resultAvailable(Void result)
+//						{
+//						}
+//						public void exceptionOccurred(Exception exception)
+//						{
+//						}
+//					});
 				}
 			}
 		});
@@ -1559,7 +1560,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		// Throw error to exit body method of aborted plan.
 		if(aborted && PlanLifecycleState.BODY.equals(getLifecycleState()))
 		{
-			System.out.println("aborting after block: "+this);
+//			System.out.println("aborting after block: "+this);
 			throw new BodyAborted();
 		}
 	}

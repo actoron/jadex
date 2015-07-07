@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,7 +151,7 @@ public class MParameter extends MElement
 	protected Set<EventType> rawevents;
 	
 	/** Cached aggregated events. */
-	protected List<EventType> allevents;
+	protected volatile List<EventType> allevents;
 	
 	/** The service mappings. */
 	protected List<String> servicemappings;
@@ -673,7 +674,7 @@ public class MParameter extends MElement
 			if(rawevents!=null)
 				allevents.addAll(rawevents);
 		}
-		return allevents;
+		return Collections.unmodifiableList(allevents);
 	}
 	
 	/**

@@ -90,20 +90,25 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public static void adoptGoal(RGoal rgoal, final IInternalAccess ia)
 	{
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-//		ip.scheduleStep(new AdoptGoalAction(rgoal));
-		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal))
-			.addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ia.getLogger().warning("Exception during goal adoption:"+exception);
-			}
-		});
+		assert ia.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		
+		if(!ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
+			System.out.println("sxfsdffsd");
+		
+		AdoptGoalAction.adoptGoal(ia, rgoal);
+		
+//		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal))
+//			.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ia.getLogger().warning("Exception during goal adoption:"+exception);
+//			}
+//		});
 	}
 	
 	/**
@@ -995,6 +1000,27 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			&& !GoalLifecycleState.DROPPED.equals(getLifecycleState()))
 		{
 			setLifecycleState(getAgent(), GoalLifecycleState.DROPPING);
+		}
+	}
+	
+	/**
+	 *  Add a new listener to get notified when the goal is finished.
+	 *  @param listener The listener.
+	 */
+	// hmm? overridden to make GoalConditions test case work
+	// assumes that goal is in dropped state after waitForGaol()
+	// has been triggered
+	public void addListener(IResultListener<Void> listener)
+	{
+		if(!GoalLifecycleState.DROPPED.equals(getLifecycleState()))
+		{
+			if(listeners==null)
+				listeners = new ArrayList<IResultListener<Void>>();
+			listeners.add(listener);
+		}
+		else
+		{
+			super.addListener(listener);
 		}
 	}
 	

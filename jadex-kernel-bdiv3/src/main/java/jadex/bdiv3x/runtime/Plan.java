@@ -180,6 +180,9 @@ public abstract class Plan
 	 */
 	public void waitForGoal(IGoal goal, long timeout)
 	{
+		if(goal==null)
+			throw new IllegalArgumentException("Goal must not null.");
+		
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
@@ -521,6 +524,9 @@ public abstract class Plan
 	 */
 	public IFuture<Void> dispatchSubgoal(IGoal subgoal)
 	{
+		if(subgoal==null)
+			throw new IllegalArgumentException("Subgoal must not null.");
+		
 		Future<Void> ret = new Future<Void>();
 		RGoal rgoal = (RGoal)subgoal;
 		rgoal.setParent(rplan);
