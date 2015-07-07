@@ -47,7 +47,7 @@
 
 	<properties>
         <property name="debugging">false</property>
-        <!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+        <property name="logging.level">java.util.logging.Level.INFO</property>
     </properties>
 
 	<configurations>

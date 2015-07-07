@@ -66,6 +66,17 @@ public class Rulebase implements IRulebase
 	}
 	
 	/**
+	 *  Update a rule.
+	 *  @param rule The rule.
+	 */
+	public void updateRule(IRule<?> rule)
+	{
+		if(containsRule(rule.getName()))
+			removeRule(rule.getName());
+		addRule(rule);
+	}
+	
+	/**
 	 *  Get all rules that are relevant for an event type.
 	 *  @param event The event type.
 	 *  @return The rules.

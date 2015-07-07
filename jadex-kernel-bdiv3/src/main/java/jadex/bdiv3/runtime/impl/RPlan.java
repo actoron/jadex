@@ -60,6 +60,7 @@ import jadex.rules.eca.Rule;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -313,19 +314,21 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			
 			if(!events.isEmpty())
 			{
-//				final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-				final String rulename = rplan.getId()+"_waitqueue";
-				Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-					{
-						System.out.println("Added to waitqueue: "+event);
-						rplan.addToWaitqueue(new ChangeEvent(event));				
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
+////			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//				final String rulename = rplan.getId()+"_waitqueue";
+//				Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
+//				{
+//					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+//					{
+//						System.out.println("Added to waitqueue: "+event);
+//						rplan.addToWaitqueue(new ChangeEvent(event));				
+//						return IFuture.DONE;
+//					}
+//				});
+//				rule.setEvents(events);
+//				ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
+				
+				rplan.internalSetupEventsRule(events);
 			}
 			
 			List<MMessageEvent> mevents = wqtr.getMessageEvents();
@@ -1795,6 +1798,41 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			
 			getAgent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
+	}
+	
+	/**
+	 *  Set up a rule for the waitque to signal to what kinds of events this plan
+	 *  in principle reacts to.
+	 */
+	public void setupEventsRule(Collection<String> events)
+	{
+		List<EventType> evs = new ArrayList<EventType>();
+		for(String event: events)
+		{
+			evs.add(new EventType(event));
+		}
+		internalSetupEventsRule(evs);
+	}
+	
+	/**
+	 *  Set up a rule for the waitqueue to signal to what kinds of events this plan
+	 *  in principle reacts to.
+	 */
+	public void internalSetupEventsRule(List<EventType> events)
+	{
+		final String rulename = getId()+"_waitqueue";
+		
+		Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
+		{
+			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+			{
+				System.out.println("Added to waitqueue: "+event);
+				addToWaitqueue(new ChangeEvent(event));				
+				return IFuture.DONE;
+			}
+		});
+		rule.setEvents(events);
+		getAgent().getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().updateRule(rule);
 	}
 	
 //	/**

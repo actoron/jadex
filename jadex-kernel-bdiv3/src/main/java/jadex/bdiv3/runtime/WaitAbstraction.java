@@ -84,9 +84,9 @@ public class WaitAbstraction
 //	 *  Add a fact added.
 //	 *  @param beliefset The beliefset.
 //	 */
-//	public IWaitAbstraction addFactAdded(String beliefset)
+//	public void addFactAdded(String beliefset)
 //	{
-//		
+//		addChangeEventType(eventtype);
 //	}
 
 
@@ -276,6 +276,15 @@ public class WaitAbstraction
 		}
 	}
 	
+	/**
+	 *  Get the change event types.
+	 *  @return The changeeventtypes
+	 */
+	public Set<String> getChangeeventtypes()
+	{
+		return changeeventtypes;
+	}
+
 	/**
 	 *  Test if this wait abstraction is waiting for the element.
 	 */

@@ -1,7 +1,5 @@
 package jadex.bdiv3x.runtime;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.logging.Logger;
 
 import jadex.bdiv3.annotation.PlanAPI;
@@ -11,8 +9,8 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCondition;
-import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -777,40 +775,52 @@ public abstract class Plan
 	 */
 	public PlanWaitAbstraction getWaitqueue()
 	{
-		WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
-		return new PlanWaitAbstraction(wa);
+		return new PlanWaitAbstraction();
 	}
 	
 	/**
 	 *  Wait for a fact change of a belief.
 	 */
-	public void waitForFactChanged(String belname)
+	public Object waitForFactChanged(String belname)
 	{
-		waitForFactChanged(belname, -1);
+		return waitForFactChanged(belname, -1);
 	}
 	
 	/**
 	 *  Wait for a fact change of a belief.
 	 */
-	public void waitForFactChanged(String belname, long timeout)
+	public Object waitForFactChanged(String belname, long timeout)
 	{
-		final Future<Void> ret = new Future<Void>();
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
-		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+		MBelief mbel = bdif.getBDIModel().getCapability().getBelief(belname);
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addChangeEventType(ChangeEvent.FACTCHANGED+"."+belname);
+
+		ChangeEvent res = (ChangeEvent)rplan.getFromWaitqueue(wa);
+		if(res!=null)
 		{
-			public void beliefChanged(ChangeInfo<Object> info)
-			{
-				ret.setResultIfUndone(null);
-			}
-		};
-		bdif.addBeliefListener(belname, lis);
-		try
-		{
-			ret.get(timeout);
+			return res.getValue();
 		}
-		finally
+		else
 		{
-			bdif.removeBeliefListener(belname, lis);
+			final Future<Object> ret = new Future<Object>();
+//			IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+			IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+			{
+				public void beliefChanged(ChangeInfo<Object> info)
+				{
+					ret.setResultIfUndone(info.getValue());
+				}
+			};
+			bdif.addBeliefListener(belname, lis);
+			try
+			{
+				return ret.get(timeout);
+			}
+			finally
+			{
+				bdif.removeBeliefListener(belname, lis);
+			}
 		}
 	}
 	
@@ -827,23 +837,36 @@ public abstract class Plan
 	 */
 	public Object waitForFactAdded(String belname, long timeout)
 	{
-		final Future<Object> ret = new Future<Object>();
-		IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
-		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		MBelief mbel = bdif.getBDIModel().getCapability().getBelief(belname);
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addChangeEventType(ChangeEvent.FACTADDED+"."+belname);
+
+		ChangeEvent res = (ChangeEvent)rplan.getFromWaitqueue(wa);
+		if(res!=null)
 		{
-			public void factAdded(ChangeInfo<Object> info)
-			{
-				ret.setResultIfUndone(info.getValue());
-			}
-		};
-		bdif.getBeliefbase().getBeliefSet(belname).addBeliefSetListener(lis);
-		try
-		{
-			return ret.get(timeout);
+			return res.getValue();
 		}
-		finally
+		else
 		{
-			bdif.getBeliefbase().getBeliefSet(belname).removeBeliefSetListener(lis);
+			final Future<Object> ret = new Future<Object>();
+//			IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
+			IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+			{
+				public void factAdded(ChangeInfo<Object> info)
+				{
+					ret.setResultIfUndone(info.getValue());
+				}
+			};
+			((IBDIXAgentFeature)bdif).getBeliefbase().getBeliefSet(belname).addBeliefSetListener(lis);
+			try
+			{
+				return ret.get(timeout);
+			}
+			finally
+			{
+				((IBDIXAgentFeature)bdif).getBeliefbase().getBeliefSet(belname).removeBeliefSetListener(lis);
+			}
 		}
 	}
 	
@@ -860,23 +883,36 @@ public abstract class Plan
 	 */
 	public Object waitForFactRemoved(String belname, long timeout)
 	{
-		final Future<Void> ret = new Future<Void>();
-		IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
-		IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		MBelief mbel = bdif.getBDIModel().getCapability().getBelief(belname);
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addChangeEventType(ChangeEvent.FACTREMOVED+"."+belname);
+
+		ChangeEvent res = (ChangeEvent)rplan.getFromWaitqueue(wa);
+		if(res!=null)
 		{
-			public void factRemoved(ChangeInfo<Object> info)
-			{
-				ret.setResultIfUndone(null);
-			}
-		};
-		bdif.getBeliefbase().getBeliefSet(belname).addBeliefSetListener(lis);
-		try
-		{
-			return ret.get(timeout);
+			return res.getValue();
 		}
-		finally
+		else
 		{
-			bdif.getBeliefbase().getBeliefSet(belname).removeBeliefSetListener(lis);
+			final Future<Void> ret = new Future<Void>();
+//			IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
+			IBeliefListener<Object> lis = new BeliefAdapter<Object>()
+			{
+				public void factRemoved(ChangeInfo<Object> info)
+				{
+					ret.setResultIfUndone(null);
+				}
+			};
+			((IBDIXAgentFeature)bdif).getBeliefbase().getBeliefSet(belname).addBeliefSetListener(lis);
+			try
+			{
+				return ret.get(timeout);
+			}
+			finally
+			{
+				((IBDIXAgentFeature)bdif).getBeliefbase().getBeliefSet(belname).removeBeliefSetListener(lis);
+			}
 		}
 	}
 	
@@ -937,17 +973,14 @@ public abstract class Plan
 	 */
 	public class PlanWaitAbstraction 
 	{
-		/** The original wait abstraction. */
-		protected WaitAbstraction wa;
-		
 		/**
-		 *  Create a new wait abstraction.
+		 *  Get the plan waitqueue waitabstraction.
 		 */
-		public PlanWaitAbstraction(WaitAbstraction wa) 
+		protected WaitAbstraction getWaitAbstraction()
 		{
-			this.wa = wa;
+			return rplan.getOrCreateWaitqueueWaitAbstraction();
 		}
-
+		
 		/**
 		 *  Add an internal event.
 		 *  @param type The type.
@@ -959,7 +992,34 @@ public abstract class Plan
 			MInternalEvent ievent = model.getCapability().getInternalEvent(event);
 			if(ievent==null)
 				throw new RuntimeException("Unknown internal event: "+event);
-			wa.addInternalEvent(ievent);
+			getWaitAbstraction().addInternalEvent(ievent);
+		}
+		
+		/**
+		 *  Add a fact added.
+		 *  @param beliefset The beliefset.
+		 */
+		public void addFactAdded(String beliefset)
+		{
+			addChangeEventType(ChangeEvent.FACTADDED+"."+beliefset);
+		}
+		
+		/**
+		 *  Add a fact removed.
+		 *  @param beliefset The beliefset.
+		 */
+		public void addFactRemoved(String beliefset)
+		{
+			addChangeEventType(ChangeEvent.FACTREMOVED+"."+beliefset);
+		}
+		
+		/**
+		 *  Add a belief change type.
+		 *  @param belief The belief.
+		 */
+		public void addBeliefChanged(String belief)
+		{
+			addChangeEventType(ChangeEvent.BELIEFCHANGED+"."+belief);
 		}
 		
 		/**
@@ -968,7 +1028,7 @@ public abstract class Plan
 		 */
 		public void addMessageEvent(MMessageEvent mevent)
 		{
-			wa.addMessageEvent(mevent);
+			getWaitAbstraction().addMessageEvent(mevent);
 		}
 		
 //		/**
@@ -985,7 +1045,7 @@ public abstract class Plan
 		 */
 		public void addInternalEvent(MInternalEvent mevent)
 		{
-			wa.addInternalEvent(mevent);
+			getWaitAbstraction().addInternalEvent(mevent);
 		}
 		
 //		/**
@@ -1053,7 +1113,7 @@ public abstract class Plan
 		 */
 		public void removeMessageEvent(MMessageEvent mevent)
 		{
-			wa.removeMessageEvent(mevent);
+			getWaitAbstraction().removeMessageEvent(mevent);
 		}
 
 //		/**
@@ -1125,7 +1185,7 @@ public abstract class Plan
 		 */
 		public void addRuntimeElement(RElement relement)
 		{
-			wa.addRuntimeElement(relement);
+			getWaitAbstraction().addRuntimeElement(relement);
 		}
 		
 		/**
@@ -1133,15 +1193,17 @@ public abstract class Plan
 		 */
 		public void removeRuntimeElement(RElement relement)
 		{
-			wa.removeRuntimeElement(relement);
+			getWaitAbstraction().removeRuntimeElement(relement);
 		}
+		
 		
 		/**
 		 * 
 		 */
 		public void addChangeEventType(String eventtype)
 		{
-			wa.addChangeEventType(eventtype);
+			getWaitAbstraction().addChangeEventType(eventtype);
+			rplan.setupEventsRule(getWaitAbstraction().getChangeeventtypes());
 		}
 		
 		/**
@@ -1149,7 +1211,9 @@ public abstract class Plan
 		 */
 		public void removeChangeEventType(String eventtype)
 		{
-			wa.removeChangeEventType(eventtype);
+			getWaitAbstraction().removeChangeEventType(eventtype);
+			rplan.setupEventsRule(getWaitAbstraction().getChangeeventtypes());
 		}
+		
 	}
 }
