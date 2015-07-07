@@ -333,12 +333,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			{
 				for(MMessageEvent mevent: mevents)
 				{
-					WaitAbstraction wa = rplan.getWaitqueueWaitAbstraction();
-					if(wa==null)
-					{
-						wa = new WaitAbstraction();
-						rplan.setWaitqueueWaitAbstraction(wa);
-					}
+					WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
 					wa.addMessageEvent(mevent);
 				}
 			}
@@ -659,6 +654,17 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public WaitAbstraction getWaitqueueWaitAbstraction()
 	{
+		return waitqueuewa;
+	}
+	
+	/**
+	 *  Get the waitabstraction.
+	 *  @return The waitabstraction.
+	 */
+	public WaitAbstraction getOrCreateWaitqueueWaitAbstraction()
+	{
+		if(waitqueuewa==null)
+			waitqueuewa = new WaitAbstraction();
 		return waitqueuewa;
 	}
 	

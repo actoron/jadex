@@ -112,6 +112,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 			List<MMessageEvent>	matched	= SCollection.createArrayList();
 			int	degree	= 0;
 
+			// todo: capabilities
 			degree = matchMessageEvents(message.getParameterMap(), bdif.getBDIModel().getCapability().getMessageEvents(), matched, events, degree, message.getMessageType());
 			
 			// For messages without conversation all capabilities are considered.

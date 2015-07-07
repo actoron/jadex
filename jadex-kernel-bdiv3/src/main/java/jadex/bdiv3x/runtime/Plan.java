@@ -1,5 +1,9 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.logging.Logger;
+
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -8,8 +12,10 @@ import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCondition;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
@@ -20,8 +26,10 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.PlanAbortedException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3x.BDIXModel;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -44,9 +52,6 @@ import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
-
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  *  Dummy class for loading v2 examples using v3x.
@@ -428,9 +433,9 @@ public abstract class Plan
 //	 */
 //	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout)
 //	{
-//		todo...
+//		return getEventbase().sendMessageAndWait(me);
 //	}
-	
+
 	/**
 	 *  Send a message and wait until it is sent.
 	 *  @param me	The message event.
@@ -759,12 +764,21 @@ public abstract class Plan
 		return agent;
 	}
 	
+//	/**
+//	 *  Get the waitqueue.
+//	 */
+//	public List<Object> getWaitqueue()
+//	{
+//		return rplan.getWaitqueue();
+//	}
+	
 	/**
 	 *  Get the waitqueue.
 	 */
-	public List<Object> getWaitqueue()
+	public PlanWaitAbstraction getWaitqueue()
 	{
-		return rplan.getWaitqueue();
+		WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
+		return new PlanWaitAbstraction(wa);
 	}
 	
 	/**
@@ -916,5 +930,226 @@ public abstract class Plan
 	public IPlan getPlanElement()
 	{
 		return rplan;
+	}
+	
+	/**
+	 *  The plan wait abstraction extends wait abstraction with convenience methods.
+	 */
+	public class PlanWaitAbstraction 
+	{
+		/** The original wait abstraction. */
+		protected WaitAbstraction wa;
+		
+		/**
+		 *  Create a new wait abstraction.
+		 */
+		public PlanWaitAbstraction(WaitAbstraction wa) 
+		{
+			this.wa = wa;
+		}
+
+		/**
+		 *  Add an internal event.
+		 *  @param type The type.
+		 */
+		public void addInternalEvent(String event)
+		{
+			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
+			// todo: add capability name of scope
+			MInternalEvent ievent = model.getCapability().getInternalEvent(event);
+			if(ievent==null)
+				throw new RuntimeException("Unknown internal event: "+event);
+			wa.addInternalEvent(ievent);
+		}
+		
+		/**
+		 *  Add a message event.
+		 *  @param type The type.
+		 */
+		public void addMessageEvent(MMessageEvent mevent)
+		{
+			wa.addMessageEvent(mevent);
+		}
+		
+//		/**
+//		 *  Add a message event reply.
+//		 *  @param me The message event.
+//		 */
+//		public void addReply(RMessageEvent mevent)
+//		{
+//		}
+
+		/**
+		 *  Add an internal event.
+		 *  @param type The type.
+		 */
+		public void addInternalEvent(MInternalEvent mevent)
+		{
+			wa.addInternalEvent(mevent);
+		}
+		
+//		/**
+//		 *  Add a goal.
+//		 *  @param type The type.
+//		 */
+//		public void addGoal(MGoal mgoal)
+//		{
+//		}
+	//
+//		/**
+//		 *  Add a goal.
+//		 *  @param goal The goal.
+//		 */
+//		public void addGoal(RGoal rgoal)
+//		{
+//		}
+
+//		/**
+//		 *  Add a fact changed.
+//		 *  @param belief The belief or beliefset.
+//		 */
+//		public void addFactChanged(String belief)
+//		{
+//		}
+	//
+//		/**
+//		 *  Add a fact added.
+//		 *  @param beliefset The beliefset.
+//		 */
+//		public IWaitAbstraction addFactAdded(String beliefset)
+//		{
+//		}
+
+
+//		/**
+//		 *  Add a fact removed.
+//		 *  @param beliefset The beliefset.
+//		 */
+//		public IWaitAbstraction addFactRemoved(String beliefset)
+//		{
+//		}
+	//	
+//		/**
+//		 *  Add a condition.
+//		 *  @param condition the condition name.
+//		 */
+//		public IWaitAbstraction addCondition(String condition)
+//		{
+//		}
+	//
+//		/**
+//		 *  Add an external condition.
+//		 *  @param condition the condition.
+//		 */
+//		public IWaitAbstraction addExternalCondition(IExternalCondition condition)
+//		{
+//		}
+
+		//-------- remover methods --------
+
+		/**
+		 *  Remove a message event.
+		 *  @param type The type.
+		 */
+		public void removeMessageEvent(MMessageEvent mevent)
+		{
+			wa.removeMessageEvent(mevent);
+		}
+
+//		/**
+//		 *  Remove a message event reply.
+//		 *  @param me The message event.
+//		 */
+//		public void removeReply(IMessageEvent me)
+//		{
+//		}
+
+//		/**
+//		 *  Remove an internal event.
+//		 *  @param type The type.
+//		 */
+//		public void removeInternalEvent(MInternalEvent mevent)
+//		{
+//		}
+	//
+//		/**
+//		 *  Remove a goal.
+//		 *  @param type The type.
+//		 */
+//		public void removeGoal(MGoal mgoal)
+//		{
+//		}
+	//
+//		/**
+//		 *  Remove a goal.
+//		 *  @param goal The goal.
+//		 */
+//		public void removeGoal(RGoal rgoal)
+//		{
+//		}
+		
+//		/**
+//		 *  Remove a fact changed.
+//		 *  @param belief The belief or beliefset.
+//		 */
+//		public void removeFactChanged(String belief);
+	//
+//		/**
+//		 *  Remove a fact added.
+//		 *  @param beliefset The beliefset.
+//		 */
+//		public void removeFactAdded(String beliefset);
+	//
+	//
+//		/**
+//		 *  Remove a fact removed.
+//		 *  @param beliefset The beliefset.
+//		 */
+//		public void removeFactRemoved(String beliefset);	
+	//
+//		/**
+//		 *  Remove a condition.
+//		 *  @param condition the condition name.
+//		 */
+//		public void removeCondition(String condition);
+	//	
+//		/**
+//		 *  Remove an external condition.
+//		 *  @param condition the condition.
+//		 */
+//		public void	removeExternalCondition(IExternalCondition condition);
+		
+		
+		/**
+		 * 
+		 */
+		public void addRuntimeElement(RElement relement)
+		{
+			wa.addRuntimeElement(relement);
+		}
+		
+		/**
+		 * 
+		 */
+		public void removeRuntimeElement(RElement relement)
+		{
+			wa.removeRuntimeElement(relement);
+		}
+		
+		/**
+		 * 
+		 */
+		public void addChangeEventType(String eventtype)
+		{
+			wa.addChangeEventType(eventtype);
+		}
+		
+		/**
+		 * 
+		 */
+		public void removeChangeEventType(String eventtype)
+		{
+			wa.removeChangeEventType(eventtype);
+		}
 	}
 }

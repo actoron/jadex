@@ -326,11 +326,11 @@ public class MCapability extends MElement
 		
 		if(ievents!=null && name!=null)
 		{
-			for(MInternalEvent bel: ievents)
+			for(MInternalEvent ievent: ievents)
 			{
-				if(name.equals(bel.getName()))
+				if(name.equals(ievent.getName()))
 				{
-					ret = bel;
+					ret = ievent;
 					break;
 				}
 			}

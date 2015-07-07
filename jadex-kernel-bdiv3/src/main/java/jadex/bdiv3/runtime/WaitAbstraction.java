@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 
+ *  Object that indicates on which elements a plan is waiting. 
  */
 public class WaitAbstraction
 {	
@@ -52,7 +52,7 @@ public class WaitAbstraction
 	{
 		addModelElement(mevent);
 	}
-
+	
 //	/**
 //	 *  Add a goal.
 //	 *  @param type The type.
@@ -200,6 +200,9 @@ public class WaitAbstraction
 	 */
 	protected void addModelElement(MElement melement)
 	{
+		if(melement==null)
+			throw new IllegalArgumentException("Element must not null.");
+		
 		if(modelelements==null)
 		{
 			modelelements = new HashSet<MElement>();
@@ -212,6 +215,9 @@ public class WaitAbstraction
 	 */
 	protected void removeModelElement(MElement melement)
 	{
+		if(melement==null)
+			throw new IllegalArgumentException("Element must not null.");
+		
 		if(modelelements!=null)
 		{
 			modelelements.remove(melement);
@@ -223,6 +229,9 @@ public class WaitAbstraction
 	 */
 	public void addRuntimeElement(RElement relement)
 	{
+		if(relement==null)
+			throw new IllegalArgumentException("Element must not null.");
+		
 		if(runtimeelements==null)
 		{
 			runtimeelements = new HashSet<RElement>();
@@ -235,6 +244,9 @@ public class WaitAbstraction
 	 */
 	public void removeRuntimeElement(RElement relement)
 	{
+		if(relement==null)
+			throw new IllegalArgumentException("Element must not null.");
+		
 		if(runtimeelements!=null)
 		{
 			runtimeelements.remove(relement);
