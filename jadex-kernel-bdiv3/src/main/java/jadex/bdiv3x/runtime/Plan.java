@@ -1215,5 +1215,12 @@ public abstract class Plan
 			rplan.setupEventsRule(getWaitAbstraction().getChangeeventtypes());
 		}
 		
+		/**
+		 *  Test if waitqueue is empty.
+		 */
+		public boolean isEmpty()
+		{
+			return rplan.getWaitqueue().isEmpty();
+		}
 	}
 }

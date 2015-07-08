@@ -1831,6 +1831,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				rulesystem.getRulebase().addRule(rule);
 			}
 			
+			
 			// Init must be set to true before init writes to ensure that new events
 			// are executed and not processed as init writes
 			IInternalBDILifecycleFeature bdil = (IInternalBDILifecycleFeature)component.getComponentFeature(ILifecycleComponentFeature.class);

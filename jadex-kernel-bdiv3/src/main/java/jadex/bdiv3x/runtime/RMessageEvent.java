@@ -5,11 +5,13 @@ import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IValueFetcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,14 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	protected MessageType mt;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a new runtime element.
+	 */
+	public RMessageEvent(MMessageEvent modelelement, IInternalAccess agent, MConfigParameterElement config)
+	{
+		this(modelelement, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, agent, config);
+	}
 	
 	/**
 	 *  Create a new runtime element.
@@ -139,12 +149,12 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(!super.hasParameter(name))
 		{
 			MParameter mp = getMMessageEvent().getParameter(name);
-			param = new RParam(mp, name, getAgent(), RBeliefbase.getFetcher(getAgent(), getModelElement()), getModelElement().getName());
+			param = new RParam(mp, name, getAgent(), null, RBeliefbase.getFetcher(getAgent(), getModelElement()), getModelElement().getName());
 			addParameter(param);
 		}
 		else
 		{
-			param = getParameter(name);
+			param = super.getParameter(name);
 		}
 		
 		return param;

@@ -1542,6 +1542,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			final ResumeCommand<Void> rescom = new ResumeCommand<Void>(sus, false);
 			setProcessingState(PlanProcessingState.WAITING);
+//			System.out.println("setting rescom: "+getId()+" "+rescom);
 			resumecommand = rescom;
 		}
 	}
@@ -1553,9 +1554,11 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	{
 		testBodyAborted();
 		setProcessingState(PlanProcessingState.RUNNING);
+		setWaitAbstraction(null);
 		if(resumecommand!=null)
 		{
 			// performs only cleanup without setting future
+//			System.out.println("afterblock rescom: "+getId()+" "+resumecommand);
 			resumecommand.execute(new Tuple2<Boolean, Boolean>(Boolean.FALSE, null));
 			resumecommand = null;
 		}
@@ -1646,6 +1649,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				}
 				if(this.equals(resumecommand))
 				{
+//					System.out.println("clear rescom: "+getId());
 					resumecommand = null;
 					donotify = true;
 				}

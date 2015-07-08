@@ -92,9 +92,6 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	{
 		assert ia.getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
-		if(!ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
-			System.out.println("sxfsdffsd");
-		
 		AdoptGoalAction.adoptGoal(ia, rgoal);
 		
 //		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal))

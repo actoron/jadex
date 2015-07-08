@@ -291,7 +291,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), (MParameter)getModelElement());
 			this.fetcher	= fetcher;
 			
-			if(modelelement.getEvaluationMode()==EvaluationMode.PULL)
+			if(modelelement!=null && modelelement.getEvaluationMode()==EvaluationMode.PULL)
 			{
 				this.inival	= inival;
 			}

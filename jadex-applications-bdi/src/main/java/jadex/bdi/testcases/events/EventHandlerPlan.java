@@ -30,6 +30,7 @@ public class EventHandlerPlan extends Plan
 		{
 			tr.setFailed("No event received.");
 		}
+//		System.out.println("fin: "+getClass().getName());
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
 }

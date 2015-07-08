@@ -1,8 +1,17 @@
 package jadex.bdiv3x.features;
 
+import java.util.List;
+
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDILifecycleFeature;
+import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MConfigParameterElement;
+import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MInternalEvent;
+import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.RInternalEvent;
+import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -10,8 +19,11 @@ import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ComponentLifecycleFeature;
+import jadex.bridge.fipa.FIPAMessageType;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
 /**
@@ -44,6 +56,31 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	{
 		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		createStartBehavior().startBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability());
+
+		MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
+		MConfiguration mconfig = mcapa.getConfiguration(getComponent().getConfiguration());
+
+		if(mconfig!=null)
+		{
+			// Send initial messages
+			// Throw initial internal events
+			for(MConfigParameterElement cpe: SUtil.safeList(mconfig.getInitialEvents()))
+			{
+				MInternalEvent mievent = mcapa.getInternalEvent(cpe.getName());
+				if(mievent!=null)
+				{
+					RInternalEvent rievent = new RInternalEvent(mievent, getComponent(), cpe);
+					bdif.getCapability().getEventbase().dispatchInternalEvent(rievent);
+				}
+				else
+				{
+					MMessageEvent mmevent = mcapa.getMessageEvent(cpe.getName());
+					RMessageEvent rmevent = new RMessageEvent(mmevent, getComponent(), cpe);
+					bdif.getCapability().getEventbase().sendMessage(rmevent);
+				}
+			}
+		}
+		
 //		inited	= true;
 		return super.body();
 	}

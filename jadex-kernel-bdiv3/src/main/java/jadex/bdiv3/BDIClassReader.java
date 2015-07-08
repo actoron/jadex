@@ -276,6 +276,7 @@ public class BDIClassReader extends MicroClassReader
 			}
 		}
 		
+		// Merge capabilities into flat agent model 
 		SBDIModel.mergeSubcapabilities(bdimodel, capas, cl);
 		
 		for(Class<?> clazz: agtcls)

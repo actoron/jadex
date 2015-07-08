@@ -852,9 +852,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("direction", "direction"), new AttributeConverter(dirconv, redirconv))},
 				new SubobjectInfo[]{
 					new SubobjectInfo(new XMLInfo(new QName(uri, "match")), new AccessInfo("match", "matchExpression")),
-//					new SubobjectInfo(new XMLInfo(new QName(uri, "parameter")), new AccessInfo("value", "defaultValue")),
-//					new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), new )),	
-//					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), OAVBDIMetaModel.parameterelement_has_parametersets))	
+					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 				}),
 			null));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageeventref")), new ObjectInfo(OAVBDIMetaModel.messageeventreference_type),

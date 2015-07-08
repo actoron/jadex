@@ -257,11 +257,13 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					if(rplan.getResumeCommand()==null)
 					{
 						// case meta-level reasoning, plan has been created but is new
+//						System.out.println("rplan no resume command: "+rplan);
 						RPlan.executePlan(rplan, ia);
 					}
 					else
 					{
 						// normal case when plan was waiting
+//						System.out.println("rplan resume command: "+rplan);
 						rplan.getResumeCommand().execute(new Tuple2<Boolean, Boolean>(null, Boolean.FALSE));
 					}
 					ret.setResult(null);

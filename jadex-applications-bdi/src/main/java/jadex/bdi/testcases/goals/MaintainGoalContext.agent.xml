@@ -65,7 +65,7 @@
 	</plans>
 	
 	<properties>
-		<!-- <property name="logging.level">Level.INFO</property> -->
+		<property name="logging.level">Level.INFO</property>
 		<property name="debugging">false</property>
 	</properties>
 

@@ -20,6 +20,7 @@ public class MessageReceiverPlan extends Plan
 			IMessageEvent	me	= waitForMessageEvent("just_born_receive", 3000);
 			if(!"initial value".equals(me.getParameter(SFipa.CONTENT).getValue()))
 			{
+//				System.out.println("wrong content: "+me.getParameter(SFipa.CONTENT).getValue());
 				tr.setReason("Wrong content: "+me.getParameter(SFipa.CONTENT).getValue());
 			}
 			else if(!getWaitqueue().isEmpty())
@@ -31,6 +32,7 @@ public class MessageReceiverPlan extends Plan
 		{
 			tr.setReason("No message received.");
 		}
+//		System.out.println("fin: "+getClass().getName());
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
 }

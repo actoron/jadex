@@ -82,6 +82,8 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 			
 			MMessageEvent mevent = null;
 			
+//			System.out.println("rec msg: "+message.getMessage());
+			
 			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIXAgentFeature.class);
 //			List<MMessageEvent> mevents = bdif.getBDIModel().getCapability().getMessageEvents();
 //			for(MMessageEvent mevent: mevents)
