@@ -71,6 +71,7 @@
 	
 	<properties>
 		<property name="debugging">false</property>
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
 	</properties>
 
 	<configurations>

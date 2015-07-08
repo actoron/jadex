@@ -842,7 +842,10 @@ public class BDIXMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factchanged")), new ObjectInfo(boc), null, null));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internalevent")), new ObjectInfo(MInternalEvent.class),
-			null, null));
+			new MappingInfo(null, null, null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("posttoall", "postToAll")),
+				}),
+			null));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internaleventref")), new ObjectInfo(OAVBDIMetaModel.internaleventreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 		

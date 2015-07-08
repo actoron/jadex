@@ -5,6 +5,7 @@ import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameterElement;
@@ -15,6 +16,7 @@ import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.RBeliefbase;
+import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -272,6 +274,15 @@ public class APL
 							precandidates.addAll(cands);
 						}
 					}
+					else if(element instanceof RInternalEvent && mtrigger!=null)
+					{
+						List<MInternalEvent> ievs = mtrigger.getInternalEvents();
+						if(ievs!=null && ievs.contains(element.getModelElement()))
+						{
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, RBeliefbase.getFetcher(ia, mplan));
+							precandidates.addAll(cands);
+						}
+					}
 				}
 			}
 		}
@@ -361,7 +372,7 @@ public class APL
 		{
 			fetcher.setValue("$goal", element);
 		}
-		else if(element instanceof RMessageEvent)
+		else if(element instanceof RMessageEvent || element instanceof RInternalEvent)
 		{
 			fetcher.setValue("$event", element);
 		}
