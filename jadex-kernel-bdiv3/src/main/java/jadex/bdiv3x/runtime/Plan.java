@@ -108,6 +108,8 @@ public abstract class Plan
 	 */
 	public void	waitFor(long timeout)
 	{
+		checkNotInAtomic();
+		
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout).get();
 	}
 	
@@ -116,6 +118,8 @@ public abstract class Plan
 	 */
 	public void	waitForTick()
 	{
+		checkNotInAtomic();
+		
 		agent.getComponentFeature(IExecutionFeature.class).waitForTick().get();
 	}
 	
@@ -146,6 +150,8 @@ public abstract class Plan
 	 */
 	public void	dispatchSubgoalAndWait(IGoal goal, long timeout)
 	{
+		checkNotInAtomic();
+		
 		dispatchSubgoal(goal);
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
@@ -183,9 +189,10 @@ public abstract class Plan
 	 */
 	public void waitForGoal(IGoal goal, long timeout)
 	{
+		checkNotInAtomic();
 		if(goal==null)
 			throw new IllegalArgumentException("Goal must not null.");
-		
+				
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
@@ -223,6 +230,8 @@ public abstract class Plan
 	 */
 	public IMessageEvent waitForMessageEvent(String type, long timeout)
 	{
+		checkNotInAtomic();
+		
 		final Future<IMessageEvent> ret = new Future<IMessageEvent>();
 
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
@@ -279,6 +288,8 @@ public abstract class Plan
 	 */
 	public IInternalEvent waitForInternalEvent(String type, long timeout)
 	{
+		checkNotInAtomic();
+		
 		final Future<IInternalEvent> ret = new Future<IInternalEvent>();
 
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
@@ -791,8 +802,9 @@ public abstract class Plan
 	 */
 	public Object waitForFactChanged(String belname, long timeout)
 	{
+		checkNotInAtomic();
+		
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
-		MBelief mbel = bdif.getBDIModel().getCapability().getBelief(belname);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addChangeEventType(ChangeEvent.FACTCHANGED+"."+belname);
 
@@ -837,8 +849,9 @@ public abstract class Plan
 	 */
 	public Object waitForFactAdded(String belname, long timeout)
 	{
+		checkNotInAtomic();
+		
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
-		MBelief mbel = bdif.getBDIModel().getCapability().getBelief(belname);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addChangeEventType(ChangeEvent.FACTADDED+"."+belname);
 
@@ -883,8 +896,9 @@ public abstract class Plan
 	 */
 	public Object waitForFactRemoved(String belname, long timeout)
 	{
+		checkNotInAtomic();
+		
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
-		MBelief mbel = bdif.getBDIModel().getCapability().getBelief(belname);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addChangeEventType(ChangeEvent.FACTREMOVED+"."+belname);
 
@@ -922,6 +936,8 @@ public abstract class Plan
 	 */
 	public void waitForCondition(String name)
 	{
+		checkNotInAtomic();
+		
 		final IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		final MCondition mcond = bdif.getCapability().getMCapability().getCondition(name);
 		if(mcond==null)
@@ -956,6 +972,8 @@ public abstract class Plan
 	 */
 	public void waitForEver()
 	{
+		checkNotInAtomic();
+		
 		Future<Void> ret = new Future<Void>();
 		ret.get();
 	}
@@ -966,6 +984,16 @@ public abstract class Plan
 	public IPlan getPlanElement()
 	{
 		return rplan;
+	}
+	
+	/**
+	 *  Check if wait is called in atomic mode.
+	 *  @throws RuntimeException in case is in atomic block. 
+	 */
+	protected void checkNotInAtomic()
+	{
+		if(rplan.isAtomic())
+			throw new RuntimeException("Wait not allowing in atomic block.");
 	}
 	
 	/**
