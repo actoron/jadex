@@ -50,11 +50,8 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.a
-					 
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					// ?mbelief = (mbelief (melement_has_name "a"))
 				</condition>
 			</trigger>
 		</plan>
@@ -64,11 +61,8 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.b 
-					
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					// ?mbelief = (mbelief (melement_has_name "b"))
 				</condition>
 			</trigger>
 		</plan>
@@ -80,18 +74,13 @@
 			<trigger>
 				<condition language="jcl">
 					$beliefbase.a &amp;&amp; $beliefbase.b
-					
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					// ?mbelief = (mbelief (melement_has_name "a"))
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-					// ?mbelief = (mbelief (melement_has_name "b"))
 				</condition>
 			</trigger>
 		</plan>
 	</plans>
 
 	<properties>
-		<!--<property name="logging.level">Level.INFO</property>-->
+		<property name="logging.level">Level.INFO</property>
 		<property name="logging.useParentHandlers">true</property>
 		<!--<property name="debugging">true</property>-->
 	</properties>
@@ -100,7 +89,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief cref="testcap.testcase_cnt">
-					<fact>3</fact>
+					<fact>2</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

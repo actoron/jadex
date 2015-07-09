@@ -40,6 +40,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -168,6 +169,10 @@ public abstract class Plan
 		{
 			throw e;
 		}
+		catch(TimeoutException e)
+		{
+			throw e;
+		}
 		catch(Exception e)
 		{
 			throw new GoalFailureException(null, e);
@@ -205,6 +210,10 @@ public abstract class Plan
 //			throw new GoalFailureException(null, new PlanAbortedException());
 //		}
 		catch(GoalFailureException e)
+		{
+			throw e;
+		}
+		catch(TimeoutException e)
 		{
 			throw e;
 		}

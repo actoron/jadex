@@ -306,6 +306,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
+								ret.setResult(null);
 								return IFuture.DONE;
 							}
 							
@@ -313,14 +314,19 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 							{
 								return "waitForDelay("+getComponent().getComponentIdentifier()+")";
 							}
-						}).addResultListener(new DelegationResultListener<Void>(ret)
+						}).addResultListener(new IResultListener<Void>()
 						{
+							public void resultAvailable(Void result)
+							{
+							}
+							
 							public void exceptionOccurred(Exception exception)
 							{
 								// Ignore outdated timer entries when component is already dead.
+								// propblem this can occur on clock thread
 								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
 								{
-									super.exceptionOccurred(exception);									
+									ret.setException(exception);									
 								}
 							}
 						});
