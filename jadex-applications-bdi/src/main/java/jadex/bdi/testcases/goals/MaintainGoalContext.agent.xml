@@ -39,10 +39,10 @@
 
 	<goals>
 		<maintaingoal name="maintain" exclude="never" retrydelay="100">
-			<contextcondition language="jcl">
+			<contextcondition>
  				$beliefbase.context
 			</contextcondition>
-			<maintaincondition language="jcl">
+			<maintaincondition>
  				$beliefbase.count==5
 			</maintaincondition>
 		</maintaingoal>

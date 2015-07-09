@@ -1360,8 +1360,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 												{
 													if(!result.booleanValue())
 													{
-		//													System.out.println("Goal maintain triggered: "+goal);
-		//													System.out.println("state was: "+goal.getProcessingState());
+		//												System.out.println("Goal maintain triggered: "+goal);
+		//												System.out.println("state was: "+goal.getProcessingState());
 														goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 													}
 												}

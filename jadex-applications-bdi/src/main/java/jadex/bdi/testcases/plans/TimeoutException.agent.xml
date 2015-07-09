@@ -18,6 +18,8 @@
 	</capabilities>
 
 	<beliefs>
+		<belief name="bel" class="String"/>
+	
 		<beliefref name="timeout"  exported="true">
 			<concrete ref="testcap.timeout"/>
 		</beliefref>

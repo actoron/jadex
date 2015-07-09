@@ -40,8 +40,9 @@ public class TimeoutExceptionPlan extends Plan
 		tr = new TestReport("#2", "Testing timeout with catch.");
 		try
 		{
+			waitForFactChanged("bel", 200);
 //			waitFor(IFilter.NEVER, 200);
-			waitForWaitAbstraction(createWaitAbstraction(), 200);
+//			waitForWaitAbstraction(createWaitAbstraction(), 200);
 			tr.setReason("No timeout exception occurred.");
 		}
 		catch(TimeoutException e)
@@ -51,8 +52,9 @@ public class TimeoutExceptionPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 
 		this.tr = new TestReport("#3", "Testing timeout without catch.");
+		waitForFactChanged("bel", 200);
 //		waitFor(IFilter.NEVER, 200);
-		waitForWaitAbstraction(createWaitAbstraction(), 200);
+//		waitForWaitAbstraction(createWaitAbstraction(), 200);
 		this.tr.setReason("No timeout exception occurred.");
 	}
 
