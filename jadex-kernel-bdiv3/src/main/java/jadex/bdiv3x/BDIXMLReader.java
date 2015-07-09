@@ -1094,6 +1094,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "internaleventmapping"), new QName("ref")}, "internalEventMapping")),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping")),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "servicemapping"), new QName("ref")}, "serviceMapping"))
 			}, new SubobjectInfo[]{
