@@ -10,7 +10,7 @@
 	package="jadex.bdi.testcases.planlib">
 
 	<imports>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
 		<import>jadex.bridge.fipa.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.bdi.testcases.*</import>

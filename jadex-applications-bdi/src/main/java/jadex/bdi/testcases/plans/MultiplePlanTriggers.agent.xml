@@ -49,11 +49,8 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.bel_a>0
-					
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact > 0))
-					// ?mbelief = (mbelief (melement_has_name "a"))
 				</condition>
 				<factchanged ref="bel_a"/>
 			</trigger>

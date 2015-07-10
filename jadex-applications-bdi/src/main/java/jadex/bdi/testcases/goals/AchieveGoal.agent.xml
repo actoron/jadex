@@ -53,10 +53,10 @@
 	
 	<goals>
 		<achievegoal name="testgoal" retry="true" exclude="never">
-			<contextcondition language="jcl">
+			<contextcondition>
  				$beliefbase.mycontext
  			</contextcondition>
-			<targetcondition language="jcl">
+			<targetcondition>
  				$beliefbase.count==5
  			</targetcondition>
 		</achievegoal>

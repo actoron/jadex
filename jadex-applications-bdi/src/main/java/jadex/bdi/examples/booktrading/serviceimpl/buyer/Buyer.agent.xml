@@ -18,20 +18,15 @@
 		<import>jadex.bdi.examples.booktrading.common.*</import>
 		<import>jadex.bdi.examples.booktrading.serviceimpl.*</import>
 		<import>java.util.*</import>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.bridge.service.types.clock.*</import>
 	</imports>
 
 	<beliefs>
 		<beliefset name="orders" class="Order" evaluationmode="push">
-			<facts language="jcl">
-				collect(
-					Order $order &amp;&amp;
-					IGoal $g &amp;&amp; $g.getModelElement().getName().equals("purchase_book") &amp;&amp;
-					$goalbase.containsGoal($g) &amp;&amp;
-					$g.getParameter("order").getValue()==$order
-				)
+			<facts>
+			    select $g.order from IGoal $g in $goalbase.getGoals("purchase_book")
 			</facts>
 		</beliefset>
 		
@@ -50,16 +45,18 @@
 		<!--  Initiate negotiation rounds every 10 secs. -->
 		<achievegoal name="purchase_book" recur="true" recurdelay="10000">
 			<parameter name="order" class="Order">
-				<value>$order</value>
+			    <bindingoptions>
+			        select Order $order from $beliefbase.orders where $order.getState()==Order.OPEN
+			    </bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl">
-				Order $order &amp;&amp; $order.getState()==Order.OPEN
+			<creationcondition>
+				true
 			</creationcondition>
-			<dropcondition language="jcl">
+			<dropcondition>
 				$goal.order.getState().equals(Order.FAILED)
 			</dropcondition>
-			<targetcondition language="jcl">
+			<targetcondition>
 				Order.DONE.equals($goal.order.getState())
 			</targetcondition>
 		</achievegoal>

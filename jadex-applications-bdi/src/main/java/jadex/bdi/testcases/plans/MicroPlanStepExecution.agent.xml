@@ -72,7 +72,7 @@
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.a &amp;&amp; $beliefbase.b
 				</condition>
 			</trigger>

@@ -33,16 +33,14 @@
 	<goals>
 		<!-- goal succeeds without plan -->
 		<achievegoal name="successgoal">
-			<targetcondition language="jcl">
+			<targetcondition>
 				true
-				// (test (Identity true))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal fails without plan -->
 		<achievegoal name="failuregoal">
-			<targetcondition language="jcl">
+			<targetcondition>
 				false
-				// (test (Identity false))
 			</targetcondition>
 		</achievegoal>
 		<!-- goal succeeds after plan -->

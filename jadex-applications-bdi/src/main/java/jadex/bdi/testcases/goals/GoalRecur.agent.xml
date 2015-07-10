@@ -36,7 +36,7 @@
 			<parameter name="result" class="String" direction="out"/>
 		</querygoal>
 		<performgoal name="perf2" recur="true">
-			<recurcondition language="jcl">
+			<recurcondition>
 				$beliefbase.context
 			</recurcondition>
 		</performgoal>	

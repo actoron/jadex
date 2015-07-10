@@ -29,7 +29,7 @@
  		</belief>
  		
  		<belief name="position" class="IVector2" evaluationmode="push" exported="true">
-			<fact language="jcl">$beliefbase.myself.position</fact>
+			<fact>$beliefbase.myself.position</fact>
  		</belief>
  		
  		<!-- Home location. -->

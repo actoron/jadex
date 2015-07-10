@@ -36,7 +36,7 @@
 			<fact>"blurps"</fact>
 		</belief>
 		<belief name="react_on_value" class="String" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
  				$beliefbase.my_value.equals("magic")? "magic": "n/a"
 			</fact>
 		</belief>
@@ -47,7 +47,7 @@
 			<fact>2</fact>
 		</beliefset>
 		<belief name="react_on_values" class="String" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
  				$beliefbase.my_values.length==2? "magic": "n/a"
 			</fact>
 		</belief>

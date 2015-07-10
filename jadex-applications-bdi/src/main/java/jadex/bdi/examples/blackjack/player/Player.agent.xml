@@ -64,30 +64,20 @@
 	<goals>
 		<!-- Main goal of the player is to play games at a dealer. -->
 		<maintaingoal name="know_dealer" recur="true" recurdelay="2000">
-			<maintaincondition language="jcl">
+			<maintaincondition>
 				$beliefbase.dealer!=null
-				
-				// ?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
 			</maintaincondition>
 		</maintaingoal>
 
 		<achievegoal name="start_playing">
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.dealer!=null
-				
-				// ?rbelief = (belief (element_has_model.melement_has_name "dealer") (belief_has_fact != null))
 			</creationcondition>
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.myself.getAccount()>0
-				
-				// ?myself = (Player (account > 0))
-				// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?myself))
 			</contextcondition>
-			<targetcondition language="jcl">
+			<targetcondition>
 				$beliefbase.myself.getState().equals(Player.STATE_IDLE)
-				
-				// ?myself = (Player (playingstate "idle"))
-				// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact != null))
 			</targetcondition>
 		</achievegoal>
 
@@ -280,16 +270,9 @@
 	</events>
 
 	<expressions>
-		<condition name="start_playing" language="jcl">
+		<condition name="start_playing">
 			$beliefbase.myself.getCards().length==2 &amp;&amp; $beliefbase.gamestate!=null
 			&amp;&amp; $beliefbase.gamestate.getDealer().getCards().length==1
-		
-			// ?player = (Player (cardCnt 2))
-			// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
-
-			// ?rbelief2 = (belief (element_has_model.melement_has_name "gamestate") (belief_has_fact ?gamestate))
-			// ?gamestate = (GameState (dealer ?dealer &amp; 
-			// 	:(== 1 (MethodCallFunction "Player" "getCardCnt" ?dealer))))
 		</condition>
 	</expressions>
 

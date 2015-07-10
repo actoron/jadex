@@ -55,7 +55,7 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
  			<fact>new BeanChangesArrayList()</fact>
 		</belief>
 		<beliefset name="belset" class="String"  evaluationmode="push">
-			<facts language="jcl">
+			<facts>
 				$beliefbase.bel
 			</facts>
 		</beliefset>

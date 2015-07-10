@@ -22,12 +22,8 @@
 				<value>"testvalue 1"</value>
 				<value>"testvalue 2"</value>
 			</parameterset>
-			<targetcondition language="jcl">
+			<targetcondition>
 				$goal.paramset.length>1 &amp;&amp; $goal.paramset[1].equals("result")
-				
-				// ?rparamset = (parameterset (parameterset_has_name "paramset")
-				// 	(parameterset_has_values $?vals &amp; :(&gt; (Length $?vals) 1))
-				//	(parameterset_has_values ?val1 ?val2 $?x &amp; :(== ?val2 "result")))
 			</targetcondition>
 		</achievegoal>
 	</goals>

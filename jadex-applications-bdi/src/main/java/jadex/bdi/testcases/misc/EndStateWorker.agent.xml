@@ -41,11 +41,8 @@
 	<goals>
 		<!-- A goal that should not be triggered in end state. -->
 		<achievegoal name="testgoal">
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.trigger
-				
-				// ?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
-				// ?mbel_trigger	= (mbelief (melement_has_name "trigger"))
 			</creationcondition>
 		</achievegoal>
 		<achievegoal name="endgoal">
@@ -68,11 +65,8 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.trigger
-					
-					// ?rbel_trigger	= (belief (element_has_model ?mbel_trigger) (belief_has_fact true))
-					// ?mbel_trigger	= (mbelief (melement_has_name "trigger"))
 				</condition>
 				<goal ref="testgoal"/>
 			</trigger>
@@ -135,19 +129,9 @@
 	<expressions>
 		<!-- Tests for end state elements are finished when all elements have
 			 been triggered and therefore there is no more unsucceeded test. -->
-		<condition name="end_tests_finished" language="jcl">
-			//(select one TestReport $report from $beliefbase.reports
-			//where !$report.isSucceeded())==null
-			
-			!(TestReport $report &amp;&amp; !$report.isSucceeded() &amp;&amp; Arrays.asList($beliefbase.reports).contains($report))
-			
-			// (not
-			// 	(and
-			// 		?report	= (TestReport (succeeded false) (reason null))
-			// 		?rbelset_reports	= (beliefset (element_has_model ?mbelset_reports) (beliefset_has_facts contains ?report))
-			// 		?mbelset_reports	= (mbeliefset (melement_has_name "reports"))
-			// 	)
-			// )
+		<condition name="end_tests_finished">
+			(select one TestReport $report from $beliefbase.reports
+				where !$report.isSucceeded())==null
 		</condition>
 	</expressions>
 	

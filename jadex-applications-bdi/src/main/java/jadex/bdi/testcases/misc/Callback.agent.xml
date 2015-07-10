@@ -34,11 +34,8 @@
 
 	<goals>
 		<achievegoal name="goal">
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.bel==2
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 2))
-				// ?mbelief = (mbelief (melement_has_name "bel"))
 			</creationcondition>
 		</achievegoal>
 	</goals>
@@ -54,7 +51,7 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.bel==4
 				</condition>
 			</trigger>

@@ -18,7 +18,7 @@
 		<import>jadex.commons.*</import>
 		<import>java.util.*</import>
 		<import>jadex.base.test.*</import>
-		<import>jadex.bdi.runtime.ICandidateInfo</import>
+		<import>jadex.bdiv3x.runtime.ICandidateInfo</import>
 	</imports>
 
 	<capabilities>

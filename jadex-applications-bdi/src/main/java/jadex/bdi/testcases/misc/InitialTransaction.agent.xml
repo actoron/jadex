@@ -47,11 +47,8 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.text!=null
-					
-					// ?rbel_text	= (belief (element_has_model ?mbel_text) (belief_has_fact != null))
-					// ?mbel_txt	= (mbelief (melement_has_name "text"))
 				</condition>
 			</trigger>
 		</plan>

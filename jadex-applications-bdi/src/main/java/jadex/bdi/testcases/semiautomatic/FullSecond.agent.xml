@@ -24,10 +24,8 @@
 	</plans>
 	
 	<expressions>
-		<condition name="five_seconds" language="jcl">
+		<condition name="five_seconds">
 			$beliefbase.timer%5000==0
-			// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact 0))
-			// ?mbelief = (mbelief (melement_has_name "timer"))
 		</condition>
 	</expressions>
 	

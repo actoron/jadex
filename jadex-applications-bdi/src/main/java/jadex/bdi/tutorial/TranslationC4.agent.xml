@@ -57,15 +57,8 @@
 		<plan name="thankyou">
 			<body class="ThankYouPlanC4"/>
 			<trigger>
-				<condition language="jcl">
+				<condition>
 					$beliefbase.transcnt>0 &amp;&amp; $beliefbase.transcnt%10==0
-
-					// ?rbelief = (belief (element_has_model ?mbelief) 
-					// 	(belief_has_fact ?fact &amp; > 0 &amp; :(== 0 (Modulo ?fact 10))))
-					// ?mbelief = (mbelief (melement_has_name "transcnt"))
-					//
-					// ?mplan = (mplan (melement_has_name "thankyou"))
-					// ?rcapa = (capability (capability_has_beliefs contains ?rbelief))
 				</condition>
 			</trigger>
 		</plan>

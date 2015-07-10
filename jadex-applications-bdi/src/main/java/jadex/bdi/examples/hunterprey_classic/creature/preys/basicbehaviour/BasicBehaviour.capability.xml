@@ -55,7 +55,7 @@
 
 		<!-- Is the prey in danger. - ->
 		<belief name="is_indanger" class="boolean" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
 				// $beliefbase.vision!=null &amp;&amp;
 				// (select $object
  				// from $beliefbase.vision.getObjects()
@@ -108,7 +108,7 @@
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="wander_around"/>
-				<inhibits ref="eat_food" language="jcl">
+				<inhibits ref="eat_food">
 					$beliefbase.my_self.getDistance($goal.$food)
 					&lt; $beliefbase.my_self.getDistance($ref.$food)
 				</inhibits>

@@ -1,7 +1,6 @@
 package jadex.bdiv3x.runtime;
 
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 
 /**
  *  The info objects for plan candidates.

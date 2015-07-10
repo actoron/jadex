@@ -48,7 +48,7 @@
 		<!-- Goal type to keep the number of entries in the dictionary
 			below some threshold given by the belief maxstorage. -->
 		<maintaingoal name="keepstorage" exclude="when_failed">
-			<maintaincondition language="jcl">
+			<maintaincondition>
 				$beliefbase.egwords.length &lt;= $beliefbase.maxstorage
 			</maintaincondition>
 		</maintaingoal>

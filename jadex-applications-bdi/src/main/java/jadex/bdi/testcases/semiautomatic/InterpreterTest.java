@@ -27,7 +27,7 @@ public class InterpreterTest
 //			// Load agent model.
 //			Map config = new HashMap();
 //			config.put("messagetype_fipa", new jadex.bridge.fipa.FIPAMessageType());
-//			config.put("planexecutor_standard", new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(
+//			config.put("planexecutor_standard", new jadex.bdiv3.runtime.impl.JavaStandardPlanExecutor(
 //				jadex.commons.concurrent.ThreadPoolFactory.createThreadPool()));
 //			
 //			OAVBDIModelLoader loader = new OAVBDIModelLoader(config, null);

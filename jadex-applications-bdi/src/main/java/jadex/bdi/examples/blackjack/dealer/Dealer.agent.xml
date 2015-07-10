@@ -104,7 +104,7 @@
 	<goals>
 		<!-- Main goal to play a game. -->
 		<performgoal name="play_game" exclude="never">
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.players.length > 0
 			</contextcondition>
 		</performgoal>
@@ -155,7 +155,7 @@
 			<trigger>
 				<goal ref="play_with_player"/>
 			</trigger>
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.getBeliefSet("players").containsFact($plan.player)
 				&amp;&amp; $plan.player.getState() != Player.STATE_IDLE
 				// &amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
@@ -340,54 +340,53 @@
 		</expression>
 		
 		<!-- Check if it is the dealer's first turn. -->
-		<condition name="dealers_first_turn" language="jcl">
+		<condition name="dealers_first_turn">
 			$beliefbase.myself.cardCnt==0 &amp;&amp;
-			!(Player $player &amp;&amp; $player.playingstate!="idle"
-							 &amp;&amp; $player.cardCnt!=2
-							 &amp;&amp; Arrays.asList($beliefbase.players).contains($player))
+			(select one Player $player from $beliefbase.players
+				where $player.playingstate!="idle"
+				&amp;&amp; $player.cardCnt!=2
+			)==null
 		</condition>
 		
 		<!-- Check if it is the dealer's second turn. -->
-		<condition name="dealers_second_turn" language="jcl">
-			!(Player $player &amp;&amp; $player.playingstate!="idle"
-							 &amp;&amp; $player.playingstate!="finished"
-							 &amp;&amp; Arrays.asList($beliefbase.players).contains($player))
+		<condition name="dealers_second_turn">
+			(select one Player $player from $beliefbase.players
+				where $player.playingstate!="idle"
+				&amp;&amp; $player.playingstate!="finished"
+			)==null
 		</condition>
 
 		<!-- Check if it is the $player's turn. -->
-		<condition name="players_turn" language="jcl">
+		<condition name="players_turn">
 			// All players must be idle, playing, or finished.
-			!(Player $p1 &amp;&amp; $p1.playingstate!="idle"
-						 &amp;&amp; $p1.playingstate!="playing"
-						 &amp;&amp; $p1.playingstate!="finished"
-						 &amp;&amp; Arrays.asList($beliefbase.players).contains($p1))
+			(select one Player $p0 from $beliefbase.players
+				where $p0.playingstate!="idle"
+				&amp;&amp; $p0.playingstate!="playing"
+				&amp;&amp; $p0.playingstate!="finished"
+			)==null
 
 			&amp;&amp;
-			// And $player must be playing.
-			Player $player &amp;&amp; $player.playingstate=="playing"
-						   &amp;&amp; Arrays.asList($beliefbase.players).contains($player)
+			// And $player must be playing. (todo return value?)
+			(select one Player $player from $beliefbase.players
+				where $player.playingstate=="playing")!=null
+			
 			&amp;&amp;
 			// And no playing player has less cards than $player.
-			!(Player $p2 &amp;&amp; $p2.playingstate=="playing"
-						 &amp;&amp; $p2.cardCnt &lt; $player.cardCnt
-					     &amp;&amp; Arrays.asList($beliefbase.players).contains($p2))
+			(select one Player $p2 from $beliefbase.players
+				where $p2.playingstate=="playing"
+				&amp;&amp; $p2.cardCnt &lt; $player.cardCnt
+			)==null
 		</condition>
 
 		<!-- Check if the dealer has drawn its first card. -->
-		<condition name="dealer_card" language="jcl">
+		<condition name="dealer_card">
 			$beliefbase.myself.getCards().length==1
-			
-			// ?player = (Player (cardCnt 1))
-			// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
 		</condition>
 
 		<!-- Check if the dealer has finished drawing cards. -->
-		<condition name="dealer_finished" language="jcl">
+		<condition name="dealer_finished">
 			$beliefbase.myself.getState().equals(Player.STATE_FINISHED)
 			|| $beliefbase.myself.getState().equals(Player.STATE_IDLE)
-						
-			// ?player = (Player (playingstate "idle" | "finished"))
-			// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?player))
 		</condition>
 
 	</expressions>

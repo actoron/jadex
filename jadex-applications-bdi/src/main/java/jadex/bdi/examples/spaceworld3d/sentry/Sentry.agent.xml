@@ -95,9 +95,8 @@
 					&lt; ((IVector3)$goal.target.position).getDistance((IVector3)$beliefbase.myself.position).getAsDouble())
 			</contextcondition>
 			<!-- Drop the goal on mission end. -->
-			<dropcondition language="jcl">
+			<dropcondition>
 				$beliefbase.missionend
-				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
 			</dropcondition>
 
 			<deliberation cardinality="1">
@@ -105,7 +104,7 @@
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. - ->
 			<!- - Target condition prevents producers from being called by sentry, because plan is aborted. - ->  
-			<targetcondition language="jcl">
+			<targetcondition>
 				$goal.target.state==AnalyzeTargetTask.STATE_ANALYZED
 				
 				// ?rgoal	= (goal (parameterelement_has_parameters ?param_target))

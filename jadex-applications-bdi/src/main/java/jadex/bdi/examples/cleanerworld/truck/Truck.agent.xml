@@ -36,15 +36,15 @@
 		<beliefset name="wastebins"  class="ISpaceObject" exported="true"/>
 
 		<belief name="my_location" class="IVector2" evaluationmode="push">
-			<fact language="jcl">$beliefbase.myself.position</fact>
+			<fact>$beliefbase.myself.position</fact>
  		</belief>
  		
  		<belief name="my_speed" class="double" evaluationmode="push">
-			<fact language="jcl">$beliefbase.myself.speed</fact>
+			<fact>$beliefbase.myself.speed</fact>
  		</belief>
  		
  		<belief name="my_vision" class="double" evaluationmode="push">
-			<fact language="jcl">$beliefbase.myself.vision_range</fact>
+			<fact>$beliefbase.myself.vision_range</fact>
  		</belief>
 	</beliefs>
 

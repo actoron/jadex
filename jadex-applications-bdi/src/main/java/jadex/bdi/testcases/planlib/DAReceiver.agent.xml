@@ -9,7 +9,7 @@
 	name="DAReceiver" package="jadex.bdi.testcases.planlib">
 
 	<imports>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.bridge.fipa.*</import>

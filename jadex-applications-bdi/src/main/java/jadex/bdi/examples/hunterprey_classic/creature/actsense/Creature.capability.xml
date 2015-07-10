@@ -69,12 +69,8 @@
 		<maintaingoal name="maintain_lease" recur="true" recurdelay="2000">
 			<!-- Hack!!! Result required for getvision plan. todo: refactor -->
 			<parameter name="result" class="Object" direction="out" />
-			<maintaincondition language="jcl">
+			<maintaincondition>
 				$beliefbase.my_self.getLeaseticks()>10
-				
-				// ?rbel_myself	= (belief (element_has_model ?mbel_myself) (belief_has_fact ?myself)) 
-				// ?mbel_myself	= (mbelief (melement_has_name "my_self"))
-				// ?myself	= (Creature (leaseticks > 10)) 
 			</maintaincondition>
 		</maintaingoal>
 

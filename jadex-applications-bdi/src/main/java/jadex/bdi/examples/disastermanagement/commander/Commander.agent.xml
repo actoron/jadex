@@ -20,7 +20,7 @@
 		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
 		<import>jadex.bdi.examples.disastermanagement.*</import>
 		<import>jadex.bdi.examples.disastermanagement.movement.*</import>
 	</imports>

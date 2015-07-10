@@ -52,17 +52,13 @@
 			<creationcondition>
 			    $beliefbase.alarms.length>0
 			</creationcondition>
-<!-- 			<creationcondition language="jel">
-				Alarm $alarm &amp;&amp; $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM
-			</creationcondition> -->
-			<contextcondition> <!-- language="jcl"> -->
+			<contextcondition>
 				$goal.alarm.isActive()
 			</contextcondition>
-			<dropcondition> <!-- language="jcl"> -->
-				//!$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)
-				!Arrays.asList($beliefbase.alarms).contains($goal.alarm)
+			<dropcondition>
+				!$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)
 			</dropcondition>
-			<targetcondition> <!-- language="jcl"> -->
+			<targetcondition>
 				$goal.alarm.getAlarmtime($scope.getTime())==Alarm.NO_ALARM
 			</targetcondition>
 		</achievegoal>

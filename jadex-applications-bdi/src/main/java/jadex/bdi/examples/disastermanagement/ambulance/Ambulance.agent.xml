@@ -16,7 +16,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
-		<import>jadex.bdi.runtime.interpreter.*</import>
+		<import>jadex.bdiv3.runtime.interpreter.*</import>
 		<import>jadex.bdi.examples.disastermanagement.*</import>
 		<import>jadex.bdi.examples.disastermanagement.movement.*</import>
 	</imports>
