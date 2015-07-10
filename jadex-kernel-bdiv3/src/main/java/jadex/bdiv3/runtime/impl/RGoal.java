@@ -1028,7 +1028,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	{
 //		System.out.println("Goal target triggered: "+RGoal.this);
 		if(getMGoal().getConditions(MGoal.CONDITION_MAINTAIN)!=null)
-		{
+		{ 
 			setProcessingState(ia, GoalProcessingState.IDLE);
 			// Hack! Notify finished listeners to allow for waiting via waitForGoal
 			// Cannot use notifyListeners() because it checks isSucceeded
