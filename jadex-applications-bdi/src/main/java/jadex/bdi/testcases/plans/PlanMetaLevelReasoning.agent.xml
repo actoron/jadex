@@ -17,7 +17,7 @@
 	<imports>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.bdi.runtime.ICandidateInfo</import>
+		<import>jadex.bdiv3.runtime.ICandidateInfo</import>
 	</imports>
 
 	<capabilities>

@@ -117,11 +117,11 @@
 				<inhibits ref="performpatrol"/>
 			</deliberation>
 			<!-- Engage in actions when the state is below 0.2. -->
- 			<maintaincondition language="jcl">
+ 			<maintaincondition>
  				$beliefbase.my_chargestate > 0.2
  			</maintaincondition>
 			<!-- The goal is satisfied when the charge state is 1.0. -->
-			<targetcondition language="jcl">
+			<targetcondition>
  				$beliefbase.my_chargestate >= 1.0
  			</targetcondition>
 		</maintaingoal>
@@ -140,7 +140,7 @@
 				true
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.daytime
  			</contextcondition>
 			<!-- The goal will be dropped when
@@ -169,14 +169,14 @@
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.daytime
  			</contextcondition>
  		</performgoal>
 
 		<!-- Perform patrols at night when the agent is not loading. -->
 		<performgoal name="performpatrol" retry="true" exclude="never">
-			<contextcondition language="jcl">
+			<contextcondition>
 				!$beliefbase.daytime
  			</contextcondition>
  		</performgoal>
@@ -198,7 +198,7 @@
  				from $beliefbase.wastebins
 				where $goal.wastebin.getId().equals($wastebin.getId())).isFull()
 			</failurecondition> -->
-			<dropcondition language="jcl">
+			<dropcondition>
 				$goal.wastebin.isFull()
 			</dropcondition>
 		</achievegoal>

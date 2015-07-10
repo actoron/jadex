@@ -58,21 +58,15 @@
 
 		<!-- Walk around without target when nothing else to do. -->
 		<performgoal name="walk_around" retry="true" exclude="never" exported="true">
-			<dropcondition language="jcl">
+			<dropcondition>
 				$beliefbase.missionend
-				
-				// (belief (element_has_model ?mbel) (belief_has_fact true))
-				// ?mbel	= (mbelief (melement_has_name "missionend"))
 			</dropcondition>
 		</performgoal>
 
 		<!-- Watch for targets and memorize them. -->
 		<performgoal name="watch_targets" exported="true">
- 			<dropcondition language="jcl">
+ 			<dropcondition>
 				$beliefbase.missionend
-				
-				// (belief (element_has_model ?mbel) (belief_has_fact true))
-				// ?mbel	= (mbelief (melement_has_name "missionend"))
 			</dropcondition>
 		</performgoal>
 
@@ -82,20 +76,9 @@
 				<value>$beliefbase.my_home</value>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.missionend
 				&amp;&amp; !$beliefbase.my_location.isNear($beliefbase.my_home)
-
-				// (belief (element_has_model ?mbel_missionend) (belief_has_fact true))
-				// ?mbel_missionend = (mbelief (melement_has_name "missionend"))
-				// 
-				// (belief (element_has_model ?mbel_myhome) (belief_has_fact ?myhome))
-				// ?mbel_myhome = (mbelief (melement_has_name "my_home"))
-				// 
-				// (belief (element_has_model ?mbel_mylocation) (belief_has_fact ?mylocation))
-				// ?mbel_mylocation = (mbelief (melement_has_name "my_location"))
-				// 
-				// ?mylocation	= (Location (isNear(?myhome) false))
 			</creationcondition>
 		</achievegoal>
 	</goals>

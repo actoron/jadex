@@ -90,8 +90,7 @@
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
-				<condition language="jcl">
-					// "test".equals($beliefbase.a)
+				<condition>
 					$beliefbase.a.equals("test")
 				</condition>
 			</trigger>
@@ -105,8 +104,7 @@
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
-				<condition language="jcl">
-					// "test".equals($beliefbase.b)
+				<condition>
 					$beliefbase.b.equals("test")
 				</condition>
 			</trigger>
@@ -120,8 +118,7 @@
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
-				<condition language="jcl">
-					// $beliefbase.c.length>0 &amp;&amp; "test".equals($beliefbase.c[0])
+				<condition>
 					$beliefbase.c.length>0 &amp;&amp; $beliefbase.c[0].equals("test")
 				</condition>
 			</trigger>
@@ -135,8 +132,7 @@
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
-				<condition language="jcl">
-					// $beliefbase.d.length>0 &amp;&amp; "test".equals($beliefbase.d[0])
+				<condition>
 					$beliefbase.d.length>0 &amp;&amp; $beliefbase.d[0].equals("test")
 				</condition>
 			</trigger>

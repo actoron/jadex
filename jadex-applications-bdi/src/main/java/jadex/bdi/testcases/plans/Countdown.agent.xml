@@ -40,11 +40,8 @@
 	<plans>
 		<plan name="countdown">
 			<body class="CountdownPlan"/>
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.num&gt;0
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact > 0))
-				// ?mbelief = (mbelief (melement_has_name "num"))
  			</contextcondition>
 		</plan>
 		<plan name="tester">

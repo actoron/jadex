@@ -40,11 +40,8 @@
 			<deliberation>
 				<inhibits ref="docnt" inhibit="when_in_process"/>
 			</deliberation>
-			<maintaincondition language="jcl">
+			<maintaincondition>
 				$beliefbase.count&lt;4
-
-				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact &lt; 4))
-				// ?mbel	= (mbelief (melement_has_name "count"))
 			</maintaincondition>
 		</maintaingoal>
 	</goals>
@@ -85,10 +82,10 @@
 	</plans>
 	
 	<expressions>
-		<condition name="countis5" language="jcl">
+		<condition name="countis5">
 			$beliefbase.count==5
 		</condition>
-		<condition name="countis6" language="jcl">
+		<condition name="countis6">
 			$beliefbase.count==6
 		</condition>
 	</expressions>

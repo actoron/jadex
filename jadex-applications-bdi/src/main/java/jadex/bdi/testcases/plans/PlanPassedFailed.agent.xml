@@ -42,7 +42,7 @@
 
 	<goals>
 		<achievegoal name="init" retry="true" exclude="never">	<!-- Hack!!! goal triggers only once, because condition uses only temporary variables -->
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.cnt&lt;4
 			</creationcondition>
 		</achievegoal>

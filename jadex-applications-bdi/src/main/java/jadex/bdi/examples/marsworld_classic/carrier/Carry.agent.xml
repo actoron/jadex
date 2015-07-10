@@ -65,9 +65,8 @@
 		<!-- Carry ore home from a target. -->
 		<achievegoal name="carry_ore">
 			<parameter name="destination" class="Location"/>
-			<dropcondition language="jcl">
+			<dropcondition>
 				$beliefbase.missionend
-				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
 			</dropcondition>
 			<deliberation>
 				<inhibits cref="move.walk_around"/>

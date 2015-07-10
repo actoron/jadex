@@ -153,30 +153,16 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		<!-- Clear one block. -->
 		<achievegoal name="clear">
 			<parameter name="block" class="Block" />
-			<targetcondition language="jcl">
+			<targetcondition>
 				$goal.block.isClear()
-				// $goal.block.clear
-				
-				// ?param = (parameter (parameter_has_name "block") (parameter_has_value ?block))
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?param))
-				// ?block = (Block (clear true))
-	
-				<!-- 
-				
-				// Drools Syntax
-				$block	: Block(clear == true)
-				$param	: parameter(parameter_has_name == "block", parameter_has_value == $block)
-				$mgoal	: mgoal(modelmelement_has_name == "clear")
-				$rgoal	: goal(element_has_model == $mgoal, parameterelement_has_parameters contains $param)
-			 -->
-				</targetcondition>
+			</targetcondition>
 		</achievegoal>
 		
 		<!-- Achieve that one block is on a some target block or the table. -->
 		<achievegoal name="stack">
 			<parameter name="block" class="Block" />
 			<parameter name="target" class="Block" />
-			<targetcondition language="jcl">
+			<targetcondition>
 				$goal.block.getLower()==$goal.target
 			</targetcondition>
 		</achievegoal>
@@ -187,27 +173,6 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
  			<parameterset name="blocks" class="Block"/>
 			<targetcondition beliefs="blocks">
 				$beliefbase.table.configurationEquals($goal.configuration)
-<!--  				<relevantbeliefset ref="blocks"/> -->
-<!-- 
-				// There is no block on the table for which there is no block in the configuration
-				!(Block $block1 &amp;&amp;
-					Arrays.asList($beliefbase.table.getAllBlocks()).contains($block1) &amp;&amp;
-					!(Block $block2 &amp;&amp;
-						$block2.color==$block1.color &amp;&amp;
-						Arrays.asList($goal.configuration.getAllBlocks()).contains($block2)))
-				&amp;&amp;
-				// There is no block in the configuration for which there is no block on the table
-				!(Block $block3 &amp;&amp;
-					Arrays.asList($goal.configuration.getAllBlocks()).contains($block3) &amp;&amp;
-					!(Block $block4 &amp;&amp;
-						$block4.color==$block3.color &amp;&amp;
-						Arrays.asList($beliefbase.table.getAllBlocks()).contains($block4)))				
-				&amp;&amp;
-				// Every block on the table is located on the same block as in the configuration
-				!(	Block $block5 &amp;&amp; Arrays.asList($beliefbase.table.getAllBlocks()).contains($block5) &amp;&amp;
-					Block $block6 &amp;&amp; Arrays.asList($goal.configuration.getAllBlocks()).contains($block6) &amp;&amp;
-					$block5.color==$block6.color &amp;&amp; $block5.lower.color!=$block6.lower.color)
- -->
  			</targetcondition>
 		</achievegoal>
 	</goals>

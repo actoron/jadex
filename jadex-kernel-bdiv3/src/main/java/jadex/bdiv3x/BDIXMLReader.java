@@ -342,6 +342,12 @@ public class BDIXMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MElementRef.class), null, null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "metagoalgoalref")), new ObjectInfo(MElementRef.class), null, null));
 		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageeventref")), new ObjectInfo(MElementRef.class), null, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internaleventref")), new ObjectInfo(MElementRef.class), null, null));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expressionref")), new ObjectInfo(MElementRef.class), null, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "conditionref")), new ObjectInfo(MElementRef.class), null, null));
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "creationcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
 //			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text)));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "dropcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
@@ -394,15 +400,26 @@ public class BDIXMLReader extends ComponentXMLReader
 		{
 			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
-				if(object instanceof MBelief || object instanceof MGoal || object instanceof MPlan || object instanceof MMessageEvent || object instanceof MInternalEvent 
-					|| object instanceof MCapabilityReference || object instanceof MElementRef
-					|| (object instanceof UnparsedExpression && pathname[pathname.length-1].getLocalPart().equals("expression")) // hack for bdi expressions
-					|| (object instanceof MCondition && pathname[pathname.length-1].getLocalPart().equals("condition")))
+				if(object instanceof MElementRef && pathname[0].getLocalPart().equals("events"))
 				{
-					parent	= ((BDIXModel)parent).getCapability();
+					((BDIXModel)parent).addEventReference(((MElementRef)object).getName(), ((MElementRef)object).getRef());
 				}
-				
-				context.getTopStackElement().getReaderHandler().linkObject(object, parent, linkinfo, pathname, context);
+				else if(object instanceof MElementRef && pathname[0].getLocalPart().equals("expressions"))
+				{
+					((BDIXModel)parent).addExpressionReference(((MElementRef)object).getName(), ((MElementRef)object).getRef());
+				}
+				else
+				{
+					if(object instanceof MBelief || object instanceof MGoal || object instanceof MPlan || object instanceof MMessageEvent || object instanceof MInternalEvent 
+						|| object instanceof MCapabilityReference || object instanceof MElementRef
+						|| (object instanceof UnparsedExpression && pathname[pathname.length-1].getLocalPart().equals("expression")) // hack for bdi expressions
+						|| (object instanceof MCondition && pathname[pathname.length-1].getLocalPart().equals("condition")))
+					{
+						parent	= ((BDIXModel)parent).getCapability();
+					}
+					
+					context.getTopStackElement().getReaderHandler().linkObject(object, parent, linkinfo, pathname, context);
+				}
 			}
 		};
 		
@@ -581,11 +598,7 @@ public class BDIXMLReader extends ComponentXMLReader
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "events"), new QName(uri, "internalevent")}), new AccessInfo(new QName(uri, "internalevent"), "internalEvent")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "events"), new QName(uri, "internaleventref")}), new AccessInfo(new QName(uri, "internaleventref"), "internalEvent")),
 		
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expression")}), new AccessInfo(new QName(uri, "expression"), "expression")),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expressionref")}), new AccessInfo(new QName(uri, "expressionref"), "expression")),
-//					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expression")}), new AccessInfo(new QName(uri, "expression"), "expression")),
-//					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expressionref")}), new AccessInfo(new QName(uri, "expressionref"), "expression")),
-			
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expression")}), new AccessInfo(new QName(uri, "expression"), "expression"))
 			}), new LinkingInfo(capalinker));
 		
 		typeinfos.add(ti_capability);
@@ -862,19 +875,20 @@ public class BDIXMLReader extends ComponentXMLReader
 //			null, null, new OAVObjectReaderHandler()));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "match")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 //			new MappingInfo(ti_expression)));
-//		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expression")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
-//			new MappingInfo(ti_expression), null, new OAVObjectReaderHandler()));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expressionref")), new ObjectInfo(OAVBDIMetaModel.expressionreference_type),
-//			null, null, new OAVObjectReaderHandler()));
-//
 
 		// Exchange expression with condition for trigger.
 		IPostProcessor condexpost = new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				expost.postProcess(context, object);
+				try
+				{
+					expost.postProcess(context, object);
+				}
+				catch(RuntimeException e)
+				{
+					throw e;
+				}
 				MCondition cond = new MCondition();
 				cond.setExpression((UnparsedExpression)object);
 				cond.setName(cond.getExpression().getName());
@@ -1128,6 +1142,11 @@ public class BDIXMLReader extends ComponentXMLReader
 //			})));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "value")}), new ObjectInfo(UnparsedExpression.class, expost),
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "values")}), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));

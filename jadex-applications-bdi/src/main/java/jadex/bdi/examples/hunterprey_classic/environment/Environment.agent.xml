@@ -264,7 +264,7 @@
 	</events>
 	
 	<expressions>
-		<condition name="notasks" language="jcl">
+		<condition name="notasks">
 			$beliefbase.environment.getTaskSize()==0
 		</condition>
 	</expressions>

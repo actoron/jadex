@@ -39,7 +39,7 @@
 		<querygoal name="qgoal">
 			<assignto ref="capA.testgoal"/>
 			<parameter name="result" class="String" direction="out" evaluationmode="push">
-				<value language="jcl">
+				<value>
 					$goal.params.length>0 ? $goal.params[0] : null
 				</value>
 			</parameter>

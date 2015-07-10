@@ -124,11 +124,11 @@
 				<inhibits ref="performpatrol" inhibit="when_in_process"/>
 			</deliberation>
 			<!-- Engage in actions when the state is below 0.2. -->
- 			<maintaincondition language="jcl">
+ 			<maintaincondition>
  				$beliefbase.my_chargestate > 0.2
  			</maintaincondition>
 			<!-- The goal is satisfied when the charge state is 1.0. -->
-			<targetcondition language="jcl">
+			<targetcondition>
  				$beliefbase.my_chargestate >= 1.0
  			</targetcondition>
 		</maintaingoal>
@@ -136,29 +136,30 @@
 		<!-- Clean up some waste. -->
 		<achievegoal name="achievecleanup" retry="true" exclude="when_failed">
 			<parameter name="waste" class="Waste">
-				<!-- Bind against variable from creation condition. -->
-				<!-- <bindingoptions>"?waste"</bindingoptions> -->
-				<value>$waste</value>
+				<bindingoptions>$beliefbase.wastes</bindingoptions>
 			</parameter>
 			<!-- Uniqueness ensures that no two goal are adopted for the same waste. -->
 			<unique/>
-			<creationcondition language="jcl">
-				Waste $waste
+			<!-- Create a new goal when new waste is seen and
+				the agent isnt already cleaning. -->
+			<!-- <creationcondition beliefs="wastes">-->
+			<creationcondition beliefs="wastes">
+				true
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.daytime
  			</contextcondition>
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
-			<dropcondition language="jcl">
+			<dropcondition>
 				$beliefbase.carriedwaste==null &amp;&amp;
 				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
  			</dropcondition>
 			<deliberation>
 			<!-- <deliberation cardinality="1"> -->
 				<inhibits ref="performlookforwaste"/>
-				<inhibits ref="achievecleanup" language="jcl">
+				<inhibits ref="achievecleanup">
 					$beliefbase.my_location.getDistance($goal.waste.getLocation())
 					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
 				</inhibits>
@@ -173,14 +174,14 @@
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.daytime
  			</contextcondition>
  		</performgoal>
 
 		<!-- Perform patrols at night when the agent is not loading. -->
 		<performgoal name="performpatrol" retry="true" exclude="never">
-			<contextcondition language="jcl">
+			<contextcondition>
 				!$beliefbase.daytime
  			</contextcondition>
  		</performgoal>
@@ -201,7 +202,7 @@
  				from $beliefbase.wastebins
 				where $goal.wastebin.getId().equals($wastebin.getId())).isFull()
 			</failurecondition> -->
-			<dropcondition language="jcl">
+			<dropcondition>
 				$goal.wastebin.isFull()
 			</dropcondition>
 		</achievegoal>
@@ -220,12 +221,11 @@
 			is as near as possible to the agent. -->
 		<querygoal name="querywastebin" exclude="never">
 			<parameter name="result" class="Wastebin" evaluationmode="push" direction="out">
-				<value language="jcl" variable="$wastebin">
-					Wastebin $wastebin &amp;&amp; !$wastebin.isFull()
-					&amp;&amp;
-					!(Wastebin $wastebin2 &amp;&amp; !$wastebin2.isFull()
-										  &amp;&amp; $beliefbase.my_location.getDistance($wastebin.getLocation())
-												   > $beliefbase.my_location.getDistance($wastebin2.getLocation()))
+				<value>
+					select one Wastebin $wastebin
+					from $beliefbase.wastebins
+					where !$wastebin.isFull()
+					order by $beliefbase.my_location.getDistance($wastebin.getLocation())
 				</value>
 			</parameter>
 		</querygoal>
@@ -233,11 +233,10 @@
 		<!-- Find the nearest charging station. -->
 		<querygoal name="querychargingstation" exclude="never">
 			<parameter name="result" class="Chargingstation" evaluationmode="push" direction="out">
-				<value language="jcl" variable="$chargingstation">
-					Chargingstation $chargingstation
-					&amp;&amp;
-					!(Chargingstation $chargingstation2 &amp;&amp; $beliefbase.my_location.getDistance($chargingstation.getLocation())
-																 > $beliefbase.my_location.getDistance($chargingstation2.getLocation()))
+				<value>
+					select one Chargingstation $station
+					from $beliefbase.chargingstations
+					order by $beliefbase.my_location.getDistance($station.getLocation())
 				</value>
 			</parameter>
 		</querygoal>
@@ -355,7 +354,7 @@
 			<trigger>
 				<goal ref="achievemoveto"/>
 			</trigger>
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.my_chargestate &gt; 0
 			</contextcondition>
 		</plan>

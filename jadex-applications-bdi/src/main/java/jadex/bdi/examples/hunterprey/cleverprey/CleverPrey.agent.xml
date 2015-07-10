@@ -53,7 +53,7 @@
 	<goals>
 		<!-- A goal to find some food, when there is no food around. -->
 		<maintaingoal name="food_seen">
-			<maintaincondition language="jcl">
+			<maintaincondition>
 				$beliefbase.seen_food.length>0
 			</maintaincondition>
 		</maintaingoal>
@@ -64,7 +64,7 @@
 				<inhibits ref="food_seen" inhibit="when_in_process"/>
 				<inhibits ref="eat_food" inhibit="when_in_process"/>
 			</deliberation>
-			<maintaincondition language="jcl">
+			<maintaincondition>
 				$beliefbase.seen_hunters.length==0
 			</maintaincondition>
 		</maintaingoal>
@@ -79,19 +79,13 @@
  				ISpaceObject $food &amp;&amp; $food.getType().equals("food")
  				&amp;&amp; Arrays.asList($beliefbase.seen_food).contains($food)
 			</creationcondition>
-			<dropcondition language="jcl">
+			<dropcondition>
  				!Arrays.asList($beliefbase.seen_food).contains($goal.food)
 			</dropcondition>
 			<deliberation>
-				<inhibits ref="eat_food" language="jcl">
+				<inhibits ref="eat_food">
 					$beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$goal.food.position).getAsInteger()
 					&lt; $beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$ref.food.position).getAsInteger()
-					
-					// Hack!!! Required, because cardinality=1 not supported in conjunction with instance-level inhibition.
-					// When same distance order by space object id.
-					|| ($beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$goal.food.position).getAsInteger()
-						==$beliefbase.env.getDistance((IVector2)$beliefbase.myself.position, (IVector2)$ref.food.position).getAsInteger()
-						&amp;&amp; $goal.food.getId() &lt; $ref.food.getId())					
 				</inhibits>
 			</deliberation>
 		</achievegoal>

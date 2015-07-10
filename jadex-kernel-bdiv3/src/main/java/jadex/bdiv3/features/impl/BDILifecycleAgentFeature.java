@@ -459,19 +459,28 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							
 							List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal, null);
 							
-							if(bindings!=null)
+							if(goal==null)
 							{
-								for(Map<String, Object> binding: bindings)
+								// XML only
+								if(bindings!=null)
 								{
-									RGoal rgoal = new RGoal(component, mgoal, null, null, binding, igoal);
+									for(Map<String, Object> binding: bindings)
+									{
+										RGoal rgoal = new RGoal(component, mgoal, null, null, binding, igoal);
+										dispatchTopLevelGoal(rgoal).addResultListener(goallis);
+									}
+								}
+								// No binding: generate one candidate.
+								else
+								{
+									RGoal rgoal = new RGoal(component, mgoal, goal, null, null, igoal);
 									dispatchTopLevelGoal(rgoal).addResultListener(goallis);
 								}
 							}
-							// No binding: generate one candidate.
 							else
 							{
-								RGoal rgoal = new RGoal(component, mgoal, null, null, null, igoal);
-								dispatchTopLevelGoal(rgoal).addResultListener(goallis);
+								// Pojo only
+								dispatchTopLevelGoal(goal).addResultListener(goallis);								
 							}
 						}
 					}

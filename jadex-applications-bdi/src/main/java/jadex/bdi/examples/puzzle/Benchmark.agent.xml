@@ -49,7 +49,7 @@
 		<!-- The goal to make a move on the board that is the solution. -->
 		<achievegoal name="makemove" recalculate="false">
 			<parameter name="depth" class="int"/>
-			<targetcondition language="jcl">
+			<targetcondition>
 				$beliefbase.board.isSolution()
 			</targetcondition>
  		</achievegoal>

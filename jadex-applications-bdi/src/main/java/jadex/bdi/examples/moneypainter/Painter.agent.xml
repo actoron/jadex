@@ -10,7 +10,7 @@
 	package="jadex.bdi.examples.moneypainter">
 
 	<imports>
-		<import>jadex.bdi.runtime.interpreter.*</import>
+		<import>jadex.bdiv3.runtime.interpreter.*</import>
 	</imports>
 
 	<beliefs>

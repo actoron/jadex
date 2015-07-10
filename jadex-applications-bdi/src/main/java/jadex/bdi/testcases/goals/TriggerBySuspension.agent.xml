@@ -19,7 +19,7 @@
 	<imports>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.base.test.*</import>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
 	</imports>
 
 	<capabilities>
@@ -43,10 +43,10 @@
 	
 	<goals>
 		<achievegoal name="cnt" retry="true" exclude="never">
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.count!=5
 			</contextcondition>
-			<targetcondition language="jcl">
+			<targetcondition>
  				$beliefbase.count==10
  			</targetcondition>
 		</achievegoal>
@@ -69,31 +69,23 @@
 		<plan name="test">
 			<parameter name="$g" class="IGoal">
 				<value>$g</value>
-				<!-- <bindingoptions>
-					select IGoal $g from $goalbase.getGoals()
+				<bindingoptions>
+					select IGoal $g from $goalbase.getGoals("cnt")
 					where OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED.equals($g.getLifecycleState())
-				</bindingoptions> -->
+				</bindingoptions>
 			</parameter>
 			<parameter name="report" class="TestReport">
 				<value>new TestReport("test_trigger", "Test if goal suspension can trigger a plan.", true, null)</value>
 			</parameter>
 			<body class="StoreReportPlan"/>
 			<trigger>
-				<condition language="jcl">
-					// true
-					
-					goal $g &amp;&amp; $g.element_has_model.melement_has_name=="cnt" &amp;&amp; $g.goal_has_lifecyclestate=="suspended"
-					
-					// ?rgoal = (goal (element_has_model ?mgoal) (goal_has_lifecyclestate "suspended"))
-					// ?mgoal = (mgoal (melement_has_name "cnt"))
+				<condition goals="cnt">
+					true
 				</condition>
 			</trigger>
 			<!-- Hack!!! Triggers more than once. -->
-			<contextcondition language="jcl">
+			<contextcondition>
 				$beliefbase.reports.length &lt; 1
-				
-				// ?rbelset = (beliefset (element_has_model ?mbelset) (beliefset_has_facts $?reports &amp; :(&lt; (jadex.rules.rulesystem.rules.functions.Length $?reports) 1)))
-				// ?mbelset = (mbeliefset (melement_has_name "reports"))
 			</contextcondition>
 		</plan>
 	</plans>

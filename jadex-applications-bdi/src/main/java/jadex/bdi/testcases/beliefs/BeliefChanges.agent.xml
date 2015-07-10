@@ -38,7 +38,7 @@ Test three kinds of belief changes.
 			<fact>"Test"</fact>
 		</belief>
 		<belief name="bel_b" class="int" evaluationmode="push">
-			<fact language="jcl">
+			<fact>
 				$beliefbase.bel_a.length()
 			</fact>
 		</belief>
