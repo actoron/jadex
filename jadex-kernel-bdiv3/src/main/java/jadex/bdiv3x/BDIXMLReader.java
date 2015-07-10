@@ -930,6 +930,22 @@ public class BDIXMLReader extends ComponentXMLReader
 						cond.addEvent(new EventType(ChangeEvent.VALUEREMOVED, pe.getName(), tok));
 					}
 				}
+				String goals = ar.getTopStackElement().getRawAttributes()==null? null: ar.getTopStackElement().getRawAttributes().get("goals");
+				if(goals!=null)
+				{
+					StringTokenizer stok = new StringTokenizer(goals, ",");
+					while(stok.hasMoreElements())
+					{
+						String tok = stok.nextToken();
+						cond.addEvent(new EventType(ChangeEvent.GOALACTIVE, tok));
+						cond.addEvent(new EventType(ChangeEvent.GOALADOPTED, tok));
+						cond.addEvent(new EventType(ChangeEvent.GOALDROPPED, tok));
+						cond.addEvent(new EventType(ChangeEvent.GOALINPROCESS, tok));
+						cond.addEvent(new EventType(ChangeEvent.GOALNOTINPROCESS, tok));
+						cond.addEvent(new EventType(ChangeEvent.GOALOPTION, tok));
+						cond.addEvent(new EventType(ChangeEvent.GOALSUSPENDED, tok));
+					}
+				}
 				String rawevs = ar.getTopStackElement().getRawAttributes()==null? null: ar.getTopStackElement().getRawAttributes().get("rawevents");
 				if(rawevs!=null)
 				{
@@ -952,7 +968,9 @@ public class BDIXMLReader extends ComponentXMLReader
 		AttributeInfo[]	condattrs	= new AttributeInfo[]
 		{
 			new AttributeInfo(new AccessInfo("beliefs", null, AccessInfo.IGNORE_READ)),
-			new AttributeInfo(new AccessInfo("parameters", null, AccessInfo.IGNORE_READ))
+			new AttributeInfo(new AccessInfo("parameters", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("goals", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("rawevents", null, AccessInfo.IGNORE_READ))
 		};
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(UnparsedExpression.class, condexpost),
 			new MappingInfo(null, null, "value", condattrs)));
