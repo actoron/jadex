@@ -1022,7 +1022,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	}
 	
 	/**
-	 * 
+	 *  Called when the target condition of a goal triggers.
 	 */
 	public void targetConditionTriggered(IInternalAccess ia, IEvent event, IRule<Void> rule, Object context)
 	{
@@ -1030,6 +1030,16 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(getMGoal().getConditions(MGoal.CONDITION_MAINTAIN)!=null)
 		{
 			setProcessingState(ia, GoalProcessingState.IDLE);
+			// Hack! Notify finished listeners to allow for waiting via waitForGoal
+			// Cannot use notifyListeners() because it checks isSucceeded
+			if(getListeners()!=null)
+			{
+				for(IResultListener<Void> lis: getListeners())
+				{
+					lis.resultAvailable(null);
+				}
+			}
+			listeners = null;
 		}
 		else
 		{
