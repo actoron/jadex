@@ -134,13 +134,14 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				// Implement atomic by changing the rule execution mode
 				RPlan rplan = ExecutePlanStepAction.RPLANS.get();
 				
-				if(rplan!=null && !isQueueEvents() && rplan.isAtomic())
+				boolean	queue	= isQueueEvents();
+				if(rplan!=null && !queue && rplan.isAtomic())
 					setQueueEvents(true);
 				
 				IFuture<Void> ret = super.addEvent(event);
 				
-				if(rplan!=null && !isQueueEvents() && rplan.isAtomic())
-					setQueueEvents(false);
+				if(queue!=isQueueEvents())
+					setQueueEvents(queue);
 				
 				return ret;
 			}
@@ -1579,6 +1580,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public IValueFetcher getValueFetcher()
 	{
+		// Todo: obsolete because of capability specific fetchers?
 		return new IValueFetcher()
 		{
 			public Object fetchValue(String name)
@@ -1586,6 +1588,10 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				if("$beliefbase".equals(name))
 				{
 					return getCapability().getBeliefbase();
+				}
+				else if("$goalbase".equals(name))
+				{
+					return getCapability().getGoalbase();
 				}
 				else if("$expressionbase".equals(name))
 				{

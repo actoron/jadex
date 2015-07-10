@@ -68,10 +68,9 @@
 		
 		<plan name="test">
 			<parameter name="$g" class="IGoal">
-				<value>$g</value>
 				<bindingoptions>
 					select IGoal $g from $goalbase.getGoals("cnt")
-					where OAVBDIRuntimeModel.GOALLIFECYCLESTATE_SUSPENDED.equals($g.getLifecycleState())
+					where IGoal.GoalLifecycleState.SUSPENDED==$g.getLifecycleState()
 				</bindingoptions>
 			</parameter>
 			<parameter name="report" class="TestReport">

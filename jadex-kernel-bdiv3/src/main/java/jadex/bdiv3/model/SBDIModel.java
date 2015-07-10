@@ -453,6 +453,10 @@ public class SBDIModel
 		{
 			plan.setTrigger(copyTrigger(bdimodel, null, plan.getTrigger()));
 			plan.setWaitqueue(copyTrigger(bdimodel, null, plan.getWaitqueue()));
+			if(plan.getContextCondition()!=null)
+			{
+				plan.getContextCondition().setEvents(convertEventTypes(null, plan.getContextCondition().getEvents(), bdimodel));
+			}
 		}
 	}
 
