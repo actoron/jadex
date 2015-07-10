@@ -24,7 +24,9 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Feature that ensures the bdi behavior is started.
@@ -76,7 +78,12 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 				{
 					MMessageEvent mmevent = mcapa.getMessageEvent(cpe.getName());
 					RMessageEvent rmevent = new RMessageEvent(mmevent, getComponent(), cpe);
-					bdif.getCapability().getEventbase().sendMessage(rmevent);
+					bdif.getCapability().getEventbase().sendMessage(rmevent).addResultListener(new DefaultResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+						}
+					});
 				}
 			}
 		}

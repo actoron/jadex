@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
 import jadex.commons.IValueFetcher;
 
 import java.util.ArrayList;
@@ -48,7 +49,28 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		this.mt = mt;
 		
 		// Must be done after msg has been assigned :-(
-		super.initParameters(null, wrapFetcher(RBeliefbase.getFetcher(agent, modelelement)), config);
+		IValueFetcher fetcher = wrapFetcher(RBeliefbase.getFetcher(agent, modelelement));
+		super.initParameters(null, fetcher, config);
+		
+		// In case of messages there can be parameters only in the config, not in the model due to underlying message type defition
+		if(config!=null && config.getParameters()!=null)
+		{
+			for(Map.Entry<String, List<UnparsedExpression>> entry: config.getParameters().entrySet())
+			{
+				if(!msg.containsKey(entry.getKey()))
+				{
+					ParameterSpecification ps = mt.getParameter(entry.getKey());
+					if(!ps.isSet())
+					{
+						addParameter(createParameter(null, entry.getKey(), getAgent(), config.getParameter(entry.getKey()), fetcher));
+					}
+					else
+					{
+						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), config.getParameters(entry.getKey()), fetcher));
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -73,36 +95,36 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 * 
 	 */
 	@Override
-	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher)
+	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher)
 	{
-		return new RParam(modelelement, modelelement.getName(), agent, inival, fetcher, getModelElement().getName());
+		return new RParam(modelelement, name, agent, inival, fetcher, getModelElement().getName());
 	}
 	
 	/**
 	 * 
 	 */
 	@Override
-	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, List<UnparsedExpression> inivals, IValueFetcher fetcher)
+	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals, IValueFetcher fetcher)
 	{
-		return new RParamSet(modelelement, modelelement.getName(), agent, inivals, fetcher, getModelElement().getName());
+		return new RParamSet(modelelement, name, agent, inivals, fetcher, getModelElement().getName());
 	}
 	
 	/**
 	 * 
 	 */
 	@Override
-	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, Object value)
+	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, Object value)
 	{
-		return new RParam(modelelement, modelelement.getName(), agent, value, getModelElement().getName());
+		return new RParam(modelelement, name, agent, value, getModelElement().getName());
 	}
 	
 	/**
 	 * 
 	 */
 	@Override
-	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, Object[] values)
+	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, Object[] values)
 	{
-		return new RParamSet(modelelement, modelelement.getName(), agent, values, getModelElement().getName());
+		return new RParamSet(modelelement, name, agent, values, getModelElement().getName());
 	}
 	
 	//-------- methods --------
@@ -301,6 +323,18 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, Object[] values, String pename)
 		{
 			super(modelelement, name, agent, values, pename);
+		}
+		
+		/**
+		 *  Get the class of a value.
+		 */
+		@Override
+		protected Class<?> getClazz()
+		{
+			Class<?> ret = getModelElement()!=null? super.getClazz(): null;
+			if(ret==null)
+				ret = getMessageType().getParameter(getName()).getClazz();
+			return ret;
 		}
 		
 		/**

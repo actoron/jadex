@@ -1210,7 +1210,9 @@ public class BDIXMLReader extends ComponentXMLReader
 				StackElement	se	= context.getStackElement(context.getStackSize()-2);
 				String	name	= se.getRawAttributes().containsKey("ref") ? se.getRawAttributes().get("ref") : se.getRawAttributes().get("cref");
 				((UnparsedExpression)object).setName(name);
-				super.linkObject(object, parent, linkinfo, pathname, context);
+				((MConfigParameterElement)parent).addParameter((UnparsedExpression)object);
+				// super add would required additional support for parameterset (subobjectinfo on all MConfigParameterElement elems
+//				super.linkObject(object, parent, linkinfo, pathname, context);
 			}
 		};
 		
