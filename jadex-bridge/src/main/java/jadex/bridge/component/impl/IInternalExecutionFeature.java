@@ -67,4 +67,11 @@ public interface IInternalExecutionFeature
 //	 *  @return True, when some breakpoint is triggered.
 //	 */
 //	public abstract boolean isAtBreakpoint(String[] breakpoints);
+	
+	/**
+	 *  Get the step number when endstate began.
+	 *  @return The step cnt.
+	 */
+	public int getEndstateStart();
+	
 }

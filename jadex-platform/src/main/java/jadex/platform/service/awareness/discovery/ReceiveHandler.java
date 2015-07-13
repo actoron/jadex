@@ -108,6 +108,16 @@ public abstract class ReceiveHandler
 												}
 												return IFuture.DONE;
 											}
+										}).addResultListener(new IResultListener<Void>()
+										{
+											public void resultAvailable(Void result)
+											{
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												agent.getMicroAgent().getLogger().warning("Could not execute receive step: "+agent.getMicroAgent().getComponentIdentifier());
+											}
 										});
 									}
 	//								System.out.println("received: "+getComponentIdentifier());

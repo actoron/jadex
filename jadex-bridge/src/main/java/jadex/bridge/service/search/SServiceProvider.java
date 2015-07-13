@@ -446,7 +446,9 @@ public class SServiceProvider
 				{
 					if(filter==null)
 					{
-						T ser = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope);
+						PlatformServiceRegistry reg = PlatformServiceRegistry.getRegistry(component);
+						T ser = reg==null? null: reg.searchService(type, component.getComponentIdentifier(), scope);
+//						T ser = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope);
 						if(ser!=null)
 						{
 							if(proxy)

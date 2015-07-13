@@ -1,18 +1,27 @@
 package jadex.bridge.service.types.factory;
 
+import java.util.Collection;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.commons.future.IFuture;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  *  Interface for operations on the component to be called from the platform.
  */
 public interface IPlatformComponentAccess
 {
+//	/** The lifecycle state of a component. */
+//	public static enum ComponentLifecycleState
+//	{
+//		CREATE,
+//		INIT,
+//		BODY,
+//		END//,
+////		TERMINATED
+//	};
+	
 	//-------- methods --------
 	
 	/**
@@ -54,4 +63,10 @@ public interface IPlatformComponentAccess
 	 *  @return An internal access exposing user operations of the component.
 	 */
 	public IInternalAccess	getInternalAccess();
+	
+//	/**
+//	 *  Get the lifecycle state. 
+//	 *  @return The lifecycle state
+//	 */
+//	public ComponentLifecycleState getLifecycleState();
 }

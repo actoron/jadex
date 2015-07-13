@@ -21,9 +21,6 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** Attribute for slot state. */
 	protected String state;
 
-	/** Attribute for slot processing state. */
-	protected String processingstate;
-
 	/** Attribute for slot component identifier. */
 	protected IComponentIdentifier name;
 
@@ -141,25 +138,6 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		this.state = state;
 	}
 
-//	/**
-//	 *  Get the processing state of the component.
-//	 *  I.e. ready, running or blocked.
-//	 *  @return The processing state.
-//	 */
-//	public String getProcessingState()
-//	{
-//		return processingstate;
-//	}
-//
-//	/**
-//	 *  Set the processing state of the component.
-//	 * @param processingstate the value to be set
-//	 */
-//	public void setProcessingState(String processingstate)
-//	{
-//		this.processingstate = processingstate;
-//	}
-	
 	/**
 	 *  Get the componentidentifier of this CESComponentDescription.
 	 * @return componentidentifier

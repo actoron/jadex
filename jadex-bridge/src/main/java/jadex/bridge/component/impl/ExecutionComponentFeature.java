@@ -1,5 +1,20 @@
 package jadex.bridge.component.impl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Logger;
+
 import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
@@ -52,21 +67,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadLocalTransferHelper;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.Logger;
-
 /**
  *  This feature provides component step execution.
  */
@@ -91,6 +91,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/** The id of the step at which the execution was stopped because of a breakpoint. */
 	protected int bpstepid = -1;
+	
+	/** The step at which the endstate begins. */
+	protected int endstepcnt = -1;
 	
 	/** The current timer. */
 	protected List<ITimer> timers = new ArrayList<ITimer>();
@@ -119,6 +122,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** The synchronous subcomponents that want to be executed (if any). */
 	protected Set<IInternalExecutionFeature> subcomponents;
 
+	/** Future for signalling that end of agenda execution has been reached. */
+	protected Future<Void> endagenda;
+	
 	//-------- constructors --------
 	
 	/**
@@ -127,29 +133,55 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public ExecutionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
+		this.endagenda = new Future<Void>();
 	}
 	
 	/**
 	 *  Shutdown the feature.
 	 */
-	public IFuture<Void>	shutdown()
+	public IFuture<Void> shutdown()
 	{
-		// Should not wake up all blocked threads at the same time?!
-		// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
-//		if(blocked!=null && blocked.size()>0)
-//			System.out.println("blocked: "+blocked.size());
-		while(blocked!=null && !blocked.isEmpty())
-		{
-			// Unblock throwing thread death as component already has been terminated.
-			unblock(blocked.keySet().iterator().next(), new StepAborted());
-//			unblock(blocked.keySet().iterator().next(), null);
-		}
+		Future<Void> ret = new Future<Void>();
 		
-		if(parenta!=null)
+		// remember cnt when endstate starts
+		this.endstepcnt = stepcnt;
+		
+//		if(getComponent().getComponentIdentifier().equals(getComponent().getComponentIdentifier().getRoot()))
+//			System.out.println("shut platform");
+		
+//		System.out.println("shutdown start: "+getComponent().getComponentIdentifier());
+		
+		endagenda.addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			parenta.removeSubcomponent(this);
-		}
-		return IFuture.DONE;
+			public void customResultAvailable(Void result)
+			{
+//				System.out.println("shutdown end: "+getComponent().getComponentIdentifier());
+				
+				// Should not wake up all blocked threads at the same time?!
+				// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
+//				if(blocked!=null && blocked.size()>0)
+//					System.out.println("blocked: "+blocked.size());
+				while(blocked!=null && !blocked.isEmpty())
+				{
+					// Unblock throwing thread death as component already has been terminated.
+					unblock(blocked.keySet().iterator().next(), new StepAborted());
+//					unblock(blocked.keySet().iterator().next(), null);
+				}
+//				
+				if(parenta!=null)
+				{
+					parenta.removeSubcomponent(ExecutionComponentFeature.this);
+				}
+				
+				super.customResultAvailable(result);
+			}
+		});
+		
+		// ensure that agenda is cleaned up
+		wakeup();
+		
+		return ret;
+//		return IFuture.DONE;
 	}
 	
 	//-------- IComponentFeature interface --------
@@ -516,6 +548,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					available	= false;
+					
 					// Happens during platform bootstrapping -> execute on platform rescue thread.
 					if(!bootstrap)
 					{
@@ -532,7 +566,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 								bootstrap	= false;
 								
 								if(again)
-								{					
+								{		
 									// Bootstrapping finished -> do real kickoff
 									wakeup();
 								}
@@ -910,7 +944,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		synchronized(this)
 		{			
 			if(steps!=null && steps.size()>0) 
-			{
+			{				
 //				if(getComponent().getComponentIdentifier().getName().indexOf("Hello")!=-1)
 //					System.out.println("executing");
 				StepInfo si = steps.first();
@@ -996,7 +1030,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				boolean valid = true;
 				if(step.getStep() instanceof IConditionalComponentStep<?>)
 					valid = ((IConditionalComponentStep<?>)step.getStep()).isValid();
-				if(valid)
+				
+				int endstart = ((IInternalExecutionFeature)getComponent().getComponentFeature(IExecutionFeature.class)).getEndstateStart();
+				boolean stateok  = endstart==-1 || step.getStepCount()>=endstart;
+				
+				if(valid && stateok)
 				{
 					step.getTransfer().afterSwitch();
 //					if(getComponent().getComponentIdentifier().getName().indexOf("Execute")!=-1)
@@ -1005,7 +1043,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else
 				{
-					ex = new RuntimeException("Step invalid.")
+					ex = new RuntimeException(!stateok? "Step omitted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep())
 					{
 						public void printStackTrace() 
 						{
@@ -1118,6 +1156,57 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											// Todo: fail fast vs robust components.
 											
+											SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+												.addResultListener(new IResultListener<IExecutionService>()
+											{
+												public void resultAvailable(IExecutionService exe)
+												{
+													// Hack!!! service is foudn before it is started, grrr.
+													if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+													{
+														if(bootstrap)
+														{
+															// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+															available	= true;
+														}
+														else
+														{
+															exe.execute(ExecutionComponentFeature.this);
+														}
+													}
+													else
+													{
+														exceptionOccurred(null);
+													}
+												}
+												
+												public void exceptionOccurred(Exception exception)
+												{
+													// Happens during platform bootstrapping -> execute on platform rescue thread.
+													if(!bootstrap)
+													{
+														bootstrap	= true;
+														Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+														{
+															public void run()
+															{
+																boolean	again	= true;
+																while(!available && again)
+																{
+																	again	= execute();
+																}
+																bootstrap	= false;
+																
+																if(again)
+																{					
+																	// Bootstrapping finished -> do real kickoff
+																	wakeup();
+																}
+															}
+														});
+													}
+												}
+											});
 											StringWriter	sw	= new StringWriter();
 											exception.printStackTrace(new PrintWriter(sw));
 											getComponent().getLogger().severe("No listener for component step exception: "+step.getStep()+"\n"+sw);
@@ -1233,6 +1322,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				ret	= again || ret;
 			}
 		}
+		
+//		if(endstepcnt!=-1 && getComponent().getComponentIdentifier().equals(getComponent().getComponentIdentifier().getRoot()))
+//			System.out.println("platform: "+steps.size());
+			
+		if(endstepcnt!=-1 && !ret && !endagenda.isDone())
+			endagenda.setResult(null);
 		
 		return ret;
 	}
@@ -1493,6 +1588,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	}
 	
 	/**
+	 *  Get the step number when endstate began.
+	 *  @return The step cnt.
+	 */
+	public int getEndstateStart()
+	{
+		return endstepcnt;
+	}
+	
+	/**
 	 *  Wrap a timer and remove it from the agent when it is cancelled.
 	 */
 	protected class TimerWrapper implements ITimer 
@@ -1631,6 +1735,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		/** The number of the step (preserve insert order of same prio). */
 		protected int stepcnt;
 		
+//		/** The component state (create, init, body, end). */
+//		protected ComponentLifecycleState state;
+		
 //		/**
 //		 *  Create a new StepInfo. 
 //		 */
@@ -1642,7 +1749,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		/**
 		 *  Create a new StepInfo. 
 		 */
-		public StepInfo(IComponentStep<?> step, Future<?> future, ThreadLocalTransferHelper transfer, int priority, int stepcnt)
+		public StepInfo(IComponentStep<?> step, Future<?> future, ThreadLocalTransferHelper transfer, 
+			int priority, int stepcnt)
 		{
 			this.step = step;
 			this.future = future;
@@ -1740,7 +1848,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			this.stepcnt = stepcnt;
 		}
-
+		
+//		/**
+//		 *  Get the state. 
+//		 *  @return The state
+//		 */
+//		public ComponentLifecycleState getState()
+//		{
+//			return state;
+//		}
+//
+//		/**
+//		 *  Set the state.
+//		 *  @param state The state to set
+//		 */
+//		public void setState(ComponentLifecycleState state)
+//		{
+//			this.state = state;
+//		}
+		
 		/**
 		 *  Compare two steps.
 		 */

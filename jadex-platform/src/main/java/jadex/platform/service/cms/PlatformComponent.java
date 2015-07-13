@@ -12,6 +12,7 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPropertiesFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -57,7 +58,7 @@ import java.util.logging.SimpleFormatter;
  *  Standalone platform component implementation.
  */
 public class PlatformComponent implements IPlatformComponentAccess, IInternalAccess
-{
+{	
 	//-------- attributes --------
 	
 	/** The creation info. */
@@ -81,6 +82,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/** The combined value fetcher (cached for speed). */
 	protected IValueFetcher	fetcher;
 	
+//	/** The component lifecycle state (init, body, end). */
+//	protected ComponentLifecycleState state = ComponentLifecycleState.CREATE;
+	
 	//-------- IPlatformComponentAccess interface --------
 	
 	/**
@@ -93,6 +97,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> facs)
 	{
+//		state = ComponentLifecycleState.CREATE;
+		
 		this.info	= info;
 		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
 		this.lfeatures	= new ArrayList<IComponentFeature>();
@@ -116,6 +122,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void>	init()
 	{
+//		state = ComponentLifecycleState.INIT;
+		
 		// Run init on component thread (hack!!! requires that execution feature works before its init)
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
 		return exe.scheduleStep(new ImmediateComponentStep<Void>()
@@ -135,6 +143,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void>	body()
 	{
+//		state = ComponentLifecycleState.BODY;
+		
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
 		return exe.scheduleStep(new IComponentStep<Void>()
 		{
@@ -152,6 +162,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void>	shutdown()
 	{
+//		state = ComponentLifecycleState.END;
+		
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
 		return exe.scheduleStep(new ImmediateComponentStep<Void>()
 		{
@@ -874,6 +886,24 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		return ret;
 	}
 	
+//	/**
+//	 *  Get the lifecycle state. 
+//	 *  @return The lifecycle state
+//	 */
+//	public ComponentLifecycleState getLifecycleState()
+//	{
+//		return state;
+//	}
+	
+	/**
+	 *  Get the step number when endstate began.
+	 *  @return The step cnt.
+	 */
+	public int getEndstateStart()
+	{
+		return ((IInternalExecutionFeature)getComponentFeature(IExecutionFeature.class)).getEndstateStart();
+	}
+
 	/**
 	 *  Get a string representation.
 	 */
