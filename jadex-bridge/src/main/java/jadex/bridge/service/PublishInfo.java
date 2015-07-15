@@ -80,9 +80,9 @@ public class PublishInfo
 		this.pid = pid;
 		this.publishtype = publishtype;
 		this.mapping = mapping==null? null: new ClassInfo(mapping);
+		this.properties = new ArrayList<UnparsedExpression>();
 		if(props!=null)
 		{
-			this.properties = new ArrayList<UnparsedExpression>();
 			for(int i=0; i<props.length; i+=2)
 			{
 				properties.add(new UnparsedExpression((String)props[i],
