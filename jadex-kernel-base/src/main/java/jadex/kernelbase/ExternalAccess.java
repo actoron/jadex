@@ -188,21 +188,21 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
-		System.out.println("exta killComp: "+getComponentIdentifier());
+//		System.out.println("exta killComp: "+getComponentIdentifier());
 		
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
-		ret.addResultListener(new IResultListener<Map<String,Object>>()
-		{
-			public void resultAvailable(Map<String, Object> result)
-			{
-				System.out.println("killComp res");
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("exOcc "+exception);
-			}
-		});
+//		ret.addResultListener(new IResultListener<Map<String,Object>>()
+//		{
+//			public void resultAvailable(Map<String, Object> result)
+//			{
+//				System.out.println("killComp res");
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("exOcc "+exception);
+//			}
+//		});
 		
 		if(!valid)
 		{

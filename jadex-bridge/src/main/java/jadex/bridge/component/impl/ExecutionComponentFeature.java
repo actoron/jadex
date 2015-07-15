@@ -1041,7 +1041,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				// for test execution to ensure that not dropped steps cause problems
 //				stateok = true;
 				
-				if(valid && stateok)
+				if(valid && stateok) 
 				{
 					step.getTransfer().afterSwitch();
 //					if(getComponent().getComponentIdentifier().getName().indexOf("Execute")!=-1)
