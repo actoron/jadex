@@ -164,6 +164,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 //		state = ComponentLifecycleState.END;
 		
+//		System.out.println("shutdown component features start: "+getComponentIdentifier());
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
 		return exe.scheduleStep(new ImmediateComponentStep<Void>()
 		{
@@ -186,6 +187,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					
 					public void proceed(final Exception ex)
 					{
+//						System.out.println("shutdown component features end: "+getComponentIdentifier());
 						if(getComponentFeature0(IMonitoringComponentFeature.class)!=null 
 							&& getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 						{
@@ -354,6 +356,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				getLogger().warning("Exception during component cleanup of "+getComponentIdentifier()+": "+fut.getException());
 				getLogger().info(sw.toString());
 			}
+//			if(getComponentIdentifier().getName().indexOf("Initiator")!=-1)
+//				System.out.println("feature shutdown start: "+getComponentIdentifier()+" "+features.get(features.size()-cnt-1));
+			
 			fut	= features.get(features.size()-cnt-1).shutdown();
 			cnt++;
 		}
@@ -511,7 +516,23 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			this.exception	= e;
 		}
 		IComponentManagementService cms = SServiceProvider.getLocalService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		return cms.destroyComponent(getComponentIdentifier());		
+		IFuture<Map<String, Object>> ret = cms.destroyComponent(getComponentIdentifier());		
+		if(getComponentIdentifier().getParent()==null)
+		{
+			ret.addResultListener(new IResultListener<Map<String,Object>>()
+			{
+				public void resultAvailable(Map<String, Object> result)
+				{
+					System.out.println("ia: "+result);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("ia: "+exception);
+				}
+			});
+		}
+		return ret;
 	}
 	
 	/**

@@ -261,8 +261,10 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 //		final IntermediateFuture ret = new IntermediateFuture();
 		
-//		if("addMessageListener".equals(methodname))
-//			System.out.println("remote addMessageListener");
+		System.out.println("remote invoke: "+methodname);
+		
+//		if(methodname.indexOf("destroy")!=-1)
+//			System.out.println("remote destroyComp");
 		
 		final IComponentIdentifier ridcom = getRealReceiver();
 		

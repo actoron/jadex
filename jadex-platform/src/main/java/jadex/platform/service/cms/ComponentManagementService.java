@@ -1199,9 +1199,9 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
-//		if(cid.getParent()==null)
-//			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
-//		System.out.println("Terminating component1: "+cid.getName());
+		if(cid.getParent()==null)
+			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
+//		System.out.println("Terminating component: "+cid.getName());
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		System.err.println("kill compo: "+cid+" "+(sc!=null? sc.getCaller(): "null"));
@@ -1229,6 +1229,21 @@ public class ComponentManagementService implements IComponentManagementService
 		if(!contains)
 		{
 			cfs.put(cid, tmp);
+			if(cid.getParent()==null)
+			{
+				tmp.addResultListener(new IResultListener<Map<String,Object>>()
+				{
+					public void resultAvailable(Map<String, Object> result)
+					{
+						System.out.println("res: "+result);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("ex: "+exception);
+					}
+				});
+			}
 //			((CMSComponentDescription)getDescription(cid)).setState(IComponentDescription.STATE_TERMINATING);
 		}
 		
@@ -1827,7 +1842,8 @@ public class ComponentManagementService implements IComponentManagementService
 			CMSComponentDescription desc;
 			Map<String, Object> results = null;
 			logger.info("Terminated component: "+cid.getName());
-//			System.out.println("CleanupCommand: "+cid);
+			if(cid.getParent()==null)
+				System.out.println("CleanupCommand: "+cid);
 //			boolean shutdown = false;
 
 //			System.out.println("CleanupCommand remove called for: "+cid);
@@ -1859,12 +1875,12 @@ public class ComponentManagementService implements IComponentManagementService
 				if(padesc!=null)
 				{
 					padesc.removeChild(desc.getName());
-//							if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+//					if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
 					if(!desc.isDaemon())
-//							if(padesc.isAutoShutdown() && !desc.isDaemon())
+//					if(padesc.isAutoShutdown() && !desc.isDaemon())
 					{
 						Integer	childcount	= (Integer)childcounts.get(padesc.getName());
-//								assert childcount!=null && childcount.intValue()>0;
+//						assert childcount!=null && childcount.intValue()>0;
 						if(childcount!=null)
 						{
 							int cc = childcount.intValue()-1;
@@ -1872,7 +1888,7 @@ public class ComponentManagementService implements IComponentManagementService
 								childcounts.put(padesc.getName(), Integer.valueOf(cc));
 							else
 								childcounts.remove(padesc.getName());
-//									System.out.println("childcount-: "+padesc.getName()+" "+cc);
+//							System.out.println("childcount-: "+padesc.getName()+" "+cc);
 						}
 						// todo: could fail when parent is still in init phase. 
 						// Should test for init phase and remember that it has to be killed.

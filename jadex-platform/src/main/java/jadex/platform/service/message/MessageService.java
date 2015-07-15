@@ -399,8 +399,8 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			public void customResultAvailable(final ClassLoader cl)
 			{
-//						System.err.println("send msg3: "+sender+" "+msg.get(SFipa.CONTENT));
-//						System.out.println("on1: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+//				System.err.println("send msg3: "+sender+" "+msg.get(SFipa.CONTENT));
+//				System.out.println("on1: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 				
 				if(loc!=null && IComponentIdentifier.LOCAL.get()!=null && !loc.equals(IComponentIdentifier.LOCAL.get()))
 				{

@@ -87,6 +87,9 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> shutdown()
 	{
+//		if(getComponent().getComponentIdentifier().getName().indexOf("Initiator")!=-1)
+//			System.out.println("lifecycle feature shutdown start: "+getComponent().getComponentIdentifier());
+			
 		final Future<Void> ret = new Future<Void>();
 		invokeMethod(getComponent(), AgentKilled.class, null).addResultListener(new IResultListener<Void>()
 		{
@@ -102,6 +105,9 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			
 			protected void proceed(Exception e)
 			{
+//				if(getComponent().getComponentIdentifier().getName().indexOf("Initiator")!=-1)
+//					System.out.println("lifecycle feature shutdown end: "+getComponent().getComponentIdentifier());
+				
 				try
 				{
 					MicroModel micromodel = (MicroModel)getComponent().getModel().getRawModel();
