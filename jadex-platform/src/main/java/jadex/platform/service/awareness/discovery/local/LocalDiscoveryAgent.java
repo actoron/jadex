@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  Agent providing local discovery using the file system.
@@ -146,18 +147,34 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				{
 					public void run()
 					{
+						final Exception[] ex = new Exception[1];
 						try
 						{
-							Method takemethod = wsclazz.getMethod("take", (Class<?>[]) null);
-							while (true)
+							Method pollmethod = wsclazz.getMethod("poll", (Class<?>[])new Class[]{long.class, TimeUnit.class});
+							while(ex[0]==null)
 							{
-								takemethod.invoke(watchservice, (Object[]) null);
+								final Object val = pollmethod.invoke(watchservice, (Object[])new Object[]{5l, TimeUnit.SECONDS});
+								// Test if agent is alive in intervals and end thread otherwise
+//								System.out.println("pollend: "+val);
 								ea.scheduleStep(new IComponentStep<Void>()
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										scan();
+//										System.out.println("poll in agent: "+val);
+										// only scan if call was due to new watchkey
+										if(val!=null)
+											scan();
 										return IFuture.DONE;
+									}
+								}).addResultListener(new IResultListener<Void>()
+								{
+									public void resultAvailable(Void result)
+									{
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										ex[0] = exception;
 									}
 								});
 							}

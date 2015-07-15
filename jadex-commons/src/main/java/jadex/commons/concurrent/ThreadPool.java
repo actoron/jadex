@@ -1,11 +1,5 @@
 package jadex.commons.concurrent;
 
-import jadex.commons.DefaultPoolStrategy;
-import jadex.commons.IPoolStrategy;
-import jadex.commons.SReflect;
-import jadex.commons.collection.ArrayBlockingQueue;
-import jadex.commons.collection.IBlockingQueue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import jadex.commons.ChangeEvent;
+import jadex.commons.DefaultPoolStrategy;
+import jadex.commons.IChangeListener;
+import jadex.commons.IPoolStrategy;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.collection.ArrayBlockingQueue;
+import jadex.commons.collection.IBlockingQueue;
 
 /**
  *  A thread pool manages pool and saves resources
@@ -121,6 +124,13 @@ public class ThreadPool implements IThreadPool
 	
 	/** The time a task should maximum wait. */
 	protected long maxwait;
+	
+	
+	/** The finished listeners. */
+	protected List<IChangeListener<Void>> listeners; 
+	
+	/** Boolean if already finished. */
+	protected boolean finished;
 	
 	//-------- constructors --------
 
@@ -255,9 +265,32 @@ public class ThreadPool implements IThreadPool
 			this.timer.cancel();
 		}
 		
-		while(!pool.isEmpty())
+		// Must not remove thread, removes itself
+//		while(!pool.isEmpty())
+//		{
+//			ServiceThread thread = (ServiceThread)pool.remove(0);
+//			synchronized(thread)
+//			{
+//				thread.terminated = true;
+//				thread.notify();
+//			}
+//		}
+//		
+//		while(!parked.isEmpty())
+//		{
+//			ServiceThread thread = (ServiceThread)parked.remove(0);
+//			synchronized(thread)
+//			{
+//				thread.terminated = true;
+//				thread.notify();
+//			}
+//		}
+		
+		ServiceThread[] pots = pool.toArray(new ServiceThread[pool.size()]);
+		ServiceThread[] pts = parked.toArray(new ServiceThread[parked.size()]);
+		
+		for(ServiceThread thread: pots)
 		{
-			ServiceThread thread = (ServiceThread)pool.remove(0);
 			synchronized(thread)
 			{
 				thread.terminated = true;
@@ -265,9 +298,8 @@ public class ThreadPool implements IThreadPool
 			}
 		}
 		
-		while(!parked.isEmpty())
+		for(ServiceThread thread: pts)
 		{
-			ServiceThread thread = (ServiceThread)parked.remove(0);
 			synchronized(thread)
 			{
 				thread.terminated = true;
@@ -373,7 +405,39 @@ public class ThreadPool implements IThreadPool
 		}
 		return ret;
 	}
-
+	
+	/**
+	 *  Add a finish listener;
+	 */
+	public synchronized void addFinishListener(IChangeListener<Void> listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList<IChangeListener<Void>>();
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Notify the finish listeners.
+	 */
+	protected void notifyFinishListeners()
+	{
+		IChangeListener<Void>[] lisar;
+		synchronized(this)
+		{
+			lisar = listeners==null? null: listeners.toArray(new IChangeListener[listeners.size()]);
+		}
+		
+		// Do not notify listeners in synchronized block
+		if(lisar!=null)
+		{
+			ChangeEvent<Void> ce = new ChangeEvent<Void>(null);
+			for(IChangeListener<Void> lis: lisar)
+			{
+				lis.changeOccurred(ce);
+			}
+		}
+	}
+	
 	//-------- inner classes --------
 
 	/**
@@ -541,22 +605,32 @@ public class ThreadPool implements IThreadPool
 		}
 		
 		/**
-		 * 
+		 *  Remove the service thread from the pool.
 		 */
 		protected void remove()
 		{
-//			System.out.println("thread terminating: "+this);
-			
 			terminated = true;
+			boolean notify = false;
 			
 			synchronized(ThreadPool.this)
 			{
 //				System.out.println("readded: "+this);
 				pool.remove(this);
 				parked.remove(this);
+				
+//				System.out.println("thread terminating: "+this+" "+pool.size()+" "+parked.size());
+				
+				if(!finished && pool.size()==0 && parked.size()==0)
+				{
+					finished = true;
+					notify = true;
+//					System.out.println("pool terminated: "+ThreadPool.this);
+				}
 			}
+			
+			if(notify)
+				notifyFinishListeners();
 		}
-		
 
 		/**
 		 *  Get the runnable (the task).

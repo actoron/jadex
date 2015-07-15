@@ -4,7 +4,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -46,8 +50,18 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 	 */
 	public synchronized IFuture<Void>	shutdownService()
 	{
+//		System.out.println("start fini: "+threadpool+" "+Thread.currentThread());
+		final Future<Void> ret = new Future<Void>();
+		threadpool.addFinishListener(new IChangeListener<Void>()
+		{
+			public void changeOccurred(ChangeEvent<Void> event)
+			{
+//				System.out.println("end fini: "+threadpool+" "+Thread.currentThread());
+				ThreadPoolService.super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
 		threadpool.dispose();
-		return super.shutdownService();
+		return ret;
 	}
 	
 	/**
@@ -76,5 +90,13 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 	public boolean	isRunning()
 	{
 		return threadpool.isRunning();
+	}
+	
+	/**
+	 *  Add a finished listener.
+	 */
+	public void addFinishListener(IChangeListener<Void> listener)
+	{
+		threadpool.addFinishListener(listener);
 	}
 }

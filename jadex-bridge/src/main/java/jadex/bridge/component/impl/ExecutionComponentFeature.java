@@ -1031,8 +1031,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(step.getStep() instanceof IConditionalComponentStep<?>)
 					valid = ((IConditionalComponentStep<?>)step.getStep()).isValid();
 				
+				// Prio steps are always ok?!
 				int endstart = ((IInternalExecutionFeature)getComponent().getComponentFeature(IExecutionFeature.class)).getEndstateStart();
-				boolean stateok  = endstart==-1 || step.getStepCount()>=endstart;
+				boolean stateok  = priostep || endstart==-1 || step.getStepCount()>=endstart;
+				
+				if(!stateok)
+					System.out.println("dropping step: "+step.getStep());
 				
 				if(valid && stateok)
 				{

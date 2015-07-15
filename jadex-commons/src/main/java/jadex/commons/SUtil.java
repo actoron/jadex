@@ -4808,4 +4808,20 @@ public class SUtil
 			return Collections.emptySet();
 		}
 	}
+	
+	/**
+	 *  Helper method to allow iterating over possibly null maps.
+	 */
+	public static <K, E> Map<K, E>	safeMap(Map<K, E> map)
+	{
+		if(map!=null)
+		{
+			return map;
+		}
+		else
+		{
+			return Collections.emptyMap();
+		}
+	}
+	
 }
