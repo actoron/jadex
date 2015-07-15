@@ -19,8 +19,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Arrays;
@@ -37,6 +35,8 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
+import org.glassfish.grizzly.http.util.Header;
+import org.glassfish.grizzly.http.util.HttpStatus;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpContainer;
@@ -233,6 +233,28 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 //		
 //		return IFuture.DONE;
 //	}
+	
+	/**
+	 *  Publish permanent redirect.
+	 */
+	public IFuture<Void> publishRedirect(URI uri, final String html)
+	{
+		HttpServer server = getHttpServer(uri, null);
+		
+		System.out.println("Publishing redir: " + uri.toString() + " " + html);
+		HttpHandler redh	= new HtmlHandler()
+	    {
+	    	public void service(Request request, Response response)
+	    	{
+	    		response.setStatus(HttpStatus.MOVED_PERMANENTLY_301);
+	    		response.setHeader(Header.Location, html);
+	    	}
+	    };
+	    ServerConfiguration sc = server.getServerConfiguration();
+		sc.addHttpHandler(redh, uri.getPath());
+		
+		return IFuture.DONE;
+	}
 	
 	/**
 	 *  Publish an html page.

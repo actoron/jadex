@@ -17,6 +17,11 @@ public interface IWebPublishService extends IPublishService
 //	public IFuture<Void> publishServet(URI uri, Object servlet);
 //	
 	/**
+	 *  Publish permanent redirect.
+	 */
+	public IFuture<Void> publishRedirect(URI uri, final String html);
+	
+	/**
 	 *  Publish a static page (without ressources).
 	 */
 	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
