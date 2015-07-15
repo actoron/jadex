@@ -261,7 +261,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 //		final IntermediateFuture ret = new IntermediateFuture();
 		
-		System.out.println("remote invoke: "+methodname);
+//		System.out.println("remote invoke: "+methodname);
 		
 //		if(methodname.indexOf("destroy")!=-1)
 //			System.out.println("remote destroyComp");

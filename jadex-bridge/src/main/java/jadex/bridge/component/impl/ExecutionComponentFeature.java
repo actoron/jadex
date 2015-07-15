@@ -1038,7 +1038,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(!stateok)
 					System.out.println("dropping step: "+step.getStep());
 
-				stateok = true;
+				// for test execution to ensure that not dropped steps cause problems
+//				stateok = true;
 				
 				if(valid && stateok)
 				{

@@ -62,6 +62,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -1199,8 +1200,8 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
-		if(cid.getParent()==null)
-			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
+//		if(cid.getParent()==null)
+//			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
 //		System.out.println("Terminating component: "+cid.getName());
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
@@ -1229,21 +1230,21 @@ public class ComponentManagementService implements IComponentManagementService
 		if(!contains)
 		{
 			cfs.put(cid, tmp);
-			if(cid.getParent()==null)
-			{
-				tmp.addResultListener(new IResultListener<Map<String,Object>>()
-				{
-					public void resultAvailable(Map<String, Object> result)
-					{
-						System.out.println("res: "+result);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						System.out.println("ex: "+exception);
-					}
-				});
-			}
+//			if(cid.getParent()==null)
+//			{
+//				tmp.addResultListener(new IResultListener<Map<String,Object>>()
+//				{
+//					public void resultAvailable(Map<String, Object> result)
+//					{
+//						System.out.println("res: "+result);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println("ex: "+exception);
+//					}
+//				});
+//			}
 //			((CMSComponentDescription)getDescription(cid)).setState(IComponentDescription.STATE_TERMINATING);
 		}
 		
@@ -1842,8 +1843,8 @@ public class ComponentManagementService implements IComponentManagementService
 			CMSComponentDescription desc;
 			Map<String, Object> results = null;
 			logger.info("Terminated component: "+cid.getName());
-			if(cid.getParent()==null)
-				System.out.println("CleanupCommand: "+cid);
+//			if(cid.getParent()==null)
+//				System.out.println("CleanupCommand: "+cid);
 //			boolean shutdown = false;
 
 //			System.out.println("CleanupCommand remove called for: "+cid);
@@ -1940,6 +1941,9 @@ public class ComponentManagementService implements IComponentManagementService
 			// Terminate rescue threads when platform is killed (hack, starter should use kill listener, but listener isn't registered in cms)
 			if(cid.getParent()==null)
 			{
+				// In case of stack compaction it has to be ensured that listeners are
+				// notified before the rescue thread is terminated
+				FutureHelper.notifyStackedListeners();
 				Starter.shutdownRescueThread(cid);
 			}
 			

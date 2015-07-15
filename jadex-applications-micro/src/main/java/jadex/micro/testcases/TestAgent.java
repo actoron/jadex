@@ -82,18 +82,18 @@ public abstract class TestAgent
 		}
 		platforms	= null;
 		
-		ret.addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				System.out.println("finiii");
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("exxx");
-			}
-		});
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("finiii");
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("exxx");
+//			}
+//		});
 		
 		return ret;
 	}

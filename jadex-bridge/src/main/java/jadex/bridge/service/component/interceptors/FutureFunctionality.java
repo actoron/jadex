@@ -2098,6 +2098,7 @@ class DelegatingFuture extends Future<Object>
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! functionality failed -> should change result of future to failure?
+//				System.out.println("Exception when notifying: "+exception+" "+listener);
 				func.getLogger().warning("Exception when notifying: "+exception);
 				DelegatingFuture.super.notifyListener(listener);
 			}

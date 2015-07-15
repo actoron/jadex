@@ -62,6 +62,8 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 		{
 			public void customResultAvailable(Void result)
 			{
+//				if(sic.getMethod().getName().indexOf("destroy")!=-1)
+//					System.out.println("hhhhuuuuu");
 //				System.out.println("method call lis end: "+sic.hashCode());
 				Object	res	= sic.getResult();
 				if(res instanceof IIntermediateFuture)

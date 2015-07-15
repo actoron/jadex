@@ -1,6 +1,5 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -381,8 +380,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 			final Object	res	= sic.getResult();
 			
-//			if(sic.getMethod().getName().equals("test"))
-//				System.out.println("heererrere");
+//			if(sic.getMethod().getName().equals("destroyComponent"))
+//				System.out.println("decoupling: "+sic.getArguments());
 			
 			if(res instanceof IFuture)
 			{

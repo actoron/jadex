@@ -517,21 +517,21 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		IComponentManagementService cms = SServiceProvider.getLocalService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IFuture<Map<String, Object>> ret = cms.destroyComponent(getComponentIdentifier());		
-		if(getComponentIdentifier().getParent()==null)
-		{
-			ret.addResultListener(new IResultListener<Map<String,Object>>()
-			{
-				public void resultAvailable(Map<String, Object> result)
-				{
-					System.out.println("ia: "+result);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					System.out.println("ia: "+exception);
-				}
-			});
-		}
+//		if(getComponentIdentifier().getParent()==null)
+//		{
+//			ret.addResultListener(new IResultListener<Map<String,Object>>()
+//			{
+//				public void resultAvailable(Map<String, Object> result)
+//				{
+//					System.out.println("ia: "+result);
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					System.out.println("ia: "+exception);
+//				}
+//			});
+//		}
 		return ret;
 	}
 	
