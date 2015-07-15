@@ -240,9 +240,19 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	public IFuture<Void> publishRedirect(URI uri, final String html)
 	{
 		HttpServer server = getHttpServer(uri, null);
+		ServerConfiguration sc = server.getServerConfiguration();
 		
-		System.out.println("Publishing redir: " + uri.toString() + " " + html);
-		HttpHandler redh	= new HtmlHandler()
+		Map<HttpHandler, String[]>	handlers	= sc.getHttpHandlers();
+        for(Map.Entry<HttpHandler, String[]> entry: handlers.entrySet())
+        {
+    		if(Arrays.asList(entry.getValue()).contains(uri.getPath()))
+    		{
+    			sc.removeHttpHandler((HttpHandler)entry.getKey());
+        		break;
+    		}
+        }
+		
+		HttpHandler redh	= new HttpHandler()
 	    {
 	    	public void service(Request request, Response response)
 	    	{
@@ -250,7 +260,6 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	    		response.setHeader(Header.Location, html);
 	    	}
 	    };
-	    ServerConfiguration sc = server.getServerConfiguration();
 		sc.addHttpHandler(redh, uri.getPath());
 		
 		return IFuture.DONE;
