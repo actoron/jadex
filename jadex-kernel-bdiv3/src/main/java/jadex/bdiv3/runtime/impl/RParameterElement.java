@@ -22,6 +22,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 				{
 					if(vals!=null && vals.containsKey(mparam.getName()) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
 					{
-						addParameterSet(createParameterSet(mparam, mparam.getName(), getAgent(), (Object[])vals.get(mparam.getName())));
+						addParameterSet(createParameterSet(mparam, mparam.getName(), getAgent(), vals.get(mparam.getName())));
 					}
 					else
 					{
@@ -145,7 +146,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 	/**
 	 * 
 	 */
-	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, Object[] values)
+	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, Object values)
 	{
 		return new RParameterSet(modelelement, name, agent, values, getModelElement().getName());
 	}
@@ -283,6 +284,18 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
+		public RParameter(MParameter modelelement, String name, IInternalAccess agent, String pename)
+		{
+			super(modelelement, agent);
+			this.name = name!=null? name: modelelement.getName();
+			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), (MParameter)getModelElement());
+		}
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
 		public RParameter(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher, String pename)
 		{
 			super(modelelement, agent);
@@ -294,7 +307,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			{
 				this.inival	= inival;
 			}
-
+			
 			setValue(evaluateValue(inival));
 		}
 		
@@ -309,6 +322,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			this.name = name!=null? name: modelelement.getName();
 			// RParameterElement.this.getName()
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), (MParameter)getModelElement());
+			
 			setValue(value);
 		}
 
@@ -344,10 +358,18 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		/**
 		 *  Evaluate the (initial or default or pull) value.
 		 */
-		protected Object	evaluateValue(UnparsedExpression inival)
+		protected Object evaluateValue(UnparsedExpression inival)
 		{
 			UnparsedExpression uexp = inival!=null ? inival : getModelElement()!=null ? ((MParameter)getModelElement()).getDefaultValue() : null;
 			return uexp!=null ? SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(fetcher) : null;
+		}
+		
+		/**
+		 *  Test if this parameter has a default value.
+		 */
+		protected boolean hasDefaultValue()
+		{
+			return getModelElement()!=null && ((MParameter)getModelElement()).getDefaultValue()!=null;
 		}
 	}
 
@@ -373,12 +395,34 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent, Object[] vals, String pename)
+		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent, String pename)
+		{
+			super(modelelement, agent);
+			this.name = name!=null?name: modelelement.getName();
+		}
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent, Object vals, String pename)
 		{
 			super(modelelement, agent);
 			
 			this.name = name!=null?name: modelelement.getName();
-			setValues(new ListWrapper<Object>(vals!=null? SUtil.arrayToList(vals): new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+pename+"."+getName(), 
+			
+			List<Object> inivals = new ArrayList<Object>();
+			if(vals!=null)
+			{
+				Iterator<?>	it	= SReflect.getIterator(vals);
+				while(it.hasNext())
+				{
+					inivals.add(it.next());
+				}
+			}
+			
+			setValues(new ListWrapper<Object>(vals!=null? inivals: new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+pename+"."+getName(), 
 				ChangeEvent.VALUEREMOVED+"."+pename+"."+getName(), ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), getModelElement()));
 		}
 		

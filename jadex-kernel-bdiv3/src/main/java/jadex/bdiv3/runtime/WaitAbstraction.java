@@ -1,12 +1,12 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.model.MElement;
-import jadex.bdiv3.model.MInternalEvent;
-import jadex.bdiv3.model.MMessageEvent;
-import jadex.bdiv3.runtime.impl.RElement;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.runtime.impl.RElement;
+import jadex.bdiv3x.features.BDIXMessageComponentFeature;
+import jadex.bdiv3x.runtime.RMessageEvent;
 
 /**
  *  Object that indicates on which elements a plan is waiting. 
@@ -22,6 +22,9 @@ public class WaitAbstraction
 	/** The event types. */
 	protected Set<String> changeeventtypes;
 	
+	/** The reply elements. */
+	protected Set<RMessageEvent> replyelements;
+	
 //	/**
 //	 *  Add a message event.
 //	 *  @param type The type.
@@ -31,18 +34,30 @@ public class WaitAbstraction
 //		addModelElement(mevent);
 //	}
 	
-//	/**
-//	 *  Add a message event reply.
-//	 *  @param me The message event.
-//	 */
-//	public void addReply(RMessageEvent mevent)
-//	{
-//		if(runtimeelements==null)
-//		{
-//			runtimeelements = new HashSet<RElement>();
-//		}
-//		runtimeelements.add(mevent);
-//	}
+	/**
+	 *  Add a message event reply.
+	 *  @param me The message event.
+	 */
+	public void addReply(RMessageEvent event)
+	{
+		if(replyelements==null)
+		{
+			replyelements = new HashSet<RMessageEvent>();
+		}
+		replyelements.add(event);
+	}
+	
+	/**
+	 *  Add a message event reply.
+	 *  @param me The message event.
+	 */
+	public void removeReply(RMessageEvent event)
+	{
+		if(replyelements!=null)
+		{
+			replyelements.remove(event);
+		}
+	}
 
 //	/**
 //	 *  Add an internal event.
@@ -315,8 +330,19 @@ public class WaitAbstraction
 				ret = changeeventtypes.contains(type+"."+src);
 			}
 		}
+		if(!ret && replyelements!=null)
+		{
+			if(procelem instanceof RMessageEvent)
+			{
+				for(RMessageEvent msg: replyelements)
+				{
+					ret = BDIXMessageComponentFeature.isReply(msg, (RMessageEvent)procelem);
+					if(ret)
+						break;
+				}
+			}
+		}
 		
 		return ret;
 	}
-
 }

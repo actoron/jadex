@@ -59,23 +59,11 @@
 		<achievegoal name="tests_finished">
 			<creationcondition language="jcl">
 				$beliefbase.testcase_cnt==$beliefbase.reports.length
-				
-				// ?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))
-				// ?mbel_off = (mbelief (melement_has_name "off"))
-				// ?rbel_rep = (beliefset (element_has_model ?mbel_rep) (beliefset_has_facts $?reports))
-				// ?mbel_rep = (mbeliefset (melement_has_name "reports"))
-				// ?rbel_cnt = (belief (element_has_model ?mbel_cnt) (belief_has_fact == (jadex.rules.rulesystem.rules.functions.Length $?reports)))
-				// ?mbel_cnt = (mbelief (melement_has_name "testcase_cnt"))
 			</creationcondition>		
 		</achievegoal>
 		<achievegoal name="test_timeout">
 			<creationcondition language="jcl">
 				$beliefbase.timeout_failure
-				
-				// ?rbel_off = (belief (element_has_model ?mbel_off) (belief_has_fact false))
-				// ?mbel_off = (mbelief (melement_has_name "off"))
-				// ?rbel_tof = (belief (element_has_model ?mbel_tof) (belief_has_fact true))
-				// ?mbel_tof = (mbelief (melement_has_name "timeout_failure"))
 			</creationcondition>		
 		</achievegoal>
 	</goals>

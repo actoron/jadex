@@ -41,6 +41,7 @@ public class AnswerPlan	extends Plan
 		{
 			IMessageEvent	answer	= getEventbase().createReply(event, "inform");
 			answer.getParameter(SFipa.CONTENT).setValue(""+i);
+//			System.out.println("Sending answer "+i+".");
 			getLogger().info("Sending answer "+i+".");
 			sendMessage(answer).get();
 			if(delay>0)

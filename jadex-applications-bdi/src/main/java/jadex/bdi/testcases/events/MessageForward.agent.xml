@@ -61,7 +61,7 @@
 
 	<properties>
 		<!--<property name="debugging">true</property>-->
-		<!-- <property name="logging.level">Level.WARNING</property> -->
+		<property name="logging.level">Level.WARNING</property>
 	</properties>
 
 	<configurations>

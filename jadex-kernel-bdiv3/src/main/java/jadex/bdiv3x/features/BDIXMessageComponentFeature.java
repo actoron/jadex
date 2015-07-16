@@ -1,5 +1,13 @@
 package jadex.bdiv3x.features;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MMessageEvent;
@@ -19,20 +27,17 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.collection.WeakList;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  *  Extension to allow message injection in agent methods.
+ *  
+ *  // todo: call registerMessageEvent in sendMessage() methods
  */
 public class BDIXMessageComponentFeature extends MessageComponentFeature
 {
@@ -40,6 +45,15 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 	
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIXMessageComponentFeature.class);
+	
+	//-------- attributes --------
+	
+	/** Send message tracking (reply_with->Entry). */
+	//protected Set sent_mevents;
+	protected List<RMessageEvent> sent_mevents;
+	
+	/** The maximum number of outstanding messages. */
+	protected long mevents_max;
 	
 	//-------- constructors --------
 	
@@ -49,6 +63,8 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 	public BDIXMessageComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
+		
+		this.sent_mevents = new WeakList<RMessageEvent>();
 	}
 	
 	//-------- IInternalMessageFeature interface --------
@@ -82,7 +98,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 			
 			MMessageEvent mevent = null;
 			
-//			System.out.println("rec msg: "+message.getMessage());
+			System.out.println("rec msg: "+message.getMessage());
 			
 			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIXAgentFeature.class);
 //			List<MMessageEvent> mevents = bdif.getBDIModel().getCapability().getMessageEvents();
@@ -116,6 +132,9 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 
 			// todo: capabilities
 			degree = matchMessageEvents(message.getParameterMap(), bdif.getBDIModel().getCapability().getMessageEvents(), matched, events, degree, message.getMessageType());
+			
+			// todo: find original message event to know in which scope the
+			// new message event type should be searched
 			
 			// For messages without conversation all capabilities are considered.
 //			if(original==null)
@@ -170,7 +189,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 			
 			if(mevent!=null)
 			{
-				RMessageEvent revent = new RMessageEvent(mevent, message.getParameterMap(), message.getMessageType(), getComponent(), null);
+				RMessageEvent revent = new RMessageEvent(mevent, message.getParameterMap(), message.getMessageType(), getComponent());
 				FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
 				getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
 			}
@@ -387,5 +406,129 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 		}
 
 		return match;
+	}
+	
+	/**
+	 *  Register a conversation or reply-with to be able
+	 *  to send back answers to the source capability.
+	 *  @param msgevent The message event.
+	 *  //@param replywith The reply-with tag.
+	 *  todo: indexing for msgevents for speed.
+	 */
+	protected void registerMessageEvent(RMessageEvent msgevent)
+	{
+		if(mevents_max!=0 && sent_mevents.size()>mevents_max)
+		{
+			getComponent().getLogger().severe("Agent does not save conversation due " +
+				"to too many outstanding messages. Increase buffer in runtime.xml - storedmessages.size");
+		}
+		else
+		{
+			sent_mevents.add(msgevent);
+			//System.out.println("+++"+getScope().getAgent().getName()+" has open conversations: "+sent_mevents.size()+" "+sent_mevents);
+		}
+	}
+	
+	/**
+	 *  Find a message event that the given native message is a reply to.
+	 *  @param message The (native) message.
+	 */
+	public RMessageEvent getInReplyMessageEvent(IMessageAdapter message)
+	{
+		//System.out.println("+++"+getScope().getAgent().getName()+" has open conversations: "+sent_mevents.size()+" "+sent_mevents);
+		
+		RMessageEvent	ret	= null;
+		// Prefer the newest messages for finding replies.
+		// todo: conversations should be better supported
+		RMessageEvent[] smes = (RMessageEvent[])sent_mevents.toArray(new RMessageEvent[0]);
+		
+		for(int i=smes.length-1; ret==null && i>-1; i--)
+		{
+			boolean	match = true; // Does the message match all convid parameters?
+			boolean	matched	= false; // Does the message match at least one (non-null) convid parameter?
+//			MessageType	type = ((MMessageEvent)smes[i].getOriginalElement().getModelElement()).getMessageType();
+			MessageType	type = ((MMessageEvent)smes[i].getModelElement()).getType();
+
+			MessageType.ParameterSpecification[] params = type.getParameters();
+			for(int j=0; match && j<params.length; j++)
+			{
+				if(params[j].isConversationIdentifier())
+				{
+					Object sourceval = smes[i].getParameter(params[j].getSource()).getValue();
+					Object destval = message.getValue(params[j].getName());
+					match = SUtil.equals(sourceval, destval);
+					matched = matched || sourceval!=null;
+				}
+			}
+
+			MessageType.ParameterSpecification[] paramsets = type.getParameterSets();
+			for(int j=0; match && j<paramsets.length; j++)
+			{
+				if(paramsets[j].isConversationIdentifier())
+				{
+					Object sourceval = smes[i].getParameter(paramsets[j].getSource()).getValue();
+					Iterator it2 = SReflect.getIterator(message.getValue(paramsets[j].getName()));
+					while(it2.hasNext())
+					{
+						Object destval = it2.next();
+						match = SUtil.equals(sourceval, destval);
+						matched	= matched || sourceval!=null;
+					}
+				}
+			}
+			
+			if(matched && match)
+			{
+				ret	= smes[i];
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test is a message is a reply of another message.
+	 *  @param message The (native) message.
+	 */
+	public static boolean isReply(RMessageEvent msg, RMessageEvent reply)
+	{
+		//System.out.println("+++"+getScope().getAgent().getName()+" has open conversations: "+sent_mevents.size()+" "+sent_mevents);
+		
+		// Prefer the newest messages for finding replies.
+		// todo: conversations should be better supported
+		boolean	match = true; // Does the message match all convid parameters?
+		boolean	matched	= false; // Does the message match at least one (non-null) convid parameter?
+//		MessageType	type = ((MMessageEvent)smes[i].getOriginalElement().getModelElement()).getMessageType();
+		MessageType	type = ((MMessageEvent)msg.getModelElement()).getType();
+
+		MessageType.ParameterSpecification[] params = type.getParameters();
+		for(int j=0; match && j<params.length; j++)
+		{
+			if(params[j].isConversationIdentifier())
+			{
+				Object sourceval = msg.getParameter(params[j].getSource()).getValue();
+				Object destval = reply.getParameter(params[j].getName()).getValue();
+				match = SUtil.equals(sourceval, destval);
+				matched = matched || sourceval!=null;
+			}
+		}
+
+		MessageType.ParameterSpecification[] paramsets = type.getParameterSets();
+		for(int j=0; match && j<paramsets.length; j++)
+		{
+			if(paramsets[j].isConversationIdentifier())
+			{
+				Object sourceval = msg.getParameter(paramsets[j].getSource()).getValue();
+				Iterator it2 = SReflect.getIterator(reply.getParameter(paramsets[j].getName()).getValue());
+				while(it2.hasNext())
+				{
+					Object destval = it2.next();
+					match = SUtil.equals(sourceval, destval);
+					matched	= matched || sourceval!=null;
+				}
+			}
+		}
+		
+		return matched && match;
 	}
 }

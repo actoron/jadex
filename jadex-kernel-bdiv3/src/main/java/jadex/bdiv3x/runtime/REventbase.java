@@ -1,5 +1,7 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.Map;
+
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
@@ -10,9 +12,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.future.IFuture;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The event base runtime element.
@@ -60,7 +59,7 @@ public class REventbase extends RElement implements IEventbase
 		MMessageEvent mevent = getCapability().getMCapability().getMessageEvent(type);
 		if(mevent==null)
 			throw new RuntimeException("Message event not found: "+type);
-		return new RMessageEvent(mevent, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, getAgent(), null);
+		return new RMessageEvent(mevent, getAgent(), null);
 	}
 
 	/**
@@ -80,7 +79,7 @@ public class REventbase extends RElement implements IEventbase
 		if(mevent==null)
 			throw new RuntimeException("Message event not found: "+msgeventtype);
 		Map<String, Object> rep = event.getMessageType().createReply((Map<String, Object>)event.getMessage());
-		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent(), null);
+		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent());
 	}
 	
 	/**

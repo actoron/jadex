@@ -474,27 +474,38 @@ public abstract class Plan
 		return getExpressionbase().createExpression(exp);
 	}
 	
-//	/**
-//	 *  Send a message and wait for the answer.
-//	 *  @param me The message event.
-//	 *  @return The result event.
-//	 */
-//	public IMessageEvent sendMessageAndWait(IMessageEvent me)
-//	{
-//		return sendMessageAndWait(me, -1);
-//	}
-//
-//	/**
-//	 *  Send a message and wait for the answer.
-//	 *  Adds a reply_with entry if not present, for tracking the conversation.
-//	 *  @param me The message event.
-//	 *  @param timeout The timeout.
-//	 *  @return The result event.
-//	 */
-//	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout)
-//	{
-//		return getEventbase().sendMessageAndWait(me);
-//	}
+	/**
+	 *  Send a message and wait for the answer.
+	 *  @param me The message event.
+	 *  @return The result event.
+	 */
+	public IMessageEvent sendMessageAndWait(IMessageEvent me)
+	{
+		return sendMessageAndWait(me, -1);
+	}
+
+	/**
+	 *  Send a message and wait for the answer.
+	 *  Adds a reply_with entry if not present, for tracking the conversation.
+	 *  @param me The message event.
+	 *  @param timeout The timeout.
+	 *  @return The result event.
+	 */
+	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout)
+	{
+		checkNotInAtomic();
+		
+		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addReply((RMessageEvent)me);
+
+		rplan.setWaitAbstraction(wa);
+		
+		sendMessage(me);
+		
+		Future<IMessageEvent> ret = new Future<IMessageEvent>();
+		return ret.get(timeout);
+	}
 
 	/**
 	 *  Send a message and wait until it is sent.
@@ -1177,13 +1188,14 @@ public abstract class Plan
 			getWaitAbstraction().addModelElement(mevent);
 		}
 		
-//		/**
-//		 *  Add a message event reply.
-//		 *  @param me The message event.
-//		 */
-//		public void addReply(RMessageEvent mevent)
-//		{
-//		}
+		/**
+		 *  Add a message event reply.
+		 *  @param me The message event.
+		 */
+		public void addReply(RMessageEvent mevent)
+		{
+			getWaitAbstraction().addReply(mevent);
+		}
 
 		/**
 		 *  Add an internal event.
@@ -1262,13 +1274,14 @@ public abstract class Plan
 			getWaitAbstraction().removeModelElement(mevent);
 		}
 
-//		/**
-//		 *  Remove a message event reply.
-//		 *  @param me The message event.
-//		 */
-//		public void removeReply(IMessageEvent me)
-//		{
-//		}
+		/**
+		 *  Remove a message event reply.
+		 *  @param me The message event.
+		 */
+		public void removeReply(IMessageEvent me)
+		{
+			getWaitAbstraction().addReply((RMessageEvent)me);
+		}
 
 //		/**
 //		 *  Remove an internal event.
@@ -1325,7 +1338,6 @@ public abstract class Plan
 //		 */
 //		public void	removeExternalCondition(IExternalCondition condition);
 		
-		
 		/**
 		 * 
 		 */
@@ -1341,7 +1353,6 @@ public abstract class Plan
 		{
 			getWaitAbstraction().removeRuntimeElement(relement);
 		}
-		
 		
 		/**
 		 * 

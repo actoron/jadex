@@ -18,12 +18,12 @@ import java.util.NoSuchElementException;
 /**
  *  A list with weak entries.
  */
-public class WeakList implements List, Serializable
+public class WeakList<E> implements List<E>, Serializable
 {
 	//-------- attributes --------
 
 	/** The list of elements. */
-	protected transient Reference[] array;
+	protected transient Reference<E>[] array;
 
 	/** The number of elements. */
 	protected int	size;
@@ -101,16 +101,16 @@ public class WeakList implements List, Serializable
 	 * of concurrent modifications. 
 	 * @return an iterator over the elements in this list in proper sequence.
 	 */
-	public Iterator iterator()
+	public Iterator<E> iterator()
 	{
 		expungeStaleEntries();
 
-		return new Iterator()
+		return new Iterator<E>()
 		{
 			int i	= 0;
 			int	removeindex	= -1;
 			int	startstate	= state;
-			Object	next	= null;
+			E	next	= null;
 			
 			public boolean hasNext()
 			{
@@ -131,10 +131,10 @@ public class WeakList implements List, Serializable
 				return next!=null;
 			}
 			
-			public Object next()
+			public E next()
 			{
 				// Find next element.
-				Object	ret;
+				E	ret;
 				if(hasNext())
 					ret	= next;
 				else
@@ -255,7 +255,7 @@ public class WeakList implements List, Serializable
 	 * @throws IllegalArgumentException if some aspect of this element
 	 * prevents it from being added to this list.
 	 */
-	public boolean add(Object o)
+	public boolean add(E o)
 	{
 		expungeStaleEntries();
 
@@ -460,11 +460,11 @@ public class WeakList implements List, Serializable
 	 * @throws IndexOutOfBoundsException if the index is out of range (index
 	 * &lt; 0 || index &gt;= size()).
 	 */
-	public Object get(int index)
+	public E get(int index)
 	{
 		expungeStaleEntries();
 
-		Object	ret;
+		E	ret;
 		// Hack !!! Throws array index out of bounds with different index than in parameter!?
 		while((ret=array[index++].get())==null);
 		return ret;
@@ -566,11 +566,11 @@ public class WeakList implements List, Serializable
 	 * @throws IndexOutOfBoundsException if the index is out of range (index
 	 * &lt; 0 || index &gt;= size()).
 	 */
-	public Object remove(int index)
+	public E remove(int index)
 	{
 		expungeStaleEntries();
 
-		Object	ret;
+		E	ret;
 		// Hack !!! Throws array index out of bounds with different index than in parameter!?
 		while((ret=array[index].get())==null)
 			index++;
@@ -637,7 +637,7 @@ public class WeakList implements List, Serializable
 	 * @return a list iterator of the elements in this list (in proper
 	 *         sequence).
 	 */
-	public ListIterator listIterator()
+	public ListIterator<E> listIterator()
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -656,7 +656,7 @@ public class WeakList implements List, Serializable
 	 * @throws IndexOutOfBoundsException if the index is out of range (index
 	 * &lt; 0 || index &gt; size()).
 	 */
-	public ListIterator listIterator(int index)
+	public ListIterator<E> listIterator(int index)
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -693,7 +693,7 @@ public class WeakList implements List, Serializable
 	 * @throws IndexOutOfBoundsException for an illegal endpoint index value
 	 * (fromIndex &lt; 0 || toIndex &gt; size || fromIndex &gt; toIndex).
 	 */
-	public List subList(int fromIndex, int toIndex)
+	public List<E> subList(int fromIndex, int toIndex)
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -734,7 +734,7 @@ public class WeakList implements List, Serializable
 
 	//-------- serialization handling --------
 
-	protected List	serialized_list;
+	protected List<E>	serialized_list;
 	
 	/**
 	 *  Perform special handling on serialization.
@@ -747,7 +747,7 @@ public class WeakList implements List, Serializable
 		this.serialized_list	= SCollection.createLinkedList();
 		for(int i=0; i<size; i++)
 		{
-			Object	next = array[i].get();
+			E	next = array[i].get();
 			if(next!=null)
 				serialized_list.add(next);
 		}
@@ -763,7 +763,7 @@ public class WeakList implements List, Serializable
 		// Use min size 10 of buffer to allow expanding with length*2.
 		this.array	= new Reference[Math.max(serialized_list.size(), 10)];
 		this.queue	= new ReferenceQueue();
-		Iterator it=serialized_list.iterator();
+		Iterator<E> it=serialized_list.iterator();
 		for(int i=0; it.hasNext(); i++)
 		{
 			array[i]	= new WeakReference(it.next(), queue);
