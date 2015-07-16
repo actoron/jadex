@@ -32,17 +32,17 @@ public interface IPlanbase extends IElement
 		
 	//-------- listeners --------
 	
-	/**
-	 *  Add a plan listener.
-	 *  @param type	The goal type.
-	 *  @param listener The plan listener.
-	 */
-	public <T> void addPlanListener(String type, IPlanListener<T> listener);	
-	
-	/**
-	 *  Remove a goal listener.
-	 *  @param type	The goal type.
-	 *  @param listener The goal listener.
-	 */
-	public <T> void removePlanListener(String type, IPlanListener<T> listener);
+//	/**
+//	 *  Add a plan listener.
+//	 *  @param type	The goal type.
+//	 *  @param listener The plan listener.
+//	 */
+//	public <T> void addPlanListener(String type, IPlanListener<T> listener);	
+//	
+//	/**
+//	 *  Remove a goal listener.
+//	 *  @param type	The goal type.
+//	 *  @param listener The goal listener.
+//	 */
+//	public <T> void removePlanListener(String type, IPlanListener<T> listener);
 }

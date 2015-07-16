@@ -22,14 +22,14 @@ public class WaitAbstraction
 	/** The event types. */
 	protected Set<String> changeeventtypes;
 	
-	/**
-	 *  Add a message event.
-	 *  @param type The type.
-	 */
-	public void addMessageEvent(MMessageEvent mevent)
-	{
-		addModelElement(mevent);
-	}
+//	/**
+//	 *  Add a message event.
+//	 *  @param type The type.
+//	 */
+//	public void addMessageEvent(MMessageEvent mevent)
+//	{
+//		addModelElement(mevent);
+//	}
 	
 //	/**
 //	 *  Add a message event reply.
@@ -44,14 +44,14 @@ public class WaitAbstraction
 //		runtimeelements.add(mevent);
 //	}
 
-	/**
-	 *  Add an internal event.
-	 *  @param type The type.
-	 */
-	public void addInternalEvent(MInternalEvent mevent)
-	{
-		addModelElement(mevent);
-	}
+//	/**
+//	 *  Add an internal event.
+//	 *  @param type The type.
+//	 */
+//	public void addInternalEvent(MInternalEvent mevent)
+//	{
+//		addModelElement(mevent);
+//	}
 	
 //	/**
 //	 *  Add a goal.
@@ -119,14 +119,14 @@ public class WaitAbstraction
 
 	//-------- remover methods --------
 
-	/**
-	 *  Remove a message event.
-	 *  @param type The type.
-	 */
-	public void removeMessageEvent(MMessageEvent mevent)
-	{
-		removeModelElement(mevent);
-	}
+//	/**
+//	 *  Remove a message event.
+//	 *  @param type The type.
+//	 */
+//	public void removeMessageEvent(MMessageEvent mevent)
+//	{
+//		removeModelElement(mevent);
+//	}
 
 //	/**
 //	 *  Remove a message event reply.
@@ -198,7 +198,7 @@ public class WaitAbstraction
 	/**
 	 * 
 	 */
-	protected void addModelElement(MElement melement)
+	public void addModelElement(MElement melement)
 	{
 		if(melement==null)
 			throw new IllegalArgumentException("Element must not null.");
@@ -213,7 +213,7 @@ public class WaitAbstraction
 	/**
 	 * 
 	 */
-	protected void removeModelElement(MElement melement)
+	public void removeModelElement(MElement melement)
 	{
 		if(melement==null)
 			throw new IllegalArgumentException("Element must not null.");

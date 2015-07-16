@@ -9,8 +9,8 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
-import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCondition;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -180,6 +180,48 @@ public abstract class Plan
 	}
 	
 	/**
+	 *  Wait for a goal.
+	 *  @param type The goal type.
+	 */
+	public IGoal waitForGoal(String type)
+	{
+		return waitForGoal(type, -1);
+	}
+
+	/**
+	 *  Wait for a goal.
+	 *  @param type The goal type.
+	 *  @param timeout The timeout.
+	 */
+	public IGoal waitForGoal(String type, long timeout)
+	{
+		checkNotInAtomic();
+		
+		final Future<IGoal> ret = new Future<IGoal>();
+		
+		BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
+		// todo: add capability name of scope
+		MGoal mgoal = model.getCapability().getGoal(type);
+		if(mgoal==null)
+			throw new RuntimeException("Unknown goal type: "+mgoal);
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addModelElement(mgoal);
+		
+
+		IGoal res = (IGoal)rplan.getFromWaitqueue(wa);
+		if(res!=null)
+		{
+			return res;
+		}
+		else
+		{
+			// todo: add scope name if is in capa
+			rplan.setWaitAbstraction(wa);
+			return ret.get(timeout);
+		}
+	}
+		
+	/**
 	 *  Wait for a goal to be finished.
 	 *  @param goal The goal.
 	 */
@@ -246,7 +288,7 @@ public abstract class Plan
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		MMessageEvent mevent = bdif.getBDIModel().getCapability().getMessageEvent(type);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addMessageEvent(mevent);
+		wa.addModelElement(mevent);
 
 		IMessageEvent res = (IMessageEvent)rplan.getFromWaitqueue(wa);
 		if(res!=null)
@@ -304,7 +346,7 @@ public abstract class Plan
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		MInternalEvent mevent = bdif.getBDIModel().getCapability().getInternalEvent(type);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addInternalEvent(mevent);
+		wa.addModelElement(mevent);
 
 		IInternalEvent res = (IInternalEvent)rplan.getFromWaitqueue(wa);
 		if(res!=null)
@@ -619,14 +661,14 @@ public abstract class Plan
 		return getCapability().getGoalbase();
 	}
 
-//	/**
-//	 *  Get the plan base.
-//	 *  @return The plan base.
-//	 */
-//	public IPlanbase getPlanbase()
-//	{
-//		getCapability().getPlanbase();
-//	}
+	/**
+	 *  Get the plan base.
+	 *  @return The plan base.
+	 */
+	public IPlanbase getPlanbase()
+	{
+		return getCapability().getPlanbase();
+	}
 
 	/**
 	 *  Get the event base.
@@ -945,6 +987,15 @@ public abstract class Plan
 	 */
 	public void waitForCondition(String name)
 	{
+		waitForCondition(name, -1);
+	}
+	
+	/**
+	 *  Wait for a condition.
+	 *  @param name The name of the condition.
+	 */
+	public void waitForCondition(String name, long timeout)
+	{
 		checkNotInAtomic();
 		
 		final IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
@@ -973,7 +1024,7 @@ public abstract class Plan
 		});
 		rule.setEvents(mcond.getEvents());
 		bdif.getRuleSystem().getRulebase().addRule(rule);
-		ret.get();
+		ret.get(timeout);
 	}
 	
 	/**
@@ -1029,7 +1080,65 @@ public abstract class Plan
 			MInternalEvent ievent = model.getCapability().getInternalEvent(event);
 			if(ievent==null)
 				throw new RuntimeException("Unknown internal event: "+event);
-			getWaitAbstraction().addInternalEvent(ievent);
+			getWaitAbstraction().addModelElement(ievent);
+		}
+		
+		/**
+		 *  Remove an internal event.
+		 *  @param type The type.
+		 */
+		public void removeInternalEvent(String event)
+		{
+			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
+			// todo: add capability name of scope
+			MInternalEvent ievent = model.getCapability().getInternalEvent(event);
+			if(ievent==null)
+				throw new RuntimeException("Unknown internal event: "+event);
+			getWaitAbstraction().removeModelElement(ievent);
+		}
+		
+		/**
+		 *  Add a message event.
+		 *  @param type The type.
+		 */
+		public void addMessageEvent(String event)
+		{
+			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
+			// todo: add capability name of scope
+			MMessageEvent mevent = model.getCapability().getMessageEvent(event);
+			if(mevent==null)
+				throw new RuntimeException("Unknown message event: "+event);
+			getWaitAbstraction().addModelElement(mevent);
+		}
+		
+		/**
+		 *  Remove a message event.
+		 *  @param type The type.
+		 */
+		public void removeMessageEvent(String event)
+		{
+			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
+			// todo: add capability name of scope
+			MMessageEvent mevent = model.getCapability().getMessageEvent(event);
+			if(mevent==null)
+				throw new RuntimeException("Unknown message event: "+event);
+			getWaitAbstraction().removeModelElement(mevent);
+		}
+		
+		/**
+		 *  Add the goal to wait for.
+		 */
+		public void addGoal(IGoal goal)
+		{
+			getWaitAbstraction().addRuntimeElement((RElement)goal);
+		}
+		
+		/**
+		 *  Remove the goal to wait for.
+		 */
+		public void removeGoal(IGoal goal)
+		{
+			getWaitAbstraction().removeRuntimeElement((RElement)goal);
 		}
 		
 		/**
@@ -1065,7 +1174,7 @@ public abstract class Plan
 		 */
 		public void addMessageEvent(MMessageEvent mevent)
 		{
-			getWaitAbstraction().addMessageEvent(mevent);
+			getWaitAbstraction().addModelElement(mevent);
 		}
 		
 //		/**
@@ -1082,7 +1191,7 @@ public abstract class Plan
 		 */
 		public void addInternalEvent(MInternalEvent mevent)
 		{
-			getWaitAbstraction().addInternalEvent(mevent);
+			getWaitAbstraction().addModelElement(mevent);
 		}
 		
 //		/**
@@ -1150,7 +1259,7 @@ public abstract class Plan
 		 */
 		public void removeMessageEvent(MMessageEvent mevent)
 		{
-			getWaitAbstraction().removeMessageEvent(mevent);
+			getWaitAbstraction().removeModelElement(mevent);
 		}
 
 //		/**

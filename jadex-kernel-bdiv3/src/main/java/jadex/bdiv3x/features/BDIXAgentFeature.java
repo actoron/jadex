@@ -1,5 +1,17 @@
 package jadex.bdiv3x.features;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -35,6 +47,7 @@ import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.REventbase;
 import jadex.bdiv3x.runtime.RExpressionbase;
 import jadex.bdiv3x.runtime.RGoalbase;
+import jadex.bdiv3x.runtime.RPlanbase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -78,18 +91,6 @@ import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.Event;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  *  BDI agent feature version for XML agents.
@@ -163,6 +164,9 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		
 		RGoalbase gb = new RGoalbase(getComponent());
 		getCapability().setGoalbase(gb);
+		
+		RPlanbase pb = new RPlanbase(getComponent());
+		getCapability().setPlanbase(pb);
 
 		REventbase evb = new REventbase(getComponent());
 		getCapability().setEventbase(evb);

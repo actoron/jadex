@@ -337,7 +337,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				for(MMessageEvent mevent: mevents)
 				{
 					WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
-					wa.addMessageEvent(mevent);
+					wa.addModelElement(mevent);
 				}
 			}
 		}

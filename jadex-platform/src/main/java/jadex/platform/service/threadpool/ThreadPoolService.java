@@ -1,6 +1,9 @@
 package jadex.platform.service.threadpool;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -57,9 +60,20 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 			public void changeOccurred(ChangeEvent<Void> event)
 			{
 //				System.out.println("end fini: "+threadpool+" "+Thread.currentThread());
-				ThreadPoolService.super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret));
+				ThreadPoolService.super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret, true));
 			}
 		});
+		
+		getInternalAccess().getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// terminate waiting for threadpool if still no notifaction
+				ret.setResultIfUndone(null);
+				return IFuture.DONE;
+			}
+		}, 8000);
+		
 		threadpool.dispose();
 		return ret;
 	}

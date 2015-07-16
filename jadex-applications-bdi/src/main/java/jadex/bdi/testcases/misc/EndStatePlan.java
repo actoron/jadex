@@ -80,7 +80,7 @@ public class EndStatePlan extends Plan
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
-		IDF df = (IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IDF df = (IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "endstate_testservice", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		

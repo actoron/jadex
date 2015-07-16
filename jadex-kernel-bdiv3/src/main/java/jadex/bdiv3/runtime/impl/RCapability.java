@@ -10,6 +10,7 @@ import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.REventbase;
 import jadex.bdiv3x.runtime.RExpressionbase;
 import jadex.bdiv3x.runtime.RGoalbase;
+import jadex.bdiv3x.runtime.RPlanbase;
 import jadex.bridge.IInternalAccess;
 
 import java.util.Collection;
@@ -67,6 +68,9 @@ public class RCapability extends RElement
 	
 	/** The eventbase. */
 	protected REventbase eventbase;
+	
+	/** The planbase. */
+	protected RPlanbase planbase;
 	
 	//-------- constructors --------
 	
@@ -440,6 +444,24 @@ public class RCapability extends RElement
 	public void setGoalbase(RGoalbase goalbase)
 	{
 		this.goalbase = goalbase;
+	}
+	
+	/**
+	 *  Get the planbase. 
+	 *  @return The planbase
+	 */
+	public RPlanbase getPlanbase()
+	{
+		return planbase;
+	}
+
+	/**
+	 *  Set the planbase.
+	 *  @param planbase The planbase to set
+	 */
+	public void setPlanbase(RPlanbase planbase)
+	{
+		this.planbase = planbase;
 	}
 
 	/**
