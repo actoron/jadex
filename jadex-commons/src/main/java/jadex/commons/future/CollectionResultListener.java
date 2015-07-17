@@ -33,20 +33,10 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new collection listener that uses default exception handling/logging.
-	 *  @param num The expected number of results.
-	 *  @param resultDelegate	The functional delegate result listener.
-	 */
-	public CollectionResultListener(int num, IFunctionalResultListener<Collection<E>> resultDelegate)
-	{
-		this(num, resultDelegate, null);
-	}
-	
-	/**
 	 *  Create a new collection listener.
 	 *  @param num The expected number of results.
 	 *  @param resultDelegate	The functional delegate result listener.
-	 * @param exceptionDelegate The functional delegate exception listener.
+	 *  @param exceptionDelegate The functional delegate exception listener.
 	 *        Passing <code>null</code> enables default exception logging.
 	 */
 	public CollectionResultListener(int num, IFunctionalResultListener<Collection<E>> resultDelegate, IFunctionalExceptionListener exceptionDelegate)

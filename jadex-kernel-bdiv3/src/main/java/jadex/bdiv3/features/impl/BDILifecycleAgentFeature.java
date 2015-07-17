@@ -1,5 +1,14 @@
 package jadex.bdiv3.features.impl;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
@@ -24,6 +33,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.EasyDeliberationStrategy;
 import jadex.bdiv3.runtime.IDeliberationStrategy;
 import jadex.bdiv3.runtime.impl.APL;
+import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
@@ -54,6 +64,7 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -72,15 +83,6 @@ import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.CombinedCondition;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
@@ -755,9 +757,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										return IFuture.DONE;
 									}
 								});
-								
-								if(events.contains(null))
-									System.out.println("hererrerer");
 								
 								rule.setEvents(events);
 								rulesystem.getRulebase().addRule(rule);
@@ -1454,22 +1453,50 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				
 				IAction<Void> createplan = new IAction<Void>()
 				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+					public IFuture<Void> execute(final IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						// Create all binding plans
-						List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mplan, component.getFetcher());
-						if(bindings!=null && bindings.size()>0)
+						List<MPlanInfo> cands = APL.createMPlanCandidates(component, mplan, RBeliefbase.getFetcher(component, mplan));
+
+						final CollectionResultListener<MPlanInfo> lis = new CollectionResultListener<MPlanInfo>(cands.size(), 
+							new IResultListener<Collection<MPlanInfo>>()
 						{
-							for(Map<String, Object> binding: bindings)
+							public void resultAvailable(Collection<MPlanInfo> result)
 							{
-								RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, binding, null);
-								RPlan.executePlan(rplan, component);
+								for(MPlanInfo mplaninfo: result)
+								{
+									RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, mplaninfo.getBinding(), null);
+									RPlan.executePlan(rplan, component);
+								}
 							}
-						}
-						else
+							
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+						});
+						
+						for(final MPlanInfo mplan: cands)
 						{
-							RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, null, null);
-							RPlan.executePlan(rplan, component);
+							// check precondition
+							APL.checkMPlan(component, mplan, null).addResultListener(new IResultListener<Boolean>()
+							{
+								public void resultAvailable(Boolean result)
+								{
+									if(result.booleanValue())
+									{
+										lis.resultAvailable(mplan);
+									}
+									else
+									{
+										lis.exceptionOccurred(null);
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									lis.exceptionOccurred(exception);
+								}
+							});
 						}
 						
 						return IFuture.DONE;

@@ -333,7 +333,7 @@ public class APL
 		
 		for(final MPlanInfo mplan: precandidates)
 		{
-			checkMPlan(ia, mplan).addResultListener(new IResultListener<Boolean>()
+			checkMPlan(ia, mplan, element).addResultListener(new IResultListener<Boolean>()
 			{
 				public void resultAvailable(Boolean result)
 				{
@@ -361,7 +361,7 @@ public class APL
 	 *  Test precondition (and match expression) of a plan to decide
 	 *  if it can be added to the candidates.
 	 */
-	protected IFuture<Boolean> checkMPlan(IInternalAccess ia, MPlanInfo mplaninfo) //, IValueFetcher fetcher
+	public static IFuture<Boolean> checkMPlan(IInternalAccess ia, MPlanInfo mplaninfo, RProcessableElement element) //, IValueFetcher fetcher
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		boolean	valid	= true;

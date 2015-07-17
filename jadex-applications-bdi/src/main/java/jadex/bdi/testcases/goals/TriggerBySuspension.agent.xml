@@ -78,18 +78,23 @@
 			</parameter>
 			<body class="StoreReportPlan"/>
 			<trigger>
-				<condition goals="cnt">
+				<condition rawevents="goalsuspended.cnt"> <!-- goals="cnt" -->
 					true
 				</condition>
 			</trigger>
 			<!-- Hack!!! Triggers more than once. -->
-			<contextcondition>
+			<precondition>
 				$beliefbase.reports.length &lt; 1
-			</contextcondition>
+			</precondition>
+			<!-- todo: check context condition initially? -->
+			<!--  <contextcondition>
+				$beliefbase.reports.length &lt; 1
+			</contextcondition>-->
 		</plan>
 	</plans>
 	
 	<properties>
+		<property name="logging.level">java.util.logging.Level.INFO</property>
 		<property name="debugging">false</property>
 	</properties>
 	
