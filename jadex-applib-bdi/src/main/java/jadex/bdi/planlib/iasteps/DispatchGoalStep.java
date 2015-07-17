@@ -1,12 +1,14 @@
 package jadex.bdi.planlib.iasteps;
 
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,10 +54,10 @@ public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 	
 	public IFuture<Map<String, Object>> execute(IInternalAccess ia)
 	{
-		final IGoal goal = ((IBDIInternalAccess) ia).getGoalbase().createGoal(goaltype);
-		if (parameters != null)
+		final IGoal goal = ia.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().createGoal(goaltype);
+		if(parameters != null)
 		{
-			for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); )
+			for(Iterator it = parameters.entrySet().iterator(); it.hasNext(); )
 			{
 				Map.Entry paramEntry = (Map.Entry) it.next();
 				goal.getParameter((String) paramEntry.getKey()).setValue(paramEntry.getValue());
@@ -63,18 +65,30 @@ public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 		}
 		
 		final Future<IParameter[]> goalFuture = new Future<IParameter[]>();
-		goal.addGoalListener(new IGoalListener()
+//		goal.addGoalListener(new IGoalListener()
+//		{
+//			public void goalFinished(AgentEvent ae)
+//			{
+//				goalFuture.setResult(goal.getParameters());
+//			}
+//			
+//			public void goalAdded(AgentEvent ae)
+//			{
+//			}
+//		});
+		ia.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)
+		.addResultListener(new IResultListener<Object>()
 		{
-			public void goalFinished(AgentEvent ae)
+			public void exceptionOccurred(Exception exception)
+			{
+				goalFuture.setException(goal.getException());
+			}
+			
+			public void resultAvailable(Object result)
 			{
 				goalFuture.setResult(goal.getParameters());
 			}
-			
-			public void goalAdded(AgentEvent ae)
-			{
-			}
 		});
-		((IBDIInternalAccess) ia).getGoalbase().dispatchTopLevelGoal(goal);
 		
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		goalFuture.addResultListener(new DefaultResultListener<IParameter[]>()

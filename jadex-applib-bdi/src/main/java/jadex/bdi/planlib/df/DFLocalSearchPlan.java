@@ -29,7 +29,7 @@ public class DFLocalSearchPlan extends Plan
 		// todo: support remote search (search on all DFs on remote platforms also).
 		if(remote)
 			throw new UnsupportedOperationException("Remote DF search not yet implemented.");
-		IFuture ret = ((IDF)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("df").get()).search(desc, con);
+		IFuture ret = ((IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("df").get()).search(desc, con);
 		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get();
 		
 		getParameterSet("result").addValues(result);

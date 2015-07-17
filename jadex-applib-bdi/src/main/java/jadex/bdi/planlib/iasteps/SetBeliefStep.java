@@ -1,5 +1,6 @@
 package jadex.bdi.planlib.iasteps;
 
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IBeliefbase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -36,7 +37,7 @@ public class SetBeliefStep implements IComponentStep<Void>
 	
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
-		IBeliefbase bb = ((IBDIInternalAccess) ia).getBeliefbase();
+		IBeliefbase bb = ia.getComponentFeature(IBDIXAgentFeature.class).getBeliefbase();
 		for (Iterator it = beliefs.entrySet().iterator(); it.hasNext(); )
 		{
 			Map.Entry entry = (Map.Entry) it.next();

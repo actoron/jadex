@@ -6,6 +6,7 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
 
 import java.util.List;
 

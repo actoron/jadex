@@ -20,7 +20,7 @@ public class CMSLocalGetExternalAccessPlan extends Plan
 
 		try
 		{
-			IFuture fut = ((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).getExternalAccess(aid);
+			IFuture fut = ((IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).getExternalAccess(aid);
 			Object ret = fut.get();
 			getParameter("result").setValue(ret);
 		}

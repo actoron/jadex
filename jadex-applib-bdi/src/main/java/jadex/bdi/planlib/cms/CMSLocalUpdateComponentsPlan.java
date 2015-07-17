@@ -1,5 +1,6 @@
 package jadex.bdi.planlib.cms;
 
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
@@ -31,7 +32,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	 */
 	public void body()
 	{
-		final IComponentManagementService	ces	= (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
+		final IComponentManagementService	ces	= (IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 		this.listener	= new ICMSComponentListener()
 		{
 			public IFuture componentAdded(final IComponentDescription desc)
@@ -43,7 +44,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 						@Classname("addFact")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").addFact(desc);
+							ia.getComponentFeature(IBDIXAgentFeature.class).getBeliefbase().getBeliefSet("components").addFact(desc);
 							return IFuture.DONE;
 						}
 					});
@@ -64,7 +65,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 						@Classname("removeFact")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").removeFact(desc);
+							ia.getComponentFeature(IBDIXAgentFeature.class).getBeliefbase().getBeliefSet("components").removeFact(desc);
 							return IFuture.DONE;
 						}
 					});

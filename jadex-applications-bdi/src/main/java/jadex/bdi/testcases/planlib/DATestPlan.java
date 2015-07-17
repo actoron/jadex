@@ -1,15 +1,17 @@
 package jadex.bdi.testcases.planlib;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
+import jadex.bdi.planlib.protocols.AuctionDescription;
+import jadex.bdi.planlib.protocols.ExponentialPriceCalculator;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Tests the dutch auction protocol with one initiator and four bidders with

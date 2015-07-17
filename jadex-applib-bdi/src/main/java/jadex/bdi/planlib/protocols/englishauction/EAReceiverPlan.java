@@ -8,6 +8,7 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.TimeoutException;
 
 import java.util.List;
 

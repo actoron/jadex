@@ -1,5 +1,6 @@
 package jadex.bdi.examples.booktrading.buyer;
 
+import jadex.bdi.planlib.protocols.ParticipantProposal;
 import jadex.bdiv3x.runtime.Plan;
 
 import java.util.ArrayList;

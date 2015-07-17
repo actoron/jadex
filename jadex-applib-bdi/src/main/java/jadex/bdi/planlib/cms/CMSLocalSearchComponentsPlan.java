@@ -23,7 +23,7 @@ public class CMSLocalSearchComponentsPlan extends Plan
 		boolean remote = getParameter("remote").getValue()!=null? 
 			((Boolean)getParameter("remote").getValue()).booleanValue(): false;
 		
-		IFuture ret = ((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get())
+		IFuture ret = ((IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get())
 			.searchComponents(desc, constraints, remote);
 		IComponentDescription[]	result =  (IComponentDescription[])ret.get();
 		for(int i=0; i<result.length; i++)

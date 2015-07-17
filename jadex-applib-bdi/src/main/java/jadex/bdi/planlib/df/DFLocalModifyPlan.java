@@ -27,7 +27,7 @@ public class DFLocalModifyPlan extends Plan
 		// When AID is ommited, enter self. Hack???
 		if(desc.getName()==null || lt!=null)
 		{
-			IDF	dfservice	= (IDF)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("df").get();
+			IDF	dfservice	= (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("df").get();
 			IComponentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getComponentIdentifier();
 			Date	leasetime	= lt==null ? desc.getLeaseTime() : new Date(getTime()+lt.longValue());
 			desc	= dfservice.createDFComponentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);
@@ -38,7 +38,7 @@ public class DFLocalModifyPlan extends Plan
 		// Throws exception, when not registered.
 		try
 		{
-			IFuture ret = ((IDF)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("df").get()).modify(desc);
+			IFuture ret = ((IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("df").get()).modify(desc);
 			ret.get();
 		}
 		catch(Exception e)

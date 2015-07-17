@@ -1,10 +1,12 @@
 package jadex.bdi.testcases.planlib;
 
 import jadex.base.test.TestReport;
+import jadex.bdi.planlib.protocols.InteractionState;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  Test different cases of protocol cancellation.

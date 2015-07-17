@@ -9,6 +9,7 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
 
 import java.util.HashMap;
 import java.util.Iterator;

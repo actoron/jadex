@@ -1,15 +1,19 @@
 package jadex.bdi.testcases.planlib;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
+import jadex.bdi.planlib.protocols.IProposalEvaluator;
+import jadex.bdi.planlib.protocols.NegotiationRecord;
+import jadex.bdi.planlib.protocols.ParticipantProposal;
+import jadex.bdi.planlib.protocols.ProposalEvaluator;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Test the cnp protocol execution.

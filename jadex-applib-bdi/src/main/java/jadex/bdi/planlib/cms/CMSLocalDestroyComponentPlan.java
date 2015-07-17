@@ -21,7 +21,7 @@ public class CMSLocalDestroyComponentPlan extends Plan
 
 		try
 		{
-			IFuture ret = ((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).destroyComponent(cid);
+			IFuture ret = ((IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).destroyComponent(cid);
 			ret.get();
 		}
 		catch(Exception e)

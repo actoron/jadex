@@ -40,7 +40,7 @@ public class PurchaseBookPlan extends Plan
 			+ order.getStartPrice();
 
 		// Find available seller agents.
-		IBuyBookService[]	services	= getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
+		IBuyBookService[] services = getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
 		if(services.length == 0)
 		{
 //			System.out.println("No seller found, purchase failed.");

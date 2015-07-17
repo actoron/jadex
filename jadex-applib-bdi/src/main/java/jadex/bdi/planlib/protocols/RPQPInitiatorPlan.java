@@ -3,6 +3,7 @@ package jadex.bdi.planlib.protocols;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
 
 
 /**

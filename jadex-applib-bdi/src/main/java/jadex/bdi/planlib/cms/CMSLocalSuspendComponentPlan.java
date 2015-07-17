@@ -19,7 +19,7 @@ public class CMSLocalSuspendComponentPlan extends Plan
 	{
 		IComponentIdentifier	cid	= (IComponentIdentifier)getParameter("componentidentifier").getValue();
 	
-		IFuture ret =((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).suspendComponent(cid);
+		IFuture ret =((IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).suspendComponent(cid);
 		IComponentDescription desc = (IComponentDescription)ret.get();
 		
 		getParameter("componentdescription").setValue(desc);

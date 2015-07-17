@@ -19,7 +19,7 @@ public class CMSLocalResumeComponentPlan extends Plan
 	{	
 		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("componentidentifier").getValue();
 		
-		IFuture ret = ((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).resumeComponent(aid);
+		IFuture ret = ((IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).resumeComponent(aid);
 		IComponentDescription desc =  (IComponentDescription) ret.get();
 		
 		getParameter("componentdescription").setValue(desc);
