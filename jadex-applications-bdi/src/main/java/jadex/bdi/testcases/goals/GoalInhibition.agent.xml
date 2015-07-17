@@ -92,7 +92,7 @@
 	
 	<properties>
 		<property name="debugging">false</property>
-		<!-- <property name="logging.level">Level.INFO</property> -->
+		<property name="logging.level">Level.INFO</property>
 	</properties>
 
 	<configurations>

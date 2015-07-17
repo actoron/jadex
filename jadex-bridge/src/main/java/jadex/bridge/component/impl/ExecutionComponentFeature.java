@@ -1291,7 +1291,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			stepfut.setResult(null);
 		}
-		
+				
 		// Reset execution state.
 		IComponentIdentifier.LOCAL.set(null);
 		IInternalExecutionFeature.LOCAL.set(null);
@@ -1330,11 +1330,19 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 		}
 		
+		if(endstepcnt!=-1 && !ret && !endagenda.isDone())
+		{
+			this.componentthread	= Thread.currentThread();
+			this.executing = true;
+			
+			endagenda.setResult(null);
+			
+			this.componentthread = null;
+			this.executing = false;
+		}
+		
 //		if(endstepcnt!=-1 && getComponent().getComponentIdentifier().equals(getComponent().getComponentIdentifier().getRoot()))
 //			System.out.println("platform: "+steps.size());
-			
-		if(endstepcnt!=-1 && !ret && !endagenda.isDone())
-			endagenda.setResult(null);
 		
 		return ret;
 	}
