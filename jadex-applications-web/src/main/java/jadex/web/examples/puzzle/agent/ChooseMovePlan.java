@@ -1,15 +1,15 @@
 package jadex.web.examples.puzzle.agent;
 
-import jadex.bdi.runtime.ICandidateInfo;
-import jadex.bdi.runtime.IGoal;
+import java.util.ArrayList;
+import java.util.List;
+
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 import jadex.web.examples.puzzle.Board;
 import jadex.web.examples.puzzle.Move;
 import jadex.web.examples.puzzle.Piece;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Meta-level reasoning plan for choosing between applicable plans.

@@ -11,11 +11,11 @@ dependencies
 	compile project(':jadex-kernel-micro')
 	compile project(':jadex-kernel-bpmn')
 	compile project(':jadex-kernel-application')
-	compile project(':jadex-kernel-gpmn')
+//	compile project(':jadex-kernel-gpmn')
 	compile project(':jadex-kernel-component')
-	compile project(':jadex-kernel-bdibpmn')
+//	compile project(':jadex-kernel-bdibpmn')
 	compile project(':jadex-applib-bdi')
-	compile project(':jadex-kernel-bdi')
+//	compile project(':jadex-kernel-bdi')
 	compile project(':jadex-kernel-bdiv3')
 	
 	// Platform

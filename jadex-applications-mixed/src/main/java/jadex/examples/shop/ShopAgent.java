@@ -2,8 +2,11 @@ package jadex.examples.shop;
 
 import jadex.bdi.examples.shop.IShopService;
 import jadex.bdi.examples.shop.ItemInfo;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -19,9 +22,14 @@ import jadex.micro.annotation.Imports;
 	@Argument(name="catalog", clazz=ItemInfo[].class, defaultvalue="new jadex.bdi.examples.shop.ItemInfo[]{new jadex.bdi.examples.shop.ItemInfo(\"Micro turbo\", 99.99, 9)}", description="The catalog of the shop.")
 //	@Argument(name="catalog", clazz=ItemInfo[].class, defaultvalue="new ItemInfo[]{new ItemInfo(\"Micro turbo\", 99.99, 9)}", description="The catalog of the shop.")
 })
-public class ShopAgent extends MicroAgent
+@Agent
+public class ShopAgent //extends MicroAgent
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The money account. */
 	protected double money;
@@ -33,7 +41,9 @@ public class ShopAgent extends MicroAgent
 	 */
 	public IFuture<Void>	agentCreated()
 	{
-		addService("shopservice", IShopService.class, new ShopService(getExternalAccess(), (String)getArgument("name")));
+		agent.getComponentFeature(IProvidedServicesFeature.class)
+			.addService("shopservice", IShopService.class, new ShopService(agent.getExternalAccess(), 
+			(String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("name")));
 		return IFuture.DONE;
 	}
 	
@@ -89,7 +99,7 @@ public class ShopAgent extends MicroAgent
 	 */
 	public ItemInfo[] getCatalog()
 	{
-		ItemInfo[] catalog = (ItemInfo[])getArgument("catalog");
+		ItemInfo[] catalog = (ItemInfo[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("catalog");
 		return catalog!=null? catalog: new ItemInfo[0];
 	}
 	

@@ -1,12 +1,16 @@
 package jadex.web.examples.puzzle.agent;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -14,6 +18,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -28,11 +33,6 @@ import jadex.web.examples.puzzle.IPuzzleService;
 import jadex.web.examples.puzzle.Move;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 /**
  *  Implementation of the puzzle service.
  */
@@ -48,7 +48,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	
 	/** The agent to which the service belongs. */
 	@ServiceComponent
-	protected IBDIInternalAccess	agent;
+	protected IInternalAccess	agent;
 	
 	/** The external access for decoupling settings service calls. */
 	// Hack!!! Remove.
@@ -130,12 +130,38 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		final Future<Move>	ret	= new Future<Move>();
 		final int depth	= board.getMoves().size();
 		
-		final IGoal	goal	= agent.getGoalbase().createGoal("makemove");
+		final IGoal	goal	= agent.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().createGoal("makemove");
 		goal.getParameter("board").setValue(board);
-		goal.getParameter("deadline").setValue(timeout!=-1 ? agent.getTime()+timeout : -1);
-		goal.addGoalListener(new IGoalListener()
+		long time = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+		goal.getParameter("deadline").setValue(timeout!=-1 ? time+timeout : -1);
+//		goal.addGoalListener(new IGoalListener()
+//		{
+//			public void goalFinished(AgentEvent ae)
+//			{
+//				if(board.isSolution())
+//				{
+//					ret.setResult(board.getMoves().get(depth));
+//				}
+//				else if(goal.getException()!=null)
+//				{
+//					ret.setException(goal.getException());
+//				}
+//				else
+//				{
+//					ret.setException(new RuntimeException("timeout"));
+//				}
+//			}
+//			
+//			public void goalAdded(AgentEvent ae)
+//			{
+//				// ignore
+//			}
+//		});
+		
+		agent.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)
+		.addResultListener(new IResultListener<Object>()
 		{
-			public void goalFinished(AgentEvent ae)
+			public void resultAvailable(Object result)
 			{
 				if(board.isSolution())
 				{
@@ -150,13 +176,12 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 					ret.setException(new RuntimeException("timeout"));
 				}
 			}
-			
-			public void goalAdded(AgentEvent ae)
+
+			public void exceptionOccurred(Exception exception)
 			{
-				// ignore
+				System.out.println("ex: "+exception);
 			}
 		});
-		agent.getGoalbase().dispatchTopLevelGoal(goal);
 		return ret;
 	}
 
@@ -245,7 +270,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	public IFuture<Void> setProperties(final Properties props)
 	{
 		// Hack!!! Should be decoupled by platform automatically
-		return exta.scheduleImmediate(new IComponentStep<Void>()
+		return exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -270,7 +295,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	public IFuture<Properties> getProperties()
 	{
 		// Hack!!! Should be decoupled by platform automatically
-		return exta.scheduleImmediate(new IComponentStep<Properties>()
+		return exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Properties>()
 		{
 			public IFuture<Properties> execute(IInternalAccess ia)
 			{
