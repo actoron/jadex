@@ -210,6 +210,9 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(getProcessingState().equals(processingstate))
 			return;
 		
+//		if(this.toString().indexOf("lower")!=-1)
+//			System.out.println("setting proc: "+this+" "+processingstate);
+		
 //		if(getMGoal().getName().indexOf("achievecleanup")!=-1)
 //			System.out.println("proc state: "+processingstate+" "+this);
 		
@@ -327,6 +330,9 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	{
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
+		
+//		if(this.toString().indexOf("docnt")!=-1 && GoalLifecycleState.DROPPING.equals(lifecyclestate))
+//			System.out.println("setting life: "+this+" "+lifecyclestate);
 		
 //		if(this.toString().indexOf("TreatV")!=-1 && ia.getComponentIdentifier().getName().indexOf("Ambu")!=-1) //&& *///GoalLifecycleState.ACTIVE.equals(getLifecycleState())
 //			&& GoalLifecycleState.OPTION.equals(lifecyclestate))
@@ -619,7 +625,11 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public void planFinished(IInternalAccess ia, IInternalPlan rplan)
 	{
+//		if(this.toString().indexOf("docnt")!=-1)
+//			System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
+
 		super.planFinished(ia, rplan);
+
 		childplan = null;
 		
 		if(rplan!=null)
@@ -693,8 +703,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		{
 			setProcessingState(ia, GoalProcessingState.SUCCEEDED);
 		}
-		
-		if(GoalLifecycleState.ACTIVE.equals(getLifecycleState()))
+				
+		if(GoalLifecycleState.ACTIVE.equals(getLifecycleState()) && GoalProcessingState.INPROCESS.equals(getProcessingState()))
 		{
 			if(!isSucceeded() && !isFailed())
 			{
@@ -1029,6 +1039,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //		System.out.println("Goal target triggered: "+RGoal.this);
 		if(getMGoal().getConditions(MGoal.CONDITION_MAINTAIN)!=null)
 		{
+			abortPlans();
 			setProcessingState(ia, GoalProcessingState.IDLE);
 			// Hack! Notify finished listeners to allow for waiting via waitForGoal
 			// Cannot use notifyListeners() because it checks isSucceeded

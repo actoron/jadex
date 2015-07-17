@@ -65,6 +65,8 @@ public abstract class RProcessableElement extends RParameterElement
 	 */
 	public void setApplicablePlanList(APL apl)
 	{
+//		if(apl==null)
+//			System.out.println("set apl to null: "+this);
 		this.apl = apl;
 	}
 
@@ -172,9 +174,12 @@ public abstract class RProcessableElement extends RParameterElement
 	{
 		if(rplan!=null)
 		{
-			addTriedPlan(rplan);
 			if(apl!=null)
+			{
+				addTriedPlan(rplan);
+//				if(apl!=null)
 				apl.planFinished(rplan);
+			}
 		}
 	}
 }

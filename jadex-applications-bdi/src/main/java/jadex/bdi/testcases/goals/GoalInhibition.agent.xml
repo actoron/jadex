@@ -38,7 +38,7 @@
 		<performgoal name="docnt" retry="true" retrydelay="100" exclude="never"/>
 		<maintaingoal name="lowerbounds">
 			<deliberation>
-				<inhibits ref="docnt" inhibit="when_in_process"/>
+				<inhibits ref="docnt"/>
 			</deliberation>
 			<maintaincondition>
 				$beliefbase.count&lt;4
@@ -92,7 +92,7 @@
 	
 	<properties>
 		<property name="debugging">false</property>
-		<property name="logging.level">Level.INFO</property>
+		<!-- <property name="logging.level">Level.INFO</property> -->
 	</properties>
 
 	<configurations>
