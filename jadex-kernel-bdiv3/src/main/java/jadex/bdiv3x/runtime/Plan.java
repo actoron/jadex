@@ -324,6 +324,42 @@ public abstract class Plan
 	}
 	
 	/**
+	 *  Wait for a reply to a message event.
+	 * 	@param event The message event.
+	 *  @param type The reply.
+	 */
+	public IMessageEvent waitForReply(IMessageEvent event)
+	{
+		return waitForReply(event, -1);
+	}
+
+	/**
+	 *  Wait for a reply to a message event.
+	 *  @param event The message event.
+	 *  @param timeout The timeout.
+	 */
+	public IMessageEvent waitForReply(IMessageEvent event, long timeout)
+	{
+		checkNotInAtomic();
+		
+		Future<IMessageEvent> ret = new Future<IMessageEvent>();
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addReply((RMessageEvent)event);
+
+		IMessageEvent res = (IMessageEvent)rplan.getFromWaitqueue(wa);
+		if(res!=null)
+		{
+			return res;
+		}
+		else
+		{
+			// todo: add scope name if is in capa
+			rplan.setWaitAbstraction(wa);
+			return ret.get(timeout);
+		}
+	}
+	
+	/**
 	 *  Wait for an internal event.
 	 *  @param type The internal event type.
 	 */
@@ -1192,9 +1228,9 @@ public abstract class Plan
 		 *  Add a message event reply.
 		 *  @param me The message event.
 		 */
-		public void addReply(RMessageEvent mevent)
+		public void addReply(IMessageEvent mevent)
 		{
-			getWaitAbstraction().addReply(mevent);
+			getWaitAbstraction().addReply((RMessageEvent)mevent);
 		}
 
 		/**
@@ -1339,7 +1375,8 @@ public abstract class Plan
 //		public void	removeExternalCondition(IExternalCondition condition);
 		
 		/**
-		 * 
+		 *  Add a runtime element.
+		 *  @param relement The runtime element.
 		 */
 		public void addRuntimeElement(RElement relement)
 		{
@@ -1347,7 +1384,8 @@ public abstract class Plan
 		}
 		
 		/**
-		 * 
+		 *  Remove a runtime element.
+		 *  @param relement The runtime element.
 		 */
 		public void removeRuntimeElement(RElement relement)
 		{
@@ -1355,7 +1393,8 @@ public abstract class Plan
 		}
 		
 		/**
-		 * 
+		 *  Add a change event type.
+		 *  @param eventtype The change event type.
 		 */
 		public void addChangeEventType(String eventtype)
 		{
@@ -1364,7 +1403,8 @@ public abstract class Plan
 		}
 		
 		/**
-		 * 
+		 *  Remove a change event type.
+		 *  @param eventtype The change event type.
 		 */
 		public void removeChangeEventType(String eventtype)
 		{
@@ -1378,6 +1418,15 @@ public abstract class Plan
 		public boolean isEmpty()
 		{
 			return rplan.getWaitqueue().isEmpty();
+		}
+		
+		/**
+		 *  Get the currently contained elements of the waitqueue.
+		 *  @return The collected elements.
+		 */
+		public Object[] getElements()
+		{
+			return rplan.getWaitqueue().toArray();
 		}
 	}
 }

@@ -5,7 +5,7 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
-import jadex.rules.eca.IEvent;
+import jadex.commons.concurrent.TimeoutException;
 
 
 /**
@@ -88,12 +88,12 @@ public class WaitqueueTestPlan	extends Plan
 		// Now handle the answers (print out).
 		int	cnt	= 0;
 //		IEvent	answer	= waitFor(filter, 100);
-		IEvent answer	= waitForReply(request, 100);
+		IMessageEvent answer = waitForReply(request, 100);
 		
 		while(answer!=null)
 		{
 			cnt++;
-			if(!((IMessageEvent)answer).getParameter(SFipa.CONTENT).getValue().equals(""+cnt))
+			if(!(answer.getParameter(SFipa.CONTENT).getValue().equals(""+cnt)))
 			{
 				success	= false;
 				getLogger().severe("Wrong answer #"+cnt+" received: " + answer);
