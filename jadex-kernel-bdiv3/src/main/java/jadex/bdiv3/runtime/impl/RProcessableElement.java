@@ -176,8 +176,9 @@ public abstract class RProcessableElement extends RParameterElement
 		{
 			if(apl!=null)
 			{
+				// do not add tried plan if apl is already reset because procedural
+				// goal semantics is wrong otherwise (isProceduralSucceeded)
 				addTriedPlan(rplan);
-//				if(apl!=null)
 				apl.planFinished(rplan);
 			}
 		}
