@@ -850,7 +850,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 					}
 					else if(ChangeEvent.FACTREMOVED.equals(event.getType().getType(0)))
 					{
-						listener.factAdded((ChangeInfo)event.getContent());
+						listener.factRemoved((ChangeInfo)event.getContent());
 					}
 					else if(ChangeEvent.FACTCHANGED.equals(event.getType().getType(0)))
 					{

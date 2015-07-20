@@ -1,5 +1,7 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import jadex.bdiv3.annotation.PlanAPI;
@@ -8,6 +10,7 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MGoal;
@@ -44,8 +47,10 @@ import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.ChangeInfo;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -961,7 +966,6 @@ public abstract class Plan
 		else
 		{
 			final Future<Object> ret = new Future<Object>();
-//			IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
 			IBeliefListener<Object> lis = new BeliefAdapter<Object>()
 			{
 				public void factAdded(ChangeInfo<Object> info)
@@ -1008,7 +1012,6 @@ public abstract class Plan
 		else
 		{
 			final Future<Void> ret = new Future<Void>();
-//			IBDIXAgentFeature bdif = agent.getComponentFeature(IBDIXAgentFeature.class);
 			IBeliefListener<Object> lis = new BeliefAdapter<Object>()
 			{
 				public void factRemoved(ChangeInfo<Object> info)
@@ -1070,6 +1073,53 @@ public abstract class Plan
 			}
 		});
 		rule.setEvents(mcond.getEvents());
+		bdif.getRuleSystem().getRulebase().addRule(rule);
+		ret.get(timeout);
+	}
+	
+	/**
+	 *  Wait for a condition.
+	 *  @param name The name of the condition.
+	 */
+	public void waitForConditionInline(String expr)
+	{
+		waitForConditionInline(expr, -1);
+	}
+	
+	/**
+	 *  Wait for a condition.
+	 *  @param name The name of the condition.
+	 */
+	public void waitForConditionInline(final String expr, long timeout)
+	{
+		checkNotInAtomic();
+		
+		final UnparsedExpression uexp = new UnparsedExpression(null, expr);
+		final IParsedExpression exp = SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), 
+			getAgent().getClassLoader());
+		List<EventType> events = new ArrayList<EventType>();
+		BDIAgentFeature.addExpressionEvents(uexp, events, rplan.getModelElement());
+		
+		final IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		final Future<Void> ret = new Future<Void>();
+		Rule<Void> rule = new Rule<Void>("plan_condition_"+rplan.getId()+"_"+expr, new ICondition()
+		{
+			public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+			{
+				Boolean ret = (Boolean)exp.getValue(getAgent().getFetcher());				
+				return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
+			}
+		}, new IAction<Void>()
+		{
+			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+			{
+				// Remove rule and continue after wait
+				bdif.getRuleSystem().getRulebase().removeRule(rule.getName());
+				ret.setResult(null);
+				return IFuture.DONE;
+			}
+		});
+		rule.setEvents(events);
 		bdif.getRuleSystem().getRulebase().addRule(rule);
 		ret.get(timeout);
 	}

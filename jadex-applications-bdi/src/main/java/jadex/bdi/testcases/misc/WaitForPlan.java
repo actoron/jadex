@@ -107,28 +107,30 @@ public class WaitForPlan extends Plan	//implements Runnable
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
 		
-//		report	= new TestReport("condition", "Waiting for a condition to become true.");
-//		oldt = ((Long)getBeliefbase().getBelief("time").getFact()).longValue();
-//		try
-//		{
-//			waitForCondition("$beliefbase.time>"+(oldt+100)+"L", 3000);
-//			long newt = ((Long)getBeliefbase().getBelief("time").getFact()).longValue();
-//			if(newt>oldt+100)
-//				report.setSucceeded(true);
-//			else
-//				report.setReason("Condition does not hold.");
-//		}
-//		catch(TimeoutException e)
-//		{
-//			report.setReason("Timeout occurred.");
-//		}
-//		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
-//		//System.out.println(i++);
+		report	= new TestReport("condition", "Waiting for a condition to become true.");
+		oldt = ((Long)getBeliefbase().getBelief("time").getFact()).longValue();
+		try
+		{
+			waitForConditionInline("$beliefbase.time>"+(oldt+100)+"L", 3000);
+			long newt = ((Long)getBeliefbase().getBelief("time").getFact()).longValue();
+			if(newt>oldt+100)
+				report.setSucceeded(true);
+			else
+				report.setReason("Condition does not hold.");
+		}
+		catch(TimeoutException e)
+		{
+			report.setReason("Timeout occurred.");
+		}
+		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		//System.out.println(i++);
+		
+		// todo: ? a) does not accept rule without events b) has to be initially evaluated
 		
 //		report	= new TestReport("truecondition", "Waiting for a condition that is initially true.");
 //		try
 //		{
-//			waitForCondition("true", 1000);
+//			waitForConditionInline("true", 1000);
 //			report.setSucceeded(true);
 //		}
 //		catch(TimeoutException e)

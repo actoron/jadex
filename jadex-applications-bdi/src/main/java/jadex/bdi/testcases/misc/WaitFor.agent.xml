@@ -118,7 +118,7 @@
 	</events>
 
 	<properties>
-		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<property name="logging.level">java.util.logging.Level.INFO</property>
 		<property name="debugging">false</property>
 	</properties>
 
@@ -126,7 +126,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief cref="testcap.testcase_cnt">
-					<fact>7</fact>
+					<fact>8</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

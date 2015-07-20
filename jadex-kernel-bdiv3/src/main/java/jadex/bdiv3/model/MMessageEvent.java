@@ -53,7 +53,7 @@ public class MMessageEvent extends MProcessableElement
 //	protected List<MParameter> parameters;
 	
 	/** The direction. */
-	protected Direction direction;
+	protected Direction direction = Direction.SENDRECEIVE; // default of BDI XML schema
 	
 	/** The message type. */
 	protected MessageType type;

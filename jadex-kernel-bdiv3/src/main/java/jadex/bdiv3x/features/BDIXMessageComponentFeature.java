@@ -241,6 +241,8 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 		for(MMessageEvent mevent: mevents)
 		{
 			Direction dir = mevent.getDirection();
+			if(dir==null)
+				System.out.println("null");
 
 			try
 			{
