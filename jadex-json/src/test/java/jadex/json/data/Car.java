@@ -34,7 +34,7 @@ public class Car
 	/**
 	 *  Get the type. 
 	 *  @return The type
-	 */
+	 */ 
 	public String getType()
 	{
 		return type;
