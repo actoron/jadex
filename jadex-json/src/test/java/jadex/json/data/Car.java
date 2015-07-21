@@ -103,7 +103,7 @@ public class Car
 		this.owner = owner;
 	}
 
-	public String toString()
+	public String toString() 
 	{
 		return "Car [type=" + type + ", model=" + model + ", color=" + color + ", owner=" + owner + "]";
 	}
