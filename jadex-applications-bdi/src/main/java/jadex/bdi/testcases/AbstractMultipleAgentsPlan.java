@@ -10,6 +10,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITuple2Future;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 	//-------- attributes --------
 	
 	/** The list of agents. */
-	protected List agents;
+	protected List<IComponentIdentifier> agents;
 	
 	/** The intended number of agents. */
 	protected int agent_cnt;
@@ -34,7 +35,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 	 *  @param type The type.
 	 *  @param args The args.
 	 */
-	protected List createAgents(String type, Map[] args)
+	protected List<IComponentIdentifier> createAgents(String type, Map<String, Object>[] args)
 	{
 		return createAgents(type, null, args);
 	}
@@ -45,7 +46,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 	 *  @param config The configuration.
 	 *  @param args The args.
 	 */
-	protected List createAgents(String type, String config, Map[] args)
+	protected List<IComponentIdentifier> createAgents(String type, String config, Map<String, Object>[] args)
 	{
 		if(agents!=null)
 			throw new RuntimeException("Create agents is intended to be called only " +
@@ -69,8 +70,8 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				
 //				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				IFuture ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentDescription().getResourceIdentifier()), null);
-				IComponentIdentifier aid = (IComponentIdentifier)ret.get();
+				ITuple2Future<IComponentIdentifier, Map<String, Object>>	ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentDescription().getResourceIdentifier()));
+				IComponentIdentifier aid = (IComponentIdentifier)ret.getFirstResult();
 				agents.add(aid);
 			}
 		}
@@ -101,7 +102,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				
 //				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				IFuture ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
+				IFuture<Map<String, Object>> ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
 				ret.get();
 //				listener.waitForResult();
 			}

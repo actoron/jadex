@@ -3,6 +3,7 @@ package jadex.bdi.testcases.events;
 import jadex.base.test.TestReport;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
 import jadex.bdiv3x.runtime.IMessageEvent;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class MessageForwardPlan extends AbstractMultipleAgentsPlan
 
 	/**
 	 * The body method is called on the
-	 * instatiated plan instance from the scheduler.
+	 * instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{
@@ -28,7 +29,7 @@ public class MessageForwardPlan extends AbstractMultipleAgentsPlan
 			return;
 		}
 
-		List agents = createAgents("/jadex/bdi/testcases/events/MessageForward.agent.xml", "receiver", new Map[1]);
+		List<IComponentIdentifier> agents = createAgents("/jadex/bdi/testcases/events/MessageForward.agent.xml", "receiver", new Map[1]);
 		
 		TestReport tr = new TestReport("forward_message", "Forward a received message.");
 		if(assureTest(tr))

@@ -183,9 +183,9 @@ public class SCollection
 	/**
 	 *  Return a fresh array list.
 	 */
-	public static ArrayList createArrayList()
+	public static <T> ArrayList<T> createArrayList()
 	{
-		ArrayList ret = new ArrayList();
+		ArrayList<T> ret = new ArrayList<T>();
 		if(DEBUG)
 			addCollection(ret);
 		return ret;

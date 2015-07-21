@@ -2,6 +2,7 @@ package jadex.bdiv3.model;
 
 import jadex.bdiv3x.BDIXModel;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -189,28 +190,30 @@ public class SBDIModel
 			}
 			
 			boolean	firstconf	= true;
-			List<MConfiguration>	outerconfs	= bdimodel.getCapability().getConfigurations();
-			for(MConfiguration config: capa.getCapability().getConfigurations())
+			ConfigurationInfo[]	outerconfs	= bdimodel.getModelInfo().getConfigurations();
+			for(ConfigurationInfo config: capa.getModelInfo().getConfigurations())
 			{
 				// Make sure at least one outer conf exists.
-				if(outerconfs==null || outerconfs.isEmpty())
+				if(outerconfs.length==0)
 				{
-					bdimodel.getCapability().addConfiguration(new MConfiguration(""));
-					outerconfs	= bdimodel.getCapability().getConfigurations();
+					((ModelInfo)bdimodel.getModelInfo()).addConfiguration(new ConfigurationInfo(""));
+					outerconfs	= bdimodel.getModelInfo().getConfigurations();
 				}
 				
 				// Need to find, which outer configuration(s) use the inner (if any)
-				for(MConfiguration outer: outerconfs)
+				for(ConfigurationInfo outer: outerconfs)
 				{
+					MConfiguration	outerbdi	= bdimodel.getCapability().getConfiguration(outer.getName());
+					
 					// Copy first inner configuration to all outer configurations that do not provide special mapping.
-					boolean	copydef	= firstconf && (outer.getInitialCapabilities()==null || !outer.getInitialCapabilities().containsKey(capaname));
+					boolean	copydef	= firstconf && (outerbdi==null || outerbdi.getInitialCapabilities()==null || !outerbdi.getInitialCapabilities().containsKey(capaname));
 					
 					// Copy all inner configurations to all outer configurations that do define this special mapping.
-					boolean	copymap	= outer.getInitialCapabilities()!=null && outer.getInitialCapabilities().containsKey(capaname) && outer.getInitialCapabilities().get(capaname).equals(config.getName());
+					boolean	copymap	= outerbdi!=null && outerbdi.getInitialCapabilities()!=null && outerbdi.getInitialCapabilities().containsKey(capaname) && outerbdi.getInitialCapabilities().get(capaname).equals(config.getName());
 					
 					if(copydef || copymap)
 					{
-						copyConfiguration(bdimodel, capaname, config, outer);						
+						copyConfiguration(bdimodel, capaname, config, outer, capa.getCapability().getConfiguration(config.getName()), outerbdi);
 					}
 				}
 				
@@ -218,7 +221,6 @@ public class SBDIModel
 			}
 			
 			// Todo: non-bdi elements from subcapabilities.
-//			capa.getModelInfo().getConfigurations()
 //			capa.getModelInfo().getFeatures()
 //			capa.getModelInfo().getNFProperties()
 //			capa.getModelInfo().getProperties()
@@ -229,72 +231,83 @@ public class SBDIModel
 	/**
 	 *  Copy an inner configuration into an outer one.
 	 */
-	protected static void	copyConfiguration(IBDIModel bdimodel, String capaname, MConfiguration inner, MConfiguration outer)
+	protected static void	copyConfiguration(IBDIModel bdimodel, String capaname, ConfigurationInfo cinner, ConfigurationInfo couter, MConfiguration inner, MConfiguration outer)
 	{
-		for(MConfigBeliefElement cbel: SUtil.safeList(inner.getInitialBeliefs()))
-		{
-			MConfigBeliefElement	cbel2	= copyConfigBelief(bdimodel, capaname, cbel, outer.getInitialBeliefs());
-			if(cbel2!=null)
-			{
-				outer.addInitialBelief(cbel2);
-			}
-		}
-		for(MConfigBeliefElement cbel: SUtil.safeList(inner.getEndBeliefs()))
-		{
-			MConfigBeliefElement	cbel2	= copyConfigBelief(bdimodel, capaname, cbel, outer.getEndBeliefs());
-			if(cbel2!=null)
-			{
-				outer.addEndBelief(cbel2);
-			}
-		}
+		// Todo: non-bdi elements.
 		
-		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialEvents()))
+		if(inner!=null)
 		{
-			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialEvents());
-			if(cpel2!=null)
+			if(outer==null)
 			{
-				outer.addInitialEvent(cpel2);
+				outer	= new MConfiguration(couter.getName());
+				bdimodel.getCapability().addConfiguration(outer);
 			}
-		}
-		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialGoals()))
-		{
-			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialGoals());
-			if(cpel2!=null)
+			
+			for(MConfigBeliefElement cbel: SUtil.safeList(inner.getInitialBeliefs()))
 			{
-				outer.addInitialGoal(cpel2);
+				MConfigBeliefElement	cbel2	= copyConfigBelief(bdimodel, capaname, cbel, outer.getInitialBeliefs());
+				if(cbel2!=null)
+				{
+					outer.addInitialBelief(cbel2);
+				}
 			}
-		}
-		for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialPlans()))
-		{
-			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialPlans());
-			if(cpel2!=null)
+			for(MConfigBeliefElement cbel: SUtil.safeList(inner.getEndBeliefs()))
 			{
-				outer.addInitialPlan(cpel2);
+				MConfigBeliefElement	cbel2	= copyConfigBelief(bdimodel, capaname, cbel, outer.getEndBeliefs());
+				if(cbel2!=null)
+				{
+					outer.addEndBelief(cbel2);
+				}
 			}
-		}
-		
-		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndEvents()))
-		{
-			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndEvents());
-			if(cpel2!=null)
+			
+			for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialEvents()))
 			{
-				outer.addEndEvent(cpel2);
+				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialEvents());
+				if(cpel2!=null)
+				{
+					outer.addInitialEvent(cpel2);
+				}
 			}
-		}
-		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndGoals()))
-		{
-			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndGoals());
-			if(cpel2!=null)
+			for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialGoals()))
 			{
-				outer.addEndGoal(cpel2);
+				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialGoals());
+				if(cpel2!=null)
+				{
+					outer.addInitialGoal(cpel2);
+				}
 			}
-		}
-		for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndPlans()))
-		{
-			MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndPlans());
-			if(cpel2!=null)
+			for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialPlans()))
 			{
-				outer.addEndPlan(cpel2);
+				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialPlans());
+				if(cpel2!=null)
+				{
+					outer.addInitialPlan(cpel2);
+				}
+			}
+			
+			for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndEvents()))
+			{
+				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndEvents());
+				if(cpel2!=null)
+				{
+					outer.addEndEvent(cpel2);
+				}
+			}
+			for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndGoals()))
+			{
+				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndGoals());
+				if(cpel2!=null)
+				{
+					outer.addEndGoal(cpel2);
+				}
+			}
+			for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndPlans()))
+			{
+				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndPlans());
+				if(cpel2!=null)
+				{
+					outer.addEndPlan(cpel2);
+				}
 			}
 		}
 	}
