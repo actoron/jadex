@@ -22,39 +22,6 @@ public class BeliefIncrementPlan extends Plan
 	/** The change rate. */
 	protected long rate;
 
-//	//-------- constructors --------
-//
-//	/**
-//	 *  Create a new plan instance.
-//	 */
-//	public BeliefIncrementPlan()
-//	{
-//		//System.out.println("Created: " + this);
-//		getLogger().info("Created: " + this);
-//		
-//		this.beliefname = (String)getParameter("beliefname").getValue();
-//		if(beliefname==null)
-//			throw new RuntimeException("Beliefname must not null: "+beliefname);
-//		
-//		if(hasParameter("value"))
-//		{
-//			values	= new Number[]{(Number)getParameter("value").getValue()};
-//		}
-//		else if(hasParameterSet("values"))
-//		{
-//			values	= (Number[])getParameterSet("values").getValues();
-//		}
-//		else
-//		{
-//			values	= new Number[]{Integer.valueOf(1)};
-//		}
-//
-//		if(hasParameter("rate"))
-//		{
-//			rate	= ((Number)getParameter("rate").getValue()).longValue();
-//		}
-//	}
-
 	//-------- methods --------
 
 	/**
@@ -96,7 +63,7 @@ public class BeliefIncrementPlan extends Plan
 			// Do atomic, to avoid being terminated before latest value is printed.
 			startAtomic();
 			getBeliefbase().getBelief(beliefname).setFact(stepcnt);
-			//System.out.println(this.getName()+": belief "+beliefname+" changed to: " + stepcnt.intValue());
+			System.out.println(getAgent().getComponentIdentifier()+": belief "+beliefname+" changed to: " + stepcnt.intValue());
 			getLogger().info(this+": belief "+beliefname+" changed to: " + stepcnt.intValue());
 			endAtomic();
 
