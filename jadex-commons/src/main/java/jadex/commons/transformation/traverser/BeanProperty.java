@@ -3,6 +3,7 @@ package jadex.commons.transformation.traverser;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  *  This class is a struct for saving data about an inspected bean property.
@@ -37,7 +38,9 @@ public class BeanProperty
 	
 	/** Accessor delegate provider. */
 	protected IBeanDelegateProvider delegateprovider;
-
+	
+	/** The generic type. */
+	protected Type gentype;
 	
 	//-------- constructors --------
 	
@@ -51,7 +54,8 @@ public class BeanProperty
 	/**
 	 *  Create a new bean property.
 	 */
-	public BeanProperty(String name, Class<?> type, Method getter, Method setter, Class<?> settertype, IBeanDelegateProvider delegateprovider, boolean readable, boolean writable)
+	public BeanProperty(String name, Class<?> type, Method getter, Method setter, Class<?> settertype, IBeanDelegateProvider delegateprovider, 
+		boolean readable, boolean writable, Type gentype)
 	{
 		this.name = name;
 		this.type = type;
@@ -61,6 +65,7 @@ public class BeanProperty
 		this.delegateprovider = delegateprovider;
 		this.readable = readable;
 		this.writable = writable;
+		this.gentype = gentype;
 	}
 	
 	/**
@@ -205,6 +210,24 @@ public class BeanProperty
 		this.field = field;
 	}
 	
+	/**
+	 *  Get the gentype. 
+	 *  @return The gentype
+	 */
+	public Type getGenericType()
+	{
+		return gentype;
+	}
+
+	/**
+	 *  Set the gentype.
+	 *  @param gentype The gentype to set
+	 */
+	public void setGenericType(Type gentype)
+	{
+		this.gentype = gentype;
+	}
+
 	/**
 	 *  Retrieves the bean property value for the given object.
 	 *  

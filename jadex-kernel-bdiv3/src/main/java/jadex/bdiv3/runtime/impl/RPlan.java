@@ -1830,7 +1830,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 			{
-				System.out.println("Added to waitqueue: "+event);
+//				System.out.println("Added to waitqueue: "+event);
 				addToWaitqueue(new ChangeEvent(event));				
 				return IFuture.DONE;
 			}

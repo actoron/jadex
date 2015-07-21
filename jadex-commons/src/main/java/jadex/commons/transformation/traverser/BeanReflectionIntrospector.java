@@ -8,6 +8,7 @@ import jadex.commons.transformation.annotations.IncludeFields;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -120,7 +121,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 						if(getter!=null && getter.getReturnType().equals(setter.getParameterTypes()[0]))
 						{
 							propname = Character.toLowerCase(propname.charAt(0)) + propname.substring(1);
-							ret.put(propname, createBeanProperty(propname, getter.getReturnType(), getter, setter, setter.getParameterTypes()[0]));
+							ret.put(propname, createBeanProperty(propname, getter.getReturnType(), getter, setter, setter.getParameterTypes()[0], getter.getGenericReturnType()));
 						}
 					}
 				}
@@ -177,9 +178,9 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	 *  @param settertype The type used by the setter.
 	 *  @return The bean property.
 	 */
-	protected BeanProperty createBeanProperty(String name, Class<?> type, Method getter, Method setter, Class<?> settertype)
+	protected BeanProperty createBeanProperty(String name, Class<?> type, Method getter, Method setter, Class<?> settertype, Type generictype)
 	{
-		return new BeanProperty(name, type, getter, setter, settertype, null, !getter.isAnnotationPresent(Exclude.class), !setter.isAnnotationPresent(Exclude.class));
+		return new BeanProperty(name, type, getter, setter, settertype, null, !getter.isAnnotationPresent(Exclude.class), !setter.isAnnotationPresent(Exclude.class), generictype);
 	}
 	
 	/**

@@ -1,0 +1,18 @@
+//apply plugin: 'maven-publish'
+
+dependencies 
+{
+	compile project(':jadex-commons')
+	testCompile project(':jadex-commons').sourceSets.test.output
+}
+
+//publishing 
+//{
+//   publications 
+//    {
+//        mavenJava(MavenPublication) 
+//        {
+//            from components.java
+//        }
+//    }
+//}

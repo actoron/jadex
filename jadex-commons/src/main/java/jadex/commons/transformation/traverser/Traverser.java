@@ -61,7 +61,7 @@ public class Traverser
 //		processors.add(new FieldProcessor());
 	}
 	
-	protected Map<Class, ITraverseProcessor> processorcache = new HashMap<Class, ITraverseProcessor>();
+	protected Map<Class<?>, ITraverseProcessor> processorcache = new HashMap<Class<?>, ITraverseProcessor>();
 	
 	/**
 	 *  Get the default traversal processors.
@@ -69,7 +69,7 @@ public class Traverser
 	 */
 	public static List<ITraverseProcessor> getDefaultProcessors()
 	{
-		List ret = new ArrayList();
+		List<ITraverseProcessor> ret = new ArrayList<ITraverseProcessor>();
 		ret.addAll(processors);
 		return ret;
 	}
@@ -113,19 +113,43 @@ public class Traverser
 	 */
 	public static Object traverseObject(Object object, List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
 	{
-//		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
-//		System.out.println("Cloning: "+object);
-//		if(!clone) 
-		
-//		if(object!=null && (object.getClass().getName().indexOf("Connection")!=-1 || 
-//			(object.getClass().getName().indexOf("TerminableIntermediateFuture")!=-1)))
-//			System.out.println("Traversing: "+object+" "+object.getClass());
+		return traverseObject(object, null, processors, clone, null, context);
+	}
 	
+	/**
+	 *  Traverse an object.
+	 *  @param object The object to traverse.
+	 *  @param processors The lists of processors.
+	 *  @return The traversed (or modified) object.
+	 */
+	public static Object traverseObject(Object object, Class<?> clazz, List<ITraverseProcessor> processors, boolean clone, Object context)
+	{
+		return traverseObject(object, clazz, processors, clone, null, context);
+	}
+	
+	/**
+	 *  Traverse an object.
+	 *  @param object The object to traverse.
+	 *  @param processors The lists of processors.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The traversed (or modified) object.
+	 */
+	public static Object traverseObject(Object object, Class<?> clazz, List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
+	{
+//		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
+//			System.out.println("Cloning: "+object);
+//			if(!clone) 
+			
+//			if(object!=null && (object.getClass().getName().indexOf("Connection")!=-1 || 
+//				(object.getClass().getName().indexOf("TerminableIntermediateFuture")!=-1)))
+//				System.out.println("Traversing: "+object+" "+object.getClass());
+		
 		Object ret = null;
 		try
 		{
 			// Must be identity hash map because otherwise empty collections will equal
-			ret = getInstance().traverse(object, null, new IdentityHashMap<Object, Object>(), processors, clone, targetcl, context);
+			ret = getInstance().traverse(object, clazz, new IdentityHashMap<Object, Object>(), processors, clone, targetcl, context);
 		}
 		catch(RuntimeException e)
 		{
@@ -133,10 +157,36 @@ public class Traverser
 			throw e;
 		}
 		
-//		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
-//		System.out.println("Cloned: "+ret);
+//			if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
+//			System.out.println("Cloned: "+ret);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Traverse an object.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The processed object.
+	 */
+	public Object traverse(Object object, Class<?> clazz, 
+		List<ITraverseProcessor> processors, ClassLoader targetcl, Object context)
+	{
+		return traverse(object, clazz, new IdentityHashMap<Object, Object>(), processors, false, targetcl, context);
+	}
+	
+	/**
+	 *  Traverse an object.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The processed object.
+	 */
+	public Object traverse(Object object, Class<?> clazz, 
+		List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
+	{
+		return traverse(object, clazz, new IdentityHashMap<Object, Object>(), processors, clone, targetcl, context);
 	}
 	
 	/**
@@ -188,7 +238,7 @@ public class Traverser
 				handleDuplicate(object, clazz, match, processors, clone, context);
 			}
 			if(clazz==null || SReflect.isSupertype(clazz, object.getClass()))
-				clazz = object.getClass();
+				clazz = findClazz(object, targetcl);
 				
 			// Todo: apply all or only first matching processor!?
 			Object	processed	= object;
@@ -214,6 +264,17 @@ public class Traverser
 		}
 			
 		return ret;
+	}
+	
+	/**
+	 *  Find the class of an object.
+	 *  @param object The object.
+	 *  @param cl The classloader.
+	 *  @return The objects class.
+	 */
+	protected Class<?> findClazz(Object object, ClassLoader cl)
+	{
+		return object.getClass();
 	}
 	
 	/**

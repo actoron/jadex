@@ -82,7 +82,7 @@ public class BeanIntrospectorFactory
 			}
 		}
 		
-		if (ret == null)
+		if(ret == null)
 		{
 			return new BeanReflectionIntrospector(lrusize);
 		}

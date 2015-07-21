@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  Abstract base class for decoding context.
+ */
 public abstract class AbstractDecodingContext implements IDecodingContext
 {
 	/** The classloader */
 	protected ClassLoader classloader;
 	
+	/** The decoder handlers. */
 	protected List<IDecoderHandler> decoderhandlers;
 	
 	/** A user context. */
@@ -34,8 +38,8 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	 */
 	public AbstractDecodingContext(List<IDecoderHandler> decoderhandlers, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
-		if (decoderhandlers == null)
-			System.out.println("FAL");
+//		if (decoderhandlers == null)
+//			System.out.println("FAL");
 		this.decoderhandlers = decoderhandlers;
 		this.postprocessors = postprocessors;
 		this.usercontext = usercontext;

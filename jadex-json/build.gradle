@@ -1,0 +1,20 @@
+//apply plugin: 'maven-publish'
+
+dependencies 
+{
+	compile project(':jadex-commons')
+	testCompile project(':jadex-commons').sourceSets.test.output
+
+	compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
+}
+
+//publishing 
+//{
+//   publications 
+//    {
+//        mavenJava(MavenPublication) 
+//        {
+//            from components.java
+//        }
+//    }
+//}
