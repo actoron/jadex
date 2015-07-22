@@ -13,6 +13,7 @@ import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCondition;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
@@ -206,7 +207,7 @@ public abstract class Plan
 		
 		BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
 		// todo: add capability name of scope
-		MGoal mgoal = model.getCapability().getGoal(type);
+		MGoal mgoal = model.getCapability().getGoal(type.replace(".", MElement.CAPABILITY_SEPARATOR));
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+mgoal);
 		WaitAbstraction wa = new WaitAbstraction();

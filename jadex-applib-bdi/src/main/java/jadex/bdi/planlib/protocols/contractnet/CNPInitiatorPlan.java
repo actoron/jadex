@@ -37,6 +37,8 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 	 */
 	public void body()
 	{
+		super.body();	// Hack???
+		
 		// Start negotiations.
 		String convid;
 		if(getParameter("conversation_id").getValue()!=null)

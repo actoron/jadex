@@ -1,5 +1,6 @@
 package jadex.bdi.planlib.protocols;
 
+import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
@@ -21,7 +22,7 @@ public abstract class AbstractInitiatorPlan extends Plan
 	/**
 	 *  Initialize the plan
 	 */
-	public AbstractInitiatorPlan()
+	public void body()
 	{
 		// Determine timeout.
 		if(hasParameter("timeout") && getParameter("timeout").getValue()!=null)

@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,8 @@ public class RPTestPlan extends AbstractMultipleAgentsPlan
 	public void body()
 	{
 		// Create 1 participants
-		Map[] args = new Map[1];
-		List agents = createAgents("/jadex/bdi/testcases/planlib/RPReceiver.agent.xml", args);	
+		Map<String, Object>[] args = new Map[1];
+		List<IComponentIdentifier> agents = createAgents("/jadex/bdi/testcases/planlib/RPReceiver.agent.xml", args);	
 
 		TestReport tr = new TestReport("#1", "Test request protocol.");
 		if(assureTest(tr))

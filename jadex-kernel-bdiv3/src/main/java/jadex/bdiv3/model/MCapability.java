@@ -190,7 +190,7 @@ public class MCapability extends MElement
 		{
 			for(MGoal goal: goals)
 			{
-				if(goal.getName().endsWith(name))
+				if(goal.getName().endsWith(name))	// For inner classes.
 				{
 					ret = goal;
 					break;

@@ -36,6 +36,8 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 	 */
 	public void body()
 	{
+		super.body();	// Hack???
+		
 		AuctionDescription auctiondesc = (AuctionDescription)getParameter("auction_description").getValue();
 		if(auctiondesc.getRoundTimeout()<=0)
 		{

@@ -1,7 +1,5 @@
 package jadex.bdi.examples.booktrading.buyer;
 
-import java.util.Date;
-
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
 import jadex.bdi.planlib.protocols.NegotiationRecord;
@@ -14,6 +12,8 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
+
+import java.util.Date;
 
 /**
  * The plan tries to purchase a book.

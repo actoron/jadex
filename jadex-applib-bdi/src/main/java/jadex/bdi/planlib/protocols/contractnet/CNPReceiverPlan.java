@@ -20,6 +20,8 @@ public class CNPReceiverPlan extends AbstractReceiverPlan
 	 */
 	public void body()
 	{
+		super.body();	// Hack???
+		
 		long timeout;
 		if(getBeliefbase().containsBelief("timeout") && getBeliefbase().getBelief("timeout").getFact()!=null)
 		{

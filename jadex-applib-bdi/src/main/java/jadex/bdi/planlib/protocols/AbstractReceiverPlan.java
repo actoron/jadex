@@ -17,7 +17,7 @@ public abstract class AbstractReceiverPlan extends Plan
 	/**
 	 *  Initialize the plan
 	 */
-	public AbstractReceiverPlan()
+	public void body()
 	{
 		// Update interaction state
 		if(hasParameter("interaction_state"))

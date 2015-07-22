@@ -17,6 +17,8 @@ public class RPQPReceiverPlan extends AbstractReceiverPlan
 	 */
 	public void body()
 	{
+		super.body();	// Hack???
+		
 		IMessageEvent me = (IMessageEvent)getParameter("message").getValue();
 		getLogger().info("Receiver got request: "+me);
 		IMessageEvent reply;

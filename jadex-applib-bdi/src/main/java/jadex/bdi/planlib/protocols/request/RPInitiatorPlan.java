@@ -32,6 +32,8 @@ public class RPInitiatorPlan extends AbstractInitiatorPlan
 	 */
 	public void body()
 	{
+		super.body();	// Hack???
+		
 		//getLogger().info(getScope().getName() + ": Request initiator action called: " + this);
 		getLogger().info("Request initiator action called: " + this+" "+getComponentName());
 

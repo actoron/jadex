@@ -36,6 +36,8 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 	 */
 	public void body()
 	{
+		super.body();	// Hack???
+		
 //		System.out.println("DA initiator plan started");
 		
 		AuctionDescription auctiondesc = (AuctionDescription)getParameter("auction_description").getValue();

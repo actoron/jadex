@@ -1,18 +1,5 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.base.test.TestReport;
-import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Collection;
 
 /**
  *  todo: ? dynamic model loading not supported

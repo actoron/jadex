@@ -26,6 +26,8 @@ public class DAReceiverPlan extends AbstractReceiverPlan
 	 */
 	public void body()
 	{
+		super.body();	// Hack???
+		
 		// Fetch the auction information.
 		IMessageEvent me = (IMessageEvent)getParameter("message").getValue();
 		

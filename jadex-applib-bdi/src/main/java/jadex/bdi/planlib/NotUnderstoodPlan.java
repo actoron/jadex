@@ -11,18 +11,6 @@ import jadex.bridge.fipa.SFipa;
  */
 public class NotUnderstoodPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public NotUnderstoodPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
-	//-------- methods --------
-
 	/**
 	 *  Execute the plan.
 	 */

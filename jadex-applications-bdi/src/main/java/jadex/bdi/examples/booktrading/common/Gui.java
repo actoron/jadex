@@ -1,6 +1,5 @@
 package jadex.bdi.examples.booktrading.common;
 
-import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;

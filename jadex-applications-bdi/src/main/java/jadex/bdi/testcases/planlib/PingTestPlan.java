@@ -1,13 +1,13 @@
 package jadex.bdi.testcases.planlib;
 
-import java.util.List;
-import java.util.Map;
-
 import jadex.base.test.TestReport;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.commons.concurrent.TimeoutException;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Test the ping capability.

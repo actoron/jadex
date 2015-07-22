@@ -1,10 +1,10 @@
 package jadex.bdi.testcases.planlib;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.bdi.planlib.protocols.ParticipantProposal;
 import jadex.bdiv3x.runtime.Plan;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Evaluate the example proposals.

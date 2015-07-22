@@ -1,6 +1,7 @@
 package jadex.bdiv3x.runtime;
 
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RElement;
@@ -50,7 +51,8 @@ public class RGoalbase extends RElement implements IGoalbase
 	public IGoal[] getGoals(String type)
 	{
 		MCapability mcapa = (MCapability)getCapability().getModelElement();
-		MGoal mgoal = mcapa.getGoal(type);
+		// Todo: add capability scope
+		MGoal mgoal = mcapa.getGoal(type.replace(".", MElement.CAPABILITY_SEPARATOR));
 		Collection<RGoal> ret = getCapability().getGoals(mgoal);
 		return ret.toArray(new IGoal[ret.size()]);
 	}
@@ -74,7 +76,8 @@ public class RGoalbase extends RElement implements IGoalbase
 	 */
 	public IGoal createGoal(String type)
 	{
-		MGoal mgoal = getCapability().getMCapability().getGoal(type);
+		// Todo, add capability scope
+		MGoal mgoal = getCapability().getMCapability().getGoal(type.replace(".", MElement.CAPABILITY_SEPARATOR));
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+type);
 		return new RGoal(getAgent(), mgoal, null, null, null, null);
