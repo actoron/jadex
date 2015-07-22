@@ -759,7 +759,7 @@ public class BDIXMLReader extends ComponentXMLReader
 			
 			public int getPass()
 			{
-				return 1;
+				return 2;	// Has to be done after capability merging in pass 1!
 			}
 		};
 		

@@ -209,8 +209,16 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 				{
 					try
 					{
-						ret.setResult(loader.loadAgentModel(model, imports, rid, cl, 
-							new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
+						if(model!=null && model.endsWith(BDIXModelLoader.FILE_EXTENSION_CAPABILITY))
+						{
+							ret.setResult(loader.loadCapabilityModel(model, imports, rid, cl, 
+								new Object[]{rid, getProviderId().getRoot()}).getModelInfo());							
+						}
+						else
+						{
+							ret.setResult(loader.loadAgentModel(model, imports, rid, cl, 
+								new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
+						}
 					}
 					catch(Exception e)
 					{
@@ -224,8 +232,16 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				ret.setResult(loader.loadAgentModel(model, imports, rid, cl, 
+				if(model!=null && model.endsWith(BDIXModelLoader.FILE_EXTENSION_CAPABILITY))
+				{
+					ret.setResult(loader.loadCapabilityModel(model, imports, rid, cl, 
+						new Object[]{rid, getProviderId().getRoot()}).getModelInfo());							
+				}
+				else
+				{
+					ret.setResult(loader.loadAgentModel(model, imports, rid, cl, 
 						new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
+				}
 			}
 			catch(Exception e)
 			{

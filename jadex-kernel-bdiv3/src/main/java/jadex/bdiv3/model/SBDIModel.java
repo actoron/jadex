@@ -184,7 +184,8 @@ public class SBDIModel
 			for(MPlan plan : capa.getCapability().getPlans())
 			{
 				MPlan plan2	= new MPlan(capaname+MElement.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
-					copyTrigger(bdimodel, capaname, plan.getTrigger()), copyTrigger(bdimodel, capaname, plan.getWaitqueue()),
+					convertTrigger(bdimodel, capaname, plan.getTrigger(), true),
+					convertTrigger(bdimodel, capaname, plan.getWaitqueue(), true),
 					plan.getPriority());
 				bdimodel.getCapability().addPlan(plan2);
 			}
@@ -464,8 +465,9 @@ public class SBDIModel
 			
 		for(MPlan plan: bdimodel.getCapability().getPlans())
 		{
-			plan.setTrigger(copyTrigger(bdimodel, null, plan.getTrigger()));
-			plan.setWaitqueue(copyTrigger(bdimodel, null, plan.getWaitqueue()));
+			// Triggers need to be converted in place, because they are post processed in pass 2!
+			convertTrigger(bdimodel, null, plan.getTrigger(), false);
+			convertTrigger(bdimodel, null, plan.getWaitqueue(), false);
 			if(plan.getContextCondition()!=null)
 			{
 				plan.getContextCondition().setEvents(convertEventTypes(null, plan.getContextCondition().getEvents(), bdimodel));
@@ -553,37 +555,44 @@ public class SBDIModel
 	//-------- helper methods --------
 
 	/**
-	 *  Coyp a plan trigger or waitqueue and map the events.
+	 *  Convert a plan trigger or waitqueue and map the events.
+	 *  Create a copy if desired.
 	 */
-	protected static MTrigger	copyTrigger(IBDIModel bdimodel, String capa, MTrigger trigger)
+	protected static MTrigger	convertTrigger(IBDIModel bdimodel, String capa, MTrigger trigger, boolean copy)
 	{
 		MTrigger trigger2	= null;
 		if(trigger!=null)
 		{
-			trigger2	= new MTrigger();
+			trigger2	= copy ? new MTrigger() : trigger;
 			if(trigger.getFactAddeds()!=null)
 			{
+				List<String>	events	= new ArrayList<String>();
 				for(String event: trigger.getFactAddeds())
 				{
 					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event : event;
-					trigger2.addFactAdded(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
+					events.add(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
 				}
+				trigger2.setFactAddeds(events);
 			}
 			if(trigger.getFactChangeds()!=null)
 			{
+				List<String>	events	= new ArrayList<String>();
 				for(String event: trigger.getFactChangeds())
 				{
 					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event : event;
-					trigger2.addFactChangeds(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
+					events.add(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
 				}
+				trigger2.setFactChangeds(events);
 			}
 			if(trigger.getFactRemoveds()!=null)
 			{
+				List<String>	events	= new ArrayList<String>();
 				for(String event: trigger.getFactRemoveds())
 				{
 					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event : event;
-					trigger2.addFactRemoved(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
+					events.add(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
 				}
+				trigger2.setFactRemoveds(events);
 			}
 			if(trigger.getGoals()!=null)
 			{

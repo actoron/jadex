@@ -233,7 +233,7 @@ public class MTrigger
 	{
 		if(factaddeds==null)
 			this.factaddeds = new ArrayList<String>();
-		fact = fact.replace(".", "/"); // Hack as long as capability separator is /
+		fact = fact.replace(".", MElement.CAPABILITY_SEPARATOR); // Hack as long as capability separator is /
 		factaddeds.add(fact);
 	}
 	
@@ -244,7 +244,7 @@ public class MTrigger
 	{
 		if(factremoveds==null)
 			this.factremoveds = new ArrayList<String>();
-		fact = fact.replace(".", "/");
+		fact = fact.replace(".", MElement.CAPABILITY_SEPARATOR);
 		factremoveds.add(fact);
 	}
 	
@@ -255,7 +255,7 @@ public class MTrigger
 	{
 		if(factchangeds==null)
 			this.factchangeds = new ArrayList<String>();
-		fact = fact.replace(".", "/");
+		fact = fact.replace(".", MElement.CAPABILITY_SEPARATOR);
 		factchangeds.add(fact);
 	}
 	
@@ -281,6 +281,30 @@ public class MTrigger
 	public List<String>	getFactChangeds()
 	{
 		return factchangeds==null? Collections.EMPTY_LIST: factchangeds;
+	}
+	
+	/**
+	 *  Set the fact added triggers (belief set names).
+	 */
+	public void	setFactAddeds(List<String> events)
+	{
+		this.factaddeds	= events;
+	}
+	
+	/**
+	 *  Set the fact removed triggers (belief set names).
+	 */
+	public void	setFactRemoveds(List<String> events)
+	{
+		this.factremoveds	= events;
+	}
+	
+	/**
+	 *  Set the fact changeds triggers (belief set names).
+	 */
+	public void	setFactChangeds(List<String> events)
+	{
+		this.factchangeds	= events;
 	}
 	
 	/**

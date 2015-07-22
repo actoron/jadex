@@ -12,7 +12,8 @@
 
 	<imports>
 		<import>jadex.bridge.fipa.*</import>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>java.util.*</import>
 		<import>jadex.commons.IFilter</import>
