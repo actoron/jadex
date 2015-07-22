@@ -1,22 +1,18 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.write;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import com.eclipsesource.json.JsonArray;
 
 import jadex.commons.SReflect;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
  * 
  */
-public class JsonCollectionProcessor implements ITraverseProcessor
+public class JsonMultiCollectionProcessor implements ITraverseProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -27,7 +23,7 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof JsonArray && SReflect.isSupertype(Collection.class, clazz);
+		return SReflect.isSupertype(MultiCollection.class, clazz);
 	}
 	
 	/**
@@ -40,49 +36,37 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		Collection ret = (List)getReturnObject(object, clazz);
-		
-		traversed.put(object, ret);
-		
-		JsonArray vals = (JsonArray)object;
-		for(int i=0; i<vals.size(); i++)
-		{
-			Object val = vals.get(i);
-			Class<?> valclazz = ((JsonContext)context).getComponentType();
-			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
-			
-			if(newval != Traverser.IGNORE_RESULT)
-			{
-				ret.add(newval);
-			}
-		}
-		
-		return ret;
-	}
-
-	/**
-	 *  Get the return object.
-	 */
-	public Object getReturnObject(Object object, Class<?> clazz)
-	{
-		Object ret = object;
-		
 		try
 		{
-			ret = clazz.newInstance();
+			JsonWriteContext wr = (JsonWriteContext)context;
+			MultiCollection<?,?> mc = (MultiCollection<?,?>)object;
+			
+	//		traversed.put(object, null);
+	
+			wr.write("{");
+			
+			wr.write("\"type\":");
+			Field typefield = MultiCollection.class.getDeclaredField("type");
+			typefield.setAccessible(true);
+			Class<?> type = (Class)typefield.get(mc);
+			wr.write("\"").write(SReflect.getClassName(type)).write("\"");
+			
+			wr.write(",\"map\":");
+			Field mapfield = MultiCollection.class.getDeclaredField("map");
+			mapfield.setAccessible(true);
+			Map<?,?> map = (Map<?,?>)mapfield.get(mc);
+			traverser.doTraverse(map, map.getClass(), traversed, processors, clone, targetcl, context);
+			
+			if(wr.isWriteClass())
+				wr.write(",").writeClass(object.getClass());
+			
+			wr.write("}");
+			
+			return object;
 		}
 		catch(Exception e)
 		{
-			if(SReflect.isSupertype(Set.class, clazz))
-			{
-				ret = new HashSet();
-			}
-			else
-			{
-				ret = new ArrayList();
-			}
+			throw new RuntimeException(e);
 		}
-		
-		return ret;
 	}
 }

@@ -6,6 +6,8 @@ dependencies
 	testCompile project(':jadex-commons').sourceSets.test.output
 
 	compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
+	
+	compile 'com.google.code.gson:gson:2.3.1'
 }
 
 //publishing 

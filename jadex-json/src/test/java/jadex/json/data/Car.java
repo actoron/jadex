@@ -8,15 +8,15 @@ import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.transformation.jsonserializer.processors.JsonArrayProcessor;
-import jadex.transformation.jsonserializer.processors.JsonBeanProcessor;
-import jadex.transformation.jsonserializer.processors.JsonClassProcessor;
-import jadex.transformation.jsonserializer.processors.JsonCollectionProcessor;
-import jadex.transformation.jsonserializer.processors.JsonContext;
-import jadex.transformation.jsonserializer.processors.JsonMapProcessor;
-import jadex.transformation.jsonserializer.processors.JsonPrimitiveProcessor;
-import jadex.transformation.jsonserializer.processors.JsonURIProcessor;
-import jadex.transformation.jsonserializer.processors.JsonURLProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonClassProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonMapProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonReadContext;
+import jadex.transformation.jsonserializer.processors.read.JsonURIProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonURLProcessor;
 
 /**
  * 
@@ -30,6 +30,17 @@ public class Car
 	protected String color;
 	
 	protected Owner owner;
+
+	public Car()
+	{
+	}
+	
+	public Car(String type, int model, String color)
+	{
+		this.type = type;
+		this.model = model;
+		this.color = color;
+	}
 
 	/**
 	 *  Get the type. 
@@ -103,10 +114,10 @@ public class Car
 		this.owner = owner;
 	}
 
-	public String toString() 
-	{
-		return "Car [type=" + type + ", model=" + model + ", color=" + color + ", owner=" + owner + "]";
-	}
+//	public String toString() 
+//	{
+//		return "Car [type=" + type + ", model=" + model + ", color=" + color + ", owner=" + owner + "]";
+//	}
 	
 	/**
 	 * 
@@ -131,8 +142,9 @@ public class Car
 		
 		JsonValue value = Json.parse(str);
 		JsonTraverser traverser = new JsonTraverser();
-		Object ret = traverser.traverse(value, null, procs, null, new JsonContext());
+		Object ret = traverser.traverse(value, null, procs, null, new JsonReadContext());
 	
+		System.out.println(str);
 		System.out.println(ret);
 	}
 }

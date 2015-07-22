@@ -1,17 +1,16 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.write;
 
 import java.util.List;
 import java.util.Map;
 
-import com.eclipsesource.json.JsonValue;
-
+import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
  * 
  */
-public class JsonPrimitiveProcessor implements ITraverseProcessor
+public class JsonToStringProcessor implements ITraverseProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -22,13 +21,7 @@ public class JsonPrimitiveProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		boolean ret = false;
-		if(object instanceof JsonValue)
-		{
-			JsonValue val = (JsonValue)object;
-			ret = val.isString() || val.isBoolean() || val.isNumber();
-		}
-		return ret;
+		return SReflect.isStringConvertableType(clazz);
 	}
 	
 	/**
@@ -41,43 +34,29 @@ public class JsonPrimitiveProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		Object ret = null;
+		JsonWriteContext wr = (JsonWriteContext)context;
 		
-		JsonValue val = (JsonValue)object;
-		if(val.isNumber())
+		Object ret = object.toString();
+
+		if(object instanceof String)
 		{
-			if(Double.class.equals(clazz) || double.class.equals(clazz))
-			{
-				ret = val.asDouble();
-			}
-			else if(Float.class.equals(clazz) || float.class.equals(clazz))
-			{
-				ret = val.asFloat();
-			}
-			else if(Integer.class.equals(clazz) || int.class.equals(clazz))
-			{
-				ret = val.asInt();
-			}
-			else if(Long.class.equals(clazz) || long.class.equals(clazz))
-			{
-				ret = val.asLong();
-			}
-			else 
-			{
-				// todo: default?
-				ret = val.asDouble();
-			}
+			wr.write("\"").write(object.toString()).write("\"");
 		}
-		else if(val.isBoolean())
+		else
 		{
-			ret = val.asBoolean();
-		}
-		else if(val.isString())
-		{
-			ret = val.asString();
+			if(!wr.isWriteClass())
+			{
+				wr.write(object.toString());
+			}
+			else
+			{
+				wr.write("{\"value\":\"").write(object.toString()).write("\",");
+				wr.writeClass(object.getClass());
+				wr.write("}");
+			}
 		}
 		
-		traversed.put(object, ret);
+//		traversed.put(object, ret);
 		
 		return ret;
 	}

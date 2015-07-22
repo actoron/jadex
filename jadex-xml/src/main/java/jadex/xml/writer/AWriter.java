@@ -97,7 +97,8 @@ public abstract class AWriter
 			byte[] ret = bos.toByteArray();
 			bos.close();
 			return ret;
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			// System.out.println("Exception writing: "+val);
@@ -113,7 +114,8 @@ public abstract class AWriter
 		try
 		{
 			writer.write(handler, val, os, classloader, context);
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			// System.out.println("Exception writing: "+val);

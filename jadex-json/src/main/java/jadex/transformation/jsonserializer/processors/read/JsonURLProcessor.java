@@ -1,5 +1,6 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.read;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -10,9 +11,10 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
- *  Codec for encoding and decoding class objects.
+ *  Codec for encoding and decoding URL objects.
+ *
  */
-public class JsonClassProcessor implements ITraverseProcessor
+public class JsonURLProcessor implements ITraverseProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -23,7 +25,7 @@ public class JsonClassProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof JsonValue && SReflect.isSupertype(Class.class, clazz);
+		return object instanceof JsonValue && SReflect.isSupertype(URL.class, clazz);
 	}
 	
 	/**
@@ -40,7 +42,8 @@ public class JsonClassProcessor implements ITraverseProcessor
 		
 		try
 		{
-			return SReflect.findClass(val.asString(), null, targetcl);
+			URL url = new URL(val.asString());
+			return url;
 		}
 		catch(Exception e)
 		{

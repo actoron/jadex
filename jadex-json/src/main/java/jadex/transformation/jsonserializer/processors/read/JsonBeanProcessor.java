@@ -1,4 +1,4 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Constructor;
 import java.util.Iterator;
@@ -58,7 +58,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		
 		try
 		{
-			traverseProperties(object, clazz, traversed, processors, traverser, clone, targetcl, ret, context);
+			traverseProperties(object, clazz, traversed, processors, traverser, clone, targetcl, ret, context, intro);
 		}
 		catch(Exception e)
 		{
@@ -71,8 +71,9 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected void traverseProperties(Object object, Class<?> clazz, Map<Object, Object> cloned, 
-		List<ITraverseProcessor> processors, Traverser traverser, boolean clone, ClassLoader targetcl, Object ret, Object context)
+	protected static void traverseProperties(Object object, Class<?> clazz, Map<Object, Object> cloned, 
+		List<ITraverseProcessor> processors, Traverser traverser, boolean clone, ClassLoader targetcl, 
+		Object ret, Object context, IBeanIntrospector intro)
 	{
 		// Get all declared fields (public, protected and private)
 		
@@ -92,11 +93,11 @@ public class JsonBeanProcessor implements ITraverseProcessor
 					{
 						if(prop.getGenericType()!=null)
 						{
-							((JsonContext)context).setComponentType(SReflect.unwrapGenericType(prop.getGenericType()));
+							((JsonReadContext)context).setComponentType(SReflect.unwrapGenericType(prop.getGenericType()));
 						}
 						else
 						{
-							((JsonContext)context).setComponentType(null);
+							((JsonReadContext)context).setComponentType(null);
 						}
 						Object newval = traverser.doTraverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
 						if(newval != Traverser.IGNORE_RESULT && (object!=ret || val!=newval))
@@ -121,9 +122,9 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		Object ret = null;
 		
 		if(targetcl!=null)
-			clazz	= SReflect.classForName0(clazz.getName(), targetcl);
+			clazz = SReflect.classForName0(clazz.getName(), targetcl);
 		
-		Constructor<?>	c;
+		Constructor<?> c;
 		
 		try
 		{

@@ -1,14 +1,13 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.write;
 
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 
-import com.eclipsesource.json.JsonArray;
-
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  * 
@@ -24,7 +23,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof JsonArray && clazz!=null && clazz.isArray();
+		return clazz.isArray();
 	}
 	
 	/**
@@ -37,35 +36,35 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		Object ret = getReturnObject(object, clazz, clone, targetcl);
-		Class<?> type = clazz.getComponentType();
+		JsonWriteContext wr = (JsonWriteContext)context;
 		
-		traversed.put(object, ret);
-		
-		JsonArray vals = (JsonArray)object;
-		for(int i=0; i<vals.size(); i++)
+		Class<?> compclazz = clazz.getComponentType();
+		if(wr.isWriteClass())
 		{
-			Object val = vals.get(i);
-			Object newval = traverser.doTraverse(val, type, traversed, processors, clone, targetcl, context);
-			if(newval != Traverser.IGNORE_RESULT && (clone || newval!=val))
-			{
-				Array.set(ret, i, JsonBeanProcessor.convertBasicType(newval, clazz));	
-			}
+			wr.write("{");
+			wr.writeClass(compclazz);
+			wr.write(",\"").write(JsonTraverser.ARRAY_MARKER).write("\":");
 		}
 		
-		return ret;
-	}
-
-	/**
-	 * 
-	 */
-	public Object getReturnObject(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-	{
-		if(targetcl!=null)
-			clazz	= SReflect.classForName0(SReflect.getClassName(clazz), targetcl);
+		wr.write("[");
 		
-		int length = ((JsonArray)object).size();
-		Class<?> type = clazz.getComponentType();
-		return Array.newInstance(type, length);
+		for(int i=0; i<Array.getLength(object); i++) 
+		{
+			if(i>0)
+				wr.write(",");
+			Object val = Array.get(object, i);
+			traverser.doTraverse(val, val.getClass(), traversed, processors, clone, targetcl, context);
+		}
+		
+		wr.write("]");
+		
+		if(wr.isWriteClass())
+		{
+			wr.write("}");
+		}
+		
+//		traversed.put(object, ret);
+		
+		return object;
 	}
 }

@@ -1,20 +1,20 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.write;
 
-import java.net.URL;
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
- *  Codec for encoding and decoding URL objects.
- *
+ * 
  */
-public class JsonURLProcessor implements ITraverseProcessor
+public class JsonCollectionProcessor implements ITraverseProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -25,7 +25,7 @@ public class JsonURLProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof JsonValue && SReflect.isSupertype(URL.class, clazz);
+		return SReflect.isSupertype(Collection.class, clazz);
 	}
 	
 	/**
@@ -38,16 +38,38 @@ public class JsonURLProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		JsonValue val = (JsonValue)object;
+		JsonWriteContext wr = (JsonWriteContext)context;
 		
-		try
+		Class<?> compclazz = SReflect.unwrapGenericType(clazz);
+		if(wr.isWriteClass() && compclazz!=null)
 		{
-			URL url = new URL(val.asString());
-			return url;
+			wr.write("{");
+			wr.writeClass(compclazz);
+			wr.write(",\"").write(JsonTraverser.COLLECTION_MARKER).write("\":");
 		}
-		catch(Exception e)
+		
+		wr.write("[");
+		
+		Collection<?> col = (Collection<?>)object;
+		
+		Iterator<?> it = col.iterator();
+		for(int i=0; i<col.size(); i++) 
 		{
-			throw new RuntimeException(e);
+			if(i>0)
+				wr.write(",");
+			Object val = it.next();
+			traverser.doTraverse(val, val.getClass(), traversed, processors, clone, targetcl, context);
 		}
+		
+		wr.write("]");
+		
+		if(wr.isWriteClass() && compclazz!=null)
+		{
+			wr.write("}");
+		}
+		
+//		traversed.put(object, ret);
+		
+		return object;
 	}
 }

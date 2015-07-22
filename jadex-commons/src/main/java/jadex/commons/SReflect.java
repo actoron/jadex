@@ -72,7 +72,7 @@ public class SReflect
 	
 	static
 	{
-		basictypes	= Collections.synchronizedMap(new HashMap());
+		basictypes = Collections.synchronizedMap(new HashMap());
 		basictypes.put("boolean", boolean.class);
 		basictypes.put("int", int.class);
 		basictypes.put("double", double.class);
@@ -82,7 +82,7 @@ public class SReflect
 		basictypes.put("byte", byte.class);
 		basictypes.put("char", char.class);
 		
-		wrappedtypes	= Collections.synchronizedMap(new HashMap());
+		wrappedtypes = Collections.synchronizedMap(new HashMap());
 		wrappedtypes.put(boolean.class, Boolean.class);
 		wrappedtypes.put(int.class, Integer.class);
 		wrappedtypes.put(double.class, Double.class);
@@ -92,7 +92,7 @@ public class SReflect
 		wrappedtypes.put(byte.class, Byte.class);
 		wrappedtypes.put(char.class, Character.class);
 		
-		convertabletypes	= Collections.synchronizedSet(new HashSet());
+		convertabletypes = Collections.synchronizedSet(new HashSet());
 		convertabletypes.add(String.class);
 		convertabletypes.add(int.class);
 		convertabletypes.add(Integer.class);

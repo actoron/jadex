@@ -1,20 +1,17 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.write;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
-
-import com.eclipsesource.json.JsonValue;
+import java.util.Set;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
- *  Codec for encoding and decoding URI objects.
- *
+ * 
  */
-public class JsonURIProcessor implements ITraverseProcessor
+public class JsonMapProcessor implements ITraverseProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -25,7 +22,7 @@ public class JsonURIProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof JsonValue && SReflect.isSupertype(URI.class, clazz);
+		return SReflect.isSupertype(Map.class, clazz);
 	}
 	
 	/**
@@ -38,16 +35,43 @@ public class JsonURIProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		JsonValue val = (JsonValue)object;
+		JsonWriteContext wr = (JsonWriteContext)context;
+		Map map = (Map)object;
 		
-		try
+//		traversed.put(object, null);
+		
+		wr.write("{");
+		
+		Set keyset = map.keySet();
+		Object[] keys = keyset.toArray(new Object[keyset.size()]);
+		boolean first = true;
+		for(int i=0; i<keys.length; i++)
 		{
-			URI uri = new URI(val.asString());
-			return uri;
+			Object val = map.get(keys[i]);
+			Class<?> valclazz = val!=null? val.getClass(): null;
+			Object key = keys[i];
+			Class<?> keyclazz = key != null? key.getClass() : null;
+			
+			if(key!=null && val!=null)
+			{
+				if(!first)
+					wr.write(",");
+				first = false;
+				// hmm key must be string :-(
+				wr.write("\"");
+				wr.write(key.toString());
+				wr.write("\"");
+//				traverser.doTraverse(key, keyclazz, traversed, processors, clone, targetcl, context);
+				wr.write(":");
+				traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+			}
 		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+
+		if(wr.isWriteClass())
+			wr.write(",").writeClass(object.getClass());
+		
+		wr.write("}");
+		
+		return object;
 	}
 }

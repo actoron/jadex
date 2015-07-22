@@ -1,9 +1,9 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.read;
 
 /**
  * 
  */
-public class JsonContext
+public class JsonReadContext
 {
 	protected Class<?> componentType;
 

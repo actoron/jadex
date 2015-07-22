@@ -1,6 +1,7 @@
-package jadex.transformation.jsonserializer.processors;
+package jadex.transformation.jsonserializer.processors.read;
 
-import java.util.LinkedHashMap;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ import jadex.commons.transformation.traverser.Traverser;
 /**
  * 
  */
-public class JsonMapProcessor implements ITraverseProcessor
+public class JsonCalendarProcessor implements ITraverseProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -24,7 +25,7 @@ public class JsonMapProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(Map.class, clazz));
+		return object instanceof JsonObject && SReflect.isSupertype(Calendar.class, clazz);
 	}
 	
 	/**
@@ -37,40 +38,20 @@ public class JsonMapProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		Map ret = (Map)getReturnObject(object, clazz);
-		JsonObject jval = (JsonObject)object;
-		traversed.put(object, ret);
+		Calendar ret = null;
 		
-		for(String name: jval.names())
-		{
-			Object val = jval.get(name);
-			Class<?> valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
-			if(newval != Traverser.IGNORE_RESULT)
-			{
-				if(newval!=val)
-					ret.put(name, newval);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public Object getReturnObject(Object object, Class clazz)
-	{
-		Object ret = object;
+		JsonObject obj = (JsonObject)object;
+		Class<?> cl = JsonPrimitiveObjectProcessor.getClazz(object, targetcl);
+		String val = obj.getString("value", null);
 		
 		try
 		{
-			ret = clazz.newInstance();
+			ret = (Calendar)cl.newInstance();
+			ret.setTime(new Date(Long.parseLong(val)));
 		}
 		catch(Exception e)
 		{
-			// Using linked hash map as default to avoid loosing order if has order.
-			ret = new LinkedHashMap();
+			throw new RuntimeException(e);
 		}
 		
 		return ret;
