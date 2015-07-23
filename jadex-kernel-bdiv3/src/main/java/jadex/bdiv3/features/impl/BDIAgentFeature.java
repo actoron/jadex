@@ -22,7 +22,7 @@ import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
-import jadex.bdiv3.runtime.impl.CapabilityWrapper;
+import jadex.bdiv3.runtime.impl.CapabilityPojoWrapper;
 import jadex.bdiv3.runtime.impl.GoalInfo;
 import jadex.bdiv3.runtime.impl.InvocationInfo;
 import jadex.bdiv3.runtime.impl.PlanInfo;
@@ -1085,7 +1085,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				if(SReflect.isSupertype(f.getType(), ICapability.class))
 				{
 					f.setAccessible(true);
-					f.set(agent, new CapabilityWrapper(pa, agent, globalname));						
+					f.set(agent, new CapabilityPojoWrapper(pa, agent, globalname));						
 				}
 				else
 				{
@@ -1844,7 +1844,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
 		
 		vals.add(capa);
-		vals.add(new CapabilityWrapper(component, capa, capaname));
+		vals.add(new CapabilityPojoWrapper(component, capa, capaname));
 		vals.add(component);
 		vals.add(component.getExternalAccess());
 
@@ -1896,7 +1896,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					Object pojo = rpe.getPojoElement();
 					MGoal mgoal = (MGoal)rpe.getModelElement();
 					List<MParameter> params = mgoal.getParameters();
-					for(MParameter param: params)
+					for(MParameter param: SUtil.safeList(params))
 					{
 						Object val = param.getValue(pojo, component.getClassLoader());
 						vals.add(val);

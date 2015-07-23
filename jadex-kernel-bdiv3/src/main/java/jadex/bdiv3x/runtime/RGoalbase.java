@@ -50,9 +50,11 @@ public class RGoalbase extends RElement implements IGoalbase
 	 */
 	public IGoal[] getGoals(String type)
 	{
-		MCapability mcapa = (MCapability)getCapability().getModelElement();
 		// Todo: add capability scope
-		MGoal mgoal = mcapa.getGoal(type.replace(".", MElement.CAPABILITY_SEPARATOR));
+		type	= type.replace(".", MElement.CAPABILITY_SEPARATOR);
+		
+		MCapability mcapa = (MCapability)getCapability().getModelElement();
+		MGoal mgoal = mcapa.getGoal(type);
 		Collection<RGoal> ret = getCapability().getGoals(mgoal);
 		return ret.toArray(new IGoal[ret.size()]);
 	}
@@ -76,8 +78,10 @@ public class RGoalbase extends RElement implements IGoalbase
 	 */
 	public IGoal createGoal(String type)
 	{
-		// Todo, add capability scope
-		MGoal mgoal = getCapability().getMCapability().getGoal(type.replace(".", MElement.CAPABILITY_SEPARATOR));
+		// Todo: add capability scope
+		type	= type.replace(".", MElement.CAPABILITY_SEPARATOR);
+		
+		MGoal mgoal = getCapability().getMCapability().getGoal(type);
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+type);
 		return new RGoal(getAgent(), mgoal, null, null, null, null);

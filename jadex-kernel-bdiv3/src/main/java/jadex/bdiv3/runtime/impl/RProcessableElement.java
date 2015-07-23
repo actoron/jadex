@@ -3,7 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MProcessableElement;
-import jadex.bdiv3x.runtime.RBeliefbase;
+import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bridge.IInternalAccess;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public abstract class RProcessableElement extends RParameterElement
 	 */
 	public RProcessableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent, Map<String, Object> vals, MConfigParameterElement config)
 	{
-		super(modelelement, agent, vals, RBeliefbase.getFetcher(agent, modelelement), config);
+		super(modelelement, agent, vals, CapabilityWrapper.getFetcher(agent, modelelement), config);
 		this.pojoelement = pojoelement;
 		this.state = State.INITIAL;
 	}

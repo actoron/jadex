@@ -3,6 +3,7 @@ package jadex.bdiv3x.runtime;
 import java.util.Map;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
@@ -56,6 +57,9 @@ public class REventbase extends RElement implements IEventbase
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
+		// Todo: add capability scope
+		type	= type.replace(".", MElement.CAPABILITY_SEPARATOR);
+		
 		MMessageEvent mevent = getCapability().getMCapability().getMessageEvent(type);
 		if(mevent==null)
 			throw new RuntimeException("Message event not found: "+type);
@@ -65,19 +69,20 @@ public class REventbase extends RElement implements IEventbase
 	/**
 	 *  Create a reply to a message event.
 	 *  @param event	The received message event.
-	 *  @param msgeventtype	The reply message event type.
+	 *  @param type	The reply message event type.
 	 *  @return The reply event.
 	 */
-	public IMessageEvent createReply(IMessageEvent event, String msgeventtype)
+	public IMessageEvent createReply(IMessageEvent event, String type)
 	{
+		// Todo: add capability scope
+		type	= type.replace(".", MElement.CAPABILITY_SEPARATOR);
+		
 		if(event==null)
 			throw new IllegalArgumentException("Event must not null");
-		if(msgeventtype==null)
-			throw new IllegalArgumentException("The message event type must not null");
 		
-		MMessageEvent mevent = getCapability().getMCapability().getMessageEvent(msgeventtype);
+		MMessageEvent mevent = getCapability().getMCapability().getMessageEvent(type);
 		if(mevent==null)
-			throw new RuntimeException("Message event not found: "+msgeventtype);
+			throw new RuntimeException("Message event not found: "+type);
 		Map<String, Object> rep = event.getMessageType().createReply((Map<String, Object>)event.getMessage());
 		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent());
 	}

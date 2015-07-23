@@ -42,7 +42,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		this.mt = SFipa.FIPA_MESSAGE_TYPE;
 		
 		// Must be done after msg has been assigned :-(
-		IValueFetcher fetcher = wrapFetcher(RBeliefbase.getFetcher(agent, modelelement));
+		IValueFetcher fetcher = wrapFetcher(CapabilityWrapper.getFetcher(agent, modelelement));
 		super.initParameters(null, fetcher, config);
 		
 		// In case of messages there can be parameters only in the config, not in the model due to underlying message type defition
@@ -79,7 +79,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		
 		// Tricky, must do init for default values if NOT present in the map
 		// Must be done after msg has been assigned :-(
-		IValueFetcher fetcher = wrapFetcher(RBeliefbase.getFetcher(agent, modelelement));
+		IValueFetcher fetcher = wrapFetcher(CapabilityWrapper.getFetcher(agent, modelelement));
 		super.initParameters(msg, fetcher, null);
 	}
 	

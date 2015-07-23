@@ -118,8 +118,19 @@ public class SBDIModel
 			{
 				MGoal goal2	= new MGoal(capaname+MElement.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
 					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
-					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), goal.getParameters(),
-					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), goal.getTriggerGoals()!=null ? new ArrayList<String>(goal.getTriggerGoals()) : null); // clone params?
+					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), null,
+					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), goal.getTriggerGoals()!=null ? new ArrayList<String>(goal.getTriggerGoals()) : null);
+				
+				// Copy parameters and convert events of dynamic parameters.
+				if(goal.getParameters()!=null)
+				{
+					for(MParameter param: goal.getParameters())
+					{
+						MParameter param2 = copyParameter(bdimodel, cl, capaname, param);
+						goal2.addParameter(param2);
+					}
+				}
+
 						
 				// Convert goal condition events
 				if(goal.getConditions()!=null)
@@ -187,6 +198,17 @@ public class SBDIModel
 					convertTrigger(bdimodel, capaname, plan.getTrigger(), true),
 					convertTrigger(bdimodel, capaname, plan.getWaitqueue(), true),
 					plan.getPriority());
+				
+				// Copy parameters and convert events of dynamic parameters.
+				if(plan.getParameters()!=null)
+				{
+					for(MParameter param: plan.getParameters())
+					{
+						MParameter param2 = copyParameter(bdimodel, cl, capaname, param);
+						plan2.addParameter(param2);
+					}
+				}
+				
 				bdimodel.getCapability().addPlan(plan2);
 			}
 			
@@ -394,7 +416,7 @@ public class SBDIModel
 	 */
 	protected static MParameter copyParameter(IBDIModel bdimodel, ClassLoader cl, String capaname, MParameter param)
 	{
-		MParameter	param2	= new MParameter(param.getField());
+		MParameter	param2	= param instanceof MPlanParameter ? new MPlanParameter() : new MParameter(param.getField());
 		param2.setBeliefEvents(convertEvents(capaname, param.getBeliefEvents(), bdimodel));
 		param2.setBindingOptions(param.getBindingOptions());
 		param2.setClazz(param.getClazz());
@@ -410,6 +432,8 @@ public class SBDIModel
 		param2.setServiceMappings(param.getServiceMappings());
 		param2.setSetter(param.getSetter());
 		param2.setUpdateRate(param.getUpdateRate());
+		
+		// Todo: parameter mappings.
 		return param2;
 	}
 

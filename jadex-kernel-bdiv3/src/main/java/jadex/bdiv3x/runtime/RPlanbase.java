@@ -3,6 +3,7 @@ package jadex.bdiv3x.runtime;
 import java.util.Collection;
 
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.RElement;
@@ -41,6 +42,9 @@ public class RPlanbase extends RElement implements IPlanbase
 	 */
 	public IPlan[] getPlans(String type)
 	{
+		// Todo: add capability scope
+		type	= type.replace(".", MElement.CAPABILITY_SEPARATOR);
+		
 		MCapability mcapa = (MCapability)getCapability().getModelElement();
 		MPlan mplan = mcapa.getPlan(type);
 		Collection<RPlan> ret = getCapability().getPlans(mplan);

@@ -44,12 +44,12 @@ public interface ICapability
 	 */
 	public IGoalbase getGoalbase();
 
-//	/**
-//	 *  Get the plan base.
-//	 *  @return The plan base.
-//	 */
-//	public IPlanbase getPlanbase();
-//
+	/**
+	 *  Get the plan base.
+	 *  @return The plan base.
+	 */
+	public IPlanbase getPlanbase();
+
 	/**
 	 *  Get the event base.
 	 *  @return The event base.

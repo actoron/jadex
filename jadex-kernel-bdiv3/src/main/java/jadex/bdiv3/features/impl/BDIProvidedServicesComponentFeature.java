@@ -4,7 +4,7 @@ import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.impl.BDIServiceInvocationHandler;
-import jadex.bdiv3.runtime.impl.CapabilityWrapper;
+import jadex.bdiv3.runtime.impl.CapabilityPojoWrapper;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IPojoComponentFeature;
@@ -57,7 +57,7 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 				
 				Set<Object> vals = new HashSet<Object>();
 				vals.add(ocapa);
-				vals.add(new CapabilityWrapper(getComponent(), ocapa, capa));
+				vals.add(new CapabilityPojoWrapper(getComponent(), ocapa, capa));
 				hackguesser = new SimpleParameterGuesser(super.getParameterGuesser(), vals);
 			}
 			else

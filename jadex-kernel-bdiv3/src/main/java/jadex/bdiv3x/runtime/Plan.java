@@ -1,9 +1,5 @@
 package jadex.bdiv3x.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -27,7 +23,6 @@ import jadex.bdiv3.runtime.impl.BodyAborted;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.PlanAbortedException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
-import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
@@ -57,6 +52,10 @@ import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *  Dummy class for loading v2 examples using v3x.
@@ -446,7 +445,7 @@ public abstract class Plan
 	 */
 	public IBeliefbase getBeliefbase()
 	{
-		return getCapability().getBeliefbase();
+		return getScope().getBeliefbase();
 	}
 
 	/**
@@ -566,14 +565,14 @@ public abstract class Plan
 		throw new PlanFailureException();
 	}
 	
-	/**
-	 *  Get the capability.
-	 *  @return The capability.
-	 */
-	protected RCapability getCapability()
-	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
-	}
+//	/**
+//	 *  Get the capability.
+//	 *  @return The capability.
+//	 */
+//	protected RCapability getCapability()
+//	{
+//		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
+//	}
 	
 	//-------- legacy --------
 	
@@ -603,7 +602,7 @@ public abstract class Plan
 	 */
 	public ICapability getScope()
 	{
-		return new jadex.bdiv3x.runtime.RCapability(agent);
+		return new CapabilityWrapper(agent, getRPlan().getModelElement().getCapabilityName());
 	}
 	
 	/**
@@ -711,7 +710,7 @@ public abstract class Plan
 	 */
 	public IGoalbase getGoalbase()
 	{
-		return getCapability().getGoalbase();
+		return getScope().getGoalbase();
 	}
 
 	/**
@@ -720,7 +719,7 @@ public abstract class Plan
 	 */
 	public IPlanbase getPlanbase()
 	{
-		return getCapability().getPlanbase();
+		return getScope().getPlanbase();
 	}
 
 	/**
@@ -729,7 +728,7 @@ public abstract class Plan
 	 */
 	public IEventbase getEventbase()
 	{
-		return getCapability().getEventbase();
+		return getScope().getEventbase();
 	}
 
 	/**
@@ -738,7 +737,7 @@ public abstract class Plan
 	 */
 	public IExpressionbase getExpressionbase()
 	{
-		return getCapability().getExpressionbase();
+		return getScope().getExpressionbase();
 	}
 	
 	/**

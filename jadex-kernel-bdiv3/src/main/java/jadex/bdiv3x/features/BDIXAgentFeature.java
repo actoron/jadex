@@ -1,17 +1,5 @@
 package jadex.bdiv3x.features;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -27,7 +15,7 @@ import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
-import jadex.bdiv3.runtime.impl.CapabilityWrapper;
+import jadex.bdiv3.runtime.impl.CapabilityPojoWrapper;
 import jadex.bdiv3.runtime.impl.GoalInfo;
 import jadex.bdiv3.runtime.impl.InvocationInfo;
 import jadex.bdiv3.runtime.impl.PlanInfo;
@@ -39,10 +27,12 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
+import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bdiv3x.runtime.IBeliefbase;
 import jadex.bdiv3x.runtime.IEventbase;
 import jadex.bdiv3x.runtime.IExpressionbase;
 import jadex.bdiv3x.runtime.IGoalbase;
+import jadex.bdiv3x.runtime.IPlanbase;
 import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.REventbase;
 import jadex.bdiv3x.runtime.RExpressionbase;
@@ -91,6 +81,18 @@ import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.Event;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *  BDI agent feature version for XML agents.
@@ -964,7 +966,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 //			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
 		
 		vals.add(capa);
-		vals.add(new CapabilityWrapper(component, capa, capaname));
+		vals.add(new CapabilityPojoWrapper(component, capa, capaname));
 		vals.add(component);
 		vals.add(component.getExternalAccess());
 
@@ -1597,13 +1599,21 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				{
 					return getCapability().getGoalbase();
 				}
+				else if("$planbase".equals(name))
+				{
+					return getCapability().getPlanbase();
+				}
+				else if("$eventbase".equals(name))
+				{
+					return getCapability().getEventbase();
+				}
 				else if("$expressionbase".equals(name))
 				{
 					return getCapability().getExpressionbase();
 				}
 				else if("$scope".equals(name))
 				{
-					return new jadex.bdiv3x.runtime.RCapability(getComponent());
+					return new CapabilityWrapper(getComponent(), null);
 				}
 				else
 				{
@@ -1670,6 +1680,15 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	public IGoalbase getGoalbase()
 	{
 		return capa.getGoalbase();
+	}
+
+	/**
+	 *  Get the plan base.
+	 *  @return The plan base.
+	 */
+	public IPlanbase getPlanbase()
+	{
+		return capa.getPlanbase();
 	}
 
 	/**

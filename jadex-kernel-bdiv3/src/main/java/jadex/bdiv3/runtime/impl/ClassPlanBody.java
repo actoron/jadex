@@ -196,12 +196,12 @@ public class ClassPlanBody extends AbstractPlanBody
 						if(f.getType().isAssignableFrom(IInternalAccess.class))
 						{
 							f.setAccessible(true);
-							f.set(plan, new CapabilityWrapper(ia, pojocapa, capaname).getAgent());
+							f.set(plan, new CapabilityPojoWrapper(ia, pojocapa, capaname).getAgent());
 						}
 						else if(f.getType().isAssignableFrom(ICapability.class))
 						{
 							f.setAccessible(true);
-							f.set(plan, new CapabilityWrapper(ia, pojocapa, capaname));
+							f.set(plan, new CapabilityPojoWrapper(ia, pojocapa, capaname));
 						}
 						else if(pojocapa!=null && f.getType().isAssignableFrom(pojocapa.getClass()))
 						{

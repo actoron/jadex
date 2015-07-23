@@ -13,6 +13,7 @@
 
 	<imports>
 		<import>jadex.base.test.*</import>
+		<import>jadex.base.Starter</import>
 	</imports>
 
 	<beliefs>
@@ -21,10 +22,9 @@
 			<fact>1</fact>
 		</belief>
 
-		<!-- Default timeout is 20 seconds. -->
+		<!-- Default timeout platform timeout, e.g. 30 seconds. -->
 		<belief name="timeout" class="long" exported="true">
-			<!--  <fact>0L</fact>-->
-			<fact>20000L</fact>
+			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
 		<!-- The testcase reports. -->

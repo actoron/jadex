@@ -2,6 +2,7 @@ package jadex.bdiv3x.runtime;
 
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bridge.IInternalAccess;
@@ -38,6 +39,9 @@ public class RExpressionbase extends RElement implements IExpressionbase
 	 */
 	public IExpression	getExpression(String name)
 	{
+		// Todo: add capability scope
+		name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
+		
 		if(expressions==null || !expressions.containsKey(name))
 		{
 			RCapability rcapa = agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
@@ -100,7 +104,7 @@ public class RExpressionbase extends RElement implements IExpressionbase
 		{
 			super(null, agent);
 			this.uexp = uexp;
-			this.fetcher = fetcher==null? RBeliefbase.getFetcher(getAgent(), getModelElement()) : fetcher;
+			this.fetcher = fetcher==null? jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(getAgent(), getModelElement()) : fetcher;
 		}
 		
 		/**
