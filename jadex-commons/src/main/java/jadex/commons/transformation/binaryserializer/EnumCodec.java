@@ -1,8 +1,10 @@
 package jadex.commons.transformation.binaryserializer;
 
+import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +45,9 @@ public class EnumCodec extends AbstractCodec
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		return isApplicable(clazz);
 	}
 	

@@ -1,6 +1,7 @@
 package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +34,9 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		return object instanceof JsonObject && (clazz!=null && !SReflect.isSupertype(Map.class, clazz));
 	}
 	
@@ -45,10 +47,11 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		Object ret = null;
+		Class<?> clazz = SReflect.getClass(type);
 		
 		if(clazz==null)
 			System.out.println("clazz is null");
@@ -71,13 +74,14 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected static void traverseProperties(Object object, Class<?> clazz, Map<Object, Object> cloned, 
+	protected static void traverseProperties(Object object, Type type, Map<Object, Object> cloned, 
 		List<ITraverseProcessor> processors, Traverser traverser, boolean clone, ClassLoader targetcl, 
 		Object ret, Object context, IBeanIntrospector intro)
 	{
 		// Get all declared fields (public, protected and private)
 		
 		JsonObject jval = (JsonObject)object;
+		Class<?> clazz = SReflect.getClass(type);
 		Map<String, BeanProperty> props = intro.getBeanProperties(clazz, true, false);
 		
 		for(Iterator<String> it=props.keySet().iterator(); it.hasNext(); )
@@ -91,15 +95,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 					Object val = jval.get(name);
 					if(val!=null) 
 					{
-						if(prop.getGenericType()!=null)
-						{
-							((JsonReadContext)context).setComponentType(SReflect.unwrapGenericType(prop.getGenericType()));
-						}
-						else
-						{
-							((JsonReadContext)context).setComponentType(null);
-						}
-						Object newval = traverser.doTraverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
+						Object newval = traverser.doTraverse(val, prop.getGenericType(), cloned, processors, clone, targetcl, context);
 						if(newval != Traverser.IGNORE_RESULT && (object!=ret || val!=newval))
 						{
 							prop.setPropertyValue(ret, convertBasicType(newval, prop.getType()));

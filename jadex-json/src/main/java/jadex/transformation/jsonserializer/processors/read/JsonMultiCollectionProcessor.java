@@ -2,6 +2,7 @@ package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +26,9 @@ public class JsonMultiCollectionProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(MultiCollection.class, clazz);
 	}
 	
@@ -37,10 +39,11 @@ public class JsonMultiCollectionProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 //		traversed.put(object, null);
+		Class<?> clazz = SReflect.getClass(type);
 		
 		MultiCollection<Object, Object> ret = null;
 		try
@@ -63,14 +66,14 @@ public class JsonMultiCollectionProcessor implements ITraverseProcessor
 
 		JsonObject obj = (JsonObject)object;
 		String classname = obj.getString("type", null);
-		Class<?> type = SReflect.classForName0(classname, targetcl);
+		Class<?> ctype = SReflect.classForName0(classname, targetcl);
 		
 		Map<?, ?> map = null;
 		JsonValue m = obj.get("map");
 		if(m!=null)
 			map = (Map<?,?>)traverser.traverse(m, Map.class, processors, targetcl, context);
 		
-		if(type == null)
+		if(ctype == null)
 			throw new RuntimeException("MultiCollection type not found: " + String.valueOf(classname));
 		
 		try
@@ -80,7 +83,7 @@ public class JsonMultiCollectionProcessor implements ITraverseProcessor
 			field.set(ret, map);
 			field = SReflect.getField(clazz, "type");
 			field.setAccessible(true);
-			field.set(ret, type);
+			field.set(ret, ctype);
 		}
 		catch (Exception e)
 		{

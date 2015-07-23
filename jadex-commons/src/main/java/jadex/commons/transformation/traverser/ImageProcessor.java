@@ -1,8 +1,10 @@
 package jadex.commons.transformation.traverser;
 
+import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Image;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ public class ImageProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
 		return object instanceof Image;
 	}
@@ -30,13 +32,14 @@ public class ImageProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		Object ret = object;
 		if(clone)
 		{
 			byte[] data = SGUI.imageToStandardBytes((Image) object, "image/png");
+			Class<?> clazz = SReflect.getClass(type);
 			ret = SGUI.imageFromBytes(data, clazz);
 		}
 		return ret;

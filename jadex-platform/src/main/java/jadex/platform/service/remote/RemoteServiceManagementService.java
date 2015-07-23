@@ -1,5 +1,15 @@
 package jadex.platform.service.remote;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
@@ -89,15 +99,6 @@ import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.stax.QName;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.IObjectWriterHandler;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 /**
@@ -1616,12 +1617,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// Update component identifiers with addresses
 		ITraverseProcessor bpreproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
+				Class<?> clazz = SReflect.getClass(type);
 				return ComponentIdentifier.class.equals(clazz);
 			}
 			
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser,
+			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				try
@@ -1648,12 +1650,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// Handle pojo services
 		bpreproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
 				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
 			}
 			
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser,
+			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				try
@@ -1672,14 +1674,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// Handle remote references
 		bpreproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
 //				if(marshal.isRemoteReference(object))
 //					System.out.println("rr: "+object);
 				return marshal.isRemoteReference(object);
 			}
 			
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser,
+			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				try
@@ -1699,7 +1701,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// output connection as result of call
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
+			public Object process(Object object, Type type, List<ITraverseProcessor> processors,
 				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				try
@@ -1719,7 +1721,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 			}
 			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
 				return object instanceof ServiceInputConnectionProxy;
 			}
@@ -1728,7 +1730,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// input connection proxy as result of call
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
+			public Object process(Object object, Type type, List<ITraverseProcessor> processors,
 				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				try
@@ -1748,7 +1750,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 			}
 			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
 				return object instanceof ServiceOutputConnectionProxy;
 			}

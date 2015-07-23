@@ -17,7 +17,6 @@ import jadex.transformation.jsonserializer.processors.read.JsonClassProcessor;
 import jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor;
 import jadex.transformation.jsonserializer.processors.read.JsonPrimitiveObjectProcessor;
 import jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonReadContext;
 import jadex.transformation.jsonserializer.processors.read.JsonURIProcessor;
 import jadex.transformation.jsonserializer.processors.read.JsonURLProcessor;
 import jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor;
@@ -66,6 +65,15 @@ public class JsonTraverser extends Traverser
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader)
 	{
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonRectangleProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonImageProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonColorProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonTupleProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonInetAddressProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonLogRecordProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonLoggingLevelProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonUUIDProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonClassProcessor());
 		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonMultiCollectionProcessor());
 		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonEnumProcessor());
 		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonCertificateProcessor());
@@ -77,7 +85,15 @@ public class JsonTraverser extends Traverser
 		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor());
 		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
 		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
-		Traverser traverser = new Traverser();
+		Traverser traverser = new Traverser()
+		{
+			public Object handleNull(Class<?> clazz, List<ITraverseProcessor> processors, boolean clone, Object context) 
+			{
+				JsonWriteContext wr = (JsonWriteContext)context;
+				wr.write("null");
+				return null;
+			}
+		};
 		JsonWriteContext wr = new JsonWriteContext(true);
 		
 		try
@@ -87,7 +103,7 @@ public class JsonTraverser extends Traverser
 			byte[] ret = wr.getString().getBytes();
 			bos.close();
 			return ret;
-		} 
+		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
@@ -105,6 +121,14 @@ public class JsonTraverser extends Traverser
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep)
 	{
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
+		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonRectangleProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonImageProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonColorProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonTupleProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonInetAddressProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonLogRecordProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonLoggingLevelProcessor());
+		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonUUIDProcessor());
 		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonMultiCollectionProcessor());
 		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonEnumProcessor());
 		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonCertificateProcessor());
@@ -123,7 +147,7 @@ public class JsonTraverser extends Traverser
 		
 		JsonValue value = Json.parse(new String(val));
 		JsonTraverser traverser = new JsonTraverser();
-		Object ret = traverser.traverse(value, null, procs, null, new JsonReadContext());
+		Object ret = traverser.traverse(value, null, procs, null, null);
 		return ret;
 	}
 }

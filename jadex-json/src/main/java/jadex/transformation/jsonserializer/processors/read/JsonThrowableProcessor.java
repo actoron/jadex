@@ -1,8 +1,7 @@
 package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Constructor;
-import java.util.Calendar;
-import java.util.Date;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -10,10 +9,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.binaryserializer.BeanCodec;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
-import jadex.commons.transformation.binaryserializer.IDecodingContext;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -33,8 +29,9 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		return object instanceof JsonObject && SReflect.isSupertype(Throwable.class, clazz);
 	}
 	
@@ -45,10 +42,11 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		Object ret = null;
+		Class<?> clazz = SReflect.getClass(type);
 		
 		JsonObject obj = (JsonObject)object;
 		String msg = obj.getString("msg", null);
@@ -56,7 +54,7 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 		Throwable cause = null;
 		JsonValue cau = obj.get("cause");
 		if(cau!=null)
-			cause = (Throwable)traverser.traverse(cau, clazz, processors, targetcl, context);
+			cause = (Throwable)traverser.traverse(cau, Throwable.class, processors, targetcl, context);
 		
 		Class<?> cl = JsonPrimitiveObjectProcessor.getClazz(object, targetcl);
 		

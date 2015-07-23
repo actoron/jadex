@@ -92,43 +92,40 @@ public abstract class Test extends TestCase
 			{	
 //			while(true)
 //			{
-//				testByte();
-//
-//				testCalendar();
-//				
-//				testException();
-//
-//				testCertificate(); 
-//
-//				testTimestamp();
-//
-//				testEnum();
-//
-//				testByte();
-//				testDouble();
-////				testBigData();
-//				
-//				// todo
-////				testSpecialCharacter();
-//					
-//				testByteArray();
-//				testBByteArray();
-//				testIntArray();
-//				testIntegerArray();
-//				testDoubleArray();
-//				testBDoubleArray();
-//				testFloatArray();
-//				testBFloatArray();
-//				testLongArray();
-//				testBLongArray();
-//				testCharArray();
-//				testCharacterArray();
-//				testShortArray();
-//				testBShortArray();
-//				testBooleanArray();
-//				testBBooleanArray();
-//				
-//				testVectorModel();
+				testByte();
+
+				testCalendar();
+				
+				testException();
+
+				testCertificate(); 
+
+				testTimestamp();
+
+				testEnum();
+
+				testByte();
+				testDouble();
+//				testBigData();
+					
+				testByteArray();
+				testBByteArray();
+				testIntArray();
+				testIntegerArray();
+				testDoubleArray();
+				testBDoubleArray();
+				testFloatArray();
+				testBFloatArray();
+				testLongArray();
+				testBLongArray();
+				testCharArray();
+				testCharacterArray();
+				testShortArray();
+				testBShortArray();
+				testBooleanArray();
+				testBBooleanArray();
+				
+				testVectorModel();
 				testMultiCollection();
 				testEmptySet();
 				testEmptyList();
@@ -136,15 +133,13 @@ public abstract class Test extends TestCase
 				testArray();
 				testList();
 				testSet();
-				testLRU();
-				testMap();
 				testEmptyArray();
 				testArrayOrder();
 				testMultiArray();
 				testMultiArray2();
 				testMultiArrayAttribute();
 				testByteArrayAttribute();
-				
+	
 				testClass();
 				testDate();
 				testUUID();
@@ -160,15 +155,21 @@ public abstract class Test extends TestCase
 			
 				testBean();
 				testExcluded();
-				testBeanWithPublicFields();
-				testBeanWithIncludedFields();
+				
 				testAnonymousInnerClass();
 				testAnonymousInnerClassWithSimpleTypes();
-				testSelfReferenceBean();
 			
 				testColor();
 				testImage();
 				testRectangle();
+				
+				// todo
+//				testSpecialCharacter();
+//				testLRU();
+//				testMap();
+//				testBeanWithPublicFields();
+//				testBeanWithIncludedFields();
+//				testSelfReferenceBean();
 			}
 			long dur = System.currentTimeMillis()-start;
 			

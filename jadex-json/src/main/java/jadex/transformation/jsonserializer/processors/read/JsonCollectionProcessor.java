@@ -1,5 +1,6 @@
 package jadex.transformation.jsonserializer.processors.read;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,8 +29,9 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		return (object instanceof JsonArray && SReflect.isSupertype(Collection.class, clazz) || 
 			(object instanceof JsonObject && ((JsonObject)object).get(JsonTraverser.COLLECTION_MARKER)!=null));
 	}
@@ -41,11 +43,12 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonArray array;
-		Class<?> compclazz = clazz;
+		Class<?> clazz = SReflect.getClass(type);
+		Class<?> compclazz = SReflect.unwrapGenericType(type);
 		if(((JsonValue)object).isArray())
 		{
 			array = (JsonArray)object;
@@ -53,19 +56,18 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		else
 		{
 			JsonObject obj = (JsonObject)object;
-			compclazz = JsonTraverser.findClazzOfJsonObject(obj, targetcl);
+//			compclazz = JsonTraverser.findClazzOfJsonObject(obj, targetcl);
 			array = (JsonArray)obj.get(JsonTraverser.COLLECTION_MARKER);
 		}
 		
-		Collection ret = (List)getReturnObject(object, compclazz);
+		Collection ret = (Collection)getReturnObject(object, clazz);
 		
 		traversed.put(object, ret);
 		
 		for(int i=0; i<array.size(); i++)
 		{
 			Object val = array.get(i);
-			Class<?> valclazz = ((JsonReadContext)context).getComponentType();
-			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+			Object newval = traverser.doTraverse(val, compclazz!=null? compclazz: val.getClass(), traversed, processors, clone, targetcl, context);
 			
 			if(newval != Traverser.IGNORE_RESULT)
 			{

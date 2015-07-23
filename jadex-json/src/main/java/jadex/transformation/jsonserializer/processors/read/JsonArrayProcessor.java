@@ -1,6 +1,7 @@
 package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +26,10 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
+		Class<?> clazz = SReflect.getClass(type);
+
 		return (object instanceof JsonArray && clazz!=null && clazz.isArray()) || 
 			(object instanceof JsonObject && ((JsonObject)object).get(JsonTraverser.ARRAY_MARKER)!=null);
 	}
@@ -38,9 +41,11 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
+		Class<?> clazz = SReflect.getClass(type);
+		
 		JsonArray array;
 		Class<?> compclazz = null;
 		if(((JsonValue)object).isArray())
@@ -56,14 +61,14 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		}
 			
 		Object ret = getReturnObject(array, compclazz, clone, targetcl);
-		Class<?> type = clazz.getComponentType();
+		Class<?> ccl = clazz.getComponentType();
 			
 		traversed.put(object, ret);
 			
 		for(int i=0; i<array.size(); i++)
 		{
 			Object val = array.get(i);
-			Object newval = traverser.doTraverse(val, type, traversed, processors, clone, targetcl, context);
+			Object newval = traverser.doTraverse(val, ccl, traversed, processors, clone, targetcl, context);
 			if(newval != Traverser.IGNORE_RESULT && (clone || newval!=val))
 			{
 				Array.set(ret, i, JsonBeanProcessor.convertBasicType(newval, clazz));	

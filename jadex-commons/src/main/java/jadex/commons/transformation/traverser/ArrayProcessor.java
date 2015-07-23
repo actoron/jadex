@@ -3,6 +3,7 @@ package jadex.commons.transformation.traverser;
 import jadex.commons.SReflect;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class ArrayProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
 		return object.getClass().isArray();
 	}
@@ -37,19 +38,20 @@ public class ArrayProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		Object ret = getReturnObject(object, clazz, clone, targetcl);
 		int length = Array.getLength(object);
-		Class type = clazz.getComponentType();
+		Class<?> ctype = clazz.getComponentType();
 		
 		traversed.put(object, ret);
 		
 		for(int i=0; i<length; i++) 
 		{
 			Object val = Array.get(object, i);
-			Object newval = traverser.doTraverse(val, type, traversed, processors, clone, targetcl, context);
+			Object newval = traverser.doTraverse(val, ctype, traversed, processors, clone, targetcl, context);
 			if(newval != Traverser.IGNORE_RESULT && (clone || newval!=val))
 				Array.set(ret, i, newval);
 		}

@@ -1,5 +1,6 @@
 package jadex.transformation.jsonserializer.processors.write;
 
+import java.lang.reflect.Type;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +22,9 @@ public class JsonCertificateProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(Certificate.class, clazz);
 	}
 	
@@ -33,7 +35,7 @@ public class JsonCertificateProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		try

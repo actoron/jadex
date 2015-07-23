@@ -1,6 +1,7 @@
 package jadex.transformation.jsonserializer.processors.write;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +22,10 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
-		return clazz.isArray();
+		Class<?> clazz = SReflect.getClass(type);
+		return clazz!=null && clazz.isArray();
 	}
 	
 	/**
@@ -33,12 +35,14 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		
+		Class<?> clazz = SReflect.getClass(type);
 		Class<?> compclazz = clazz.getComponentType();
+		
 		if(wr.isWriteClass())
 		{
 			wr.write("{");
@@ -53,7 +57,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 			if(i>0)
 				wr.write(",");
 			Object val = Array.get(object, i);
-			traverser.doTraverse(val, val.getClass(), traversed, processors, clone, targetcl, context);
+			traverser.doTraverse(val, val!=null? val.getClass(): null, traversed, processors, clone, targetcl, context);
 		}
 		
 		wr.write("]");
