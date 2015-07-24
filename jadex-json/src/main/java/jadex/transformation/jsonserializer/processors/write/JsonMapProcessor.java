@@ -76,6 +76,8 @@ public class JsonMapProcessor implements ITraverseProcessor
 					Class<?> valclazz = val!=null? val.getClass(): null;
 					Object key = keys[i];
 					
+					if(i>0)
+						wr.write(",");
 					wr.write("\"").write(key.toString()).write("\":");
 					traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
 				}

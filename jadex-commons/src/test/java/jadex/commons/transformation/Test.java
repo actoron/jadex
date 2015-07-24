@@ -92,6 +92,8 @@ public abstract class Test extends TestCase
 			{	
 //			while(true)
 //			{
+				testMultiCollection();
+
 				testByte();
 
 				testCalendar();
@@ -126,7 +128,6 @@ public abstract class Test extends TestCase
 				testBBooleanArray();
 				
 				testVectorModel();
-				testMultiCollection();
 				testEmptySet();
 				testEmptyList();
 				testEmptyMap();
