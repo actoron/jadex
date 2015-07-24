@@ -10,6 +10,7 @@ import jadex.commons.transformation.traverser.Traverser;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -169,7 +170,7 @@ public class BeanCodec extends AbstractCodec
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
 		return object != null;
 	}

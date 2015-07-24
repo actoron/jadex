@@ -14,7 +14,6 @@ import jadex.transformation.jsonserializer.processors.read.JsonClassProcessor;
 import jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor;
 import jadex.transformation.jsonserializer.processors.read.JsonMapProcessor;
 import jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonReadContext;
 import jadex.transformation.jsonserializer.processors.read.JsonURIProcessor;
 import jadex.transformation.jsonserializer.processors.read.JsonURLProcessor;
 
@@ -142,7 +141,7 @@ public class Car
 		
 		JsonValue value = Json.parse(str);
 		JsonTraverser traverser = new JsonTraverser();
-		Object ret = traverser.traverse(value, null, procs, null, new JsonReadContext());
+		Object ret = traverser.traverse(value, null, procs, null, null);
 	
 		System.out.println(str);
 		System.out.println(ret);

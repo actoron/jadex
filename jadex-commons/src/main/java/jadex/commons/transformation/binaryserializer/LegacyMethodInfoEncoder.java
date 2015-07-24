@@ -1,9 +1,11 @@
 package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +18,19 @@ public class LegacyMethodInfoEncoder implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
 		return object instanceof MethodInfo;
+	}
+	
+	/**
+	 *  Tests if the decoder can decode the class.
+	 *  @param clazz The class.
+	 *  @return True, if the decoder can decode this class.
+	 */
+	public boolean isApplicable(Class<?> clazz)
+	{
+		return SReflect.isSupertype(MethodInfo.class, clazz);
 	}
 	
 	/**
@@ -28,7 +40,7 @@ public class LegacyMethodInfoEncoder implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		IEncodingContext ec = (IEncodingContext) context;

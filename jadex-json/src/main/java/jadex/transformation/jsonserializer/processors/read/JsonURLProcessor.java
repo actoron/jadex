@@ -1,9 +1,11 @@
 package jadex.transformation.jsonserializer.processors.read;
 
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
@@ -23,9 +25,10 @@ public class JsonURLProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof JsonValue && SReflect.isSupertype(URL.class, clazz);
+		Class<?> clazz = SReflect.getClass(type);
+		return SReflect.isSupertype(URL.class, clazz);
 	}
 	
 	/**
@@ -35,14 +38,24 @@ public class JsonURLProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		JsonValue val = (JsonValue)object;
+		String v = null;
+		if(object instanceof JsonObject)
+		{
+			JsonObject obj = (JsonObject)object;
+			v = obj.getString("value", null);
+		}
+		else if(object instanceof JsonValue)
+		{
+			JsonValue val = (JsonValue)object;
+			v = val.asString();
+		}
 		
 		try
 		{
-			URL url = new URL(val.asString());
+			URL url = new URL(v);
 			return url;
 		}
 		catch(Exception e)

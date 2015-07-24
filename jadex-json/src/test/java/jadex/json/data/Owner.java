@@ -145,7 +145,7 @@ public class Owner
 		map.put(car1, car1);
 		
 		Gson gson = new Gson();
-		System.out.println(gson.toJson(tr));   
+		System.out.println(gson.toJson(map));   
 		
 		Traverser traverser = new Traverser();
 		JsonWriteContext wr = new JsonWriteContext(false);

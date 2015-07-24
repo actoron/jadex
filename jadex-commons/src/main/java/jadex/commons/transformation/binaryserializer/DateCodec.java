@@ -1,8 +1,10 @@
 package jadex.commons.transformation.binaryserializer;
 
+import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
+import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
@@ -42,17 +44,18 @@ public class DateCodec extends AbstractCodec
 		return ret;
 	}
 	
-	/**
-	 *  Test if the processor is applicable.
-	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
-	 *    e.g. by cloning the object using the class loaded from the target class loader.
-	 *  @return True, if is applicable. 
-	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-	{
-		return isApplicable(clazz);
-	}
+//	/**
+//	 *  Test if the processor is applicable.
+//	 *  @param object The object.
+//	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+//	 *    e.g. by cloning the object using the class loaded from the target class loader.
+//	 *  @return True, if is applicable. 
+//	 */
+//	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+//	{
+//		Class<?> clazz = SReflect.getClass(type);
+//		return isApplicable(clazz);
+//	}
 	
 	/**
 	 *  Encode the object.

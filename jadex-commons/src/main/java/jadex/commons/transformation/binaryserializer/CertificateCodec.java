@@ -5,6 +5,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Type;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.List;
@@ -55,17 +56,18 @@ public class CertificateCodec extends AbstractCodec
 		}
 	}
 	
-	/**
-	 *  Test if the processor is applicable.
-	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
-	 *    e.g. by cloning the object using the class loaded from the target class loader.
-	 *  @return True, if is applicable. 
-	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-	{
-		return isApplicable(clazz);
-	}
+//	/**
+//	 *  Test if the processor is applicable.
+//	 *  @param object The object.
+//	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+//	 *    e.g. by cloning the object using the class loaded from the target class loader.
+//	 *  @return True, if is applicable. 
+//	 */
+//	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+//	{
+//		Class<?> clazz = SReflect.getClass(type);
+//		return isApplicable(clazz);
+//	}
 	
 	/**
 	 *  Encode the object.

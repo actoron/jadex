@@ -2,6 +2,7 @@ package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -196,7 +197,7 @@ public class Traverser
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object traverse(Object object, Class<?> clazz, Map<Object, Object> traversed, 
+	public Object traverse(Object object, Type clazz, Map<Object, Object> traversed, 
 		List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
 	{
 		if(processors == null)
@@ -219,10 +220,11 @@ public class Traverser
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object doTraverse(Object object, Class<?> clazz, Map<Object, Object> traversed, 
+	public Object doTraverse(Object object, Type type, Map<Object, Object> traversed, 
 		List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
 	{
 		Object ret = object;
+		Class<?> clazz = SReflect.getClass(type);
 		
 		if(object!=null)
 		{

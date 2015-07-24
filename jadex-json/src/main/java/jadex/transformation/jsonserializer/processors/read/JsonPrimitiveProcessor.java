@@ -1,10 +1,12 @@
 package jadex.transformation.jsonserializer.processors.read;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
 import com.eclipsesource.json.JsonValue;
 
+import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
@@ -20,14 +22,11 @@ public class JsonPrimitiveProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
 		boolean ret = false;
-		if(object instanceof JsonValue)
-		{
-			JsonValue val = (JsonValue)object;
-			ret = val.isString() || val.isBoolean() || val.isNumber();
-		}
+		JsonValue val = (JsonValue)object;
+		ret = val.isString() || val.isBoolean() || val.isNumber();
 		return ret;
 	}
 	
@@ -38,10 +37,11 @@ public class JsonPrimitiveProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		Object ret = null;
+		Class<?> clazz = SReflect.getClass(type);
 		
 		JsonValue val = (JsonValue)object;
 		if(val.isNumber())

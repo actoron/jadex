@@ -18,6 +18,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.javaparser.SJavaParser;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1746,12 +1747,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				return Traverser.IGNORE_RESULT;
 			}
 			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
 				boolean ret = false;
 				if (object instanceof MEdge)
@@ -1768,12 +1769,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		});
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				return object;
 			}
 			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
 				return object instanceof MPool ||
 						object instanceof MLane ||

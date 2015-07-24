@@ -1,5 +1,33 @@
 package jadex.platform.service.message;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
@@ -77,33 +105,6 @@ import jadex.platform.service.message.transport.ITransport;
 import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
 import jadex.platform.service.remote.RemoteMethodInvocationHandler;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Proxy;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 
 /**
@@ -579,7 +580,7 @@ public class MessageService extends BasicService implements IMessageService
 		List<ITraverseProcessor> procs = Traverser.getDefaultProcessors();
 		procs.add(1, new ITraverseProcessor()
 		{
-			public Object process(Object object, Class<?> clazz,
+			public Object process(Object object, Type type,
 				List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
@@ -587,7 +588,7 @@ public class MessageService extends BasicService implements IMessageService
 //				return internalUpdateComponentIdentifier((ITransportComponentIdentifier)object);
 			}
 			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
 				return object instanceof ITransportComponentIdentifier;
 			}
@@ -596,15 +597,16 @@ public class MessageService extends BasicService implements IMessageService
 		// Ignore service proxies.
 		procs.add(1, new ITraverseProcessor()
 		{
-			public Object process(Object object, Class<?> clazz,
+			public Object process(Object object, Type type,
 				List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				return object;
 			}
 			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
+				Class<?> clazz = SReflect.getClass(type);
 				return Proxy.isProxyClass(clazz) &&
 					(Proxy.getInvocationHandler(object) instanceof BasicServiceInvocationHandler
 						|| Proxy.getInvocationHandler(object) instanceof RemoteMethodInvocationHandler);

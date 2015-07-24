@@ -2,6 +2,7 @@ package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,9 @@ public class ListProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(List.class, clazz);
 	}
 	
@@ -30,9 +32,10 @@ public class ListProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
+		Class<?> clazz = SReflect.getClass(type);
 		List ret = (List)getReturnObject(object, clazz, clone);
 		List list = (List)object;
 		
