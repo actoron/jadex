@@ -188,13 +188,30 @@ public class MCapability extends MElement
 		MGoal ret = null;
 		if(goals!=null)
 		{
+			List<MGoal>	partials	= null;
 			for(MGoal goal: goals)
 			{
-				if(goal.getName().endsWith(name))	// For inner classes.
+				if(goal.getName().equals(name))
 				{
 					ret = goal;
 					break;
 				}
+				
+				// Partial matches needed for pojo goals, as capability name is not known.
+				// Todo: find exact capability name for non-static inner class goals.
+				else if(goal.getName().endsWith(name))
+				{
+					if(partials==null)
+					{
+						partials	= new ArrayList<MGoal>();
+					}
+					partials.add(goal);
+				}
+			}
+			
+			if(ret==null && partials!=null && partials.size()==1)
+			{
+				ret	= partials.get(0);
 			}
 		}
 		return ret;

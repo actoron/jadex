@@ -53,7 +53,7 @@ public abstract class AbstractReceiverPlan extends Plan
 		if(hasParameter("interaction_state"))
 		{
 			InteractionState	state	= (InteractionState)getParameter("interaction_state").getValue();
-			if(InteractionState.INTERACTION_RUNNING.equals(state.getInteractionState()))
+			if(state!=null && InteractionState.INTERACTION_RUNNING.equals(state.getInteractionState()))
 			{
 				state.setInteractionState(InteractionState.INTERACTION_FINISHED);
 			}

@@ -433,7 +433,22 @@ public class SBDIModel
 		param2.setSetter(param.getSetter());
 		param2.setUpdateRate(param.getUpdateRate());
 		
-		// Todo: parameter mappings.
+		if(param instanceof MPlanParameter)
+		{
+			for(String mapping: SUtil.safeList(((MPlanParameter)param).getGoalMappings()))
+			{
+				((MPlanParameter)param2).addGoalMapping(capaname + MElement.CAPABILITY_SEPARATOR + mapping);
+			}
+			for(String mapping: SUtil.safeList(((MPlanParameter)param).getMessageEventMappings()))
+			{
+				((MPlanParameter)param2).addMessageEventMapping(capaname + MElement.CAPABILITY_SEPARATOR + mapping);
+			}
+			for(String mapping: SUtil.safeList(((MPlanParameter)param).getInternalEventMappings()))
+			{
+				((MPlanParameter)param2).addInternalEventMapping(capaname + MElement.CAPABILITY_SEPARATOR + mapping);
+			}
+		}
+		
 		return param2;
 	}
 

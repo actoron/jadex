@@ -17,7 +17,7 @@ public class CountdownTesterPlan extends Plan
 	{
 		waitFor(300);
 		TestReport tr = new TestReport("#1", "Test plan context condition.");
-		if(getCapability().getPlans().size()==1)
+		if(getPlanbase().getPlans().length==1)
 		{
 			tr.setSucceeded(true);
 		}

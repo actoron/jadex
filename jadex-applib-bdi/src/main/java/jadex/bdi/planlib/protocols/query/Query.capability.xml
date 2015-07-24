@@ -212,7 +212,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.JADEX_XML</value>
 			</parameter>
-			<match>$beliefbase.qp_filter.filter($message) &amp;&amp; $conversation_id!=null
+			<match>$beliefbase.qp_filter.filter($messagemap) &amp;&amp; $conversation_id!=null
 				&amp;&amp; (SFipa.QUERY_IF.equals($performative) || SFipa.QUERY_REF.equals($performative))</match>
 		</messageevent> 
 		
@@ -229,7 +229,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.JADEX_XML</value>
 			</parameter>
-			<match>$beliefbase.qp_filter.filter($message) &amp;&amp; $conversation_id!=null</match>
+			<match>$beliefbase.qp_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
 		</messageevent> -->
 		
 		<!-- <messageevent name="qp_query_if" type="fipa" exported="true">
@@ -245,7 +245,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.JADEX_XML</value>
 			</parameter>
-			<match>$beliefbase.qp_filter.filter($message) &amp;&amp; $conversation_id!=null</match>
+			<match>$beliefbase.qp_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
 		</messageevent> -->
 		
 		<!-- <messageevent name="qp_query_ref" type="fipa" exported="true">
@@ -261,7 +261,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.JADEX_XML</value>
 			</parameter>
-			<match>$beliefbase.qp_filter.filter($message) &amp;&amp; $conversation_id!=null</match>
+			<match>$beliefbase.qp_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
 		</messageevent> -->
 
 		<messageevent name="qp_agree" type="fipa" exported="true">

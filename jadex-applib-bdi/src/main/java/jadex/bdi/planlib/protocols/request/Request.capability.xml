@@ -212,7 +212,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.JADEX_XML</value>
 			</parameter>
-			<match>$beliefbase.rp_filter.filter($message) &amp;&amp; $conversation_id!=null</match>
+			<match>$beliefbase.rp_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
 		</messageevent>
 
 		<messageevent name="rp_agree" type="fipa" exported="true">

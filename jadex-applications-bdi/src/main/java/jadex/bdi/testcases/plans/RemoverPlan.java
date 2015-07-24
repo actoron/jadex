@@ -18,7 +18,7 @@ public class RemoverPlan extends Plan
 		waitFor(3000);
 		getBeliefbase().getBelief("mycontext").setFact(Boolean.FALSE);
 
-		if(getCapability().getPlans().size()==1)
+		if(getPlanbase().getPlans().length==1)
 		{
 			getLogger().info("Success. Plan has been removed.");
 		}

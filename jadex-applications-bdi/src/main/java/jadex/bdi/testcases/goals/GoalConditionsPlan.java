@@ -26,7 +26,7 @@ public class GoalConditionsPlan	extends Plan
 		{
 			report.setFailed("Goal already exists");
 		}
-		else if(getCapability().getPlans().size()!=1)
+		else if(getPlanbase().getPlans().length!=1)
 		{
 			report.setFailed("Wrong planbase contents");
 		}
@@ -43,7 +43,7 @@ public class GoalConditionsPlan	extends Plan
 		{
 			report.setFailed("Goal does not exist");
 		}
-		else if(getCapability().getPlans().size()!=1)
+		else if(getPlanbase().getPlans().length!=1)
 		{
 			report.setFailed("Wrong planbase contents");
 		}
