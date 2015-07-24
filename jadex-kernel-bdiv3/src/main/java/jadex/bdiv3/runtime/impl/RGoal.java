@@ -5,9 +5,6 @@ import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
-import jadex.bdiv3.model.BDIModel;
-import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
@@ -853,13 +850,13 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			// AND case
 			else
 			{
-				MCapability mcapa = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IInternalBDIAgentFeature.class)).getBDIModel().getCapability();
-				
-				String capaname = getMGoal().getCapabilityName();
-				if(capaname!=null)
-				{
-					mcapa = ((BDIModel)((IInternalBDIAgentFeature)getAgent().getComponentFeature(IInternalBDIAgentFeature.class)).getBDIModel()).getCapability(capaname);
-				}
+//				MCapability mcapa = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IInternalBDIAgentFeature.class)).getBDIModel().getCapability();
+//				
+//				String capaname = getMGoal().getCapabilityName();
+//				if(capaname!=null)
+//				{
+//					mcapa = ((BDIModel)((IInternalBDIAgentFeature)getAgent().getComponentFeature(IInternalBDIAgentFeature.class)).getBDIModel()).getCapability(capaname);
+//				}
 				
 				// No further candidate? Then is considered as succeeded
 				// todo: is it sufficient that one plan has succeeded or all?

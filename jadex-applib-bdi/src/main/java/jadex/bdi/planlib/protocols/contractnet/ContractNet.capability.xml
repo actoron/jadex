@@ -560,7 +560,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.JADEX_XML</value>
  			</parameter>
-			<match>/* $beliefbase.cnp_filter.filter($messagemap) &amp;&amp; */ $conversation_id!=null</match>
+			<match>$beliefbase.cnp_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
 		</messageevent>
 
 		<messageevent name="cnp_propose" type="fipa" exported="true">
@@ -673,7 +673,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.JADEX_XML</value>
  			</parameter>
-			<match>/* $beliefbase.icnp_filter.filter($messagemap) &amp;&amp; */ $conversation_id!=null</match>
+			<match>$beliefbase.icnp_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
 		</messageevent>
 
 		<messageevent name="icnp_propose" type="fipa" exported="true">

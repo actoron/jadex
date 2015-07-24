@@ -254,7 +254,7 @@
  				<value>"begin_auction"</value>
  			</parameter>			
  			<parameter name="content" class="AuctionDescription" direction="inout"/>
- 			<match>/*$beliefbase.ea_filter.filter($messagemap) &amp;&amp; */ $conversation_id!=null</match>
+ 			<match>$beliefbase.ea_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
 		</messageevent>
 		
 		<messageevent name="ea_inform_end_auction" type="fipa" exported="true">
