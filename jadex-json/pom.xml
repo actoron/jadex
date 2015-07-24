@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jadex-javaparser</artifactId>
+	<artifactId>jadex-json</artifactId>
 	<packaging>jar</packaging>
 	<name>jadex-json</name>
 	<parent>
@@ -21,12 +21,15 @@
 			<artifactId>jadex-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- Javacc only needed when regenerating the grammars. - ->
 		<dependency>
-		    <groupId>net.java.dev.javacc</groupId>
-		    <artifactId>javacc</artifactId>
-		    <version>4.0</version>
+		    <groupId>com.eclipsesource.minimal-json</groupId>
+		    <artifactId>minimal-json</artifactId>
+		    <version>0.9.4</version>
 		</dependency>
-		-->
+		<dependency>
+		    <groupId>com.google.code.gson</groupId>
+		    <artifactId>gson</artifactId>
+		    <version>2.3.1</version>
+		</dependency>
 	</dependencies>
 </project>

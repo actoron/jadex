@@ -30,7 +30,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	{
 		Class<?> clazz = SReflect.getClass(type);
 
-		return (object instanceof JsonArray && clazz!=null && clazz.isArray()) || 
+		return (object instanceof JsonArray && (clazz==null || clazz.isArray())) || 
 			(object instanceof JsonObject && ((JsonObject)object).get(JsonTraverser.ARRAY_MARKER)!=null);
 	}
 	
@@ -50,7 +50,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		Class<?> compclazz = null;
 		if(((JsonValue)object).isArray())
 		{
-			compclazz = clazz.getComponentType();
+			compclazz = clazz!=null? clazz.getComponentType(): null;
 			array = (JsonArray)object;
 		}
 		else
@@ -61,7 +61,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		}
 			
 		Object ret = getReturnObject(array, compclazz, clone, targetcl);
-		Class<?> ccl = clazz.getComponentType();
+		Class<?> ccl = ret.getClass().getComponentType();
 			
 		traversed.put(object, ret);
 			
@@ -83,8 +83,11 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	 */
 	public Object getReturnObject(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		if(targetcl!=null)
-			clazz	= SReflect.classForName0(SReflect.getClassName(clazz), targetcl);
+		if(clazz!=null && targetcl!=null)
+			clazz = SReflect.classForName0(SReflect.getClassName(clazz), targetcl);
+
+		if(clazz==null)
+			clazz = Object.class;
 		
 		int length = ((JsonArray)object).size();
 		return Array.newInstance(clazz, length);

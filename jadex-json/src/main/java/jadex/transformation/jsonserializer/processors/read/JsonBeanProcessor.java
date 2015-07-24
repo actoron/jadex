@@ -184,7 +184,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 				}
 			}
 			// Autoconvert basic to string
-			else if(targetclazz.equals(String.class))
+			else if(String.class.equals(targetclazz))
 			{
 				IObjectStringConverter conv = BasicTypeConverter.getBasicObjectConverter(value.getClass());
 				if(conv!=null)

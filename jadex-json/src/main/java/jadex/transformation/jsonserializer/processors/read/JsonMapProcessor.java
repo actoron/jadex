@@ -1,6 +1,8 @@
 package jadex.transformation.jsonserializer.processors.read;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,20 +44,38 @@ public class JsonMapProcessor implements ITraverseProcessor
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		Map ret = (Map)getReturnObject(object, clazz);
-		JsonObject jval = (JsonObject)object;
+		JsonObject obj = (JsonObject)object;
 		traversed.put(object, ret);
 		
-		for(String name: jval.names())
+		if(obj.get("__keys")==null)
 		{
-			if(JsonTraverser.CLASSNAME_MARKER.equals(name))
-				continue;
-			Object val = jval.get(name);
-			Class<?> valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
-			if(newval != Traverser.IGNORE_RESULT)
+			for(String name: obj.names())
 			{
-				if(newval!=val)
-					ret.put(name, newval);
+				if(JsonTraverser.CLASSNAME_MARKER.equals(name))
+					continue;
+				Object val = obj.get(name);
+				Class<?> valclazz = val!=null? val.getClass(): null;
+				Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+				if(newval != Traverser.IGNORE_RESULT)
+				{
+					if(newval!=val)
+						ret.put(name, newval);
+				}
+			}
+		}
+		else
+		{
+			Object keys = traverser.doTraverse(obj.get("__keys"), null, traversed, processors, clone, targetcl, context);
+			Object vals = traverser.doTraverse(obj.get("__values"), null, traversed, processors, clone, targetcl, context);
+			
+			for(int i=0; i<Array.getLength(keys); i++)
+			{
+				Object key = Array.get(keys, i);
+				Object val = Array.get(vals, i);
+				if(val != Traverser.IGNORE_RESULT)
+				{
+					ret.put(key, val);
+				}
 			}
 		}
 		

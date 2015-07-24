@@ -96,7 +96,7 @@ public class LRUCodec extends AbstractCodec
 	{
 		ec.writeVarInt(((LRU) object).getMaxEntries());
 		ILRUEntryCleaner cleaner = ((LRU) object).getCleaner();
-		if (cleaner == null)
+		if(cleaner == null)
 		{
 			ec.writeClassname(BinarySerializer.NULL_MARKER);
 		}

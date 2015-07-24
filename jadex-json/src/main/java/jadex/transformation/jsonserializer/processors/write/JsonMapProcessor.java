@@ -53,27 +53,56 @@ public class JsonMapProcessor implements ITraverseProcessor
 		
 		Set keyset = map.keySet();
 		Object[] keys = keyset.toArray(new Object[keyset.size()]);
-		for(int i=0; i<keys.length; i++)
+		
+		if(keys.length>0)
 		{
-			Object val = map.get(keys[i]);
-			Class<?> valclazz = val!=null? val.getClass(): null;
-			Object key = keys[i];
-//			Class<?> keyclazz = key != null? key.getClass() : null;
-			
-			if(key!=null && val!=null)
+			if(!first)
 			{
-				if(!first)
+				wr.write(",");
+				first = false;
+			}
+			
+			boolean keystring = true;
+			for(int i=0; i<keys.length && keystring; i++)
+			{
+				keystring = keys[i] instanceof String;
+			}
+			
+			if(keystring)
+			{
+				for(int i=0; i<keys.length; i++)
 				{
-					wr.write(",");
-					first = false;
+					Object val = map.get(keys[i]);
+					Class<?> valclazz = val!=null? val.getClass(): null;
+					Object key = keys[i];
+					
+					wr.write("\"").write(key.toString()).write("\":");
+					traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
 				}
-				// hmm key must be string :-(
-				wr.write("\"");
-				wr.write(key.toString());
-				wr.write("\"");
-//				traverser.doTraverse(key, keyclazz, traversed, processors, clone, targetcl, context);
-				wr.write(":");
-				traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+			}
+			else
+			{
+				wr.write("\"__keys\":[");
+				for(int i=0; i<keys.length; i++)
+				{
+					if(i>0)
+						wr.write(",");
+					Object key = keys[i];
+					Class<?> keyclazz = key != null? key.getClass() : null;
+					traverser.doTraverse(key, keyclazz, traversed, processors, clone, targetcl, context);
+				}
+				wr.write("]");
+				
+				wr.write(",\"__values\":[");
+				for(int i=0; i<keys.length; i++)
+				{
+					if(i>0)
+						wr.write(",");
+					Object val = map.get(keys[i]);
+					Class<?> valclazz = val!=null? val.getClass(): null;
+					traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+				}
+				wr.write("]");
 			}
 		}
 		

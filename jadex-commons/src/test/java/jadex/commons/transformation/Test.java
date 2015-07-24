@@ -162,11 +162,11 @@ public abstract class Test extends TestCase
 				testColor();
 				testImage();
 				testRectangle();
+				testMap();
+				testLRU();
 				
 				// todo
 //				testSpecialCharacter();
-//				testLRU();
-//				testMap();
 //				testBeanWithPublicFields();
 //				testBeanWithIncludedFields();
 //				testSelfReferenceBean();
