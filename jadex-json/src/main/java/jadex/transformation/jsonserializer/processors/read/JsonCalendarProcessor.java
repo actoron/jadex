@@ -44,12 +44,12 @@ public class JsonCalendarProcessor implements ITraverseProcessor
 		
 		JsonObject obj = (JsonObject)object;
 		Class<?> cl = JsonPrimitiveObjectProcessor.getClazz(object, targetcl);
-		String val = obj.getString("value", null);
+		long val = obj.getLong("value", 0);
 		
 		try
 		{
 			ret = (Calendar)cl.newInstance();
-			ret.setTime(new Date(Long.parseLong(val)));
+			ret.setTime(new Date(val));
 		}
 		catch(Exception e)
 		{

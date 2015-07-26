@@ -167,9 +167,9 @@ public abstract class Test extends TestCase
 				testLRU();
 				
 				// todo
-//				testSpecialCharacter();
-//				testBeanWithPublicFields();
-//				testBeanWithIncludedFields();
+				testSpecialCharacter();
+				testBeanWithPublicFields();
+				testBeanWithIncludedFields();
 //				testSelfReferenceBean();
 			}
 			long dur = System.currentTimeMillis()-start;

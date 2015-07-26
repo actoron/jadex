@@ -42,8 +42,10 @@ public class JsonColorProcessor implements ITraverseProcessor
 	
 		Color c  = (Color)object;
 		
-		wr.write("{\"value\":");
-		wr.write(""+c.getRGB());
+		wr.write("{");
+		wr.writeNameValue("value", c.getRGB());
+//		wr.write("{\"value\":");
+//		wr.write(""+c.getRGB());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");

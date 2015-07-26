@@ -39,7 +39,9 @@ public class JsonInetAddressProcessor implements ITraverseProcessor
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		
-		wr.write("{\"value\":\"").write(((InetAddress)object).getHostAddress()).write("\"");
+		wr.write("{");
+		wr.writeNameString("value", ((InetAddress)object).getHostAddress());
+//		wr.write("{\"value\":\"").write(((InetAddress)object).getHostAddress()).write("\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");

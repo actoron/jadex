@@ -50,7 +50,8 @@ public class JsonLRUProcessor extends JsonMapProcessor
 		
 		wr.write("{");
 		
-		wr.write("\"max\":").write(""+lru.getMaxEntries());
+		wr.writeNameValue("max", lru.getMaxEntries());
+//		wr.write("\"max\":").write(""+lru.getMaxEntries());
 		
 		if(lru.getCleaner()!=null)
 		{

@@ -48,7 +48,10 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		{
 			wr.write("{");
 			wr.writeClass(clazz);
-			wr.write(",\"").write(JsonTraverser.COLLECTION_MARKER).write("\":");
+			wr.write(",");
+			wr.writeString(JsonTraverser.COLLECTION_MARKER);
+			wr.write(":");
+//			wr.write(",\"").write(JsonTraverser.COLLECTION_MARKER).write("\":");
 		}
 		
 		wr.write("[");

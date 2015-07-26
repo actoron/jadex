@@ -68,8 +68,12 @@ public class JsonLoggingLevelProcessor implements ITraverseProcessor
 		
 		if(id < DEFAULT_LEVELS.length)
 		{
-			wr.write("{\"subclassed\":false,");
-			wr.write("\"id\":").write(""+id);
+			wr.write("{");
+			wr.writeNameValue("subclassed", false);
+			wr.write(",");
+			wr.writeNameValue("id", id);
+//			wr.write("{\"subclassed\":false,");
+//			wr.write("\"id\":").write(""+id);
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
 			wr.write("}");
@@ -77,9 +81,15 @@ public class JsonLoggingLevelProcessor implements ITraverseProcessor
 		else
 		{
 			// Subclassed Level object
-			wr.write("{\"subclassed\":true,");
-			wr.write("\"name\":").write(level.getName()).write("\",");
-			wr.write("\"value\":").write(""+level.intValue()).write("\"");
+			wr.write("{");
+			wr.writeNameValue("subclassed", true);
+			wr.write(",");
+			wr.writeNameString("name", level.getName());
+			wr.write(",");
+			wr.writeNameValue("value", level.intValue());
+//			wr.write("{\"subclassed\":true,");
+//			wr.write("\"name\":").write(level.getName()).write("\",");
+//			wr.write("\"value\":").write(""+level.intValue()).write("\"");
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
 			wr.write("}");

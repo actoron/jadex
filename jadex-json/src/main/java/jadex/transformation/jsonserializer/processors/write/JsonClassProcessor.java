@@ -27,7 +27,7 @@ public class JsonClassProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
-		Class<?> clazz = SReflect.getClass(type);
+//		Class<?> clazz = SReflect.getClass(type);
 		return object instanceof Class;
 	}
 	
@@ -43,7 +43,9 @@ public class JsonClassProcessor implements ITraverseProcessor
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		
-		wr.write("{\"value\":\"").write(SReflect.getClassName((Class)object)).write("\"");
+		wr.write("{");
+		wr.writeNameValue("value", (Class<?>)object);
+//		wr.write("{\"value\":\"").write(SReflect.getClassName((Class)object)).write("\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");

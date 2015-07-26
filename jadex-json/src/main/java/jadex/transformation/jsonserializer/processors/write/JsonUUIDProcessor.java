@@ -41,8 +41,12 @@ public class JsonUUIDProcessor implements ITraverseProcessor
 	
 		UUID uuid = (UUID)object;
 		
-		wr.write("{\"msb\":").write(""+uuid.getMostSignificantBits()).write(",");
-		wr.write("\"lsb\":").write(""+uuid.getLeastSignificantBits());
+		wr.write("{");
+		wr.writeNameValue("msb", uuid.getMostSignificantBits());
+		wr.write(",");
+		wr.writeNameValue("lsb", uuid.getLeastSignificantBits());
+//		wr.write("{\"msb\":").write(""+uuid.getMostSignificantBits()).write(",");
+//		wr.write("\"lsb\":").write(""+uuid.getLeastSignificantBits());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");

@@ -47,7 +47,9 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		{
 			wr.write("{");
 			wr.writeClass(compclazz);
-			wr.write(",\"").write(JsonTraverser.ARRAY_MARKER).write("\":");
+			wr.write(",");
+			wr.writeString(JsonTraverser.ARRAY_MARKER);
+			wr.write(":");
 		}
 		
 		wr.write("[");

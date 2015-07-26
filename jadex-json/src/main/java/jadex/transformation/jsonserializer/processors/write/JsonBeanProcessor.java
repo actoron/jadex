@@ -95,9 +95,8 @@ public class JsonBeanProcessor implements ITraverseProcessor
 						if(!first)
 							wr.write(",");
 						first = false;
-						wr.write("\"");
-						wr.write(name);
-						wr.write("\":");
+						wr.writeString(name);
+						wr.write(":");
 						
 						traverser.doTraverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
 					}

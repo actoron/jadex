@@ -47,11 +47,12 @@ public class JsonMultiCollectionProcessor implements ITraverseProcessor
 	
 			wr.write("{");
 			
-			wr.write("\"type\":");
+//			wr.write("\"type\":");
 			Field typefield = MultiCollection.class.getDeclaredField("type");
 			typefield.setAccessible(true);
 			Class<?> ctype = (Class)typefield.get(mc);
-			wr.write("\"").write(SReflect.getClassName(ctype)).write("\"");
+//			wr.write("\"").write(SReflect.getClassName(ctype)).write("\"");
+			wr.writeNameValue("type", ctype);
 			
 			wr.write(",\"map\":");
 			Field mapfield = MultiCollection.class.getDeclaredField("map");

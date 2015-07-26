@@ -46,8 +46,10 @@ public class JsonImageProcessor implements ITraverseProcessor
 		byte[] bytes = Base64.encode(encimg);
 		String enc = new String(bytes);
 		
-		wr.write("{\"value\":\"");
-		wr.write(enc).write("\"");
+		wr.write("{");
+		wr.writeNameString("value", enc);
+//		wr.write("{\"value\":\"");
+//		wr.write(enc).write("\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");

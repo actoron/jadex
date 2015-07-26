@@ -46,8 +46,12 @@ public class JsonCertificateProcessor implements ITraverseProcessor
 			byte[] bytes = Base64.encode(ste.getEncoded());
 			String enc = new String(bytes);
 			
-			wr.write("{\"type\":\"").write(ste.getType()).write("\",");
-			wr.write("\"encoded\":\"").write(enc).write("\"");
+			wr.write("{");
+			wr.writeNameString("type", ste.getType());
+			wr.write(",");
+			wr.writeNameString("encoded", enc);
+//			wr.write("{\"type\":\"").write(ste.getType()).write("\",");
+//			wr.write("\"encoded\":\"").write(enc).write("\"");
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
 			wr.write("}");

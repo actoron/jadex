@@ -48,8 +48,12 @@ public class JsonLogRecordProcessor implements ITraverseProcessor
 		wr.write("\"level\":");
 		Level level = rec.getLevel();
 		traverser.doTraverse(level, level.getClass(), traversed, processors, clone, targetcl, context);
-		wr.write(",\"msg\":\"").write(rec.getMessage()).write("\"");
-		wr.write(",\"millis\":").write(""+rec.getMillis());
+		wr.write(",");
+		wr.writeNameString("msg", rec.getMessage());
+		wr.write(",");
+		wr.writeNameValue("millis", rec.getMillis());
+//		wr.write(",\"msg\":\"").write(rec.getMessage()).write("\"");
+//		wr.write(",\"millis\":").write(""+rec.getMillis());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");

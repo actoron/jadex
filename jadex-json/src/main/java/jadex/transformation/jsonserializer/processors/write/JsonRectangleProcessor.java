@@ -41,10 +41,19 @@ public class JsonRectangleProcessor implements ITraverseProcessor
 	
 		Rectangle r = (Rectangle)object;
 		
-		wr.write("{\"x\":").write(""+r.x).write(",");
-		wr.write("\"y\":").write(""+r.y).write(",");
-		wr.write("\"w\":").write(""+r.width).write(",");
-		wr.write("\"h\":").write(""+r.height);
+		wr.write("{");
+		wr.writeNameValue("x", r.x);
+		wr.write(",");
+		wr.writeNameValue("y", r.y);
+		wr.write(",");
+		wr.writeNameValue("w", r.width);
+		wr.write(",");
+		wr.writeNameValue("h", r.height);
+		
+//		wr.write("{\"x\":").write(""+r.x).write(",");
+//		wr.write("\"y\":").write(""+r.y).write(",");
+//		wr.write("\"w\":").write(""+r.width).write(",");
+//		wr.write("\"h\":").write(""+r.height);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
