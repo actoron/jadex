@@ -2316,13 +2316,11 @@ public class MessageService extends BasicService implements IMessageService
 							try
 							{
 								com.messageArrived(new DefaultMessageAdapter(fmessage, messagetype));
-								ret.setResult(null);
 							}
 							catch(Exception e)
 							{
 								logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ fmessage.get(messagetype.getIdIdentifier())+", "+e);
 								
-								ret.setResult(null);
 								// todo: notify sender that message could not be delivered!
 								// Problem: there is no connection back to the sender, so that
 								// the only chance is sending a separate failure message.
@@ -2335,7 +2333,8 @@ public class MessageService extends BasicService implements IMessageService
 						
 						return IFuture.DONE;
 					}
-				});
+				}).addResultListener(component.getComponentFeature(IExecutionFeature.class)
+					.createResultListener( new DelegationResultListener<Void>(ret)));
 			}
 			public void exceptionOccurred(Exception exception)
 			{

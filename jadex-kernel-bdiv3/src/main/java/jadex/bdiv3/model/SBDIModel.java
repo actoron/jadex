@@ -719,8 +719,9 @@ public class SBDIModel
 			for(EventType event: evs)
 			{
 				String[]	types	= event.getTypes().clone();
-				String	mapped = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+types[types.length-1] : types[types.length-1];
-				types[types.length-1]	= bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped;
+				int	exchange	= (types[0].startsWith("value") || types[0].startsWith("parameter")) ? types.length-2 : types.length-1;
+				String	mapped = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+types[exchange] : types[exchange];
+				types[exchange]	= bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped;					
 				ret.add(new EventType(types));
 			}
 		}

@@ -1364,13 +1364,16 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		
 		for(IParameter param: goal.getParameters())
 		{
-			Direction dir = ((MParameter)param.getModelElement()).getDirection();
-			if(MParameter.Direction.OUT.equals(dir) || MParameter.Direction.INOUT.equals(dir))
+			if(!((MParameter)param.getModelElement()).isOptional())
 			{
-				Object val = param.getValue();
-				ret = val!=null;
-				if(!ret)
-					break;
+				Direction dir = ((MParameter)param.getModelElement()).getDirection();
+				if(MParameter.Direction.OUT.equals(dir) || MParameter.Direction.INOUT.equals(dir))
+				{
+					Object val = param.getValue();
+					ret = val!=null;
+					if(!ret)
+						break;
+				}
 			}
 		}
 		
@@ -1378,13 +1381,16 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		{
 			for(IParameterSet paramset: goal.getParameterSets())
 			{
-				Direction dir = ((MParameter)paramset.getModelElement()).getDirection();
-				if(MParameter.Direction.OUT.equals(dir) || MParameter.Direction.INOUT.equals(dir))
+				if(!((MParameter)paramset.getModelElement()).isOptional())
 				{
-					Object[] vals = paramset.getValues();
-					ret = vals.length>0;
-					if(!ret)
-						break;
+					Direction dir = ((MParameter)paramset.getModelElement()).getDirection();
+					if(MParameter.Direction.OUT.equals(dir) || MParameter.Direction.INOUT.equals(dir))
+					{
+						Object[] vals = paramset.getValues();
+						ret = vals.length>0;
+						if(!ret)
+							break;
+					}
 				}
 			}
 		}

@@ -43,6 +43,16 @@ public class MPlanParameter	extends MParameter
 	 */
 	public void	addGoalMapping(String mapping)
 	{
+		// Convert capability separator.
+		int	idx	= mapping.lastIndexOf('.');
+		if(idx==-1)
+		{
+			throw new RuntimeException("Parameter mapping must follow the form <elementname>.<parametername>: "+name+", "+mapping);
+		}
+		String	param	= mapping.substring(idx+1);
+		String	elem	= mapping.substring(0, idx);
+		mapping	= MElement.internalName(elem) + "." + param;
+		
 		if(goalmappings==null)
 		{
 			goalmappings	= new ArrayList<String>();
@@ -71,6 +81,16 @@ public class MPlanParameter	extends MParameter
 	 */
 	public void	addMessageEventMapping(String mapping)
 	{
+		// Convert capability separator.
+		int	idx	= mapping.lastIndexOf('.');
+		if(idx==-1)
+		{
+			throw new RuntimeException("Parameter mapping must follow the form <elementname>.<parametername>: "+name+", "+mapping);
+		}
+		String	param	= mapping.substring(idx+1);
+		String	elem	= mapping.substring(0, idx);
+		mapping	= MElement.internalName(elem) + "." + param;
+		
 		if(messageeventmappings==null)
 		{
 			messageeventmappings	= new ArrayList<String>();
@@ -99,6 +119,16 @@ public class MPlanParameter	extends MParameter
 	 */
 	public void	addInternalEventMapping(String mapping)
 	{
+		// Convert capability separator.
+		int	idx	= mapping.lastIndexOf('.');
+		if(idx==-1)
+		{
+			throw new RuntimeException("Parameter mapping must follow the form <elementname>.<parametername>: "+name+", "+mapping);
+		}
+		String	param	= mapping.substring(idx+1);
+		String	elem	= mapping.substring(0, idx);
+		mapping	= MElement.internalName(elem) + "." + param;
+		
 		if(internaleventmappings==null)
 		{
 			internaleventmappings	= new ArrayList<String>();

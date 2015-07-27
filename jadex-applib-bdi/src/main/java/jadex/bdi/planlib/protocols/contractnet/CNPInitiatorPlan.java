@@ -8,6 +8,7 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
 
@@ -193,9 +194,19 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 			while(rec.size() > 0)
 			{
 				// Wait for the replies.
-				long wait_time = getTimeout() + time - 	getTime();
-				if(wait_time <= 0)
-					break;
+				long wait_time;
+				if(getTimeout()==Timeout.NONE)
+				{
+					wait_time	= Timeout.NONE;
+				}
+				else
+				{
+					wait_time	= getTimeout() + time - getTime();
+					if(wait_time <= 0)
+					{
+						break;
+					}
+				}
 
 				getLogger().info(getComponentName()+" (I)CNPPlan: waiting: "+wait_time);
 
@@ -380,9 +391,19 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 			while(results.size()<acceptables.length)
 			{
 				// Wait for the replies.
-				long wait_time = getTimeout() + time - getTime();
-				if(wait_time <= 0)
-					break;
+				long wait_time;
+				if(getTimeout()==Timeout.NONE)
+				{
+					wait_time	= Timeout.NONE;
+				}
+				else
+				{
+					wait_time	= getTimeout() + time - getTime();
+					if(wait_time <= 0)
+					{
+						break;
+					}
+				}
 
 				// Wait for messages indicating the task execution state.
 				IMessageEvent reply = (IMessageEvent)waitForReply(me, wait_time);

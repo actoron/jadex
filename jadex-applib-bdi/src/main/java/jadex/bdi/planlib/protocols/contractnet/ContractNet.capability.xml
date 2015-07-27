@@ -18,6 +18,7 @@
 		<import>java.util.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.commons.IFilter</import>
+		<import>jadex.base.Starter</import>
 	</imports>
 	
 	<capabilities>
@@ -27,10 +28,7 @@
 	<beliefs>
 		<!-- Timeout for messages. -->
 		<belief name="timeout" class="Long" exported="true">
-			<fact>
-				// (Integer)$properties.get("standard.timeout")
-				20000L
-			</fact>
+			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
 		<!-- Filters are only relevant for the participants protocol side. -->
@@ -92,28 +90,22 @@
 			<parameter name="cfp" class="Object"/>
 			<!-- The call-for-proposals info (local information). -->
 			<parameter name="cfp_info" class="Object" optional="true" direction="inout"/>
-			<!-- Dummy parameter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
-			<parameter name="evaluated" class="Boolean" direction="out" evaluationmode="push">
-				<value language="jcl" variable="$ret">
-					// ($goal.acceptables.length>0 ||
-					// (select one ParticipantProposal $prop from $goal.proposals
-					// where $prop.getEvaluation()==null)==null) ? true : null
-					
-					$beliefbase.true_const==$ret
-					// $ret==true // Currently not supported by Rete builder.
-					&amp;&amp;
-					!($goal.acceptables.length==0 &amp;&amp;
-						ParticipantProposal $prop &amp;&amp;
-						$prop.getEvaluation()==null &amp;&amp;
-						Arrays.asList($goal.proposals).contains($prop))
-				</value>
-			</parameter>
 			<!-- The received proposals. -->
 			<parameterset name="proposals" class="ParticipantProposal"/>
 			<!-- The negotiation history. -->
 			<parameterset name="history" class="NegotiationRecord"/>
 			<!--  The acceptable proposals, sorted by preference (best proposal first). -->
 			<parameterset name="acceptables" class="ParticipantProposal" optional="true" direction="out"/>
+			
+			<!-- Dummy parameter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
+			<parameter name="evaluated" class="Boolean" direction="out" evaluationmode="push">
+				<value language="jcl" variable="$ret">
+					($goal.acceptables.length>0 ||
+					(select one ParticipantProposal $prop from $goal.proposals
+					where $prop.getEvaluation()==null)==null) ? true : null
+				</value>
+			</parameter>
+			
 		</querygoal>
 
 		<!-- (Participant side) Contract-net protocol interaction goal (top-level goal of all receiver-side interactions). -->
@@ -194,22 +186,6 @@
 			<parameter name="cfp" class="Object"/>
 			<!-- The call-for-proposals info (local information). -->
 			<parameter name="cfp_info" class="Object" optional="true" direction="inout"/>
-			<!-- Dummy paramter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
-			<parameter name="evaluated" class="Boolean" direction="out" evaluationmode="push">
-				<value language="jcl" variable="$ret">
-					// ($goal.acceptables.length>0 ||
-					// (select one ParticipantProposal $prop from $goal.proposals
-					// where $prop.getEvaluation()==null)==null) ? true : null
-					
-					$beliefbase.true_const==$ret
-					// $ret==true // Currently not supported by Rete builder.
-					&amp;&amp;
-					!($goal.acceptables.length==0 &amp;&amp;
-						ParticipantProposal $prop &amp;&amp;
-						$prop.getEvaluation()==null &amp;&amp;
-						Arrays.asList($goal.proposals).contains($prop))
-				</value>
-			</parameter>
 			<!-- The received proposals -->
 			<parameterset name="proposals" class="ParticipantProposal"/>
 			<!-- The negotiation history. -->
@@ -217,6 +193,16 @@
 			<!-- The acceptable proposals, sorted by preference (best proposal first).
 				 By default, setting acceptable proposals will end the protocol (i.e. no more iterations). -->
 			<parameterset name="acceptables" class="ParticipantProposal" optional="true" direction="out"/>
+			
+			<!-- Dummy paramter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
+			<parameter name="evaluated" class="Boolean" direction="out" evaluationmode="push">
+				<value language="jcl" variable="$ret">
+					($goal.acceptables.length>0 ||
+					(select one ParticipantProposal $prop from $goal.proposals
+					where $prop.getEvaluation()==null)==null) ? true : null
+				</value>
+			</parameter>
+			
 		</querygoal>
 		
 		<!-- (Initiator side) Collect information for next round (if any). -->
