@@ -373,9 +373,28 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  The values to set.
 		 *  @param values The values to set
 		 */
-		public void setValues(List<Object> values)
+		protected void setValues(List<Object> values)
 		{
 			msg.put(getName(), values);
+		}
+		
+		/**
+		 *  Adapt to message type for implicit parameters.
+		 */
+		@Override
+		public Object[] getValues()
+		{
+			Object[]	ret;
+			if(getModelElement()==null)
+			{
+				ret	= super.getValues(mt.getParameterSet(getName()).getClazz());
+			}
+			else
+			{
+				ret	= super.getValues();
+			}
+			
+			return ret;
 		}
 		
 		/**

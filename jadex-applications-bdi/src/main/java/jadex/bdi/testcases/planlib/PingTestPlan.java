@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.TimeoutException;
 
 import java.util.List;
@@ -20,8 +21,8 @@ public class PingTestPlan extends AbstractMultipleAgentsPlan
 	public void body()
 	{
 		// Create 1 participants
-		Map[] args = new Map[1];
-		List agents = createAgents("/jadex/bdi/testcases/planlib/PingReceiver.agent.xml", args);	
+		Map<String, Object>[] args = new Map[1];
+		List<IComponentIdentifier> agents = createAgents("/jadex/bdi/testcases/planlib/PingReceiver.agent.xml", args);	
 
 		TestReport tr = new TestReport("#1", "Test single ping message.");
 		if(assureTest(tr))
@@ -31,7 +32,7 @@ public class PingTestPlan extends AbstractMultipleAgentsPlan
 				IGoal ping = createGoal("pingcap.ping");
 				ping.getParameter("receiver").setValue(agents.get(0));
 				dispatchSubgoalAndWait(ping);
-				getLogger().info("Ping result:"+ping.getParameter("result").getValue());
+				getLogger().info("Ping result: "+ping.isSucceeded());
 				tr.setSucceeded(true);
 			}
 			catch(GoalFailureException e)

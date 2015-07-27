@@ -14,7 +14,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 
@@ -341,6 +340,16 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public void setValue(Object value)
 		{
+			if(value!=null && getModelElement()!=null)
+			{
+				Class<?>	clazz	= ((MParameter)getModelElement()).getClazz().getType(getAgent().getClassLoader(), getAgent().getModel().getAllImports());
+				if(!SReflect.isSupertype(clazz, value.getClass()))
+				{
+					throw new IllegalArgumentException("Incompatible value for parameter "+getName()+": "+value);
+				}
+				value	= SReflect.convertWrappedValue(value, clazz);
+			}
+			
 			Object oldvalue = this.value;
 			this.value = value;
 			publisher.entryChanged(oldvalue, value, -1);
@@ -517,6 +526,16 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public void addValue(Object value)
 		{
+			if(value!=null && getModelElement()!=null)
+			{
+				Class<?>	clazz	= ((MParameter)getModelElement()).getClazz().getType(getAgent().getClassLoader(), getAgent().getModel().getAllImports());
+				if(!SReflect.isSupertype(clazz, value.getClass()))
+				{
+					throw new IllegalArgumentException("Incompatible value for parameter set "+getName()+": "+value);
+				}
+				value	= SReflect.convertWrappedValue(value, clazz);
+			}
+			
 			internalGetValues().add(value);
 		}
 
@@ -573,10 +592,18 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public Object[]	getValues()
 		{
+			return getValues(((MParameter)getModelElement()).getType(getAgent().getClassLoader()));
+		}
+		
+		/**
+		 *  Get the values of a parameterset.
+		 *  @return The values.
+		 */
+		protected Object[]	getValues(Class<?> type)
+		{
 			Object ret;
 			List<Object> vals = internalGetValues();
 			
-			Class<?> type = ((MParameter)getModelElement()).getType(getAgent().getClassLoader());
 			int size = vals==null? 0: vals.size();
 			ret = type!=null? ret = Array.newInstance(SReflect.getWrappedType(type), size): new Object[size];
 			
@@ -600,7 +627,8 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 *  The values to set.
 		 *  @param values The values to set
 		 */
-		public void setValues(List<Object> values)
+		// Internal method, overridden for message event.
+		protected void setValues(List<Object> values)
 		{
 			this.values = values;
 		}

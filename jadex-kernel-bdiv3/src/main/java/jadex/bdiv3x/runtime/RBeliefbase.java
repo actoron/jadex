@@ -491,6 +491,16 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			boolean	changed	= !SUtil.equals(this.value, value);
 			if(changed)
 			{
+				if(value!=null)
+				{
+					Class<?>	clazz	= ((MBelief)getModelElement()).getClazz().getType(getAgent().getClassLoader(), getAgent().getModel().getAllImports());
+					if(!SReflect.isSupertype(clazz, value.getClass()))
+					{
+						throw new IllegalArgumentException("Incompatible value for belief "+getName()+": "+value);
+					}
+					value	= SReflect.convertWrappedValue(value, clazz);
+				}
+				
 				Object oldvalue = this.value;
 				this.value = value;
 				publisher.entryChanged(oldvalue, value, -1);
@@ -653,6 +663,16 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public void addFact(Object fact)
 		{
+			if(fact!=null)
+			{
+				Class<?>	clazz	= ((MBelief)getModelElement()).getClazz().getType(getAgent().getClassLoader(), getAgent().getModel().getAllImports());
+				if(!SReflect.isSupertype(clazz, fact.getClass()))
+				{
+					throw new IllegalArgumentException("Incompatible value for belief set "+getName()+": "+fact);
+				}
+				fact	= SReflect.convertWrappedValue(fact, clazz);
+			}
+			
 			internalGetValues().add(fact);
 			
 			// Push to result, if any.

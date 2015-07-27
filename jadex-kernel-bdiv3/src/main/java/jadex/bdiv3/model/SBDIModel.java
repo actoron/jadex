@@ -362,6 +362,7 @@ public class SBDIModel
 			{
 				String	fname	= capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : "");
 				UnparsedExpression	fact2	= new UnparsedExpression(fname, (String)null, fact.getValue(), fact.getLanguage());
+				fact2.setParsedExp(fact.getParsed());	// Use parsed expression from inner scope (with correct imports).
 				fact2.setClazz(fact.getClazz());
 				cbel2.addFact(fact2);
 			}
@@ -400,6 +401,7 @@ public class SBDIModel
 					for(UnparsedExpression value: param.getValue())
 					{
 						UnparsedExpression	value2	= new UnparsedExpression(value.getName(), (String)null, value.getValue(), value.getLanguage());
+						value2.setParsedExp(value.getParsed());	// Use parsed expression from inner scope (with correct imports).
 						value2.setClazz(value.getClazz());
 						cpel2.addParameter(value2);
 						// Hack!!! change name after adding.

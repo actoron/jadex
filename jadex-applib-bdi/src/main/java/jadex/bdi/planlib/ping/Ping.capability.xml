@@ -109,7 +109,7 @@
 			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="pinging.receiver"/>
 			</parameter>
-			<parameter name="ping_delay" class="jadex.bridge.IComponentIdentifier">
+			<parameter name="ping_delay" class="long">
 				<goalmapping ref="pinging.ping_delay"/>
 			</parameter>
 			<parameter name="missed_cnt" class="int" direction="inout">

@@ -497,6 +497,12 @@ public class MParameter extends MElement
 				value = new UnparsedExpression(null, "0");
 			else if(clazz.getTypeName()=="int")
 				value = new UnparsedExpression(null, "0");
+			
+			if(value!=null)
+			{
+				// Make sure parsed expression is set...
+				SJavaParser.parseExpression(value, null, null);
+			}
 		}
 		
 		return value;
