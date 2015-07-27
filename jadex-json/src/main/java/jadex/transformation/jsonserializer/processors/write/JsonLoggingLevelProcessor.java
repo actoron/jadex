@@ -57,8 +57,7 @@ public class JsonLoggingLevelProcessor implements ITraverseProcessor
 		JsonWriteContext wr = (JsonWriteContext)context;
 	
 		Level level = (Level)object;
-		
-//		traversed.put(object, ret);
+		wr.addObject(traversed, object);
 		
 		int id = 0;
 
@@ -72,8 +71,6 @@ public class JsonLoggingLevelProcessor implements ITraverseProcessor
 			wr.writeNameValue("subclassed", false);
 			wr.write(",");
 			wr.writeNameValue("id", id);
-//			wr.write("{\"subclassed\":false,");
-//			wr.write("\"id\":").write(""+id);
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
 			wr.write("}");
@@ -87,9 +84,6 @@ public class JsonLoggingLevelProcessor implements ITraverseProcessor
 			wr.writeNameString("name", level.getName());
 			wr.write(",");
 			wr.writeNameValue("value", level.intValue());
-//			wr.write("{\"subclassed\":true,");
-//			wr.write("\"name\":").write(level.getName()).write("\",");
-//			wr.write("\"value\":").write(""+level.intValue()).write("\"");
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
 			wr.write("}");

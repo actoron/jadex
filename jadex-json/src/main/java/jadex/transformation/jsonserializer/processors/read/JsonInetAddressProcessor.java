@@ -43,14 +43,18 @@ public class JsonInetAddressProcessor implements ITraverseProcessor
 	{
 		JsonObject obj = (JsonObject)object;
 		InetAddress ret = null;
+		
 		try
 		{
 			ret = InetAddress.getByName(obj.getString("value", null));
+//			traversed.put(object, ret);
+			((JsonReadContext)context).addKnownObject(ret);
 		}
 		catch (UnknownHostException e)
 		{
 			throw new RuntimeException(e);
 		}
+		
 		return ret;
 	}
 }

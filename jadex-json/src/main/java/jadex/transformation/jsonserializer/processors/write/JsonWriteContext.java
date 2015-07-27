@@ -1,6 +1,7 @@
 package jadex.transformation.jsonserializer.processors.write;
 
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.transformation.jsonserializer.JsonTraverser;
@@ -13,6 +14,8 @@ public class JsonWriteContext
 	protected StringBuffer buffer = new StringBuffer();
 	
 	protected boolean writeclass = true;
+	
+	protected int objectcnt = 0;
 	
 	/**
 	 * 
@@ -136,7 +139,23 @@ public class JsonWriteContext
 		return writeclass;
 	}
 	
-
+	/**
+	 * 
+	 */
+	public void addObject(Map<Object, Object> traversed, Object obj)
+	{
+		traversed.put(obj, new Integer(objectcnt++));
+//		System.out.println("obs: "+traversed);
+	}
+	
+	/**
+	 * 
+	 */
+	public void incObjectCount()
+	{
+		objectcnt++;
+	}
+	
 	/**
 	 * 
 	 */

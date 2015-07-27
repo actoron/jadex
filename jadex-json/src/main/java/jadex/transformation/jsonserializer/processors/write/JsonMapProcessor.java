@@ -38,9 +38,9 @@ public class JsonMapProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
-		Map map = (Map)object;
+		wr.addObject(traversed, object);
 		
-//		traversed.put(object, null);
+		Map map = (Map)object;
 		
 		wr.write("{");
 		boolean first = true;
@@ -85,6 +85,8 @@ public class JsonMapProcessor implements ITraverseProcessor
 			else
 			{
 				wr.write("\"__keys\":[");
+				// just increase reference count because these helper objects do not count on read side
+				wr.incObjectCount();
 				for(int i=0; i<keys.length; i++)
 				{
 					if(i>0)
@@ -96,6 +98,8 @@ public class JsonMapProcessor implements ITraverseProcessor
 				wr.write("]");
 				
 				wr.write(",\"__values\":[");
+				// just increase reference count because these helper objects do not count on read side
+				wr.incObjectCount();
 				for(int i=0; i<keys.length; i++)
 				{
 					if(i>0)

@@ -38,17 +38,15 @@ public class JsonCalendarProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
-		
+		wr.addObject(traversed, object);
+
 		long time = ((Calendar)object).getTime().getTime();
 		
 		wr.write("{");
 		wr.writeNameValue("value", time);
-//		wr.write("{\"value\":\"").write(""+time).write("\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-		
-//		traversed.put(object, ret);
 		
 		return object;
 	}

@@ -42,8 +42,8 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 //		System.out.println("fp: "+object);
-		
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 		
 		wr.write("{");
 		
@@ -63,8 +63,6 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		}
 		
 		wr.write("}");
-		
-//		traversed.put(object, null);
 		
 		return object;
 	}

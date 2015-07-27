@@ -41,6 +41,9 @@ public class JsonColorProcessor implements ITraverseProcessor
 	{
 		JsonObject obj = (JsonObject)object;
 		int rgb = obj.getInt("value", 0);
-		return new Color(rgb);
+		Color ret = new Color(rgb);
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
+		return ret;
 	}
 }

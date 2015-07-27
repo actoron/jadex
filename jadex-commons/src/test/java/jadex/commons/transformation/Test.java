@@ -62,7 +62,7 @@ public abstract class Test extends TestCase
 	 */
 	public void performTests()
 	{
-		performTests(1);
+		performTests(1000);
 	}
 	
 	/**
@@ -166,11 +166,10 @@ public abstract class Test extends TestCase
 				testMap();
 				testLRU();
 				
-				// todo
 				testSpecialCharacter();
 				testBeanWithPublicFields();
 				testBeanWithIncludedFields();
-//				testSelfReferenceBean();
+				testSelfReferenceBean();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -200,7 +199,7 @@ public abstract class Test extends TestCase
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-		System.out.println("written is:"+new String((byte[])written));
+//		System.out.println("written is:"+new String((byte[])written));
 		
 		Object ro = doRead(written);
 		
@@ -478,7 +477,7 @@ public abstract class Test extends TestCase
 		doWriteAndRead(data, new Comparator()
 		{
 			public int compare(Object o1, Object o2)
-			{
+			{objs:
 				return Arrays.equals((short[])o1, (short[])o2)? 0: -1;
 			}
 		});

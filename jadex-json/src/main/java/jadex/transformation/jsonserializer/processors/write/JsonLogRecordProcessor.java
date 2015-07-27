@@ -39,10 +39,9 @@ public class JsonLogRecordProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
-	
+		wr.addObject(traversed, object);
+
 		LogRecord rec = (LogRecord)object;
-		
-//		traversed.put(object, ret);
 		
 		wr.write("{");
 		wr.write("\"level\":");
@@ -52,8 +51,6 @@ public class JsonLogRecordProcessor implements ITraverseProcessor
 		wr.writeNameString("msg", rec.getMessage());
 		wr.write(",");
 		wr.writeNameValue("millis", rec.getMillis());
-//		wr.write(",\"msg\":\"").write(rec.getMessage()).write("\"");
-//		wr.write(",\"millis\":").write(""+rec.getMillis());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");

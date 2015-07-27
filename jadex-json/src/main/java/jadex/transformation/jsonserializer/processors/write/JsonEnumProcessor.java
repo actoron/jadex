@@ -37,15 +37,13 @@ public class JsonEnumProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 		
 		wr.write("{");
 		wr.writeNameString("value", ((Enum)object).name());
-//		wr.write("{\"value\":\"").write(((Enum)object).name()).write("\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-		
-//		traversed.put(object, ret);
 		
 		return object;
 	}

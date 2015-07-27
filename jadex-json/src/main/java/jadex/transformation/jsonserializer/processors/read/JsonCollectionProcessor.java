@@ -61,8 +61,8 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		}
 		
 		Collection ret = (Collection)getReturnObject(object, clazz);
-		
-		traversed.put(object, ret);
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
 		
 		for(int i=0; i<array.size(); i++)
 		{

@@ -50,6 +50,8 @@ public class JsonCalendarProcessor implements ITraverseProcessor
 		{
 			ret = (Calendar)cl.newInstance();
 			ret.setTime(new Date(val));
+//			traversed.put(object, ret);
+			((JsonReadContext)context).addKnownObject(ret);
 		}
 		catch(Exception e)
 		{

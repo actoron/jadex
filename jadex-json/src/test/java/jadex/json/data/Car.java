@@ -29,6 +29,8 @@ public class Car
 	protected String color;
 	
 	protected Owner owner;
+	
+	protected Car car;
 
 	public Car()
 	{
@@ -112,12 +114,32 @@ public class Car
 	{
 		this.owner = owner;
 	}
+	
+	
+	/**
+	 *  Get the car. 
+	 *  @return The car
+	 */
+	public Car getCar()
+	{
+		return car;
+	}
+
+	/**
+	 *  Set the car.
+	 *  @param car The car to set
+	 */
+	public void setCar(Car car)
+	{
+		this.car = car;
+	}
 
 //	public String toString() 
 //	{
 //		return "Car [type=" + type + ", model=" + model + ", color=" + color + ", owner=" + owner + "]";
 //	}
-	
+
+
 	/**
 	 * 
 	 */

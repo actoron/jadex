@@ -41,6 +41,7 @@ public class JsonImageProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 	
 		byte[] encimg = SGUI.imageToStandardBytes((Image)object, "image/png");
 		byte[] bytes = Base64.encode(encimg);
@@ -48,13 +49,9 @@ public class JsonImageProcessor implements ITraverseProcessor
 		
 		wr.write("{");
 		wr.writeNameString("value", enc);
-//		wr.write("{\"value\":\"");
-//		wr.write(enc).write("\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-	
-//		traversed.put(object, ret);
 	
 		return object;
 	}

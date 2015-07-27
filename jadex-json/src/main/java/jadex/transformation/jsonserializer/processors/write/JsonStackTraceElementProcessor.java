@@ -37,6 +37,7 @@ public class JsonStackTraceElementProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 		
 		StackTraceElement ste = (StackTraceElement)object;
 		
@@ -49,15 +50,9 @@ public class JsonStackTraceElementProcessor implements ITraverseProcessor
 		wr.write(",");
 		wr.writeNameValue("linenumber", ste.getLineNumber());
 
-//		wr.write("{\"classname\":\"").write(ste.getClassName()).write("\",");
-//		wr.write("\"methodname\":\"").write(ste.getMethodName()).write("\",");
-//		wr.write("\"filename\":\"").write(ste.getFileName()).write("\",");
-//		wr.write("\"linenumber\":").write(""+ste.getLineNumber());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-		
-//		traversed.put(object, ret);
 		
 		return object;
 	}

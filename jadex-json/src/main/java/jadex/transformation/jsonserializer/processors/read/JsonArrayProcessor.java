@@ -61,9 +61,10 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		}
 			
 		Object ret = getReturnObject(array, compclazz, clone, targetcl);
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
+		
 		Class<?> ccl = ret.getClass().getComponentType();
-			
-		traversed.put(object, ret);
 			
 		for(int i=0; i<array.size(); i++)
 		{

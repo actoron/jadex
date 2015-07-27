@@ -55,8 +55,10 @@ public class JsonURLProcessor implements ITraverseProcessor
 		
 		try
 		{
-			URL url = new URL(v);
-			return url;
+			URL ret = new URL(v);
+//			traversed.put(object, ret);
+			((JsonReadContext)context).addKnownObject(ret);
+			return ret;
 		}
 		catch(Exception e)
 		{

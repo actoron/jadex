@@ -38,6 +38,7 @@ public class JsonRectangleProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 	
 		Rectangle r = (Rectangle)object;
 		
@@ -50,15 +51,9 @@ public class JsonRectangleProcessor implements ITraverseProcessor
 		wr.write(",");
 		wr.writeNameValue("h", r.height);
 		
-//		wr.write("{\"x\":").write(""+r.x).write(",");
-//		wr.write("\"y\":").write(""+r.y).write(",");
-//		wr.write("\"w\":").write(""+r.width).write(",");
-//		wr.write("\"h\":").write(""+r.height);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-	
-//		traversed.put(object, ret);
 	
 		return object;
 	}

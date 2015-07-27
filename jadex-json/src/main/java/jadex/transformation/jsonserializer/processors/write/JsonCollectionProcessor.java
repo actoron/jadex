@@ -40,9 +40,9 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 		
 		Class<?> clazz = SReflect.getClass(type);
-//		Class<?> compclazz = SReflect.unwrapGenericType(type);
 		
 		if(wr.isWriteClass())
 		{
@@ -51,7 +51,6 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 			wr.write(",");
 			wr.writeString(JsonTraverser.COLLECTION_MARKER);
 			wr.write(":");
-//			wr.write(",\"").write(JsonTraverser.COLLECTION_MARKER).write("\":");
 		}
 		
 		wr.write("[");
@@ -73,8 +72,6 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		{
 			wr.write("}");
 		}
-		
-//		traversed.put(object, ret);
 		
 		return object;
 	}

@@ -41,7 +41,8 @@ public class JsonCertificateProcessor implements ITraverseProcessor
 		try
 		{
 			JsonWriteContext wr = (JsonWriteContext)context;
-		
+			wr.addObject(traversed, object);
+	
 			Certificate ste = (Certificate)object;
 			byte[] bytes = Base64.encode(ste.getEncoded());
 			String enc = new String(bytes);
@@ -50,13 +51,9 @@ public class JsonCertificateProcessor implements ITraverseProcessor
 			wr.writeNameString("type", ste.getType());
 			wr.write(",");
 			wr.writeNameString("encoded", enc);
-//			wr.write("{\"type\":\"").write(ste.getType()).write("\",");
-//			wr.write("\"encoded\":\"").write(enc).write("\"");
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
 			wr.write("}");
-		
-//			traversed.put(object, ret);
 		
 			return object;
 		}

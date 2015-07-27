@@ -129,6 +129,8 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 		
 		if(ret!=null)
 		{
+//			traversed.put(object, ret);
+			((JsonReadContext)context).addKnownObject(ret);
 			JsonBeanProcessor.traverseProperties(object, clazz, traversed, processors, traverser, clone, targetcl, ret, context, intro);
 		}
 		
