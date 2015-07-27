@@ -12,17 +12,7 @@ import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-import jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonClassProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonPrimitiveObjectProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonURIProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonURLProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonCalendarProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonMapProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonReadContext;
 import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 
 /**
@@ -32,9 +22,69 @@ import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 public class JsonTraverser extends Traverser
 {
 	public final static String  CLASSNAME_MARKER = "__classname";
+	public final static String  REFERENCE_MARKER = "__ref";
 	public final static String  ARRAY_MARKER = "__array";
 	public final static String  COLLECTION_MARKER = "__collection";
 
+	protected static Traverser writetraverser;
+	protected static JsonTraverser readtraverser;
+
+	protected static List<ITraverseProcessor> writeprocs;
+	protected static List<ITraverseProcessor> readprocs;
+	
+	static
+	{
+		writeprocs = new ArrayList<ITraverseProcessor>();
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonRectangleProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonImageProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonColorProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonTupleProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonInetAddressProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLogRecordProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLoggingLevelProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonUUIDProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonClassProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMultiCollectionProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonEnumProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCertificateProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonArrayProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonStackTraceElementProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonThrowableProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCalendarProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCollectionProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLRUProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
+		
+		readprocs = new ArrayList<ITraverseProcessor>();
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonReferenceProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonRectangleProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonImageProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonColorProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonTupleProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonInetAddressProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLogRecordProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLoggingLevelProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonUUIDProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMultiCollectionProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonEnumProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCertificateProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonStackTraceElementProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonThrowableProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCalendarProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURIProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURLProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveObjectProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLRUProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMapProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor());
+	}
+	
 	/**
 	 *  Find the class of an object.
 	 *  @param object The object.
@@ -60,47 +110,59 @@ public class JsonTraverser extends Traverser
 	}
 	
 	/**
+	 * 
+	 *  @return
+	 */
+	protected static synchronized Traverser getWriteTraverser()
+	{
+		if(writetraverser==null)
+		{
+			writetraverser = new Traverser()
+			{
+				public Object handleNull(Class<?> clazz, List<ITraverseProcessor> processors, boolean clone, Object context) 
+				{
+					JsonWriteContext wr = (JsonWriteContext)context;
+					wr.write("null");
+					return null;
+				}
+				
+				public void handleDuplicate(Object object, Class<?> clazz, Object match,
+					List<ITraverseProcessor> processors, boolean clone, Object context)
+				{
+					JsonWriteContext wr = (JsonWriteContext)context;
+					wr.write("{");
+					int ref = ((Integer)match).intValue();
+					wr.writeNameValue(REFERENCE_MARKER, ref);
+					wr.write("}");
+				}
+			};
+		}
+		return writetraverser;
+	}
+	
+	/**
+	 * 
+	 *  @return
+	 */
+	protected static synchronized JsonTraverser getReadTraverser()
+	{
+		if(readtraverser==null)
+			readtraverser = new JsonTraverser();
+		return readtraverser;
+	}
+	
+	/**
 	 *  Convert to a byte array.
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader)
 	{
-		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonRectangleProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonImageProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonColorProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonTupleProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonInetAddressProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonLogRecordProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonLoggingLevelProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonUUIDProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonClassProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonMultiCollectionProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonEnumProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonCertificateProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonArrayProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonStackTraceElementProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonThrowableProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonCalendarProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonCollectionProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonLRUProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
-		Traverser traverser = new Traverser()
-		{
-			public Object handleNull(Class<?> clazz, List<ITraverseProcessor> processors, boolean clone, Object context) 
-			{
-				JsonWriteContext wr = (JsonWriteContext)context;
-				wr.write("null");
-				return null;
-			}
-		};
+		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(true);
 		
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			traverser.traverse(val, null, procs, null, wr);
+			traverser.traverse(val, null, writeprocs, null, wr);
 			byte[] ret = wr.getString().getBytes();
 			bos.close();
 			return ret;
@@ -121,35 +183,11 @@ public class JsonTraverser extends Traverser
 	 */
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep)
 	{
-		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonRectangleProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonImageProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonColorProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonTupleProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonInetAddressProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonLogRecordProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonLoggingLevelProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonUUIDProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonMultiCollectionProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonEnumProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonCertificateProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonStackTraceElementProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonThrowableProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonCalendarProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonURIProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonURLProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveObjectProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonLRUProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonMapProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor());
-		procs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor());
-		
 		JsonValue value = Json.parse(new String(val));
-		JsonTraverser traverser = new JsonTraverser();
-		Object ret = traverser.traverse(value, null, procs, null, null);
+		JsonTraverser traverser = getReadTraverser();
+		JsonReadContext rc = new JsonReadContext();
+		Object ret = traverser.traverse(value, null, readprocs, null, rc);
+//		System.out.println("rc: "+rc.knownobjects);
 		return ret;
 	}
 }

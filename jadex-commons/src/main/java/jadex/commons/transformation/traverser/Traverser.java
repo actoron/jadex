@@ -158,8 +158,8 @@ public class Traverser
 			throw e;
 		}
 		
-//			if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
-//			System.out.println("Cloned: "+ret);
+//		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
+//		System.out.println("Cloned: "+ret);
 		
 		return ret;
 	}
@@ -265,6 +265,8 @@ public class Traverser
 			ret = handleNull(clazz, processors, clone, context);
 		}
 			
+//		System.out.println("traversed: "+traversed);
+		
 		return ret;
 	}
 	

@@ -43,15 +43,13 @@ public class JsonLRUProcessor extends JsonMapProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
-		
-//		traversed.put(object, null);
+		wr.addObject(traversed, object);
 		
 		LRU lru = (LRU)object;
 		
 		wr.write("{");
 		
 		wr.writeNameValue("max", lru.getMaxEntries());
-//		wr.write("\"max\":").write(""+lru.getMaxEntries());
 		
 		if(lru.getCleaner()!=null)
 		{
@@ -93,6 +91,7 @@ public class JsonLRUProcessor extends JsonMapProcessor
 			else
 			{
 				wr.write("\"__keys\":[");
+				wr.incObjectCount();
 				for(int i=0; i<keys.length; i++)
 				{
 					if(i>0)
@@ -104,6 +103,7 @@ public class JsonLRUProcessor extends JsonMapProcessor
 				wr.write("]");
 				
 				wr.write(",\"__values\":[");
+				wr.incObjectCount();
 				for(int i=0; i<keys.length; i++)
 				{
 					if(i>0)

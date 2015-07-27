@@ -7,8 +7,7 @@ import jadex.transformation.jsonserializer.JsonTraverser;
  */
 public class JsonTest extends jadex.commons.transformation.Test
 {
-
-	// -------- methods --------
+	//-------- methods --------
 
 	/**
 	 * 

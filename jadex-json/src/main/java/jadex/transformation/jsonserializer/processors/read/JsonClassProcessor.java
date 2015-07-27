@@ -40,23 +40,28 @@ public class JsonClassProcessor implements ITraverseProcessor
 	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
+		Class<?> ret = null;
 		JsonValue val = (JsonValue)object;
 		
 		try
 		{
 			if(val.isString())
 			{
-				return SReflect.findClass(val.asString(), null, targetcl);
+				ret = SReflect.findClass(val.asString(), null, targetcl);
 			}
 			else
 			{
 				String clname = ((JsonObject)val).getString("value", null);
-				return SReflect.findClass(clname, null, targetcl);
+				ret = SReflect.findClass(clname, null, targetcl);
 			}
 		}
 		catch(Exception e)
 		{
 			throw new RuntimeException(e);
 		}
+		
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
+		return ret;
 	}
 }

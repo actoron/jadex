@@ -42,15 +42,13 @@ public class JsonClassProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 		
 		wr.write("{");
 		wr.writeNameValue("value", (Class<?>)object);
-//		wr.write("{\"value\":\"").write(SReflect.getClassName((Class)object)).write("\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-		
-//		traversed.put(object, ret);
 		
 		return object;
 	}

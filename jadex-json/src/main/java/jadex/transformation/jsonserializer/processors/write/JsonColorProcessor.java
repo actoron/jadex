@@ -39,18 +39,15 @@ public class JsonColorProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 	
 		Color c  = (Color)object;
 		
 		wr.write("{");
 		wr.writeNameValue("value", c.getRGB());
-//		wr.write("{\"value\":");
-//		wr.write(""+c.getRGB());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-	
-//		traversed.put(object, ret);
 	
 		return object;
 	}

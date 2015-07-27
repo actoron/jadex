@@ -53,11 +53,9 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		Object ret = null;
 		Class<?> clazz = SReflect.getClass(type);
 		
-		if(clazz==null)
-			System.out.println("clazz is null");
-		
 		ret = getReturnObject(object, clazz, targetcl);
-		traversed.put(object, ret);
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
 		
 		try
 		{
@@ -84,13 +82,12 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		Class<?> clazz = SReflect.getClass(type);
 		Map<String, BeanProperty> props = intro.getBeanProperties(clazz, true, false);
 		
-		for(Iterator<String> it=props.keySet().iterator(); it.hasNext(); )
+		for(String name: jval.names())
 		{
 			try
 			{
-				String name = (String)it.next();
 				BeanProperty prop = (BeanProperty)props.get(name);
-				if(prop.isReadable() && prop.isWritable())
+				if(prop!=null && prop.isReadable() && prop.isWritable())
 				{
 					Object val = jval.get(name);
 					if(val!=null) 
@@ -108,6 +105,31 @@ public class JsonBeanProcessor implements ITraverseProcessor
 				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
 			}
 		}
+		
+//		for(Iterator<String> it=props.keySet().iterator(); it.hasNext(); )
+//		{
+//			try
+//			{
+//				String name = (String)it.next();
+//				BeanProperty prop = (BeanProperty)props.get(name);
+//				if(prop.isReadable() && prop.isWritable())
+//				{
+//					Object val = jval.get(name);
+//					if(val!=null) 
+//					{
+//						Object newval = traverser.doTraverse(val, prop.getGenericType(), cloned, processors, clone, targetcl, context);
+//						if(newval != Traverser.IGNORE_RESULT && (object!=ret || val!=newval))
+//						{
+//							prop.setPropertyValue(ret, convertBasicType(newval, prop.getType()));
+//						}
+//					}
+//				}
+//			}
+//			catch(Exception e)
+//			{
+//				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+//			}
+//		}
 	}
 	
 	/**

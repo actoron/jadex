@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.thoughtworks.xstream.XStream;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 import jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor;
 import jadex.transformation.jsonserializer.processors.write.JsonMapProcessor;
 import jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor;
@@ -132,6 +134,8 @@ public class Owner
 		
 		Car car1 = new Car("fiat", 500, "white");
 		Car car2 = new Car("vw", 80, "grey");
+		Car car3 = new Car("tt", 888, "black");
+		car3.setCar(car3);
 		
 		List<Car> cars = new ArrayList<Car>();
 		cars.add(car1);
@@ -145,12 +149,14 @@ public class Owner
 		map.put(car1, car1);
 		
 		Gson gson = new Gson();
-		System.out.println(gson.toJson(map));   
+//		System.out.println(gson.toJson(car3));   
 		
-		Traverser traverser = new Traverser();
-		JsonWriteContext wr = new JsonWriteContext(false);
-		traverser.traverse(map, null, procs, null, wr);
+		byte[] ar = JsonTraverser.objectToByteArray(car3, null);
+		
+//		Traverser traverser = new Traverser();
+//		JsonWriteContext wr = new JsonWriteContext(false);
+//		traverser.traverse(car3, null, procs, null, wr);
 	
-		System.out.println(wr.getString());
+		System.out.println(new String(ar));
 	}
 }

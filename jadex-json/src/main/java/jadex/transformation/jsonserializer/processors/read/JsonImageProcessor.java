@@ -47,7 +47,10 @@ public class JsonImageProcessor implements ITraverseProcessor
 		String b64 = obj.getString("value", null);
 		byte[] data = Base64.decode(b64.getBytes());
 		
-		return SGUI.imageFromBytes(data, clazz);
+		Image ret = SGUI.imageFromBytes(data, clazz);
 //		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
+		
+		return ret;
 	}
 }

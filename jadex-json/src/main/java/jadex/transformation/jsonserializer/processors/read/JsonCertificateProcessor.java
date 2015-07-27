@@ -49,7 +49,6 @@ public class JsonCertificateProcessor implements ITraverseProcessor
 		String type = obj.getString("type", null);
 		String encoded = obj.getString("encoded", null);
 		byte[] enc = Base64.decode(encoded.getBytes());
-//		traversed.put(object, ret);
 		
 		try
 		{
@@ -57,7 +56,10 @@ public class JsonCertificateProcessor implements ITraverseProcessor
 			// This is correct because this byte array is a technical object specific to the image and
 			// is not part of the object graph proper.
 			CertificateFactory cf = CertificateFactory.getInstance(type);
-			return cf.generateCertificate(new ByteArrayInputStream(enc));
+			Object ret = cf.generateCertificate(new ByteArrayInputStream(enc));
+//			traversed.put(object, ret);
+			((JsonReadContext)context).addKnownObject(ret);
+			return ret;
 		}
 		catch(RuntimeException e)
 		{

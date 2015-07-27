@@ -87,6 +87,10 @@ public class JsonLoggingLevelProcessor implements ITraverseProcessor
 				throw new RuntimeException(e);
 			}
 		}
+		
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
+		
 		return ret;
 	}
 }

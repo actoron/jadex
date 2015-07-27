@@ -45,7 +45,10 @@ public class JsonUUIDProcessor implements ITraverseProcessor
 		{
 			long lsb = obj.getLong("lsb", 0);
 			long msb = obj.getLong("msb", 0);
-			return new UUID(msb, lsb);
+			UUID ret = new UUID(msb, lsb);
+//			traversed.put(object, ret);
+			((JsonReadContext)context).addKnownObject(ret);
+			return ret;
 		}
 		catch(Exception e)
 		{

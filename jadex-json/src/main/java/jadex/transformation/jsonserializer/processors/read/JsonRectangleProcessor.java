@@ -46,7 +46,10 @@ public class JsonRectangleProcessor implements ITraverseProcessor
 		int w = obj.getInt("w", 0);
 		int h = obj.getInt("h", 0);
 	
-		return new Rectangle(x, y, w, h);
+		Rectangle ret = new Rectangle(x, y, w, h);
 //		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
+		
+		return ret;
 	}
 }

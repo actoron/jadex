@@ -52,6 +52,9 @@ public class JsonLogRecordProcessor implements ITraverseProcessor
 		LogRecord ret = new LogRecord(level, msg);
 		ret.setMillis(millis);
 		
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
+		
 		return ret;
 	}
 }

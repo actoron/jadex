@@ -38,15 +38,13 @@ public class JsonInetAddressProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 		
 		wr.write("{");
 		wr.writeNameString("value", ((InetAddress)object).getHostAddress());
-//		wr.write("{\"value\":\"").write(((InetAddress)object).getHostAddress()).write("\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-		
-//		traversed.put(object, ret);
 		
 		return object;
 	}

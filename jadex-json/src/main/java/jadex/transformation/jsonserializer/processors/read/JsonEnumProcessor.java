@@ -45,6 +45,7 @@ public class JsonEnumProcessor implements ITraverseProcessor
 		Enum ret = Enum.valueOf((Class<Enum>)clazz, val);
 		
 //		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
 		
 		return ret;
 	}

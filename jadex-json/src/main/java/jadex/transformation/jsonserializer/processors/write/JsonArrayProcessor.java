@@ -39,12 +39,15 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 		
 		Class<?> clazz = SReflect.getClass(type);
 		Class<?> compclazz = clazz.getComponentType();
 		
 		if(wr.isWriteClass())
 		{
+			// just increase reference count because these helper objects do not count on read side
+//			wr.incObjectCount();
 			wr.write("{");
 			wr.writeClass(compclazz);
 			wr.write(",");
@@ -68,8 +71,6 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		{
 			wr.write("}");
 		}
-		
-//		traversed.put(object, ret);
 		
 		return object;
 	}

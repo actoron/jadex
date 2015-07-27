@@ -42,7 +42,6 @@ public class JsonMultiCollectionProcessor implements ITraverseProcessor
 	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-//		traversed.put(object, null);
 		Class<?> clazz = SReflect.getClass(type);
 		
 		MultiCollection<Object, Object> ret = null;
@@ -64,6 +63,9 @@ public class JsonMultiCollectionProcessor implements ITraverseProcessor
 			throw new RuntimeException(e);
 		}
 
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
+		
 		JsonObject obj = (JsonObject)object;
 		String classname = obj.getString("type", null);
 		Class<?> ctype = SReflect.classForName0(classname, targetcl);

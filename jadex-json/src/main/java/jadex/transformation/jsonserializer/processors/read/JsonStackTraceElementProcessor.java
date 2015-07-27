@@ -46,8 +46,9 @@ public class JsonStackTraceElementProcessor implements ITraverseProcessor
 		String filename = obj.getString("filename", null);
 		int linenumber = obj.getInt("linenumber", 0);
 
+		StackTraceElement ret = new StackTraceElement(classname, methodname, filename, linenumber);
 //		traversed.put(object, ret);
-		
-		return new StackTraceElement(classname, methodname, filename, linenumber);
+		((JsonReadContext)context).addKnownObject(ret);
+		return ret;
 	}
 }

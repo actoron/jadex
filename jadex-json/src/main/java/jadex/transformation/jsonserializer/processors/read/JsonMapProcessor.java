@@ -42,10 +42,12 @@ public class JsonMapProcessor implements ITraverseProcessor
 	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
+		JsonReadContext rc = (JsonReadContext)context;
 		Class<?> clazz = SReflect.getClass(type);
 		Map ret = (Map)getReturnObject(object, clazz);
 		JsonObject obj = (JsonObject)object;
-		traversed.put(object, ret);
+//		traversed.put(object, ret);
+		rc.addKnownObject(ret);
 		
 		if(obj.get("__keys")==null)
 		{
@@ -65,7 +67,9 @@ public class JsonMapProcessor implements ITraverseProcessor
 		}
 		else
 		{
+//			rc.setIgnoreNext(true);
 			Object keys = traverser.doTraverse(obj.get("__keys"), null, traversed, processors, clone, targetcl, context);
+//			rc.setIgnoreNext(true);
 			Object vals = traverser.doTraverse(obj.get("__values"), null, traversed, processors, clone, targetcl, context);
 			
 			for(int i=0; i<Array.getLength(keys); i++)

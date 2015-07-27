@@ -50,15 +50,15 @@ public class JsonTupleProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
-	
+		wr.addObject(traversed, object);
+
 		Object[] entities = ((Tuple)object).getEntities();
-		wr.write("{\"values\":");
+		wr.write("{");
+		wr.write("\"values\":");
 		traverser.doTraverse(entities, entities.getClass(), traversed, processors, clone, targetcl, context);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		wr.write("}");
-	
-//			traversed.put(object, ret);
 	
 		return object;
 	}

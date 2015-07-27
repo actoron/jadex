@@ -45,7 +45,8 @@ public class JsonLRUProcessor implements ITraverseProcessor
 		Class<?> clazz = SReflect.getClass(type);
 		LRU ret = (LRU)getReturnObject(object, clazz);
 		JsonObject obj = (JsonObject)object;
-		traversed.put(object, ret);
+//		traversed.put(object, ret);
+		((JsonReadContext)context).addKnownObject(ret);
 		
 		int maxentries = (int)obj.getInt("max", 0);
 		ret.setMaxEntries(maxentries);

@@ -42,6 +42,7 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(traversed, object);
 		
 		Throwable t = (Throwable)object;
 		
@@ -73,8 +74,6 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 		JsonBeanProcessor.traverseProperties(object, traversed, processors, traverser, clone, targetcl, context, intro, first);
 		
 		wr.write("}");
-		
-//		traversed.put(object, ret);
 		
 		return object;
 	}
