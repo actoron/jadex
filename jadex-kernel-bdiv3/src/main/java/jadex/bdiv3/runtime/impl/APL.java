@@ -606,23 +606,31 @@ public class APL
 	/**
 	 *  Get the rank of a candidate.
 	 *  The order is as follows:
-	 *  new plan from model/candidate (0) -> waitqueue (1) -> running plan instance (2).
+	 *  new plan from model/candidate (0/1) -> waitqueue (2/3) -> running plan instance (4/5).
 	 *  @return The rank of a candidate.
 	 */
-	protected static int getRank(Object cand)
+	protected int getRank(Object cand)
 	{
 		int ret;
+		String	capaname	= null;
 		
 		if(cand instanceof RPlan)
 		{
-			ret = 2;
+			ret = 4;
+			capaname	= ((RPlan)cand).getModelElement().getCapabilityName();
 		}
 //		else if() // waitqueue
 //		{
+//			ret = 2;
 //		}
 		else
 		{
 			ret = 0;
+		}
+		
+		if(SUtil.equals(element.getModelElement().getCapabilityName(), capaname))
+		{
+			ret++;
 		}
 		
 		return ret;

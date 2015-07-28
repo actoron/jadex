@@ -1,14 +1,5 @@
 package jadex.bdiv3.features.impl;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
@@ -37,10 +28,10 @@ import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3.runtime.impl.RParameterElement.RParameter;
+import jadex.bdiv3.runtime.impl.RParameterElement.RParameterSet;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
-import jadex.bdiv3x.runtime.IParameter;
-import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -82,6 +73,15 @@ import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.CombinedCondition;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
@@ -701,7 +701,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						if(mparam.getEvaluationMode().equals(EvaluationMode.PUSH))
 						{
-							List<EventType> events = mparam.getAllEvents(component).size()==0? new ArrayList<EventType>(): new ArrayList<EventType>(mparam.getAllEvents(component));
+							List<EventType> events = mparam.getAllEvents(component, mgoal).size()==0? new ArrayList<EventType>(): new ArrayList<EventType>(mparam.getAllEvents(component, mgoal));
 //							System.out.println("evs1: "+events+" "+events.hashCode()+" "+component.getComponentIdentifier());
 							
 							BDIAgentFeature.addExpressionEvents(mparam.getDefaultValue(), events, mgoal);
@@ -721,35 +721,15 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //										System.out.println("parameter update: "+event);
 										
 										RCapability capa = BDIAgentFeature.getCapability(component);
-										if(capa.getGoals()!=null)
+										for(RGoal goal: SUtil.safeCollection(capa.getGoals(mgoal)))
 										{
-											for(RGoal goal: capa.getGoals(mgoal))
+											if(!mparam.isMulti(component.getClassLoader()))
 											{
-												if(!mparam.isMulti(component.getClassLoader()))
-												{
-													IParameter param = goal.getParameter(mparam.getName());
-													// reevaluate the belief on change events
-													Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-														component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mgoal));
-													// save the value, automatically throws change event
-													param.setValue(value);
-												}
-												else
-												{
-													IParameterSet paramset = goal.getParameterSet(mparam.getName());
-													// reevaluate the belief on change events
-													Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-														component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mgoal));
-													// save the value, automatically throws change event
-													if(SReflect.isIterable(value))
-													{
-														paramset.removeValues();
-														for(Object val: SReflect.getIterable(value))
-														{
-															paramset.addValue(val);
-														}
-													}
-												}
+												((RParameter)goal.getParameter(mparam.getName())).updateDynamicValue();
+											}
+											else
+											{
+												((RParameterSet)goal.getParameterSet(mparam.getName())).updateDynamicValues();
 											}
 										}
 										
@@ -782,16 +762,15 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 														System.out.println("parameter updaterate: "+mparam.getUpdaterateValue(component));
 														
 														RCapability capa = BDIAgentFeature.getCapability(component);
-														if(capa.getGoals()!=null)
+														for(RGoal goal: SUtil.safeCollection(capa.getGoals(mgoal)))
 														{
-															for(RGoal goal: capa.getGoals(mgoal))
+															if(!mparam.isMulti(component.getClassLoader()))
 															{
-																IParameter param = goal.getParameter(mparam.getName());
-																// reevaluate the belief on change events
-																Object value = SJavaParser.parseExpression(mparam.getDefaultValue(), 
-																	component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mgoal));
-																// save the value, automatically throws change event
-																param.setValue(value);
+																((RParameter)goal.getParameter(mparam.getName())).updateDynamicValue();
+															}
+															else
+															{
+																((RParameterSet)goal.getParameterSet(mparam.getName())).updateDynamicValues();
 															}
 														}
 													}

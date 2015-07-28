@@ -659,9 +659,9 @@ public class MParameter extends MElement
 	}
 	
 	/**
-	 *  Get all events that this belief depends on.
+	 *  Get all events that this parameter depends on.
 	 */
-	public List<EventType> getAllEvents(IInternalAccess agent)
+	public List<EventType> getAllEvents(IInternalAccess agent, MElement owner)
 	{
 		if(allevents==null)
 		{
@@ -679,6 +679,12 @@ public class MParameter extends MElement
 			Collection<EventType> rawevents = getRawEvents();
 			if(rawevents!=null)
 				allevents.addAll(rawevents);
+			
+			// Hack!!! what about initial values?
+			if(getDefaultValue()!=null)
+			{
+				BDIAgentFeature.addExpressionEvents(getDefaultValue(), allevents, owner);
+			}
 		}
 		return Collections.unmodifiableList(allevents);
 	}

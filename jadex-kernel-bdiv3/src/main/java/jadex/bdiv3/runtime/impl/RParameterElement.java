@@ -354,6 +354,14 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			this.value = value;
 			publisher.entryChanged(oldvalue, value, -1);
 		}
+		
+		/**
+		 *  Update the dynamic value for push or update rate implementation.
+		 */
+		public void	updateDynamicValue()
+		{
+			setValue(evaluateValue(inival));
+		}
 
 		/**
 		 *  Get the value of a parameter.
@@ -595,6 +603,14 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			return getValues(((MParameter)getModelElement()).getType(getAgent().getClassLoader()));
 		}
 		
+		/**
+		 *  Update the dynamic values for push or update rate implementation.
+		 */
+		public void	updateDynamicValues()
+		{
+			setValues(evaluateValues(inivals));
+		}
+
 		/**
 		 *  Get the values of a parameterset.
 		 *  @return The values.

@@ -99,7 +99,7 @@
 			
 			<!-- Dummy parameter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
 			<parameter name="evaluated" class="Boolean" direction="out" evaluationmode="push">
-				<value language="jcl" variable="$ret">
+				<value>
 					($goal.acceptables.length>0 ||
 					(select one ParticipantProposal $prop from $goal.proposals
 					where $prop.getEvaluation()==null)==null) ? true : null

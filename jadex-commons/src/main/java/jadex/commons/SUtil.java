@@ -4795,6 +4795,21 @@ public class SUtil
 	}
 	
 	/**
+	 *  Helper method to allow iterating over possibly null collections.
+	 */
+	public static <T> Collection<T>	safeCollection(Collection<T> coll)
+	{
+		if(coll!=null)
+		{
+			return coll;
+		}
+		else
+		{
+			return Collections.emptyList();
+		}
+	}
+	
+	/**
 	 *  Helper method to allow iterating over possibly null sets.
 	 */
 	public static <T> Set<T>	safeSet(Set<T> set)
