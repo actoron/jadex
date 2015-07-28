@@ -20,8 +20,9 @@ import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -33,7 +34,6 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
-import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.grizzly.http.util.Header;
 import org.glassfish.grizzly.http.util.HttpStatus;
@@ -54,10 +54,10 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	//-------- constants --------
 	
 	/** The servers per service id. */
-	protected Map<IServiceIdentifier, Tuple2<HttpServer, HttpHandler>> sidservers;
+	protected Map<IServiceIdentifier, Tuple2<HttpServer, URI>> sidservers;
 	
 	/** The servers per port. */
-	protected Map<Integer, HttpServer> portservers;
+	protected Map<Integer, Tuple2<MainHttpHandler, HttpServer>> portservers;
 	
 	//-------- constructors --------
 	
@@ -85,15 +85,16 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	{
 		try
 		{
-			HttpServer server = getHttpServer(uri, info);
+			Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, info);
 			System.out.println("Adding http handler to server: "+uri.getPath());
 			HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, rc);
-			ServerConfiguration sc = server.getServerConfiguration();
-			sc.addHttpHandler(handler, uri.getPath());
+//			ServerConfiguration sc = server.getServerConfiguration();
+//			sc.addHttpHandler(handler, uri.getPath());
+			servertuple.getFirstEntity().addSubhandler(null, uri.getPath(), handler);
 			
 			if(sidservers==null)
-				sidservers = new HashMap<IServiceIdentifier, Tuple2<HttpServer, HttpHandler>>();
-			sidservers.put(sid, new Tuple2<HttpServer, HttpHandler>(server, handler));
+				sidservers = new HashMap<IServiceIdentifier, Tuple2<HttpServer, URI>>();
+			sidservers.put(sid, new Tuple2<HttpServer, URI>(servertuple.getSecondEntity(), uri));
 			
 	//		Map<HttpHandler, String[]> handlers = server.getServerConfiguration().getHttpHandlers();
 	//		for(HttpHandler hand: handlers.keySet())
@@ -118,88 +119,22 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	/**
 	 *  Get or start an api to the http server.
 	 */
-	public HttpServer getHttpServer(URI uri, PublishInfo info)
+	public Tuple2<MainHttpHandler, HttpServer> getHttpServer(URI uri, PublishInfo info)
 	{
-		HttpServer server = null;
+		Tuple2<MainHttpHandler, HttpServer> servertuple = null;
 		
 		try
 		{
 //			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
-			server = portservers==null? null: portservers.get(uri.getPort());
+			servertuple = portservers==null? null: portservers.get(uri.getPort());
 			
-			if(server==null)
+			if(servertuple==null)
 			{
-				System.out.println("Starting new server: "+uri.getPort());
-				
-				ErrorPageGenerator epg = null;
-				
-				String	keystore	= null;
-				String	keystorepass	= null;
-				if(info!=null)
-				{
-					for(UnparsedExpression upex: info.getProperties())
-					{
-//						System.out.println("found publish expression: "+upex.getName());
-						
-						if("sslkeystore".equals(upex.getName()))
-						{
-							keystore	= (String)SJavaParser.getParsedValue(upex, null,
-								component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
-						}
-						else if("sslkeystorepass".equals(upex.getName()))
-						{
-							keystorepass	= (String)SJavaParser.getParsedValue(upex, null,
-								component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
-						}
-						else if("errorpage".equals(upex.getName()))
-						{
-							String errpage = (String)SJavaParser.getParsedValue(upex, null,
-								component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
-							
-							if(errpage!=null)
-							{
-								final String errp = SUtil.readFile(errpage);
-								
-//								System.out.println("errorpage path: "+errpage);
-//								System.out.println("errorpage: "+errp);
-								
-								epg = new ErrorPageGenerator()
-								{
-						             public String generate(Request request, int status, String reasonPhrase, String description, Throwable exception) 
-						             {
-						            	 return errp;
-						             }
-								};
-							}
-						}
-					}
-				}
-				
-				if(keystore!=null)
-				{
-					SSLContextConfigurator sslContext = new SSLContextConfigurator();
-					sslContext.setKeyStoreFile(keystore); // contains server keypair
-					sslContext.setKeyStorePass(keystorepass);
-//					sslContext.setTrustStoreFile("./truststore_server"); // contains client certificate
-//					sslContext.setTrustStorePass("asdfgh");
-					SSLEngineConfigurator sslConf = new SSLEngineConfigurator(sslContext).setClientMode(false);
-					
-					server = GrizzlyHttpServerFactory.createHttpServer(uri, (GrizzlyHttpContainer)null, true, sslConf, false);
-				}
-				else
-				{
-					server	= GrizzlyHttpServerFactory.createHttpServer(uri, false);
-				}
-				
-				if(epg!=null)
-				{
-					server.getServerConfiguration().setDefaultErrorPageGenerator(epg);
-				}
-				server.start();
-				
-				if(portservers==null)
-					portservers = new HashMap<Integer, HttpServer>();
-				portservers.put(uri.getPort(), server);
+				HttpServer server = startServer(uri, info);
+				MainHttpHandler mainhandler = new MainHttpHandler();
+				server.getServerConfiguration().addHttpHandler(mainhandler);
+				servertuple = new Tuple2<MainHttpHandler, HttpServer>(mainhandler, server);
+				portservers.put(uri.getPort(), servertuple);
 			}
 		}
 		catch(RuntimeException e)
@@ -211,7 +146,61 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			throw new RuntimeException(e);
 		}
 		
-		return server;
+		return servertuple;
+	}
+	
+	/**
+	 *  Mirror an existing http server.
+	 *  @param sourceserveruri The URI of the server being mirrored.
+	 *  @param targetserveruri The URI of the mirror server.
+	 *  @param info Publish infos for the mirror server.
+	 */
+	public IFuture<Void> mirrorHttpServer(URI sourceserveruri, URI targetserveruri, PublishInfo info)
+	{
+		Future<Void> ret = new Future<Void>();
+		Tuple2<MainHttpHandler, HttpServer> sourceservertuple = portservers==null? null: portservers.get(sourceserveruri.getPort());
+		
+		if (sourceservertuple != null)
+		{
+			try
+			{
+				HttpServer newserver = startServer(targetserveruri, info);
+				newserver.getServerConfiguration().addHttpHandler(sourceservertuple.getFirstEntity());
+				Tuple2<MainHttpHandler, HttpServer> newservertuple = new Tuple2<MainHttpHandler, HttpServer>(sourceservertuple.getFirstEntity(), newserver);
+				portservers.put(targetserveruri.getPort(), newservertuple);
+				
+			}
+			catch (Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Server mirror source not found: " + sourceserveruri.toString()));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Explicitely terminated an existing http server.
+	 *  @param uri URI of the server.
+	 */
+	public IFuture<Void> shutdownHttpServer(URI uri)
+	{
+		Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
+		for(Iterator<Tuple2<MainHttpHandler, HttpServer>> servers=portservers.values().iterator(); servers.hasNext(); )
+    	{
+    		if(servers.next().getSecondEntity().equals(servertuple.getSecondEntity()))
+    		{
+    			servers.remove();
+    			break;
+    		}
+    	}
+		System.out.println("Terminating server: "+uri.getPort());
+    	servertuple.getSecondEntity().shutdownNow();
+    	return IFuture.DONE;
 	}
 	
 //	/**
@@ -237,20 +226,14 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	/**
 	 *  Publish permanent redirect.
 	 */
-	public IFuture<Void> publishRedirect(URI uri, final String html)
+	public IFuture<Void> publishRedirect(final URI uri, final String html)
 	{
-		HttpServer server = getHttpServer(uri, null);
-		ServerConfiguration sc = server.getServerConfiguration();
+		Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
 		
-		Map<HttpHandler, String[]>	handlers	= sc.getHttpHandlers();
-        for(Map.Entry<HttpHandler, String[]> entry: handlers.entrySet())
-        {
-    		if(Arrays.asList(entry.getValue()).contains(uri.getPath()))
-    		{
-    			sc.removeHttpHandler((HttpHandler)entry.getKey());
-        		break;
-    		}
-        }
+		if (servertuple.getFirstEntity().containsSubhandlerForExactUri(null, uri.getPath()))
+		{
+			return new Future<Void>(new IllegalArgumentException("Cannot redirect, URI already bound: " + uri.toString()));
+		}
 		
 		HttpHandler redh	= new HttpHandler()
 	    {
@@ -260,54 +243,62 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	    		response.setHeader(Header.Location, html);
 	    	}
 	    };
-		sc.addHttpHandler(redh, uri.getPath());
+	    
+		servertuple.getFirstEntity().addSubhandler(null, uri.getPath(), redh);
 		
 		return IFuture.DONE;
 	}
 	
 	/**
-	 *  Publish an html page.
+	 *  Publish an html page.x	
 	 */
 	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
 	{
-		HttpServer server = getHttpServer(uri, null);
+		Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
 		
-        ServerConfiguration sc = server.getServerConfiguration();
-        Map<HttpHandler, String[]>	handlers	= sc.getHttpHandlers();
-        HtmlHandler	htmlh	= null;
-        for(Map.Entry<HttpHandler, String[]> entry: handlers.entrySet())
-        {
-        	if(entry.getKey() instanceof HtmlHandler)
-        	{
-        		if(Arrays.asList(entry.getValue()).contains(uri.getPath()))
-        		{
-	        		htmlh	= (HtmlHandler)entry.getKey();
-	        		break;
-        		}
-        	}
-        }
+//        ServerConfiguration sc = server.getServerConfiguration();
+//        Map<HttpHandler, String[]>	handlers	= sc.getHttpHandlers();
+//        HtmlHandler	htmlh	= null;
+//        for(Map.Entry<HttpHandler, String[]> entry: handlers.entrySet())
+//        {
+//        	if(entry.getKey() instanceof HtmlHandler)
+//        	{
+//        		if(Arrays.asList(entry.getValue()).contains(uri.getPath()))
+//        		{
+//	        		htmlh	= (HtmlHandler)entry.getKey();
+//	        		break;
+//        		}
+//        	}
+//        }
+		
+		if (servertuple.getFirstEntity().containsSubhandlerForExactUri(vhost, uri.getPath()))
+		{
+			return new Future<Void>(new IllegalArgumentException("Cannot publish HTML, URI already bound: " + uri.toString()));
+		}
         
-        if(htmlh==null)
-        {
-        	htmlh	= new HtmlHandler()
-    	    {
-    	    	public void service(Request request, Response response)
-    	    	{
-    	    		// Hack!!! required for investment planner
-    	    		// Todo: make accessible to outside
-    	    		response.addHeader("Access-Control-Allow-Origin", "*");
-    	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
-    	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
-    	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-    	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+//        if(htmlh==null)
+//        {
+		HtmlHandler htmlh	= new HtmlHandler()
+	    {
+	    	public void service(Request request, Response response)
+	    	{
+	    		// Hack!!! required for investment planner
+	    		// Todo: make accessible to outside
+	    		response.addHeader("Access-Control-Allow-Origin", "*");
+	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
 
-    	    		super.service(request, response);
-    	    	}
-    	    };
-    		sc.addHttpHandler(htmlh, uri.getPath());
-        }
+	    		super.service(request, response);
+	    	}
+	    };
+	    htmlh.addMapping(vhost, html);
+	    
+//		sc.addHttpHandler(htmlh, uri.getPath());
+//        }
         
-       	htmlh.addMapping(vhost, html);
+       	servertuple.getFirstEntity().addSubhandler(vhost, uri.getPath(), htmlh);
 		
 //		System.out.println("published at: "+uri.getPath());
 		
@@ -382,9 +373,24 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
-						HttpServer server = getHttpServer(uri, null);
-				        ServerConfiguration sc = server.getServerConfiguration();
-						sc.addHttpHandler(new CLStaticHttpHandler(cl, path.endsWith("/")? path: path+"/")
+						Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
+//				        ServerConfiguration sc = server.getServerConfiguration();
+//						sc.addHttpHandler(new CLStaticHttpHandler(cl, path.endsWith("/")? path: path+"/")
+//					    {
+//					    	public void service(Request request, Response response) throws Exception
+//					    	{
+//					    		// Hack!!! required for investment planner
+//					    		// Todo: make accessible to outside
+//				   	    		response.addHeader("Access-Control-Allow-Origin", "*");
+//			    	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+//			    	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+//			    	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+//			    	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+//					    		super.service(request, response);
+//					    	}
+//						}, uri.getPath());
+						
+						servertuple.getFirstEntity().addSubhandler(null, uri.getPath(), new CLStaticHttpHandler(cl, path.endsWith("/")? path: path+"/")
 					    {
 					    	public void service(Request request, Response response) throws Exception
 					    	{
@@ -397,7 +403,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			    	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
 					    		super.service(request, response);
 					    	}
-						}, uri.getPath());
+						});
 						
 						System.out.println("Resource published at: "+uri.getPath());
 						ret.setResult(null);
@@ -412,10 +418,9 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	/**
 	 *  Publish file resources from the file system.
 	 */
-	public IFuture<Void> publishExternal(URI uri, String rootpath)
+	public IFuture<Void> publishExternal(final URI uri, String rootpath)
 	{		
-		HttpServer server = getHttpServer(uri, null);
-		
+		Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
 	    StaticHttpHandler handler	= new StaticHttpHandler(rootpath)
 	    {
 	    	public void service(Request request, Response response) throws Exception
@@ -432,8 +437,9 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	    };
 	    handler.setFileCacheEnabled(false);	// see http://stackoverflow.com/questions/13307489/grizzly-locks-static-served-resources
 		
-        ServerConfiguration sc = server.getServerConfiguration();
-		sc.addHttpHandler(handler, uri.getPath());
+//        ServerConfiguration sc = server.getServerConfiguration();
+//		sc.addHttpHandler(handler, uri.getPath());
+	    servertuple.getFirstEntity().addSubhandler(null, uri.getPath(), handler);
 		
 //		System.out.println("published at: "+uri.getPath());
 		
@@ -451,18 +457,22 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		boolean stopped = false;
 		if(sidservers!=null)
 		{
-			Tuple2<HttpServer, HttpHandler> tup = sidservers.remove(sid);
+			Tuple2<HttpServer, URI> tup = sidservers.remove(sid);
 			if(tup!=null)
 			{
 				HttpServer server = tup.getFirstEntity();
-			    ServerConfiguration config = server.getServerConfiguration();
+//			    ServerConfiguration config = server.getServerConfiguration();
 			    System.out.println("unpub: "+tup.getSecondEntity());
-			    config.removeHttpHandler(tup.getSecondEntity());
-			    if(config.getHttpHandlers().size()==0)
+			    
+//			    config.removeHttpHandler(tup.getSecondEntity());
+//			    if(config.getHttpHandlers().size()==0)
+			    Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(tup.getSecondEntity(), null);
+				servertuple.getFirstEntity().removeSubhandler(null, tup.getSecondEntity().getPath());
+			    if (servertuple.getFirstEntity().isEmpty())
 			    {
-			    	for(Iterator<HttpServer> servers=portservers.values().iterator(); servers.hasNext(); )
+			    	for(Iterator<Tuple2<MainHttpHandler, HttpServer>> servers=portservers.values().iterator(); servers.hasNext(); )
 			    	{
-			    		if(servers.next().equals(server))
+			    		if(servers.next().getSecondEntity().equals(server))
 			    		{
 			    			servers.remove();
 			    			break;
@@ -481,6 +491,20 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	}
 	
 	/**
+	 *  Unpublish an already-published handler.
+	 *  @param vhost The virtual host, if any, null for general.
+	 *  @param uti The uri being unpublished.
+	 */
+	public IFuture<Void> unpublish(String vhost, URI uri)
+	{
+		Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
+		
+		servertuple.getFirstEntity().removeSubhandler(vhost, uri.getPath());
+		
+		return IFuture.DONE;
+	}
+	
+	/**
 	 *  Test if a service is published.
 	 */
 	public boolean isPublished(IServiceIdentifier sid)
@@ -488,7 +512,251 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		return sidservers!=null && sidservers.containsKey(sid);
 	}
 	
+	protected HttpServer startServer(URI uri, PublishInfo info) throws Exception
+	{
+		HttpServer server = null;
+		
+		System.out.println("Starting new server: "+uri.getPort());
+		
+		ErrorPageGenerator epg = null;
+		
+		String	keystore	= null;
+		String	keystorepass	= null;
+		if(info!=null)
+		{
+			for(UnparsedExpression upex: info.getProperties())
+			{
+//				System.out.println("found publish expression: "+upex.getName());
+				
+				if("sslkeystore".equals(upex.getName()))
+				{
+					keystore	= (String)SJavaParser.getParsedValue(upex, null,
+						component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+				}
+				else if("sslkeystorepass".equals(upex.getName()))
+				{
+					keystorepass	= (String)SJavaParser.getParsedValue(upex, null,
+						component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+				}
+				else if("errorpage".equals(upex.getName()))
+				{
+					String errpage = (String)SJavaParser.getParsedValue(upex, null,
+						component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+					
+					if(errpage!=null)
+					{
+						final String errp = SUtil.readFile(errpage);
+						
+//						System.out.println("errorpage path: "+errpage);
+//						System.out.println("errorpage: "+errp);
+						
+						epg = new ErrorPageGenerator()
+						{
+				             public String generate(Request request, int status, String reasonPhrase, String description, Throwable exception) 
+				             {
+				            	 return errp;
+				             }
+						};
+					}
+				}
+			}
+		}
+		
+		if(keystore!=null)
+		{
+			SSLContextConfigurator sslContext = new SSLContextConfigurator();
+			sslContext.setKeyStoreFile(keystore); // contains server keypair
+			sslContext.setKeyStorePass(keystorepass);
+//			sslContext.setTrustStoreFile("./truststore_server"); // contains client certificate
+//			sslContext.setTrustStorePass("asdfgh");
+			SSLEngineConfigurator sslConf = new SSLEngineConfigurator(sslContext).setClientMode(false);
+			
+			server = GrizzlyHttpServerFactory.createHttpServer(uri, (GrizzlyHttpContainer)null, true, sslConf, false);
+		}
+		else
+		{
+			server	= GrizzlyHttpServerFactory.createHttpServer(uri, false);
+		}
+		
+		if(epg!=null)
+		{
+			server.getServerConfiguration().setDefaultErrorPageGenerator(epg);
+		}
+		server.start();
+		
+		if(portservers==null)
+			portservers = new HashMap<Integer, Tuple2<MainHttpHandler, HttpServer>>();
+		
+		return server;
+	}
+	
 	//-------- helper classes --------
+	
+	/**
+	 *  Main handler dealing with incoming request more intelligently than Grizzly does.
+	 *
+	 */
+	public static class MainHttpHandler extends HttpHandler
+	{
+		/** Published subhandlers.
+		 *  vhost+path -> path+httphandler
+		 *  
+		 *  Path needs to be preserved in the value since the cache does not preserve it.
+		 */
+		protected Map<Tuple2<String, String>, Tuple2<String, HttpHandler>> subhandlers;
+		
+		/** Published subhandler matching cache. */
+		protected Map<Tuple2<String, String>, Tuple2<String, HttpHandler>> subhandlercache;
+		
+		/**
+		 *  Create the handler.
+		 */
+		public MainHttpHandler()
+		{
+			subhandlers = Collections.synchronizedMap(new HashMap<Tuple2<String, String>, Tuple2<String, HttpHandler>>());
+			subhandlercache = Collections.synchronizedMap(new HashMap<Tuple2<String, String>, Tuple2<String, HttpHandler>>());
+		}
+		
+		/**
+		 *  Service the request.
+		 */
+		public void service(Request request, Response resp) throws Exception
+		{
+			
+			String path = request.getRequest().getRequestURIRef().getURI();
+			String	host	= request.getHeader("host");
+			int	idx	= host.indexOf(":");
+			if(idx!=-1)
+			{
+				host	= host.substring(0, idx);
+			}
+			
+			Tuple2<String, HttpHandler> subhandlertuple = subhandlercache.get(new Tuple2<String, String>(host, path));
+			if (subhandlertuple == null)
+			{
+				subhandlertuple = subhandlercache.get(new Tuple2<String, String>(null, path));
+			}
+			
+			int pidx = path.lastIndexOf('/');
+			if (subhandlertuple == null && pidx > 0 && pidx <= path.length() - 1)
+			{
+				String cpath = path.substring(0, pidx);
+				subhandlertuple = subhandlercache.get(new Tuple2<String, String>(host, cpath));
+			}
+			
+			
+			if (subhandlertuple == null)
+			{
+				subhandlertuple = findSubhandler(host, path);
+				if (subhandlertuple == null)
+				{
+					subhandlertuple = findSubhandler(null, path);
+				}
+				
+				if (subhandlertuple != null)
+				{
+					subhandlercache.put(new Tuple2<String, String>(host, path), subhandlertuple);
+				}
+			}
+			
+			if (subhandlertuple == null)
+			{
+				throw new RuntimeException("No handler found for path: " + path);
+			}
+			
+			try
+			{
+				Method setcontextpath = Request.class.getDeclaredMethod("setContextPath", new Class<?>[] { String.class });
+				setcontextpath.setAccessible(true);
+				setcontextpath.invoke(request, subhandlertuple.getFirstEntity());
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+			subhandlertuple.getSecondEntity().service(request, resp);
+		}
+		
+		/**
+		 *  Adds a new subhandler.
+		 *  
+		 *  @param vhost Virtual host specification.
+		 *  @param path Path being handled.
+		 *  @param subhandler The subhandler.
+		 */
+		public void addSubhandler(String vhost, String path, HttpHandler subhandler)
+		{
+			subhandlers.put(new Tuple2<String, String>(vhost, path), new Tuple2<String, HttpHandler>(path, subhandler));
+			synchronized (subhandlers)
+			{
+				subhandlercache = Collections.synchronizedMap(new HashMap<Tuple2<String,String>, Tuple2<String, HttpHandler>>(subhandlers));
+			}
+		}
+		
+		/**
+		 *  Tests if a handler for the exact URI is currently published.
+		 * 
+		 *  @param vhost Virtual host specification.
+		 *  @param path Path being handled.
+		 *  @return True, if a handler was found.
+		 */
+		public boolean containsSubhandlerForExactUri(String vhost, String path)
+		{
+			return subhandlers.containsKey(new Tuple2<String, String>(vhost, path));
+		}
+		
+		/**
+		 *  Tests if the handler contains no subhandlers.
+		 *  
+		 *  @return True, if no subhandlers remain.
+		 */
+		public boolean isEmpty()
+		{
+			return subhandlers.isEmpty();
+		}
+		
+		/**
+		 * 
+		 * @param vhost Virtual host specification.
+		 *  @param path Path being handled.
+		 */
+		public void removeSubhandler(String vhost, String path)
+		{
+			subhandlers.remove(new Tuple2<String, String>(vhost, path));
+			synchronized (subhandlers)
+			{
+				subhandlercache = Collections.synchronizedMap(new HashMap<Tuple2<String,String>, Tuple2<String, HttpHandler>>(subhandlers));
+			}			
+		}
+		
+		/**
+		 *  Locates an appropriate subhandler that matches the requested resource closely.
+		 *  
+		 *  @param host The requested virtual host.
+		 *  @param path The requested path
+		 *  @return The subhandler or null if none is found for the host.
+		 */
+		protected Tuple2<String, HttpHandler> findSubhandler(String host, String path)
+		{
+			Tuple2<String, HttpHandler> ret = null;
+			do
+			{
+				int pidx = path.lastIndexOf('/');
+				if (pidx >= 0)
+				{
+					path = path.substring(0, pidx);
+					ret = subhandlercache.get(new Tuple2<String, String>(host, path));
+				}
+				else
+				{
+					path = null;
+				}
+			}
+			while (ret == null && path != null && path.length() > 0);
+			return ret;
+		}
+	}
 	
 	/**
 	 *	Allow responding with different htmls based on virtual host name. 
