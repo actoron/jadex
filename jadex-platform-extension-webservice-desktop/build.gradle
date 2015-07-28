@@ -6,6 +6,8 @@ dependencies
 	compile project(':jadex-kernel-component')
 	compile project(':jadex-platform-extension-webservice')
 
+	compile 'javax.ws.rs:javax.ws.rs-api:2.0'
+
 	compile 'javassist:javassist:3.12.1.GA'
 	compile 'javax.activation:activation:1.1'
 	compile 'javax.servlet:javax.servlet-api:3.0.1'
@@ -15,5 +17,6 @@ dependencies
 	compile 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.11'
 	compile 'org.glassfish.jersey.core:jersey-client:2.11'
 	compile 'org.glassfish.jersey.media:jersey-media-moxy:2.11'
-	compile 'javax.ws.rs:javax.ws.rs-api:2.0'
+
+	compile 'org.eclipse.jetty:jetty-server:9.3.1.v20150714'
 }

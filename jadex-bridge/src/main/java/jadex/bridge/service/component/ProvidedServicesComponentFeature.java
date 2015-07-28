@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -19,8 +20,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -58,6 +61,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	
 	/** The map of provided service infos. (sid -> method listener) */
 	protected Map<IServiceIdentifier, MethodListenerHandler> servicelisteners;
+	
+	/** The map of provided service infos. (sid -> provided service info) */
+	protected Map<IServiceIdentifier, ProvidedServiceInfo> serviceinfos;
 	
 	//-------- constructors --------
 	
@@ -227,8 +233,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	protected void	addService(IInternalService service, ProvidedServiceInfo info)
 	{
-		if(BasicServiceInvocationHandler.isRequiredServiceProxy(service))
-			System.out.println("sdfsddgsdgg");
+		if(serviceinfos==null)
+			serviceinfos = new HashMap<IServiceIdentifier, ProvidedServiceInfo>();
+		serviceinfos.put(service.getServiceIdentifier(), info);
 		
 		// Find service types
 //		Class<?>	type	= info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
@@ -244,10 +251,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		}
 
 		if(services==null)
-		{
 			services = Collections.synchronizedMap(new LinkedHashMap<Class<?>, Collection<IInternalService>>());
-		}
-
+		
 		for(Class<?> servicetype: types)
 		{
 			Collection<IInternalService> tmp = services.get(servicetype);
@@ -261,6 +266,16 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			// Make all services available immediately, even before start (hack???).
 			PlatformServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service);
 		}
+	}
+	
+	/**
+	 *  Get the provided service info for a service.
+	 *  @param sid The service identifier.
+	 *  @return The provided service info.
+	 */
+	protected ProvidedServiceInfo getProvidedServiceInfo(IServiceIdentifier sid)
+	{
+		return serviceinfos.get(sid);
 	}
 	
 	/**
@@ -407,21 +422,158 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		{
 			public void customResultAvailable(Void result)
 			{
-				is.startService().addResultListener(new IResultListener<Void>()
+				is.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
-					public void resultAvailable(Void result)
+					public void customResultAvailable(Void result)
 					{
 						component.getLogger().info("Started service: "+is.getServiceIdentifier());
-						ret.setResult(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
+						serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
 		});
+		return ret;
+	}
+	
+	/**
+	 *  Called after a service has been started.
+	 */
+	public IFuture<Void> serviceStarted(final IInternalService service)
+	{
+		final Future<Void> ret = new Future<Void>();
+		ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceIdentifier());
+		PublishInfo pit = info==null? null: info.getPublish();
+		if(pit!=null)
+		{
+			// Hack?! evaluate the publish id string 
+			// Must clone info to not change the model
+			final PublishInfo pi = new PublishInfo(pit);
+			try
+			{
+				String pid = (String)SJavaParser.evaluateExpression(pi.getPublishId(), getComponent().getModel().getAllImports(), getComponent().getFetcher(), getComponent().getClassLoader());
+				pi.setPublishId(pid);
+//				System.out.println("pid is now: "+pid);
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+			}
+			
+			getPublishService(getComponent(), pi.getPublishType(), (Iterator<IPublishService>)null)
+				.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
+				.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
+			{
+				public void customResultAvailable(IPublishService ps)
+				{
+					ps.publishService(getComponent().getClassLoader(), service, pi)
+						.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+//					exception.printStackTrace();
+					getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+					ret.setResult(null);
+				}
+			}));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Called after a service has been shutdowned.
+	 */
+	public IFuture<Void> serviceShutdowned(final IInternalService service)
+	{
+		final Future<Void> ret = new Future<Void>();
+//		adapter.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+				ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceIdentifier());
+				final PublishInfo pi = info==null? null: info.getPublish();
+//				System.out.println("shutdown ser: "+service.getServiceIdentifier());
+				if(pi!=null)
+				{
+					final IServiceIdentifier sid = service.getServiceIdentifier();
+//					getPublishService(instance, pi.getPublishType(), null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
+					getPublishService(getComponent(), pi.getPublishType(), null).addResultListener(new IResultListener<IPublishService>()
+					{
+						public void resultAvailable(IPublishService ps)
+						{
+							ps.unpublishService(sid).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+			//				instance.getLogger().severe("Could not unpublish: "+sid+" "+exception.getMessage());
+							
+							// ignore, if no publish info
+							ret.setResult(null);
+							// todo: what if publish info but no publish service?
+						}
+					});
+				}
+				else
+				{
+					ret.setResult(null);
+				}				
+//			}
+//		});
+		return ret;
+	}
+	
+	/**
+	 *  Get the publish service for a publish type (e.g. web service).
+	 *  @param type The type.
+	 *  @param services The iterator of publish services (can be null).
+	 *  @return The publish service.
+	 */
+	public static IFuture<IPublishService> getPublishService(final IInternalAccess instance, final String type, final Iterator<IPublishService> services)
+	{
+		final Future<IPublishService> ret = new Future<IPublishService>();
+		
+		if(services==null)
+		{
+			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance, IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM, null);
+			fut.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
+			{
+				public void customResultAvailable(Collection<IPublishService> result)
+				{
+					getPublishService(instance, type, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
+				}
+			}));
+		}
+		else
+		{
+			if(services.hasNext())
+			{
+				final IPublishService ps = (IPublishService)services.next();
+				ps.isSupported(type).addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
+				{
+					public void customResultAvailable(Boolean supported)
+					{
+						if(supported.booleanValue())
+						{
+							ret.setResult(ps);
+						}
+						else
+						{
+							getPublishService(instance, type, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
+						}
+					}
+				}));
+			}
+			else
+			{
+//				ret.setResult(null);
+				ret.setException(new ServiceNotFoundException("IPublishService not found."));
+			}
+		}
+		
 		return ret;
 	}
 	
@@ -438,18 +590,18 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			removeService(is);
 			
 			component.getLogger().info("Stopping service: "+is.getServiceIdentifier());
-			is.shutdownService().addResultListener(new IResultListener<Void>()
+			is.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				public void resultAvailable(Void result)
+				public void customResultAvailable(Void result)
 				{
 					component.getLogger().info("Stopped service: "+is.getServiceIdentifier());
-					
-					shutdownServices(services).addResultListener(new DelegationResultListener<Void>(ret));
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
+					serviceShutdowned(is).addResultListener(new DelegationResultListener<Void>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+							shutdownServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					});
 				}
 			});
 		}
