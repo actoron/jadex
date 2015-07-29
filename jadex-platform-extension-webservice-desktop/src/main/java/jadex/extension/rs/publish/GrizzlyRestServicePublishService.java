@@ -130,7 +130,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			
 			if(servertuple==null)
 			{
-				HttpServer server = startServer(uri, info);
+				HttpServer server = startServer(uri, info, null);
 				MainHttpHandler mainhandler = new MainHttpHandler();
 				server.getServerConfiguration().addHttpHandler(mainhandler);
 				servertuple = new Tuple2<MainHttpHandler, HttpServer>(mainhandler, server);
@@ -164,9 +164,23 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		{
 			try
 			{
-				HttpServer newserver = startServer(targetserveruri, info);
+				String errorfallback = null;
+				if ((sourceservertuple.getSecondEntity().getServerConfiguration().getDefaultErrorPageGenerator() instanceof RedirectErrorPageGenerator))
+				{
+					errorfallback = ((RedirectErrorPageGenerator) sourceservertuple.getSecondEntity().getServerConfiguration().getDefaultErrorPageGenerator()).getRedirectUrl();
+				}
+				HttpServer newserver = startServer(targetserveruri, info, errorfallback);
 				newserver.getServerConfiguration().addHttpHandler(sourceservertuple.getFirstEntity());
 				Tuple2<MainHttpHandler, HttpServer> newservertuple = new Tuple2<MainHttpHandler, HttpServer>(sourceservertuple.getFirstEntity(), newserver);
+				if (!(newserver.getServerConfiguration().getDefaultErrorPageGenerator() instanceof RedirectErrorPageGenerator))
+				{
+					ErrorPageGenerator epg = sourceservertuple.getSecondEntity().getServerConfiguration().getDefaultErrorPageGenerator();
+					System.out.println(epg);
+					if (epg != null)
+					{
+						newserver.getServerConfiguration().setDefaultErrorPageGenerator(epg);
+					}
+				}
 				portservers.put(targetserveruri.getPort(), newservertuple);
 				
 			}
@@ -512,7 +526,15 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		return sidservers!=null && sidservers.containsKey(sid);
 	}
 	
-	protected HttpServer startServer(URI uri, PublishInfo info) throws Exception
+	/**
+	 *  Starts a server.
+	 *  
+	 *  @param uri The server URI.
+	 *  @param info Publish infos.
+	 *  @param errorpagefallback Error page URL fallback if not provided in publish infos.
+	 *  @return The server.
+	 */
+	protected HttpServer startServer(URI uri, PublishInfo info, String errorpagefallback) throws Exception
 	{
 		HttpServer server = null;
 		
@@ -540,23 +562,21 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 				}
 				else if("errorpage".equals(upex.getName()))
 				{
-					String errpage = (String)SJavaParser.getParsedValue(upex, null,
-						component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+					String errpage = null;
+					try
+					{
+						errpage = (String)SJavaParser.getParsedValue(upex, null,
+							component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+					}
+					catch (Exception e)
+					{
+						errpage = upex.getValue();
+					}
 					
 					if(errpage!=null)
 					{
-						final String errp = SUtil.readFile(errpage);
 						
-//						System.out.println("errorpage path: "+errpage);
-//						System.out.println("errorpage: "+errp);
-						
-						epg = new ErrorPageGenerator()
-						{
-				             public String generate(Request request, int status, String reasonPhrase, String description, Throwable exception) 
-				             {
-				            	 return errp;
-				             }
-						};
+						epg = new RedirectErrorPageGenerator(errpage);
 					}
 				}
 			}
@@ -576,6 +596,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		else
 		{
 			server	= GrizzlyHttpServerFactory.createHttpServer(uri, false);
+		}
+		
+		if(epg==null && errorpagefallback != null)
+		{
+			epg = new RedirectErrorPageGenerator(errorpagefallback);
 		}
 		
 		if(epg!=null)
@@ -832,5 +857,36 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static class RedirectErrorPageGenerator implements ErrorPageGenerator
+	{
+		/** Redirect URL. */
+		protected String redirecturl;
+		
+		/**
+		 *  Creates the Generator. 
+		 */
+		public RedirectErrorPageGenerator(String redirecturl)
+		{
+			this.redirecturl = redirecturl;
+		}
+		
+		/**
+		 *  Returns the redirect URL.
+		 *  @return The redirect URL.
+		 */
+		public String getRedirectUrl()
+		{
+			return redirecturl;
+		}
+		
+		/**
+		 *  Generates the error page with a redirect.
+		 */
+        public String generate(Request request, int status, String reasonPhrase, String description, Throwable exception) 
+        {
+       	 return "<html><html><head><meta http-equiv=\"refresh\" content=\"0;url=" + redirecturl + "\"><body></body></html>";
+        }
 	}
 }
