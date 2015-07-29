@@ -16,7 +16,6 @@
 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
 		<capability name="pingcap" file="jadex.bdi.planlib.ping.Ping"/>
 	</capabilities>
 

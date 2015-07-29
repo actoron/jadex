@@ -18,7 +18,6 @@
 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
 		<capability name="cnpcap" file="jadex.bdi.planlib.protocols.contractnet.ContractNet"/>
 	</capabilities>
 

@@ -32,7 +32,6 @@ public class StartPeerPlan extends Plan
 		int max = ((Integer)getBeliefbase().getBelief("max").getFact()).intValue();
 		Long starttime = (Long)getBeliefbase().getBelief("starttime").getFact();
 		Long startmem = (Long)getBeliefbase().getBelief("startmem").getFact();
-		boolean service = ((Boolean)getBeliefbase().getBelief("service").getFact()).booleanValue();
 		boolean parallel = ((Boolean)getBeliefbase().getBelief("parallel").getFact()).booleanValue();
 
 		// Create new peer.
@@ -54,11 +53,7 @@ public class StartPeerPlan extends Plan
 				args.put("startmem", startmem);
 				args.put("parallel", Boolean.valueOf(parallel));
 				
-				IComponentIdentifier aid;
-				if(service)
-					aid = serviceCreateAgent(createPeerName(newnum), args);
-				else
-					aid = capabilityCreateAgent(createPeerName(newnum), args);
+				IComponentIdentifier aid = serviceCreateAgent(createPeerName(newnum), args);
 				
 				System.out.println("Successfully created peer: "+aid.getLocalName());
 			}
@@ -77,11 +72,7 @@ public class StartPeerPlan extends Plan
 					args.put("startmem", startmem);
 					args.put("parallel", Boolean.valueOf(parallel));
 					
-					IComponentIdentifier aid;
-					if(service)
-						aid = serviceCreateAgent(createPeerName(newnum), args);
-					else
-						aid = capabilityCreateAgent(createPeerName(newnum), args);
+					IComponentIdentifier aid	= serviceCreateAgent(createPeerName(newnum), args);
 					
 					System.out.println("Successfully created peer: "+aid.getLocalName());
 				}
@@ -112,10 +103,7 @@ public class StartPeerPlan extends Plan
 				{
 					final String	name	= createPeerName(cnt);
 //					System.err.println("Destroying peer: "+name);
-					if(service)
-						serviceDestroyAgent(name);
-					else
-						capabilityDestroyAgent(name);
+					serviceDestroyAgent(name);
 					System.out.println("Successfully destroyed peer: "+name);
 				}
 			}
@@ -175,24 +163,6 @@ public class StartPeerPlan extends Plan
 	}
 	
 	/**
-	 *  Create an agent by using the CMS capability.
-	 *  @param name The agent instance name.
-	 *  @param args The arguments.
-	 */
-	protected IComponentIdentifier capabilityCreateAgent(String name, Map<String, Object> args)
-	{
-		IGoal sp = createGoal("cms_create_component");
-		sp.getParameter("type").setValue("/jadex/bdi/benchmarks/AgentCreation.agent.xml");
-		// todo: Hack! Assumes there is no capability
-		sp.getParameter("configuration").setValue(getScope().getConfigurationName());
-		sp.getParameter("name").setValue(name);
-		sp.getParameter("arguments").setValue(args);
-		sp.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
-		dispatchSubgoalAndWait(sp);
-		return (IComponentIdentifier)sp.getParameter("componentidentifier").getValue();
-	}
-	
-	/**
 	 *  Destroy an agent by directly using the CMS service.
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
@@ -212,20 +182,6 @@ public class StartPeerPlan extends Plan
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
 		IFuture<Map<String, Object>> ret = ces.destroyComponent(aid);
 		ret.get();
-	}
-	
-	/**
-	 *  Destroy an agent by using the CMS capability.
-	 *  @param name The agent instance name.
-	 *  @param args The arguments.
-	 */
-	protected void capabilityDestroyAgent(String name)
-	{
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
-		IGoal sp = createGoal("cms_destroy_component");
-		sp.getParameter("componentidentifier").setValue(aid);
-		dispatchSubgoalAndWait(sp);
-		System.out.println("Successfully destroyed peer: "+name);
 	}
 }
 

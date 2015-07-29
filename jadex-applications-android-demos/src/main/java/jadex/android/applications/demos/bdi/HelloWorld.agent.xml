@@ -15,10 +15,6 @@
 		<import>jadex.bridge.service.types.cms.*</import>
 		<import>jadex.bridge.service.types.context.*</import>
 	</imports>
-<!--
- 	<capabilities>
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
-	</capabilities> -->
 
 	<beliefs>
 		<!-- <belief name="delay" class="int">

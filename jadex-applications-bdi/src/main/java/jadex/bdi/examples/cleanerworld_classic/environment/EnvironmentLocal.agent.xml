@@ -14,10 +14,6 @@
 		<import>java.util.logging.Level</import>
 	</imports>
 
-	<capabilities>
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
-	</capabilities>
-
 	<beliefs>
 		<belief name="environment" class="Environment">
 			<!-- Use own environment for remote. -->
@@ -32,12 +28,6 @@
 		</belief>
 	</beliefs>
 	
-<!--	<goals>
-		<achievegoalref name="cms_destroy_component">
-			<concrete ref="cmscap.cms_destroy_component"/>
-		</achievegoalref>
-	</goals>-->
-
 	<properties>
 <!--		<property name="logging.level">Level.INFO</property>-->
 	</properties>

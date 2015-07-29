@@ -1,9 +1,12 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.TimeoutException;
 
@@ -22,14 +25,13 @@ public class ArgumentsPlan extends Plan
 		TestReport tr = new TestReport("#1", "Test if a worker agent can be started and supplied with arguments.");
 		try
 		{
-			IGoal ca = createGoal("cmscap.cms_create_component");
-			ca.getParameter("type").setValue("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml");
-			ca.getParameter("parent").setValue(getComponentIdentifier());
-			Map args = SCollection.createHashMap();
+			IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			Map<String, Object> args = SCollection.createHashMap();
 			args.put("creator", getComponentIdentifier());
-			ca.getParameter("arguments").setValue(args);
-			dispatchSubgoalAndWait(ca);
-//			IComponentIdentifier worker = (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
+			cms.createComponent("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml",
+				new CreationInfo(args, getComponentIdentifier())).getFirstResult();
+
 			waitForMessageEvent("inform_created", 1000);
 			tr.setSucceeded(true);
 		}

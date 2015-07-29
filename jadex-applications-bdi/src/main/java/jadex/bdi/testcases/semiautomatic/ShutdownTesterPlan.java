@@ -1,9 +1,10 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 
 /**
  *  Test the shutdown of a platform
@@ -15,12 +16,11 @@ public class ShutdownTesterPlan extends Plan
 	 */
 	public void body()
 	{
-		IComponentIdentifier ams = (IComponentIdentifier)getBeliefbase().getBelief("cms").getFact();
-		IGoal sd = createGoal("cms_shutdown_platform");
-		sd.getParameter("cms").setValue(ams);
+		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		try
 		{
-			dispatchSubgoalAndWait(sd);
+			cms.destroyComponent(getComponentIdentifier().getRoot()).get();
 			System.out.println("Remote platform successfully shutdowned.");
 		}
 		catch(GoalFailureException e)

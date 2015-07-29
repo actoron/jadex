@@ -23,7 +23,6 @@
 	<capabilities>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
 	</capabilities>
 
 	<beliefs>
@@ -52,10 +51,6 @@
 		</achievegoalref>
 		<achievegoalref name="df_deregister">
 			<concrete ref="dfcap.df_deregister"/>
-		</achievegoalref>
-
-		<achievegoalref name="cms_destroy_component">
-			<concrete ref="cmscap.cms_destroy_component"/>
 		</achievegoalref>
 
 		<querygoalref name="rp_decide_request">

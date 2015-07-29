@@ -117,24 +117,6 @@ public class EnvironmentGui	extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-//				// todo: move to end goal
-//				Environment en = (Environment)agent.getBeliefbase().getBelief("environment").getFact();
-//				Creature[] creatures = en.getCreatures();
-//				for(int i=0; i<creatures.length; i++)
-//				{
-//					try
-//					{
-////						System.out.println(creatures[i].getAID());
-//						IGoal kg = agent.createGoal("cms_destroy_component");
-//						kg.getParameter("componentidentifier").setValue(creatures[i].getAID());
-//						agent.dispatchTopLevelGoalAndWait(kg);
-//					}
-//					catch(GoalFailureException gfe) 
-//					{
-//					}
-//				}
-//				agent.killAgent();
-				
 				dispose();
 				
 				agent.scheduleStep(new IComponentStep<Void>()
@@ -148,16 +130,6 @@ public class EnvironmentGui	extends JFrame
 						return IFuture.DONE;
 					}
 				});
-//				agent.createGoal("end_agent").addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
-//				{
-//					public void customResultAvailable(Object source, Object result)
-//					{
-//						agent.dispatchTopLevelGoal((IEAGoal)result);
-//					}
-//				});
-				
-//				IGoal eg = agent.createGoal("end_agent");
-//				agent.dispatchTopLevelGoal(eg);
 			}
 		});
 		
@@ -166,20 +138,6 @@ public class EnvironmentGui	extends JFrame
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				bia.addComponentListener(new TerminationAdapter()
-//				{
-//					public void componentTerminated()
-//					{
-//						SwingUtilities.invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-//								EnvironmentGui.this.dispose();
-//							}
-//						});
-//					}
-//				});
-				
 				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{

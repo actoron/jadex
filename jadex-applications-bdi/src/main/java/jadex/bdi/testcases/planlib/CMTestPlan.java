@@ -6,6 +6,10 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.concurrent.TimeoutException;
 
 /**
@@ -30,12 +34,10 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IGoal	ca	= createGoal("cmscap.cms_create_component");
-		ca.getParameter("type").setValue(agenttype);
-		ca.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
-		dispatchSubgoalAndWait(ca);
-		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
-
+		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentIdentifier	receiver	= cms.createComponent(agenttype, new CreationInfo(getComponentIdentifier())).getFirstResult();
+		
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");
 		request.getParameter("action").setValue("dummy request");
@@ -65,9 +67,7 @@ public class CMTestPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
 		// Destroy receiver agent.
-		IGoal	da	= createGoal("cmscap.cms_destroy_component");
-		da.getParameter("componentidentifier").setValue(receiver);
-		dispatchSubgoalAndWait(da);
+		cms.destroyComponent(receiver).get();
 	}
 	
 	/**
@@ -77,12 +77,10 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IGoal	ca	= createGoal("cmscap.cms_create_component");
-		ca.getParameter("type").setValue(agenttype);
-		ca.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
-		dispatchSubgoalAndWait(ca);
-		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
-
+		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentIdentifier	receiver	= cms.createComponent(agenttype, new CreationInfo(getComponentIdentifier())).getFirstResult();
+		
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");
 		request.getParameter("action").setValue("dummy request");
@@ -91,9 +89,7 @@ public class CMTestPlan extends Plan
 		
 		// Wait a sec. and then kill the receiver agent (should abort interaction in its end state).
 		waitFor(1000);
-		IGoal	da	= createGoal("cmscap.cms_destroy_component");
-		da.getParameter("componentidentifier").setValue(receiver);
-		dispatchSubgoalAndWait(da);
+		cms.destroyComponent(receiver).get();
 		
 		// Check if goal finishes. (todo: check result).
 		TestReport	report	= new TestReport("test_abort", "Test if interaction can be aborted on receiver side.");

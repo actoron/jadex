@@ -231,8 +231,6 @@ public class ClockFrame extends JFrame
 //				});
 				
 				ClockFrame.this.agent.killComponent(); // Use -autoshutdown to kill standalone platform as well
-				//IGoal kp = agent.createGoal("cms_shutdown_platform");
-				//agent.dispatchTopLevelGoal(kp);
 			}
 		};
 		

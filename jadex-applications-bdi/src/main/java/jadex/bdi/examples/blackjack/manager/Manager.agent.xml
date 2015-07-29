@@ -27,8 +27,6 @@
 		<!-- this capability provides easy access to "out-of-the-box"-plans
 			 allowing - for example - to register at the DF. -->
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
-		<!-- Capability to start other agents. -->
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
 	</capabilities>
 
 	<beliefs>
@@ -57,21 +55,9 @@
 	</beliefs>
 
 	<goals>
-		<!-- Used to find other agents. -->
-		<achievegoalref name="cms_search_components">
-			<concrete ref="cmscap.cms_search_components"/>
-		</achievegoalref>
 		<!-- Used to search for the dealer. -->
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search"/>
-		</achievegoalref>
-		<!-- Used to start other agents. -->
-		<achievegoalref name="cms_create_component">
-			<concrete ref="cmscap.cms_create_component"/>
-		</achievegoalref>
-		<!-- Used to stop other agents. -->
-		<achievegoalref name="cms_destroy_component">
-			<concrete ref="cmscap.cms_destroy_component"/>
 		</achievegoalref>
 	</goals>
 	

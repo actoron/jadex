@@ -17,10 +17,6 @@
 		<import>jadex.bridge.service.types.threadpool.IThreadPoolService</import>
 	</imports>
 
-	<capabilities>
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
-	</capabilities>
-
 	<beliefs>
 		<!-- The filename of the alarmclock settings. -->
 		<belief name="settingsfile" class="String" exported="true">
@@ -70,11 +66,6 @@
 		<performgoal name="play_song">
 			<parameter name="song" class="URL"/>
 		</performgoal>
-<!-- 
-		<achievegoalref name="cms_shutdown_platform">
-			<concrete ref="cmscap.cms_shutdown_platform"/>
-		</achievegoalref>
-		 -->
 	</goals>
 
 	<plans>

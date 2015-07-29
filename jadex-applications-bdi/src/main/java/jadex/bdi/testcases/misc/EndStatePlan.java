@@ -7,8 +7,12 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -27,18 +31,17 @@ public class EndStatePlan extends Plan
 	 */
 	public void body()
 	{
+		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		
 		// Store report message from worker agent.
 		getWaitqueue().addMessageEvent("inform_reports");
 		
 		// Create worker agent.
-		IGoal	create	= createGoal("cmscap.cms_create_component");
-		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateWorker.agent.xml");
-		Map args = SCollection.createHashMap();
+		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
-		create.getParameter("arguments").setValue(args);
-		create.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
-		dispatchSubgoalAndWait(create);
-		IComponentIdentifier	worker	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
+		IComponentIdentifier	worker	= cms.createComponent("/jadex/bdi/testcases/misc/EndStateWorker.agent.xml",
+			new CreationInfo(args, getComponentIdentifier())).getFirstResult();
 		
 		// Wait for reports from worker agent.
 		IMessageEvent	msg	= waitForMessageEvent("inform_reports");
@@ -47,14 +50,10 @@ public class EndStatePlan extends Plan
 		
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
-		IGoal	search	= createGoal("cmscap.cms_search_components");
-//		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-//			getComponentFeature(IRequiredServicesFeature.class), IComponentManagementService.class).get();
-//		search.getParameter("description").setValue(cms.createComponentDescription(worker, null, null, null, null, null));
-		search.getParameter("description").setValue(new CMSComponentDescription(worker, null, false, false, false, false, false, null, null, null, null, -1, null, null, false));
-		dispatchSubgoalAndWait(search);
+		IComponentDescription[]	results	= cms.searchComponents(
+			new CMSComponentDescription(worker, null, false, false, false, false, false, null, null, null, null, -1, null, null, false), null).get();
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");
-		if(search.getParameterSet("result").getValues().length==0)
+		if(results.length==0)
 		{
 			report.setSucceeded(true);
 		}
@@ -72,11 +71,9 @@ public class EndStatePlan extends Plan
 
 		// Create deregister agent.
 		report	= new TestReport("deregister", "Test if an agent can deregister on termination.");
-		create	= createGoal("cmscap.cms_create_component");
-		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateDeregister.agent.xml");
-		create.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
-		dispatchSubgoalAndWait(create);
-		IComponentIdentifier deregister	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
+		IComponentIdentifier	deregister	= cms.createComponent("/jadex/bdi/testcases/misc/EndStateDeregister.agent.xml",
+			new CreationInfo(getComponentIdentifier())).getFirstResult();
+
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
@@ -94,9 +91,7 @@ public class EndStatePlan extends Plan
 		else
 		{
 			// Kill deregister agent.
-			IGoal	destroy	= createGoal("cmscap.cms_destroy_component");
-			destroy.getParameter("componentidentifier").setValue(deregister);
-			dispatchSubgoalAndWait(destroy);
+			cms.destroyComponent(deregister).get();
 			
 			// Check if deregister agent is deregistered.
 			waitFor(100);	// Hack!!! how to ensure that agent has time to deregister itself?
@@ -110,11 +105,9 @@ public class EndStatePlan extends Plan
 			else
 			{
 				// Check if deregister agent has been correctly removed.
-				search = createGoal("cmscap.cms_search_components");
-//				search.getParameter("description").setValue(cms.createComponentDescription(deregister, null, null, null, null, null));
-				search.getParameter("description").setValue(new CMSComponentDescription(deregister, null, false, false, false, false, false, null, null, null, null, -1, null, null, false));
-				dispatchSubgoalAndWait(search);
-				if(search.getParameterSet("result").getValues().length!=0)
+				results	= cms.searchComponents(
+					new CMSComponentDescription(deregister, null, false, false, false, false, false, null, null, null, null, -1, null, null, false), null).get();
+				if(results.length!=0)
 				{
 					report.setFailed("Deregister agent still alive.");
 				}

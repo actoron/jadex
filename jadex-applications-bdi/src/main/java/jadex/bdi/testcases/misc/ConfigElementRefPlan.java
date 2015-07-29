@@ -3,7 +3,12 @@ package jadex.bdi.testcases.misc;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
 
 import java.util.List;
@@ -23,13 +28,12 @@ public class ConfigElementRefPlan extends Plan
 		getWaitqueue().addMessageEvent("inform_reports");
 		
 		// Create worker agent (kills itself automatically).
-		IGoal	create	= createGoal("cmscap.cms_create_component");
-		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml");
+		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
-		create.getParameter("arguments").setValue(args);
-		create.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
-		dispatchSubgoalAndWait(create);
+		cms.createComponent("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml",
+			new CreationInfo(args, getComponentIdentifier())).getFirstResult();
 		
 		// Wait for reports from worker agent.
 		IMessageEvent	msg	= waitForMessageEvent("inform_reports");

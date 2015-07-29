@@ -15,18 +15,11 @@
 	<imports>
 		<import>jadex.bridge.service.types.cms.*</import>
 	</imports>
-<!--
- 	<capabilities>
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
-	</capabilities> -->
 
 	<beliefs>
 		<!-- <belief name="delay" class="int">
 			<fact>0</fact>
 		</belief> -->
-		<belief name="service" class="boolean" exported="true">
-			<fact>true</fact>
-		</belief>
 		<!-- Parallel execution gains only performance advantages if platform executes
 			agents also in parallel (standalone -> async platform executor) -->
 		<belief name="parallel" class="boolean" exported="true">

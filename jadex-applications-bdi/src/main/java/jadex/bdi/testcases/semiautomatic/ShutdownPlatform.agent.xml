@@ -17,10 +17,6 @@
 		<import>jadex.bridge.*</import>
 	</imports>
 
-	<capabilities>
-		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"></capability>
-	</capabilities>
-
 	<beliefs>
 		<belief name="cms" class="IComponentIdentifier">
 			<fact>$scope.getEventbase().createComponentIdentifier("cms@horst", false, new String[]{"nio-mtp://134.100.11.203:8888"})</fact>
@@ -35,13 +31,6 @@
 
 	<configurations>
 		<configuration name="default">
-			<!-- <goals>
-				<initialgoal ref="cms_shutdown_platform">
-					<parameter ref="cms">
-						<value>$beliefbase.ams</value>
-					</parameter>
-				</initialgoal>
-			</goals> -->
 			<plans>
 				<initialplan ref="tester_plan"/>
 			</plans>

@@ -59,16 +59,6 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		{
 			for(int i=0; i<args.length; i++)
 			{
-//				IGoal ca = createGoal("cms_create_component");
-//				ca.getParameter("type").setValue(type);
-//				if(config!=null)
-//					ca.getParameter("configuration").setValue(config);
-//				if(args[i]!=null)
-//					ca.getParameter("arguments").setValue(args[i]);
-//				dispatchSubgoalAndWait(ca);
-//				agents.add(ca.getParameter("componentidentifier").getValue());
-				
-//				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				ITuple2Future<IComponentIdentifier, Map<String, Object>>	ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentDescription().getResourceIdentifier()));
 				IComponentIdentifier aid = (IComponentIdentifier)ret.getFirstResult();
@@ -96,15 +86,9 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //			System.out.println("Killing " + ((IComponentIdentifier)agents.get(i)).getName());
 			try
 			{
-//				IGoal da = createGoal("cmscap.cms_destroy_component");
-//				da.getParameter("componentidentifier").setValue(agents.get(i));
-//				dispatchSubgoalAndWait(da);
-				
-//				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				IFuture<Map<String, Object>> ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
 				ret.get();
-//				listener.waitForResult();
 			}
 			catch(GoalFailureException e)
 			{

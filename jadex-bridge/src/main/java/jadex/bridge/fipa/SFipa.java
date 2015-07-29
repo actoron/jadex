@@ -29,18 +29,12 @@ public class SFipa
 	/** The FIPA AMS local component identifier. */
 //	public static final IFIPAComponentIdentifier AMS = new ComponentIdentifier("cms", true);
 
-	/** The default cms component name. */
-	public static final String CMS_COMPONENT = "cms";
-	
 	/** The FIPA DF local component identifier. */
 //	public static final IFIPAComponentIdentifier DF = new ComponentIdentifier("df", true);
 
 	/** The default df component name. */
 	public static final String DF_COMPONENT = "df";
 	
-//	/** The (standard) AMS service name. */
-//	public static final String CMS_SERVICE = "cms_service";
-//	
 //	/** The (standard) DF service name. */
 //	public static final String DF_SERVICE = "df_service";
 //

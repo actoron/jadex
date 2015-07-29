@@ -468,44 +468,6 @@ public class EnvironmentGui	extends JFrame
 							public void windowClosing(WindowEvent e)
 							{				
 								agent.killComponent();
-								
-//								IContextService	cs	= (IContextService)agent.getPlatform().getService(IContextService.class);
-//								if(cs!=null)
-//								{
-//									IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), IApplicationContext.class);
-//									if(contexts!=null && contexts.length>0)
-//									{
-//										cs.deleteContext(contexts[0], null);
-//									}
-//								}
-//								else
-//								{
-//									System.out.println("No context service found: Killing agents manually.");
-//									// Todo: move to end goal.
-//									Environment en = (Environment)agent.getBeliefbase().getBelief("environment").getFact();
-//									Cleaner[] cleaners = en.getCleaners();
-//									for(int i=0; i<cleaners.length; i++)
-//									{
-//										try
-//										{
-//											// Hack!!! Should ignore remote cleaners.
-//											IGoal	kill	= agent.createGoal("cms_destroy_component");
-////											System.out.println("killing: "+cleaners[i].getName());
-//											IComponentIdentifier aid = ((IAMS)agent.getPlatform().getService(IAMS.class))
-//												.createAgentIdentifier(cleaners[i].getName(), true);
-//											kill.getParameter("componentidentifier").setValue(aid);
-//											agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoalAndWait(kill);
-//										}
-////										catch(GoalFailureException gfe) {}
-//										catch(Exception ex) 
-//										{
-//											// There might be old cleaner entries in the environment that can lead to exceptions
-//											// because the agents cannot be killed.
-//											//ex.printStackTrace();
-//										}
-//									}
-//									agent.killComponent();
-//								}
 							}
 						});
 

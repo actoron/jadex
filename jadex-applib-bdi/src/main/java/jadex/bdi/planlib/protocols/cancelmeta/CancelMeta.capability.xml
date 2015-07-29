@@ -15,18 +15,16 @@
 		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.bdiv3.runtime.*</import>
 		<import>jadex.bdiv3x.runtime.*</import>
-				<import>jadex.bdi.planlib.protocols.*</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>java.util.*</import>
 		<import>jadex.commons.IFilter</import>
+		<import>jadex.base.Starter</import>
 	</imports>
 
 	<beliefs>
 		<!-- Timeout for messages. -->
 		<belief name="timeout" class="Long" exported="true">
-			<fact>
-				// (Integer)$properties.get("standard.timeout")
-				20000L
-			</fact>
+			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
 		<!-- Filters are only relevant for the participants protocol side. -->
