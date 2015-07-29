@@ -123,7 +123,7 @@ public class NativeResponseMapper implements IValueMapper
 		
 //		ret	= buildResponse(ret, value);
 		
-		return ret.build();
+		return ret==null? value: ret.build();
 	}
 	
 	/**

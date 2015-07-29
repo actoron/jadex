@@ -5,6 +5,7 @@ dependencies
 	compile project(':jadex-platform')
 	compile project(':jadex-kernel-component')
 	compile project(':jadex-platform-extension-webservice')
+	compile project(':jadex-json')
 
 	compile 'javax.ws.rs:javax.ws.rs-api:2.0'
 

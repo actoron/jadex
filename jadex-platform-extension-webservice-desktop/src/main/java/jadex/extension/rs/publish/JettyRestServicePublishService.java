@@ -1,9 +1,13 @@
 package jadex.extension.rs.publish;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -16,12 +20,16 @@ import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -31,10 +39,16 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.extension.rs.publish.JettyRestServicePublishService.MappingInfo.HttpMethod;
+import jadex.extension.rs.publish.annotation.ResultMapper;
+import jadex.extension.rs.publish.mapper.IValueMapper;
+import jadex.extension.rs.publish.mapper.NativeResponseMapper;
+import jadex.javaparser.SJavaParser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  * 
@@ -89,9 +103,6 @@ public class JettyRestServicePublishService implements IWebPublishService
 		try
 		{
 			URI uri = new URI(pi.getPublishId());
-			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
-			Class<?> baseclazz = pi.getMapping()!=null? pi.getMapping().getType(cl): null;
-						
 			internalPublishService(uri, service, pi);
 		}
 		catch(Exception e)
@@ -105,7 +116,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 	/**
 	 * 
 	 */
-	public void internalPublishService(final URI uri, IService service, PublishInfo info)
+	public void internalPublishService(final URI uri, final IService service, PublishInfo info)
 	{
 		try
 		{
@@ -114,7 +125,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 			
 			ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
 			
-			final Map<String, MappingInfo> mappings = evaluateMapping(info);
+			final Map<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
 			
 			ContextHandler ch = new ContextHandler()
 			{
@@ -125,14 +136,107 @@ public class JettyRestServicePublishService implements IWebPublishService
 			    	
 			    	String methodname = request.getPathInfo();
 			    	
+			    	if(methodname.startsWith("/"))
+			    		methodname = methodname.substring(1);
+			    	
 			    	if(mappings.containsKey(methodname))
 			    	{
-			    		System.out.println(mappings.get(methodname));
+//			    		out.println("<h1>" + "Found method - calling service: " + mappings.get(methodname).getMethod().getName() + "</h1>");
+			    		try
+			    		{
+			    			MappingInfo mi = mappings.get(methodname);
+			    			Object[] params = computeParameters(mi);
+			    			Method method = mi.getMethod();
+			    			Object ret = method.invoke(service, params);
+			    			
+			    			if(ret instanceof IFuture)
+			    				ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null)); 
+			    			System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
+			    			
+			    			Enumeration<String> accepts = request.getHeaders("Accept");
+			    			while(accepts.hasMoreElements())
+			    			{
+			    				System.out.println(accepts.nextElement());
+			    			}
+			    			
+			    			
+			    			if(method.isAnnotationPresent(ResultMapper.class))
+			    			{
+			    				ResultMapper mm = method.getAnnotation(ResultMapper.class);
+			    				Class<?> pclazz = mm.value().clazz();
+			    				IValueMapper mapper;
+//			    				System.out.println("res mapper: "+clazz);
+			    				if(!Object.class.equals(pclazz))
+			    				{
+			    					mapper = (IValueMapper)pclazz.newInstance();
+			    				}
+			    				else
+			    				{
+			    					mapper = (IValueMapper)SJavaParser.evaluateExpression(mm.value().value(), null);
+			    				}
+			    				
+			    				ret = mapper.convertValue(ret);
+			    			}
+			    			else
+			    			{
+			    				NativeResponseMapper mapper = new NativeResponseMapper();
+			    				ret = mapper.convertValue(ret);
+			    			}
+
+			    			Response resp = ret instanceof Response? (Response)ret: null;
+			    			if(resp==null)
+			    			{
+				    			ResponseBuilder rb = Response.ok(ret);
+				    			rb.header("Access-Control-Allow-Origin", "*");
+				    			// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+				    			rb.header("Access-Control-Allow-Credentials", "true ");
+				    			rb.header("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+				    			rb.header("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+						        rb.type(MediaType.APPLICATION_JSON_TYPE);
+						        rb.encoding("utf-8");
+//						        ContentType("text/html; charset=utf-8");
+						        resp = rb.build();
+			    			}
+			    				
+			    			// copy values from response to http response
+			    			
+		    				response.setStatus(resp.getStatus());
+		    				
+		    				for(String name: resp.getStringHeaders().keySet())
+		    				{
+		    					response.addHeader(name, resp.getHeaderString(name));
+		    				}
+		    				
+		    				Object content = resp.getEntity();
+		    				if(MediaType.APPLICATION_JSON_TYPE.equals(resp.getMediaType()))
+		    				{
+		    					byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
+		    					PrintWriter out = response.getWriter();
+		    					out.write(new String(data));
+		    				}
+		    				
+			    		}
+			    		catch(Exception e)
+			    		{
+			    			e.printStackTrace();
+			    		}
 			    	}
 			    	else
 			    	{
+			    		PrintWriter out = response.getWriter();
+			    		out.println("<h1>" + "Found no method mapping, available are: " + "</h1>");
+			    		out.println("<ul>");
+			    		for(Map.Entry<String, MappingInfo> entry: mappings.entrySet())
+			    		{
+			    			out.println(entry.getKey()+" -> "+entry.getValue().getMethod().getName()+"<br/>");
+			    		}
+			    		out.println("</ul>");
 			    		System.out.println(mappings);
+			    		response.setContentType("text/html; charset=utf-8");
+			    		response.setStatus(HttpServletResponse.SC_OK);
 			    	}
+			    	
+			    	baseRequest.setHandled(true);
 			    	
 //			    	Map<String, String[]> params = request.getParameterMap();
 //			    	
@@ -266,68 +370,74 @@ public class JettyRestServicePublishService implements IWebPublishService
 	/**
 	 * 
 	 */
-	public Map<String, MappingInfo> evaluateMapping(PublishInfo pi)
+	protected Object[] computeParameters(MappingInfo mi)
 	{
-		Class<?> mapcl = pi.getMapping().getType(component.getClassLoader());
+		Class<?>[] types = mi.getMethod().getParameterTypes();
+		Object[] ret = new Object[types.length];
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public Map<String, MappingInfo> evaluateMapping(IServiceIdentifier sid, PublishInfo pi)
+	{
+		Class<?> mapcl = pi.getMapping()==null? null: pi.getMapping().getType(component.getClassLoader());
+		if(mapcl==null)
+			mapcl = sid.getServiceType().getType(component.getClassLoader());
 		
 		Map<String, MappingInfo> ret = new HashMap<String, MappingInfo>(); 
+		Map<String, MappingInfo> natret = new HashMap<String, MappingInfo>(); 
 		
 		for(Method m: SReflect.getAllMethods(mapcl))
 		{
-			MappingInfo mi = null;
+			MappingInfo mi = new MappingInfo();
 			if(m.isAnnotationPresent(GET.class))
 			{
-				if(mi==null)
-					 mi = new MappingInfo();
 				mi.setHttpMethod(HttpMethod.GET);
 			}
 			else if(m.isAnnotationPresent(POST.class))
 			{
-				if(mi==null)
-					 mi = new MappingInfo();
 				mi.setHttpMethod(HttpMethod.POST);
 			}
 			else if(m.isAnnotationPresent(PUT.class))
 			{
-				if(mi==null)
-					 mi = new MappingInfo();
 				mi.setHttpMethod(HttpMethod.PUT);
 			}
 			else if(m.isAnnotationPresent(DELETE.class))
 			{
-				if(mi==null)
-					 mi = new MappingInfo();
 				mi.setHttpMethod(HttpMethod.DELETE);
 			}
 			else if(m.isAnnotationPresent(OPTIONS.class))
 			{
-				if(mi==null)
-					 mi = new MappingInfo();
 				mi.setHttpMethod(HttpMethod.OPTIONS);
 			}
 			else if(m.isAnnotationPresent(HEAD.class))
 			{
-				if(mi==null)
-					 mi = new MappingInfo();
 				mi.setHttpMethod(HttpMethod.HEAD);
 			}
 			
 			if(m.isAnnotationPresent(Path.class))
 			{
-				if(mi==null)
-					 mi = new MappingInfo();
 				Path path = m.getAnnotation(Path.class);
 				mi.setPath(path.value());
 			}
+			else if(!mi.isEmpty())
+			{
+				mi.setPath(m.getName());
+			}
 			
-			if(mi!=null)
+			if(!mi.isEmpty())
 			{
 				mi.setMethod(m);
 				ret.put(mi.getPath(), mi);
 			}
+			
+			// Natural mapping using simply all declared methods
+			natret.put(m.getName(), new MappingInfo(null, m, m.getName()));
 		}
 		
-		return ret;
+		return ret.size()>0? ret: natret;
 	}
 	
 	/**
@@ -346,13 +456,30 @@ public class JettyRestServicePublishService implements IWebPublishService
 		}
 		
 		/** The http method. */
-		protected HttpMethod httpMethod;
+		protected HttpMethod httpmethod;
 
 		/** The target method. */
 		protected Method method;
 		
 		/** The url path. */
 		protected String path;
+
+		/**
+		 *  Create a new mapping info.
+		 */
+		public MappingInfo()
+		{
+		}
+		
+		/**
+		 *  Create a new mapping info.
+		 */
+		public MappingInfo(HttpMethod httpMethod, Method method, String path)
+		{
+			this.httpmethod = httpMethod;
+			this.method = method;
+			this.path = path;
+		}
 		
 		/**
 		 *  Get the httpMethod. 
@@ -360,7 +487,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 		 */
 		public HttpMethod getHttpMethod()
 		{
-			return httpMethod;
+			return httpmethod;
 		}
 
 		/**
@@ -369,7 +496,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 		 */
 		public void setHttpMethod(HttpMethod httpMethod)
 		{
-			this.httpMethod = httpMethod;
+			this.httpmethod = httpMethod;
 		}
 		
 		/**
@@ -406,6 +533,14 @@ public class JettyRestServicePublishService implements IWebPublishService
 		public void setPath(String path)
 		{
 			this.path = path;
+		}
+		
+		/**
+		 *  Test if has no settings.
+		 */
+		public boolean isEmpty()
+		{
+			return path==null && method==null && httpmethod==null;
 		}
 	}
 }

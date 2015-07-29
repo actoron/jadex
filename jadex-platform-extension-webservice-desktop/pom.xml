@@ -161,6 +161,13 @@
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-json</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>

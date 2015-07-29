@@ -26,6 +26,4 @@ public interface IRestMethodGenerator
 	public List<RestMethodInfo> generateRestMethodInfos(IService service, ClassLoader classloader, 
 		Class<?> baseclass, Map<String, Object> mapprops) throws Exception;
 	
-	
-
 }
