@@ -1,21 +1,16 @@
 package jadex.json.data;
 
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor;
+import jadex.transformation.jsonserializer.processors.write.JsonMapProcessor;
+import jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.google.gson.Gson;
-import com.thoughtworks.xstream.XStream;
-
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonMapProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 
 public class Owner
 {
@@ -130,7 +125,7 @@ public class Owner
 //		String str = "{\"type\":\"Fiat\",\"model\":500,\"color\":\"white\",\"owner\":{\"name\":\"Hugo\",\"age\":55,\"url\":\"http://www.google.de\"}}";
 //		String str = "{\"__classname\":\"data.Car\",\"type\":\"Fiat\",\"model\":500,\"color\":\"white\",\"owner\":{\"name\":\"Hugo\",\"age\":55,\"uri\":\"http://www.google.de\",\"clazz\":\"java.lang.String\"}}";
 //		String str = "{\"type\":\"Fiat\",\"model\":500,\"color\":\"white\",\"owner\":{\"name\":\"Hugo\",\"age\":55,\"url\":\"http://www.google.de\"}}";
-		String str = "{\"__classname\":\"jadex.json.data.Transporter\",\"cars\":[{\"type\":\"Fiat\",\"model\":500,\"color\":\"white\"}]}";
+//		String str = "{\"__classname\":\"jadex.json.data.Transporter\",\"cars\":[{\"type\":\"Fiat\",\"model\":500,\"color\":\"white\"}]}";
 		
 		Car car1 = new Car("fiat", 500, "white");
 		Car car2 = new Car("vw", 80, "grey");
@@ -148,7 +143,7 @@ public class Owner
 		Map<Car, Car> map = new HashMap<Car, Car>();
 		map.put(car1, car1);
 		
-		Gson gson = new Gson();
+//		Gson gson = new Gson();
 //		System.out.println(gson.toJson(car3));   
 		
 		byte[] ar = JsonTraverser.objectToByteArray(car3, null);

@@ -405,7 +405,7 @@ public class MCapability extends MElement
 	}
 	
 	/**
-	 *  Get a message.
+	 *  Get a message. Null if not found.
 	 */
 	public MMessageEvent getMessageEvent(String name)
 	{
@@ -424,6 +424,20 @@ public class MCapability extends MElement
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get a message event by resolved name. Exception if not found.
+	 *  @param scope	The local scope.
+	 *  @param name	The name, relative to scope.
+	 */
+	public MMessageEvent	getResolvedMessageEvent(String scope, String name)
+	{
+		name	= scope!=null ? scope + MElement.CAPABILITY_SEPARATOR + MElement.internalName(name) : MElement.internalName(name);
+		MMessageEvent mevent = getMessageEvent(name);
+		if(mevent==null)
+			throw new RuntimeException("Message event not found: "+name);
+		return mevent;
 	}
 
 	/**

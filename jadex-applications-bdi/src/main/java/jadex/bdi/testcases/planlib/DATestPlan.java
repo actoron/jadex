@@ -26,10 +26,10 @@ public class DATestPlan extends AbstractMultipleAgentsPlan
 	{
 		// The round timeout, if the testcase fails, adjust it according to the
 		// speed of your pc.
-		long roundtimeout = 250;
+		long roundtimeout = 2500;
 
 		// Create 4 bidders
-		Map[] args = new Map[4];
+		Map[] args = new Map[1];
 		for(int i=0; i<args.length; i++)
 		{
 			args[i] = SCollection.createHashMap();

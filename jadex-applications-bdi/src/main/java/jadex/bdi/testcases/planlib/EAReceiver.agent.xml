@@ -31,13 +31,13 @@
 	<plans>
 		<plan name="decide_participation_plan">
 			<parameter name="initiator" class="IComponentIdentifier">
-				<goalmapping ref="eacap.decide_participation.initiator" />
+				<goalmapping ref="eacap.ea_decide_participation.initiator" />
 			</parameter>
 			<parameter name="participate" class="Boolean" direction="out">
-				<goalmapping ref="eacap.decide_participation.participate" />
+				<goalmapping ref="eacap.ea_decide_participation.participate" />
 			</parameter>
 			<parameter name="auction_description" class="AuctionDescription">
-				<goalmapping ref="eacap.decide_participation.auction_description" />
+				<goalmapping ref="eacap.ea_decide_participation.auction_description" />
 			</parameter>
 			<body class="EADecideParticipationPlan"/>
 			<trigger>
@@ -47,22 +47,22 @@
 	
 		<plan name="make_proposal_plan">
 			<parameter name="accept" class="Boolean" direction="out" optional="true">
-				<goalmapping ref="eacap.make_proposal.accept" />
+				<goalmapping ref="eacap.ea_make_proposal.accept" />
 			</parameter>
 			<parameter name="leave" class="Boolean" direction="out" optional="true">
-				<goalmapping ref="eacap.make_proposal.leave" />
+				<goalmapping ref="eacap.ea_make_proposal.leave" />
 			</parameter>
 			<parameter name="cfp" class="Object">
-				<goalmapping ref="eacap.make_proposal.cfp" />
+				<goalmapping ref="eacap.ea_make_proposal.cfp" />
 			</parameter>
 			<parameter name="auction_description" class="AuctionDescription">
-				<goalmapping ref="eacap.make_proposal.auction_description" />
+				<goalmapping ref="eacap.ea_make_proposal.auction_description" />
 			</parameter>
 			<parameter name="auction_info" class="Object">
-				<goalmapping ref="eacap.make_proposal.auction_info" />
+				<goalmapping ref="eacap.ea_make_proposal.auction_info" />
 			</parameter>
 			<parameterset name="history" class="Comparable" optional="true">
-				<goalmapping ref="eacap.make_proposal.history" />
+				<goalmapping ref="eacap.ea_make_proposal.history" />
 			</parameterset>
 			<body class="EAMakeProposalPlan"/>
 			<trigger>

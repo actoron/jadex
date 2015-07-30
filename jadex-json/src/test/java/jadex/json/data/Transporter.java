@@ -1,7 +1,6 @@
 package jadex.json.data;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class Transporter
 {

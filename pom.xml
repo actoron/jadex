@@ -379,6 +379,7 @@
 			</build>
 	        <modules>
 	        	<module>jadex-applications-webservice</module>
+				<module>jadex-json</module>
 				<module>jadex-platform-extension-webservice</module>
 				<module>jadex-platform-extension-webservice-desktop</module>
 		    </modules>

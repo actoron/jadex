@@ -1,12 +1,15 @@
 package jadex.bdiv3.runtime;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3x.features.BDIXMessageComponentFeature;
 import jadex.bdiv3x.runtime.RMessageEvent;
+import jadex.commons.Tuple2;
+
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  *  Object that indicates on which elements a plan is waiting. 
@@ -23,7 +26,7 @@ public class WaitAbstraction
 	protected Set<String> changeeventtypes;
 	
 	/** The reply elements. */
-	protected Set<RMessageEvent> replyelements;
+	protected Set<Tuple2<RMessageEvent, Set<MMessageEvent>>> replyelements;
 	
 //	/**
 //	 *  Add a message event.
@@ -37,14 +40,15 @@ public class WaitAbstraction
 	/**
 	 *  Add a message event reply.
 	 *  @param me The message event.
+	 *  @param mevents Allowed message templates (null for any).
 	 */
-	public void addReply(RMessageEvent event)
+	public void addReply(RMessageEvent event,  Set<MMessageEvent> mevents)
 	{
 		if(replyelements==null)
 		{
-			replyelements = new HashSet<RMessageEvent>();
+			replyelements = new LinkedHashSet<Tuple2<RMessageEvent, Set<MMessageEvent>>>();
 		}
-		replyelements.add(event);
+		replyelements.add(new Tuple2<RMessageEvent, Set<MMessageEvent>>(event, mevents));
 	}
 	
 	/**
@@ -334,9 +338,10 @@ public class WaitAbstraction
 		{
 			if(procelem instanceof RMessageEvent)
 			{
-				for(RMessageEvent msg: replyelements)
+				for(Tuple2<RMessageEvent, Set<MMessageEvent>> msg: replyelements)
 				{
-					ret = BDIXMessageComponentFeature.isReply(msg, (RMessageEvent)procelem);
+					ret = (msg.getSecondEntity()==null || msg.getSecondEntity().contains(((RMessageEvent)procelem).getMMessageEvent()))
+						&& BDIXMessageComponentFeature.isReply(msg.getFirstEntity(), (RMessageEvent)procelem);
 					if(ret)
 						break;
 				}

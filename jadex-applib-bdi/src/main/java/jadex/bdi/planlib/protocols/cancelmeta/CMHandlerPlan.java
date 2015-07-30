@@ -30,7 +30,7 @@ public class CMHandlerPlan extends Plan
 		IMessageEvent	canceldummy	= createMessageEvent("cm_cancel");	// Hack??? Need some conversation message to wait for
 		canceldummy.getParameter(SFipa.CONVERSATION_ID).setValue(inimsg.getParameter(SFipa.CONVERSATION_ID).getValue());
 		getWaitqueue().addReply(canceldummy);
-		cancel_msg = waitForReply(canceldummy);	// Todo: wait only for specific event type "cm_cancel".
+		cancel_msg = waitForReply(canceldummy, "cm_cancel");
 		getLogger().info("Receiver received cancel: "+getComponentName());
 
 		try

@@ -64,6 +64,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  *  Runtime element of a plan.
@@ -917,7 +918,15 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public List<Object> getWaitqueue()
 	{
 		if(waitqueue==null)
-			waitqueue = new ArrayList<Object>();
+			waitqueue = new ArrayList<Object>()
+		{
+			int	nr	= new Random().nextInt();
+			@Override
+			public String toString()
+			{
+				return "Waitqueue(@"+nr+") of "+RPlan.this;
+			}
+		};
 		return waitqueue;
 	}
 

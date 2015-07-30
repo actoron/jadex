@@ -79,7 +79,7 @@ public class MElement
 	
 	/**
 	 *  Get the capability name for an element.
-	 *  @return The capability name.
+	 *  @return The capability name or null for global elements.
 	 */
 	public String getCapabilityName()
 	{

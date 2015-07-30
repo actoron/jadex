@@ -67,6 +67,10 @@ public class DAReceiverPlan extends AbstractReceiverPlan
 			try
 			{
 				getLogger().info(getComponentName()+" waiting for: "+(firsttimeout==-1? buftimeout: firsttimeout));
+				if(getRPlan().getWaitqueue()!=null)
+				{
+					System.out.println("seguip");
+				}
 				IMessageEvent msg = (IMessageEvent)waitForReply(dummy, firsttimeout==-1? buftimeout: firsttimeout);
 				getLogger().info(getComponentName()+" received cfp: "+msg.getParameter(SFipa.CONTENT).getValue());
 				missing_cnt = 0; // Reset missing_cnt as auction continues

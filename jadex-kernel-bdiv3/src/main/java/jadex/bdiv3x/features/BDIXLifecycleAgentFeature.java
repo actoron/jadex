@@ -76,7 +76,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 				}
 				else
 				{
-					MMessageEvent mmevent = mcapa.getMessageEvent(cpe.getName());
+					MMessageEvent mmevent = mcapa.getResolvedMessageEvent(null, cpe.getName());
 					RMessageEvent rmevent = new RMessageEvent(mmevent, getComponent(), cpe);
 					bdif.getCapability().getEventbase().sendMessage(rmevent).addResultListener(new DefaultResultListener<Void>()
 					{

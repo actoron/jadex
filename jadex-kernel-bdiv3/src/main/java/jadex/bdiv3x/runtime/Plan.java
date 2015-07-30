@@ -54,6 +54,7 @@ import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -291,7 +292,8 @@ public abstract class Plan
 		final Future<IMessageEvent> ret = new Future<IMessageEvent>();
 
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
-		MMessageEvent mevent = bdif.getBDIModel().getCapability().getMessageEvent(type);
+		MMessageEvent mevent = bdif.getBDIModel().getCapability().getResolvedMessageEvent(
+			getRPlan().getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addModelElement(mevent);
 
@@ -331,11 +333,10 @@ public abstract class Plan
 	/**
 	 *  Wait for a reply to a message event.
 	 * 	@param event The message event.
-	 *  @param type The reply.
 	 */
 	public IMessageEvent waitForReply(IMessageEvent event)
 	{
-		return waitForReply(event, -1);
+		return waitForReply(event, null, -1);
 	}
 
 	/**
@@ -345,11 +346,36 @@ public abstract class Plan
 	 */
 	public IMessageEvent waitForReply(IMessageEvent event, long timeout)
 	{
+		return waitForReply(event, null, timeout);
+	}
+	
+	/**
+	 *  Wait for a reply to a message event.
+	 * 	@param event The message event.
+	 *  @param type The reply.
+	 */
+	public IMessageEvent waitForReply(IMessageEvent event, String type)
+	{
+		return waitForReply(event, type, -1);
+	}
+
+	/**
+	 *  Wait for a reply to a message event.
+	 *  @param event The message event.
+	 *  @param type The reply.
+	 *  @param timeout The timeout.
+	 */
+	public IMessageEvent waitForReply(IMessageEvent event, String type, long timeout)
+	{
 		checkNotInAtomic();
+		
+		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		MMessageEvent	mreply	= type==null ? null
+			: bdif.getBDIModel().getCapability().getResolvedMessageEvent(getRPlan().getModelElement().getCapabilityName(), type);
 		
 		Future<IMessageEvent> ret = new Future<IMessageEvent>();
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addReply((RMessageEvent)event);
+		wa.addReply((RMessageEvent)event, mreply!=null ? Collections.singleton(mreply) : null);
 
 		IMessageEvent res = (IMessageEvent)rplan.getFromWaitqueue(wa);
 		if(res!=null)
@@ -538,7 +564,7 @@ public abstract class Plan
 		
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addReply((RMessageEvent)me);
+		wa.addReply((RMessageEvent)me, null);
 
 		rplan.setWaitAbstraction(wa);
 		
@@ -1201,10 +1227,8 @@ public abstract class Plan
 		public void addMessageEvent(String event)
 		{
 			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
-			// todo: add capability name of scope
-			MMessageEvent mevent = model.getCapability().getMessageEvent(event);
-			if(mevent==null)
-				throw new RuntimeException("Unknown message event: "+event);
+			MMessageEvent mevent = model.getCapability().getResolvedMessageEvent(
+				getRPlan().getModelElement().getCapabilityName(), event);
 			getWaitAbstraction().addModelElement(mevent);
 		}
 		
@@ -1215,10 +1239,8 @@ public abstract class Plan
 		public void removeMessageEvent(String event)
 		{
 			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
-			// todo: add capability name of scope
-			MMessageEvent mevent = model.getCapability().getMessageEvent(event);
-			if(mevent==null)
-				throw new RuntimeException("Unknown message event: "+event);
+			MMessageEvent mevent = model.getCapability().getResolvedMessageEvent(
+				getRPlan().getModelElement().getCapabilityName(), event);
 			getWaitAbstraction().removeModelElement(mevent);
 		}
 		
@@ -1280,7 +1302,7 @@ public abstract class Plan
 		 */
 		public void addReply(IMessageEvent mevent)
 		{
-			getWaitAbstraction().addReply((RMessageEvent)mevent);
+			getWaitAbstraction().addReply((RMessageEvent)mevent, null);
 		}
 
 		/**
@@ -1366,7 +1388,7 @@ public abstract class Plan
 		 */
 		public void removeReply(IMessageEvent me)
 		{
-			getWaitAbstraction().addReply((RMessageEvent)me);
+			getWaitAbstraction().addReply((RMessageEvent)me, null);
 		}
 
 //		/**
