@@ -4,15 +4,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -20,6 +24,7 @@ import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -49,6 +54,7 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.extension.rs.publish.mapper.NativeResponseMapper;
 import jadex.javaparser.SJavaParser;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.xml.bean.JavaWriter;
 
 /**
  * 
@@ -153,13 +159,6 @@ public class JettyRestServicePublishService implements IWebPublishService
 			    				ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null)); 
 			    			System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
 			    			
-			    			Enumeration<String> accepts = request.getHeaders("Accept");
-			    			while(accepts.hasMoreElements())
-			    			{
-			    				System.out.println(accepts.nextElement());
-			    			}
-			    			
-			    			
 			    			if(method.isAnnotationPresent(ResultMapper.class))
 			    			{
 			    				ResultMapper mm = method.getAnnotation(ResultMapper.class);
@@ -177,44 +176,106 @@ public class JettyRestServicePublishService implements IWebPublishService
 			    				
 			    				ret = mapper.convertValue(ret);
 			    			}
+//			    			else
+//			    			{
+//			    				NativeResponseMapper mapper = new NativeResponseMapper();
+//			    				ret = mapper.convertValue(ret);
+//			    			}
+
+			    			// handle rs-response object by copying to response
+//			    			Response resp = ret instanceof Response? (Response)ret: null;
+//			    			if(resp==null)
+//			    			{
+//				    			ResponseBuilder rb = Response.ok(ret);
+//						        rb.type(MediaType.APPLICATION_JSON_TYPE);
+//						        rb.encoding("utf-8");
+////						        ContentType("text/html; charset=utf-8");
+//						        resp = rb.build();
+//			    			}
+			    			
+			    			Object content = ret;
+			    			List<String> sr =  null;
+			    			
+			    			// copy values from response to http response
+			    			if(ret instanceof Response)
+			    			{
+			    				Response resp = (Response)ret;
+			    					
+			    				response.setStatus(resp.getStatus());
+		    				
+			    				for(String name: resp.getStringHeaders().keySet())
+			    				{
+			    					response.addHeader(name, resp.getHeaderString(name));
+			    				}
+			    				
+			    				ret = resp.getEntity();
+			    				if(resp.getMediaType()!=null)
+			    				{
+			    					sr = new ArrayList<String>();
+			    					sr.add(resp.getMediaType().toString());
+			    				}
+			    			}
 			    			else
 			    			{
-			    				NativeResponseMapper mapper = new NativeResponseMapper();
-			    				ret = mapper.convertValue(ret);
-			    			}
-
-			    			Response resp = ret instanceof Response? (Response)ret: null;
-			    			if(resp==null)
-			    			{
-				    			ResponseBuilder rb = Response.ok(ret);
-				    			rb.header("Access-Control-Allow-Origin", "*");
-				    			// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
-				    			rb.header("Access-Control-Allow-Credentials", "true ");
-				    			rb.header("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-				    			rb.header("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
-						        rb.type(MediaType.APPLICATION_JSON_TYPE);
-						        rb.encoding("utf-8");
-//						        ContentType("text/html; charset=utf-8");
-						        resp = rb.build();
-			    			}
+				    			// acceptable media types for response
+			    				List<String> cl = parseMimetypes(request);
+			    				sr = mi.getProducedMediaTypes(); 
+			    				if(sr==null || sr.size()==0)
+			    				{
+			    					sr = cl;
+			    				}
+			    				else
+			    				{
+			    					sr.retainAll(cl);
+			    				}
 			    				
-			    			// copy values from response to http response
+			    				if(sr.size()>0)
+			    				{
+			    					System.out.println("found acceptable return types: "+sr);
+			    				}
+			    				else
+			    				{
+			    					System.out.println("found no acceptable return types.");
+			    				}
+			    				
+			    				// todo: add option for CORS
+			    				response.addHeader("Access-Control-Allow-Origin", "*");
+			 		    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+			 					response.addHeader("Access-Control-Allow-Credentials", "true ");
+			 					response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+			 					response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+			    			}
 			    			
-		    				response.setStatus(resp.getStatus());
-		    				
-		    				for(String name: resp.getStringHeaders().keySet())
+			    			// handle content 
+			    			PrintWriter out = response.getWriter();
+		    				if(content!=null)
 		    				{
-		    					response.addHeader(name, resp.getHeaderString(name));
+			    				if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
+			    				{
+			    					byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
+			    					out.write(new String(data));
+			    				}
+			    				else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
+			    				{
+			    					byte[] data = JavaWriter.objectToByteArray(content, component.getClassLoader());
+			    					out.write(new String(data));
+			    				}
+			    				else if(SReflect.isStringConvertableType(content.getClass()))
+			    				{
+			    					response.setContentType("text/plain; charset=utf-8");
+			    					out.write(content.toString());
+			    				}
+			    				else if(sr!=null && sr.contains("*/*"))
+			    				{
+			    					// use json if all is allowed
+			    					byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
+			    					out.write(new String(data));
+			    				}
+			    				else
+			    				{
+			    					System.out.println("cannot convert result: "+ret);
+			    				}
 		    				}
-		    				
-		    				Object content = resp.getEntity();
-		    				if(MediaType.APPLICATION_JSON_TYPE.equals(resp.getMediaType()))
-		    				{
-		    					byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
-		    					PrintWriter out = response.getWriter();
-		    					out.write(new String(data));
-		    				}
-		    				
 			    		}
 			    		catch(Exception e)
 			    		{
@@ -378,6 +439,33 @@ public class JettyRestServicePublishService implements IWebPublishService
 	}
 	
 	/**
+	 *  todo: make statically accessible
+	 *  Copied from Jadex ForwardFilter
+	 */
+	protected List<String> parseMimetypes(HttpServletRequest request)
+	{
+		List<String> mimetypes = null;
+		String mts = request.getHeader("Accept");
+		if(mts!=null)
+		{
+			mimetypes = new ArrayList<String>();
+			StringTokenizer stok = new StringTokenizer(mts, ",");
+			while(stok.hasMoreTokens())
+			{
+				String tok = stok.nextToken();
+				StringTokenizer substok = new StringTokenizer(tok, ";");
+				String mt = substok.nextToken();
+				if(mimetypes==null)
+				{
+					mimetypes = new ArrayList<String>();
+				}
+				mimetypes.add(mt);
+			}
+		}
+		return mimetypes;
+	}
+	
+	/**
 	 * 
 	 */
 	public Map<String, MappingInfo> evaluateMapping(IServiceIdentifier sid, PublishInfo pi)
@@ -429,6 +517,33 @@ public class JettyRestServicePublishService implements IWebPublishService
 			
 			if(!mi.isEmpty())
 			{
+				if(m.isAnnotationPresent(Consumes.class))
+				{
+					Consumes con = (Consumes)m.getAnnotation(Consumes.class);
+					String[] types = con.value();
+					for(String type: types)
+					{
+						mi.addConsumedMediaType(type);
+					}
+				}
+				
+				if(m.isAnnotationPresent(Produces.class))
+				{
+					Produces prod = (Produces)m.getAnnotation(Produces.class);
+					String[] types = prod.value();
+					for(String type: types)
+					{
+						mi.addProducedMediaType(type);
+					}
+				}
+				
+				// Jadex specific annotations
+				
+				if(m.isAnnotationPresent(ResultMapper.class))
+				{
+					
+				}
+				
 				mi.setMethod(m);
 				ret.put(mi.getPath(), mi);
 			}
@@ -463,6 +578,12 @@ public class JettyRestServicePublishService implements IWebPublishService
 		
 		/** The url path. */
 		protected String path;
+		
+		/** The accepted media types for the response. */
+		protected List<String> producedtypes;
+		
+		/** The accepted media types for consumption. */
+		protected List<String> consumedtypes;
 
 		/**
 		 *  Create a new mapping info.
@@ -535,6 +656,62 @@ public class JettyRestServicePublishService implements IWebPublishService
 			this.path = path;
 		}
 		
+		/**
+		 *  Get the respmediatypes. 
+		 *  @return The respmediatypes
+		 */
+		public List<String> getProducedMediaTypes()
+		{
+			return producedtypes==null? Collections.EMPTY_LIST: producedtypes;
+		}
+
+		/**
+		 *  Set the response mediatypes.
+		 *  @param respmediatypes The response mediatypes to set
+		 */
+		public void setProducedMediaTypes(List<String> respmediatypes)
+		{
+			this.producedtypes = respmediatypes;
+		}
+		
+		/**
+		 * 
+		 */
+		public void addProducedMediaType(String type)
+		{
+			if(producedtypes==null)
+				producedtypes = new ArrayList<String>();
+			producedtypes.add(type);
+		}
+		
+		/**
+		 *  Get the consumedmediatypes. 
+		 *  @return The consumedtypes
+		 */
+		public List<String> getConsumedMediaTypes()
+		{
+			return consumedtypes==null? Collections.EMPTY_LIST: consumedtypes;
+		}
+
+		/**
+		 *  Set the respmediatypes.
+		 *  @param consumedtypes The consumedtypes to set
+		 */
+		public void setConsumedMediaTypes(List<String> respmediatypes)
+		{
+			this.consumedtypes = respmediatypes;
+		}
+		
+		/**
+		 * 
+		 */
+		public void addConsumedMediaType(String type)
+		{
+			if(consumedtypes==null)
+				consumedtypes = new ArrayList<String>();
+			consumedtypes.add(type);
+		}
+
 		/**
 		 *  Test if has no settings.
 		 */
