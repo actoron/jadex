@@ -250,6 +250,9 @@ public class JettyRestServicePublishService implements IWebPublishService
 			    			PrintWriter out = response.getWriter();
 		    				if(content!=null)
 		    				{
+		    					// for testing with browser
+		    					// http://brockallen.com/2012/04/27/change-firefoxs-default-accept-header-to-prefer-json-over-xml/
+		    					
 			    				if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
 			    				{
 			    					byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
