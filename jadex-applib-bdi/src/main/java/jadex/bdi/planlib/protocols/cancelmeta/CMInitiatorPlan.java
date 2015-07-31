@@ -5,6 +5,7 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
 
@@ -46,9 +47,19 @@ public class CMInitiatorPlan extends Plan
 			while(rec.size()>0)
 			{
 				// Wait for the replies.
-				long wait_time = timeout + time - getTime();
-				if(wait_time <= 0)
-					break;
+				long wait_time;
+				if(timeout==Timeout.NONE)
+				{
+					wait_time	= Timeout.NONE;
+				}
+				else
+				{
+					wait_time	= timeout + time - getTime();
+					if(wait_time <= 0)
+					{
+						break;
+					}
+				}
 
 				IMessageEvent reply = waitForReply(cancel, wait_time);
 				rec.remove(reply.getParameter(SFipa.SENDER).getValue());
