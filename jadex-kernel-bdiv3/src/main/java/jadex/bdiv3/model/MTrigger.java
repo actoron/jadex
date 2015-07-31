@@ -1,13 +1,12 @@
 package jadex.bdiv3.model;
 
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.Tuple2;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.bridge.modelinfo.UnparsedExpression;
 
 /**
  *  Model element for a plan trigger.

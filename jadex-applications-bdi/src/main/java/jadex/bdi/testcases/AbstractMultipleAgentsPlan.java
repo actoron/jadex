@@ -60,7 +60,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 			for(int i=0; i<args.length; i++)
 			{
 				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				ITuple2Future<IComponentIdentifier, Map<String, Object>>	ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentDescription().getResourceIdentifier()));
+				ITuple2Future<IComponentIdentifier, Map<String, Object>>	ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentIdentifier()));
 				IComponentIdentifier aid = (IComponentIdentifier)ret.getFirstResult();
 				agents.add(aid);
 			}

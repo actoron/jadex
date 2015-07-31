@@ -1,5 +1,9 @@
 package jadex.bdiv3.features.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
@@ -13,10 +17,6 @@ import jadex.bridge.component.impl.MonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  *  Overrides the monitoring feature to add the logic for current state.

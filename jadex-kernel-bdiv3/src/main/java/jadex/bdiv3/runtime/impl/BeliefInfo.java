@@ -1,12 +1,12 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.model.MBelief;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.SReflect;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import jadex.bdiv3.model.MBelief;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 
 
 /**

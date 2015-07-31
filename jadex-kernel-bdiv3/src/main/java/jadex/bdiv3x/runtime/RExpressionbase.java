@@ -1,5 +1,8 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
@@ -11,9 +14,6 @@ import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The expression base runtime element.

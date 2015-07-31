@@ -1,12 +1,5 @@
 package jadex.bdiv3;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.model.BDIModel;
-import jadex.bdiv3.model.MBelief;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.rules.eca.EventType;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,6 +21,13 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MBelief;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.rules.eca.EventType;
 
 
 /**

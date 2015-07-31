@@ -1,10 +1,10 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.model.MElement;
-import jadex.javaparser.IMapAccess;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.bdiv3.model.MElement;
+import jadex.javaparser.IMapAccess;
 
 /**
  *  Prepend capability prefix to belief names.

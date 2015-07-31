@@ -1,12 +1,12 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  *  Implementation of a method as a plan body.

@@ -1,8 +1,8 @@
 package jadex.bdiv3.asm;
 
-import jadex.bdiv3.OpcodeHelper;
-
 import org.objectweb.asm.Opcodes;
+
+import jadex.bdiv3.OpcodeHelper;
 
 /**
  *  Helper for creating opcodes.

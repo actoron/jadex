@@ -1,6 +1,5 @@
 package jadex.bdi.planlib.protocols;
 
-import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
@@ -45,6 +44,7 @@ public abstract class AbstractInitiatorPlan extends Plan
 			if(state==null)
 			{
 				state	= new InteractionState();
+				getParameter("interaction_state").setValue(state);
 			}
 			state.setInteractionState(InteractionState.INTERACTION_RUNNING);
 		}
@@ -77,7 +77,7 @@ public abstract class AbstractInitiatorPlan extends Plan
 		{
 			cancel.getParameter("interaction_state").setValue(getParameter("interaction_state").getValue());
 		}
-		dispatchSubgoalAndWait(cancel);		
+		dispatchSubgoalAndWait(cancel);
 		getLogger().info("Initiator aborted");
 	}
 	

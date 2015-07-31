@@ -1,5 +1,7 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.Collection;
+
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
@@ -10,8 +12,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Collection;
 
 /**
  *  The goalbase runtime element.

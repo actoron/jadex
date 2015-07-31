@@ -1,5 +1,12 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
@@ -15,13 +22,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
 import jadex.rules.eca.ChangeInfo;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  *  Plan body that is represented as complete class.

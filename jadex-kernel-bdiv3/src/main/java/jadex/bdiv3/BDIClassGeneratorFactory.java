@@ -1,11 +1,11 @@
 package jadex.bdiv3;
 
-import jadex.bridge.IInternalAccess;
-import jadex.commons.SReflect;
-
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 
 public abstract class BDIClassGeneratorFactory
 {

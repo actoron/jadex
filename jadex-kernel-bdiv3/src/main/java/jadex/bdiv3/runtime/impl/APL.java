@@ -1,5 +1,17 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -15,6 +27,7 @@ import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
@@ -32,18 +45,6 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  The APL is the applicable plan list. It stores the
@@ -619,10 +620,11 @@ public class APL
 			ret = 4;
 			capaname	= ((RPlan)cand).getModelElement().getCapabilityName();
 		}
-//		else if() // waitqueue
-//		{
-//			ret = 2;
-//		}
+		else if(cand instanceof Waitqueue)
+		{
+			ret = 2;
+			capaname	= ((Waitqueue)cand).getPlan().getModelElement().getCapabilityName();
+		}
 		else
 		{
 			ret = 0;

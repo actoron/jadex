@@ -2,7 +2,6 @@ package jadex.bdiv3x.runtime;
 
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.IPlanListener;
 
 
 /**

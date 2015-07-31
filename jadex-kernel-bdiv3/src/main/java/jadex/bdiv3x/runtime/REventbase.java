@@ -1,7 +1,8 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.Map;
+
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
-import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
@@ -11,8 +12,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
 
 /**
  *  The event base runtime element.

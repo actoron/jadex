@@ -1,5 +1,10 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Logger;
+
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -52,11 +57,6 @@ import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  *  Dummy class for loading v2 examples using v3x.
@@ -1498,7 +1498,7 @@ public abstract class Plan
 		 */
 		public Object[] getElements()
 		{
-			return rplan.getWaitqueue().toArray();
+			return rplan.getWaitqueue().getElements();
 		}
 	}
 }

@@ -1,5 +1,9 @@
 package jadex.bdiv3.actions;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
@@ -12,6 +16,7 @@ import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.IInternalPlan;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IElement;
@@ -23,10 +28,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
 
 /**
  *  Action for selecting a candidate from the APL.
@@ -268,10 +269,10 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					}
 					ret.setResult(null);
 				}
-				else if(cand instanceof List)
+				else if(cand instanceof Waitqueue)
 				{
 					// dispatch to waitqueue
-					((List)cand).add(element);
+					((Waitqueue)cand).addElement(element);
 					ret.setResult(null);
 				}
 //				// Unwrap candidate info coming from meta-level reasoning

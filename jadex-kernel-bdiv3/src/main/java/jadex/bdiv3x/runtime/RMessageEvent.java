@@ -1,5 +1,10 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
@@ -10,11 +15,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
 import jadex.commons.IValueFetcher;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  The runtime message event.

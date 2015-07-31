@@ -1,5 +1,9 @@
 package jadex.bdiv3.features.impl;
 
+import java.lang.reflect.Proxy;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MElement;
@@ -15,10 +19,6 @@ import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.lang.reflect.Proxy;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Overriden to allow for service implementations to be directly mapped to plans.
