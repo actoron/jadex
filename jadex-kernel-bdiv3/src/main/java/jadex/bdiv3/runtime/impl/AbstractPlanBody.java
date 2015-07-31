@@ -1,14 +1,14 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 /**
  *  Abstract base class for plan body implementations.

@@ -1,5 +1,9 @@
 package jadex.bdiv3.actions;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
@@ -24,10 +28,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
 
 /**
  *  Action for selecting a candidate from the APL.

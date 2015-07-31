@@ -1,5 +1,13 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
@@ -16,14 +24,6 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Base element for elements with parameters such as:

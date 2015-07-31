@@ -1,5 +1,8 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentIdentifier;
@@ -18,9 +21,6 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *  XML version of the capability. 

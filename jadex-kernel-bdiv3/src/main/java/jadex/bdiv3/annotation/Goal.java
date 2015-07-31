@@ -1,11 +1,11 @@
 package jadex.bdiv3.annotation;
 
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 
 /**
  *

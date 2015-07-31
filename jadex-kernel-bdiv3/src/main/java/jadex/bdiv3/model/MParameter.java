@@ -1,16 +1,5 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3x.runtime.CapabilityWrapper;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.FieldInfo;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
-import jadex.javaparser.SJavaParser;
-import jadex.rules.eca.EventType;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,6 +10,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3x.runtime.CapabilityWrapper;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.FieldInfo;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.javaparser.SJavaParser;
+import jadex.rules.eca.EventType;
 
 
 /**

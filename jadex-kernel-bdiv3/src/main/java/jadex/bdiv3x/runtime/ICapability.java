@@ -1,5 +1,8 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -9,9 +12,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * 

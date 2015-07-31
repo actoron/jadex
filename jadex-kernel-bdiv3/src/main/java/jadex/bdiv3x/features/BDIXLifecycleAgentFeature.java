@@ -1,7 +1,5 @@
 package jadex.bdiv3x.features;
 
-import java.util.List;
-
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDILifecycleFeature;
 import jadex.bdiv3.model.MCapability;
@@ -19,14 +17,11 @@ import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ComponentLifecycleFeature;
-import jadex.bridge.fipa.FIPAMessageType;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  Feature that ensures the bdi behavior is started.

@@ -1,5 +1,7 @@
 package jadex.bdiv3.features.impl;
 
+import java.util.Map;
+
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.RCapability;
@@ -8,8 +10,6 @@ import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.RuleSystem;
-
-import java.util.Map;
 
 /**
  *  Methods internally called on the BDI agent feature. 

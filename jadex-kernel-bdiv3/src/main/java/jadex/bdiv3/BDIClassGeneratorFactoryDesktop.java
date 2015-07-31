@@ -1,8 +1,8 @@
 package jadex.bdiv3;
 
-import jadex.bridge.IInternalAccess;
-
 import java.util.Map;
+
+import jadex.bridge.IInternalAccess;
 
 /**
  * 

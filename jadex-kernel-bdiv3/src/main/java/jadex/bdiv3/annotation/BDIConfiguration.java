@@ -1,14 +1,14 @@
 package jadex.bdiv3.annotation;
 
-import jadex.micro.annotation.Component;
-import jadex.micro.annotation.NameValue;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.RequiredService;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import jadex.micro.annotation.Component;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.RequiredService;
 
 
 /**

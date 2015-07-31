@@ -1,5 +1,14 @@
 package jadex.bdiv3.features.impl;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
@@ -73,15 +82,6 @@ import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.CombinedCondition;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 

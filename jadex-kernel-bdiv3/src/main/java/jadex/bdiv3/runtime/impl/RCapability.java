@@ -1,18 +1,5 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MElement;
-import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.IDeliberationStrategy;
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.runtime.RBeliefbase;
-import jadex.bdiv3x.runtime.REventbase;
-import jadex.bdiv3x.runtime.RExpressionbase;
-import jadex.bdiv3x.runtime.RGoalbase;
-import jadex.bdiv3x.runtime.RPlanbase;
-import jadex.bridge.IInternalAccess;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +8,18 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.runtime.IDeliberationStrategy;
+import jadex.bdiv3x.runtime.RBeliefbase;
+import jadex.bdiv3x.runtime.REventbase;
+import jadex.bdiv3x.runtime.RExpressionbase;
+import jadex.bdiv3x.runtime.RGoalbase;
+import jadex.bdiv3x.runtime.RPlanbase;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  Runtime element for storing goal and plan instances.

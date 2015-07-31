@@ -1,9 +1,9 @@
 package jadex.bdiv3.model;
 
-import jadex.bridge.modelinfo.UnparsedExpression;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.bridge.modelinfo.UnparsedExpression;
 
 /**
  *  Represents an initial / end belief (set).

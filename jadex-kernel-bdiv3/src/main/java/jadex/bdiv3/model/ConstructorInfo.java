@@ -1,9 +1,9 @@
 package jadex.bdiv3.model;
 
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Constructor;
+
+import jadex.commons.SReflect;
 
 /**
  *  Describes a constructor.

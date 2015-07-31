@@ -1,5 +1,7 @@
 package jadex.bdiv3.features.impl;
 
+import java.util.Collection;
+
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MPlan;
@@ -12,8 +14,6 @@ import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
-
-import java.util.Collection;
 
 /**
  *  Feature for required services.

@@ -1,12 +1,12 @@
 package jadex.bdiv3.model;
 
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.MethodInfo;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.MethodInfo;
 
 /**
  *  Model element for inhibitions.

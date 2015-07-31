@@ -1,14 +1,14 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bridge.IInternalAccess;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Runtime element for all elements that can be processed via means-end reasoning.
