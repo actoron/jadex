@@ -622,7 +622,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public void planFinished(IInternalAccess ia, IInternalPlan rplan)
 	{
-//		if(this.toString().indexOf("docnt")!=-1)
+//		if(this.toString().indexOf("da_initiate")!=-1)
 //			System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
 
 		super.planFinished(ia, rplan);

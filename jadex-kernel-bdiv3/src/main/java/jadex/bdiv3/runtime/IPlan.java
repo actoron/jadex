@@ -1,13 +1,12 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.ICondition;
-
-import java.util.List;
 
 /**
  *  User interface for plans.
@@ -61,12 +60,6 @@ public interface IPlan extends IParameterElement  // todo: do not extend IParame
 	 *  @return The dispatched element.
 	 */
 	public Object getDispatchedElement();
-	
-	/**
-	 *  Get the waitqueue.
-	 *  @return The waitqueue.
-	 */
-	public List<Object> getWaitqueue();
 	
 	/**
 	 *  Wait for a delay.

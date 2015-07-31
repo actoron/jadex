@@ -15,6 +15,7 @@ import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
@@ -619,10 +620,11 @@ public class APL
 			ret = 4;
 			capaname	= ((RPlan)cand).getModelElement().getCapabilityName();
 		}
-//		else if() // waitqueue
-//		{
-//			ret = 2;
-//		}
+		else if(cand instanceof Waitqueue)
+		{
+			ret = 2;
+			capaname	= ((Waitqueue)cand).getPlan().getModelElement().getCapabilityName();
+		}
 		else
 		{
 			ret = 0;

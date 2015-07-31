@@ -12,6 +12,7 @@ import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.IInternalPlan;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IElement;
@@ -268,10 +269,10 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					}
 					ret.setResult(null);
 				}
-				else if(cand instanceof List)
+				else if(cand instanceof Waitqueue)
 				{
 					// dispatch to waitqueue
-					((List)cand).add(element);
+					((Waitqueue)cand).addElement(element);
 					ret.setResult(null);
 				}
 //				// Unwrap candidate info coming from meta-level reasoning

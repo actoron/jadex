@@ -1,5 +1,12 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Plan;
@@ -58,14 +65,6 @@ import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 /**
  *  Runtime element of a plan.
  */
@@ -112,7 +111,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	protected WaitAbstraction waitqueuewa;
 	
 	/** The waitqueue. */
-	protected List<Object> waitqueue;
+	protected Waitqueue waitqueue;
 	
 	/** The wait future (to resume execution). */
 //	protected Future<?> waitfuture;
@@ -652,14 +651,14 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		return waitqueuewa!=null && waitqueuewa.isWaitingFor(procelem);
 	}
 	
-	/**
-	 *  Get the waitabstraction.
-	 *  @return The waitabstraction.
-	 */
-	public WaitAbstraction getWaitqueueWaitAbstraction()
-	{
-		return waitqueuewa;
-	}
+//	/**
+//	 *  Get the waitabstraction.
+//	 *  @return The waitabstraction.
+//	 */
+//	public WaitAbstraction getWaitqueueWaitAbstraction()
+//	{
+//		return waitqueuewa;
+//	}
 	
 	/**
 	 *  Get the waitabstraction.
@@ -672,14 +671,14 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		return waitqueuewa;
 	}
 	
-	/**
-	 *  Set the waitabstraction.
-	 *  @param waitabstraction The waitabstraction to set.
-	 */
-	public void setWaitqueueWaitAbstraction(WaitAbstraction waitabstraction)
-	{
-		this.waitqueuewa = waitabstraction;
-	}
+//	/**
+//	 *  Set the waitabstraction.
+//	 *  @param waitabstraction The waitabstraction to set.
+//	 */
+//	public void setWaitqueueWaitAbstraction(WaitAbstraction waitabstraction)
+//	{
+//		this.waitqueuewa = waitabstraction;
+//	}
 
 	/**
 	 * 
@@ -687,8 +686,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	protected void addToWaitqueue(Object obj)
 	{
 		if(waitqueue==null)
-			waitqueue = new ArrayList<Object>();
-		waitqueue.add(obj);
+			waitqueue = new Waitqueue();
+		waitqueue.addElement(obj);
 	}
 	
 	/**
@@ -696,21 +695,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public Object getFromWaitqueue(WaitAbstraction wa)
 	{
-		Object ret = null;
-		if(waitqueue!=null)
-		{
-			for(int i=0; i<waitqueue.size(); i++)
-			{
-				Object obj = waitqueue.get(i);
-				if(wa.isWaitingFor(obj))
-				{
-					ret = obj;
-					waitqueue.remove(i);
-					break;
-				}
-			}
-		}
-		return ret;
+		return waitqueue!=null ? waitqueue.getFromWaitqueue(wa) : null;
 	}
 	
 	/**
@@ -915,31 +900,15 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  Get the waitqueue.
 	 *  @return The waitqueue.
 	 */
-	public List<Object> getWaitqueue()
+	public Waitqueue getWaitqueue()
 	{
 		if(waitqueue==null)
-			waitqueue = new ArrayList<Object>()
 		{
-			int	nr	= new Random().nextInt();
-			@Override
-			public String toString()
-			{
-				return "Waitqueue(@"+nr+") of "+RPlan.this;
-			}
-		};
+			waitqueue = new Waitqueue();
+		}
 		return waitqueue;
 	}
 
-	/**
-	 *  Set the waitqueue.
-	 *  @param waitqueue The waitqueue to set.
-	 */
-	public void setWaitqueue(List<Object> waitqueue)
-	{
-		this.waitqueue = waitqueue;
-	}
-	
-	
 	// methods that can be called from pojo plan
 
 //	/**
@@ -1899,6 +1868,66 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		public void addResultListener(IResultListener<E> listener) 
 		{
 			super.addResultListener(new BDIComponentResultListener<E>(listener, getAgent()));
+		}
+	}
+	
+	/**
+	 *  Waitque holds events for later processing.
+	 */
+	
+	public class Waitqueue
+	{
+		protected List<Object>	queue	= new ArrayList<Object>();
+		
+		public String toString()
+		{
+			return "Waitqueue("+RPlan.this+", "+queue.toString()+")";
+		}
+
+		public RPlan getPlan()
+		{
+			return RPlan.this;
+		}
+
+		public void addElement(Object element)
+		{
+			queue.add(element);
+		}
+		
+		/**
+		 *  Test if waitqueue is empty.
+		 */
+		public boolean isEmpty()
+		{
+			return queue.isEmpty();
+		}
+		
+		/**
+		 *  Get the currently contained elements of the waitqueue.
+		 *  @return The collected elements.
+		 */
+		public Object[] getElements()
+		{
+			return queue.toArray();
+		}
+
+		/**
+		 * 
+		 */
+		protected Object getFromWaitqueue(WaitAbstraction wa)
+		{
+			Object ret = null;
+			for(int i=0; i<queue.size(); i++)
+			{
+				Object obj = queue.get(i);
+				if(wa.isWaitingFor(obj))
+				{
+					ret = obj;
+					queue.remove(i);
+					break;
+				}
+			}
+			return ret;
 		}
 	}
 }
