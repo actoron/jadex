@@ -570,9 +570,7 @@ public class BDIXMLReader extends ComponentXMLReader
 		};
 		
 		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(BDIXModel.class, capaproc), 
-			new MappingInfo(comptype, null, null, 
-				new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},  
+			new MappingInfo(comptype, null, null, null,  
 				new SubobjectInfo[]{
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefref")}), new AccessInfo(new QName(uri, "beliefref"), "belief")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "beliefs"), new QName(uri, "beliefsetref")}), new AccessInfo(new QName(uri, "beliefsetref"), "belief")),
