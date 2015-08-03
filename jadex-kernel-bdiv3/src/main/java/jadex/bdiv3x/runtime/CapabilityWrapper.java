@@ -85,7 +85,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public IGoalbase getGoalbase()
 	{
-		return scope!=null ? new GoalbaseWrapper(capa.getGoalbase(), scope+MElement.CAPABILITY_SEPARATOR) : capa.getGoalbase();
+		return scope!=null ? new RGoalbase(agent, scope) : capa.getGoalbase();
 	}
 
 	/**
@@ -325,7 +325,7 @@ public class CapabilityWrapper implements ICapability
 			String	prefix	= element.getCapabilityName()+MElement.CAPABILITY_SEPARATOR;
 			SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ret);
 			fetcher.setValue("$beliefbase", new BeliefbaseWrapper(capa.getBeliefbase(), prefix));
-			fetcher.setValue("$goalbase", new GoalbaseWrapper(capa.getGoalbase(), prefix));
+			fetcher.setValue("$goalbase", new RGoalbase(agent, element.getCapabilityName()));
 			fetcher.setValue("$planbase", new PlanbaseWrapper(capa.getPlanbase(), prefix));
 			fetcher.setValue("$eventbase", new EventbaseWrapper(capa.getEventbase(), prefix));
 			fetcher.setValue("$expressionbase", new ExpressionbaseWrapper(capa.getExpressionbase(), prefix));

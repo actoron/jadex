@@ -206,10 +206,7 @@ public abstract class Plan
 		final Future<IGoal> ret = new Future<IGoal>();
 		
 		BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
-		// todo: add capability name of scope
-		MGoal mgoal = model.getCapability().getGoal(type.replace(".", MElement.CAPABILITY_SEPARATOR));
-		if(mgoal==null)
-			throw new RuntimeException("Unknown goal type: "+mgoal);
+		MGoal mgoal = model.getCapability().getResolvedGoal(rplan.getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addModelElement(mgoal);
 		

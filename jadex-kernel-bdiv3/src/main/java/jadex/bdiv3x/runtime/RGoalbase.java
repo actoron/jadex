@@ -1,37 +1,41 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- *  The goalbase runtime element.
+ *  The goal base runtime element.
  */
 public class RGoalbase extends RElement implements IGoalbase
 {
+	//-------- attributes --------
+	
+	/** The scope (for local views). */
+	protected String	scope;
+	
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new goalbase.
 	 */
-	public RGoalbase(IInternalAccess agent)
+	public RGoalbase(IInternalAccess agent, String scope)
 	{
 		super(null, agent);
+		this.scope	= scope;
 	}
 	
-	/**
-	 *  Get a (proprietary) adopted goal by name.
-	 *  @param name	The goal name.
-	 *  @return The goal (if found).
-	 */
-//	public IGoal getGoal(String name);
+	//-------- IGoalbase methods --------
 
 	/**
 	 *  Test if an adopted goal is already contained in the goal base.
@@ -50,11 +54,7 @@ public class RGoalbase extends RElement implements IGoalbase
 	 */
 	public IGoal[] getGoals(String type)
 	{
-		// Todo: add capability scope
-		type	= type.replace(".", MElement.CAPABILITY_SEPARATOR);
-		
-		MCapability mcapa = (MCapability)getCapability().getModelElement();
-		MGoal mgoal = mcapa.getGoal(type);
+		MGoal mgoal = getCapability().getMCapability().getResolvedGoal(scope, type);
 		Collection<RGoal> ret = getCapability().getGoals(mgoal);
 		return ret.toArray(new IGoal[ret.size()]);
 	}
@@ -65,7 +65,14 @@ public class RGoalbase extends RElement implements IGoalbase
 	 */
 	public IGoal[] getGoals()
 	{
-		Collection<RGoal> ret = getCapability().getGoals();
+		List<IGoal>	ret	= new ArrayList<IGoal>();
+		for(IGoal goal: getCapability().getGoals())
+		{
+			if(SUtil.equals(goal.getModelElement().getCapabilityName(), scope))
+			{
+				ret.add(goal);
+			}
+		}
 		return ret.toArray(new IGoal[ret.size()]);
 	}
 
@@ -78,12 +85,7 @@ public class RGoalbase extends RElement implements IGoalbase
 	 */
 	public IGoal createGoal(String type)
 	{
-		// Todo: add capability scope
-		type	= type.replace(".", MElement.CAPABILITY_SEPARATOR);
-		
-		MGoal mgoal = getCapability().getMCapability().getGoal(type);
-		if(mgoal==null)
-			throw new RuntimeException("Unknown goal type: "+type);
+		MGoal mgoal = getCapability().getMCapability().getResolvedGoal(scope, type);
 		return new RGoal(getAgent(), mgoal, null, null, null, null);
 	}
 

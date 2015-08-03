@@ -433,18 +433,13 @@ public class RCapability extends RElement
 	 */
 	public RGoalbase getGoalbase()
 	{
+		if(goalbase==null)
+		{
+			goalbase	= new RGoalbase(getAgent(), null);
+		}
 		return goalbase;
 	}
 
-	/**
-	 *  The goalbase to set.
-	 *  @param goalbase The goalbase to set
-	 */
-	public void setGoalbase(RGoalbase goalbase)
-	{
-		this.goalbase = goalbase;
-	}
-	
 	/**
 	 *  Get the planbase. 
 	 *  @return The planbase

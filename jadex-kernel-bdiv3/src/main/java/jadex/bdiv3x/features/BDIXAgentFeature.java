@@ -164,8 +164,8 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		RExpressionbase eb = new RExpressionbase(getComponent());
 		getCapability().setExpressionbase(eb);
 		
-		RGoalbase gb = new RGoalbase(getComponent());
-		getCapability().setGoalbase(gb);
+//		RGoalbase gb = new RGoalbase(getComponent());
+//		getCapability().setGoalbase(gb);
 		
 		RPlanbase pb = new RPlanbase(getComponent());
 		getCapability().setPlanbase(pb);
