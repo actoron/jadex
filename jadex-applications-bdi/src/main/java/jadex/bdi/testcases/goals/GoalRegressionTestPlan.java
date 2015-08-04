@@ -1,6 +1,7 @@
 package jadex.bdi.testcases.goals;
 
 import jadex.base.test.TestReport;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
@@ -19,7 +20,8 @@ public class GoalRegressionTestPlan extends Plan
 	 */
 	public void body()
 	{
-		IGoal	goal	= (IGoal)getReason();
+//		IGoal	goal	= (IGoal)getReason();	// old
+		IGoal	goal	= (IGoal)((ChangeEvent)getReason()).getValue();	// new to differentiate from goals to be processed.
 		Boolean	state	= (Boolean)goal.getParameter("test_state").getValue();
 //		boolean[]	pstates	= (boolean[])goal.getParameter("test_process_states").getValue();
 		String 	errors	= "";
