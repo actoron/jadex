@@ -406,6 +406,7 @@ public class SBDIModel
 		param2.setBindingOptions(param.getBindingOptions());
 		param2.setClazz(param.getClazz());
 		param2.setDefaultValue(param.getDefaultValue());
+		param2.setDefaultValues(param.getDefaultValues());
 		param2.setDescription(param.getDescription());
 		param2.setDirection(param.getDirection());
 		param2.setEvaluationMode(param.getEvaluationMode());

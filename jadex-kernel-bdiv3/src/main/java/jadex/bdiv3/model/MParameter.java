@@ -530,6 +530,15 @@ public class MParameter extends MElement
 	 *  The value to set.
 	 *  @param value The value to set
 	 */
+	public void setDefaultValues(List<UnparsedExpression> values)
+	{
+		this.values = values;
+	}
+	
+	/**
+	 *  The value to set.
+	 *  @param value The value to set
+	 */
 	public void addDefaultValues(UnparsedExpression fact)
 	{
 		if(values==null)
