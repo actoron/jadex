@@ -619,42 +619,64 @@ public class ComponentManagementService implements IComponentManagementService
 																	final IPlatformComponentAccess	component	= new PlatformComponent();
 																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, cinfo.getProvidedServiceInfos(), cinfo.getRequiredServiceBindings());
 																	component.create(cci, features);
-																	IArgumentsResultsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsResultsFeature.class);
 																	if(resultlistener!=null)
 																	{
-																		IResultListener<Collection<Tuple2<String, Object>>>	rl;
-																		if(!(resultlistener instanceof IIntermediateResultListener))
+																		IArgumentsResultsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsResultsFeature.class);
+																		IResultListener<Collection<Tuple2<String, Object>>>	rl	= new IIntermediateResultListener<Tuple2<String, Object>>()
 																		{
-																			rl	= new IIntermediateResultListener<Tuple2<String, Object>>()
+																			public void exceptionOccurred(final Exception exception)
 																			{
-																				Map<String, Tuple2<String, Object>>	results	= new LinkedHashMap<String, Tuple2<String, Object>>();
-																				
-																				public void exceptionOccurred(Exception exception)
+																				// Wait for cleanup finished before posting results
+																				cfs.get(cid).addResultListener(new IResultListener<Map<String,Object>>()
 																				{
-																					resultlistener.exceptionOccurred(exception);
-																				}
-																				
-																				public void finished()
+																					public void resultAvailable(java.util.Map<String,Object> result)
+																					{
+																						resultlistener.exceptionOccurred(exception);
+																					}
+																					
+																					public void exceptionOccurred(Exception exception)
+																					{
+																						resultlistener.exceptionOccurred(exception);																						
+																					}
+																				});
+																			}
+																			
+																			public void finished()
+																			{
+																				// Wait for cleanup finished before posting results
+																				cfs.get(cid).addResultListener(new IResultListener<Map<String,Object>>()
 																				{
-																					resultlistener.resultAvailable(results.values());																		
-																				}
-																				
-																				public void intermediateResultAvailable(Tuple2<String, Object> result)
+																					public void resultAvailable(java.util.Map<String,Object> result)
+																					{
+																						Collection<Tuple2<String, Object>>	results	= new ArrayList<Tuple2<String,Object>>();
+																						for(Map.Entry<String, Object> entry: result.entrySet())
+																						{
+																							results.add(new Tuple2<String, Object>(entry.getKey(), entry.getValue()));
+																						}
+																						resultlistener.resultAvailable(results);
+																					}
+																					
+																					public void exceptionOccurred(Exception exception)
+																					{
+																						resultlistener.exceptionOccurred(exception);																																												
+																					}
+																				});
+																			}
+																			
+																			public void intermediateResultAvailable(Tuple2<String, Object> result)
+																			{
+																				if(resultlistener instanceof IIntermediateResultListener)
 																				{
-																					results.put(result.getFirstEntity(), result);
+																					((IIntermediateResultListener)resultlistener).intermediateResultAvailable(result);
 																				}
-																				
-																				public void resultAvailable(Collection<Tuple2<String, Object>> result)
-																				{
-																					// shouldn't happen...
-																					Thread.dumpStack();
-																				}
-																			}; 
-																		}
-																		else
-																		{
-																			rl	= resultlistener;
-																		}
+																			}
+																			
+																			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+																			{
+																				// shouldn't happen...
+																				Thread.dumpStack();
+																			}
+																		}; 
 																		af.subscribeToResults().addResultListener(rl);
 																	}
 																	
