@@ -103,7 +103,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public IEventbase getEventbase()
 	{
-		return scope!=null ? new EventbaseWrapper(capa.getEventbase(), scope+MElement.CAPABILITY_SEPARATOR) : capa.getEventbase();
+		return scope!=null ? new REventbase(agent, scope) : capa.getEventbase();
 	}
 
 	/**
@@ -327,7 +327,7 @@ public class CapabilityWrapper implements ICapability
 			fetcher.setValue("$beliefbase", new BeliefbaseWrapper(capa.getBeliefbase(), prefix));
 			fetcher.setValue("$goalbase", new RGoalbase(agent, element.getCapabilityName()));
 			fetcher.setValue("$planbase", new PlanbaseWrapper(capa.getPlanbase(), prefix));
-			fetcher.setValue("$eventbase", new EventbaseWrapper(capa.getEventbase(), prefix));
+			fetcher.setValue("$eventbase", new REventbase(agent, element.getCapabilityName()));
 			fetcher.setValue("$expressionbase", new ExpressionbaseWrapper(capa.getExpressionbase(), prefix));
 			if(values!=null)
 			{

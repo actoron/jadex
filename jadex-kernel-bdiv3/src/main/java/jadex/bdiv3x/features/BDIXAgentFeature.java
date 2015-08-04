@@ -170,8 +170,8 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		RPlanbase pb = new RPlanbase(getComponent());
 		getCapability().setPlanbase(pb);
 
-		REventbase evb = new REventbase(getComponent());
-		getCapability().setEventbase(evb);
+//		REventbase evb = new REventbase(getComponent());
+//		getCapability().setEventbase(evb);
 
 		// cannot do this in constructor because it needs access to this feature in expressions
 	

@@ -408,7 +408,7 @@ public abstract class Plan
 		final Future<IInternalEvent> ret = new Future<IInternalEvent>();
 
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
-		MInternalEvent mevent = bdif.getBDIModel().getCapability().getInternalEvent(type);
+		MInternalEvent mevent = bdif.getBDIModel().getCapability().getResolvedInternalEvent(rplan.getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addModelElement(mevent);
 
@@ -1196,10 +1196,7 @@ public abstract class Plan
 		public void addInternalEvent(String event)
 		{
 			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
-			// todo: add capability name of scope
-			MInternalEvent ievent = model.getCapability().getInternalEvent(event);
-			if(ievent==null)
-				throw new RuntimeException("Unknown internal event: "+event);
+			MInternalEvent ievent = model.getCapability().getResolvedInternalEvent(rplan.getModelElement().getCapabilityName(), event);
 			getWaitAbstraction().addModelElement(ievent);
 		}
 		
@@ -1210,10 +1207,7 @@ public abstract class Plan
 		public void removeInternalEvent(String event)
 		{
 			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
-			// todo: add capability name of scope
-			MInternalEvent ievent = model.getCapability().getInternalEvent(event);
-			if(ievent==null)
-				throw new RuntimeException("Unknown internal event: "+event);
+			MInternalEvent ievent = model.getCapability().getResolvedInternalEvent(rplan.getModelElement().getCapabilityName(), event);
 			getWaitAbstraction().removeModelElement(ievent);
 		}
 		

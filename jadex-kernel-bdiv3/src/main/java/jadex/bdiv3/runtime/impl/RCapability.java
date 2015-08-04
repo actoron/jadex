@@ -415,17 +415,21 @@ public class RCapability extends RElement
 	 */
 	public REventbase getEventbase()
 	{
+		if(eventbase==null)
+		{
+			eventbase	= new REventbase(getAgent(), null);
+		}
 		return eventbase;
 	}
 
-	/**
-	 *  The eventbase to set.
-	 *  @param eventbase The eventbase to set
-	 */
-	public void setEventbase(REventbase eventbase)
-	{
-		this.eventbase = eventbase;
-	}
+//	/**
+//	 *  The eventbase to set.
+//	 *  @param eventbase The eventbase to set
+//	 */
+//	public void setEventbase(REventbase eventbase)
+//	{
+//		this.eventbase = eventbase;
+//	}
 
 	/**
 	 *  Get the goalbase.
