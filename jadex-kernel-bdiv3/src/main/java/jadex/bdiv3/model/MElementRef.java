@@ -29,7 +29,7 @@ public class MElementRef extends MElement
 	 */
 	public void setRef(String ref)
 	{
-		this.ref = ref;
+		this.ref = internalName(ref);
 	}
 
 	/**

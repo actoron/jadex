@@ -461,6 +461,26 @@ public class MCapability extends MElement
 	}
 
 	/**
+	 *  Get an internal event by resolved name. Exception if not found.
+	 *  This method is meant handles calls from user code (e.g. createXYZ() in a plan).
+	 *  Internally, all references should be mapped to the correct concrete elements already during loading (e.g. config elements).
+	 *  @param scope	The local scope.
+	 *  @param name	The name, relative to scope.
+	 */
+	public MInternalEvent	getResolvedInternalEvent(String scope, String name)
+	{
+		name	= scope!=null ? scope + MElement.CAPABILITY_SEPARATOR + MElement.internalName(name) : MElement.internalName(name);
+		if(eventreferences!=null && eventreferences.containsKey(name))
+		{
+			name	= eventreferences.get(name);
+		}
+		MInternalEvent melement = getInternalEvent(name);
+		if(melement==null)
+			throw new RuntimeException("Internal event not found: "+name+(scope!=null ? "("+scope+")" : ""));
+		return melement;
+	}
+
+	/**
 	 *  Get a message event by resolved name. Exception if not found.
 	 *  This method is meant handles calls from user code (e.g. createXYZ() in a plan).
 	 *  Internally, all references should be mapped to the correct concrete elements already during loading (e.g. config elements).

@@ -699,11 +699,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				{
 					for(String name: names)
 					{
-						// todo: capa scoping?!
-						name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
-						if(mcapa.getMessageEvent(name)==null)
-							throw new RuntimeException("Message event not found: "+name);
-						mtr.addMessageEvent(mcapa.getMessageEvent(name));
+						mtr.addMessageEvent(mcapa.getResolvedMessageEvent(null, name));
 					}
 				}
 				
@@ -712,11 +708,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				{
 					for(String name: names)
 					{
-						// todo: capa scoping?!
-						name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
-						if(mcapa.getInternalEvent(name)==null)
-							throw new RuntimeException("Internal event not found: "+name);
-						mtr.addInternalEvent(mcapa.getInternalEvent(name));
+						mtr.addInternalEvent(mcapa.getResolvedInternalEvent(null, name));
 					}
 				}
 				
@@ -725,11 +717,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				{
 					for(String name: names)
 					{
-						// todo: capa scoping?!
-						name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
-						if(mcapa.getGoal(name)==null)
-							throw new RuntimeException("Goal not found: "+name);
-						mtr.addGoal(mcapa.getGoal(name));
+						mtr.addGoal(mcapa.getResolvedGoal(null, name));
 					}
 				}
 				
@@ -738,11 +726,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				{
 					for(String name: names)
 					{
-						// todo: capa scoping?!
-						name	= name.replace(".", MElement.CAPABILITY_SEPARATOR);
-						if(mcapa.getGoal(name)==null)
-							throw new RuntimeException("GoalFinished not found: "+name);
-						mtr.addGoalFinished(mcapa.getGoal(name));
+						mtr.addGoalFinished(mcapa.getResolvedGoal(null, name));
 					}
 				}
 				
