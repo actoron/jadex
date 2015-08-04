@@ -154,6 +154,23 @@ public class BDIXMLReader extends ComponentXMLReader
 		}
 	};
 	
+	public static final IStringObjectConverter exconf = new IStringObjectConverter()
+	{
+		public Object convertString(String val, Object context) throws Exception
+		{
+			return new UnparsedExpression(null, val);
+		}
+	};
+	
+	public static final IObjectStringConverter rexconf = new IObjectStringConverter()
+	{
+		public String convertObject(Object val, Object context)
+		{
+			return ((UnparsedExpression)val).getValue();
+		}
+	};
+	
+	
 	/** The loader constant. */
 	public static final String	CONTEXT_LOADER	= "context_loader";
 	
@@ -607,6 +624,7 @@ public class BDIXMLReader extends ComponentXMLReader
 		AttributeInfo[]	belattrs	= new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 			new AttributeInfo(new AccessInfo("argument", "exported")),
+			new AttributeInfo(new AccessInfo("updaterate", "updateRate"), new AttributeConverter(exconf, rexconf)),
 			new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
 		};
 		IPostProcessor	belproc	= new IPostProcessor()
@@ -1028,7 +1046,7 @@ public class BDIXMLReader extends ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
-				new AttributeInfo(new AccessInfo("updaterate", "updateRate")),
+				new AttributeInfo(new AccessInfo("updaterate", "updateRate"), new AttributeConverter(exconf, rexconf)),
 				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "servicemapping"), new QName("ref")}, "serviceMapping"))
 			}, new SubobjectInfo[]{
@@ -1042,7 +1060,7 @@ public class BDIXMLReader extends ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
-				new AttributeInfo(new AccessInfo("updaterate", "updateRate")),
+				new AttributeInfo(new AccessInfo("updaterate", "updateRate"), new AttributeConverter(exconf, rexconf)),
 				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
 //				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
 //				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping")),
@@ -1059,6 +1077,8 @@ public class BDIXMLReader extends ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
+				new AttributeInfo(new AccessInfo("updaterate", "updateRate"), new AttributeConverter(exconf, rexconf)),
+				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "internaleventmapping"), new QName("ref")}, "internalEventMapping")),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping")),
@@ -1073,6 +1093,8 @@ public class BDIXMLReader extends ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
+				new AttributeInfo(new AccessInfo("updaterate", "updateRate"), new AttributeConverter(exconf, rexconf)),
+				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping")),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "servicemapping"), new QName("ref")}, "serviceMapping"))

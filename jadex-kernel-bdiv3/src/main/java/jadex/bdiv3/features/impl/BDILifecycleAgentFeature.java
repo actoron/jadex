@@ -618,7 +618,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					rulesystem.getRulebase().addRule(rule);
 				}
 				
-				if(mbel.getUpdaterate()>0)
+				if(mbel.getUpdaterateValue(component)>0)
 				{
 					final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //					cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
@@ -666,7 +666,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 											e.printStackTrace();
 										}
 										
-										cs.createTimer(mbel.getUpdaterate(), self);
+										cs.createTimer(mbel.getUpdaterateValue(component), self);
 										return IFuture.DONE;
 									}
 								});

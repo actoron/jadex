@@ -67,11 +67,11 @@ public class SBDIModel
 					MBelief	bel2;
 					if(bel.getGetter()==null)
 					{
-						bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+						bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdateRate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 					}
 					else
 					{
-						bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+						bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdateRate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 						bel2.setSetter(bel.getSetter());
 					}
 					bel2.setName(belname);

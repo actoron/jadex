@@ -401,7 +401,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		
 		// Only store event for non-update-rate beliefs (update rate beliefs get set later)
-		else if(mbel.getUpdaterate()<=0)
+//		else if(mbel.getUpdaterate()<=0)
+		else if(mbel.getUpdateRate()==null)
 		{
 			// In init set field immediately but throw events later, when agent is available.
 			
