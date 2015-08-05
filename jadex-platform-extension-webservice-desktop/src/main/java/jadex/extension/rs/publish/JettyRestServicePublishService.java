@@ -1,37 +1,9 @@
 package jadex.extension.rs.publish;
 
-import jadex.base.Starter;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.types.publish.IPublishService;
-import jadex.bridge.service.types.publish.IWebPublishService;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.collection.MultiCollection;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.BasicTypeConverter;
-import jadex.extension.rs.publish.JettyRestServicePublishService.MappingInfo.HttpMethod;
-import jadex.extension.rs.publish.annotation.ParametersMapper;
-import jadex.extension.rs.publish.annotation.ResultMapper;
-import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
-import jadex.extension.rs.publish.mapper.IParameterMapper;
-import jadex.extension.rs.publish.mapper.IValueMapper;
-import jadex.javaparser.SJavaParser;
-import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -43,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import javax.servlet.AsyncContext;
@@ -60,13 +33,44 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.glassfish.jersey.server.ResourceConfig;
+
+import jadex.base.Starter;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.types.publish.IPublishService;
+import jadex.bridge.service.types.publish.IWebPublishService;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.BasicTypeConverter;
+import jadex.extension.rs.publish.JettyRestServicePublishService.MappingInfo.HttpMethod;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
+import jadex.extension.rs.publish.annotation.ResultMapper;
+import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
+import jadex.extension.rs.publish.mapper.IParameterMapper;
+import jadex.extension.rs.publish.mapper.IValueMapper;
+import jadex.javaparser.SJavaParser;
+import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 /**
  *
@@ -100,44 +104,11 @@ public class JettyRestServicePublishService implements IWebPublishService
      *  @param service The original service.
      *  @param pid The publish id (e.g. url or name).
      */
-    public IFuture<Void> publishService(ClassLoader cl, IService service, final PublishInfo pi)
-    {
-        final Future<Void> ret = new Future<Void>();
-
-        System.out.println("start publish: "+pi.getPublishId());
-        ret.addResultListener(new IResultListener<Void>()
-        {
-            public void resultAvailable(Void result)
-            {
-                System.out.println("end publish: "+pi.getPublishId());
-            }
-
-            public void exceptionOccurred(Exception exception)
-            {
-                exception.printStackTrace();
-            }
-        });
-
-        try
-        {
-            URI uri = new URI(pi.getPublishId());
-            internalPublishService(uri, service, pi);
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            ret.setException(e);
-        }
-        return IFuture.DONE;
-    }
-
-    /**
-     *
-     */
-    public void internalPublishService(final URI uri, final IService service, PublishInfo info)
+    public IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info)
     {
         try
         {
+            final URI uri = new URI(info.getPublishId());
             Server server = getHttpServer(uri, info);
             System.out.println("Adding http handler to server: "+uri.getPath());
 
@@ -194,16 +165,20 @@ public class JettyRestServicePublishService implements IWebPublishService
 	                        		
 	                        		public void exceptionOccurred(Exception exception)
 	                        		{
-	                        			List<String> sr = writeResponseHeader(exception, mi, request, response);
-	                        			writeResponseContent(exception, mi, request, response, sr);
+	                        			Object result = mapResult(method, exception);
+	                        			List<String> sr = writeResponseHeader(result, mi, request, response);
+	                        			writeResponseContent(result, mi, request, response, sr);
 	                        			ctx.complete();
 	                        		}
 	                        		
 	                        		public void intermediateResultAvailable(Object result)
 	                        		{
-	                        			if(first)
-	                        				sr = writeResponseHeader(result, mi, request, response);
 	                        			result = mapResult(method, result);
+	                        			if(first)
+	                        			{
+	                        				sr = writeResponseHeader(result, mi, request, response);
+	                        				first = false;
+	                        			}
 	                        			writeResponseContent(result, mi, request, response, sr);
 	                        		}
 	                        		
@@ -229,8 +204,9 @@ public class JettyRestServicePublishService implements IWebPublishService
 	
 	                        		public void exceptionOccurred(Exception exception)
 	                        		{
-	                        			List<String> sr = writeResponseHeader(exception, mi, request, response);
-	                        			writeResponseContent(exception, mi, request, response, sr);
+	                        			Object result = mapResult(method, exception);
+	                        			List<String> sr = writeResponseHeader(result, mi, request, response);
+	                        			writeResponseContent(result, mi, request, response, sr);
 	                        			ctx.complete();
 	                        		}
 								});
@@ -238,11 +214,9 @@ public class JettyRestServicePublishService implements IWebPublishService
 	                        }
 	                        else
 	                        {
-	                        	System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
-	
+//	                        	System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
 	                        	// map the result by user defined mappers
 	                        	ret = mapResult(method, ret);
-	
 	                        	// convert content and write result to servlet response
 	                        	List<String> sr = writeResponseHeader(ret, mi, request, response);
 	                			writeResponseContent(ret, mi, request, response, sr);
@@ -256,63 +230,30 @@ public class JettyRestServicePublishService implements IWebPublishService
                     }
                     else
                     {
+                    	
+                    	
                         PrintWriter out = response.getWriter();
-                        out.println("<h1>" + "Found no method mapping, available are: " + "</h1>");
-                        out.println("<ul>");
-                        for(Map.Entry<String, Collection<MappingInfo>> entry: mappings.entrySet())
-                        {
-                        	for(MappingInfo mi: entry.getValue())
-                        	{
-                        		out.println(entry.getKey()+" -> "+mi.getMethod().getName()+"<br/>");
-                        	}
-                        }
-                        out.println("</ul>");
-                        System.out.println(mappings);
+                        
                         response.setContentType("text/html; charset=utf-8");
                         response.setStatus(HttpServletResponse.SC_OK);
+                    
+                        String info = getServiceInfo(service, uri, mappings);
+                        out.write(info);
+                        
+//                      out.println("<h1>" + "Found no method mapping, available are: " + "</h1>");
+//                      out.println("<ul>");
+//                      for(Map.Entry<String, Collection<MappingInfo>> entry: mappings.entrySet())
+//                      {
+//                      	for(MappingInfo mi: entry.getValue())
+//                      	{
+//                      		out.println(entry.getKey()+" -> "+mi.getMethod().getName()+"<br/>");
+//                      	}
+//                      }
+//                      out.println("</ul>");
+//                      System.out.println(mappings);
                     }
 
                     baseRequest.setHandled(true);
-
-//                    Map<String, String[]> params = request.getParameterMap();
-//
-//                    if(params!=null && params.containsKey("names"))
-//                    {
-//                        String[] names = params.get("names"); // seems to autoconvert the string array
-//
-////                        ObjectMapper mapper = new ObjectMapper();
-//
-//                        String name = params.get("name")[0];
-////                        Car car = mapper.readValue(params.get("car")[0], Car.class);
-//
-////                        for(String name: names)
-////                        {
-////                            Object names = mapper.readValue(params.get(name), .class);
-////                        }
-//
-//                        System.out.println(names);
-//                    }
-//
-//                    // http://apache-sling.73963.n3.nabble.com/Lost-parameter-order-for-form-POSTs-td4030212.html
-//                    Enumeration<String> names = request.getParameterNames();
-//                    while(names!=null && names.hasMoreElements())
-//                        System.out.println(names.nextElement());
-//
-//                    response.setContentType("text/html; charset=utf-8");
-//
-// response.addHeader("Access-Control-Allow-Origin", "*");
-//                    // http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
-//  response.addHeader("Access-Control-Allow-Credentials", "true ");
-//  response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-//  response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
-//
-//                    response.setStatus(HttpServletResponse.SC_OK);
-//
-//                    PrintWriter out = response.getWriter();
-//
-//                    out.println("<h1>" + "Hello World" + "</h1>");
-//
-//                    baseRequest.setHandled(true);
                 }
             };
             ch.setContextPath(uri.getPath());
@@ -327,6 +268,8 @@ public class JettyRestServicePublishService implements IWebPublishService
         {
             throw new RuntimeException(e);
         }
+        
+        return IFuture.DONE;
     }
 
     /**
@@ -404,7 +347,7 @@ public class JettyRestServicePublishService implements IWebPublishService
     }
 
     /**
-     *
+     *  Map the incoming uri/post/multipart parameters to the service target parameter types.
      */
     protected Tuple2<MappingInfo, Object[]> mapParameters(HttpServletRequest request, Collection<MappingInfo> mis) 
     {
@@ -467,14 +410,10 @@ public class JettyRestServicePublishService implements IWebPublishService
 	            sr.retainAll(cl);
 	        }
 	
-	        if(sr.size()>0)
-	        {
-	            System.out.println("found acceptable in types: "+sr);
-	        }
-	        else
-	        {
+//	        if(sr.size()>0)
+//	            System.out.println("found acceptable in types: "+sr);
+	        if(sr.size()==0)
 	            System.out.println("found no acceptable in types.");
-	        }
 	        
 	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: inparamsmap.getObjects();
 	        
@@ -554,7 +493,10 @@ public class JettyRestServicePublishService implements IWebPublishService
     }
 
     /**
-     * 
+     *  Convert a parameter string to an object if is json or xml.
+     *  @param sr The media types.
+     *  @param val The string value.
+     *  @return The decoded object.
      */
     protected Object convertParameter(List<String> sr, String val)
     {
@@ -589,7 +531,7 @@ public class JettyRestServicePublishService implements IWebPublishService
     }
     
     /**
-     *
+     *  Map a result using the result mapper.
      */
     protected Object mapResult(Method method, Object ret)
     {
@@ -687,50 +629,48 @@ public class JettyRestServicePublishService implements IWebPublishService
     /**
      *
      */
-    protected void writeResponseContent(Object ret, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, List<String> sr) 
+    protected void writeResponseContent(Object result, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, List<String> sr) 
     {
     	try
     	{
-	        Object content = ret;
-	        
 	        // handle content
 	        PrintWriter out = response.getWriter();
-	        if(content!=null)
+	        if(result!=null)
 	        {
 	            // for testing with browser
 	            // http://brockallen.com/2012/04/27/change-firefoxs-default-accept-header-to-prefer-json-over-xml/
 	
 	            if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
 	            {
-	                byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
+	                byte[] data = JsonTraverser.objectToByteArray(result, component.getClassLoader());
 	                if(response.getHeader("Content-Type")==null)
 	                	response.setHeader("Content-Type", MediaType.APPLICATION_JSON);
 	                out.write(new String(data));
 	            }
 	            else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
 	            {
-	                byte[] data = JavaWriter.objectToByteArray(content, component.getClassLoader());
+	                byte[] data = JavaWriter.objectToByteArray(result, component.getClassLoader());
 	                if(response.getHeader("Content-Type")==null)
 	                	response.setHeader("Content-Type", MediaType.APPLICATION_XML);
 	                out.write(new String(data));
 	            }
-	            else if(SReflect.isStringConvertableType(content.getClass()))
+	            else if(SReflect.isStringConvertableType(result.getClass()))
 	            {
 	            	if(response.getHeader("Content-Type")==null)
 	            		response.setContentType("text/plain; charset=utf-8");
-	                out.write(content.toString());
+	                out.write(result.toString());
 	            }
 	            else if(sr!=null && sr.contains("*/*"))
 	            {
 	                // use json if all is allowed
 	            	if(response.getHeader("Content-Type")==null)
 	                 	response.setHeader("Content-Type", MediaType.APPLICATION_JSON);
-	                byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
+	                byte[] data = JsonTraverser.objectToByteArray(result, component.getClassLoader());
 	                out.write(new String(data));
 	            }
 	            else
 	            {
-	                System.out.println("cannot convert result: "+ret);
+	                System.out.println("cannot convert result: "+result);
 	            }
 	            
 	            out.flush();
@@ -877,6 +817,278 @@ public class JettyRestServicePublishService implements IWebPublishService
         return ret.size()>0? ret: natret;
     }
 
+    /**
+	 *  Functionality blueprint for get service info web method.
+	 *  Creates a html page with css for style and javascript for ajax post requests.
+	 *  The service info site contains a section for each published method. 
+	 *  @param params The parameters.
+	 *  @return The result.
+	 */
+	public String getServiceInfo(Object service, URI baseuri, MultiCollection<String, MappingInfo> mappings)
+	{
+		StringBuffer ret = new StringBuffer();
+		
+		try
+		{
+			String functionsjs;
+			String stylecss;
+			Scanner sc = null;
+			try
+			{
+				InputStream is = SUtil.getResource0("jadex/extension/rs/publish/functions.js", 
+					component.getClassLoader());
+				sc = new Scanner(is);
+				functionsjs = sc.useDelimiter("\\A").next();
+//					System.out.println(functionsjs);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+			finally
+			{
+				if(sc!=null)
+				{
+					sc.close();
+				}
+			}
+			
+			try
+			{
+				InputStream is = SUtil.getResource0("jadex/extension/rs/publish/style.css", 
+					component.getClassLoader());
+				sc = new Scanner(is);
+				stylecss = sc.useDelimiter("\\A").next();
+				
+				String	stripes	= SUtil.loadBinary("jadex/extension/rs/publish/jadex_stripes.png");
+				stylecss	= stylecss.replace("$stripes", stripes);
+				
+//				System.out.println(functionsjs);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+			finally
+			{
+				if(sc!=null)
+				{
+					sc.close();
+				}
+			}
+			
+			ret.append("<html>");
+			ret.append("\n");
+			ret.append("<head>");
+			ret.append("\n");
+			ret.append(stylecss);
+			ret.append("\n");
+			ret.append(functionsjs);
+			ret.append("\n");
+	//		ret.append("<script src=\"functions.js\" type=\"text/javascript\"/>");
+			ret.append("</head>");
+			ret.append("\n");
+			ret.append("<body>");
+			ret.append("\n");
+			
+			ret.append("<div class=\"header\">");
+			ret.append("\n");
+			ret.append("<h1>");//Service Info for: ");
+			String ifacename = ((IService)service).getServiceIdentifier().getServiceType().getTypeName();
+			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
+			ret.append("</h1>");
+			ret.append("\n");
+			ret.append("</div>");
+			ret.append("\n");
+
+			ret.append("<div class=\"middle\">");
+			ret.append("\n");
+			
+//			Class<?> clazz = service.getClass();
+//			List<Method> methods = new ArrayList<Method>();
+//			while(!clazz.equals(Object.class))
+//			{
+//				List<Method> l = SUtil.arrayToList(clazz.getDeclaredMethods());
+//				methods.addAll(l);
+//				clazz = clazz.getSuperclass();
+//			}
+
+//			Collections.sort(mappings, new MethodComparator());
+			
+			if(mappings!=null)
+			{
+				for(MappingInfo mi: (MappingInfo[])mappings.getObjects(MappingInfo.class))
+				{
+					Method method = mi.getMethod();
+					HttpMethod restmethod = mi.getHttpMethod()!=null? mi.getHttpMethod(): HttpMethod.GET;
+//					RSJAXAnnotationHelper.getDeclaredRestType(method);
+					
+//					if(restmethod!=null)
+//					{
+//						System.out.println("method: "+method.getName()+" "+SUtil.arrayToString(methods));
+//						java.lang.annotation.Annotation[][] ans = method.getParameterAnnotations();
+//						for(int j=0; j<ans.length; j++)
+//						{
+//							System.out.println(SUtil.arrayToString(ans[j]));
+//						}
+					Path path = method.getAnnotation(Path.class);
+					Consumes consumes = method.getAnnotation(Consumes.class);
+					Produces produces = method.getAnnotation(Produces.class);
+					Class<?>[] ptypes = method.getParameterTypes();
+					
+					ret.append("<div class=\"method\">");
+					ret.append("\n");
+					
+					ret.append("<div class=\"methodname\">");
+//						ret.append("<i><b>");
+					ret.append(method.getName());
+//						ret.append("</b></i>");
+					
+					ret.append("(");
+					if(ptypes!=null && ptypes.length>0)
+					{
+						for(int j=0; j<ptypes.length; j++)
+						{
+							ret.append(SReflect.getUnqualifiedClassName(ptypes[j]));
+							if(j+1<ptypes.length)
+								ret.append(", ");
+						}
+					}
+					ret.append(")");
+					ret.append("</div>");
+					ret.append("\n");
+//						ret.append("</br>");
+					
+					ret.append("<div class=\"restproperties\">");
+					ret.append(restmethod).append(" ");
+					
+					if(consumes!=null)
+					{
+						String[] cons = consumes.value();
+						if(cons.length>0)
+						{
+							ret.append("<i>");
+							ret.append("Consumes: ");
+							ret.append("</i>");
+							for(int j=0; j<cons.length; j++)
+							{
+								ret.append(cons[j]);
+								if(j+1<cons.length)
+									ret.append(" ,");
+							}
+							ret.append(" ");
+						}
+					}
+					
+					if(produces!=null)
+					{
+						String[] prods = produces.value();
+						if(prods.length>0)
+						{
+							ret.append("<i>");
+							ret.append("Produces: ");
+							ret.append("</i>");
+							for(int j=0; j<prods.length; j++)
+							{
+								ret.append(prods[j]);
+								if(j+1<prods.length)
+									ret.append(" ,");
+							}
+							ret.append(" ");
+						}
+					}
+//						ret.append("</br>");
+					ret.append("</div>");
+					ret.append("\n");
+
+					String link = baseuri.toString();
+					if(path!=null)
+						link = link+"/"+path; 
+					System.out.println("path: "+link);
+					
+					if(ptypes.length>0)
+					{
+						ret.append("<div class=\"servicelink\">");
+						ret.append(link);
+						ret.append("</div>");
+						ret.append("\n");
+						
+						// For post set the media type of the arguments.
+						ret.append("<form class=\"arguments\" action=\"").append(link).append("\" method=\"")
+							.append(restmethod).append("\" enctype=\"multipart/form-data\" ");
+						
+						if(restmethod.equals(POST.class))
+							ret.append("onSubmit=\"return extract(this)\"");
+						ret.append(">");
+						ret.append("\n");
+						
+						for(int j=0; j<ptypes.length; j++)
+						{
+							ret.append("arg").append(j).append(": ");
+							ret.append("<input name=\"arg").append(j).append("\" type=\"text\" />");
+//									.append(" accept=\"").append(cons[0]).append("\" />");
+						}
+						
+						ret.append("<select name=\"mediatype\">");
+						if(consumes!=null)
+						{
+							String[] cons = consumes.value();
+							if(cons!=null && cons.length>0)
+							{
+//									ret.append("<select name=\"mediatype\">");
+								for(int j=0; j<cons.length; j++)
+								{
+									// todo: hmm? what about others?
+									if(!MediaType.MULTIPART_FORM_DATA.equals(cons[j]) &&
+										!MediaType.APPLICATION_FORM_URLENCODED.equals(cons[j]))
+									{
+										ret.append("<option>").append(cons[j]).append("</option>");
+									}
+								}
+							}
+						}
+						else
+						{
+							ret.append("<option>").append(MediaType.TEXT_PLAIN).append("</option>");
+						}
+						ret.append("</select>");
+						ret.append("\n");
+						
+						ret.append("<input type=\"submit\" value=\"invoke\"/>");
+						ret.append("</form>");
+						ret.append("\n");
+					}
+					else
+					{
+						ret.append("<div class=\"servicelink\">");
+						ret.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
+						ret.append("</div>");
+						ret.append("\n");
+					}
+					
+					ret.append("</div>");
+					ret.append("\n");
+				}
+			}
+			
+			ret.append("</div>");
+			ret.append("\n");
+			
+			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">Jadex Active Components</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>\n");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+		ret.append("</body>\n</html>\n");
+
+		return ret.toString();
+	}
+    
     /**
      *
      */
