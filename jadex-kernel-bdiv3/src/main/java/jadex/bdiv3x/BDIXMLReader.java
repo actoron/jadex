@@ -46,7 +46,10 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.IndexMap;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.component.ComponentXMLReader;
@@ -541,6 +544,38 @@ public class BDIXMLReader extends ComponentXMLReader
 						BDIXModelLoader	loader	= (BDIXModelLoader)((Map<String,Object>)context.getUserContext()).get(CONTEXT_LOADER);
 						BDIXModel	cmodel	= (BDIXModel)loader.loadCapabilityModel(subcap.getFile(), model.getAllImports(),
 							rid, context.getClassLoader(), new Object[]{rid, root}).getModelInfo();
+						
+						if(cmodel.getModelInfo().getReport()!=null)
+					    {
+							Map	user = (Map)context.getUserContext();
+							MultiCollection<Tuple, String>	report	= (MultiCollection<Tuple, String>)user.get(CONTEXT_ENTRIES);
+							Map<String, String> externals = (Map<String, String>)user.get(CONTEXT_EXTERNALS);
+							String	pos;
+							Tuple	stack	= new Tuple(((AReadContext)context).getStack());
+							if(stack.getEntities().length>0)
+							{
+								StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
+								pos	= " (line "+se.getLocation().getLineNumber()+", column "+se.getLocation().getColumnNumber()+")";
+							}
+							else
+							{
+								pos	= " (line 0, column 0)";			
+							}
+							String msg = "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getModelInfo().getName()+"</a> has errors.";
+							report.add(stack, msg+pos);
+							externals.put(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().getErrorHTML());
+							
+//							model.getReport().getDocuments().put(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().getErrorHTML());
+//							Tuple se = new Tuple(new Object[]
+//							{
+//								new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+//								new StackElement(new QName("capabilities"), null),
+//								new StackElement(new QName("capability"), mcrs[i])
+//							});
+//							model.addEntry(se, "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getModelInfo().getName()+"</a> has errors.");
+//							model.addDocument(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().getErrorHTML());
+					    }
+						
 						subcaps.put(subcap.getName(), cmodel);
 					}
 					catch(Exception e)
