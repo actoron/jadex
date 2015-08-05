@@ -48,7 +48,6 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
@@ -256,6 +255,11 @@ public class BDIXMLReader extends ComponentXMLReader
 					String condtype = pathname[pathname.length-1].getLocalPart();
 					condtype = condtype.substring(0, condtype.length()-9);
 					mgoal.addCondition(condtype, (MCondition)object);
+				}
+				else if(object instanceof String && parent instanceof MGoal && context.getStackElement(context.getStackSize()-4).getObject() instanceof BDIXModel)
+				{
+					BDIXModel	model	= (BDIXModel)context.getStackElement(context.getStackSize()-4).getObject();
+					model.getCapability().addGoalReference(MElement.internalName((String)object), ((MElement)parent).getName());
 				}
 				else
 				{
@@ -690,11 +694,41 @@ public class BDIXMLReader extends ComponentXMLReader
 				return 0;
 			}
 		};
+		
+		// 'Link' assign to refs by adding reference entries.
+		IObjectLinker	atlinker	= new BeanObjectReaderHandler()
+		{
+			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
+			{
+				if(object instanceof String && parent instanceof MBelief)// && context.getStackElement(context.getStackSize()-4).getObject() instanceof BDIXModel)
+				{
+					BDIXModel	model	= (BDIXModel)context.getStackElement(context.getStackSize()-4).getObject();
+					model.getCapability().addBeliefReference(MElement.internalName((String)object), ((MElement)parent).getName());
+				}
+				
+				// goals in condlinker
+				
+				else if(object instanceof String && parent instanceof MMessageEvent)// && context.getStackElement(context.getStackSize()-4).getObject() instanceof BDIXModel)
+				{
+					BDIXModel	model	= (BDIXModel)context.getStackElement(context.getStackSize()-4).getObject();
+					model.getCapability().addEventReference(MElement.internalName((String)object), ((MElement)parent).getName());
+				}
+				else if(object instanceof String && parent instanceof MInternalEvent)// && context.getStackElement(context.getStackSize()-4).getObject() instanceof BDIXModel)
+				{
+					BDIXModel	model	= (BDIXModel)context.getStackElement(context.getStackSize()-4).getObject();
+					model.getCapability().addEventReference(MElement.internalName((String)object), ((MElement)parent).getName());
+				}
+				else
+				{
+					super.linkObject(object, parent, linkinfo, pathname, context);
+				}
+			}
+		};
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, belproc),
 			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
-			}), null));
+			}), new LinkingInfo(atlinker)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(MBelief.class, belsetproc), 
 			new MappingInfo(null, belattrs, new SubobjectInfo[]{
@@ -702,12 +736,12 @@ public class BDIXMLReader extends ComponentXMLReader
 				// and multiple facts are added to a list
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFacts")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "facts"), "defaultFact"))
-			}), null));//, new OAVObjectReaderHandler()));	
+			}), new LinkingInfo(atlinker)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MBelief.class, belproc),
 			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
-			}), null));
+			}), new LinkingInfo(atlinker)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(MBelief.class, belsetproc), 
 			new MappingInfo(null, belattrs, new SubobjectInfo[]{
@@ -715,7 +749,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				// and multiple facts are added to a list
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFacts")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "facts"), "defaultFact"))
-			}), null));//, new OAVObjectReaderHandler()));	
+			}), new LinkingInfo(atlinker)));
 		
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "plan")), new ObjectInfo(MPlan.class), 
@@ -879,6 +913,9 @@ public class BDIXMLReader extends ComponentXMLReader
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
+
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "assignto")), new ObjectInfo(boc), new MappingInfo(null,
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internalevent")), new ObjectInfo(MInternalEvent.class),
 			new MappingInfo(null, null, null, new AttributeInfo[]{
@@ -899,7 +936,7 @@ public class BDIXMLReader extends ComponentXMLReader
 					new SubobjectInfo(new XMLInfo(new QName(uri, "match")), new AccessInfo("match", "matchExpression")),
 					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 				}),
-			null));
+			new LinkingInfo(atlinker)));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageeventref")), new ObjectInfo(OAVBDIMetaModel.messageeventreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "match")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 

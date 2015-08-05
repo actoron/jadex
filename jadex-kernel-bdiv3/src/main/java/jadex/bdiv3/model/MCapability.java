@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -450,14 +449,30 @@ public class MCapability extends MElement
 	 */
 	public MGoal	getResolvedGoal(String scope, String name)
 	{
+		MGoal melement = null;
 		name	= scope!=null ? scope + MElement.CAPABILITY_SEPARATOR + MElement.internalName(name) : MElement.internalName(name);
 		if(goalreferences!=null && goalreferences.containsKey(name))
 		{
-			name	= goalreferences.get(name);
+			String	ref	= goalreferences.get(name);
+			if(ref==null)
+			{
+				// Abstract element -> create dummy element to hold name.
+				melement	= new MGoal();
+				melement.setName(name);
+			}
+			else
+			{
+				name	= ref;
+			}
 		}
-		MGoal melement = getGoal(name);
 		if(melement==null)
+		{
+			melement	= getGoal(name);
+		}
+		if(melement==null)
+		{
 			throw new RuntimeException("Goal not found: "+name+(scope!=null ? "("+scope+")" : ""));
+		}
 		return melement;
 	}
 
@@ -470,14 +485,30 @@ public class MCapability extends MElement
 	 */
 	public MInternalEvent	getResolvedInternalEvent(String scope, String name)
 	{
+		MInternalEvent melement = null;
 		name	= scope!=null ? scope + MElement.CAPABILITY_SEPARATOR + MElement.internalName(name) : MElement.internalName(name);
 		if(eventreferences!=null && eventreferences.containsKey(name))
 		{
-			name	= eventreferences.get(name);
+			String	ref	= eventreferences.get(name);
+			if(ref==null)
+			{
+				// Abstract element -> create dummy element to hold name.
+				melement	= new MInternalEvent();
+				melement.setName(name);
+			}
+			else
+			{
+				name	= ref;
+			}
 		}
-		MInternalEvent melement = getInternalEvent(name);
 		if(melement==null)
+		{
+			melement	= getInternalEvent(name);
+		}
+		if(melement==null)
+		{
 			throw new RuntimeException("Internal event not found: "+name+(scope!=null ? "("+scope+")" : ""));
+		}
 		return melement;
 	}
 
@@ -490,14 +521,30 @@ public class MCapability extends MElement
 	 */
 	public MMessageEvent	getResolvedMessageEvent(String scope, String name)
 	{
+		MMessageEvent melement = null;
 		name	= scope!=null ? scope + MElement.CAPABILITY_SEPARATOR + MElement.internalName(name) : MElement.internalName(name);
 		if(eventreferences!=null && eventreferences.containsKey(name))
 		{
-			name	= eventreferences.get(name);
+			String	ref	= eventreferences.get(name);
+			if(ref==null)
+			{
+				// Abstract element -> create dummy element to hold name.
+				melement	= new MMessageEvent();
+				melement.setName(name);
+			}
+			else
+			{
+				name	= ref;
+			}
 		}
-		MMessageEvent melement = getMessageEvent(name);
 		if(melement==null)
+		{
+			melement	= getMessageEvent(name);
+		}
+		if(melement==null)
+		{
 			throw new RuntimeException("Message event not found: "+name+(scope!=null ? "("+scope+")" : ""));
+		}
 		return melement;
 	}
 
@@ -920,20 +967,11 @@ public class MCapability extends MElement
 			references = new LinkedHashMap<String, String>();
 		}
 		
-		// Resolve transitive depenpency.
+		// Resolve transitive dependency.
 		if(references.containsKey(concrete))
 		{
 			concrete	= references.get(concrete);
 			assert	!references.containsKey(concrete);	// Should be only one level.
-		}
-		
-		// Resolve inverse transitive dependency (assignto...).
-		for(Entry<String, String> entry: references.entrySet())
-		{
-			if(entry.getValue().equals(reference))
-			{
-				references.put(entry.getKey(), concrete);
-			}
 		}
 		
 		references.put(reference, concrete);
