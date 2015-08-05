@@ -1,9 +1,16 @@
 package jadex.webservice.examples.rs.banking;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +24,10 @@ public class BankingService implements IBankingService
 {
 	/** The account data. */
 	protected List<String> data;
+	
+	/** The component. */
+	@ServiceComponent
+	protected IInternalAccess component;
 	
 	/**
 	 *  Init with some data.
@@ -64,6 +75,38 @@ public class BankingService implements IBankingService
 		System.out.println("getAccountStatement(Request request)");
 		AccountStatement as = new AccountStatement(data.toArray(new String[data.size()]), request);
 		return new Future<AccountStatement>(as);
+	}
+	
+	/**
+	 *  Subscribe for account statements.
+	 *  @return Account statements whenever available.
+	 */
+	public IIntermediateFuture<AccountStatement> subscribeForAccountStatements()
+	{
+		final IntermediateFuture<AccountStatement> ret = new IntermediateFuture<AccountStatement>();
+		
+		
+		final int max = 5;
+		ret.addIntermediateResult(new AccountStatement(new String[]{"initial"}, null));
+		component.getComponentFeature(IExecutionFeature.class).waitForDelay(1500, new IComponentStep<Void>()
+		{
+			int cnt = 0;
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if(cnt++<max)
+				{
+					ret.addIntermediateResult(new AccountStatement(new String[]{""+cnt}, null));
+					component.getComponentFeature(IExecutionFeature.class).waitForDelay(500, this);
+				}
+				else
+				{
+					ret.setFinished();
+				}
+				return IFuture.DONE;
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

@@ -11,10 +11,14 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.BasicTypeConverter;
 import jadex.extension.rs.publish.JettyRestServicePublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -23,6 +27,7 @@ import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
@@ -40,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -137,11 +143,11 @@ public class JettyRestServicePublishService implements IWebPublishService
 
             ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
 
-            final Map<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
+            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
 
             ContextHandler ch = new ContextHandler()
             {
-                 public void doHandle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+                 public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
                     throws IOException, ServletException
                 {
                     System.out.println("handler is: "+uri.getPath());
@@ -154,29 +160,98 @@ public class JettyRestServicePublishService implements IWebPublishService
                     if(mappings.containsKey(methodname))
                     {
 //                        out.println("<h1>" + "Found method - calling service: " + mappings.get(methodname).getMethod().getName() + "</h1>");
+                        Collection<MappingInfo> mis = mappings.get(methodname);
+                        
+                        // convert and map parameters
+                        Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis);
+                        final MappingInfo mi = tup.getFirstEntity();
+                        Object[] params = tup.getSecondEntity();
+                        
+                        // invoke the service method
+                        final Method method = mi.getMethod();
                         try
                         {
-                            MappingInfo mi = mappings.get(methodname);
-
-                            // convert and map parameters
-                            Object[] params = mapParameters(request, mi);
-
-                            // invoke the service method
-                            Method method = mi.getMethod();
-                            Object ret = method.invoke(service, params);
-                            if(ret instanceof IFuture)
-                                ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
-                            System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
-
-                            // map the result by user defined mappers
-                            ret = mapResult(method, ret);
-
-                            // convert content and write result to servlet response
-                            writeResponse(ret, mi, request, response);
+                        	Object ret = method.invoke(service, params);
+                        
+//                          if(ret instanceof IFuture)
+//                          	ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
+	                        if(ret instanceof IIntermediateFuture)
+	                        {
+	                        	final AsyncContext ctx = request.startAsync();
+	                        	
+	                        	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(new IIntermediateResultListener<Object>()
+								{
+	                        		boolean first = true;
+	                        		List<String> sr = null;
+	                        		public void resultAvailable(Collection<Object> result)
+	                        		{
+	                        			for(Object res: result)
+	                        			{
+	                        				intermediateResultAvailable(result);
+	                        			}
+	                        			ctx.complete();
+	                        		}
+	                        		
+	                        		public void exceptionOccurred(Exception exception)
+	                        		{
+	                        			List<String> sr = writeResponseHeader(exception, mi, request, response);
+	                        			writeResponseContent(exception, mi, request, response, sr);
+	                        			ctx.complete();
+	                        		}
+	                        		
+	                        		public void intermediateResultAvailable(Object result)
+	                        		{
+	                        			if(first)
+	                        				sr = writeResponseHeader(result, mi, request, response);
+	                        			result = mapResult(method, result);
+	                        			writeResponseContent(result, mi, request, response, sr);
+	                        		}
+	                        		
+	                        	    public void finished()
+	                        	    {
+	                        	    	ctx.complete();
+	                        	    }
+								});
+	                        }
+	                        else if(ret instanceof IFuture)
+	                        {
+	                        	final AsyncContext ctx = request.startAsync();
+	                        	
+	                        	((IFuture)ret).addResultListener(new IResultListener<Object>()
+								{
+	                        		public void resultAvailable(Object ret)
+	                        		{
+	                        			ret = mapResult(method, ret);
+	                        			List<String> sr = writeResponseHeader(ret, mi, request, response);
+	                        			writeResponseContent(ret, mi, request, response, sr);
+	                        			ctx.complete();
+	                        		}
+	
+	                        		public void exceptionOccurred(Exception exception)
+	                        		{
+	                        			List<String> sr = writeResponseHeader(exception, mi, request, response);
+	                        			writeResponseContent(exception, mi, request, response, sr);
+	                        			ctx.complete();
+	                        		}
+								});
+	                            ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
+	                        }
+	                        else
+	                        {
+	                        	System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
+	
+	                        	// map the result by user defined mappers
+	                        	ret = mapResult(method, ret);
+	
+	                        	// convert content and write result to servlet response
+	                        	List<String> sr = writeResponseHeader(ret, mi, request, response);
+	                			writeResponseContent(ret, mi, request, response, sr);
+	                        }
                         }
                         catch(Exception e)
                         {
-                            e.printStackTrace();
+                        	List<String> sr = writeResponseHeader(e, mi, request, response);
+                			writeResponseContent(e, mi, request, response, sr);
                         }
                     }
                     else
@@ -184,14 +259,17 @@ public class JettyRestServicePublishService implements IWebPublishService
                         PrintWriter out = response.getWriter();
                         out.println("<h1>" + "Found no method mapping, available are: " + "</h1>");
                         out.println("<ul>");
-                        for(Map.Entry<String, MappingInfo> entry: mappings.entrySet())
+                        for(Map.Entry<String, Collection<MappingInfo>> entry: mappings.entrySet())
                         {
-                            out.println(entry.getKey()+" -> "+entry.getValue().getMethod().getName()+"<br/>");
+                        	for(MappingInfo mi: entry.getValue())
+                        	{
+                        		out.println(entry.getKey()+" -> "+mi.getMethod().getName()+"<br/>");
+                        	}
                         }
                         out.println("</ul>");
                         System.out.println(mappings);
                         response.setContentType("text/html; charset=utf-8");
- response.setStatus(HttpServletResponse.SC_OK);
+                        response.setStatus(HttpServletResponse.SC_OK);
                     }
 
                     baseRequest.setHandled(true);
@@ -328,159 +406,188 @@ public class JettyRestServicePublishService implements IWebPublishService
     /**
      *
      */
-    protected Object[] mapParameters(HttpServletRequest request, MappingInfo mi) throws Exception
+    protected Tuple2<MappingInfo, Object[]> mapParameters(HttpServletRequest request, Collection<MappingInfo> mis) 
     {
-    	Object[] targetparams = null;
-    	
-        Method method = mi.getMethod();
-        // target method types
-        Class<?>[] types = mi.getMethod().getParameterTypes();
-
-        MultiCollection<String, String> paramscol = null;
-
-        if(request.getPathInfo()!=null)
-        {
-            paramscol = splitQueryString(request.getPathInfo());
-        }
-
-        if(request.getParts().size()>0)
-        {
-            if(paramscol==null)
-                paramscol = new MultiCollection<String, String>(new LinkedHashMap<String, Collection<String>>(), ArrayList.class);
-            for(Part part: request.getParts())
-            {
-                byte[] data = SUtil.readStream(part.getInputStream());
-                paramscol.add(part.getName(), new String(data));
-            }
-        }
-
-        Object[] params = paramscol.getObjects();
-
-//        // parameters for query string and posted form data
-//        // not for multi-part
-//        MultivaluedMap<String, String> params = SInvokeHelper.convertToMultiMap(request.getParameterMap());
-//
-//        // add multi-part parameter (if multi-part)
-//        if(request.getContentType()!=null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA))
-//        {
-//            System.out.println("parsing multipart/form-data");
-//
-////            Map<String, String> map = SInvokeHelper.extractCallerValues(request);
-////            for(Map.Entry<String, String> entry: map.entrySet())
-////            {
-////                params.add(entry.getKey(), entry.getValue());
-////            }
-//
-//            Collection<Part> parts = request.getParts();
-//            for(Part part: parts)
-//            {
-//                byte[] data = SUtil.readStream(part.getInputStream());
-//                params.add(part.getName(), new String(data));
-//            }
-//        }
-
-        if(method.isAnnotationPresent(ParametersMapper.class))
-        {
-//            System.out.println("foundmapper");
-            ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
-            if(!mm.automapping())
-            {
-                Class<?> pclazz = mm.value().clazz();
-                Object mapper;
-                if(!Object.class.equals(pclazz))
-                {
-                    mapper = pclazz.newInstance();
-                }
-                else
-                {
-                    mapper = SJavaParser.evaluateExpression(mm.value().value(), null);
-                }
-                if(mapper instanceof IValueMapper)
-                    mapper = new DefaultParameterMapper((IValueMapper)mapper);
-
-                targetparams = ((IParameterMapper)mapper).convertParameters(params, request);
-            }
-            else
-            {
-                // In case of GET autmap the query parameters
-                if(method.isAnnotationPresent(GET.class))
-                {
-//                    System.out.println("automapping detected");
-                    Class<?>[] ts = method.getParameterTypes();
-                    targetparams = new Object[ts.length];
-                    if(ts.length==1)
-                    {
-                        if(SReflect.isSupertype(ts[0], Map.class))
-                        {
-                            targetparams[0] = request.getParameterMap();
-                            ((Map)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
-                        }
-                        else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
-                        {
-                            targetparams[0] = SInvokeHelper.convertMultiMap(request.getParameterMap());
-                            ((Map)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
-                        }
-                    }
-                }
-                else //if(method.isAnnotationPresent(POST.class))
-                {
-                    Class<?>[] ts = method.getParameterTypes();
-                    targetparams = new Object[ts.length];
-//                    System.out.println("automapping detected: "+SUtil.arrayToString(ts));
-                    if(ts.length==1)
-                    {
-                        if(SReflect.isSupertype(ts[0], Map.class))
-                        {
-                            if(request.getContentType()!=null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA))
-                            {
-                                System.out.println("parsing multipart/form-data");
-                                // Todo: why doesn't work out of the box any more!?
-                                final Map<String, String> map = SInvokeHelper.extractCallerValues(request);//new LinkedHashMap<String, Object>();
-                                targetparams[0]    = map;
-                                final Future<Void>    done  = new Future<Void>();
-
-                                Collection<Part> parts = request.getParts();
-                                for(Part part: parts)
-                                {
-                                    byte[] data = SUtil.readStream(part.getInputStream());
-                                    map.put(part.getName(), new String(data));
-                                }
-                            }
-                            else
-                            {
-//                                // Hack!!! Assume urlencoded when text/plain (required e.g. for XDomainRequest in IE <10).
-//                                if(request.getContentType()==null || request.getContentType().startsWith(MediaType.TEXT_PLAIN))
-//                                {
-//  								qreq.getRequest().setContentType(Constants.FORM_POST_CONTENT_TYPE);
-//                                }
-//                                // Hack!!! IE doesn't send char set in ajax request by default!?
-// 									 if(request.getCharacterEncoding()==null)
-//                                {
-// 									 greq.getRequest().setCharacterEncoding("UTF-8");
-//                                }
-
-                                targetparams[0] = SInvokeHelper.convertMultiMap(request.getParameterMap());
-                                ((Map<String, String>)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
-                            }
-                        }
-                        else if(request!=null)
-                        {
-                            targetparams[0] = SInvokeHelper.convertMultiMap(request.getParameterMap());
-                            ((Map<String, String>)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
-                        }
-                        }
-                        else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
-                        {
-                            targetparams[0] = SInvokeHelper.convertToMultiMap(request.getParameterMap());
-                            ((Map<String, String>)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
-                        }
-                    }
-                }
-            }
-
-       return targetparams;
+    	try
+    	{
+	    	Object[] targetparams = null;
+	    
+	        MultiCollection<String, String> inparamsmap = null;
+	        
+	        // parameters for query string (must be parsed to keep order) and 
+	        // posted form data not for multi-part
+	        if(request.getQueryString()!=null)
+	        {
+	            inparamsmap = splitQueryString(request.getQueryString());
+	        }
+	
+	        if(request.getContentType()!=null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA) && request.getParts().size()>0)
+	        {
+	            if(inparamsmap==null)
+	                inparamsmap = new MultiCollection<String, String>(new LinkedHashMap<String, Collection<String>>(), ArrayList.class);
+	            for(Part part: request.getParts())
+	            {
+	                byte[] data = SUtil.readStream(part.getInputStream());
+	                inparamsmap.add(part.getName(), new String(data));
+	            }
+	        }
+	        
+	        MappingInfo mi = null;
+	        if(mis.size()==1)
+	        {
+	        	mi = mis.iterator().next();
+	        }
+	        else 
+	        {
+	        	int psize = inparamsmap==null? 0: inparamsmap.size();
+	        	for(MappingInfo tst: mis)
+	        	{
+	        		if(psize==tst.getMethod().getParameterTypes().length)
+	        		{
+	        			mi = tst;
+	        			break;
+	        		}
+	        	}
+	        }
+	        
+	        Method method = mi.getMethod();
+	        // target method types
+	        Class<?>[] types = mi.getMethod().getParameterTypes();
+	        
+	        // acceptable media types for input
+	    	String mts = request.getHeader("Content-Type");
+	        List<String> cl = parseMimetypes(mts);
+	        List<String> sr = mi.getProducedMediaTypes();
+	        if(sr==null || sr.size()==0)
+	        {
+	            sr = cl;
+	        }
+	        else
+	        {
+	            sr.retainAll(cl);
+	        }
+	
+	        if(sr.size()>0)
+	        {
+	            System.out.println("found acceptable in types: "+sr);
+	        }
+	        else
+	        {
+	            System.out.println("found no acceptable in types.");
+	        }
+	        
+	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: inparamsmap.getObjects();
+	        
+	        for(int i=0; i<inparams.length; i++)
+	        {
+	        	if(inparams[i] instanceof String)
+	        		inparams[i] = convertParameter(sr, (String)inparams[i]);
+	        }
+	 
+	        if(method.isAnnotationPresent(ParametersMapper.class))
+	        {
+	//          System.out.println("foundmapper");
+	            ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
+	            if(!mm.automapping())
+	            {
+	                Class<?> pclazz = mm.value().clazz();
+	                Object mapper;
+	                if(!Object.class.equals(pclazz))
+	                {
+	                    mapper = pclazz.newInstance();
+	                }
+	                else
+	                {
+	                    mapper = SJavaParser.evaluateExpression(mm.value().value(), null);
+	                }
+	                if(mapper instanceof IValueMapper)
+	                    mapper = new DefaultParameterMapper((IValueMapper)mapper);
+	
+	                targetparams = ((IParameterMapper)mapper).convertParameters(inparams, request);
+	            }
+	            else
+	            {
+	//           	System.out.println("automapping detected");
+	                Class<?>[] ts = method.getParameterTypes();
+	                targetparams = new Object[ts.length];
+	                if(ts.length==1 && inparamsmap!=null)
+	                {
+	                    if(SReflect.isSupertype(ts[0], Map.class))
+	                    {
+	                        targetparams[0] = inparamsmap;
+	                        ((Map)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
+	                    }
+	//                    else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
+	//                    {
+	//                        targetparams[0] = SInvokeHelper.convertMultiMap(inparamsmap);
+	//                        ((Map)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
+	//                    }
+	                }
+	            }
+	        }
+	        // natural auto map if there are in parameters
+	        else 
+	        {
+	        	Class<?>[] ts = method.getParameterTypes();
+	            targetparams = new Object[ts.length];
+	            
+	            for(int i=0; i<targetparams.length && i<inparams.length; i++)
+	            {
+	            	Object p = inparams[i];
+	            	if(p!=null && SReflect.isSupertype(ts[i], p.getClass()))
+	            	{
+	            		targetparams[i] = p;
+	            	}
+	            	else if(p instanceof String && BasicTypeConverter.isBuiltInType(ts[i]))
+	            	{
+	            		targetparams[i] = BasicTypeConverter.getBasicStringConverter(ts[i]).convertString((String)p, null);
+	            	}
+	            }
+	        }
+	
+	        return new Tuple2<MappingInfo, Object[]>(mi, targetparams);
+    	}
+    	catch(Exception e)
+    	{
+    		throw new RuntimeException(e);
+    	}
     }
 
+    /**
+     * 
+     */
+    protected Object convertParameter(List<String> sr, String val)
+    {
+    	Object ret = val;
+        boolean done = false;
+        
+		if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
+        {
+        	try
+        	{
+        		ret = JsonTraverser.objectFromByteArray(val.getBytes(), component.getClassLoader(), null);
+        		done = true;
+        	}
+        	catch(Exception e)
+        	{
+        	}
+        }
+        
+        if(!done && sr!=null && sr.contains(MediaType.APPLICATION_XML))
+        {
+        	try
+        	{
+        		ret = JavaReader.objectFromByteArray(val.getBytes(), component.getClassLoader(), null);
+        		done = true;
+        	}
+        	catch(Exception e)
+        	{
+        	}
+        }
+        
+        return ret;
+    }
+    
     /**
      *
      */
@@ -522,13 +629,11 @@ public class JettyRestServicePublishService implements IWebPublishService
     /**
      *
      */
-    protected void writeResponse(Object ret, MappingInfo mi, HttpServletRequest request, HttpServletResponse response) throws Exception
+    protected List<String> writeResponseHeader(Object ret, MappingInfo mi, HttpServletRequest request, HttpServletResponse response) 
     {
-        Object content = ret;
-        List<String> sr =  null;
-
-        // copy values from response to http response
-        if(ret instanceof Response)
+    	List<String> sr =  null;
+    	
+    	if(ret instanceof Response)
         {
             Response resp = (Response)ret;
 
@@ -549,7 +654,8 @@ public class JettyRestServicePublishService implements IWebPublishService
         else
         {
             // acceptable media types for response
-            List<String> cl = parseMimetypes(request);
+        	String mts = request.getHeader("Accept");
+            List<String> cl = parseMimetypes(mts);
             sr = mi.getProducedMediaTypes();
             if(sr==null || sr.size()==0)
             {
@@ -560,69 +666,93 @@ public class JettyRestServicePublishService implements IWebPublishService
                 sr.retainAll(cl);
             }
 
-            if(sr.size()>0)
-            {
-                System.out.println("found acceptable return types: "+sr);
-            }
-            else
-            {
+//            if(sr.size()>0)
+//            {
+//                System.out.println("found acceptable return types: "+sr);
+//            }
+            if(sr.size()==0)
                 System.out.println("found no acceptable return types.");
-            }
 
             // todo: add option for CORS
             response.addHeader("Access-Control-Allow-Origin", "*");
-                // http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
- response.addHeader("Access-Control-Allow-Credentials", "true ");
-                response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-                response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+            // http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+            response.addHeader("Access-Control-Allow-Credentials", "true ");
+            response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+            response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
         }
-
-        // handle content
-        PrintWriter out = response.getWriter();
-        if(content!=null)
-        {
-            // for testing with browser
-            // http://brockallen.com/2012/04/27/change-firefoxs-default-accept-header-to-prefer-json-over-xml/
-
-            if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
-            {
-                byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
-                out.write(new String(data));
-            }
-            else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
-            {
-                byte[] data = JavaWriter.objectToByteArray(content, component.getClassLoader());
-                out.write(new String(data));
-            }
-            else if(SReflect.isStringConvertableType(content.getClass()))
-            {
-                response.setContentType("text/plain; charset=utf-8");
-                out.write(content.toString());
-            }
-            else if(sr!=null && sr.contains("*/*"))
-            {
-                // use json if all is allowed
-                byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
-                out.write(new String(data));
-            }
-            else
-            {
-                System.out.println("cannot convert result: "+ret);
-            }
-        }
+    	
+    	return sr;
     }
-
+    
+    /**
+     *
+     */
+    protected void writeResponseContent(Object ret, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, List<String> sr) 
+    {
+    	try
+    	{
+	        Object content = ret;
+	        
+	        // handle content
+	        PrintWriter out = response.getWriter();
+	        if(content!=null)
+	        {
+	            // for testing with browser
+	            // http://brockallen.com/2012/04/27/change-firefoxs-default-accept-header-to-prefer-json-over-xml/
+	
+	            if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
+	            {
+	                byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
+	                if(response.getHeader("Content-Type")==null)
+	                	response.setHeader("Content-Type", MediaType.APPLICATION_JSON);
+	                out.write(new String(data));
+	            }
+	            else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
+	            {
+	                byte[] data = JavaWriter.objectToByteArray(content, component.getClassLoader());
+	                if(response.getHeader("Content-Type")==null)
+	                	response.setHeader("Content-Type", MediaType.APPLICATION_XML);
+	                out.write(new String(data));
+	            }
+	            else if(SReflect.isStringConvertableType(content.getClass()))
+	            {
+	            	if(response.getHeader("Content-Type")==null)
+	            		response.setContentType("text/plain; charset=utf-8");
+	                out.write(content.toString());
+	            }
+	            else if(sr!=null && sr.contains("*/*"))
+	            {
+	                // use json if all is allowed
+	            	if(response.getHeader("Content-Type")==null)
+	                 	response.setHeader("Content-Type", MediaType.APPLICATION_JSON);
+	                byte[] data = JsonTraverser.objectToByteArray(content, component.getClassLoader());
+	                out.write(new String(data));
+	            }
+	            else
+	            {
+	                System.out.println("cannot convert result: "+ret);
+	            }
+	            
+	            out.flush();
+	        }
+    	}
+    	catch(Exception e)
+    	{
+    		throw new RuntimeException(e);
+    	}
+    }
+    
     /**
      *  todo: make statically accessible
      *  Copied from Jadex ForwardFilter
      */
-    public static List<String> parseMimetypes(HttpServletRequest request)
+    public static List<String> parseMimetypes(String mts)
     {
-        List<String> mimetypes = null;
-        String mts = request.getHeader("Accept");
+//        List<String> mimetypes = null;
+        List<String> mimetypes = new ArrayList<String>();
         if(mts!=null)
         {
-            mimetypes = new ArrayList<String>();
+//            mimetypes = new ArrayList<String>();
             StringTokenizer stok = new StringTokenizer(mts, ",");
             while(stok.hasMoreTokens())
             {
@@ -657,16 +787,18 @@ public class JettyRestServicePublishService implements IWebPublishService
     }
 
     /**
-     *
+     *  Evaluate the service interface and generate mappings.
+     *  Return a multicollection in which for each path name the possible
+     *  methods are contained (can be more than one due to different parameters).
      */
-    public Map<String, MappingInfo> evaluateMapping(IServiceIdentifier sid, PublishInfo pi)
+    public MultiCollection<String, MappingInfo> evaluateMapping(IServiceIdentifier sid, PublishInfo pi)
     {
         Class<?> mapcl = pi.getMapping()==null? null: pi.getMapping().getType(component.getClassLoader());
         if(mapcl==null)
             mapcl = sid.getServiceType().getType(component.getClassLoader());
 
-        Map<String, MappingInfo> ret = new HashMap<String, MappingInfo>();
-        Map<String, MappingInfo> natret = new HashMap<String, MappingInfo>();
+        MultiCollection<String, MappingInfo> ret = new MultiCollection<String, MappingInfo>();
+        MultiCollection<String, MappingInfo> natret = new MultiCollection<String, MappingInfo>();
 
         for(Method m: SReflect.getAllMethods(mapcl))
         {
@@ -728,19 +860,18 @@ public class JettyRestServicePublishService implements IWebPublishService
                     }
                 }
 
-                // Jadex specific annotations
-
-                if(m.isAnnotationPresent(ResultMapper.class))
-                {
-
-                }
+//                // Jadex specific annotations
+//                if(m.isAnnotationPresent(ResultMapper.class))
+//                {
+//
+//                }
 
                 mi.setMethod(m);
-                ret.put(mi.getPath(), mi);
+                ret.add(mi.getPath(), mi);
             }
 
             // Natural mapping using simply all declared methods
-            natret.put(m.getName(), new MappingInfo(null, m, m.getName()));
+            natret.add(m.getName(), new MappingInfo(null, m, m.getName()));
         }
 
         return ret.size()>0? ret: natret;
