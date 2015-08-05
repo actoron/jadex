@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -807,16 +808,7 @@ public class MCapability extends MElement
 	 */
 	public Map<String, String> getBeliefReferences()
 	{
-		Map<String, String>	ret;
-		if(beliefreferences==null)
-		{
-			ret	= Collections.emptyMap();
-		}
-		else
-		{
-			ret	= beliefreferences;
-		}
-		return ret;
+		return getReferences(beliefreferences);
 	}
 	
 	/**
@@ -826,15 +818,12 @@ public class MCapability extends MElement
 	 */
 	public void addBeliefReference(String reference, String concrete)
 	{
-		if(beliefreferences==null)
-		{
-			beliefreferences = new LinkedHashMap<String, String>();
-		}
-		beliefreferences.put(reference, concrete);
+		beliefreferences = addReference(beliefreferences, reference, concrete);
 	}
-	
+
 	/**
-	 *  Get the result mappings (belief->result).
+	 *  Get the result mappings (concrete belief->result name).
+	 *  Note: result mappings are inverse to reference mappings!
 	 */
 	public Map<String, String> getResultMappings()
 	{
@@ -852,7 +841,8 @@ public class MCapability extends MElement
 	
 	/**
 	 *  Add a result mapping.
-	 *  @param belief The belief name (fully qualified). 
+	 *  Note: result mappings are inverse to reference mappings!
+	 *  @param belief The concrete belief name (fully qualified). 
 	 *  @param result The result name.
 	 */
 	public void addResultMapping(String belief, String result)
@@ -869,16 +859,7 @@ public class MCapability extends MElement
 	 */
 	public Map<String, String> getExpressionReferences()
 	{
-		Map<String, String>	ret;
-		if(expressionreferences==null)
-		{
-			ret	= Collections.emptyMap();
-		}
-		else
-		{
-			ret	= expressionreferences;
-		}
-		return ret;
+		return getReferences(expressionreferences);
 	}
 
 	/**
@@ -888,11 +869,7 @@ public class MCapability extends MElement
 	 */
 	public void addExpressionReference(String reference, String concrete)
 	{
-		if(expressionreferences==null)
-		{
-			expressionreferences = new LinkedHashMap<String, String>();
-		}
-		expressionreferences.put(reference, concrete);
+		expressionreferences = addReference(expressionreferences, reference, concrete);
 	}
 	
 	/**
@@ -900,16 +877,7 @@ public class MCapability extends MElement
 	 */
 	public Map<String, String> getEventReferences()
 	{
-		Map<String, String>	ret;
-		if(eventreferences==null)
-		{
-			ret	= Collections.emptyMap();
-		}
-		else
-		{
-			ret	= eventreferences;
-		}
-		return ret;
+		return getReferences(eventreferences);
 	}
 
 	/**
@@ -919,11 +887,7 @@ public class MCapability extends MElement
 	 */
 	public void addEventReference(String reference, String concrete)
 	{
-		if(eventreferences==null)
-		{
-			eventreferences = new LinkedHashMap<String, String>();
-		}
-		eventreferences.put(reference, concrete);
+		eventreferences = addReference(eventreferences, reference, concrete);
 	}
 
 	/**
@@ -931,16 +895,7 @@ public class MCapability extends MElement
 	 */
 	public Map<String, String> getGoalReferences()
 	{
-		Map<String, String>	ret;
-		if(goalreferences==null)
-		{
-			ret	= Collections.emptyMap();
-		}
-		else
-		{
-			ret	= goalreferences;
-		}
-		return ret;
+		return getReferences(goalreferences);
 	}
 
 	/**
@@ -950,10 +905,50 @@ public class MCapability extends MElement
 	 */
 	public void addGoalReference(String reference, String concrete)
 	{
-		if(goalreferences==null)
+		goalreferences = addReference(goalreferences, reference, concrete);
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Add a reference and resolve transitive dependencies.
+	 */
+	protected static Map<String, String> addReference(Map<String, String> references, String reference, String concrete)
+	{
+		if(references==null)
 		{
-			goalreferences = new LinkedHashMap<String, String>();
+			references = new LinkedHashMap<String, String>();
 		}
-		goalreferences.put(reference, concrete);
+		
+		// Resolve transitive depenpency.
+		if(references.containsKey(concrete))
+		{
+			concrete	= references.get(concrete);
+			assert	!references.containsKey(concrete);	// Should be only one level.
+		}
+		
+		// Resolve inverse transitive dependency (assignto...).
+		for(Entry<String, String> entry: references.entrySet())
+		{
+			if(entry.getValue().equals(reference))
+			{
+				references.put(entry.getKey(), concrete);
+			}
+		}
+		
+		references.put(reference, concrete);
+		return references;
+	}
+	
+	/**
+	 *  Get references or empty map.
+	 */
+	protected static Map<String, String> getReferences(Map<String, String> references)
+	{
+		if(references==null)
+		{
+			references	= Collections.emptyMap();
+		}
+		return references;
 	}
 }
