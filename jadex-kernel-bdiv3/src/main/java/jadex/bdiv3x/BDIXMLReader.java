@@ -1167,7 +1167,8 @@ public class BDIXMLReader extends ComponentXMLReader
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "expression")}), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("exported", null, AccessInfo.IGNORE_READ))	// Todo: support checking?
 			}, null)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "bindingoptions")}), new ObjectInfo(UnparsedExpression.class, expost),

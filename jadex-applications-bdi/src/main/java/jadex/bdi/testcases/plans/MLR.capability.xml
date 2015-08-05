@@ -20,7 +20,7 @@
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.commons.*</import>
 		<import>java.util.*</import>
-		<import>jadex.bdiv3.runtime.ICandidateInfo</import>
+		<import>jadex.bdiv3x.runtime.ICandidateInfo</import>
 	</imports>
 
 	<beliefs>
