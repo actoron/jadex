@@ -88,13 +88,36 @@ public class SBDIModel
 			for(String reference: capa.getCapability().getBeliefReferences().keySet())
 			{
 				String	concrete	= capaname+MElement.CAPABILITY_SEPARATOR+capa.getCapability().getBeliefReferences().get(reference);
-				// Resolve transitive reference.
+				// Resolve transitive reference. todo: unify goal/event references and belief references?
 				if(bdimodel.getCapability().getBeliefReferences().containsKey(concrete))
 				{
 					concrete	= bdimodel.getCapability().getBeliefReferences().get(concrete);
 					assert !bdimodel.getCapability().getBeliefReferences().containsKey(concrete);	// Should only be one level!
 				}
 				bdimodel.getCapability().addBeliefReference(capaname+MElement.CAPABILITY_SEPARATOR+reference, concrete);
+			}
+			
+			for(Entry<String, String> reference: capa.getCapability().getGoalReferences().entrySet())
+			{
+				// either abstract (value==null) and contained or not abstract and not contained
+				assert bdimodel.getCapability().getGoalReferences().containsKey(capaname+MElement.CAPABILITY_SEPARATOR+reference)
+					== (reference.getValue()==null);
+				
+				if(reference.getValue()!=null)
+				{
+					bdimodel.getCapability().addGoalReference(capaname+MElement.CAPABILITY_SEPARATOR+reference.getKey(), capaname+MElement.CAPABILITY_SEPARATOR+reference.getValue());
+				}
+			}
+			for(Entry<String, String> reference: capa.getCapability().getEventReferences().entrySet())
+			{
+				// either abstract (value==null) and contained or not abstract and not contained
+				assert bdimodel.getCapability().getEventReferences().containsKey(capaname+MElement.CAPABILITY_SEPARATOR+reference)
+					== (reference.getValue()==null);
+				
+				if(reference.getValue()!=null)
+				{
+					bdimodel.getCapability().addEventReference(capaname+MElement.CAPABILITY_SEPARATOR+reference.getKey(), capaname+MElement.CAPABILITY_SEPARATOR+reference.getValue());
+				}
 			}
 			
 			for(MGoal goal: capa.getCapability().getGoals())
