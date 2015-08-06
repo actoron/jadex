@@ -44,6 +44,7 @@
 				types[i] = type;
 			}
 			
+			// replace empty string with null if json or xml
 			if(vals[i]=="")
 			{
 				if(types[i]=="application/json")
@@ -83,6 +84,7 @@
 			var accept = "";
 			var had = [];
 			var num = 0;
+			
 			for(i=0; i<types.length; i++)
 			{
 				if("text/plain"!=types[i])
@@ -98,9 +100,11 @@
 					had[num++] = types[i];
 				}
 			}
+			
 			if(num!=0)
 			{
 				accept += ";q=0.9,*/*;q=0.8";
+				alert(accept);
 				http.setRequestHeader("Accept", accept);
 			}
 			// else use default browser accept header

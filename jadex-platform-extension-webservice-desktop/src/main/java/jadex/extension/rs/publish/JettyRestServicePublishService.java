@@ -18,6 +18,7 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,6 +77,9 @@ import jadex.xml.bean.JavaWriter;
 @Service
 public class JettyRestServicePublishService implements IWebPublishService
 {
+	// Hack constant for enabling multi-part :-(
+	private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
+
 	/** Some basic media types for service invocations. */
 	public static List<String> PARAMETER_MEDIATYPES = Arrays.asList(new String[]{MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML});
 	
@@ -124,6 +128,11 @@ public class JettyRestServicePublishService implements IWebPublishService
                 {
                     System.out.println("handler is: "+uri.getPath());
 
+                    // Hack to enable multi-part
+                    // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
+                    if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
+                    	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+                    
                     String methodname = request.getPathInfo();
 
                     if(methodname.startsWith("/"))
@@ -131,18 +140,19 @@ public class JettyRestServicePublishService implements IWebPublishService
 
                     if(mappings.containsKey(methodname))
                     {
-//                        out.println("<h1>" + "Found method - calling service: " + mappings.get(methodname).getMethod().getName() + "</h1>");
-                        Collection<MappingInfo> mis = mappings.get(methodname);
-                        
-                        // convert and map parameters
-                        Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis);
-                        final MappingInfo mi = tup.getFirstEntity();
-                        Object[] params = tup.getSecondEntity();
-                        
-                        // invoke the service method
-                        final Method method = mi.getMethod();
                         try
                         {
+//                          out.println("<h1>" + "Found method - calling service: " + mappings.get(methodname).getMethod().getName() + "</h1>");
+                            Collection<MappingInfo> mis = mappings.get(methodname);
+                            
+                            // convert and map parameters
+                            Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis);
+                            final MappingInfo mi = tup.getFirstEntity();
+                            Object[] params = tup.getSecondEntity();
+                            
+                            // invoke the service method
+                            final Method method = mi.getMethod();
+                        	
                         	Object ret = method.invoke(service, params);
                         
 //                          if(ret instanceof IFuture)
@@ -225,14 +235,12 @@ public class JettyRestServicePublishService implements IWebPublishService
                         }
                         catch(Exception e)
                         {
-                        	List<String> sr = writeResponseHeader(e, mi, request, response);
-                			writeResponseContent(e, mi, request, response, sr);
+                        	List<String> sr = writeResponseHeader(e, null, request, response);
+                			writeResponseContent(e, null, request, response, sr);
                         }
                     }
                     else
                     {
-                    	
-                    	
                         PrintWriter out = response.getWriter();
                         
                         response.setContentType("text/html; charset=utf-8");
@@ -393,6 +401,9 @@ public class JettyRestServicePublishService implements IWebPublishService
 	        		}
 	        	}
 	        }
+	        
+	        if(mi==null)
+	        	throw new RuntimeException("No method mapping found.");
 	        
 	        Method method = mi.getMethod();
 	        // target method types
@@ -599,7 +610,7 @@ public class JettyRestServicePublishService implements IWebPublishService
             // acceptable media types for response
         	String mts = request.getHeader("Accept");
             List<String> cl = parseMimetypes(mts);
-            sr = mi.getProducedMediaTypes();
+            sr = mi==null? null: mi.getProducedMediaTypes();
             if(sr==null || sr.size()==0)
             {
                 sr = cl;
@@ -936,17 +947,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 				for(MappingInfo mi: (MappingInfo[])mappings.getObjects(MappingInfo.class))
 				{
 					Method method = mi.getMethod();
-					HttpMethod restmethod = mi.getHttpMethod()!=null? mi.getHttpMethod(): HttpMethod.GET;
-//					RSJAXAnnotationHelper.getDeclaredRestType(method);
-					
-//					if(restmethod!=null)
-//					{
-//						System.out.println("method: "+method.getName()+" "+SUtil.arrayToString(methods));
-//						java.lang.annotation.Annotation[][] ans = method.getParameterAnnotations();
-//						for(int j=0; j<ans.length; j++)
-//						{
-//							System.out.println(SUtil.arrayToString(ans[j]));
-//						}
+					HttpMethod restmethod = mi.getHttpMethod()!=null? mi.getHttpMethod(): guessRestType(method);
 					
 					String path = mi.getPath()!=null? mi.getPath(): method.getName();
 					List<String> consumed = mi.getConsumedMediaTypes();
@@ -981,7 +982,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 					ret.append(")");
 					ret.append("</div>");
 					ret.append("\n");
-//						ret.append("</br>");
+//					ret.append("</br>");
 					
 					ret.append("<div class=\"restproperties\">");
 					ret.append(restmethod).append(" ");
@@ -1028,7 +1029,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 					String link = baseuri.toString();
 					if(path!=null)
 						link = link+"/"+path; 
-					System.out.println("path: "+link);
+//					System.out.println("path: "+link);
 					
 					if(ptypes.length>0)
 					{
@@ -1041,7 +1042,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 						ret.append("<form class=\"arguments\" action=\"").append(link).append("\" method=\"")
 							.append(restmethod).append("\" enctype=\"multipart/form-data\" ");
 						
-						if(restmethod.equals(POST.class))
+						if(restmethod.equals(HttpMethod.POST))
 							ret.append("onSubmit=\"return extract(this)\"");
 						ret.append(">");
 						ret.append("\n");
@@ -1050,7 +1051,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 						{
 							ret.append("arg").append(j).append(": ");
 							ret.append("<input name=\"arg").append(j).append("\" type=\"text\" />");
-//									.append(" accept=\"").append(cons[0]).append("\" />");
+//							.append(" accept=\"").append(cons[0]).append("\" />");
 						}
 						
 						ret.append("<select name=\"mediatype\">");
@@ -1105,6 +1106,69 @@ public class JettyRestServicePublishService implements IWebPublishService
 		ret.append("</body>\n</html>\n");
 
 		return ret.toString();
+	}
+	
+	/**
+	 *  Guess the http type (GET, POST, PUT, DELETE, ...) of a method.
+	 *  @param method The method.
+	 *  @return  The rs annotation of the method type to use 
+	 */
+	public HttpMethod guessRestType(Method method)
+	{
+	    // Retrieve = GET (hasparams && hasret)
+	    // Update = POST (hasparams && hasret)
+	    // Create = PUT  return is pointer to new resource (hasparams? && hasret)
+	    // Delete = DELETE (hasparams? && hasret?)
+
+		HttpMethod ret = HttpMethod.GET;
+		
+		Class<?> rettype = SReflect.unwrapGenericType(method.getGenericReturnType());
+		Class<?>[] paramtypes = method.getParameterTypes();
+		
+		boolean hasparams = paramtypes.length>0;
+		boolean hasret = rettype!=null && !rettype.equals(Void.class) && !rettype.equals(void.class);
+		
+		// GET or POST if has both
+		if(hasret)
+		{
+			if(hasparams)
+			{
+				if(hasStringConvertableParameters(method, rettype, paramtypes))
+				{
+					ret = HttpMethod.GET;
+				}
+				else
+				{
+					ret = HttpMethod.POST;
+				}
+			}
+		}
+		
+		// todo: other types?
+		
+//		System.out.println("rest-type: "+ret.getName()+" "+method.getName()+" "+hasparams+" "+hasret);
+		
+		return ret;
+//		return GET.class;
+	}
+	
+	/**
+	 *  Test if a method has parameters that are all convertible from string.
+	 *  @param method The method.
+	 *  @param rettype The return types (possibly unwrapped from future type).
+	 *  @param paramtypes The parameter types.
+	 *  @return True, if is convertible.
+	 */
+	public boolean hasStringConvertableParameters(Method method, Class<?> rettype, Class<?>[] paramtypes)
+	{
+		boolean ret = true;
+		
+		for(int i=0; i<paramtypes.length && ret; i++)
+		{
+			ret = SReflect.isStringConvertableType(paramtypes[i]);
+		}
+		
+		return ret;
 	}
     
     /**
