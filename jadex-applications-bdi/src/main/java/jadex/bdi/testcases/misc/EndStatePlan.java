@@ -68,55 +68,5 @@ public class EndStatePlan extends Plan
 		{
 			getBeliefbase().getBeliefSet("testcap.reports").addFact(reports.get(i));
 		}
-
-		// Create deregister agent.
-		report	= new TestReport("deregister", "Test if an agent can deregister on termination.");
-		IComponentIdentifier	deregister	= cms.createComponent("/jadex/bdi/testcases/misc/EndStateDeregister.agent.xml",
-			new CreationInfo(getComponentIdentifier())).getFirstResult();
-
-
-		// Check if deregister agent is registered.
-		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
-		IDF df = (IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IDFServiceDescription sd = df.createDFServiceDescription(null, "endstate_testservice", null);
-		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
-		
-		IGoal	dfsearch	= createGoal("dfcap.df_search");
-		dfsearch.getParameter("description").setValue(ad);
-		dispatchSubgoalAndWait(dfsearch);
-		if(dfsearch.getParameterSet("result").getValues().length==0)
-		{
-			report.setFailed("Agent is not registered at DF.");
-		}
-		else
-		{
-			// Kill deregister agent.
-			cms.destroyComponent(deregister).get();
-			
-			// Check if deregister agent is deregistered.
-			waitFor(100);	// Hack!!! how to ensure that agent has time to deregister itself?
-			dfsearch	= createGoal("dfcap.df_search");
-			dfsearch.getParameter("description").setValue(ad);
-			dispatchSubgoalAndWait(dfsearch);
-			if(dfsearch.getParameterSet("result").getValues().length!=0)
-			{
-				report.setFailed("Agent is still registered at DF.");
-			}
-			else
-			{
-				// Check if deregister agent has been correctly removed.
-				results	= cms.searchComponents(
-					new CMSComponentDescription(deregister, null, false, false, false, false, false, null, null, null, null, -1, null, null, false), null).get();
-				if(results.length!=0)
-				{
-					report.setFailed("Deregister agent still alive.");
-				}
-				else
-				{
-					report.setSucceeded(true);
-				}
-			}
-		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 	}
 }

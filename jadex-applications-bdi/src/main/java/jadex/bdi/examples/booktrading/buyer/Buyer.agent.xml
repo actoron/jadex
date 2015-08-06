@@ -27,7 +27,6 @@
 
 	<capabilities>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.contractnet.ContractNet"/>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 
 	<beliefs>
@@ -67,10 +66,6 @@
 				Order.DONE.equals($goal.order.getState())
 			</targetcondition>
 		</achievegoal>
-		
-		<achievegoalref name="df_search">
-			<concrete ref="dfcap.df_search"/>
-		</achievegoalref>
 		
 		<achievegoalref name="cnp_initiate">
 			<concrete ref="procap.cnp_initiate"/>

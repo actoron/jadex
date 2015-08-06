@@ -23,12 +23,6 @@
 		<import>jadex.bridge.service.types.cms.*</import>
 	</imports>
 	
-	<capabilities>
-		<!-- this capability provides easy access to "out-of-the-box"-plans
-			 allowing - for example - to register at the DF. -->
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
-	</capabilities>
-
 	<beliefs>
 
 		<!-- The player objects with initial values. -->
@@ -54,13 +48,6 @@
 		
 	</beliefs>
 
-	<goals>
-		<!-- Used to search for the dealer. -->
-		<achievegoalref name="df_search">
-			<concrete ref="dfcap.df_search"/>
-		</achievegoalref>
-	</goals>
-	
 	<plans>
 		<!-- Plan to register, when dealer belief changes. -->
 		<plan name="dealerRegister">

@@ -1,12 +1,11 @@
 package jadex.bridge.service.types.df;
 
+import java.util.Date;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.future.IFuture;
-
-import java.util.Date;
 
 /**
  *  Interface for the directory facilitator (DF). Provides services for registering,
@@ -77,6 +76,14 @@ public interface IDF
 	 *  @return The df component description.
 	 */
 	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier component, IDFServiceDescription service);
+
+	/**
+	 *  Create a df component description.
+	 *  @param component The component.
+	 *  @param service The service.
+	 *  @return The df component description.
+	 */
+	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier component, IDFServiceDescription service, long leasetime);
 
 	/**
 	 *  Create a new df component description.

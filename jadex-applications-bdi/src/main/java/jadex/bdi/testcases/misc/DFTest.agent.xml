@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3>Test the DF capability.</H3>
+	<H3>Test the DF service.</H3>
 	DF Test Agent.
-	Tests the df plans.
+	Tests the df service.
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -19,7 +19,6 @@
 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 
 	<beliefs>
@@ -37,10 +36,6 @@
 		</plan>
 	</plans>
 	
-	<componenttypes>
-		<componenttype name="DF" filename="jadex/bdi/dfagent/DF.agent.xml"/>
-	</componenttypes>
-
 	<properties>
 		<property name="debugging">false</property>
 	</properties>
@@ -49,32 +44,12 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief cref="testcap.testcase_cnt">
-					<fact>14</fact>
+					<fact>6</fact>
 				</initialbelief>
 			</beliefs>
-			<goals>
-				<initialgoal name="initial_keep" cref="dfcap.df_keep_registered">
-					<parameter ref="description">
-						<value>
-							new DFComponentDescription(null, new IDFServiceDescription[]
-								{
-									new DFServiceDescription("service_a", "a", "a"),
-									new DFServiceDescription("service_b", "b", "b"),
-									new DFServiceDescription("service_c", "c", "c")
-								}, null, null, null, null)
-						</value>
-					</parameter>
-					<parameter ref="leasetime">
-						<value>4000</value>
-					</parameter>
-				</initialgoal>
-			</goals>
 			<plans>
 				<initialplan ref="test"/>
 			</plans>
-			<components>
-				<component name="df" type="DF"/>
-			</components>
 		</configuration>
 	</configurations>
 </agent>

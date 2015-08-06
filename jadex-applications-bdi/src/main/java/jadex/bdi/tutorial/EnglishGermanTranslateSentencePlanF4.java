@@ -70,13 +70,8 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 				IDFServiceDescription sd = dfservice.createDFServiceDescription(null, "translate english_german", null);
 				IDFComponentDescription ad = dfservice.createDFComponentDescription(null, sd);
 
-				// Use a subgoal to search for a translation agent
-				IGoal ft = createGoal("df_search");
-                ft.getParameter("description").setValue(ad);
-
-				dispatchSubgoalAndWait(ft);
-                //Object result = ft.getResult();
-                IDFComponentDescription[]	result = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
+				// Search for a translation agent
+				IDFComponentDescription[]	result = dfservice.search(ad, null).get();
 
 				if(result.length>0)
 				{

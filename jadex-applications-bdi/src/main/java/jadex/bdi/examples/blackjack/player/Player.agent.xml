@@ -24,12 +24,6 @@
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
-	<capabilities>
-		<!-- this capability provides easy access to "out-of-the-box"-plans
-			 allowing - for example - to register at the DF. -->
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
-	</capabilities>
-
 	<beliefs>
 		<!-- The player's knowledge about itself, encapsulated as player object. -->
 		<belief name="myself" class="Player" exported="true">
@@ -80,11 +74,6 @@
 				$beliefbase.myself.getState().equals(Player.STATE_IDLE)
 			</targetcondition>
 		</achievegoal>
-
-		<!-- Used to search for the dealer. -->
-		<achievegoalref name="df_search">
-			<concrete ref="dfcap.df_search"/>
-		</achievegoalref>
 	</goals>
 
 	<plans>

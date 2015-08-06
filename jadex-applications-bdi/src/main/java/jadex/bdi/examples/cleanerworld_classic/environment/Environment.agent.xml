@@ -20,7 +20,6 @@
 
 	<capabilities>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 
 	<beliefs>
@@ -43,13 +42,6 @@
 	</beliefs>
 
 	<goals>
-		<achievegoalref name="df_register">
-			<concrete ref="dfcap.df_register"/>
-		</achievegoalref>
-		<achievegoalref name="df_deregister">
-			<concrete ref="dfcap.df_deregister"/>
-		</achievegoalref>
-
 		<querygoalref name="rp_decide_request">
 			<concrete ref="procap.rp_decide_request"/>
 		</querygoalref>
@@ -123,6 +115,10 @@
 				</goal>
 			</trigger>
 		</plan>
+	    <plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
 	</plans>
 
 	<properties>
@@ -136,21 +132,18 @@
 					<fact>jadex.commons.IFilter.ALWAYS</fact>
 				</initialbelief>
 			</beliefs>
-			<goals>
-				<initialgoal ref="df_register">
-<!--					<parameter ref="df">
-						<value>new AgentIdentifier("df@vsispro3:1099/JADE", new String[]{"http://134.100.11.53:7778/acc"})</value>
-					</parameter>
--->					<parameter ref="description">
+			<plans>
+				<initialplan ref="df_keep_registered">
+					<parameter ref="description">
 						<value>
-							new DFComponentDescription(null, new IDFServiceDescription[]{ 
-								new DFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg")},
-								null, null, null, null)
-						</value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg"),
+								20000)
+ 						</value>
 					</parameter>
-				</initialgoal>	
-				<endgoal ref="df_deregister"/>
-			</goals>
+				</initialplan>
+			</plans>
 		</configuration>
 	</configurations>
 </agent>

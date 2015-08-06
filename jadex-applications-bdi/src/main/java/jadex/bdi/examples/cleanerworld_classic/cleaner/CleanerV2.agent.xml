@@ -27,7 +27,6 @@
 
 	<capabilities>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 
 	<beliefs>
@@ -262,15 +261,6 @@
 		<!-- Memorize the already visited positions in a raster. -->
 		<performgoal name="performmemorizepositions"/>
 
-		<!-- Imported DF-Goals -->
-<!--  
-		<achievegoalref name="df_search">
-			<concrete ref="dfcap.df_search"/>
-		</achievegoalref>
-
-		<achievegoalref name="rp_initiate">
-			<concrete ref="procap.rp_initiate"/>
-		</achievegoalref>-->
  	</goals>
 
 	<plans>
