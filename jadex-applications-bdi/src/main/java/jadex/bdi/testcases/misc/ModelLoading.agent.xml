@@ -15,7 +15,7 @@
 		<import>jadex.bdi.*</import>
 		<import>jadex.bdi.testcases.*</import>
 	</imports>
-
+<!-- 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
 	</capabilities>
@@ -28,8 +28,8 @@
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
 	</beliefs>
-
-	<plans>
+	
+ 	<plans>
 		<plan name="model_loading_plan">
 			<body class="ModelLoadingPlan"/>
 		</plan>
@@ -51,5 +51,6 @@
 			</plans>
 		</configuration>
 	</configurations>
+-->
 
 </agent>
