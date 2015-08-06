@@ -381,40 +381,23 @@ public class SBDIModel
 	 */
 	protected static MConfigParameterElement copyConfigParameterElement(IBDIModel bdimodel, String capaname, MConfigParameterElement cpel, List<MConfigParameterElement> test)
 	{
-		// Only copy element if it does not exist already (outer overrides inner settings).
-		MConfigParameterElement	cpel2	= null;
-		String	name	= capaname + MElement.CAPABILITY_SEPARATOR + cpel.getName();
-		// todo: parameter element references
-//		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
-		boolean	found	= false;
-		for(MConfigParameterElement tpel: SUtil.safeList(test))
+		MConfigParameterElement	cpel2	= new MConfigParameterElement();
+		cpel2.setRef(capaname + MElement.CAPABILITY_SEPARATOR + cpel.getRef());
+		cpel2.setName(cpel.getName());
+		if(cpel.getParameters()!=null)
 		{
-			if(tpel.getName().equals(name))
+			for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
 			{
-				found	= true;
-				break;
-			}
-		}
-
-		if(!found)
-		{
-			cpel2	= new MConfigParameterElement();
-			cpel2.setName(name);
-			if(cpel.getParameters()!=null)
-			{
-				for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
+				for(UnparsedExpression value: param.getValue())
 				{
-					for(UnparsedExpression value: param.getValue())
-					{
-						UnparsedExpression	value2	= new UnparsedExpression(value.getName(), (String)null, value.getValue(), value.getLanguage());
-						value2.setParsedExp(value.getParsed());	// Use parsed expression from inner scope (with correct imports).
-						value2.setClazz(value.getClazz());
-						cpel2.addParameter(value2);
-						// Hack!!! change name after adding.
-						value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
-					}
-				}			
-			}
+					UnparsedExpression	value2	= new UnparsedExpression(value.getName(), (String)null, value.getValue(), value.getLanguage());
+					value2.setParsedExp(value.getParsed());	// Use parsed expression from inner scope (with correct imports).
+					value2.setClazz(value.getClazz());
+					cpel2.addParameter(value2);
+					// Hack!!! change name after adding.
+					value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
+				}
+			}			
 		}
 		return cpel2;
 	}

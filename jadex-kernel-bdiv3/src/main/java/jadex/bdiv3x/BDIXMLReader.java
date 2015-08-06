@@ -1243,13 +1243,13 @@ public class BDIXMLReader extends ComponentXMLReader
 			new AttributeInfo(new AccessInfo("configuration", null, AccessInfo.IGNORE_READ))
 		})));
 
-		MappingInfo	configelementmapping	= new MappingInfo(null, new AttributeInfo[]{
+		MappingInfo	configbeliefmapping	= new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("ref", "name")),
 			new AttributeInfo(new AccessInfo("cref", "name"))
 		});
-		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbelief")), new ObjectInfo(MConfigBeliefElement.class), configelementmapping, null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbeliefset")), new ObjectInfo(MConfigBeliefElement.class), configelementmapping, null));
+
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbelief")), new ObjectInfo(MConfigBeliefElement.class), configbeliefmapping, null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbeliefset")), new ObjectInfo(MConfigBeliefElement.class), configbeliefmapping, null));
 		
 		// Link parameter values of config elements.
 		IObjectLinker	valinker	= new BeanObjectReaderHandler()
@@ -1265,14 +1265,18 @@ public class BDIXMLReader extends ComponentXMLReader
 			}
 		};
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, new LinkingInfo(valinker)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, new LinkingInfo(valinker)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialinternalevent")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, new LinkingInfo(valinker)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialmessageevent")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, new LinkingInfo(valinker)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endgoal")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, new LinkingInfo(valinker)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endplan")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, new LinkingInfo(valinker)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endinternalevent")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, new LinkingInfo(valinker)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endmessageevent")), new ObjectInfo(MConfigParameterElement.class), configelementmapping, new LinkingInfo(valinker)));
+		MappingInfo	configpelementmapping	= new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("cref", "ref"))
+		});
+
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(MConfigParameterElement.class), configpelementmapping, new LinkingInfo(valinker)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(MConfigParameterElement.class), configpelementmapping, new LinkingInfo(valinker)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialinternalevent")), new ObjectInfo(MConfigParameterElement.class), configpelementmapping, new LinkingInfo(valinker)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialmessageevent")), new ObjectInfo(MConfigParameterElement.class), configpelementmapping, new LinkingInfo(valinker)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endgoal")), new ObjectInfo(MConfigParameterElement.class), configpelementmapping, new LinkingInfo(valinker)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endplan")), new ObjectInfo(MConfigParameterElement.class), configpelementmapping, new LinkingInfo(valinker)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endinternalevent")), new ObjectInfo(MConfigParameterElement.class), configpelementmapping, new LinkingInfo(valinker)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "endmessageevent")), new ObjectInfo(MConfigParameterElement.class), configpelementmapping, new LinkingInfo(valinker)));
 		
 		MappingInfo	cpmapping	= new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),

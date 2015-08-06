@@ -353,11 +353,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							Object goal = null;
 							
 							// try to fetch via name
-							mgoal = bdimodel.getCapability().getGoal(igoal.getName());
-							if(mgoal==null && igoal.getName().indexOf(".")==-1)
+							mgoal = bdimodel.getCapability().getGoal(igoal.getRef());
+							if(mgoal==null && igoal.getRef().indexOf(".")==-1)
 							{
 								// try with package
-								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+igoal.getName());
+								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+igoal.getRef());
 							}
 							
 							if(mgoal!=null)
@@ -367,7 +367,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							// if not found, try expression
 							else
 							{
-								Object o = SJavaParser.parseExpression(igoal.getName(), component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mgoal));
+								Object o = SJavaParser.parseExpression(igoal.getRef(), component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mgoal));
 								if(o instanceof Class)
 								{
 									gcl = (Class<?>)o;
@@ -492,7 +492,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						for(MConfigParameterElement iplan: iplans)
 						{
-							MPlan mplan = bdimodel.getCapability().getPlan(iplan.getName());
+							MPlan mplan = bdimodel.getCapability().getPlan(iplan.getRef());
 							// todo: allow Java plan constructor calls
 		//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 							
