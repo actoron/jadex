@@ -38,12 +38,12 @@
 	<goals>
 		<querygoal name="qgoal">
 			<assignto ref="capA.testgoal"/>
+			<parameterset name="params" class="String"/>
 			<parameter name="result" class="String" direction="out" evaluationmode="push">
 				<value>
 					$goal.params.length>0 ? $goal.params[0] : null
 				</value>
 			</parameter>
-			<parameterset name="params" class="String"/>
 		</querygoal>
 	</goals>
 		

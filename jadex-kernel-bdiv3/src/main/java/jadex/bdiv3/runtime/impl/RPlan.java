@@ -13,6 +13,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBody;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
@@ -26,6 +27,7 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
+import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
@@ -188,18 +190,30 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 					{
 						for(String mapping: mappings)
 						{
-							if(mapping.startsWith(rpe.getModelElement().getName()))
+							MCapability	capa	= ((IBDIModel)ia.getModel()).getCapability();
+							String sourceelm = mapping.substring(0, mapping.indexOf("."));
+							String sourcepara = mapping.substring(mapping.indexOf(".")+1);
+							
+							if(rpe instanceof RGoal && capa.getGoalReferences().containsKey(sourceelm))
 							{
-								String source = mapping.substring(mapping.indexOf(".")+1);
+								sourceelm	= capa.getGoalReferences().get(sourceelm);
+							}
+							else if((rpe instanceof RMessageEvent || rpe instanceof RInternalEvent) && capa.getEventReferences().containsKey(sourceelm))
+							{
+								sourceelm	= capa.getEventReferences().get(sourceelm);
+							}
+							
+							if(rpe.getModelElement().getName().equals(sourceelm))
+							{
 								if(mappingvals==null)
 									mappingvals = new HashMap<String, Object>();
 								if(mparam.isMulti(null))
 								{
-									mappingvals.put(mparam.getName(), rpe.getParameterSet(source).getValues());
+									mappingvals.put(mparam.getName(), rpe.getParameterSet(sourcepara).getValues());
 								}
 								else
 								{
-									mappingvals.put(mparam.getName(), rpe.getParameter(source).getValue());
+									mappingvals.put(mparam.getName(), rpe.getParameter(sourcepara).getValue());
 								}
 								break;
 							}

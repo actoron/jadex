@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 
 /**
@@ -972,6 +974,15 @@ public class MCapability extends MElement
 		{
 			concrete	= references.get(concrete);
 			assert	!references.containsKey(concrete);	// Should be only one level.
+		}
+		
+		// Resolve indirect assignto dependencies (i.e. assignto from reference/abstract)
+		for(Entry<String, String> entry: references.entrySet())
+		{
+			if(SUtil.equals(entry.getValue(), reference))
+			{
+				entry.setValue(concrete);
+			}
 		}
 		
 		references.put(reference, concrete);

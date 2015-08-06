@@ -616,8 +616,7 @@ public class SBDIModel
 			{
 				for(MGoal goal: trigger.getGoals())
 				{
-					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+goal.getName() : goal.getName();
-					trigger2.addGoal(bdimodel.getCapability().getGoal(mapped));
+					trigger2.addGoal(bdimodel.getCapability().getResolvedGoal(capa, goal.getName()));
 //					trigger.getGoalMatchExpression(mgoal)	// todo!
 				}
 			}
@@ -625,14 +624,14 @@ public class SBDIModel
 			{
 				for(MGoal goal: trigger.getGoalFinisheds())
 				{
-					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+goal.getName() : goal.getName();
-					trigger2.addGoalFinished(bdimodel.getCapability().getGoal(mapped));
+					trigger2.addGoalFinished(bdimodel.getCapability().getResolvedGoal(capa, goal.getName()));
 				}
 			}
 			if(trigger.getServices()!=null)
 			{
 				for(MServiceCall ser: trigger.getServices())
 				{
+					// Todo: service call references?
 					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+ser.getName() : ser.getName();
 					trigger2.addService(bdimodel.getCapability().getService(mapped));
 				}
@@ -641,16 +640,14 @@ public class SBDIModel
 			{
 				for(MMessageEvent event: trigger.getMessageEvents())
 				{
-					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event.getName() : event.getName();
-					trigger2.addMessageEvent(bdimodel.getCapability().getMessageEvent(mapped));
+					trigger2.addMessageEvent(bdimodel.getCapability().getResolvedMessageEvent(capa, event.getName()));
 				}
 			}
 			if(trigger.getInternalEvents()!=null)
 			{
 				for(MInternalEvent event: trigger.getInternalEvents())
 				{
-					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event.getName() : event.getName();
-					trigger2.addInternalEvent(bdimodel.getCapability().getInternalEvent(mapped));
+					trigger2.addInternalEvent(bdimodel.getCapability().getResolvedInternalEvent(capa, event.getName()));
 				}
 			}
 			if(trigger.getCondition()!=null)
