@@ -624,7 +624,7 @@ public class JettyRestServicePublishService implements IWebPublishService
             response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
         }
     	
-    	return sr;
+    	return sr; 
     }
     
     /**
