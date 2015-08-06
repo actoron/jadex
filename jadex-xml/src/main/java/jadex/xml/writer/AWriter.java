@@ -6,6 +6,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+/**
+ * 
+ */
 public abstract class AWriter
 {
 	
@@ -90,10 +93,18 @@ public abstract class AWriter
 	 */
 	public static byte[] objectToByteArray(AWriter writer, Object val, ClassLoader classloader, Object context, IObjectWriterHandler handler)
 	{
+		return objectToByteArray(writer, val, SXML.DEFAULT_ENCODING, classloader, context, handler);
+	}
+	
+	/**
+	 * Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(AWriter writer, Object val, String encoding, ClassLoader classloader, Object context, IObjectWriterHandler handler)
+	{
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			writer.write(handler, val, bos, classloader, context);
+			writer.write(handler, val, encoding, bos, classloader, context);
 			byte[] ret = bos.toByteArray();
 			bos.close();
 			return ret;

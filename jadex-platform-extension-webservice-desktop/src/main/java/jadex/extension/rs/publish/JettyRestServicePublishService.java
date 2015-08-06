@@ -3,7 +3,6 @@ package jadex.extension.rs.publish;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -34,14 +33,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.glassfish.jersey.server.ResourceConfig;
 
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
@@ -73,11 +69,16 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 /**
- *
+ *  Publish service without Jersey directly using Jetty container.
+ *  
+ *  todo: make abstract base class without Jetty deps
  */
 @Service
 public class JettyRestServicePublishService implements IWebPublishService
 {
+	/** Some basic media types for service invocations. */
+	public static List<String> PARAMETER_MEDIATYPES = Arrays.asList(new String[]{MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML});
+	
     /** The component. */
     @ServiceComponent
     protected IInternalAccess component;
@@ -649,10 +650,23 @@ public class JettyRestServicePublishService implements IWebPublishService
 	            }
 	            else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
 	            {
-	                byte[] data = JavaWriter.objectToByteArray(result, component.getClassLoader());
-	                if(response.getHeader("Content-Type")==null)
-	                	response.setHeader("Content-Type", MediaType.APPLICATION_XML);
-	                out.write(new String(data));
+	            	byte[] data = JavaWriter.objectToByteArray(result, component.getClassLoader());
+	            	if(response.getHeader("Content-Type")==null)
+	            		response.setHeader("Content-Type", MediaType.APPLICATION_XML);
+	          
+	            	// this code below writes <?xml... prolog only once>
+//	            	byte[] data;
+//	            	if(response.getHeader("Content-Type")==null)
+//	            	{
+//	            		response.setHeader("Content-Type", MediaType.APPLICATION_XML);
+//	            		data = JavaWriter.objectToByteArray(result, component.getClassLoader());
+//	            	}
+//	            	else
+//	            	{
+//	            		// write without xml prolog
+//	            		data = JavaWriter.objectToByteArray(result, null, component.getClassLoader(), null);
+//	            	}
+	            	out.write(new String(data));
 	            }
 	            else if(SReflect.isStringConvertableType(result.getClass()))
 	            {
@@ -933,18 +947,26 @@ public class JettyRestServicePublishService implements IWebPublishService
 //						{
 //							System.out.println(SUtil.arrayToString(ans[j]));
 //						}
-					Path path = method.getAnnotation(Path.class);
-					Consumes consumes = method.getAnnotation(Consumes.class);
-					Produces produces = method.getAnnotation(Produces.class);
+					
+					String path = mi.getPath()!=null? mi.getPath(): method.getName();
+					List<String> consumed = mi.getConsumedMediaTypes();
+					List<String> produced = mi.getProducedMediaTypes();
+					
+					// Use defaults if nothing is given
+					if(consumed==null)
+						consumed = PARAMETER_MEDIATYPES;
+					if(produced==null)
+						produced = PARAMETER_MEDIATYPES;
+					
 					Class<?>[] ptypes = method.getParameterTypes();
 					
 					ret.append("<div class=\"method\">");
 					ret.append("\n");
 					
 					ret.append("<div class=\"methodname\">");
-//						ret.append("<i><b>");
+//					ret.append("<i><b>");
 					ret.append(method.getName());
-//						ret.append("</b></i>");
+//					ret.append("</b></i>");
 					
 					ret.append("(");
 					if(ptypes!=null && ptypes.length>0)
@@ -964,40 +986,40 @@ public class JettyRestServicePublishService implements IWebPublishService
 					ret.append("<div class=\"restproperties\">");
 					ret.append(restmethod).append(" ");
 					
-					if(consumes!=null)
+					if(consumed!=null && consumed.size()>0) 
 					{
-						String[] cons = consumes.value();
-						if(cons.length>0)
-						{
-							ret.append("<i>");
+						ret.append("<i>");
+						
+						if(consumed!=PARAMETER_MEDIATYPES)
 							ret.append("Consumes: ");
-							ret.append("</i>");
-							for(int j=0; j<cons.length; j++)
-							{
-								ret.append(cons[j]);
-								if(j+1<cons.length)
-									ret.append(" ,");
-							}
-							ret.append(" ");
+						else
+							ret.append("Consumes [not declared by the service]: ");
+						ret.append("</i>");
+						for(int j=0; j<consumed.size(); j++)
+						{
+							ret.append(consumed.get(j));
+							if(j+1<consumed.size())
+								ret.append(" ,");
 						}
+						ret.append(" ");
 					}
 					
-					if(produces!=null)
+					if(produced!=null && produced.size()>0)
 					{
-						String[] prods = produces.value();
-						if(prods.length>0)
-						{
-							ret.append("<i>");
+						ret.append("<i>");
+						ret.append("Produces: ");
+						if(produced!=PARAMETER_MEDIATYPES)
 							ret.append("Produces: ");
-							ret.append("</i>");
-							for(int j=0; j<prods.length; j++)
-							{
-								ret.append(prods[j]);
-								if(j+1<prods.length)
-									ret.append(" ,");
-							}
-							ret.append(" ");
+						else
+							ret.append("Produces [not declared by the service]: ");
+						ret.append("</i>");
+						for(int j=0; j<produced.size(); j++)
+						{
+							ret.append(produced.get(j));
+							if(j+1<produced.size())
+								ret.append(" ,");
 						}
+						ret.append(" ");
 					}
 //						ret.append("</br>");
 					ret.append("</div>");
@@ -1032,20 +1054,16 @@ public class JettyRestServicePublishService implements IWebPublishService
 						}
 						
 						ret.append("<select name=\"mediatype\">");
-						if(consumes!=null)
+						if(consumed!=null && consumed.size()>0)
 						{
-							String[] cons = consumes.value();
-							if(cons!=null && cons.length>0)
+//							ret.append("<select name=\"mediatype\">");
+							for(int j=0; j<consumed.size(); j++)
 							{
-//									ret.append("<select name=\"mediatype\">");
-								for(int j=0; j<cons.length; j++)
+								// todo: hmm? what about others?
+								if(!MediaType.MULTIPART_FORM_DATA.equals(consumed.get(j)) &&
+									!MediaType.APPLICATION_FORM_URLENCODED.equals(consumed.get(j)))
 								{
-									// todo: hmm? what about others?
-									if(!MediaType.MULTIPART_FORM_DATA.equals(cons[j]) &&
-										!MediaType.APPLICATION_FORM_URLENCODED.equals(cons[j]))
-									{
-										ret.append("<option>").append(cons[j]).append("</option>");
-									}
+									ret.append("<option>").append(consumed.get(j)).append("</option>");
 								}
 							}
 						}
@@ -1196,7 +1214,7 @@ public class JettyRestServicePublishService implements IWebPublishService
          */
         public List<String> getProducedMediaTypes()
         {
-            return producedtypes==null? Collections.EMPTY_LIST: producedtypes;
+            return producedtypes;//==null? Collections.EMPTY_LIST: producedtypes;
         }
 
         /**
@@ -1224,7 +1242,7 @@ public class JettyRestServicePublishService implements IWebPublishService
          */
         public List<String> getConsumedMediaTypes()
         {
-            return consumedtypes==null? Collections.EMPTY_LIST: consumedtypes;
+            return consumedtypes;//==null? Collections.EMPTY_LIST: consumedtypes;
         }
 
         /**

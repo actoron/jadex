@@ -864,6 +864,14 @@ public class JavaWriter
 	}
 	
 	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Object val, String encoding, ClassLoader classloader, IObjectWriterHandler handler)
+	{
+		return AWriter.objectToByteArray(getInstance(), val, encoding, classloader, null, handler==null? getObjectHandler(): handler);
+	}
+	
+	/**
 	 *  Write to output stream.
 	 */
 	public static void objectToOutputStream(Object val, OutputStream os, ClassLoader classloader, IObjectWriterHandler handler)
