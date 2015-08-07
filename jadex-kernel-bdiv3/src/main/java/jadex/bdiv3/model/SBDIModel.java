@@ -48,6 +48,8 @@ public class SBDIModel
 				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
 			}
 			
+			
+			int addpos	= bdimodel.getCapability().getBeliefs().isEmpty() ? -1 : 0;	// add inner beliefs before outer in case of dependencies
 			for(MBelief bel: capa.getCapability().getBeliefs())
 			{
 				String	belname	= capaname+MElement.CAPABILITY_SEPARATOR+bel.getName();
@@ -81,7 +83,15 @@ public class SBDIModel
 					bel2.setEvaluationMode(bel.getEvaluationMode());
 					bel2.setMulti(bel.isMulti(cl));
 					bel2.setClazz(bel.getClazz()!=null ? new ClassInfo(bel.getClazz().getType(cl)) : null);
-					bdimodel.getCapability().addBelief(bel2);
+					
+					if(addpos==-1)
+					{
+						bdimodel.getCapability().addBelief(bel2);
+					}
+					else
+					{
+						bdimodel.getCapability().getBeliefs().add(addpos++, bel2);
+					}
 				}
 			}
 			
