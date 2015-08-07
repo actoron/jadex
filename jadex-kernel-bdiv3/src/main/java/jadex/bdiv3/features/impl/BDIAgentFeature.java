@@ -2293,16 +2293,40 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 							if("getBelief".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
 							{
 								String	name	= (String)arg.getConstantValue();
-								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, name));
 								addEvent(events, new EventType(ChangeEvent.FACTCHANGED, name));
 							}
 							else if("getBeliefSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
 							{
 								String	name	= (String)arg.getConstantValue();
-								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, name));
 								addEvent(events, new EventType(ChangeEvent.FACTCHANGED, name));
 								addEvent(events, new EventType(ChangeEvent.FACTADDED, name));
 								addEvent(events, new EventType(ChangeEvent.FACTREMOVED, name));
+							}
+						}
+					}
+				}
+				
+				else if("$goalbase".equals(param.getText()))
+				{
+					Node parent	= param.jjtGetParent();
+					if(parent instanceof ReflectNode)
+					{
+						ReflectNode	ref	= (ReflectNode)parent;
+						if(ref.getType()==ReflectNode.METHOD)
+						{
+							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+							if("getGoals".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.GOALACTIVE, name));
+								addEvent(events, new EventType(ChangeEvent.GOALADOPTED, name));
+								addEvent(events, new EventType(ChangeEvent.GOALDROPPED, name));
+								addEvent(events, new EventType(ChangeEvent.GOALINPROCESS, name));
+								addEvent(events, new EventType(ChangeEvent.GOALNOTINPROCESS, name));
+								addEvent(events, new EventType(ChangeEvent.GOALOPTION, name));
+								addEvent(events, new EventType(ChangeEvent.GOALSUSPENDED, name));
 							}
 						}
 					}

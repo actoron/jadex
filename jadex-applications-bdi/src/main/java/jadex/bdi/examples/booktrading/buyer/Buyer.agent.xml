@@ -56,7 +56,7 @@
 			    </bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition>
+			<creationcondition beliefs="orders">
 				true
 			</creationcondition>
 			<dropcondition>
