@@ -60,7 +60,6 @@ public class ProducerPlan extends Plan
 		// Todo: multiple spaces by name...
 		
 		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();
-//			((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
 
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");

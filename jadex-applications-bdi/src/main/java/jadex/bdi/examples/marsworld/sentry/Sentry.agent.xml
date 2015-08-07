@@ -63,7 +63,7 @@
 			</creationcondition>
 			<!-- Suspend the goal when some other target is nearer to the agent. -->
 			<contextcondition>
-				(select one Target $target from $beliefbase.my_targets
+				(select one ISpaceObject $target from $beliefbase.my_targets
 				order by $beliefbase.my_location.getDistance($target.getLocation()))
 				== $goal.target
 			</contextcondition>
@@ -72,7 +72,8 @@
 				$beliefbase.missionend
 			</dropcondition>
 
-			<deliberation cardinality="1">
+			<!-- <deliberation cardinality="1"> -->
+			<deliberation cardinalityone="true">
 				<inhibits cref="move.walk_around"/>
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. - ->

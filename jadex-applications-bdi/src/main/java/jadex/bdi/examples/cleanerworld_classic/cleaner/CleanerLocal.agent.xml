@@ -150,7 +150,7 @@
 					!$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
 			</dropcondition>
 			<!-- <deliberation cardinality="1"> -->
-			<deliberation> <!--   cardinality="1"> -->
+			<deliberation cardinalityone="true">
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup">
 					$goal.waste.equals($beliefbase.carriedwaste) || 

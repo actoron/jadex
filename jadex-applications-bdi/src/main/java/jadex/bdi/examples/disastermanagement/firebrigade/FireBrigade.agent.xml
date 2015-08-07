@@ -74,7 +74,8 @@
 				&amp;&amp; $goalbase.getGoals(($goal).element_has_model.melement_has_name).length
 					+ $goalbase.getGoals("clear_chemicals").length>1
 			</dropcondition>
-			<deliberation cardinality="1"/>
+			<!-- <deliberation cardinality="1"/> -->
+			<deliberation cardinalityone="true"/>
 			<publish class="IExtinguishFireService" method="extinguishFire"/>
 			<targetcondition>
 				$goal.disaster.fire==0
@@ -89,7 +90,8 @@
 				&amp;&amp; $goalbase.getGoals("extinguish_fire").length
 					+ $goalbase.getGoals(($goal).element_has_model.melement_has_name).length>1
 			</dropcondition>
-			<deliberation cardinality="1"/>
+			<!-- <deliberation cardinality="1"/> -->
+			<deliberation cardinalityone="true"/>
 			<publish class="IClearChemicalsService" method="clearChemicals"/>
 			<targetcondition>
 				$goal.disaster.chemicals==0

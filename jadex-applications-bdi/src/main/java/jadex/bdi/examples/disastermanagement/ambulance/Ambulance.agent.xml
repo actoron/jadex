@@ -72,8 +72,9 @@
 				($goal).goal_has_lifecyclestate==OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION
 				&amp;&amp; $goalbase.getGoals(($goal).element_has_model.melement_has_name).length>1
 			</dropcondition>
-			<deliberation cardinality="1"/>
-			<!--
+			<!-- <deliberation cardinality="1"/> -->
+			<deliberation cardinalityone="true"/>
+						<!--
 			<goalpublish class="IExtinguishFireService" method="extinguishFire"/>
 			 -->
 		</achievegoal>

@@ -155,8 +155,8 @@
 				$beliefbase.carriedwaste==null &amp;&amp;
 				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
  			</dropcondition>
-			<deliberation>
 			<!-- <deliberation cardinality="1"> -->
+			<deliberation cardinalityone="true">
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup">
 					$beliefbase.my_location.getDistance($goal.waste.getLocation())
