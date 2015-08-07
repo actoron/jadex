@@ -111,7 +111,18 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 								List<Object>	inivals	= new ArrayList<Object>();
 								for(UnparsedExpression upex: inibel.getFacts())
 								{
-									inivals.add(SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), inibel)));
+									Object	value	= SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), inibel));
+									if(SReflect.isIterable(value) && inibel.getFacts().size()==1)	// Hack!!! support beliefset of iterable type with one initial element?
+									{
+										for(Object val: SReflect.getIterable(value))
+										{
+											inivals.add(val);											
+										}
+									}
+									else
+									{
+										inivals.add(value);
+									}
 								}
 								inival	= inivals;
 							}

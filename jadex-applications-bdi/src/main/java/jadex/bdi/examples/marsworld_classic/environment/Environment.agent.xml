@@ -21,7 +21,7 @@
 	<beliefs>
 		<!-- The environment as singleton object. -->
 		<belief name="environment" class="Environment">
-			<fact>Environment.createInstance($properties.clock)</fact>
+			<fact>Environment.createInstance((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))</fact>
 	  	</belief>
 
 		<belief name="gui" class="jadex.commons.gui.GuiCreator">
@@ -29,13 +29,7 @@
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>
-	
-	<properties>
-		<property name="clock" class="IFuture">
-			SServiceProvider.getService($scope.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-		</property>
-	</properties>
-	
+		
 	<plans>
 		<plan name="clear_plan">
 			<body class="ClearPlan"/>

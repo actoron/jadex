@@ -96,7 +96,7 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 	{
 		if(guesser==null)
 		{
-			guesser	= new SimpleParameterGuesser(Collections.singleton(pojoagent));
+			guesser	= new SimpleParameterGuesser(super.getParameterGuesser(), Collections.singleton(pojoagent));
 		}
 		return guesser;
 	}

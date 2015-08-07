@@ -400,7 +400,6 @@
 	 		+new java.text.SimpleDateFormat("yyyy.MM.dd_HH.mm.ss")
 	 		.format(new java.util.Date())+".log"</property>
 	 	<property name="logging.useParentHandlers">false</property> -->
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 
 	<configurations>

@@ -41,7 +41,7 @@
 		<belief name="localDealerAID"  class="jadex.bridge.IComponentIdentifier" />
 		
 		<!-- The gui object. -->
-		<belief name="gui" class="ManagerFrame">
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
 			<fact>new jadex.commons.gui.GuiCreator(ManagerFrame.class, new Class[]{jadex.bridge.IExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>

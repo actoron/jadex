@@ -256,7 +256,7 @@ public class SFipa
 		
 		IComponentIdentifier id = source.getName();
 //		id	= cms.createComponentIdentifier(id.getName(), false, id.getAddresses());
-		id	= new BasicComponentIdentifier(id.getName());//, id.getAddresses());
+		id	= id!=null ? new BasicComponentIdentifier(id.getName()) : null;//, id.getAddresses());
 		
 		return df.createDFComponentDescription(id, tds, source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getLeaseTime());
 	}

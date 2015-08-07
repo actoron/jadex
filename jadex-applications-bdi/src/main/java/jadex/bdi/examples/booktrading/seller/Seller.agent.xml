@@ -158,7 +158,6 @@
 		<!-- Seller generates warning about unhandled (passive) sell_book goals. -->
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 		<property name="debugging">false</property>
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 		<property name="componentviewer.viewerclass">"jadex.bdi.examples.booktrading.common.GuiViewerPanel"</property>
 	</properties>
 

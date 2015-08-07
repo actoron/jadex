@@ -263,7 +263,6 @@
 
 	<properties>
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 	
 	<configurations>

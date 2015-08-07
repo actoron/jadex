@@ -146,7 +146,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		</beliefset>
 		
 		<!-- The gui (if any). -->
-		<belief name="gui" class="BlocksworldGui"/>
+		<belief name="gui" class="jadex.commons.gui.GuiCreator"/>
 	</beliefs>
 
 	<goals>
