@@ -79,7 +79,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				{
 					for(MConfigBeliefElement ibel: ibels)
 					{
-						inibels.put(ibel.getName(), ibel);
+						inibels.put(bdimodel.getCapability().getBeliefReferences().containsKey(ibel.getName())
+							? bdimodel.getCapability().getBeliefReferences().get(ibel.getName()) : ibel.getName(), ibel);
 					}
 				}
 			}

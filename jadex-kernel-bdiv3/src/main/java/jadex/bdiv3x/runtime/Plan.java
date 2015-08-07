@@ -950,7 +950,8 @@ public abstract class Plan
 					ret.setResultIfUndone(info.getValue());
 				}
 			};
-			bdif.addBeliefListener(belname, lis);
+			String	capa	= rplan.getModelElement().getCapabilityName();
+			bdif.addBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+belname : belname, lis);
 			try
 			{
 				return ret.get(timeout);
