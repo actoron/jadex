@@ -392,6 +392,7 @@ public class BDIXMLReader extends ComponentXMLReader
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("ref", "name")),
+				new AttributeInfo(new AccessInfo("cref", "name")),
 				new AttributeInfo(new AccessInfo("inhibit", null, AccessInfo.IGNORE_READ)),
 			}, null)));
 		

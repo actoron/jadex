@@ -27,9 +27,6 @@
 	</imports>
 
 	<capabilities>
-		<!-- Include the df capability as dfcap for finding other agents
-			and registering the sentry service. -->
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 		<!-- Include the move capability as move for basic movement. -->
 		<capability name="move" file="jadex.bdi.examples.marsworld_classic.movement.Movement" />
 	</capabilities>
@@ -68,19 +65,16 @@
 			<!-- The parameter target is bound to one
 				of the facts in the belief my_targets. -->
 			<parameter name="target" class="Target">
-				<value>
-					// Hack!!! Condition can also match target object from message
-					$beliefbase.environment.getTarget($target.getId())
-				</value>
+				<bindingoptions>
+					select Target $target from $beliefbase.my_targets
+					where !Arrays.asList($beliefbase.analysed_targets).contains($target)
+				</bindingoptions>
 			</parameter>
 			<unique/>
 			<!-- Create a new goal when a target was added
 				and the mission is going on. -->
-			<creationcondition language="jcl">
-				!$beliefbase.missionend &amp;&amp;
-				Target $target &amp;&amp;
-				Arrays.asList($beliefbase.my_targets).contains($target) &amp;&amp;
-				!Arrays.asList($beliefbase.analysed_targets).contains($target)
+			<creationcondition beliefs="my_targets">
+				!$beliefbase.missionend
 			</creationcondition>
 			<!-- Suspend the goal when some other target is nearer to the agent.- ->
 			<contextcondition>
@@ -132,6 +126,11 @@
 				<messageevent ref="target_inform"/>
 			</trigger>
 		</plan>
+
+		<plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
 	</plans>
 
 	<events>
@@ -163,7 +162,6 @@
 	<properties>
    		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 		<property name="debugging">false</property>
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 
 	<configurations>
@@ -179,21 +177,23 @@
 					<fact>0.1</fact>
 				</initialbelief>
 			</beliefs>
-			<goals>
-				<!-- Create initial goals. -->
-				<initialgoal cref="dfcap.df_register">
+			<plans>
+				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							$properties.dfservice.createDFComponentDescription(null, 
-								$properties.dfservice.createDFServiceDescription("service_sentry", "service_sentry", "University of Hamburg"))
-						</value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("service_sentry", "service_sentry", "University of Hamburg"),
+								20000)
+ 						</value>
 					</parameter>
-				</initialgoal>
+				</initialplan>
+			</plans>
+			<goals>
 				<!-- Create a goal for walking around. -->
 				<initialgoal cref="move.walk_around"/>
 				<!-- Create a goal for finding targets. -->
 				<initialgoal ref="find_targets"/>
-				<endgoal cref="dfcap.df_deregister"/>
 			</goals>
 		</configuration>
 	</configurations>
