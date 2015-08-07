@@ -27,7 +27,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">
- 			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
+ 			<fact>jadex.application.EnvironmentService.getSpace($component, "my2dspace").get()</fact>
  		</belief>
  		
  		<!-- Myself. -->
@@ -72,12 +72,13 @@
 		<!-- Goal to eat any seen food (activated in order of distance). -->
 		<achievegoal name="eat_food">
 			<parameter name="food" class="ISpaceObject">
-				<value>$food</value>
+				<bindingoptions>
+				    select ISpaceObject $food from $beliefbase.seen_food
+				</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl">
- 				ISpaceObject $food &amp;&amp; $food.getType().equals("food")
- 				&amp;&amp; Arrays.asList($beliefbase.seen_food).contains($food)
+			<creationcondition beliefs="food">
+			    true
 			</creationcondition>
 			<dropcondition>
  				!Arrays.asList($beliefbase.seen_food).contains($goal.food)

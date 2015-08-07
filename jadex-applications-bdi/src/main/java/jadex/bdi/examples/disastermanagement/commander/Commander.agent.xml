@@ -28,7 +28,7 @@
 	<beliefs>
 		<!-- Environment imported inherited from move capability. -->
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
+ 			<fact class="ContinuousSpace2D">jadex.application.EnvironmentService.getSpace($component, "my2dspace").get()</fact>
 		</belief>
 		
 		<!-- Required to have disasters in OAV state. -->
@@ -42,13 +42,15 @@
 	<goals>
 		<achievegoal name="handle_disaster">
 			<parameter name="disaster" class="ISpaceObject">
-				<value>$disaster</value>
+				<bindingoptions>
+				    select ISpaceObject $disaster from $beliefbase.disasters
+				    where $disaster.getType().equals("disaster") &amp;&amp;	($disaster.fire!=0 || $disaster.victims!=0 || $disaster.chemicals!=0)
+				</bindingoptions>
 			</parameter>
 			<unique/>
 			<!-- Create one goal for each known disaster. -->
-			<creationcondition language="jcl">
-				ISpaceObject $disaster &amp;&amp; $disaster.getType().equals("disaster") &amp;&amp;
-				($disaster.fire!=0 || $disaster.victims!=0 || $disaster.chemicals!=0)
+			<creationcondition beliefs="disasters">
+				true
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="handle_disaster">

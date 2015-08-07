@@ -50,49 +50,22 @@
 			<!-- The parameter target is bound to one
 				of the facts in the belief my_targets. -->
 			<parameter name="target" class="ISpaceObject">
-<!-- 					// Hack!!! Condition can also match target object from message
-					// $beliefbase.environment.getTarget($target.getId())
- -->
-				<value>
-					$target
-				</value>
+				<bindingoptions>
+					select ISpaceObject $target from $beliefbase.my_targets
+					where $target.state==AnalyzeTargetTask.STATE_UNKNOWN
+				</bindingoptions>
 			</parameter>
 			<unique/>
 			<!-- Create a new goal when a target was added
 				and the mission is going on. -->
-			<creationcondition language="jcl">
-				//!$beliefbase.missionend &amp;&amp;
-				ISpaceObject $target &amp;&amp;
-				Arrays.asList($beliefbase.my_targets).contains($target) &amp;&amp;
-				$target.state==AnalyzeTargetTask.STATE_UNKNOWN
-				// Todo: Should work for method also.
-				// $target.getProperty("state")==AnalyzeTargetTask.STATE_UNKNOWN
-				
-				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact false))
-				//
-				// (beliefset (element_has_model ?mbel_mytargets) (beliefset_has_facts $?x ?target $?y))
-				// ?mbel_mytargets = (mbeliefset (melement_has_name "my_targets"))
-				// (not
-				// 	(and
-				// 		(beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
-				// 		?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
-				// 	)
-				// )
+			<creationcondition beliefs="my_targets">
+			    true
 			</creationcondition>
 			<!-- Suspend the goal when some other target is nearer to the agent. -->
-			<contextcondition language="jcl">
-				// (select one Target $target from $beliefbase.my_targets
-				// order by $beliefbase.my_location.getDistance($target.getLocation()))
-				// == $goal.target
-				
-				// !(ISpaceObject $t2 &amp;&amp; $t2.getType().equals("target") &amp;&amp;
-				// 	((IVector2)$beliefbase.myself.position).getDistance((IVector2)$goal.target.position)
-				// 	> ((IVector2)$beliefbase.myself.position).getDistance((IVector2)$t2.position))
-
-				// Hack!!! $t2 must occur first. Todo: support reordering to allow arbitrary constraints in NOT. 
-				!(ISpaceObject $t2 &amp;&amp; $t2.getType().equals("target") &amp;&amp; $t2.state==AnalyzeTargetTask.STATE_UNKNOWN &amp;&amp;
-					((IVector2)$t2.position).getDistance((IVector2)$beliefbase.myself.position).getAsDouble()
-					&lt; ((IVector2)$goal.target.position).getDistance((IVector2)$beliefbase.myself.position).getAsDouble())
+			<contextcondition>
+				(select one Target $target from $beliefbase.my_targets
+				order by $beliefbase.my_location.getDistance($target.getLocation()))
+				== $goal.target
 			</contextcondition>
 			<!-- Drop the goal on mission end. -->
 			<dropcondition>
