@@ -11,16 +11,6 @@ import jadex.extension.envsupport.math.Vector3Int;
  */
 public class RandomWalkPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public RandomWalkPlan()
-	{
-		//getLogger().info("Created: "+this+" for goal "+getRootGoal());
-	}
-
 	//-------- methods --------
 
 	/**

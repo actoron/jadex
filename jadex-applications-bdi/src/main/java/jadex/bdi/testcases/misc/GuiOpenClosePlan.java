@@ -34,12 +34,12 @@ public class GuiOpenClosePlan extends Plan
 	/** Set to true when event was dispatched. */
 	protected boolean	dispatched;
 
-	//-------- constructors --------
+	//-------- methods --------
 
 	/**
-	 *  Create a new plan.
+	 *  The body method.
 	 */
-	public GuiOpenClosePlan()
+	public void body()
 	{
 		frame = new JFrame();
 		button = new JButton("close_me");
@@ -72,15 +72,7 @@ public class GuiOpenClosePlan extends Plan
 		frame.pack();
 //		frame.setLocation(0,0); SGUI.calculateMiddlePosition(frame));
 		frame.setVisible(true);
-	}
 
-	//-------- methods --------
-
-	/**
-	 *  The body method.
-	 */
-	public void body()
-	{
 		getWaitqueue().addInternalEvent("gui_closed");
 		
 		SwingUtilities.invokeLater(new Runnable()

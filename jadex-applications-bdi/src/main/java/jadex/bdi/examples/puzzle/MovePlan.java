@@ -23,15 +23,6 @@ public class MovePlan extends Plan
 	/** The board. */
 	protected IBoard board;
 
-	//-------- constrcutors --------
-
-	/**
-	 *  Create a new move plan.
-	 */
-	public MovePlan()
-	{
-	}
-
 	//-------- methods --------
 
 	/**

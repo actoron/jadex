@@ -9,16 +9,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class ProduceOrePlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ProduceOrePlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -26,6 +16,8 @@ public class ProduceOrePlan extends Plan
 	 */
 	public void body()
 	{
+		getLogger().info("Created: "+this);
+		
 		// Get the target first.
 		Target target = (Target)getParameter("target").getValue();
 

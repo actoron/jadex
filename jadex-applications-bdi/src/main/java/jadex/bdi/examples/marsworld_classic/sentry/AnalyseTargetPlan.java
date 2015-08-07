@@ -18,16 +18,6 @@ import jadex.bridge.service.types.df.IDFServiceDescription;
  */
 public class AnalyseTargetPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public AnalyseTargetPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -35,6 +25,8 @@ public class AnalyseTargetPlan extends Plan
 	 */
 	public void body()
 	{
+		getLogger().info("Created: "+this);
+		
 		Target target = (Target)getParameter("target").getValue();
 
 		// Move to the target.

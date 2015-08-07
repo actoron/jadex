@@ -15,16 +15,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
  */
 public class CarryPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public CarryPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -32,6 +22,8 @@ public class CarryPlan extends Plan
 	 */
 	public void body()
 	{
+		getLogger().info("Created: "+this);
+		
 		while(true)
 		{
 			// Wait for a request.

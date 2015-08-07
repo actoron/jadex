@@ -22,16 +22,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
  */
 public class ProducerPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ProducerPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -39,6 +29,8 @@ public class ProducerPlan extends Plan
 	 */
 	public void body()
 	{
+		getLogger().info("Created: "+this);
+		
 		while(true)
 		{
 			// Wait for a request.

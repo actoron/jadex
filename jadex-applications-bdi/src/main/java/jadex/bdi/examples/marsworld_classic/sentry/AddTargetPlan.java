@@ -11,16 +11,6 @@ import jadex.bridge.fipa.SFipa;
  */
 public class AddTargetPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public AddTargetPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -28,6 +18,8 @@ public class AddTargetPlan extends Plan
 	 */
 	public void body()
 	{
+		getLogger().info("Created: "+this);
+		
 		//System.out.println("AddPlan found");
 		Environment env = (Environment)getBeliefbase().getBelief("move.environment").getFact();
 		IMessageEvent req = (IMessageEvent)getReason();

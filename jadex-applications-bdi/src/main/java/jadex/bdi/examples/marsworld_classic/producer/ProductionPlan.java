@@ -30,12 +30,12 @@ public class ProductionPlan extends Plan
 
 	protected int visited;
 
-	//-------- constructors --------
+	//-------- methods --------
 
 	/**
-	 *  Create a new plan.
+	 *  Method body.
 	 */
-	public ProductionPlan()
+	public void body()
 	{
 		getLogger().info("Created: "+this);
 		this.visited = 0;
@@ -44,22 +44,13 @@ public class ProductionPlan extends Plan
 		env.setAgentInfo(new AgentInfo(getComponentName(),
 			(String)getBeliefbase().getBelief("move.my_type").getFact(), (Location)getBeliefbase()
 			.getBelief("move.my_home").getFact(),((Number)getBeliefbase().getBelief("move.my_vision").getFact()).doubleValue()));
-	}
-
-	//-------- methods --------
-
-	/**
-	 *  Method body.
-	 */
-	public void body()
-	{
+		
 		while(true)
 		{
 			// Wait for a request.
 			IMessageEvent req = waitForMessageEvent("request_production");
 
 			Target ot = ((RequestProduction)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
-			Environment env = (Environment)getBeliefbase().getBelief("move.environment").getFact();
 			Target target = env.getTarget(ot.getId());
 
 			// Producing ore here.

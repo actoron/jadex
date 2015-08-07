@@ -21,17 +21,7 @@ public class DumbHunterPlan	extends Plan
 	//-------- attributes --------
 
 	/** Random number generator. */
-	protected Random	rand;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public DumbHunterPlan()
-	{
-		this.rand	= new Random(hashCode());
-	}
+	protected Random	rand	= new Random(hashCode());
 
 	//-------- methods --------
 

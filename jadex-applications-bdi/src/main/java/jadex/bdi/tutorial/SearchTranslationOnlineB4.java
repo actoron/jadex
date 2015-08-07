@@ -13,17 +13,6 @@ import java.net.URL;
  */
 public class SearchTranslationOnlineB4 extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public SearchTranslationOnlineB4()
-	{
-//		getLogger().info("Created: "+this);
-		System.out.println("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -31,6 +20,9 @@ public class SearchTranslationOnlineB4 extends Plan
 	 */
 	public void body()
 	{
+//		getLogger().info("Created: "+this);
+		System.out.println("Created: "+this);
+		
 		String eword = (String)((IMessageEvent)getReason()).getParameter(SFipa.CONTENT).getValue();
 		try
 		{

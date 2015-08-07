@@ -19,17 +19,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 	//-------- attributes --------
 	
 	/** List for test reports. */
-	protected List	reports;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create plan.
-	 */
-	public ConfigElementRefWorkerPlan()
-	{
-		this.reports	= new ArrayList();
-	}
+	protected List	reports	= new ArrayList();
 	
 	//-------- methods --------
 
