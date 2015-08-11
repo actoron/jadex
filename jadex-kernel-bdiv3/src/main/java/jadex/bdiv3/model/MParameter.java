@@ -627,7 +627,8 @@ public class MParameter extends MElement
 	{
 		long ret = -1;
 		if(updaterate!=null) 
-			ret = ((Number)SJavaParser.parseExpression(updaterate, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(agent, this))).longValue();
+			ret = ((Number)SJavaParser.parseExpression(updaterate, agent.getModel().getAllImports(), agent.getClassLoader())
+				.getValue(CapabilityWrapper.getFetcher(agent, updaterate.getLanguage()))).longValue();
 		return ret;
 	}
 	

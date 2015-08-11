@@ -292,7 +292,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 			{
 				Object pvalue = msg.get(param.getName());
 				Object mvalue = SJavaParser.parseExpression(param.getDefaultValue(), getComponent().getModel().getAllImports(), 
-					getComponent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getComponent(), msgevent));
+					getComponent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getComponent(), param.getDefaultValue().getLanguage()));
 //				Object pvalue = RExpression.evaluateExpression(params[i].getDefaultValue(), scope.getExpressionParameters());
 //				Object mvalue = getValue(params[i].getName(), scope);
 				if(!SUtil.equals(pvalue, mvalue))
@@ -402,7 +402,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 			{
 				exparams.put("$messagemap", msg);
 				IParsedExpression exp = SJavaParser.parseExpression(matchexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
-				match = ((Boolean)exp.getValue(CapabilityWrapper.getFetcher(getComponent(), msgevent, exparams))).booleanValue();
+				match = ((Boolean)exp.getValue(CapabilityWrapper.getFetcher(getComponent(), matchexp.getLanguage(), exparams))).booleanValue();
 			}
 			catch(Exception e)
 			{

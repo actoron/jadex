@@ -77,12 +77,13 @@ public class SBDIModel
 						bel2.setSetter(bel.getSetter());
 					}
 					bel2.setName(belname);
-					bel2.setDefaultFact(bel.getDefaultFact());
-					bel2.setDefaultFacts(bel.getDefaultFacts());
+					bel2.setDefaultFact(copyExpression(capaname, bel.getDefaultFact()));
+					bel2.setDefaultFacts(copyExpressions(capaname, bel.getDefaultFacts()));
 					bel2.setDescription(bel.getDescription());
 					bel2.setEvaluationMode(bel.getEvaluationMode());
 					bel2.setMulti(bel.isMulti(cl));
 					bel2.setClazz(bel.getClazz()!=null ? new ClassInfo(bel.getClazz().getType(cl)) : null);
+					bel2.setUpdateRate(copyExpression(capaname, bel.getUpdateRate()));
 					
 					if(addpos==-1)
 					{
@@ -172,7 +173,7 @@ public class SBDIModel
 				event2.setDescription(event.getDescription());
 				event2.setDirection(event.getDirection());
 				event2.setExcludeMode(event.getExcludeMode());
-				event2.setMatchExpression(event.getMatchExpression());
+				event2.setMatchExpression(copyExpression(capaname, event.getMatchExpression()));
 				event2.setPostToAll(event.isPostToAll());
 				event2.setRandomSelection(event.isRandomSelection());
 				event2.setRebuild(event.isRebuild());
@@ -374,14 +375,12 @@ public class SBDIModel
 		{
 			cbel2	= new MConfigBeliefElement();
 			cbel2.setName(name);
-			for(UnparsedExpression fact: SUtil.safeList(cbel.getFacts()))
-			{
-				String	fname	= capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : "");
-				UnparsedExpression	fact2	= new UnparsedExpression(fname, (String)null, fact.getValue(), fact.getLanguage());
-				fact2.setParsedExp(fact.getParsed());	// Use parsed expression from inner scope (with correct imports).
-				fact2.setClazz(fact.getClazz());
-				cbel2.addFact(fact2);
-			}
+			cbel2.setFacts(copyExpressions(capaname, cbel.getFacts()));
+//			for(UnparsedExpression fact: SUtil.safeList(cbel.getFacts()))
+//			{
+//				// Todo: why new name?
+//				fact.setName(capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : ""));
+//			}
 		}
 		return cbel2;
 	}
@@ -400,12 +399,9 @@ public class SBDIModel
 			{
 				for(UnparsedExpression value: param.getValue())
 				{
-					UnparsedExpression	value2	= new UnparsedExpression(value.getName(), (String)null, value.getValue(), value.getLanguage());
-					value2.setParsedExp(value.getParsed());	// Use parsed expression from inner scope (with correct imports).
-					value2.setClazz(value.getClazz());
-					cpel2.addParameter(value2);
-					// Hack!!! change name after adding.
-					value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
+					cpel2.addParameter(copyExpression(capaname, value));
+//					// Hack!!! change name after adding.	todo: why?
+//					value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
 				}
 			}			
 		}
@@ -419,10 +415,10 @@ public class SBDIModel
 	{
 		MParameter	param2	= param instanceof MPlanParameter ? new MPlanParameter() : new MParameter(param.getField());
 		param2.setBeliefEvents(convertEvents(capaname, param.getBeliefEvents(), bdimodel));
-		param2.setBindingOptions(param.getBindingOptions());
+		param2.setBindingOptions(copyExpression(capaname, param.getBindingOptions()));
 		param2.setClazz(param.getClazz());
-		param2.setDefaultValue(param.getDefaultValue());
-		param2.setDefaultValues(param.getDefaultValues());
+		param2.setDefaultValue(copyExpression(capaname, param.getDefaultValue()));
+		param2.setDefaultValues(copyExpressions(capaname, param.getDefaultValues()));
 		param2.setDescription(param.getDescription());
 		param2.setDirection(param.getDirection());
 		param2.setEvaluationMode(param.getEvaluationMode());
@@ -433,7 +429,7 @@ public class SBDIModel
 		param2.setRawEvents(param.getRawEvents());
 		param2.setServiceMappings(param.getServiceMappings());
 		param2.setSetter(param.getSetter());
-		param2.setUpdateRate(param.getUpdateRate());
+		param2.setUpdateRate(copyExpression(capaname, param.getUpdateRate()));
 		
 		if(param instanceof MPlanParameter)
 		{
@@ -632,7 +628,17 @@ public class SBDIModel
 			{
 				for(MGoal goal: trigger.getGoals())
 				{
-					trigger2.addGoal(bdimodel.getCapability().getResolvedGoal(capa, goal.getName()));
+					// Pojo
+					if(goal.getTarget()!=null)
+					{
+						trigger2.addGoal(bdimodel.getCapability().getGoal(capa+MElement.CAPABILITY_SEPARATOR+goal.getName()));
+					}
+					
+					// XML
+					else
+					{
+						trigger2.addGoal(bdimodel.getCapability().getResolvedGoal(capa, goal.getName()));
+					}
 //					trigger.getGoalMatchExpression(mgoal)	// todo!
 				}
 			}
@@ -640,7 +646,17 @@ public class SBDIModel
 			{
 				for(MGoal goal: trigger.getGoalFinisheds())
 				{
-					trigger2.addGoalFinished(bdimodel.getCapability().getResolvedGoal(capa, goal.getName()));
+					// Pojo
+					if(goal.getTarget()!=null)
+					{
+						trigger2.addGoalFinished(bdimodel.getCapability().getGoal(capa+MElement.CAPABILITY_SEPARATOR+goal.getName()));
+					}
+					
+					// XML
+					else
+					{
+						trigger2.addGoalFinished(bdimodel.getCapability().getResolvedGoal(capa, goal.getName()));
+					}
 				}
 			}
 			if(trigger.getServices()!=null)
@@ -727,8 +743,44 @@ public class SBDIModel
 		MCondition ccond = new MCondition(cname, convertEventTypes(capa, cond.getEvents(), bdimodel));
 		ccond.setConstructorTarget(cond.getConstructorTarget());
 		ccond.setMethodTarget(cond.getMethodTarget());
-		ccond.setExpression(cond.getExpression());
+		ccond.setExpression(copyExpression(capa, cond.getExpression()));
 		ccond.setDescription(cond.getDescription());
 		return ccond;
 	}
+	
+	/**
+	 *  Copy an expression.
+	 *  Adds correct scope.
+	 */
+	protected static UnparsedExpression	copyExpression(String scope, UnparsedExpression upex)
+	{
+		UnparsedExpression	upex2	= null;
+		if(upex!=null)
+		{
+			upex2	= new UnparsedExpression(upex.getName(), (String)null, upex.getValue(),
+				upex.getLanguage()!=null ? scope + MElement.CAPABILITY_SEPARATOR + upex.getLanguage() : scope);	// Hack: use language as scope.
+			upex2.setClazz(upex.getClazz());
+			upex2.setParsedExp(upex.getParsed());
+		}
+		return upex2;
+	}
+	
+	/**
+	 *  Copy expressions.
+	 *  Adds correct scope.
+	 */
+	protected static List<UnparsedExpression>	copyExpressions(String scope, List<UnparsedExpression> upes)
+	{
+		List<UnparsedExpression>	ret	= null;
+		if(upes!=null)
+		{
+			ret	= new ArrayList<UnparsedExpression>();
+			for(UnparsedExpression upex: upes)
+			{
+				ret.add(copyExpression(scope, upex));
+			}
+		}
+		return ret;
+	}
+
 }

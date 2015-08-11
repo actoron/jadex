@@ -26,7 +26,6 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
-import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
@@ -168,17 +167,11 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	{
 		// Find parameter mappings for xml agents
 		Map<String, Object> mappingvals = binding;
-		SimpleValueFetcher	svf	= null;
 		
 		// Todo: service call mappings?
 		if(reason instanceof RParameterElement && mplan.getParameters()!=null && mplan.getParameters().size()>0)
 		{
 			RParameterElement rpe = (RParameterElement)reason;
-			if(svf==null)
-			{
-				svf	= new SimpleValueFetcher(CapabilityWrapper.getFetcher(ia, mplan));
-				svf.setValue(rpe instanceof RGoal ? "$goal" : "$event", rpe);
-			}
 			
 			for(MParameter mparam: mplan.getParameters())
 			{
@@ -223,7 +216,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			}
 		}
 		
-		final RPlan rplan = new RPlan(mplan, candidate, ia, mappingvals, svf!=null ? svf : CapabilityWrapper.getFetcher(ia, mplan), config); //mappingvals==null? new RPlan(mplan, candidate, ia): 
+		final RPlan rplan = new RPlan(mplan, candidate, ia, mappingvals, config); //mappingvals==null? new RPlan(mplan, candidate, ia): 
 //		rplan.setInternalAccess(ia);
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);
@@ -375,6 +368,20 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	}
 	
 	/**
+	 *  Add reason to fetcher.
+	 */
+	@Override
+	public SimpleValueFetcher wrapFetcher(IValueFetcher fetcher)
+	{
+		SimpleValueFetcher	ret	= super.wrapFetcher(fetcher);
+		if(reason instanceof RParameterElement)
+		{
+			ret.setValue(reason instanceof RGoal ? "$goal" : "$event", reason);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get the pojo plan of a plan.
 	 *  @return The pojo plan.
 	 */
@@ -415,9 +422,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 *  Create a new plan.
 	 */
-	public RPlan(MPlan mplan, Object candidate, IInternalAccess agent, Map<String, Object> mappingvals, IValueFetcher fetcher, MConfigParameterElement config)
+	public RPlan(MPlan mplan, Object candidate, IInternalAccess agent, Map<String, Object> mappingvals, MConfigParameterElement config)
 	{
-		super(mplan, agent, mappingvals, fetcher, config);
+		super(mplan, agent, mappingvals, config);
 		this.candidate = candidate;
 		setLifecycleState(PlanLifecycleState.NEW);
 		setProcessingState(PlanProcessingState.READY);

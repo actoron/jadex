@@ -15,6 +15,7 @@ import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.IGoal.GoalProcessingState;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
@@ -293,7 +294,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 							UnparsedExpression uexp = uexps.get(mother.getName());
 							if(uexp!=null && uexp.getValue()!=null && uexp.getValue().length()>0)
 							{
-								SimpleValueFetcher fet = new SimpleValueFetcher(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(agent, goal.getMGoal()));
+								SimpleValueFetcher fet = new SimpleValueFetcher(CapabilityWrapper.getFetcher(agent, uexp.getLanguage()));
 								fet.setValue("$goal", goal);
 								fet.setValue("$ref", other);
 								

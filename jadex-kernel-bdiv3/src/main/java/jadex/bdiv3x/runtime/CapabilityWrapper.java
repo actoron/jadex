@@ -302,32 +302,30 @@ public class CapabilityWrapper implements ICapability
 	//-------- helper methods --------
 
 	/**
-	 *  Get the capability-specific fetcher for an element.
+	 *  Get the capability-specific fetcher (scope==null for agent scope).
 	 */
-	public static IValueFetcher	getFetcher(final IInternalAccess agent, MElement element)
+	public static IValueFetcher	getFetcher(final IInternalAccess agent, String scope)
 	{
-		return getFetcher(agent, element, null);
+		return getFetcher(agent, scope, null);
 	}
 
 	/**
-	 *  Get the capability-specific fetcher for an element.
+	 *  Get the capability-specific fetcher (scope==null for agent scope).
 	 *  Also creates a new fetcher, if values are given.
 	 */
-	// Todo: move somewhere else?
-	public static IValueFetcher	getFetcher(final IInternalAccess agent, MElement element, Map<String, Object> values)
+	public static IValueFetcher	getFetcher(final IInternalAccess agent, String scope, Map<String, Object> values)
 	{
 		IValueFetcher	ret	= agent.getFetcher();
 		
-		// Todo: some RElements have no MElement (e.g. expression)
-		if(element!=null && element.getCapabilityName()!=null && agent.getComponentFeature0(IBDIXAgentFeature.class)!=null)	
+		if(scope!=null && agent.getComponentFeature0(IBDIXAgentFeature.class)!=null)	
 		{
 			ICapability	capa	= agent.getComponentFeature(IBDIXAgentFeature.class);
-			String	prefix	= element.getCapabilityName()+MElement.CAPABILITY_SEPARATOR;
+			String	prefix	= scope+MElement.CAPABILITY_SEPARATOR;
 			SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ret);
 			fetcher.setValue("$beliefbase", new BeliefbaseWrapper(capa.getBeliefbase(), prefix));
-			fetcher.setValue("$goalbase", new RGoalbase(agent, element.getCapabilityName()));
+			fetcher.setValue("$goalbase", new RGoalbase(agent, scope));
 			fetcher.setValue("$planbase", new PlanbaseWrapper(capa.getPlanbase(), prefix));
-			fetcher.setValue("$eventbase", new REventbase(agent, element.getCapabilityName()));
+			fetcher.setValue("$eventbase", new REventbase(agent, scope));
 			fetcher.setValue("$expressionbase", new ExpressionbaseWrapper(capa.getExpressionbase(), prefix));
 			if(values!=null)
 			{

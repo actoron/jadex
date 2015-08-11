@@ -41,6 +41,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+//import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -393,6 +394,7 @@ public class BDIXMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("ref", "name")),
 				new AttributeInfo(new AccessInfo("cref", "name")),
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("inhibit", null, AccessInfo.IGNORE_READ)),
 			}, null)));
 		
@@ -769,7 +771,9 @@ public class BDIXMLReader extends ComponentXMLReader
 //			new AttributeInfo(new AccessInfo("impl", OAVBDIMetaModel.body_has_impl))
 			}, null)));//, bopost));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "precondition")), new ObjectInfo(UnparsedExpression.class, expost),
-			new MappingInfo(null, null, "value")));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ))
+			})));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
 //			new MappingInfo(ti_expression)));
 			
@@ -1034,6 +1038,7 @@ public class BDIXMLReader extends ComponentXMLReader
 		};
 		AttributeInfo[]	condattrs	= new AttributeInfo[]
 		{
+			new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 			new AttributeInfo(new AccessInfo("beliefs", null, AccessInfo.IGNORE_READ)),
 			new AttributeInfo(new AccessInfo("parameters", null, AccessInfo.IGNORE_READ)),
 			new AttributeInfo(new AccessInfo("goals", null, AccessInfo.IGNORE_READ)),
@@ -1180,37 +1185,44 @@ public class BDIXMLReader extends ComponentXMLReader
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "value")}), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "values")}), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "fact")}), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "facts")}), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "match")}), new ObjectInfo(UnparsedExpression.class, expost), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "expression")}), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("exported", null, AccessInfo.IGNORE_READ))	// Todo: support checking?
 			}, null)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "bindingoptions")}), new ObjectInfo(UnparsedExpression.class, expost),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("language", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		

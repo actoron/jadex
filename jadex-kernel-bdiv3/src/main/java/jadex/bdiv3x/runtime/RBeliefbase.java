@@ -112,7 +112,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 								List<Object>	inivals	= new ArrayList<Object>();
 								for(UnparsedExpression upex: inibel.getFacts())
 								{
-									Object	value	= SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), inibel));
+									Object	value	= SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader())
+										.getValue(CapabilityWrapper.getFetcher(getAgent(), upex.getLanguage()));
 									if(SReflect.isIterable(value) && inibel.getFacts().size()==1)	// Hack!!! support beliefset of iterable type with one initial element?
 									{
 										for(Object val: SReflect.getIterable(value))
@@ -129,7 +130,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 							}
 							else if(!inibel.getFacts().isEmpty())
 							{
-								inival	= SJavaParser.parseExpression(inibel.getFacts().get(0), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), inibel));								
+								inival	= SJavaParser.parseExpression(inibel.getFacts().get(0), getAgent().getModel().getAllImports(), getAgent().getClassLoader())
+									.getValue(CapabilityWrapper.getFetcher(getAgent(), inibel.getFacts().get(0).getLanguage()));								
 							}
 							hasinival	= true;
 						}
@@ -467,7 +469,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			String name = getModelElement().getName();
 			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
 			if(modelelement.getDefaultFact()!=null)
-				setFact(SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), getModelElement())));
+				setFact(SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader())
+					.getValue(CapabilityWrapper.getFetcher(getAgent(), modelelement.getDefaultFact().getLanguage())));
 		}
 		
 		/**
@@ -539,7 +542,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			if(((MBelief)getModelElement()).getDefaultFact()!=null && MParameter.EvaluationMode.PULL.equals(((MBelief)getModelElement()).getEvaluationMode()))
 			{
 				ret = SJavaParser.parseExpression(((MBelief)getModelElement()).getDefaultFact(), 
-					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), getModelElement()));
+					getAgent().getModel().getAllImports(), getAgent().getClassLoader())
+						.getValue(CapabilityWrapper.getFetcher(getAgent(), ((MBelief)getModelElement()).getDefaultFact().getLanguage()));
 			}
 			return ret;
 		}
@@ -639,7 +643,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			List<Object> tmpfacts = new ArrayList<Object>();
 			if(mbel.getDefaultFact()!=null)
 			{
-				Object tmp = SJavaParser.parseExpression(mbel.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), getModelElement()));
+				Object tmp = SJavaParser.parseExpression(mbel.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader())
+					.getValue(CapabilityWrapper.getFetcher(getAgent(), mbel.getDefaultFact().getLanguage()));
 				Iterator<?>	it	= SReflect.getIterator(tmp);
 				while(it.hasNext())
 				{
@@ -652,7 +657,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				{
 					for(UnparsedExpression uexp: mbel.getDefaultFacts())
 					{
-						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), getModelElement()));
+						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader())
+							.getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 						tmpfacts.add(fact);
 					}
 				}

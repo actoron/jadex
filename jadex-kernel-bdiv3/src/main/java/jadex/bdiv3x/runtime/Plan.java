@@ -1083,7 +1083,7 @@ public abstract class Plan
 			{
 				UnparsedExpression uexp = mcond.getExpression();
 				Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), 
-					getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+					getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 				return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 			}
 		}, new IAction<Void>()
@@ -1130,7 +1130,7 @@ public abstract class Plan
 		{
 			public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 			{
-				Boolean ret = (Boolean)exp.getValue(getAgent().getFetcher());				
+				Boolean ret = (Boolean)exp.getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 				return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 			}
 		}, new IAction<Void>()
