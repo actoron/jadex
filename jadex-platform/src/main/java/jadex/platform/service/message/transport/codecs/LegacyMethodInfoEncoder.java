@@ -1,5 +1,6 @@
 package jadex.platform.service.message.transport.codecs;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class LegacyMethodInfoEncoder extends AbstractCodec
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type clazz, boolean clone, ClassLoader targetcl)
 	{
 		return object instanceof MethodInfo;
 	}
