@@ -1,6 +1,12 @@
 package jadex.commons.transformation;
 
+import java.net.URI;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -37,12 +43,26 @@ public class BasicTypeConverter //implements ITypeConverter
 	/** String -> Character converter. (remove?) */
 	public static final IStringObjectConverter CHARACTER_CONVERTER = new CharacterTypeConverter();
 	
+	
+	/** String -> Date converter. */
+	public static final IStringObjectConverter DATE_CONVERTER = new DateTypeConverter();
+
+	/** String -> URL converter. */
+	public static final IStringObjectConverter URL_CONVERTER = new URLTypeConverter();
+
+	/** String -> URI converter. */
+	public static final IStringObjectConverter URI_CONVERTER = new URITypeConverter();
+
+	
 	/** The map of basic converters. */
-	protected static final Map basicconverters;
+	protected static final Map<Class<?>, IStringObjectConverter> basicconverters;
+	
+	/** The extended map of converters. */
+	protected static final Map<Class<?>, IStringObjectConverter> extconverters;
 	
 	static
 	{
-		basicconverters = new HashMap();
+		basicconverters = new HashMap<Class<?>, IStringObjectConverter>();
 		basicconverters.put(String.class, STRING_CONVERTER);
 		basicconverters.put(int.class, INTEGER_CONVERTER);
 		basicconverters.put(Integer.class, INTEGER_CONVERTER);
@@ -60,6 +80,12 @@ public class BasicTypeConverter //implements ITypeConverter
 		basicconverters.put(Byte.class, BYTE_CONVERTER);
 		basicconverters.put(char.class, CHARACTER_CONVERTER);
 		basicconverters.put(Character.class, CHARACTER_CONVERTER);
+		
+		extconverters = new HashMap<Class<?>, IStringObjectConverter>();
+		extconverters.putAll(basicconverters);
+		extconverters.put(Date.class, DATE_CONVERTER);
+		extconverters.put(URI.class, URI_CONVERTER);
+		extconverters.put(URL.class, URL_CONVERTER);
 	}
 	
 	/**
@@ -70,6 +96,16 @@ public class BasicTypeConverter //implements ITypeConverter
 	public static boolean isBuiltInType(Class clazz)
 	{
 		return basicconverters.get(clazz)!=null;
+	}
+	
+	/**
+	 *  Test if a clazz is a built-in type.
+	 *  @param clazz The clazz.
+	 *  @return True, if built-in type.
+	 */
+	public static boolean isExtendedBuiltInType(Class clazz)
+	{
+		return extconverters.get(clazz)!=null;
 	}
 	
 	/**
@@ -91,6 +127,37 @@ public class BasicTypeConverter //implements ITypeConverter
 	{
 		IObjectStringConverter ret = null;
 		if(isBuiltInType(clazz))
+		{
+			ret = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, Object context)
+				{
+					return val==null? "null": val.toString();
+				}
+			};
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get a String -> X converter for a target clazz.
+	 *  @param clazz The clazz.
+	 *  @return converter The converter.
+	 */
+	public static IStringObjectConverter getExtendedStringConverter(Class<?> clazz)
+	{
+		return (IStringObjectConverter)extconverters.get(clazz);
+	}
+	
+	/**
+	 *  Get a X -> String converter for a source clazz.
+	 *  @param clazz The clazz.
+	 *  @return converter The converter.
+	 */
+	public static IObjectStringConverter getExtendedObjectConverter(Class<?> clazz)
+	{
+		IObjectStringConverter ret = null;
+		if(extconverters.get(clazz)!=null)
 		{
 			ret = new IObjectStringConverter()
 			{
@@ -242,5 +309,91 @@ class CharacterTypeConverter implements IStringObjectConverter
 		return Character.valueOf(((String)val).charAt(0)); //?
 	}
 	
+}
+
+
+/**
+ *  String -> Date converter.
+ */
+class DateTypeConverter implements IStringObjectConverter
+{
+	/**
+	 *  Convert a string value to another type.
+	 *  @param val The string value to convert.
+	 */
+	public Object convertString(String val, Object context)
+	{
+		Object ret = null;
+		for(Locale locale: DateFormat.getAvailableLocales()) 
+		{
+			for(int style=DateFormat.FULL; style<=DateFormat.SHORT && ret==null; style ++) 
+			{
+		        DateFormat df = DateFormat.getDateInstance(style, locale);
+		        try 
+		        {
+		        	ret = df.parse(val);
+		        } 
+		        catch(ParseException ex) 
+		        {
+		            continue;
+		        }
+		    }
+			if(ret!=null)
+				break;
+		}
+		return ret;
+	}
+}
+
+/**
+ *  String -> URL converter.
+ */
+class URLTypeConverter implements IStringObjectConverter
+{
+	/**
+	 *  Convert a string value to another type.
+	 *  @param val The string value to convert.
+	 */
+	public Object convertString(String val, Object context)
+	{
+		try
+		{
+			return new URL(val);
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+}
+
+/**
+ *  String -> URI converter.
+ */
+class URITypeConverter implements IStringObjectConverter
+{
+	/**
+	 *  Convert a string value to another type.
+	 *  @param val The string value to convert.
+	 */
+	public Object convertString(String val, Object context)
+	{
+		try
+		{
+			return new URI(val);
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 }
 

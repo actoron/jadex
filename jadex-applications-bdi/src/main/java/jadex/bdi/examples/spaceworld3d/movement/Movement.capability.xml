@@ -20,7 +20,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact class="IFuture">$scope.getParentAccess().getExtension("my3dspace")</fact>
+ 			<fact>jadex.application.EnvironmentService.getSpace($component, "my3dspace").get()</fact>
  		</belief>
  		
  		<!-- Myself. -->
@@ -88,11 +88,4 @@
 			</trigger>
 		</plan>
 	</plans>
-	<!-- 
-	<properties>
-		<property name="env" class="IFuture">
-			$scope.getParentAccess().getExtension("my2dspace")		
-		</property>
-	</properties>
-	 -->
 </capability>

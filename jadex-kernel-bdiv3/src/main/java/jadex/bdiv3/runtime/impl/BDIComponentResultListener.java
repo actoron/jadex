@@ -1,5 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.logging.Logger;
+
 import jadex.base.Starter;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
@@ -11,8 +13,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
-
-import java.util.logging.Logger;
 
 /**
  *  This listener has the purpose to keep the current plan

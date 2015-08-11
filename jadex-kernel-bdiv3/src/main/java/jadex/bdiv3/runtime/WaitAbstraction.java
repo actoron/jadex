@@ -1,15 +1,15 @@
 package jadex.bdiv3.runtime;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3x.features.BDIXMessageComponentFeature;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.commons.Tuple2;
-
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  *  Object that indicates on which elements a plan is waiting. 

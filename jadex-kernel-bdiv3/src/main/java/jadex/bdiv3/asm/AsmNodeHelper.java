@@ -1,11 +1,11 @@
 package jadex.bdiv3.asm;
 
-import jadex.bdiv3.NodeHelper;
-
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
+
+import jadex.bdiv3.NodeHelper;
 
 /**
  *  Helper for creating nodes.

@@ -1,16 +1,5 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3x.runtime.CapabilityWrapper;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.FieldInfo;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
-import jadex.javaparser.SJavaParser;
-import jadex.rules.eca.EventType;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,6 +10,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3x.runtime.CapabilityWrapper;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.FieldInfo;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.javaparser.SJavaParser;
+import jadex.rules.eca.EventType;
 
 
 /**
@@ -530,6 +530,15 @@ public class MParameter extends MElement
 	 *  The value to set.
 	 *  @param value The value to set
 	 */
+	public void setDefaultValues(List<UnparsedExpression> values)
+	{
+		this.values = values;
+	}
+	
+	/**
+	 *  The value to set.
+	 *  @param value The value to set
+	 */
 	public void addDefaultValues(UnparsedExpression fact)
 	{
 		if(values==null)
@@ -617,8 +626,9 @@ public class MParameter extends MElement
 	public long getUpdaterateValue(IInternalAccess agent)
 	{
 		long ret = -1;
-		if(updaterate!=null)
-			ret = ((Long)SJavaParser.parseExpression(updaterate, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(agent, this))).longValue();
+		if(updaterate!=null) 
+			ret = ((Number)SJavaParser.parseExpression(updaterate, agent.getModel().getAllImports(), agent.getClassLoader())
+				.getValue(CapabilityWrapper.getFetcher(agent, updaterate.getLanguage()))).longValue();
 		return ret;
 	}
 	

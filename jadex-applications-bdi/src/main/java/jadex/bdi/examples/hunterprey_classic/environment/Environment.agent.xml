@@ -22,7 +22,6 @@
 
 	<capabilities>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 
 	<beliefs>
@@ -46,13 +45,6 @@
 	</beliefs>
 
 	<goals>
-		<achievegoalref name="df_register">
-			<concrete ref="dfcap.df_register"/>
-		</achievegoalref>
-		<achievegoalref name="df_deregister">
-			<concrete ref="dfcap.df_deregister"/>
-		</achievegoalref>
-
 		<querygoalref name="rp_decide_request">
 			<concrete ref="procap.rp_decide_request"/>
 		</querygoalref>
@@ -154,6 +146,11 @@
 				-->
 			</trigger>
 		</plan>
+		
+	    <plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
 	</plans>
 
 	<events>
@@ -266,7 +263,6 @@
 
 	<properties>
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 	
 	<configurations>
@@ -276,20 +272,19 @@
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
 			</beliefs>
-			<goals>
-				<initialgoal ref="df_register">
-					<parameter ref="description">
-						<value>
-							$properties.dfservice.createDFComponentDescription(null,
-								$properties.dfservice.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
-										new String[]{"JADEX_XML"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null))
-						</value>
-					</parameter>
-				</initialgoal>
-				<endgoal ref="df_deregister"/>
-			</goals>
 			<plans>
 				<initialplan ref="simticker"/>
+				<initialplan ref="df_keep_registered">
+					<parameter ref="description">
+						<value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
+										new String[]{"JADEX_XML"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null),
+								20000)
+ 						</value>
+					</parameter>
+				</initialplan>
 			</plans>
 		</configuration>
 	</configurations>

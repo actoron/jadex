@@ -1,5 +1,20 @@
 package jadex.bdiv3.features.impl;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import jadex.bdiv3.ASMBDIClassGenerator;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.Capability;
@@ -79,21 +94,6 @@ import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.Event;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  *  The bdi agent feature implementation for pojo agents.
@@ -401,7 +401,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		
 		// Only store event for non-update-rate beliefs (update rate beliefs get set later)
-		else if(mbel.getUpdaterate()<=0)
+//		else if(mbel.getUpdaterate()<=0)
+		else if(mbel.getUpdateRate()==null)
 		{
 			// In init set field immediately but throw events later, when agent is available.
 			
@@ -683,7 +684,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 //			System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
 		BDIModel bdimodel = (BDIModel)component.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel();
-		String	belname	= bdimodel.getBeliefReferences().get(capa+MElement.CAPABILITY_SEPARATOR+name);
+		String	belname	= bdimodel.getCapability().getBeliefReferences().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
 			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
@@ -717,7 +718,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 //			System.out.println("setAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
 		BDIModel bdimodel = (BDIModel)component.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel();
-		String	belname	= bdimodel.getBeliefReferences().get(capa+MElement.CAPABILITY_SEPARATOR+name);
+		String	belname	= bdimodel.getCapability().getBeliefReferences().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
 			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
@@ -1202,7 +1203,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				// For abstract belief find corresponding mapping.
 				else
 				{
-					Map<String, String>	map	= bdimodel.getBeliefReferences();
+					Map<String, String>	map	= bdimodel.getCapability().getBeliefReferences();
 					for(String target: map.keySet())
 					{
 						if(source.equals(map.get(target)))
@@ -1704,7 +1705,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public void addBeliefListener(String name, final IBeliefListener listener)
 	{
-		String fname = bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
+		String fname = bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		
 		List<EventType> events = new ArrayList<EventType>();
 		addBeliefEvents(getComponent(), events, fname);
@@ -1756,7 +1757,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
+		name	= bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		getRuleSystem().getRulebase().removeRule(rulename);
 	}
@@ -1927,9 +1928,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					{
 						source	= capaname + MElement.CAPABILITY_SEPARATOR + source;
 					}
-					if(bdif.getBDIModel().getBeliefReferences().containsKey(source))
+					if(bdif.getBDIModel().getCapability().getBeliefReferences().containsKey(source))
 					{
-						source	= bdif.getBDIModel().getBeliefReferences().get(source);
+						source	= bdif.getBDIModel().getCapability().getBeliefReferences().get(source);
 					}
 					
 					if(event!=null && event.getSource()!=null && event.getSource().equals(source))
@@ -2292,16 +2293,40 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 							if("getBelief".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
 							{
 								String	name	= (String)arg.getConstantValue();
-								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, name));
 								addEvent(events, new EventType(ChangeEvent.FACTCHANGED, name));
 							}
 							else if("getBeliefSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
 							{
 								String	name	= (String)arg.getConstantValue();
-								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(events, new EventType(ChangeEvent.BELIEFCHANGED, name));
 								addEvent(events, new EventType(ChangeEvent.FACTCHANGED, name));
 								addEvent(events, new EventType(ChangeEvent.FACTADDED, name));
 								addEvent(events, new EventType(ChangeEvent.FACTREMOVED, name));
+							}
+						}
+					}
+				}
+				
+				else if("$goalbase".equals(param.getText()))
+				{
+					Node parent	= param.jjtGetParent();
+					if(parent instanceof ReflectNode)
+					{
+						ReflectNode	ref	= (ReflectNode)parent;
+						if(ref.getType()==ReflectNode.METHOD)
+						{
+							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+							if("getGoals".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, new EventType(ChangeEvent.GOALACTIVE, name));
+								addEvent(events, new EventType(ChangeEvent.GOALADOPTED, name));
+								addEvent(events, new EventType(ChangeEvent.GOALDROPPED, name));
+								addEvent(events, new EventType(ChangeEvent.GOALINPROCESS, name));
+								addEvent(events, new EventType(ChangeEvent.GOALNOTINPROCESS, name));
+								addEvent(events, new EventType(ChangeEvent.GOALOPTION, name));
+								addEvent(events, new EventType(ChangeEvent.GOALSUSPENDED, name));
 							}
 						}
 					}

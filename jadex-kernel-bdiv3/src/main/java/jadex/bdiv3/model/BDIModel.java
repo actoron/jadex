@@ -1,15 +1,12 @@
 package jadex.bdiv3.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.FieldInfo;
 import jadex.commons.Tuple2;
 import jadex.micro.MicroModel;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -18,10 +15,6 @@ public class BDIModel extends MicroModel	implements IBDIModel
 {
 	/** The subcapabilities. */
 	protected List<Tuple2<FieldInfo, BDIModel>> subcapabilities;
-
-	/** The belief mappings. */
-	protected Map<String, String> beliefmappings;
-
 
 	/** The capability. */
 	protected MCapability mcapa;
@@ -35,42 +28,42 @@ public class BDIModel extends MicroModel	implements IBDIModel
 		this.mcapa = mcapa;
 	}
 
-	/**
-	 *  Get a capability by name.
-	 *  @return The mcapa.
-	 */
-	public MCapability getCapability(String name)
-	{
-		MCapability ret = null;
-		int idx = name.indexOf(MElement.CAPABILITY_SEPARATOR);
-		if(idx!=-1)
-		{
-			String capaname = name.substring(0, idx-1);
-			String rest = name.substring(idx+1);
-			if(subcapabilities!=null)
-			{
-				BDIModel subcap = null;
-				for(Tuple2<FieldInfo, BDIModel> tup: subcapabilities)
-				{
-					subcap = tup.getSecondEntity();
-					if(subcap.getCapability().getName().equals(capaname))
-					{
-						break;
-					}
-				}
-				if(subcap==null)
-				{
-					throw new RuntimeException("Capability not found: "+capaname);
-				}
-				ret = subcap.getCapability(rest);
-			}
-		}
-		else
-		{
-			ret = mcapa;
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get a capability by name.
+//	 *  @return The mcapa.
+//	 */
+//	public MCapability getCapability(String name)
+//	{
+//		MCapability ret = null;
+//		int idx = name.indexOf(MElement.CAPABILITY_SEPARATOR);
+//		if(idx!=-1)
+//		{
+//			String capaname = name.substring(0, idx-1);
+//			String rest = name.substring(idx+1);
+//			if(subcapabilities!=null)
+//			{
+//				BDIModel subcap = null;
+//				for(Tuple2<FieldInfo, BDIModel> tup: subcapabilities)
+//				{
+//					subcap = tup.getSecondEntity();
+//					if(subcap.getCapability().getName().equals(capaname))
+//					{
+//						break;
+//					}
+//				}
+//				if(subcap==null)
+//				{
+//					throw new RuntimeException("Capability not found: "+capaname);
+//				}
+//				ret = subcap.getCapability(rest);
+//			}
+//		}
+//		else
+//		{
+//			ret = mcapa;
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the mcapa.
@@ -110,36 +103,5 @@ public class BDIModel extends MicroModel	implements IBDIModel
 	public Tuple2<FieldInfo, BDIModel>[] getSubcapabilities()
 	{
 		return subcapabilities==null? new Tuple2[0]: (Tuple2<FieldInfo, BDIModel>[])subcapabilities.toArray(new Tuple2[subcapabilities.size()]);
-	}
-	
-	/**
-	 *  Add a belief reference (abstract/reference name -> concrete belief name).
-	 *  @param reference The fully qualified abstract / reference belief name. 
-	 *  @param concrete The fully qualified concrete belief name.
-	 */
-	public void addBeliefReference(String reference, String concrete)
-	{
-		if(beliefmappings==null)
-		{
-			beliefmappings = new LinkedHashMap<String, String>();
-		}
-		beliefmappings.put(reference, concrete);
-	}
-	
-	/**
-	 *  Get the fully qualified belief references (abstract/reference name -> concrete belief name).
-	 */
-	public Map<String, String> getBeliefReferences()
-	{
-		Map<String, String>	ret;
-		if(beliefmappings==null)
-		{
-			ret	= Collections.emptyMap();
-		}
-		else
-		{
-			ret	= beliefmappings;
-		}
-		return ret;
 	}
 }

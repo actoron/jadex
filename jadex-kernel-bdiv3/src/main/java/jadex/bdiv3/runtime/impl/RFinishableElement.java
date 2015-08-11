@@ -1,13 +1,13 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Element that can be finished with processing.

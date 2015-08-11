@@ -1,5 +1,8 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
@@ -7,13 +10,9 @@ import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The expression base runtime element.
@@ -86,25 +85,13 @@ public class RExpressionbase extends RElement implements IExpressionbase
 		/** The unparsed expression. */
 		protected UnparsedExpression uexp;
 		
-		/** The fetcher. */
-		protected IValueFetcher fetcher;
-		
 		/**
 		 * 
 		 */
 		public RExpression(UnparsedExpression uexp, IInternalAccess agent)
 		{
-			this(uexp, null, agent);
-		}
-		
-		/**
-		 * 
-		 */
-		public RExpression(UnparsedExpression uexp, IValueFetcher fetcher, IInternalAccess agent)
-		{
 			super(null, agent);
 			this.uexp = uexp;
-			this.fetcher = fetcher==null? jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(getAgent(), getModelElement()) : fetcher;
 		}
 		
 		/**
@@ -113,7 +100,7 @@ public class RExpressionbase extends RElement implements IExpressionbase
 		 */
 		public Object getValue()
 		{
-			return getParsedExpression().getValue(fetcher);
+			return getParsedExpression().getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 		}
 
 		/**
@@ -133,7 +120,7 @@ public class RExpressionbase extends RElement implements IExpressionbase
 		 */
 		public Object execute(String name, Object value)
 		{
-			SimpleValueFetcher fet = new SimpleValueFetcher(fetcher);
+			SimpleValueFetcher fet = new SimpleValueFetcher(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 			fet.setValue(name, value);
 			return getParsedExpression().getValue(fet);
 		}
@@ -146,7 +133,7 @@ public class RExpressionbase extends RElement implements IExpressionbase
 		 */
 		public Object execute(String[] names, Object[] values)
 		{
-			SimpleValueFetcher fet = new SimpleValueFetcher(fetcher);
+			SimpleValueFetcher fet = new SimpleValueFetcher(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 			for(int i=0; i<names.length; i++)
 			{
 				fet.setValue(names[i], values[i]);

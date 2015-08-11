@@ -30,7 +30,6 @@
 		
 	<capabilities>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.contractnet.ContractNet"/>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 
 	<beliefs>
@@ -63,7 +62,7 @@
 			    </bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition>
+			<creationcondition beliefs="orders">
 				true
 			</creationcondition>
 			<dropcondition>
@@ -132,6 +131,12 @@
 				<goal ref="cnp_execute_task"/>
 			</trigger>
 		</plan>
+		
+		<plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
+		
 	</plans>
 	
 	<expressions>
@@ -153,10 +158,10 @@
 		<!-- Seller generates warning about unhandled (passive) sell_book goals. -->
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 		<property name="debugging">false</property>
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 		<property name="componentviewer.viewerclass">"jadex.bdi.examples.booktrading.common.GuiViewerPanel"</property>
 	</properties>
 
+	
 	<configurations>
 		<configuration name="default">
 			<beliefs>
@@ -168,17 +173,18 @@
 						new Object[]{$scope.getExternalAccess()})</fact>
 				</initialbelief>
 			</beliefs>
-			<goals>
-				<initialgoal ref="df_register">
+			<plans>
+				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							$properties.dfservice.createDFComponentDescription(null,
-								$properties.dfservice.createDFServiceDescription("sell", "service_seller", "UniHH"))
-						</value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("sell", "service_seller", "UniHH"),
+								20000)
+ 						</value>
 					</parameter>
-				</initialgoal>
-				<endgoal ref="df_deregister"/>
-			</goals>
+				</initialplan>
+			</plans>
 		</configuration>
 	</configurations>
 

@@ -1,5 +1,10 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Logger;
+
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -52,11 +57,6 @@ import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  *  Dummy class for loading v2 examples using v3x.
@@ -206,10 +206,7 @@ public abstract class Plan
 		final Future<IGoal> ret = new Future<IGoal>();
 		
 		BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
-		// todo: add capability name of scope
-		MGoal mgoal = model.getCapability().getGoal(type.replace(".", MElement.CAPABILITY_SEPARATOR));
-		if(mgoal==null)
-			throw new RuntimeException("Unknown goal type: "+mgoal);
+		MGoal mgoal = model.getCapability().getResolvedGoal(rplan.getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addModelElement(mgoal);
 		
@@ -411,7 +408,7 @@ public abstract class Plan
 		final Future<IInternalEvent> ret = new Future<IInternalEvent>();
 
 		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
-		MInternalEvent mevent = bdif.getBDIModel().getCapability().getInternalEvent(type);
+		MInternalEvent mevent = bdif.getBDIModel().getCapability().getResolvedInternalEvent(rplan.getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addModelElement(mevent);
 
@@ -953,7 +950,8 @@ public abstract class Plan
 					ret.setResultIfUndone(info.getValue());
 				}
 			};
-			bdif.addBeliefListener(belname, lis);
+			String	capa	= rplan.getModelElement().getCapabilityName();
+			bdif.addBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+belname : belname, lis);
 			try
 			{
 				return ret.get(timeout);
@@ -1085,7 +1083,7 @@ public abstract class Plan
 			{
 				UnparsedExpression uexp = mcond.getExpression();
 				Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), 
-					getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+					getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 				return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 			}
 		}, new IAction<Void>()
@@ -1132,7 +1130,7 @@ public abstract class Plan
 		{
 			public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 			{
-				Boolean ret = (Boolean)exp.getValue(getAgent().getFetcher());				
+				Boolean ret = (Boolean)exp.getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 				return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 			}
 		}, new IAction<Void>()
@@ -1199,10 +1197,7 @@ public abstract class Plan
 		public void addInternalEvent(String event)
 		{
 			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
-			// todo: add capability name of scope
-			MInternalEvent ievent = model.getCapability().getInternalEvent(event);
-			if(ievent==null)
-				throw new RuntimeException("Unknown internal event: "+event);
+			MInternalEvent ievent = model.getCapability().getResolvedInternalEvent(rplan.getModelElement().getCapabilityName(), event);
 			getWaitAbstraction().addModelElement(ievent);
 		}
 		
@@ -1213,10 +1208,7 @@ public abstract class Plan
 		public void removeInternalEvent(String event)
 		{
 			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
-			// todo: add capability name of scope
-			MInternalEvent ievent = model.getCapability().getInternalEvent(event);
-			if(ievent==null)
-				throw new RuntimeException("Unknown internal event: "+event);
+			MInternalEvent ievent = model.getCapability().getResolvedInternalEvent(rplan.getModelElement().getCapabilityName(), event);
 			getWaitAbstraction().removeModelElement(ievent);
 		}
 		
@@ -1498,7 +1490,7 @@ public abstract class Plan
 		 */
 		public Object[] getElements()
 		{
-			return rplan.getWaitqueue().toArray();
+			return rplan.getWaitqueue().getElements();
 		}
 	}
 }

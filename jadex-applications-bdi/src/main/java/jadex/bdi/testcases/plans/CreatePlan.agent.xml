@@ -11,7 +11,7 @@
 	<imports>
 		<import>jadex.base.test.*</import>
 	</imports>
-
+<!-- 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
 	</capabilities>
@@ -27,7 +27,6 @@
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
 	</beliefs>
-
 	<plans>
 		<plan name="startplan">
 			<body class="ToStartPlan"/>
@@ -39,8 +38,8 @@
 
 
 	<properties>
-        <!--<property name="debugging">true</property>-->
-        <!--<property name="logging.level">java.util.logging.Level.INFO</property>-->
+        <!- -<property name="debugging">true</property>- ->
+        <!- -<property name="logging.level">java.util.logging.Level.INFO</property>- ->
         <property name="logging.useParentHandlers">true</property>
     </properties>
 
@@ -52,6 +51,7 @@
 			</plans>
 		</configuration>
 	</configurations>
-
+ -->
+	
 </agent>
 

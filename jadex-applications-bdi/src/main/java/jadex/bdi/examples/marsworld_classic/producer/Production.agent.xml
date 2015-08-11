@@ -24,9 +24,6 @@
 	</imports>
 
 	<capabilities>
-		<!-- Include the df capability as dfcap for finding other agents
-			and registering the production service. -->
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 		<!-- Include the move capability as move for basic movement. -->
 		<capability name="move" file="jadex.bdi.examples.marsworld_classic.movement.Movement" />
 	</capabilities>
@@ -81,6 +78,11 @@
 				<factadded cref="move.my_targets"/>
 			</trigger>
 		</plan>
+
+		<plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
 	</plans>
 
 	<events>
@@ -123,7 +125,6 @@
 	<properties>
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 		<property name="debugging">false</property>
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 
 	<configurations>
@@ -140,23 +141,23 @@
 				</initialbelief>
 			</beliefs>
 			<goals>
-				<!-- Create a goal for registering at the df. -->
-				<initialgoal cref="dfcap.df_register">
-					<parameter ref="description">
-						<value>
-							$properties.dfservice.createDFComponentDescription(null, 
-								$properties.dfservice.createDFServiceDescription("service_produce", "service_produce", "University of Hamburg"))
-						</value>
-					</parameter>
-				</initialgoal>
 				<!-- Create a goal for walking around. -->
 				<initialgoal cref="move.walk_around"/>
 				<!-- Create a goal for watching for targets. -->
 				<initialgoal cref="move.watch_targets"/>
-				<endgoal cref="dfcap.df_deregister"/>
 			</goals>
 			<plans>
 				<initialplan ref="produce"/>
+				<initialplan ref="df_keep_registered">
+					<parameter ref="description">
+						<value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("service_produce", "service_produce", "University of Hamburg"),
+								20000)
+ 						</value>
+					</parameter>
+				</initialplan>
 			</plans>
 		</configuration>
 		

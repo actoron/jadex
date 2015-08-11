@@ -1,9 +1,14 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+
+import javax.swing.JPanel;
+
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IExpression;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
@@ -17,13 +22,6 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-
-import javax.swing.JPanel;
 
 /**
  *  Panel for showing the cleaner world view.
@@ -69,8 +67,7 @@ class CleanerPanel extends JPanel
 					public IFuture<DrawData> execute(IInternalAccess ia)
 					{
 						// Hack, as long as we do not have a specific XML feature interface
-						IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-						RCapability capa = bdif.getCapability();
+						IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
 						
 						DrawData	drawdata	= new DrawData();
 						drawdata.daytime = ((Boolean)capa.getBeliefbase().getBelief("daytime").getFact()).booleanValue();

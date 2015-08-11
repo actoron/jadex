@@ -98,7 +98,8 @@ public class Writer extends AWriter
 			writer	= FACTORY.createXMLStreamWriter(out, encoding);
 		}
 		
-		writer.writeStartDocument(encoding, "1.0"); 
+		if(encoding!=null)
+			writer.writeStartDocument(encoding, "1.0"); 
 		writeNewline(writer);
 		
 		WriteContextDesktop wc = new WriteContextDesktop(handler, writer, context, object, classloader);

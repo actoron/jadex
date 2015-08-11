@@ -1,5 +1,18 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -15,12 +28,12 @@ import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
@@ -31,19 +44,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  The APL is the applicable plan list. It stores the
@@ -252,7 +252,7 @@ public class APL
 						List<MGoal> mgoals = mtrigger.getGoals();
 						if(mgoals!=null && mgoals.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, CapabilityWrapper.getFetcher(ia, mplan));
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan);
 							precandidates.addAll(cands);
 						}
 					}
@@ -261,7 +261,7 @@ public class APL
 						List<MServiceCall> msers = mtrigger.getServices();
 						if(msers!=null && msers.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, CapabilityWrapper.getFetcher(ia, mplan));
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan);
 							precandidates.addAll(cands);
 						}
 					}
@@ -270,7 +270,7 @@ public class APL
 						List<MMessageEvent> msgs = mtrigger.getMessageEvents();
 						if(msgs!=null && msgs.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, CapabilityWrapper.getFetcher(ia, mplan));
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan);
 							precandidates.addAll(cands);
 						}
 					}
@@ -279,7 +279,7 @@ public class APL
 						List<MInternalEvent> ievs = mtrigger.getInternalEvents();
 						if(ievs!=null && ievs.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, CapabilityWrapper.getFetcher(ia, mplan));
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan);
 							precandidates.addAll(cands);
 						}
 					}
@@ -361,24 +361,28 @@ public class APL
 	 *  Test precondition (and match expression) of a plan to decide
 	 *  if it can be added to the candidates.
 	 */
-	public static IFuture<Boolean> checkMPlan(IInternalAccess ia, MPlanInfo mplaninfo, RProcessableElement element) //, IValueFetcher fetcher
+	public static IFuture<Boolean> checkMPlan(IInternalAccess ia, MPlanInfo mplaninfo, RProcessableElement element)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		boolean	valid	= true;
 		MPlan mplan = mplaninfo.getMPlan();
 		
-		SimpleValueFetcher	fetcher	= new SimpleValueFetcher(CapabilityWrapper.getFetcher(ia, mplan, mplaninfo.getBinding()));
+		Map<String, Object>	vals	= new LinkedHashMap<String, Object>();
+		if(mplaninfo.getBinding()!=null)
+		{
+			vals.putAll(mplaninfo.getBinding());
+		}
 		if(element instanceof RGoal)
 		{
-			fetcher.setValue("$goal", element);
+			vals.put("$goal", element);
 		}
 		else if(element instanceof RMessageEvent || element instanceof RInternalEvent)
 		{
-			fetcher.setValue("$event", element);
+			vals.put("$event", element);
 		}
 		else if(element instanceof RServiceCall)
 		{
-			fetcher.setValue("$call", element);
+			vals.put("$call", element);
 		}
 		
 		// chack match expression
@@ -388,7 +392,8 @@ public class APL
 			UnparsedExpression uexp = mplan.getTrigger().getGoalMatchExpression((MGoal)rgoal.getModelElement());
 			if(uexp!=null)
 			{
-				Object val = SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(fetcher);
+				Object val = SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(
+					CapabilityWrapper.getFetcher(ia, uexp.getLanguage(), vals));
 				if(val instanceof Boolean)
 				{
 					valid	= ((Boolean)val).booleanValue();
@@ -414,7 +419,7 @@ public class APL
 		{
 			try
 			{
-				Object	val	= SJavaParser.getParsedValue(upex, null, fetcher, null);
+				Object	val	= SJavaParser.getParsedValue(upex, null, CapabilityWrapper.getFetcher(ia, upex.getLanguage(), vals), null);
 				if(val instanceof Boolean)
 				{
 					valid	= ((Boolean)val).booleanValue();
@@ -619,10 +624,11 @@ public class APL
 			ret = 4;
 			capaname	= ((RPlan)cand).getModelElement().getCapabilityName();
 		}
-//		else if() // waitqueue
-//		{
-//			ret = 2;
-//		}
+		else if(cand instanceof Waitqueue)
+		{
+			ret = 2;
+			capaname	= ((Waitqueue)cand).getPlan().getModelElement().getCapabilityName();
+		}
 		else
 		{
 			ret = 0;
@@ -677,11 +683,11 @@ public class APL
 	 *  Checks precondition and evaluates bindings (if any).
 	 *  @return apl	returns new apl object in case a null apl is supplied.
 	 */
-	public static List<MPlanInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan, IValueFetcher fetcher)
+	public static List<MPlanInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan)
 	{
 		List<MPlanInfo> ret = new ArrayList<MPlanInfo>();
 		
-		List<Map<String, Object>> bindings = calculateBindingElements(agent, mplan, fetcher);
+		List<Map<String, Object>> bindings = calculateBindingElements(agent, mplan);
 		
 		if(bindings!=null)
 		{
@@ -707,12 +713,9 @@ public class APL
 	 *  @param fetcher The value fetcher.
 	 *  @return The list of binding maps.
 	 */
-	public static List<Map<String, Object>> calculateBindingElements(IInternalAccess agent, MParameterElement melem, IValueFetcher fetcher)
+	public static List<Map<String, Object>> calculateBindingElements(IInternalAccess agent, MParameterElement melem)
 	{
 		List<Map<String, Object>> ret = null;
-		
-		if(fetcher==null)
-			fetcher = CapabilityWrapper.getFetcher(agent, melem);
 		
 		Map<String, Object> bindingparams	= null;
 		List<MParameter> params	= melem.getParameters();
@@ -756,7 +759,7 @@ public class APL
 						if(bindingparams==null)
 							bindingparams = new HashMap<String, Object>();
 						IParsedExpression exp = SJavaParser.parseExpression(bo, agent.getModel().getAllImports(), agent.getClassLoader());
-						Object val = exp.getValue(fetcher);
+						Object val = exp.getValue(CapabilityWrapper.getFetcher(agent, bo.getLanguage()));
 						bindingparams.put(param.getName(), val);
 					}
 				}

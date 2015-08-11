@@ -2213,7 +2213,7 @@ public class MessageService extends BasicService implements IMessageService
 									if(lis!=null)
 									{
 										// Decode message for listener. What if listener has different class loader?
-										decodeMessage(logger, messagetype, msg, classloader, null);
+										decodeMessage(logger, messagetype, msg, classloader, null, component);
 										IMessageAdapter message = new DefaultMessageAdapter(msg, messagetype);
 										for(int i=0; i<lis.length; i++)
 										{
@@ -2311,7 +2311,7 @@ public class MessageService extends BasicService implements IMessageService
 						if(com!=null)
 						{
 							ClassLoader cl = classloader!=null? classloader: ia.getClassLoader();
-							decodeMessage(logger, messagetype, fmessage, cl, receiver);
+							decodeMessage(logger, messagetype, fmessage, cl, receiver, ia);
 							
 							try
 							{
@@ -2787,7 +2787,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Decode a message.
 	 */
-	protected void decodeMessage(final Logger logger, final MessageType messagetype, final Map<String, Object> fmessage, ClassLoader cl, IComponentIdentifier rec)
+	protected void decodeMessage(final Logger logger, final MessageType messagetype, final Map<String, Object> fmessage, ClassLoader cl, IComponentIdentifier rec, IInternalAccess component)
 	{
 //		System.out.println("dec: "+cl+" "+component.getComponentIdentifier()+" "+MessageService.this.component.getComponentIdentifier());
 		// Conversion via platform specific codecs

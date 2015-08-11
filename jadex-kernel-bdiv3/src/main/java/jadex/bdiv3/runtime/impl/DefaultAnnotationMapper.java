@@ -1,6 +1,8 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
+import java.lang.reflect.Method;
+import java.util.List;
+
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MGoal;
@@ -9,9 +11,6 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  *  Service mapper that uses the annotations in a goal.

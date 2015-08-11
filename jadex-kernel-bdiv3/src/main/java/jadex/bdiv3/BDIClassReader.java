@@ -1,5 +1,22 @@
 package jadex.bdiv3;
 
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -78,23 +95,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.Publish;
 import jadex.micro.annotation.RequiredService;
 import jadex.rules.eca.EventType;
-
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Reads micro agent classes and generates a model from metainfo and annotations.
@@ -263,7 +263,7 @@ public class BDIClassReader extends MicroClassReader
 							{
 								throw new RuntimeException("No such belief for mapping from "+source+" to "+fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target);
 							}
-							bdimodel.addBeliefReference(fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping (inner abstract reference -> outer concrete belief)
+							bdimodel.getCapability().addBeliefReference(fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping (inner abstract reference -> outer concrete belief)
 						}
 						
 						bdimodel.addSubcapability(new FieldInfo(fields[i]), cap);
@@ -1202,7 +1202,7 @@ public class BDIClassReader extends MicroClassReader
 				String clname = values[i].clazz().equals(Object.class) ? null : values[i].clazz().getName();
 				String v = (val==null || val.length()==0) ? clname!=null? clname+".class": null : val;
 				MConfigParameterElement	elm	= new MConfigParameterElement();
-				elm.setFlatName(v==null ? values[i].name() : v);
+				elm.setFlatRef(v==null ? values[i].name() : v);
 				ret.add(elm);
 			}
 		}

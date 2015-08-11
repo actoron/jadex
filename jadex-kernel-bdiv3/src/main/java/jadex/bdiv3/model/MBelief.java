@@ -1,20 +1,5 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
-import jadex.bdiv3.model.MParameter.EvaluationMode;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bdiv3x.runtime.IBelief;
-import jadex.bdiv3x.runtime.IBeliefSet;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.FieldInfo;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
-import jadex.rules.eca.EventType;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,6 +11,23 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MParameter.EvaluationMode;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bdiv3x.runtime.CapabilityWrapper;
+import jadex.bdiv3x.runtime.IBelief;
+import jadex.bdiv3x.runtime.IBeliefSet;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.FieldInfo;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.javaparser.SJavaParser;
+import jadex.rules.eca.EventType;
 
 
 /**
@@ -47,7 +49,7 @@ public class MBelief extends MElement
 //	protected boolean dynamic;
 	
 	/** The update rate. */
-	protected long	updaterate;
+	protected UnparsedExpression updaterate;
 	
 	/** Flag if is multi. */
 	protected Boolean multi;
@@ -94,6 +96,27 @@ public class MBelief extends MElement
 	/**
 	 *  Create a new belief.
 	 */
+	public MBelief(FieldInfo target, String impl, boolean dynamic, UnparsedExpression updaterate, Set<String> beliefevents, Collection<EventType> rawevents)
+	{
+		super(target!=null? target.getName(): null);
+		this.ftarget = target;
+		this.impl = impl;
+		if(dynamic)
+			this.evaluationmode = updaterate!=null ? MParameter.EvaluationMode.POLLING : MParameter.EvaluationMode.PULL;
+		this.updaterate	= updaterate;
+		this.beliefevents = beliefevents;
+		this.rawevents = rawevents;
+
+		// Set to push if user specified event dependencies (not if only deduced from an expression)
+		if(this.beliefevents!=null && this.beliefevents.size()>0 || this.rawevents!=null && this.rawevents.size()>0)
+			this.evaluationmode = MParameter.EvaluationMode.PUSH;
+		
+//		System.out.println("bel: "+(target!=null?target.getName():"")+" "+dynamic);
+	}
+	
+	/**
+	 *  Create a new belief.
+	 */
 	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, Set<String> beliefevents, Collection<EventType> rawevents)
 	{
 		super(target!=null? target.getName(): null);
@@ -102,7 +125,7 @@ public class MBelief extends MElement
 		if(dynamic)
 			this.evaluationmode = updaterate>0 ? MParameter.EvaluationMode.POLLING : MParameter.EvaluationMode.PULL;
 //		this.dynamic = dynamic;
-		this.updaterate	= updaterate;
+		this.updaterate	= updaterate>0? new UnparsedExpression(null, ""+updaterate): null;
 		this.beliefevents = beliefevents;
 		this.rawevents = rawevents;
 
@@ -124,7 +147,7 @@ public class MBelief extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, Set<String> beliefevents, Collection<EventType> rawevents)
+	public MBelief(MethodInfo target, String impl, boolean dynamic, UnparsedExpression updaterate, Set<String> beliefevents, Collection<EventType> rawevents)
 	{
 		this((FieldInfo)null, impl, dynamic, updaterate, beliefevents, rawevents);
 		
@@ -145,6 +168,14 @@ public class MBelief extends MElement
 		}
 		
 		name = name.substring(0, 1).toLowerCase()+name.substring(1);
+	}
+	
+	/**
+	 *  Create a new belief.
+	 */
+	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, Set<String> beliefevents, Collection<EventType> rawevents)
+	{
+		this(target, impl, dynamic, updaterate>0? new UnparsedExpression(null, ""+updaterate): null, beliefevents, rawevents);
 	}
 	
 	/**
@@ -283,22 +314,54 @@ public class MBelief extends MElement
 
 	}
 	
+//	/**
+//	 *  Get the updaterate.
+//	 *  @return The updaterate.
+//	 */
+//	public long getUpdaterate()
+//	{
+//		return updaterate;
+//	}
+//
+//	/**
+//	 *  Set the updaterate.
+//	 *  @param updaterate The updaterate to set.
+//	 */
+//	public void setUpdaterate(long updaterate)
+//	{
+//		this.updaterate = updaterate;
+//	}
+	
 	/**
 	 *  Get the updaterate.
-	 *  @return The updaterate.
+	 *  @return The updaterate
 	 */
-	public long getUpdaterate()
+	public UnparsedExpression getUpdateRate()
 	{
 		return updaterate;
 	}
 
 	/**
-	 *  Set the updaterate.
-	 *  @param updaterate The updaterate to set.
+	 *  The updaterate to set.
+	 *  @param updaterate The updaterate to set
 	 */
-	public void setUpdaterate(long updaterate)
+	public void setUpdateRate(UnparsedExpression updaterate)
 	{
 		this.updaterate = updaterate;
+	}
+	
+	/**
+	 *  Get/Evaluate the updaterate value.
+	 *  @param agent The agent.
+	 *  @return The update rate.
+	 */
+	public long getUpdaterateValue(IInternalAccess agent)
+	{
+		long ret = -1;
+		if(updaterate!=null)
+			ret = ((Number)SJavaParser.parseExpression(updaterate, agent.getModel().getAllImports(), 
+				agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(agent, updaterate.getLanguage()))).longValue();
+		return ret;
 	}
 	
 	/**

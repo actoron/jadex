@@ -53,17 +53,15 @@
 
 		<!-- Private beliefs -->
 
-		<!-- Is the prey in danger. - ->
+		<!-- Is the prey in danger. -->
 		<belief name="is_indanger" class="boolean" evaluationmode="push">
 			<fact>
-				// $beliefbase.vision!=null &amp;&amp;
-				// (select $object
- 				// from $beliefbase.vision.getObjects()
-				// where $object instanceof Hunter).size()>0
-				
-				!(Hunter $hunter &amp;&amp; Arrays.asList($beliefbase.vision.getObjects()).contains($hunter))				
+				$beliefbase.vision!=null &amp;&amp;
+				(select $object
+ 				from $beliefbase.vision.getObjects()
+				where $object instanceof Hunter).size()>0
 			</fact>
-		</belief>-->
+		</belief>
 
 		<!-- Forbidden food. -->
 		<beliefset name="forbidden_food" class="Food"/>
@@ -81,30 +79,21 @@
 				<inhibits ref="eat_food" inhibit="when_in_process"/>
 				<inhibits ref="wander_around" inhibit="when_in_process" />
 			</deliberation>
-			<maintaincondition language="jcl">
-				// !$beliefbase.is_indanger
-				
-				!(Hunter $hunter &amp;&amp; Arrays.asList($beliefbase.vision.getObjects()).contains($hunter))
-				
-				// ?rbel_vision	= (belief (element_has_model.melement_has_name "vision") (belief_has_fact ?vision))
-				// (not
-				// 	(and
-				// 		?hunter	= (Hunter)
-				// 		?vision	= (Vision (objects contains ?hunter))
-				// 	)
-				// )
+			<maintaincondition>
+				!$beliefbase.is_indanger
 			</maintaincondition>
 		</maintaingoal>
 
 		<achievegoal name="eat_food">
 			<parameter name="$food" class="Food">
-				<value>$food</value>
+				<bindingoptions>
+				    select $food from $beliefbase.food
+					where !Arrays.asList($beliefbase.forbidden_food).contains($food)
+				</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl">
- 				$beliefbase.eating_allowed &amp;&amp;
- 				Food $food &amp;&amp; Arrays.asList($beliefbase.food).contains($food)
- 				&amp;&amp; !Arrays.asList($beliefbase.forbidden_food).contains($food)
+			<creationcondition  beliefs="wastes">
+ 				$beliefbase.eating_allowed
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="wander_around"/>

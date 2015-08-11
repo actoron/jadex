@@ -18,12 +18,12 @@ public class EnglishGermanTranslationPlanF2 extends Plan
 	/** The wordtable. */
 	protected Map<String, String> wordtable;
 
-	//-------- constructors --------
+	//-------- methods --------
 
 	/**
-	 *  Create a new plan.
+	 *  Execute the plan.
 	 */
-	public EnglishGermanTranslationPlanF2()
+	public void body()
 	{
 		System.out.println("Created: "+this);
 
@@ -33,15 +33,7 @@ public class EnglishGermanTranslationPlanF2 extends Plan
 		this.wordtable.put("cow", "Kuh");
 		this.wordtable.put("cat", "Katze");
 		this.wordtable.put("dog", "Hund");
-	}
-
-	//-------- methods --------
-
-	/**
-	 *  Execute the plan.
-	 */
-	public void body()
-	{
+		
 		String	reply;
 		String	content;
 		IMessageEvent me = (IMessageEvent)getReason();

@@ -22,16 +22,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
  */
 public class ProducerPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ProducerPlan()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -39,6 +29,8 @@ public class ProducerPlan extends Plan
 	 */
 	public void body()
 	{
+		getLogger().info("Created: "+this);
+		
 		while(true)
 		{
 			// Wait for a request.
@@ -68,7 +60,6 @@ public class ProducerPlan extends Plan
 		// Todo: multiple spaces by name...
 		
 		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();
-//			((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
 
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");

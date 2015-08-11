@@ -1,5 +1,8 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentIdentifier;
@@ -18,9 +21,6 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *  XML version of the capability. 
@@ -85,7 +85,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public IGoalbase getGoalbase()
 	{
-		return scope!=null ? new GoalbaseWrapper(capa.getGoalbase(), scope+MElement.CAPABILITY_SEPARATOR) : capa.getGoalbase();
+		return scope!=null ? new RGoalbase(agent, scope) : capa.getGoalbase();
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public IEventbase getEventbase()
 	{
-		return scope!=null ? new EventbaseWrapper(capa.getEventbase(), scope+MElement.CAPABILITY_SEPARATOR) : capa.getEventbase();
+		return scope!=null ? new REventbase(agent, scope) : capa.getEventbase();
 	}
 
 	/**
@@ -302,32 +302,30 @@ public class CapabilityWrapper implements ICapability
 	//-------- helper methods --------
 
 	/**
-	 *  Get the capability-specific fetcher for an element.
+	 *  Get the capability-specific fetcher (scope==null for agent scope).
 	 */
-	public static IValueFetcher	getFetcher(final IInternalAccess agent, MElement element)
+	public static IValueFetcher	getFetcher(final IInternalAccess agent, String scope)
 	{
-		return getFetcher(agent, element, null);
+		return getFetcher(agent, scope, null);
 	}
 
 	/**
-	 *  Get the capability-specific fetcher for an element.
+	 *  Get the capability-specific fetcher (scope==null for agent scope).
 	 *  Also creates a new fetcher, if values are given.
 	 */
-	// Todo: move somewhere else?
-	public static IValueFetcher	getFetcher(final IInternalAccess agent, MElement element, Map<String, Object> values)
+	public static IValueFetcher	getFetcher(final IInternalAccess agent, String scope, Map<String, Object> values)
 	{
 		IValueFetcher	ret	= agent.getFetcher();
 		
-		// Todo: some RElements have no MElement (e.g. expression)
-		if(element!=null && element.getCapabilityName()!=null && agent.getComponentFeature0(IBDIXAgentFeature.class)!=null)	
+		if(scope!=null && agent.getComponentFeature0(IBDIXAgentFeature.class)!=null)	
 		{
 			ICapability	capa	= agent.getComponentFeature(IBDIXAgentFeature.class);
-			String	prefix	= element.getCapabilityName()+MElement.CAPABILITY_SEPARATOR;
+			String	prefix	= scope+MElement.CAPABILITY_SEPARATOR;
 			SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ret);
 			fetcher.setValue("$beliefbase", new BeliefbaseWrapper(capa.getBeliefbase(), prefix));
-			fetcher.setValue("$goalbase", new GoalbaseWrapper(capa.getGoalbase(), prefix));
+			fetcher.setValue("$goalbase", new RGoalbase(agent, scope));
 			fetcher.setValue("$planbase", new PlanbaseWrapper(capa.getPlanbase(), prefix));
-			fetcher.setValue("$eventbase", new EventbaseWrapper(capa.getEventbase(), prefix));
+			fetcher.setValue("$eventbase", new REventbase(agent, scope));
 			fetcher.setValue("$expressionbase", new ExpressionbaseWrapper(capa.getExpressionbase(), prefix));
 			if(values!=null)
 			{

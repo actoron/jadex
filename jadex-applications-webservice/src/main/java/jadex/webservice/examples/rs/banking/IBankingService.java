@@ -1,6 +1,7 @@
 package jadex.webservice.examples.rs.banking;
 
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 import java.util.Date;
 
@@ -29,6 +30,12 @@ public interface IBankingService
 	 *  @return The account statement.
 	 */
 	public IFuture<AccountStatement> getAccountStatement(Request request);
+	
+	/**
+	 *  Subscribe for account statements.
+	 *  @return Account statements whenever available.
+	 */
+	public IIntermediateFuture<AccountStatement> subscribeForAccountStatements();
 	
 	/**
 	 *  Add an account statement.

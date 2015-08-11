@@ -1,5 +1,13 @@
 package jadex.platform.service.df;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
@@ -24,14 +32,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 /**
  *  Directory facilitator implementation for standalone platform.
@@ -331,6 +331,24 @@ public class DirectoryFacilitatorService	implements IDF
 			ret.addService(service);
 		return ret;
 	}
+	
+	/**
+	 *  Create a df component description.
+	 *  @param component The component.
+	 *  @param service The service.
+	 *  @return The df component description.
+	 */
+	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier component, IDFServiceDescription service, long leasetime)
+	{
+		DFComponentDescription	ret	= new DFComponentDescription();
+		ret.setName(component);
+		if(service!=null)
+			ret.addService(service);
+		
+		ret.setLeaseTime(new Date(clockservice.getTime()+leasetime));
+		
+		return ret;		
+	}
 
 	/**
 	 *  Create a new df component description.
@@ -409,7 +427,7 @@ public class DirectoryFacilitatorService	implements IDF
 		final Future<Void> ret = new Future<Void>();
 		
 		final boolean[]	services	= new boolean[2];
-		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -427,7 +445,7 @@ public class DirectoryFacilitatorService	implements IDF
 			}
 		});
 		
-		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

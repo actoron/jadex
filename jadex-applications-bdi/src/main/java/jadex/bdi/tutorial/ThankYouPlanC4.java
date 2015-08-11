@@ -8,16 +8,6 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class ThankYouPlanC4 extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ThankYouPlanC4()
-	{
-		System.out.println("Created:"+this);
-	}
-
 	//-------- methods --------
 
 	/**
@@ -25,6 +15,8 @@ public class ThankYouPlanC4 extends Plan
 	 */
 	public void body()
 	{
+		System.out.println("Created:"+this);
+		
 		int cnt = ((Integer)getBeliefbase().getBelief("transcnt").getFact()).intValue();
 		getLogger().info("Congratulations! You have translated the  "+cnt
 			+" word today!");

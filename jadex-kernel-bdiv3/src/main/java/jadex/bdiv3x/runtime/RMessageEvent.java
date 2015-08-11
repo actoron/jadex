@@ -1,5 +1,10 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
@@ -9,12 +14,6 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
-import jadex.commons.IValueFetcher;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  The runtime message event.
@@ -42,10 +41,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		this.mt = SFipa.FIPA_MESSAGE_TYPE;
 		
 		// Must be done after msg has been assigned :-(
-		IValueFetcher fetcher = wrapFetcher(CapabilityWrapper.getFetcher(agent, modelelement));
-		super.initParameters(null, fetcher, config);
+		super.initParameters(null, config);
 		
-		// In case of messages there can be parameters only in the config, not in the model due to underlying message type defition
+		// In case of messages there can be parameters only in the config, not in the model due to underlying message type definition
 		if(config!=null && config.getParameters()!=null)
 		{
 			for(Map.Entry<String, List<UnparsedExpression>> entry: config.getParameters().entrySet())
@@ -55,11 +53,11 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 					ParameterSpecification ps = mt.getParameter(entry.getKey());
 					if(!ps.isSet())
 					{
-						addParameter(createParameter(null, entry.getKey(), getAgent(), config.getParameter(entry.getKey()), fetcher));
+						addParameter(createParameter(null, entry.getKey(), getAgent(), config.getParameter(entry.getKey())));
 					}
 					else
 					{
-						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), config.getParameters(entry.getKey()), fetcher));
+						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), config.getParameters(entry.getKey())));
 					}
 				}
 			}
@@ -79,15 +77,14 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		
 		// Tricky, must do init for default values if NOT present in the map
 		// Must be done after msg has been assigned :-(
-		IValueFetcher fetcher = wrapFetcher(CapabilityWrapper.getFetcher(agent, modelelement));
-		super.initParameters(msg, fetcher, null);
+		super.initParameters(msg, null);
 	}
 	
 	/**
 	 *  Create the parameters from model spec.
 	 */
 	@Override
-	public void initParameters(Map<String, Object> vals, IValueFetcher fetcher, MConfigParameterElement config)
+	public void initParameters(Map<String, Object> vals, MConfigParameterElement config)
 	{
 		// do nothing in super constructor init 
 	}
@@ -105,18 +102,18 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 * 
 	 */
 	@Override
-	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher)
+	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival)
 	{
-		return new RParam(modelelement, name, agent, inival, fetcher, getModelElement().getName());
+		return new RParam(modelelement, name, agent, inival, getModelElement().getName());
 	}
 	
 	/**
 	 * 
 	 */
 	@Override
-	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals, IValueFetcher fetcher)
+	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals)
 	{
-		return new RParamSet(modelelement, name, agent, inivals, fetcher, getModelElement().getName());
+		return new RParamSet(modelelement, name, agent, inivals, getModelElement().getName());
 	}
 	
 	/**
@@ -287,9 +284,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParam(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, IValueFetcher fetcher,  String pename)
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, String pename)
 		{
-			super(modelelement, name, agent, inival, fetcher, pename);
+			super(modelelement, name, agent, inival, pename);
 		}
 		
 		/**
@@ -342,9 +339,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals, IValueFetcher fetcher, String pename)
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals, String pename)
 		{
-			super(modelelement, name, agent, inivals, fetcher, pename);
+			super(modelelement, name, agent, inivals, pename);
 		}
 		
 		/**

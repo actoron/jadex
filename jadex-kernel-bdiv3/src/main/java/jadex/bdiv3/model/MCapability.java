@@ -1,15 +1,18 @@
 package jadex.bdiv3.model;
 
-import jadex.bridge.ClassInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.Tuple2;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 
 /**
  *  The capability model.
@@ -37,16 +40,29 @@ public class MCapability extends MElement
 	/** The configurations. */
 	protected List<MConfiguration> configurations;
 	
-	//-------- additional xml properties --------
+	/** The belief mappings (abstract/reference name -> concrete belief name). */
+	protected Map<String, String> beliefreferences;
+	
+	//-------- xml only --------
+	
+	/** The result mappings <belief->result>. */
+	// Cached for speed.
+	protected Map<String, String> resultmappings;
+	
+	/** The goal mappings (abstract/reference name -> concrete name). */
+	protected Map<String, String> goalreferences;
+	
+	/** The event mappings (abstract/reference name -> concrete name). */
+	protected Map<String, String> eventreferences;
+	
+	/** The expression mappings (abstract/reference name -> concrete name). */
+	protected Map<String, String> expressionreferences;
 
 	/** The subcapabilities. */
 	protected List<MCapabilityReference> subcapabilities;
 	
 	/** The internal events. */
 	protected List<MInternalEvent> ievents;
-	
-	/** The element references. */
-	protected List<MElementRef> elementrefs;
 	
 	/** The goal/service publications. */
 	protected Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs = new HashMap<ClassInfo, List<Tuple2<MGoal, String>>>();
@@ -405,7 +421,7 @@ public class MCapability extends MElement
 	}
 	
 	/**
-	 *  Get a message. Null if not found.
+	 *  Get a message event. Null if not found.
 	 */
 	public MMessageEvent getMessageEvent(String name)
 	{
@@ -427,17 +443,111 @@ public class MCapability extends MElement
 	}
 	
 	/**
+	 *  Get a goal by resolved name. Exception if not found.
+	 *  This method is meant handles calls from user code (e.g. createXYZ() in a plan).
+	 *  Internally, all references should be mapped to the correct concrete elements already during loading (e.g. config elements).
+	 *  @param scope	The local scope.
+	 *  @param name	The name, relative to scope.
+	 */
+	public MGoal	getResolvedGoal(String scope, String name)
+	{
+		MGoal melement = null;
+		name	= scope!=null ? scope + MElement.CAPABILITY_SEPARATOR + MElement.internalName(name) : MElement.internalName(name);
+		if(goalreferences!=null && goalreferences.containsKey(name))
+		{
+			String	ref	= goalreferences.get(name);
+			if(ref==null)
+			{
+				// Abstract element -> create dummy element to hold name.
+				melement	= new MGoal();
+				melement.setName(name);
+			}
+			else
+			{
+				name	= ref;
+			}
+		}
+		if(melement==null)
+		{
+			melement	= getGoal(name);
+		}
+		if(melement==null)
+		{
+			throw new RuntimeException("Goal not found: "+name+(scope!=null ? "("+scope+")" : ""));
+		}
+		return melement;
+	}
+
+	/**
+	 *  Get an internal event by resolved name. Exception if not found.
+	 *  This method is meant handles calls from user code (e.g. createXYZ() in a plan).
+	 *  Internally, all references should be mapped to the correct concrete elements already during loading (e.g. config elements).
+	 *  @param scope	The local scope.
+	 *  @param name	The name, relative to scope.
+	 */
+	public MInternalEvent	getResolvedInternalEvent(String scope, String name)
+	{
+		MInternalEvent melement = null;
+		name	= scope!=null ? scope + MElement.CAPABILITY_SEPARATOR + MElement.internalName(name) : MElement.internalName(name);
+		if(eventreferences!=null && eventreferences.containsKey(name))
+		{
+			String	ref	= eventreferences.get(name);
+			if(ref==null)
+			{
+				// Abstract element -> create dummy element to hold name.
+				melement	= new MInternalEvent();
+				melement.setName(name);
+			}
+			else
+			{
+				name	= ref;
+			}
+		}
+		if(melement==null)
+		{
+			melement	= getInternalEvent(name);
+		}
+		if(melement==null)
+		{
+			throw new RuntimeException("Internal event not found: "+name+(scope!=null ? "("+scope+")" : ""));
+		}
+		return melement;
+	}
+
+	/**
 	 *  Get a message event by resolved name. Exception if not found.
+	 *  This method is meant handles calls from user code (e.g. createXYZ() in a plan).
+	 *  Internally, all references should be mapped to the correct concrete elements already during loading (e.g. config elements).
 	 *  @param scope	The local scope.
 	 *  @param name	The name, relative to scope.
 	 */
 	public MMessageEvent	getResolvedMessageEvent(String scope, String name)
 	{
+		MMessageEvent melement = null;
 		name	= scope!=null ? scope + MElement.CAPABILITY_SEPARATOR + MElement.internalName(name) : MElement.internalName(name);
-		MMessageEvent mevent = getMessageEvent(name);
-		if(mevent==null)
-			throw new RuntimeException("Message event not found: "+name);
-		return mevent;
+		if(eventreferences!=null && eventreferences.containsKey(name))
+		{
+			String	ref	= eventreferences.get(name);
+			if(ref==null)
+			{
+				// Abstract element -> create dummy element to hold name.
+				melement	= new MMessageEvent();
+				melement.setName(name);
+			}
+			else
+			{
+				name	= ref;
+			}
+		}
+		if(melement==null)
+		{
+			melement	= getMessageEvent(name);
+		}
+		if(melement==null)
+		{
+			throw new RuntimeException("Message event not found: "+name+(scope!=null ? "("+scope+")" : ""));
+		}
+		return melement;
 	}
 
 	/**
@@ -707,34 +817,6 @@ public class MCapability extends MElement
 		
 		return ret;
 	}
-	
-	/**
-	 *  Get the elementrefs.
-	 *  @return The elementrefs
-	 */
-	public List<MElementRef> getElementRefs()
-	{
-		return elementrefs;
-	}
-
-	/**
-	 *  The elementrefs to set.
-	 *  @param elementrefs The elementrefs to set
-	 */
-	public void setElementRefs(List<MElementRef> elementrefs)
-	{
-		this.elementrefs = elementrefs;
-	}
-	
-	/**
-	 *  Add an element ref.
-	 */
-	public void addElementRef(MElementRef ref)
-	{
-		if(elementrefs==null)
-			elementrefs = new ArrayList<MElementRef>();
-		elementrefs.add(ref);
-	}
 
 	/**
 	 *  Get the pubs.
@@ -768,5 +850,154 @@ public class MCapability extends MElement
 			pubs.put(ci, ps);
 		}
 		ps.add(new Tuple2<MGoal, String>(mgoal, methodname));
+	}
+
+	/**
+	 *  Get the fully qualified belief references (abstract/reference name -> concrete belief name).
+	 */
+	public Map<String, String> getBeliefReferences()
+	{
+		return getReferences(beliefreferences);
+	}
+	
+	/**
+	 *  Add a belief reference (abstract/reference name -> concrete belief name).
+	 *  @param reference The fully qualified abstract / reference belief name. 
+	 *  @param concrete The fully qualified concrete belief name.
+	 */
+	public void addBeliefReference(String reference, String concrete)
+	{
+		beliefreferences = addReference(beliefreferences, reference, concrete);
+	}
+
+	/**
+	 *  Get the result mappings (concrete belief->result name).
+	 *  Note: result mappings are inverse to reference mappings!
+	 */
+	public Map<String, String> getResultMappings()
+	{
+		Map<String, String>	ret;
+		if(resultmappings==null)
+		{
+			ret	= Collections.emptyMap();
+		}
+		else
+		{
+			ret	= resultmappings;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Add a result mapping.
+	 *  Note: result mappings are inverse to reference mappings!
+	 *  @param belief The concrete belief name (fully qualified). 
+	 *  @param result The result name.
+	 */
+	public void addResultMapping(String belief, String result)
+	{
+		if(resultmappings==null)
+		{
+			resultmappings = new LinkedHashMap<String, String>();
+		}
+		resultmappings.put(belief, result);
+	}
+	
+	/**
+	 *  Get the fully qualified expression references (abstract/reference name -> concrete expression name).
+	 */
+	public Map<String, String> getExpressionReferences()
+	{
+		return getReferences(expressionreferences);
+	}
+
+	/**
+	 *  Add a expression reference (abstract/reference name -> concrete expression name).
+	 *  @param reference The fully qualified abstract / reference expression name. 
+	 *  @param concrete The fully qualified concrete expression name.
+	 */
+	public void addExpressionReference(String reference, String concrete)
+	{
+		expressionreferences = addReference(expressionreferences, reference, concrete);
+	}
+	
+	/**
+	 *  Get the fully qualified event references (abstract/reference name -> concrete event name).
+	 */
+	public Map<String, String> getEventReferences()
+	{
+		return getReferences(eventreferences);
+	}
+
+	/**
+	 *  Add a event reference (abstract/reference name -> concrete event name).
+	 *  @param reference The fully qualified abstract / reference event name. 
+	 *  @param concrete The fully qualified concrete event name.
+	 */
+	public void addEventReference(String reference, String concrete)
+	{
+		eventreferences = addReference(eventreferences, reference, concrete);
+	}
+
+	/**
+	 *  Get the fully qualified goal references (abstract/reference name -> concrete goal name).
+	 */
+	public Map<String, String> getGoalReferences()
+	{
+		return getReferences(goalreferences);
+	}
+
+	/**
+	 *  Add a goal reference (abstract/reference name -> concrete goal name).
+	 *  @param reference The fully qualified abstract / reference goal name. 
+	 *  @param concrete The fully qualified concrete goal name.
+	 */
+	public void addGoalReference(String reference, String concrete)
+	{
+		goalreferences = addReference(goalreferences, reference, concrete);
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Add a reference and resolve transitive dependencies.
+	 */
+	protected static Map<String, String> addReference(Map<String, String> references, String reference, String concrete)
+	{
+		if(references==null)
+		{
+			references = new LinkedHashMap<String, String>();
+		}
+		
+		// Resolve transitive dependency.
+		if(references.containsKey(concrete))
+		{
+			concrete	= references.get(concrete);
+			assert	!references.containsKey(concrete);	// Should be only one level.
+		}
+		
+		// Resolve indirect assignto dependencies (i.e. assignto from reference/abstract)
+		for(Entry<String, String> entry: references.entrySet())
+		{
+			if(SUtil.equals(entry.getValue(), reference))
+			{
+				entry.setValue(concrete);
+			}
+		}
+		
+		references.put(reference, concrete);
+		return references;
+	}
+	
+	/**
+	 *  Get references or empty map.
+	 */
+	protected static Map<String, String> getReferences(Map<String, String> references)
+	{
+		if(references==null)
+		{
+			references	= Collections.emptyMap();
+		}
+		return references;
 	}
 }

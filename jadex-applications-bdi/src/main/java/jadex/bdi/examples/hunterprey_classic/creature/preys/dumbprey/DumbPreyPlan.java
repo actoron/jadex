@@ -20,17 +20,7 @@ public class DumbPreyPlan	extends Plan
 	//-------- attributes --------
 
 	/** Random number generator. */
-	protected Random	rand;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public DumbPreyPlan()
-	{
-		this.rand	= new Random(hashCode());
-	}
+	protected Random	rand	= new Random(hashCode());
 
 	//-------- methods --------
 

@@ -1,11 +1,11 @@
 package jadex.extension.agr;
 
-import jadex.bridge.IComponentIdentifier;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  An AGR group hold information about agent instances

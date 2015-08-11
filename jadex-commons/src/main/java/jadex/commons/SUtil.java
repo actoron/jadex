@@ -37,6 +37,8 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.Channel;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -168,10 +170,14 @@ public class SUtil
 	};
 
 	/** An empty string array. */
-	public static final String[] EMPTY_STRING_ARRAY	 = new String[0];
+	public static final String[] EMPTY_STRING_ARRAY	= new String[0];
 
 	/** An empty class array. */
-	public static final Class[]	EMPTY_CLASS_ARRAY		= new Class[0];
+	public static final Class[]	EMPTY_CLASS_ARRAY = new Class[0];
+	
+	/** An empty class array. */
+	public static final Object[] EMPTY_OBJECT_ARRAY	= new Class[0];
+
 	
 	protected static final IResultCommand<ResourceInfo, URLConnection>[]	RESOURCEINFO_MAPPERS;
 
@@ -3816,7 +3822,7 @@ public class SUtil
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try
 		{
-			FileChannel channel = fis.getChannel( );
+			FileChannel channel = fis.getChannel();
 			MappedByteBuffer mbb = channel.map(FileChannel.MapMode.READ_ONLY, 0L, channel.size());
 			byte[] buf = new byte[4096];
 			while(mbb.hasRemaining())
@@ -3847,6 +3853,31 @@ public class SUtil
 		}
 		
 		return baos.toByteArray();
+	}
+	
+	/**
+	 *  Reads an input stream into memory (byte array).
+	 *  Note: This only works for files smaller than 2GiB.
+	 *  
+	 * 	@param file The file.
+	 * 	@return Contents of the file.
+	 * 	@throws IOException Exception on IO errors.
+	 */
+	public static byte[] readStream(InputStream is) throws IOException
+	{
+		ByteArrayOutputStream buf = new ByteArrayOutputStream();
+		
+		byte[] data = new byte[4096];
+
+		int cnt;
+		while((cnt=is.read(data, 0, data.length))!=-1) 
+		{
+			buf.write(data, 0, cnt);
+		}
+
+		buf.flush();
+
+		return buf.toByteArray();
 	}
 	
 	/**

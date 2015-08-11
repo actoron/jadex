@@ -1,13 +1,5 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3.annotation.GoalAPLBuild;
-import jadex.bdiv3.annotation.GoalResult;
-import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -18,6 +10,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.bdiv3.annotation.GoalAPLBuild;
+import jadex.bdiv3.annotation.GoalResult;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 
 
 /**

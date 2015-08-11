@@ -1,5 +1,14 @@
 package jadex.bdiv3.features.impl;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
@@ -32,6 +41,7 @@ import jadex.bdiv3.runtime.impl.RParameterElement.RParameter;
 import jadex.bdiv3.runtime.impl.RParameterElement.RParameterSet;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -61,7 +71,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
@@ -73,15 +82,6 @@ import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.CombinedCondition;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
@@ -206,8 +206,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		UnparsedExpression uexp = cond.getExpression();
 		if(uexp.getParsed()==null)
 			SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader());
-		SimpleValueFetcher fet = new SimpleValueFetcher(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(agent, owner, vals));
-		Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
+		Object res = ((IParsedExpression)uexp.getParsed()).getValue(CapabilityWrapper.getFetcher(agent, uexp.getLanguage(), vals));
 		if(res instanceof Boolean)
 		{
 			ret = ((Boolean)res).booleanValue();
@@ -327,7 +326,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								{
 									UnparsedExpression	fact	= ibel.getFacts().get(0);	// pojo initial beliefs are @NameValue, thus exactly one fact.
 									MBelief mbel = bdimodel.getCapability().getBelief(ibel.getName());
-									Object val = SJavaParser.parseExpression(fact, component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mbel));
+									Object val = SJavaParser.parseExpression(fact, component.getModel().getAllImports(), component.getClassLoader()).getValue(CapabilityWrapper.getFetcher(component, fact.getLanguage()));
 									mbel.setValue(component, val);
 								}
 								catch(RuntimeException e)
@@ -353,11 +352,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							Object goal = null;
 							
 							// try to fetch via name
-							mgoal = bdimodel.getCapability().getGoal(igoal.getName());
-							if(mgoal==null && igoal.getName().indexOf(".")==-1)
+							mgoal = bdimodel.getCapability().getGoal(igoal.getRef());
+							if(mgoal==null && igoal.getRef().indexOf(".")==-1)
 							{
 								// try with package
-								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+igoal.getName());
+								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+igoal.getRef());
 							}
 							
 							if(mgoal!=null)
@@ -367,7 +366,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							// if not found, try expression
 							else
 							{
-								Object o = SJavaParser.parseExpression(igoal.getName(), component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mgoal));
+								Object o = SJavaParser.parseExpression(igoal.getRef(), component.getModel().getAllImports(), component.getClassLoader()).getValue(CapabilityWrapper.getFetcher(component, igoal.getCapabilityName()));
 								if(o instanceof Class)
 								{
 									gcl = (Class<?>)o;
@@ -458,7 +457,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								throw new RuntimeException("Could not create initial goal: "+igoal);
 							}
 							
-							List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal, null);
+							List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal);
 							
 							if(goal==null)
 							{
@@ -492,7 +491,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						for(MConfigParameterElement iplan: iplans)
 						{
-							MPlan mplan = bdimodel.getCapability().getPlan(iplan.getName());
+							MPlan mplan = bdimodel.getCapability().getPlan(iplan.getRef());
 							// todo: allow Java plan constructor calls
 		//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 							
@@ -606,7 +605,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							{
 								// reevaluate the belief on change events
 								Object value = SJavaParser.parseExpression(mbel.getDefaultFact(), 
-									component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mbel));
+									component.getModel().getAllImports(), component.getClassLoader()).getValue(CapabilityWrapper.getFetcher(component, mbel.getDefaultFact().getLanguage()));
 								// save the value
 								mbel.setValue(component, value);
 //								oldval = value;	// not needed for xml
@@ -618,7 +617,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					rulesystem.getRulebase().addRule(rule);
 				}
 				
-				if(mbel.getUpdaterate()>0)
+				if(mbel.getUpdaterateValue(component)>0)
 				{
 					final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //					cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
@@ -654,7 +653,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 											{
 												// reevaluate the belief on change events
 												Object value = SJavaParser.parseExpression(mbel.getDefaultFact(), 
-													component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mbel));
+													component.getModel().getAllImports(), component.getClassLoader()).getValue(CapabilityWrapper.getFetcher(component, mbel.getDefaultFact().getLanguage()));
 												// save the value 
 												// change event is automatically thrown
 												mbel.setValue(component, value);
@@ -666,7 +665,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 											e.printStackTrace();
 										}
 										
-										cs.createTimer(mbel.getUpdaterate(), self);
+										cs.createTimer(mbel.getUpdaterateValue(component), self);
 										return IFuture.DONE;
 									}
 								});
@@ -976,7 +975,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								{
 			//						System.out.println("create: "+create);
 									
-									List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal, null);
+									List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal);
 									
 									if(bindings!=null)
 									{
@@ -1434,7 +1433,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					public IFuture<Void> execute(final IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						// Create all binding plans
-						List<MPlanInfo> cands = APL.createMPlanCandidates(component, mplan, jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mplan));
+						List<MPlanInfo> cands = APL.createMPlanCandidates(component, mplan);
 
 						final CollectionResultListener<MPlanInfo> lis = new CollectionResultListener<MPlanInfo>(cands.size(), 
 							new IResultListener<Collection<MPlanInfo>>()
@@ -1538,7 +1537,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 							{
 								UnparsedExpression uexp = mcond.getExpression();
-								Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(component, mplan));
+								Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(CapabilityWrapper.getFetcher(component, uexp.getLanguage()));
 								return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 							}
 						}, createplan);

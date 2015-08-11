@@ -1,9 +1,9 @@
 package jadex.extension.agr;
 
-import jadex.commons.SReflect;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.commons.SReflect;
 
 /**
  *  An AGR group type.

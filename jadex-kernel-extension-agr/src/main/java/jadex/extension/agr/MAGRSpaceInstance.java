@@ -1,5 +1,8 @@
 package jadex.extension.agr;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.application.IExtensionInfo;
 import jadex.application.IExtensionInstance;
 import jadex.bridge.IExternalAccess;
@@ -7,9 +10,6 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  An instance of an AGR space. 

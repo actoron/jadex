@@ -1,5 +1,8 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MServiceCall;
@@ -8,9 +11,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 
 /**
  * 

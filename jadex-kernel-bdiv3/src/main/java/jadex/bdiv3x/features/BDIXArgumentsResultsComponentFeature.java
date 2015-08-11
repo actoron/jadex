@@ -1,7 +1,6 @@
 package jadex.bdiv3x.features;
 
 import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3x.BDIXModel;
 import jadex.bridge.IInternalAccess;
@@ -31,7 +30,7 @@ public class BDIXArgumentsResultsComponentFeature extends ArgumentsResultsCompon
 		BDIXModel	model	= (BDIXModel)bdif.getModel();
 		for(MBelief mbel: model.getCapability().getBeliefs())
 		{
-			if(model.getResultMappings().containsKey(mbel.getName()) && mbel.getEvaluationMode()==EvaluationMode.PULL)
+			if(model.getCapability().getResultMappings().containsKey(mbel.getName()) && mbel.getEvaluationMode()==EvaluationMode.PULL)
 			{
 				Object	val;
 				if(mbel.isMulti(null))
@@ -42,7 +41,7 @@ public class BDIXArgumentsResultsComponentFeature extends ArgumentsResultsCompon
 				{
 					val	= bdif.getBeliefbase().getBelief(mbel.getName()).getFact();
 				}
-				getResults().put(model.getResultMappings().get(mbel.getName()), val);
+				getResults().put(model.getCapability().getResultMappings().get(mbel.getName()), val);
 			}
 		}
 		return super.shutdown();

@@ -1,5 +1,10 @@
 package jadex.extension.agr;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import jadex.application.IExtensionInstance;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -13,11 +18,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  *  An AGR (agent-group-role) space.

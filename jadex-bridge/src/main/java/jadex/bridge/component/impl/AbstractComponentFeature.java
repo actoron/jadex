@@ -1,10 +1,13 @@
 package jadex.bridge.component.impl;
 
+import java.util.Collections;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.IFuture;
 
 /**
@@ -19,6 +22,9 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	
 	/** The creation info. */
 	protected ComponentCreationInfo	cinfo;
+		
+	/** The parameter guesser. */
+	protected IParameterGuesser	guesser;
 		
 	//-------- constructors --------
 	
@@ -107,6 +113,10 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	 */
 	public IParameterGuesser	getParameterGuesser()
 	{
-		return null;
+		if(guesser==null)
+		{
+			guesser	= new SimpleParameterGuesser(Collections.singleton(this));
+		}
+		return guesser;
 	}
 }

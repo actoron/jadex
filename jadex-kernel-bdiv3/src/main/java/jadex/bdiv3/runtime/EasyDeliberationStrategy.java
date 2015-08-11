@@ -1,20 +1,5 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
-import jadex.bdiv3.model.MDeliberation;
-import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
-import jadex.bdiv3.runtime.IGoal.GoalProcessingState;
-import jadex.bdiv3.runtime.impl.RCapability;
-import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.MethodInfo;
-import jadex.commons.future.IFuture;
-import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
-import jadex.rules.eca.RuleSystem;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -22,6 +7,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MDeliberation;
+import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
+import jadex.bdiv3.runtime.IGoal.GoalProcessingState;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3x.runtime.CapabilityWrapper;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.MethodInfo;
+import jadex.commons.future.IFuture;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
+import jadex.rules.eca.RuleSystem;
 
 /**
  *  The easy deliberation strategy.
@@ -293,7 +294,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 							UnparsedExpression uexp = uexps.get(mother.getName());
 							if(uexp!=null && uexp.getValue()!=null && uexp.getValue().length()>0)
 							{
-								SimpleValueFetcher fet = new SimpleValueFetcher(jadex.bdiv3x.runtime.CapabilityWrapper.getFetcher(agent, goal.getMGoal()));
+								SimpleValueFetcher fet = new SimpleValueFetcher(CapabilityWrapper.getFetcher(agent, uexp.getLanguage()));
 								fet.setValue("$goal", goal);
 								fet.setValue("$ref", other);
 								

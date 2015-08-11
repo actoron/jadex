@@ -45,18 +45,18 @@
 		<module>jadex-javaparser</module>
 		<module>jadex-bridge</module>
 		<module>jadex-platform</module>
-		<module>jadex-nuggets</module>
+<!-- 	<module>jadex-nuggets</module> -->
 
 		<module>jadex-model-bpmn</module>
 		<module>jadex-kernel-base</module>
 		<module>jadex-kernel-component</module>
 		<module>jadex-kernel-application</module>
-		<module>jadex-kernel-bdi</module>
+<!-- 	<module>jadex-kernel-bdi</module> -->
 		<module>jadex-kernel-bdiv3</module>
 		<module>jadex-kernel-micro</module>
 		<module>jadex-kernel-bpmn</module>
-		<module>jadex-kernel-bdibpmn</module>
-		<module>jadex-kernel-gpmn</module>
+<!-- 	<module>jadex-kernel-bdibpmn</module>
+		<module>jadex-kernel-gpmn</module> -->
 		<module>jadex-kernel-extension-envsupport</module>
 		<module>jadex-kernel-extension-envsupport-opengl</module>
 		<module>jadex-kernel-extension-agr</module>
@@ -66,8 +66,8 @@
 		<module>jadex-applications-bdiv3</module>
 		<module>jadex-applications-micro</module>
 		<module>jadex-applications-bpmn</module>
-		<module>jadex-applications-bdibpmn</module>
-		<module>jadex-applications-gpmn</module>
+<!-- 	<module>jadex-applications-bdibpmn</module>
+		<module>jadex-applications-gpmn</module> -->
 		<module>jadex-applications-web</module>
 		<module>jadex-applications-java8</module>
 		

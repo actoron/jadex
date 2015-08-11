@@ -33,7 +33,7 @@
 	<services>
 		<providedservice name="printservice" class="IPrintHelloService">
 			<implementation class="PrintHelloService">
-				<interceptor>new BDIReasoningInterceptor($scope)</interceptor>
+				<interceptor>new BDIReasoningInterceptor($component)</interceptor>
 			</implementation>
 		</providedservice>
 	</services>

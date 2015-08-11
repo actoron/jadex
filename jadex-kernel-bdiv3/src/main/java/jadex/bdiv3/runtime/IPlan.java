@@ -7,8 +7,6 @@ import jadex.commons.future.IFuture;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.ICondition;
 
-import java.util.List;
-
 /**
  *  User interface for plans.
  */
@@ -61,12 +59,6 @@ public interface IPlan extends IParameterElement  // todo: do not extend IParame
 	 *  @return The dispatched element.
 	 */
 	public Object getDispatchedElement();
-	
-	/**
-	 *  Get the waitqueue.
-	 *  @return The waitqueue.
-	 */
-	public List<Object> getWaitqueue();
 	
 	/**
 	 *  Wait for a delay.

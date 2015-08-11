@@ -16,7 +16,7 @@ public class ErrorReport implements IErrorReport
 	protected String errhtml;
 	
 	/** The external reports. */
-	protected Map documents;
+	protected Map<String, String> documents;
 	
 	//-------- constructors --------
 	
@@ -80,7 +80,7 @@ public class ErrorReport implements IErrorReport
 	 *  (model -> report)
 	 *  @return The external documents.
 	 */
-	public Map	getDocuments()
+	public Map<String, String> getDocuments()
 	{
 		return documents;
 	}
@@ -89,7 +89,7 @@ public class ErrorReport implements IErrorReport
 	 *  Set the documents.
 	 *  @param documents The documents to set.
 	 */
-	public void setDocuments(Map documents)
+	public void setDocuments(Map<String, String> documents)
 	{
 		this.documents = documents;
 	}

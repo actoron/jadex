@@ -16,12 +16,12 @@ public class EnglishGermanTranslationPlanB3 extends Plan
 	/** The wordtable. */
 	protected Map wordtable;
 
-	//-------- constructors --------
+	//-------- methods --------
 
 	/**
-	 *  Create a new plan.
+	 *  Execute the plan.
 	 */
-	public EnglishGermanTranslationPlanB3()
+	public void body()
 	{
 		System.out.println("Created: "+this);
 
@@ -31,15 +31,7 @@ public class EnglishGermanTranslationPlanB3 extends Plan
 		this.wordtable.put("cow", "Kuh");
 		this.wordtable.put("cat", "Katze");
 		this.wordtable.put("dog", "Hund");
-	}
-
-	//-------- methods --------
-
-	/**
-	 *  Execute the plan.
-	 */
-	public void body()
-	{
+		
 		String eword = (String)getParameter("word").getValue();
 		String gword = (String)this.wordtable.get(eword);
 		if(gword!=null)

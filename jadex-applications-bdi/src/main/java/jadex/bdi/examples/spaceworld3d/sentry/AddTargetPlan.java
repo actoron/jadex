@@ -11,16 +11,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
  */
 public class AddTargetPlan extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public AddTargetPlan()
-	{
-		getLogger().info("Created: "+this+" "+getLogger().getName());
-	}
-
 	//-------- methods --------
 
 	/**
@@ -28,6 +18,8 @@ public class AddTargetPlan extends Plan
 	 */
 	public void body()
 	{
+		getLogger().info("Created: "+this+" "+getLogger().getName());
+		
 		//System.out.println("AddPlan found");
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
 		IMessageEvent req = (IMessageEvent)getReason();

@@ -1,8 +1,8 @@
 package jadex.bdiv3;
 
-import jadex.bdiv3.model.BDIModel;
-
 import java.util.List;
+
+import jadex.bdiv3.model.BDIModel;
 
 /**
  * 

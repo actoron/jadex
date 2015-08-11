@@ -1,12 +1,5 @@
 package jadex.bdiv3;
 
-import jadex.bdiv3.model.BDIModel;
-import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.model.MGoal;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -45,6 +38,13 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifier;
 import org.objectweb.asm.util.TraceClassVisitor;
+
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MGoal;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 
 /**

@@ -15,7 +15,7 @@
 		<import>jadex.bdi.*</import>
 		<import>jadex.bdi.testcases.*</import>
 	</imports>
-
+<!-- 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
 	</capabilities>
@@ -28,7 +28,7 @@
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
 	</beliefs>
-
+ 
 	<plans>
 		<plan name="dynamic_model_plan">
 			<body class="DynamicModelPlan"/>
@@ -51,5 +51,5 @@
 			</plans>
 		</configuration>
 	</configurations>
-
+-->
 </agent>

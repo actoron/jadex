@@ -1,10 +1,20 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.model.IBDIModel;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
@@ -29,14 +39,6 @@ import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Goal instance implementation.
@@ -622,7 +624,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public void planFinished(IInternalAccess ia, IInternalPlan rplan)
 	{
-//		if(this.toString().indexOf("docnt")!=-1)
+//		if(this.toString().indexOf("da_initiate")!=-1)
 //			System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
 
 		super.planFinished(ia, rplan);
@@ -638,10 +640,10 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			
 			// Find parameter mappings for xml agents
 			// todo: goal-goal mappings
+			// Todo: unify mapping code with RPlan.createPlan()
 			if(rplan instanceof RPlan && rplan.isPassed())
 			{
 				MPlan mplan = (MPlan)((RPlan)rplan).getModelElement();
-				Map<String, Object> mappingvals = null;
 				if(mplan.getParameters()!=null && mplan.getParameters().size()>0)
 				{
 					for(MParameter mparam: mplan.getParameters())
@@ -653,23 +655,29 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 							{
 								for(String mapping: mappings)
 								{
-									if(mapping.startsWith(getModelElement().getName()))
+									MCapability	capa	= ((IBDIModel)ia.getModel()).getCapability();
+									String targetelm = mapping.substring(0, mapping.indexOf("."));
+									String targetpara = mapping.substring(mapping.indexOf(".")+1);
+									
+									if(capa.getGoalReferences().containsKey(targetelm))
 									{
-										String target = mapping.substring(mapping.indexOf(".")+1);
-										if(mappingvals==null)
-											mappingvals = new HashMap<String, Object>();
+										targetelm	= capa.getGoalReferences().get(targetelm);
+									}
+									
+									if(getModelElement().getName().equals(targetelm))
+									{
 										if(mparam.isMulti(null))
 										{
-											getParameterSet(target).removeValues();
+											getParameterSet(targetpara).removeValues();
 											Object[] vals = rplan.getParameterSet(mparam.getName()).getValues();
 											for(Object val: vals)
 											{
-												getParameterSet(target).addValue(val);
+												getParameterSet(targetpara).addValue(val);
 											}
 										}
 										else
 										{
-											getParameter(target).setValue(rplan.getParameter(mparam.getName()).getValue());
+											getParameter(targetpara).setValue(rplan.getParameter(mparam.getName()).getValue());
 										}
 										break;
 									}

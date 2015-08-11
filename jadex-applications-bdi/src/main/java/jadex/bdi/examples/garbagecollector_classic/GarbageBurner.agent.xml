@@ -51,6 +51,7 @@
 			    $beliefbase.garbages.length>0
 			</creationcondition>
 			<!-- <deliberation cardinality="1"/> -->
+			<deliberation cardinalityone="true"/>
 		</achievegoal>
 
 		<!-- The goal for picking up waste. Tries endlessly to pick up. -->

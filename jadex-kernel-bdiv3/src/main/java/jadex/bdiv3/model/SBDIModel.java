@@ -1,5 +1,14 @@
 package jadex.bdiv3.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import jadex.bdiv3x.BDIXModel;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -9,15 +18,6 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
 import jadex.rules.eca.EventType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  *  Helper methods for pojo BDI and BDI V3X models.
@@ -48,12 +48,14 @@ public class SBDIModel
 				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
 			}
 			
+			
+			int addpos	= bdimodel.getCapability().getBeliefs().isEmpty() ? -1 : 0;	// add inner beliefs before outer in case of dependencies
 			for(MBelief bel: capa.getCapability().getBeliefs())
 			{
 				String	belname	= capaname+MElement.CAPABILITY_SEPARATOR+bel.getName();
 				
 				// Mapped (abstract) belief.
-				if(bdimodel.getBeliefReferences().containsKey(belname))
+				if(bdimodel.getCapability().getBeliefReferences().containsKey(belname))
 				{
 					// ignore (only use concrete element from outer model).
 					// Todo: merge settings? update rate etc.
@@ -67,50 +69,65 @@ public class SBDIModel
 					MBelief	bel2;
 					if(bel.getGetter()==null)
 					{
-						bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+						bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdateRate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 					}
 					else
 					{
-						bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+						bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdateRate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 						bel2.setSetter(bel.getSetter());
 					}
 					bel2.setName(belname);
-					bel2.setDefaultFact(bel.getDefaultFact());
-					bel2.setDefaultFacts(bel.getDefaultFacts());
+					bel2.setDefaultFact(copyExpression(capaname, bel.getDefaultFact()));
+					bel2.setDefaultFacts(copyExpressions(capaname, bel.getDefaultFacts()));
 					bel2.setDescription(bel.getDescription());
 					bel2.setEvaluationMode(bel.getEvaluationMode());
 					bel2.setMulti(bel.isMulti(cl));
 					bel2.setClazz(bel.getClazz()!=null ? new ClassInfo(bel.getClazz().getType(cl)) : null);
-					bdimodel.getCapability().addBelief(bel2);
+					bel2.setUpdateRate(copyExpression(capaname, bel.getUpdateRate()));
+					
+					if(addpos==-1)
+					{
+						bdimodel.getCapability().addBelief(bel2);
+					}
+					else
+					{
+						bdimodel.getCapability().getBeliefs().add(addpos++, bel2);
+					}
 				}
 			}
 			
-			if(bdimodel instanceof BDIModel)
+			for(String reference: capa.getCapability().getBeliefReferences().keySet())
 			{
-				for(String reference: capa.getBeliefReferences().keySet())
+				String	concrete	= capaname+MElement.CAPABILITY_SEPARATOR+capa.getCapability().getBeliefReferences().get(reference);
+				// Resolve transitive reference. todo: unify goal/event references and belief references?
+				if(bdimodel.getCapability().getBeliefReferences().containsKey(concrete))
 				{
-					String	concrete	= capaname+MElement.CAPABILITY_SEPARATOR+capa.getBeliefReferences().get(reference);
-					// Resolve transitive reference.
-					if(bdimodel.getBeliefReferences().containsKey(concrete))
-					{
-						concrete	= bdimodel.getBeliefReferences().get(concrete);
-						assert !bdimodel.getBeliefReferences().containsKey(concrete);	// Should only be one level!
-					}
-					((BDIModel)bdimodel).addBeliefReference(capaname+MElement.CAPABILITY_SEPARATOR+reference, concrete);
+					concrete	= bdimodel.getCapability().getBeliefReferences().get(concrete);
+					assert !bdimodel.getCapability().getBeliefReferences().containsKey(concrete);	// Should only be one level!
+				}
+				bdimodel.getCapability().addBeliefReference(capaname+MElement.CAPABILITY_SEPARATOR+reference, concrete);
+			}
+			
+			for(Entry<String, String> reference: capa.getCapability().getGoalReferences().entrySet())
+			{
+				// either abstract (value==null) and contained or not abstract and not contained
+				assert bdimodel.getCapability().getGoalReferences().containsKey(capaname+MElement.CAPABILITY_SEPARATOR+reference)
+					== (reference.getValue()==null);
+				
+				if(reference.getValue()!=null)
+				{
+					bdimodel.getCapability().addGoalReference(capaname+MElement.CAPABILITY_SEPARATOR+reference.getKey(), capaname+MElement.CAPABILITY_SEPARATOR+reference.getValue());
 				}
 			}
-			else // if(bdimodel instanceof BDIXModel)
+			for(Entry<String, String> reference: capa.getCapability().getEventReferences().entrySet())
 			{
-				for(String reference: capa.getBeliefReferences().keySet())
+				// either abstract (value==null) and contained or not abstract and not contained
+				assert bdimodel.getCapability().getEventReferences().containsKey(capaname+MElement.CAPABILITY_SEPARATOR+reference)
+					== (reference.getValue()==null);
+				
+				if(reference.getValue()!=null)
 				{
-					String	concrete	= capaname+MElement.CAPABILITY_SEPARATOR+capa.getBeliefReferences().get(reference);
-					// Resolve transitive reference.
-					if(bdimodel.getBeliefReferences().containsKey(concrete))
-					{
-						concrete	= bdimodel.getBeliefReferences().get(concrete);
-						assert !bdimodel.getBeliefReferences().containsKey(concrete);	// Should only be one level!
-					}
-					((BDIXModel)bdimodel).addBeliefReference(capaname+MElement.CAPABILITY_SEPARATOR+reference, concrete);
+					bdimodel.getCapability().addEventReference(capaname+MElement.CAPABILITY_SEPARATOR+reference.getKey(), capaname+MElement.CAPABILITY_SEPARATOR+reference.getValue());
 				}
 			}
 			
@@ -156,7 +173,7 @@ public class SBDIModel
 				event2.setDescription(event.getDescription());
 				event2.setDirection(event.getDirection());
 				event2.setExcludeMode(event.getExcludeMode());
-				event2.setMatchExpression(event.getMatchExpression());
+				event2.setMatchExpression(copyExpression(capaname, event.getMatchExpression()));
 				event2.setPostToAll(event.isPostToAll());
 				event2.setRandomSelection(event.isRandomSelection());
 				event2.setRebuild(event.isRebuild());
@@ -343,7 +360,7 @@ public class SBDIModel
 		// Only copy belief if it does not exist already (outer overrides inner settings).
 		MConfigBeliefElement	cbel2	= null;
 		String	name	= capaname + MElement.CAPABILITY_SEPARATOR + cbel.getName();
-		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
+		name	= bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		boolean	found	= false;
 		for(MConfigBeliefElement tbel: SUtil.safeList(test))
 		{
@@ -358,14 +375,12 @@ public class SBDIModel
 		{
 			cbel2	= new MConfigBeliefElement();
 			cbel2.setName(name);
-			for(UnparsedExpression fact: SUtil.safeList(cbel.getFacts()))
-			{
-				String	fname	= capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : "");
-				UnparsedExpression	fact2	= new UnparsedExpression(fname, (String)null, fact.getValue(), fact.getLanguage());
-				fact2.setParsedExp(fact.getParsed());	// Use parsed expression from inner scope (with correct imports).
-				fact2.setClazz(fact.getClazz());
-				cbel2.addFact(fact2);
-			}
+			cbel2.setFacts(copyExpressions(capaname, cbel.getFacts()));
+//			for(UnparsedExpression fact: SUtil.safeList(cbel.getFacts()))
+//			{
+//				// Todo: why new name?
+//				fact.setName(capaname + MElement.CAPABILITY_SEPARATOR + (fact.getName()!=null ? fact.getName() : ""));
+//			}
 		}
 		return cbel2;
 	}
@@ -375,40 +390,20 @@ public class SBDIModel
 	 */
 	protected static MConfigParameterElement copyConfigParameterElement(IBDIModel bdimodel, String capaname, MConfigParameterElement cpel, List<MConfigParameterElement> test)
 	{
-		// Only copy element if it does not exist already (outer overrides inner settings).
-		MConfigParameterElement	cpel2	= null;
-		String	name	= capaname + MElement.CAPABILITY_SEPARATOR + cpel.getName();
-		// todo: parameter element references
-//		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
-		boolean	found	= false;
-		for(MConfigParameterElement tpel: SUtil.safeList(test))
+		MConfigParameterElement	cpel2	= new MConfigParameterElement();
+		cpel2.setRef(capaname + MElement.CAPABILITY_SEPARATOR + cpel.getRef());
+		cpel2.setName(cpel.getName());
+		if(cpel.getParameters()!=null)
 		{
-			if(tpel.getName().equals(name))
+			for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
 			{
-				found	= true;
-				break;
-			}
-		}
-
-		if(!found)
-		{
-			cpel2	= new MConfigParameterElement();
-			cpel2.setName(name);
-			if(cpel.getParameters()!=null)
-			{
-				for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
+				for(UnparsedExpression value: param.getValue())
 				{
-					for(UnparsedExpression value: param.getValue())
-					{
-						UnparsedExpression	value2	= new UnparsedExpression(value.getName(), (String)null, value.getValue(), value.getLanguage());
-						value2.setParsedExp(value.getParsed());	// Use parsed expression from inner scope (with correct imports).
-						value2.setClazz(value.getClazz());
-						cpel2.addParameter(value2);
-						// Hack!!! change name after adding.
-						value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
-					}
-				}			
-			}
+					cpel2.addParameter(copyExpression(capaname, value));
+//					// Hack!!! change name after adding.	todo: why?
+//					value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
+				}
+			}			
 		}
 		return cpel2;
 	}
@@ -420,9 +415,10 @@ public class SBDIModel
 	{
 		MParameter	param2	= param instanceof MPlanParameter ? new MPlanParameter() : new MParameter(param.getField());
 		param2.setBeliefEvents(convertEvents(capaname, param.getBeliefEvents(), bdimodel));
-		param2.setBindingOptions(param.getBindingOptions());
+		param2.setBindingOptions(copyExpression(capaname, param.getBindingOptions()));
 		param2.setClazz(param.getClazz());
-		param2.setDefaultValue(param.getDefaultValue());
+		param2.setDefaultValue(copyExpression(capaname, param.getDefaultValue()));
+		param2.setDefaultValues(copyExpressions(capaname, param.getDefaultValues()));
 		param2.setDescription(param.getDescription());
 		param2.setDirection(param.getDirection());
 		param2.setEvaluationMode(param.getEvaluationMode());
@@ -433,7 +429,7 @@ public class SBDIModel
 		param2.setRawEvents(param.getRawEvents());
 		param2.setServiceMappings(param.getServiceMappings());
 		param2.setSetter(param.getSetter());
-		param2.setUpdateRate(param.getUpdateRate());
+		param2.setUpdateRate(copyExpression(capaname, param.getUpdateRate()));
 		
 		if(param instanceof MPlanParameter)
 		{
@@ -466,14 +462,7 @@ public class SBDIModel
 		{
 			if(mbel.getRef()!=null)
 			{
-				if(bdimodel instanceof BDIModel)
-				{
-					((BDIModel)bdimodel).addBeliefReference(mbel.getName(), mbel.getRef());
-				}
-				else
-				{
-					((BDIXModel)bdimodel).addBeliefReference(mbel.getName(), mbel.getRef());
-				}
+				bdimodel.getCapability().addBeliefReference(mbel.getName(), mbel.getRef());
 			}
 		}
 		
@@ -611,7 +600,7 @@ public class SBDIModel
 				for(String event: trigger.getFactAddeds())
 				{
 					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event : event;
-					events.add(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
+					events.add(bdimodel.getCapability().getBeliefReferences().containsKey(mapped) ? bdimodel.getCapability().getBeliefReferences().get(mapped) : mapped);
 				}
 				trigger2.setFactAddeds(events);
 			}
@@ -621,7 +610,7 @@ public class SBDIModel
 				for(String event: trigger.getFactChangeds())
 				{
 					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event : event;
-					events.add(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
+					events.add(bdimodel.getCapability().getBeliefReferences().containsKey(mapped) ? bdimodel.getCapability().getBeliefReferences().get(mapped) : mapped);
 				}
 				trigger2.setFactChangeds(events);
 			}
@@ -631,7 +620,7 @@ public class SBDIModel
 				for(String event: trigger.getFactRemoveds())
 				{
 					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event : event;
-					events.add(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
+					events.add(bdimodel.getCapability().getBeliefReferences().containsKey(mapped) ? bdimodel.getCapability().getBeliefReferences().get(mapped) : mapped);
 				}
 				trigger2.setFactRemoveds(events);
 			}
@@ -639,8 +628,17 @@ public class SBDIModel
 			{
 				for(MGoal goal: trigger.getGoals())
 				{
-					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+goal.getName() : goal.getName();
-					trigger2.addGoal(bdimodel.getCapability().getGoal(mapped));
+					// Pojo
+					if(goal.getTarget()!=null)
+					{
+						trigger2.addGoal(bdimodel.getCapability().getGoal(capa+MElement.CAPABILITY_SEPARATOR+goal.getName()));
+					}
+					
+					// XML
+					else
+					{
+						trigger2.addGoal(bdimodel.getCapability().getResolvedGoal(capa, goal.getName()));
+					}
 //					trigger.getGoalMatchExpression(mgoal)	// todo!
 				}
 			}
@@ -648,14 +646,24 @@ public class SBDIModel
 			{
 				for(MGoal goal: trigger.getGoalFinisheds())
 				{
-					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+goal.getName() : goal.getName();
-					trigger2.addGoalFinished(bdimodel.getCapability().getGoal(mapped));
+					// Pojo
+					if(goal.getTarget()!=null)
+					{
+						trigger2.addGoalFinished(bdimodel.getCapability().getGoal(capa+MElement.CAPABILITY_SEPARATOR+goal.getName()));
+					}
+					
+					// XML
+					else
+					{
+						trigger2.addGoalFinished(bdimodel.getCapability().getResolvedGoal(capa, goal.getName()));
+					}
 				}
 			}
 			if(trigger.getServices()!=null)
 			{
 				for(MServiceCall ser: trigger.getServices())
 				{
+					// Todo: service call references?
 					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+ser.getName() : ser.getName();
 					trigger2.addService(bdimodel.getCapability().getService(mapped));
 				}
@@ -664,16 +672,14 @@ public class SBDIModel
 			{
 				for(MMessageEvent event: trigger.getMessageEvents())
 				{
-					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event.getName() : event.getName();
-					trigger2.addMessageEvent(bdimodel.getCapability().getMessageEvent(mapped));
+					trigger2.addMessageEvent(bdimodel.getCapability().getResolvedMessageEvent(capa, event.getName()));
 				}
 			}
 			if(trigger.getInternalEvents()!=null)
 			{
 				for(MInternalEvent event: trigger.getInternalEvents())
 				{
-					String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event.getName() : event.getName();
-					trigger2.addInternalEvent(bdimodel.getCapability().getInternalEvent(mapped));
+					trigger2.addInternalEvent(bdimodel.getCapability().getResolvedInternalEvent(capa, event.getName()));
 				}
 			}
 			if(trigger.getCondition()!=null)
@@ -697,7 +703,7 @@ public class SBDIModel
 			for(String event: evs)
 			{
 				String	mapped	= capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+event : event;
-				ret.add(bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped);
+				ret.add(bdimodel.getCapability().getBeliefReferences().containsKey(mapped) ? bdimodel.getCapability().getBeliefReferences().get(mapped) : mapped);
 			}			
 		}
 		else
@@ -721,7 +727,7 @@ public class SBDIModel
 				String[]	types	= event.getTypes().clone();
 				int	exchange	= (types[0].startsWith("value") || types[0].startsWith("parameter")) ? types.length-2 : types.length-1;
 				String	mapped = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+types[exchange] : types[exchange];
-				types[exchange]	= bdimodel.getBeliefReferences().containsKey(mapped) ? bdimodel.getBeliefReferences().get(mapped) : mapped;					
+				types[exchange]	= bdimodel.getCapability().getBeliefReferences().containsKey(mapped) ? bdimodel.getCapability().getBeliefReferences().get(mapped) : mapped;					
 				ret.add(new EventType(types));
 			}
 		}
@@ -737,8 +743,44 @@ public class SBDIModel
 		MCondition ccond = new MCondition(cname, convertEventTypes(capa, cond.getEvents(), bdimodel));
 		ccond.setConstructorTarget(cond.getConstructorTarget());
 		ccond.setMethodTarget(cond.getMethodTarget());
-		ccond.setExpression(cond.getExpression());
+		ccond.setExpression(copyExpression(capa, cond.getExpression()));
 		ccond.setDescription(cond.getDescription());
 		return ccond;
 	}
+	
+	/**
+	 *  Copy an expression.
+	 *  Adds correct scope.
+	 */
+	protected static UnparsedExpression	copyExpression(String scope, UnparsedExpression upex)
+	{
+		UnparsedExpression	upex2	= null;
+		if(upex!=null)
+		{
+			upex2	= new UnparsedExpression(upex.getName(), (String)null, upex.getValue(),
+				upex.getLanguage()!=null ? scope + MElement.CAPABILITY_SEPARATOR + upex.getLanguage() : scope);	// Hack: use language as scope.
+			upex2.setClazz(upex.getClazz());
+			upex2.setParsedExp(upex.getParsed());
+		}
+		return upex2;
+	}
+	
+	/**
+	 *  Copy expressions.
+	 *  Adds correct scope.
+	 */
+	protected static List<UnparsedExpression>	copyExpressions(String scope, List<UnparsedExpression> upes)
+	{
+		List<UnparsedExpression>	ret	= null;
+		if(upes!=null)
+		{
+			ret	= new ArrayList<UnparsedExpression>();
+			for(UnparsedExpression upex: upes)
+			{
+				ret.add(copyExpression(scope, upex));
+			}
+		}
+		return ret;
+	}
+
 }

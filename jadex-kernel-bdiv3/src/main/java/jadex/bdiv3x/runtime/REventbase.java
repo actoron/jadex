@@ -1,7 +1,8 @@
 package jadex.bdiv3x.runtime;
 
+import java.util.Map;
+
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
-import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
@@ -12,21 +13,25 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.future.IFuture;
 
-import java.util.Map;
-
 /**
  *  The event base runtime element.
  */
 public class REventbase extends RElement implements IEventbase
 {
+	//-------- attributes --------
+	
+	/** The scope (for local views). */
+	protected String	scope;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new goalbase.
 	 */
-	public REventbase(IInternalAccess agent)
+	public REventbase(IInternalAccess agent, String scope)
 	{
 		super(null, agent);
+		this.scope	= scope;
 	}
 
 	//-------- IEventbase interface --------
@@ -57,7 +62,7 @@ public class REventbase extends RElement implements IEventbase
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
-		MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(null, type);
+		MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(scope, type);
 		return new RMessageEvent(mevent, getAgent(), null);
 	}
 
@@ -72,7 +77,7 @@ public class REventbase extends RElement implements IEventbase
 		if(event==null)
 			throw new IllegalArgumentException("Event must not null");
 		
-		MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(null, type);
+		MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(scope, type);
 		Map<String, Object> rep = event.getMessageType().createReply((Map<String, Object>)event.getMessage());
 		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent());
 	}
@@ -83,9 +88,7 @@ public class REventbase extends RElement implements IEventbase
 	 */
 	public IInternalEvent createInternalEvent(String type)
 	{
-		MInternalEvent mevent = getCapability().getMCapability().getInternalEvent(type);
-		if(mevent==null)
-			throw new RuntimeException("Internal event not found: "+type);
+		MInternalEvent mevent = getCapability().getMCapability().getResolvedInternalEvent(scope, type);
 		return new RInternalEvent(mevent, getAgent(), null);
 	}
 

@@ -21,9 +21,9 @@ public class EnglishGermanTranslationPlanB1 extends Plan
 	//-------- methods --------
 
 	/**
-	 *  Create a new plan.
+	 *  The plan body.
 	 */
-	public EnglishGermanTranslationPlanB1()
+	public void body()
 	{
 		System.out.println("Created: "+this);
 
@@ -33,15 +33,7 @@ public class EnglishGermanTranslationPlanB1 extends Plan
 		this.wordtable.put("cow", "Kuh");
 		this.wordtable.put("cat", "Katze");
 		this.wordtable.put("dog", "Hund");
-	}
-
-	//-------- methods --------
-
-	/**
-	 *  The plan body.
-	 */
-	public void body()
-	{
+		
 		while(true)
 		{
 			IMessageEvent me = waitForMessageEvent("request_translation");

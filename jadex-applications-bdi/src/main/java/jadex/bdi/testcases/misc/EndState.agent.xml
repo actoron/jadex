@@ -18,7 +18,6 @@
 	
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 	
 	<beliefs>
@@ -48,7 +47,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief cref="testcap.testcase_cnt">
-					<fact>14</fact>
+					<fact>13</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

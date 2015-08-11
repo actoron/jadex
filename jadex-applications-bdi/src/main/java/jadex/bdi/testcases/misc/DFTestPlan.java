@@ -1,30 +1,31 @@
 package jadex.bdi.testcases.misc;
 
+import java.util.Date;
+
 import jadex.base.test.TestReport;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.fipa.SFipa;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.TimeoutException;
-import jadex.rules.eca.IEvent;
-
-import java.util.Arrays;
-import java.util.Date;
 
 /**
  *  Test the df plans.
  */
 public class DFTestPlan extends Plan
 {
+	private static final IDFServiceDescription[] SERVICES = new IDFServiceDescription[]
+	{
+		new DFServiceDescription("service_a", "a", "a"),
+		new DFServiceDescription("service_b", "b", "b"),
+		new DFServiceDescription("service_c", "c", "c")
+	};
+	
 	//-------- methods --------
 
 	/**
@@ -32,278 +33,104 @@ public class DFTestPlan extends Plan
 	 */
 	public void body()
 	{
-		waitFor(300);	// Allow initial register to happen first.
 		int num = 1;
-		num	= performInitialTests(num);
-		num = performTests(num, null); // test locally
-		
-		// Todo: support remote DF agent!?
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(
-			getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_COMPONENT, getComponentIdentifier(), null);
-		IComponentIdentifier da = new BasicComponentIdentifier(SFipa.DF_COMPONENT, getComponentIdentifier());
-		performTests(num, da); // test remotely
+		num = performTests(num, SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)); // test locally
 	}
 	
 	/**
-	 *  Test initial keep registered goal.
+	 *  Perform the tests.
 	 */
-	public int	performInitialTests(int num)
+	public int performTests(int num, IDF df)
 	{
-		IDFComponentDescription desc = ((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.createDFComponentDescription(null, new IDFServiceDescription[]
-			{
-				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.createDFServiceDescription("service_c", "c", "c")
-			}, null, null, null, null);
+		// Register without lease time.
+		num = testRegister(num, df, null);
+		num = testSearch(num, df, true);
+		num	= testDeregister(num, df);
 
-		// Try to search at the df.
-		TestReport	tr = new TestReport("#"+num++, "Try to search for initial registration.");
-		getLogger().info("\nTrying to search...");
-		IGoal search = createGoal("dfcap.df_search");
-		search.getParameter("description").setValue(desc);
-		try
-		{
-			dispatchSubgoalAndWait(search);
-			getLogger().info(" search ok: "+ SUtil.arrayToString(search.getParameterSet("result").getValues()));
-			tr.setSucceeded(true);
-		}
-		catch(GoalFailureException gfe)
-		{
-			getLogger().info(" search failed. "+Arrays.toString(search.getParameterSet("result").getValues()));
-			tr.setReason("Search failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
-		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-
-		// Check if keep goal continues to modify.
-		getLogger().info("Trying to keep registered...");
-		tr = new TestReport("#"+num++, "Try to keep (modify) initial registration.");
-		try
-		{
-//			IGoal[]	keeps	= getGoalbase().getGoals("dfcap.df_keep_registered");
-//			waitForGoal(keeps[0], 6000);
-//			tr.setSucceeded(true);
-//			keeps[0].drop();
-
-			IGoal	keep	= waitForGoal("dfcap.df_keep_registered", 6000);
-			tr.setSucceeded(true);
-			keep.drop();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			getLogger().info(" modify failed.");
-			tr.setReason("Modify failed.");
-		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		
-		// Deregister by the df to asure clean state before next tests.
-		IGoal deregister = createGoal("dfcap.df_deregister");
-		deregister.getParameter("description").setValue(desc);
-		try
-		{
-			dispatchSubgoalAndWait(deregister);
-		}
-		catch(GoalFailureException gfe)
-		{
-			// No prob, registration already removed.
-		}
+		// Register with lease time.
+		num = testRegister(num, df, new Date(getTime()+1000));
+		num = testSearch(num, df, true);
+		waitFor(2000);
+		num = testSearch(num, df, false);
 		
 		return num;
 	}
 
 	/**
-	 *  Perform the tests.
+	 *  Test registering.
 	 */
-	public int performTests(int num, IComponentIdentifier df)
+	protected int testRegister(int num, IDF df, Date lt)
 	{
-		IDFComponentDescription desc = ((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.createDFComponentDescription(null, new IDFServiceDescription[]
-			{
-				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.createDFServiceDescription("service_c", "c", "c")
-			}, null, null, null, null);
-		
-		long olt = getTime()+2000;
-//		desc_clone.setLeaseTime(new Date(olt));
-		
-		IDF dfservice = (IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		// Hack! does not clone services
-		IDFComponentDescription desc_clone = dfservice.createDFComponentDescription(desc.getName(), desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), new Date(olt));
-
-		// Try to register by the df for some lease time.
-		TestReport tr = new TestReport("#"+num++, "Test of lease time.");
-		getLogger().info("Testing lease time...");
-		IGoal register = createGoal("dfcap.df_register");
-		register.getParameter("description").setValue(desc_clone);
-		register.getParameter("df").setValue(df);
-		//register.getParameter("leasetime").setValue(new Long(2000));
-
+		// Try to register by the df 
+		TestReport	tr = new TestReport("#"+num++, lt!=null ? "Test register with lease time." : "Test register.");
+		getLogger().info(tr.getDescription());
 		try
 		{
-			dispatchSubgoalAndWait(register);
+			df.register(new DFComponentDescription(getAgent().getComponentIdentifier(), SERVICES, null, null, null, lt)).get();
 			getLogger().info(" register ok.");
-			waitFor(2200);
-			//desc_clone.setLeaseTime(null);
-			//desc_clone.setName(null);
-			IGoal search = createGoal("dfcap.df_search");
-			search.getParameter("description").setValue(desc_clone);
-			search.getParameter("df").setValue(df);
-			dispatchSubgoalAndWait(search);
-			if(search.getParameterSet("result").getValues().length>0)
+			tr.setSucceeded(true);
+		}
+		catch(GoalFailureException gfe)
+		{
+			getLogger().info(" register failed: "+gfe);
+			tr.setFailed(gfe);
+		}
+		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
+		return num;
+	}
+
+	/**
+	 *  Test searching for the agent.
+	 */
+	protected int testSearch(int num, IDF df, boolean find)
+	{
+		// Try to search at the df.
+		TestReport	tr = new TestReport("#"+num++, "Try to search for registration.");
+		getLogger().info("\nTrying to search...");
+		try
+		{
+			IDFComponentDescription[]	results	= df.search(new DFComponentDescription(null, SERVICES, null, null, null, null), null).get();
+			if(find==(results.length!=0))
 			{
-				getLogger().info(" lease time test failed. "+Arrays.toString(search.getParameterSet("result").getValues()));
-				tr.setReason("Lease time test failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
+				getLogger().info(" search ok: "+ SUtil.arrayToString(results));
+				tr.setSucceeded(true);
 			}
 			else
 			{
-				tr.setSucceeded(true);
+				getLogger().info("Searchb not ok: "+find+", "+SUtil.arrayToString(results));
+				tr.setFailed("Searchb not ok: "+find+", "+SUtil.arrayToString(results));
 			}
 		}
 		catch(GoalFailureException gfe)
 		{
-			//getLogger().info(" register failed. "+register.getResult());
-			getLogger().info(" register failed. "+register.getParameter("result").getValue());
-			tr.setReason("Register failed. "+register.getParameter("result").getValue());
+			getLogger().info(" search failed: "+gfe);
+			tr.setFailed(gfe);
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		//waitFor(2000);
-
-		// Try to register by the df.
-		tr = new TestReport("#"+num++, "Try to register.");
-		getLogger().info("Trying to register...");
-		register = createGoal("dfcap.df_register");
-		register.getParameter("description").setValue(desc);
-		register.getParameter("df").setValue(df);
+		
+		return num;
+	}
+	
+	/**
+	 *  Test deregistering.
+	 */
+	protected int testDeregister(int num, IDF df)
+	{
+		// Try to deregister by the df 
+		TestReport	tr = new TestReport("#"+num++, "Test deregister.");
+		getLogger().info(tr.getDescription());
 		try
 		{
-			dispatchSubgoalAndWait(register);
-			getLogger().info(" register ok.");
-			tr.setSucceeded(true);
-		}
-		catch(GoalFailureException gfe)
-		{
-			//getLogger().info(" register failed. "+register.getResult());
-			getLogger().info(" register failed. "+register.getParameter("result").getValue());
-			tr.setReason("Register failed. "+register.getParameter("result").getValue());
-		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		//waitFor(2000);
-
-		// Try to search at the df.
-		tr = new TestReport("#"+num++, "Try to search.");
-		getLogger().info("\nTrying to search...");
-		IGoal search = createGoal("dfcap.df_search");
-		search.getParameter("description").setValue(desc);
-		search.getParameter("df").setValue(df);
-		try
-		{
-			dispatchSubgoalAndWait(search);
-			//getLogger().info(" search ok: "+SUtil.arrayToString(search.getResult()));
-			getLogger().info(" search ok: "+ SUtil.arrayToString(search.getParameterSet("result").getValues()));
-			tr.setSucceeded(true);
-		}
-		catch(GoalFailureException gfe)
-		{
-			//getLogger().info(" search failed. "+search.getResult());
-			getLogger().info(" search failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
-			tr.setReason("Search failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
-		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		//waitFor(2000);
-
-		// Try to deregister by the df.
-		tr = new TestReport("#"+num++, "Try to deregister.");
-		getLogger().info("\nTrying to deregister...");
-		IGoal deregister = createGoal("dfcap.df_deregister");
-		deregister.getParameter("description").setValue(desc);
-		deregister.getParameter("df").setValue(df);
-		try
-		{
-			dispatchSubgoalAndWait(deregister);
+			df.deregister(new DFComponentDescription(getAgent().getComponentIdentifier())).get();
 			getLogger().info(" deregister ok.");
 			tr.setSucceeded(true);
 		}
 		catch(GoalFailureException gfe)
 		{
-			getLogger().info(" deregister failed. "+deregister);
-			tr.setReason("Deregister failed: "+deregister);
+			getLogger().info(" deregister failed: "+gfe);
+			tr.setFailed(gfe);
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-
-		// Try to keep registered by the df.
-		tr = new TestReport("#"+num++, "Try to keep registered (initial register).");
-		getLogger().info("Trying to keep registered (should modify each 5 sec)...");
-		IGoal keep = createGoal("dfcap.df_keep_registered");
-		keep.getParameter("description").setValue(desc);
-		keep.getParameter("leasetime").setValue(Integer.valueOf(5000));
-		keep.getParameter("df").setValue(df);
-		IEvent event = null;
-		try
-		{
-			dispatchSubgoalAndWait(keep);
-		}
-		catch(GoalFailureException e)
-		{
-//			e.printStackTrace();
-			getLogger().warning("Exception: "+e);
-		}
-		if(keep.isSucceeded())
-		{
-			getLogger().info(" initial register ok.");
-			tr.setSucceeded(true);
-		}
-		else
-		{
-			getLogger().info(" initial register failed: "+keep.getLifecycleState()+", "+event);
-			tr.setReason("Initial register failed: "+keep.getLifecycleState()+", "+event);
-		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-
-		//waitFor(2000);
-		getLogger().info("Trying to keep registered...");
-		tr = new TestReport("#"+num++, "Try to keep registered (modify).");
-		try
-		{
-			waitForGoal(keep, 6000);
-			if(keep.isSucceeded())
-				getLogger().info(" modify succeeded. ");
-			tr.setSucceeded(true);
-		}
-		catch(TimeoutException e)
-		{
-			getLogger().info(" modify failed. "+keep);
-			tr.setReason("Modify failed. "+keep);
-		}
-		catch(GoalFailureException e)
-		{
-			getLogger().info(" modify failed. "+keep);
-			tr.setReason("Modify failed. "+keep);
-		}
-		keep.drop();
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-
-		//getLogger().info("\nAll tests finished");
-
-		// Deregister and delete agent.
-		try
-		{
-			IGoal	deregister2 = createGoal("dfcap.df_deregister");
-			deregister2.getParameter("description").setValue(desc);
-			deregister2.getParameter("df").setValue(df);
-			dispatchSubgoalAndWait(deregister2);
-		}
-		catch(GoalFailureException e)
-		{
-		}
 		return num;
 	}
 }

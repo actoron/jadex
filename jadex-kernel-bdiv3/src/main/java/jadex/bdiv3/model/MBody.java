@@ -1,5 +1,8 @@
 package jadex.bdiv3.model;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanContextCondition;
@@ -9,9 +12,6 @@ import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.runtime.impl.ServiceCallPlan;
 import jadex.bridge.ClassInfo;
 import jadex.commons.MethodInfo;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 
 /**
  *  The plan mbody.

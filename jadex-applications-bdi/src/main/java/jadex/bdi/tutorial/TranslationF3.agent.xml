@@ -23,45 +23,31 @@
 	</imports>
 
 	<capabilities>
-		<!-- Include the directory facilitator capability under the name dfcap. -->
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 		<!-- Include the translation capability under the name transcap. -->
 		<capability name="transcap" file="jadex.bdi.tutorial.TranslationD1"/>
 	</capabilities>
-
-	<goals>
-		<!-- Make the keep registered goal available. -->
-		<maintaingoalref name="df_keep_registered">
-			<concrete ref="dfcap.df_keep_registered"/>
-		</maintaingoalref>
-
-		<!-- Make the register goal available. -->
-		<!-- <achievegoalref name="df_register">
-			<concrete ref="dfcap.df_register"/>
-		</achievegoalref> -->
-
-		<!-- Make the deregister goal available. -->
-		<!--  <achievegoalref name="df_deregister">
-			<concrete ref="dfcap.df_deregister"/>
-		</achievegoalref> -->
-	</goals>
+	
+	<plans>
+	    <plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
+	</plans>
 
 	<configurations>
 		<configuration name="default">
-			<goals>
-				<initialgoal ref="df_keep_registered">
+			<plans>
+				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
 							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
 								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
-								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
+								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"),
+								20000)
  						</value>
 					</parameter>
-					<parameter ref="leasetime">
-						<value>20000</value>
-					</parameter>
-				</initialgoal>
-			</goals>
+				</initialplan>
+			</plans>
 		</configuration>
 	</configurations>
 

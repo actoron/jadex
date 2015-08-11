@@ -44,6 +44,7 @@
 				types[i] = type;
 			}
 			
+			// replace empty string with null if json or xml
 			if(vals[i]=="")
 			{
 				if(types[i]=="application/json")
@@ -58,19 +59,38 @@
 			}
 		}
 		
-		send(form.action, "post", names, vals, types, form);
+		var httpmethod = document.getElementById("httpmethod").innerHTML;
+		send(form.action, httpmethod, names, vals, types, form);
 		
 		return false;
 	}
 
 	function send(url, method, names, vals, types, form) 
 	{
-//		this.xmlHttpReq = new XMLHttpRequest();
+		var res = document.getElementById("result");
+		if(res!=null)
+			res.innerHTML = "";
 		
-//		var http = xmlHttpReq;
+		method = method.toLowerCase();
+		
+		// http://stackoverflow.com/questions/15185499/webkit-equivalent-to-firefoxs-moz-chunked-arraybuffer-xhr-responsetype
+		// http://stackoverflow.com/questions/20319727/using-multipart-x-mixed-replace-with-xmlhttprequest
+		// http://stackoverflow.com/questions/18472745/how-to-prevent-xmlhttprequest-from-buffering-the-entire-response
 		var http = new XMLHttpRequest();
+		// Only for firefox, does not work
+//		http.responseType = "moz-chunked-text";
 		
-		http.open(method, url, true);
+		// if get and has parameters in form, extract and add to url
+		if("get"==method && names!=null && names.length>0)
+		{
+			url = url+"?";
+			for(i=0; i<names.length; i++)
+			{
+				url = url + names[i] + "=" + vals[i];
+			}
+		}
+		
+		http.open(method, encodeURI(url), true);
 		
 		var multipart = "";
 	
@@ -78,11 +98,13 @@
 
 		var textpost = "post"==method.toLowerCase();
 		
+		// determine accept header
 		if(types.length>0)
 		{
 			var accept = "";
 			var had = [];
 			var num = 0;
+			
 			for(i=0; i<types.length; i++)
 			{
 				if("text/plain"!=types[i])
@@ -98,17 +120,35 @@
 					had[num++] = types[i];
 				}
 			}
+			
 			if(num!=0)
 			{
 				accept += ";q=0.9,*/*;q=0.8";
+				alert(accept);
 				http.setRequestHeader("Accept", accept);
 			}
 			// else use default browser accept header
 //			http.setRequestHeader("Accept", "text/html,application/json;q=0.9,*/*;q=0.8");
 		}
 			
-		http.onreadystatechange = function() 
+//		http.onprogress = function () 
+//		{
+//			//readyState: headers received 2, body received 3, done 4
+//			if(http.readyState!=2 && http.readyState!=3 && http.readyState!=4)
+//				return;
+//			if(http.readyState == 3 && http.status!=200)
+//				return;
+//			
+//			alert(http.response);
+////			$("#boo").append("<div>"+xhr.response.slice(nextLine) +"</div>");  
+////			nextLine = xhr.response.length;
+//		}
+		
+		var reshandler = function() 
 		{
+//			alert(http.readyState+" "+http.status+" "+http.responseText);
+			
+//			if(http.responseText!=null)
 			if(http.readyState == 4 && http.status == 200) 
 			{
 //				document.getElementById("content").innerHTML = http.responseText;
@@ -117,11 +157,34 @@
 //				window.history.pushState("some string", "Test", url);
 //				window.location.replace(url);
 //				window.history.pushState("some string", "Test", url);
+				
+				var res = document.getElementById("result");
+				if(res!=null)
+				{
+					res.innerHTML += http.responseText;
+				}
+				else
+				{
+					document.open();
+					document.write(http.responseText);
+					document.close();
+				}
 
-				document.open();
-				document.write(http.responseText);
-				document.close();
-			
+				var callid = http.getResponseHeader("x-jadex-callid");
+				if(callid!=null)
+				{
+					http = new XMLHttpRequest(); 
+					http.open(method, encodeURI(url), true);
+					http.setRequestHeader("x-jadex-callid", callid);
+					http.onreadystatechange = reshandler;
+					http.send(null);
+				}
+				var callid = http.getResponseHeader("x-jadex-callidfin");
+				if(callid!=null)
+				{
+					alert("call finished: "+callid);
+				}
+				
 //				try
 //				{
 //				var tas = form.getElementsByTagName("textarea");
@@ -151,8 +214,13 @@
 //				}
 			}
 		}
+		http.onreadystatechange = reshandler;
 		
-		if(textpost)
+		if("get"==method)
+		{
+			http.send(null);
+		}
+		else if(textpost)
 		{
 			var fd = new FormData(form);
 //			http.setRequestHeader("content-type", "application/x-www-form-urlencoded");

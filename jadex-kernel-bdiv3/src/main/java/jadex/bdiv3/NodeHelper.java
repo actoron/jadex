@@ -1,13 +1,13 @@
 package jadex.bdiv3;
 
-import jadex.bdiv3.asm.AsmNodeHelper;
-import jadex.commons.SReflect;
-
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
+
+import jadex.bdiv3.asm.AsmNodeHelper;
+import jadex.commons.SReflect;
 
 /**
  * 

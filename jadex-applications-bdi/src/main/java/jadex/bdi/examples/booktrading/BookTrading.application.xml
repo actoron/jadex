@@ -26,12 +26,6 @@
 		<componenttype name="Seller" filename="jadex/bdi/examples/booktrading/seller/Seller.agent.xml"/>
 	</componenttypes>
 	
-	<properties>
-		<property name="clock" class="IFuture">
-			SServiceProvider.getService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-		</property>
-	</properties>
-	
 	<configurations>
 		<configuration name="One buyer and one seller">
 			<components>
@@ -40,10 +34,10 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($properties.clock.getTime()+60000), 100, 120, true, $properties.clock),
-								new Order("All about web services", new Date($properties.clock.getTime()+60000), 40, 60, true, $properties.clock),
-								new Order("Harry Potter", new Date($properties.clock.getTime()+60000), 5, 10, true, $properties.clock),
-								new Order("Agents in the real world", new Date($properties.clock.getTime()+60000), 30, 65, true, $properties.clock)
+								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 120, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("All about web services", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 40, 60, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("Harry Potter", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 5, 10, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("Agents in the real world", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 30, 65, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
 							}
 						</argument>
 					</arguments>
@@ -53,10 +47,10 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($properties.clock.getTime()+60000), 130, 110, false, $properties.clock),
-								new Order("All about web services", new Date($properties.clock.getTime()+60000), 50, 30, false, $properties.clock),
-								new Order("Harry Potter", new Date($properties.clock.getTime()+60000), 15, 9, false, $properties.clock),
-								new Order("Agents in the real world", new Date($properties.clock.getTime()+60000), 100, 60, false, $properties.clock)
+								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 130, 110, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("All about web services", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 50, 30, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("Harry Potter", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 15, 9, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("Agents in the real world", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 60, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
 							}
 						</argument>
 					</arguments>
@@ -70,7 +64,7 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($properties.clock.getTime()+60000), 100, 120, true, $properties.clock)
+								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 120, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
 							}
 						</argument>
 					</arguments>
@@ -80,7 +74,7 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($properties.clock.getTime()+60000), 130, 110, false, $properties.clock)
+								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 130, 110, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
 							}
 						</argument>
 					</arguments>
@@ -94,10 +88,10 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($properties.clock.getTime()+60000), 100, 120, true, $properties.clock),
-								new Order("All about web services", new Date($properties.clock.getTime()+60000), 40, 60, true, $properties.clock),
-								new Order("Harry Potter", new Date($properties.clock.getTime()+60000), 5, 10, true, $properties.clock),
-								new Order("Agents in the real world", new Date($properties.clock.getTime()+60000), 30, 65, true, $properties.clock)
+								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 120, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("All about web services", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 40, 60, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("Harry Potter", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 5, 10, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("Agents in the real world", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 30, 65, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
 							}
 						</argument>
 					</arguments>
@@ -107,10 +101,10 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($properties.clock.getTime()+60000), 130, 110, false, $properties.clock),
-								new Order("All about web services", new Date($properties.clock.getTime()+60000), 50, 30, false, $properties.clock),
-								new Order("Harry Potter", new Date($properties.clock.getTime()+60000), 15, 9, false, $properties.clock),
-								new Order("Agents in the real world", new Date($properties.clock.getTime()+60000), 100, 60, false, $properties.clock)
+								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 130, 110, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("All about web services", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 50, 30, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("Harry Potter", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 15, 9, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
+								new Order("Agents in the real world", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 60, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
 							}
 						</argument>
 					</arguments>

@@ -27,12 +27,6 @@
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
-	<capabilities>
-		<!-- this capability provides easy access to "out-of-the-box"-plans
-			 allowing - for example - to register at the DF. -->
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
-	</capabilities>
-	
 	<!-- 
 	     These are the dealers beliefs. None of these beliefs should be edited in the ADF 
 	     because all beliefs are initialized by the plans during the game or have 
@@ -173,6 +167,12 @@
 			<!-- not possible because game must always be updated. -->
 			<!--<precondition>$beliefbase.players.length>0</precondition>-->
 		</plan>
+		
+		<plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
+		
 	</plans>
 	
 	<!-- events -->
@@ -400,7 +400,6 @@
 	 		+new java.text.SimpleDateFormat("yyyy.MM.dd_HH.mm.ss")
 	 		.format(new java.util.Date())+".log"</property>
 	 	<property name="logging.useParentHandlers">false</property> -->
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 
 	<configurations>
@@ -410,22 +409,19 @@
 					<fact>new DealerFrame($beliefbase.myself, $scope.getExternalAccess())</fact>
 				</initialbelief>
 			</beliefs> -->
-			<goals>
-				<!-- Register the dealer at the df on startup. -->
-				<initialgoal ref="df_register">
-					<!-- The services to register. -->
+			<plans>
+				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							<!-- This is the agent-description for the dealer. With this description
-							     the dealers is registered at the directory facilitator.
-							     Note, that the dealer only offers one service, that is 'dealing'
-							     (see service description below).	-->
-							$properties.dfservice.createDFComponentDescription(null,
-								$properties.dfservice.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
-	
-						</value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"),
+								20000)
+ 						</value>
 					</parameter>
-				</initialgoal>				
+				</initialplan>
+			</plans>
+			<goals>
 				<initialgoal ref="play_game"/>
 				<endgoal ref="df_deregister"/>
 			</goals>
@@ -437,22 +433,19 @@
 					<fact>null</fact>
 				</initialbelief>
 			</beliefs>
-			<goals>
-				<!-- Register the dealer at the df on startup. -->
-				<initialgoal ref="df_register">
-					<!-- The services to register. -->
+			<plans>
+				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							<!-- This is the agent-description for the dealer. With this description
-							     the dealers is registered at the directory facilitator.
-							     Note, that the dealer only offers one service, that is 'dealing'
-							     (see service description below).	-->
-							$properties.dfservice.createDFComponentDescription(null,
-								$properties.dfservice.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
-	
-						</value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"),
+								20000)
+ 						</value>
 					</parameter>
-				</initialgoal>				
+				</initialplan>
+			</plans>
+			<goals>
 				<initialgoal ref="play_game"/>
 				<endgoal ref="df_deregister"/>
 			</goals>

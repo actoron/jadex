@@ -1,5 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -10,8 +12,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Collection;
 
 /**
  *  Plan body implementation as a component.

@@ -1,5 +1,17 @@
 package jadex.bdiv3x.features;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -82,18 +94,6 @@ import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.Event;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
 /**
  *  BDI agent feature version for XML agents.
  */
@@ -164,14 +164,14 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		RExpressionbase eb = new RExpressionbase(getComponent());
 		getCapability().setExpressionbase(eb);
 		
-		RGoalbase gb = new RGoalbase(getComponent());
-		getCapability().setGoalbase(gb);
+//		RGoalbase gb = new RGoalbase(getComponent());
+//		getCapability().setGoalbase(gb);
 		
 		RPlanbase pb = new RPlanbase(getComponent());
 		getCapability().setPlanbase(pb);
 
-		REventbase evb = new REventbase(getComponent());
-		getCapability().setEventbase(evb);
+//		REventbase evb = new REventbase(getComponent());
+//		getCapability().setEventbase(evb);
 
 		// cannot do this in constructor because it needs access to this feature in expressions
 	
@@ -668,7 +668,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				// For abstract belief find corresponding mapping.
 				else
 				{
-					Map<String, String>	map	= bdimodel.getBeliefReferences();
+					Map<String, String>	map	= bdimodel.getCapability().getBeliefReferences();
 					for(String target: map.keySet())
 					{
 						if(source.equals(map.get(target)))
@@ -826,7 +826,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public void addBeliefListener(String name, final IBeliefListener listener)
 	{
-		String fname = bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
+		String fname = bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		
 		List<EventType> events = new ArrayList<EventType>();
 		addBeliefEvents(getComponent(), events, fname);
@@ -878,7 +878,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		name	= bdimodel.getBeliefReferences().containsKey(name) ? bdimodel.getBeliefReferences().get(name) : name;
+		name	= bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		getRuleSystem().getRulebase().removeRule(rulename);
 	}
@@ -1049,9 +1049,9 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 					{
 						source	= capaname + MElement.CAPABILITY_SEPARATOR + source;
 					}
-					if(bdif.getBDIModel().getBeliefReferences().containsKey(source))
+					if(bdif.getBDIModel().getCapability().getBeliefReferences().containsKey(source))
 					{
-						source	= bdif.getBDIModel().getBeliefReferences().get(source);
+						source	= bdif.getBDIModel().getCapability().getBeliefReferences().get(source);
 					}
 					
 					if(event!=null && event.getSource()!=null && event.getSource().equals(source))

@@ -72,6 +72,9 @@ public class ComponentXMLReader
 	/** Key for error entries in read context. */
 	public static final String CONTEXT_ENTRIES = "context_entries";
 	
+	/** Key for error entries in read context. */
+	public static final String CONTEXT_EXTERNALS = "context_externals";
+	
 	/** Key for resource identifier in read context. */
 	public static final String CONTEXT_RID = "context_rid";
 	
@@ -106,7 +109,8 @@ public class ComponentXMLReader
 	{
 		public Object convertString(String val, Object context) throws Exception
 		{
-			return new ClassInfo(SReflect.findClass((String)val, ((IModelInfo)((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader()));
+			ClassInfo ret = new ClassInfo(SReflect.findClass((String)val, ((IModelInfo)((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader()));
+			return ret;
 		}
 	};
 	
@@ -214,6 +218,8 @@ public class ComponentXMLReader
 		Map<String, Object>	context	= createContext();
 		MultiCollection<Tuple, String>	entries	= new MultiCollection<Tuple, String>(new IndexMap().getAsMap(), LinkedHashSet.class);
 		context.put(CONTEXT_ENTRIES, entries);
+		Map<String, String> externals = new HashMap<String, String>();
+		context.put(CONTEXT_EXTERNALS, externals);
 		context.put(CONTEXT_RID, rid);
 		context.put(CONTEXT_ROOT, root);
 		ModelInfo mi = (ModelInfo)reader.read(manager, handler, rinfo.getInputStream(), classloader, context);
@@ -259,7 +265,7 @@ public class ComponentXMLReader
 		if(entries.size()>0)
 		{
 //			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
-			mi.setReport(buildReport(mi.getFullName(), mi.getFilename(), entries));
+			mi.setReport(buildReport(mi.getFullName(), mi.getFilename(), entries, externals));
 		}
 		return ret;
 	}
@@ -471,10 +477,10 @@ public class ComponentXMLReader
 	/**
      *  Build the error report.
      */
-    public static IErrorReport buildReport(String modelname, String filename, MultiCollection<Tuple, String> entries)
+    public static IErrorReport buildReport(String modelname, String filename, MultiCollection<Tuple, String> entries, Map<String, String> externals)
     {
         return new AbstractErrorReportBuilder(modelname, filename,
-            new String[]{"Component", "Configuration"}, entries, null)
+            new String[]{"Component", "Configuration"}, entries, externals)
         {
             public boolean isInCategory(Object obj, String category)
             {

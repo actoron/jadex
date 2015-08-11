@@ -13,17 +13,7 @@ public class MemorizePositionsPlan extends Plan
 	//-------- attributes --------
 
 	/** The forget factor. */
-	protected double forget;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public MemorizePositionsPlan()
-	{
-		this.forget = 0.01;
-	}
+	protected double forget = 0.01;
 
 	//-------- methods --------
 

@@ -1,5 +1,12 @@
 package jadex.bdiv3x.runtime;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
@@ -24,13 +31,6 @@ import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.RuleSystem;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Runtime element for storing beliefs.
@@ -79,7 +79,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				{
 					for(MConfigBeliefElement ibel: ibels)
 					{
-						inibels.put(ibel.getName(), ibel);
+						inibels.put(bdimodel.getCapability().getBeliefReferences().containsKey(ibel.getName())
+							? bdimodel.getCapability().getBeliefReferences().get(ibel.getName()) : ibel.getName(), ibel);
 					}
 				}
 			}
@@ -111,13 +112,26 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 								List<Object>	inivals	= new ArrayList<Object>();
 								for(UnparsedExpression upex: inibel.getFacts())
 								{
-									inivals.add(SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), inibel)));
+									Object	value	= SJavaParser.parseExpression(upex, getAgent().getModel().getAllImports(), getAgent().getClassLoader())
+										.getValue(CapabilityWrapper.getFetcher(getAgent(), upex.getLanguage()));
+									if(SReflect.isIterable(value) && inibel.getFacts().size()==1)	// Hack!!! support beliefset of iterable type with one initial element?
+									{
+										for(Object val: SReflect.getIterable(value))
+										{
+											inivals.add(val);											
+										}
+									}
+									else
+									{
+										inivals.add(value);
+									}
 								}
 								inival	= inivals;
 							}
 							else if(!inibel.getFacts().isEmpty())
 							{
-								inival	= SJavaParser.parseExpression(inibel.getFacts().get(0), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), inibel));								
+								inival	= SJavaParser.parseExpression(inibel.getFacts().get(0), getAgent().getModel().getAllImports(), getAgent().getClassLoader())
+									.getValue(CapabilityWrapper.getFetcher(getAgent(), inibel.getFacts().get(0).getLanguage()));								
 							}
 							hasinival	= true;
 						}
@@ -167,14 +181,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		IBelief	ret;
 		if(beliefs!=null)
 		{
-			ret	= ((IBDIModel)getAgent().getModel()).getBeliefReferences().containsKey(name)
-				? beliefs.get(((IBDIModel)getAgent().getModel()).getBeliefReferences().get(name))
+			ret	= ((IBDIModel)getAgent().getModel()).getCapability().getBeliefReferences().containsKey(name)
+				? beliefs.get(((IBDIModel)getAgent().getModel()).getCapability().getBeliefReferences().get(name))
 				: beliefs.get(name);
 			if(ret==null)
 			{
 				name	= MElement.internalName(name);
-				ret	= ((IBDIModel)getAgent().getModel()).getBeliefReferences().containsKey(name)
-					? beliefs.get(((IBDIModel)getAgent().getModel()).getBeliefReferences().get(name))
+				ret	= ((IBDIModel)getAgent().getModel()).getCapability().getBeliefReferences().containsKey(name)
+					? beliefs.get(((IBDIModel)getAgent().getModel()).getCapability().getBeliefReferences().get(name))
 					: beliefs.get(name);
 			}
 		}
@@ -194,14 +208,14 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		IBeliefSet	ret;
 		if(beliefsets!=null)
 		{
-			ret	= ((IBDIModel)getAgent().getModel()).getBeliefReferences().containsKey(name)
-				? beliefsets.get(((IBDIModel)getAgent().getModel()).getBeliefReferences().get(name))
+			ret	= ((IBDIModel)getAgent().getModel()).getCapability().getBeliefReferences().containsKey(name)
+				? beliefsets.get(((IBDIModel)getAgent().getModel()).getCapability().getBeliefReferences().get(name))
 				: beliefsets.get(name);
 			if(ret==null)
 			{
 				name	= MElement.internalName(name);
-				ret	= ((IBDIModel)getAgent().getModel()).getBeliefReferences().containsKey(name)
-					? beliefsets.get(((IBDIModel)getAgent().getModel()).getBeliefReferences().get(name))
+				ret	= ((IBDIModel)getAgent().getModel()).getCapability().getBeliefReferences().containsKey(name)
+					? beliefsets.get(((IBDIModel)getAgent().getModel()).getCapability().getBeliefReferences().get(name))
 					: beliefsets.get(name);
 			}
 		}
@@ -455,7 +469,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			String name = getModelElement().getName();
 			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
 			if(modelelement.getDefaultFact()!=null)
-				setFact(SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), getModelElement())));
+				setFact(SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader())
+					.getValue(CapabilityWrapper.getFetcher(getAgent(), modelelement.getDefaultFact().getLanguage())));
 		}
 		
 		/**
@@ -506,7 +521,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				publisher.entryChanged(oldvalue, value, -1);
 				
 				// Push to result, if any.
-				String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+				String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
 				if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
 				{
 					getAgent().getComponentFeature(IArgumentsResultsFeature.class)
@@ -527,7 +542,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			if(((MBelief)getModelElement()).getDefaultFact()!=null && MParameter.EvaluationMode.PULL.equals(((MBelief)getModelElement()).getEvaluationMode()))
 			{
 				ret = SJavaParser.parseExpression(((MBelief)getModelElement()).getDefaultFact(), 
-					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), getModelElement()));
+					getAgent().getModel().getAllImports(), getAgent().getClassLoader())
+						.getValue(CapabilityWrapper.getFetcher(getAgent(), ((MBelief)getModelElement()).getDefaultFact().getLanguage()));
 			}
 			return ret;
 		}
@@ -627,7 +643,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			List<Object> tmpfacts = new ArrayList<Object>();
 			if(mbel.getDefaultFact()!=null)
 			{
-				Object tmp = SJavaParser.parseExpression(mbel.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), getModelElement()));
+				Object tmp = SJavaParser.parseExpression(mbel.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader())
+					.getValue(CapabilityWrapper.getFetcher(getAgent(), mbel.getDefaultFact().getLanguage()));
 				Iterator<?>	it	= SReflect.getIterator(tmp);
 				while(it.hasNext())
 				{
@@ -640,7 +657,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				{
 					for(UnparsedExpression uexp: mbel.getDefaultFacts())
 					{
-						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), getModelElement()));
+						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader())
+							.getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
 						tmpfacts.add(fact);
 					}
 				}
@@ -676,7 +694,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			internalGetValues().add(fact);
 			
 			// Push to result, if any.
-			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
 			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
 			{
 				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
@@ -693,7 +711,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			internalGetValues().remove(fact);
 			
 			// Push to result, if any.
-			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
 			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
 			{
 				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
@@ -723,7 +741,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			internalGetValues().clear();
 			
 			// Push to result, if any.
-			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
 			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
 			{
 				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
@@ -826,7 +844,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			}
 
 			// Push to result, if any.
-			String	result	= ((BDIXModel)getAgent().getModel()).getResultMappings().get(getName());
+			String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
 			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
 			{
 				getAgent().getComponentFeature(IArgumentsResultsFeature.class)

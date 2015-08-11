@@ -27,12 +27,13 @@
 			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
-		<!-- Filters are only relevant for the participants protocol side. -->
+		<!-- Filters are only relevant for the participants protocol side. - ->
 
-		<!-- The filter for deciding which cancel messages are handled in this capability. -->
+		<!- - The filter for deciding which cancel messages are handled in this capability. not needed as matching uses converstion id - ->
 		<belief name="cm_filter" class="IFilter" exported="true">
 			<fact>IFilter.NEVER</fact>
 		</belief>
+		-->
 	</beliefs>
 
 	<goals>
@@ -125,7 +126,7 @@
 			<parameter name="protocol" class="String" direction="fixed">
 				<value>SFipa.PROTOCOL_CANCEL_META</value>
 			</parameter>
-  			<match>$beliefbase.cm_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
+  			<match>/*$beliefbase.cm_filter.filter($messagemap) &amp;&amp;*/ $conversation_id!=null</match>
 		</messageevent>	
 
 		<!-- Inform message sent by receiver side describing successful termination of an ongoing interaction.
