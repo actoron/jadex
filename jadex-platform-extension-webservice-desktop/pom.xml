@@ -163,7 +163,6 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-json</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		
 		<dependency>

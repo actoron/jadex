@@ -39,13 +39,14 @@
 			<artifactId>jadex-kernel-application</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+<!-- 	<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-gpmn</artifactId>
 			<version>${project.version}</version>
-		</dependency>	
+		</dependency> -->	
 		
 		<!-- BDI kernel -->
+		<!-- 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdibpmn</artifactId>
@@ -53,12 +54,13 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applib-bdi</artifactId>
+			<artifactId>jadex-kernel-bdi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-bdi</artifactId>
+			<artifactId>jadex-applib-bdi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

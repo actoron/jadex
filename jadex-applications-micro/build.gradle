@@ -6,7 +6,7 @@ dependencies
 	compile project(':jadex-tools-base-swing')
 	compile project(':jadex-kernel-micro')
 	runtime project(':jadex-kernel-component') // Todo: move component tests in own project. -<scope>runtime</scope>
-	runtime project(':jadex-kernel-application') // <scope>runtime</scope>
+	compile project(':jadex-kernel-application')
 	compile project(':jadex-kernel-extension-envsupport')
 	
 	compile 'com.github.sarxos:webcam-capture:0.3.9'
