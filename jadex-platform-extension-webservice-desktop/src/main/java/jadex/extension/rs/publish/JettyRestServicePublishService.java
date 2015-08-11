@@ -76,6 +76,15 @@ import jadex.xml.bean.JavaWriter;
 @Service
 public class JettyRestServicePublishService implements IWebPublishService
 {
+	/** Http header for the call id. */
+	public static final String HEADER_JADEX_CALLID = "x-jadex-callid";
+	
+	/** Http header for . */
+	public static final String HEADER_JADEX_CALLFINISHED = "x-jadex-callidfin";
+	
+	/** Finished result marker. */
+	public static final String FINISHED = "finished";
+	
 	// Hack constant for enabling multi-part :-(
 	private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
 
@@ -131,18 +140,21 @@ public class JettyRestServicePublishService implements IWebPublishService
                 public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
                     throws IOException, ServletException
                 {
-                    System.out.println("handler is: "+uri.getPath());
+//                    System.out.println("handler is: "+uri.getPath());
 
                     // check if call is an intermediate result fetch
-                    String callid = request.getHeader("x-jadex-callid");
-                    if(resultspercall.containsKey(callid))
+                    String callid = request.getHeader(HEADER_JADEX_CALLID);
+                    // requestpercall is used to signal an ongoing conversation
+                    if(requestspercall.containsKey(callid))
                     {
                     	Collection<ResultInfo> results = resultspercall.get(callid);
-                    	if(results.size()>0)
+                    	if(results!=null && results.size()>0)
                     	{
                     		ResultInfo result = results.iterator().next();
-                    		resultspercall.removeObject(callid, result);
-                    		writeResponse(result.getResult(), callid, result.getMappingInfo(), request, response);
+//                    		resultspercall.removeObject(callid, result);
+                    		results.remove(result);
+                    		
+                    		writeResponse(result.getResult(), callid, result.getMappingInfo(), request, response, false);
                     	}
                     	else
                     	{
@@ -151,15 +163,9 @@ public class JettyRestServicePublishService implements IWebPublishService
 //                    		System.out.println("added context: "+callid+" "+ctx);
                     	}
                     }
-                    else if(requestspercall.containsKey(callid))
-                    {
-                    	AsyncContext ctx = request.startAsync();
-                		requestspercall.add(callid, ctx);
-//                		System.out.println("added context: "+callid+" "+ctx);
-                    }
                     else if(callid!=null)
                     {
-                    	writeResponse("Unknown callid", null, null, request, response);
+                    	writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
                     }
                     // handle new call
                     else
@@ -202,56 +208,44 @@ public class JettyRestServicePublishService implements IWebPublishService
 		                        	
 		                        	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(new IIntermediateResultListener<Object>()
 									{
-		                        		boolean first = true;
-		                        		List<String> sr = null;
 		                        		public void resultAvailable(Collection<Object> result)
 		                        		{
 		                        			for(Object res: result)
 		                        			{
-		                        				intermediateResultAvailable(result);
+		                        				intermediateResultAvailable(res);
 		                        			}
-		                        			ctx.complete();
 		                        		}
 		                        		
 		                        		public void exceptionOccurred(Exception exception)
 		                        		{
 		                        			Object result = mapResult(method, exception);
-		                        			writeResponse(result, null, mi, request, response);
-		                        			requestspercall.remove(fcallid);
+		                        			writeResponse(result, null, mi, request, response, true);
 		                        		}
 		                        		
 		                        		public void intermediateResultAvailable(Object result)
 		                        		{
 		                        			result = mapResult(method, result);
 		                        			
-		                        			if(requestspercall.containsKey(fcallid))
+		                        			if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size()>0)
 		                        			{
-		                        				AsyncContext ctx = requestspercall.get(fcallid).iterator().next();
-		                        				requestspercall.removeObject(fcallid, ctx);
+		                        				Collection<AsyncContext> cls = requestspercall.get(fcallid);
+		                        				AsyncContext ctx = cls.iterator().next();
+		                        				cls.remove(ctx);
+		                        				
+//		                        				requestspercall.removeObject(fcallid, ctx);
 //		                        				System.out.println("removed context: "+fcallid+" "+ctx);
-		                        				writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse());
+		                        				writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
 		                        				ctx.complete();
 		                        			}
 		                        			else
 		                        			{
 		                        				resultspercall.add(fcallid, new ResultInfo(result, fcallid, mi));
 		                        			}
-		                        			
-		                        			if(first)
-		                        				first = false;
-		                        			
-//		                        			if(first)
-//		                        			{
-//	//	                        		        response.addHeader("Transfer-encoding", "chunked");
-//		                        				sr = writeResponseHeader(result, mi, request, response);
-//		                        				first = false;
-//		                        			}
-//		                        			writeResponseContent(result, request, response, sr);
 		                        		}
 		                        		
 		                        	    public void finished()
 		                        	    {
-		                        	    	requestspercall.remove(fcallid);
+		                        	    	intermediateResultAvailable(FINISHED);
 		                        	    }
 									});
 		                        }
@@ -264,14 +258,14 @@ public class JettyRestServicePublishService implements IWebPublishService
 		                        		public void resultAvailable(Object ret)
 		                        		{
 		                        			ret = mapResult(method, ret);
-		                        			writeResponse(ret, null, mi, request, response);
+		                        			writeResponse(ret, null, mi, request, response, true);
 		                        			ctx.complete();
 		                        		}
 		
 		                        		public void exceptionOccurred(Exception exception)
 		                        		{
 		                        			Object result = mapResult(method, exception);
-		                        			writeResponse(exception, null, mi, request, response);
+		                        			writeResponse(exception, null, mi, request, response, true);
 		                        			ctx.complete();
 		                        		}
 									});
@@ -283,12 +277,12 @@ public class JettyRestServicePublishService implements IWebPublishService
 		                        	// map the result by user defined mappers
 		                        	ret = mapResult(method, ret);
 		                        	// convert content and write result to servlet response
-		                        	writeResponse(ret, null, mi, request, response);
+		                        	writeResponse(ret, null, mi, request, response, true);
 		                        }
 	                        }
 	                        catch(Exception e)
 	                        {
-	                        	writeResponse(e, null, null, request, response);
+	                        	writeResponse(e, null, null, request, response, true);
 	                        }
 	                    }
 		                else
@@ -333,6 +327,22 @@ public class JettyRestServicePublishService implements IWebPublishService
         return IFuture.DONE;
     }
 
+    /**
+     * 
+     */
+    protected boolean removeCallWhenFinished(String callid)
+    {
+    	boolean ret = false;
+    	if(requestspercall.get(callid).size()==0 && 
+    		(resultspercall.get(callid)==null || resultspercall.get(callid).size()==0))
+    	{
+    		requestspercall.remove(callid);
+    		resultspercall.remove(callid);
+    		ret = true;
+    	}
+    	return ret;
+    }
+    
     /**
      *  Get or start an api to the http server.
      */
@@ -541,9 +551,9 @@ public class JettyRestServicePublishService implements IWebPublishService
 	            	{
 	            		targetparams[i] = p;
 	            	}
-	            	else if(p instanceof String && BasicTypeConverter.isBuiltInType(ts[i]))
+	            	else if(p instanceof String && BasicTypeConverter.isExtendedBuiltInType(ts[i]))
 	            	{
-	            		targetparams[i] = BasicTypeConverter.getBasicStringConverter(ts[i]).convertString((String)p, null);
+	            		targetparams[i] = BasicTypeConverter.getExtendedStringConverter(ts[i]).convertString((String)p, null);
 	            	}
 	            }
 	        }
@@ -635,18 +645,42 @@ public class JettyRestServicePublishService implements IWebPublishService
    /**
     *
     */
-   protected void writeResponse(Object result, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response) 
+   protected void writeResponse(Object result, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin) 
    {
-	   List<String> sr = writeResponseHeader(result, callid, mi, request, response);
-	   writeResponseContent(result, request, response, sr);
+	   writeResponse(result, Response.Status.OK.getStatusCode(), callid, mi, request, response, fin);
+   }
+   
+   /**
+    *
+    */
+   protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin) 
+   {
+	   if(FINISHED.equals(result))
+	   {
+		   writeResponse(null, status, callid, mi, request, response, true);
+	   }
+	   else
+	   {
+		   if(fin)
+		   {
+			   requestspercall.remove(callid);
+			   resultspercall.remove(callid);
+		   }
+		   
+		   List<String> sr = writeResponseHeader(result, status, callid, mi, request, response, fin);
+		   writeResponseContent(result, request, response, sr);
+	   }
    }
     
     /**
      *
      */
-    protected List<String> writeResponseHeader(Object ret, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response) 
+    protected List<String> writeResponseHeader(Object ret, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin) 
     {
     	List<String> sr =  null;
+    	
+    	if(FINISHED.equals(ret))
+    		System.out.println("sdfsdf");
     	
     	if(ret instanceof Response)
         {
@@ -668,6 +702,9 @@ public class JettyRestServicePublishService implements IWebPublishService
         }
         else
         {
+        	if(status>0)
+        		response.setStatus(status);
+        	
             // acceptable media types for response
         	String mts = request.getHeader("Accept");
             List<String> cl = parseMimetypes(mts);
@@ -685,7 +722,16 @@ public class JettyRestServicePublishService implements IWebPublishService
                 System.out.println("found no acceptable return types.");
             
             if(callid!=null)
-            	response.addHeader("x-jadex-callid", callid);
+            {
+            	if(fin)
+            	{
+            		response.addHeader(HEADER_JADEX_CALLFINISHED, callid);
+            	}
+            	else
+            	{
+            		response.addHeader(HEADER_JADEX_CALLID, callid);
+            	}
+            }
             
             // todo: add option for CORS
             response.addHeader("Access-Control-Allow-Origin", "*");

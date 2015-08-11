@@ -179,6 +179,11 @@
 					http.onreadystatechange = reshandler;
 					http.send(null);
 				}
+				var callid = http.getResponseHeader("x-jadex-callidfin");
+				if(callid!=null)
+				{
+					alert("call finished: "+callid);
+				}
 				
 //				try
 //				{

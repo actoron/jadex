@@ -1,25 +1,5 @@
 package jadex.extension.rs.publish;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ServiceCall;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.javaparser.SJavaParser;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Arrays;
@@ -42,6 +22,24 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpContainer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ServiceCall;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  The default web service publish service.
