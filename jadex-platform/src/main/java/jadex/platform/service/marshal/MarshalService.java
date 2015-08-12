@@ -140,7 +140,18 @@ public class MarshalService extends BasicService implements IMarshalService
 		{
 			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
-				return object instanceof ServiceInputConnectionProxy;
+				boolean ret = false;
+				if(object instanceof ServiceInputConnectionProxy)
+				{
+					ret = true;
+					// does not work because initiator/participant are always null :-(
+//					ServiceInputConnectionProxy sp = (ServiceInputConnectionProxy)object;
+//					if(sp.getInitiator()!=null && sp.getParticipant()!=null)
+//					{
+//						ret = sp.getInitiator().getPlatformName().equals(sp.getParticipant().getPlatformName());
+//					}
+				}
+				return ret;
 			}
 			
 			public Object process(Object object, Type type,
@@ -167,7 +178,18 @@ public class MarshalService extends BasicService implements IMarshalService
 		{
 			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 			{
-				return object instanceof ServiceOutputConnectionProxy;
+				boolean ret = false;
+				if(object instanceof ServiceOutputConnectionProxy)
+				{
+					ret = true;
+					// does not work because initiator/participant are always null :-(
+//					ServiceOutputConnectionProxy sp = (ServiceOutputConnectionProxy)object;
+//					if(sp.getInitiator()!=null && sp.getParticipant()!=null)
+//					{
+//						ret = sp.getInitiator().getPlatformName().equals(sp.getParticipant().getPlatformName());
+//					}
+				}
+				return ret;
 			}
 			
 			public Object process(Object object, Type type,

@@ -41,7 +41,7 @@ public class StreamUserAgent extends TestAgent
 	 */
 	protected int	getTestCount()
 	{
-		return 12;
+		return 8;
 	}
 	
 	/**
@@ -60,17 +60,17 @@ public class StreamUserAgent extends TestAgent
 			public void customResultAvailable(Integer testcnt)
 			{
 				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-//				testRemote(1, tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+//				testRemote(1, tc, true).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
 					public void customResultAvailable(Integer testcnt)
 					{
-						testRemote(testcnt.intValue(), tc, true).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-						{
-							public void customResultAvailable(Integer result)
-							{
+//						testRemote(testcnt.intValue(), tc, true).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+//						{
+//							public void customResultAvailable(Integer result)
+//							{
 								ret.setResult(null);
-							}
-						}));
+//							}
+//						}));
 					}
 				}));
 			}
@@ -225,27 +225,28 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
+				System.out.println("created: "+cid+" by "+agent.getComponentIdentifier());
 				SServiceProvider.getService(agent, cid, IStreamService.class)
 					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 				{
 					public void customResultAvailable(final IStreamService ss)
 					{
-						testSecureGetInputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+						testSecureGetInputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 						{
 							public void customResultAvailable(TestReport result)
 							{
 								tc.addReport(result);
-								testSecureGetOutputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+								testSecureGetOutputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
 										tc.addReport(result);
-										testSecurePassInputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+										testSecurePassInputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
 												tc.addReport(result);
-												testSecurePassOutputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+												testSecurePassOutputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 												{
 													public void customResultAvailable(TestReport result)
 													{
@@ -258,13 +259,13 @@ public class StreamUserAgent extends TestAgent
 															}
 														});
 													}
-												});
+												}));
 											}
-										});
+										}));
 									}
-								});
+								}));
 							}
-						});
+						}));
 					}
 				});
 			}
@@ -374,7 +375,7 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void resultAvailable(IInputConnection con)
 			{
-				System.out.println("received icon: "+con.getNonFunctionalProperties());
+				System.out.println("received icon: "+con);//.getNonFunctionalProperties());
 				Map<String, Object> props = con.getNonFunctionalProperties();
 				Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
 				if(sec==null || !sec.booleanValue())

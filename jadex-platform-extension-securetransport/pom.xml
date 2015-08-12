@@ -26,6 +26,19 @@
 			<artifactId>bcprov-jdk15</artifactId>
 			<version>140</version>
 		</dependency>   -->          
+		
+		<!-- <dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bpmn</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency> -->
 	</dependencies>
 
 	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->

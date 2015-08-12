@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.io.OutputStream;
@@ -44,6 +45,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	public ServiceInputConnectionProxy(ServiceOutputConnection con)
 	{
 		this.con = con;
+//		this.initiator = IComponentIdentifier.LOCAL.get();
 	}
 	
 	/**
