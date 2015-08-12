@@ -6,6 +6,8 @@ import java.util.Map;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MConfigParameterElement;
+import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameter.Direction;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bridge.IInternalAccess;
 
@@ -179,6 +181,25 @@ public abstract class RProcessableElement extends RParameterElement
 				// goal semantics is wrong otherwise (isProceduralSucceeded)
 				addTriedPlan(rplan);
 				apl.planFinished(rplan);
+			}
+		}
+	}
+	
+	/**
+	 *  Test if parameter writes are currently allowed.
+	 *  @throws Exception when write not ok.
+	 */
+	public void	testWriteOK(MParameter mparam)
+	{
+		if(mparam!=null)
+		{
+			boolean	ok	= mparam.getDirection()==Direction.INOUT
+				|| getState()==null	// in constructor -> initParameters
+				|| mparam.getDirection()==Direction.IN && getState()==State.INITIAL
+				|| mparam.getDirection()==Direction.OUT && getState()!=State.INITIAL;
+			if(!ok)
+			{
+				throw new IllegalStateException("Cannot write parameter "+getModelElement().getName()+"."+mparam.getName()+" in state "+getState()+".");
 			}
 		}
 	}

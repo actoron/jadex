@@ -372,6 +372,8 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		protected void setValues(List<Object> values)
 		{
+			testWriteOK((MParameter)getModelElement());
+			
 			msg.put(getName(), values);
 		}
 		

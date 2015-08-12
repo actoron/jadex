@@ -7,12 +7,14 @@ import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.annotation.GoalParent;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameter.Direction;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RParameterElement.RParameter;
 import jadex.bdiv3.runtime.impl.RParameterElement.RParameterSet;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
+import jadex.bdiv3.runtime.impl.RProcessableElement.State;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IConditionalComponentStep;
@@ -132,14 +134,34 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 			{
 				if(((MParameter)param.getModelElement()).getEvaluationMode()==EvaluationMode.PUSH)
 				{
+					State	state	= null;
+					if(((MParameter)param.getModelElement()).getDirection()==Direction.OUT)
+					{
+						state	= goal.getState();
+						goal.setState(State.UNPROCESSED);	// Set hack state due to parameter protection
+					}
 					((RParameter)param).updateDynamicValue();
+					if(state!=null)
+					{
+						goal.setState(state);
+					}
 				}
 			}
 			for(IParameterSet param: goal.getParameterSets())
 			{
 				if(((MParameter)param.getModelElement()).getEvaluationMode()==EvaluationMode.PUSH)
 				{
+					State	state	= null;
+					if(((MParameter)param.getModelElement()).getDirection()==Direction.OUT)
+					{
+						state	= goal.getState();
+						goal.setState(State.UNPROCESSED);	// Set hack state due to parameter protection
+					}
 					((RParameterSet)param).updateDynamicValues();
+					if(state!=null)
+					{
+						goal.setState(state);
+					}
 				}
 			}
 			

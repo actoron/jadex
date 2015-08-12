@@ -13,6 +13,10 @@
 	                    http://jadex.sourceforge.net/jadex-bdi-2.5.xsd"
 	name="ParameterProtection"
 	package="jadex.bdi.testcases.misc">
+	
+    <imports>
+        <import>jadex.bdi.testcases.ResultPlan</import>
+    </imports>
 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
@@ -56,6 +60,19 @@
 	<plans>
 		<plan name="test_plan">
 			<body class="ParameterProtectionPlan"/>
+		</plan>
+		
+		<plan name="process_plan">
+			<parameter name="success" class="boolean">
+				<value>false</value>
+			</parameter>
+			<parameter name="wait" class="long">
+				<value>1000</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="test_goal"/>
+			</trigger>
 		</plan>
 	</plans>
 

@@ -104,6 +104,15 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 	public abstract String getFetcherName();
 	
 	/**
+	 *  Test if parameter writes are currently allowed.
+	 *  @throws Exception when write not ok.
+	 */
+	public void	testWriteOK(MParameter mparam)
+	{
+		// Nop. overriden for processable elements.
+	}
+	
+	/**
 	 * 
 	 */
 	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival)
@@ -321,6 +330,8 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public void setValue(Object value)
 		{
+			testWriteOK((MParameter)getModelElement());
+			
 			if(value!=null && getModelElement()!=null)
 			{
 				Class<?>	clazz	= ((MParameter)getModelElement()).getClazz().getType(getAgent().getClassLoader(), getAgent().getModel().getAllImports());
@@ -514,6 +525,8 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public void addValue(Object value)
 		{
+			testWriteOK((MParameter)getModelElement());
+			
 			if(value!=null && getModelElement()!=null)
 			{
 				Class<?>	clazz	= ((MParameter)getModelElement()).getClazz().getType(getAgent().getClassLoader(), getAgent().getModel().getAllImports());
@@ -533,6 +546,8 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public void removeValue(Object value)
 		{
+			testWriteOK((MParameter)getModelElement());
+			
 			internalGetValues().remove(value);
 		}
 
@@ -555,6 +570,8 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public void removeValues()
 		{
+			testWriteOK((MParameter)getModelElement());
+			
 			internalGetValues().clear();
 		}
 
@@ -626,6 +643,8 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		// Internal method, overridden for message event.
 		protected void setValues(List<Object> values)
 		{
+			testWriteOK((MParameter)getModelElement());
+			
 			this.values = values;
 		}
 		

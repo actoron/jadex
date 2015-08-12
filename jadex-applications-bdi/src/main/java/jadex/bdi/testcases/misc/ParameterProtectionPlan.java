@@ -22,29 +22,23 @@ public class ParameterProtectionPlan extends Plan
 	{
 		IInternalEvent event = createInternalEvent("test_event");
 		testInit(event);
-		// Use atomic block to avoid event being cleanupped before test has been performed.
-		startAtomic();
 		dispatchInternalEvent(event);
+		waitFor(500);	// Wait for event processing actions being done.
 		testInProcess(event);
-		endAtomic();
 
 		IGoal subgoal = createGoal("test_goal");
 		testInit(subgoal);
-		// Use atomic block to avoid goal being processed before test has been performed.
-		startAtomic();
-		getWaitqueue().addGoal(subgoal);
 		dispatchSubgoal(subgoal);
+		waitFor(500);	// Wait for start of plan processing the goal.
 		testInProcess(subgoal);
-		endAtomic();
 		try
 		{
-			waitForGoal(subgoal, 1000);
+			waitForGoal(subgoal, 2000);
 		}
 		catch(GoalFailureException e)
 		{
-			// Goal fails because of no plan.
+			// Goal fails because of failed plan after 1000 millis.
 		}
-		getWaitqueue().removeGoal(subgoal);
 		testInit(subgoal);
 
 		// Todo: Test  parameter sets.
