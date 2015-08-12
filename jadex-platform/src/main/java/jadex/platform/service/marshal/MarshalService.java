@@ -181,7 +181,7 @@ public class MarshalService extends BasicService implements IMarshalService
 				boolean ret = false;
 				if(object instanceof ServiceOutputConnectionProxy)
 				{
-					ret = true;
+					ret = true; 
 					// does not work because initiator/participant are always null :-(
 //					ServiceOutputConnectionProxy sp = (ServiceOutputConnectionProxy)object;
 //					if(sp.getInitiator()!=null && sp.getParticipant()!=null)
