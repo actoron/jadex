@@ -68,8 +68,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		boolean isref, String methodname, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
-		if(methodname!=null && methodname.equals("getInputStream"))
-			System.out.println("callid of getResult result: "+callid+" "+result);
+//		if(methodname!=null && methodname.equals("getInputStream"))
+//			System.out.println("callid of getResult result: "+callid+" "+result);
 		
 		this.result = result;
 		this.sender = sender;
@@ -184,6 +184,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public Object getResult()
 	{
+//		if("getInputStream".equals(methodname))
+//			System.out.println("setting methodname");
 		return result;
 	}
 
@@ -265,6 +267,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public void setMethodName(String methodname)
 	{
+//		if("getInputStream".equals(methodname))
+//			System.out.println("setting methodname");
 		this.methodname = methodname;
 	}
 

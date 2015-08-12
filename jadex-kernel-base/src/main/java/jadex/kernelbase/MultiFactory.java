@@ -1049,7 +1049,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 											public void customResultAvailable(ClassLoader result)
 											{
 												final String[] kexts = (String[]) info.getProperty(KERNEL_EXTENSIONS, result) == null? new String[0] : (String[]) info.getProperty(KERNEL_EXTENSIONS, result);
-												System.out.println("multi creates factory: "+kernelmodel);
+//												System.out.println("multi creates factory: "+kernelmodel);
 												cms.createComponent(fname, kernelmodel, ci, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 												{
 													public void resultAvailable(Object result)

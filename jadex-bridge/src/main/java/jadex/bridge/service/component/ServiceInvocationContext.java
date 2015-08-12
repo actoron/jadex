@@ -575,7 +575,8 @@ public class ServiceInvocationContext
 	 */
 	public boolean isRemoteCall()
 	{
-		return caller==null? false: !caller.getRoot().equals(platform);
+		return caller==null? false: !caller.getRoot().equals(platform) 
+			|| (caller.getLocalName().equals("rms") && caller.getRoot().equals(platform)); // Hack? Shouldn't be caller be set to the remote component?
 	}
 	
 //	/**

@@ -44,7 +44,8 @@ public class StreamProviderAgent implements IStreamService
 		Future<IInputConnection> ret = new Future<IInputConnection>();
 		ServiceOutputConnection oc = new ServiceOutputConnection();
 		write(oc, agent);
-		System.out.println("getInputStream result is: "+oc.getInputConnection());
+		Object o = oc.getInputConnection();
+		System.out.println("getInputStream result is: "+o);
 		ret.setResult(oc.getInputConnection());
 		return ret;
 	}
