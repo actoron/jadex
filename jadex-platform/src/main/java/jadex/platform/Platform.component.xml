@@ -172,7 +172,7 @@
 		<!-- Flag if address component and service should be started.  -->
 		<argument name="address" class="boolean">true</argument>
 		<!-- Flag if dht storage ring should be provided. -->
-		<argument name="providedht" class="boolean">false</argument>
+		<argument name="dhtprovide" class="boolean">false</argument>
 	</arguments>
 	
 	<componenttypes>
