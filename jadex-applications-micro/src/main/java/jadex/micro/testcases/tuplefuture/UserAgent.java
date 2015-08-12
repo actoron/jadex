@@ -14,6 +14,8 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -33,6 +35,9 @@ import jadex.micro.annotation.Results;
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
+// Scope global causes search timeouts -> increase test timeout to exceed search timeout
+@Properties(
+	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 1.5)"))
 public class UserAgent
 {
 	@Agent
@@ -86,6 +91,7 @@ public class UserAgent
 			
 			public void finished()
 			{
+				System.out.println("finished: ");
 				if(res[0] && res[1])
 				{
 					tr2.setSucceeded(true);
@@ -102,6 +108,10 @@ public class UserAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("ex: "+exception);
+				tr2.setFailed(exception);
+				
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+				agent.killComponent();
 			}
 		});
 		

@@ -1,7 +1,7 @@
 package jadex.base.test;
 
 import jadex.base.Starter;
-import jadex.base.test.impl.BrokenComponentTest;
+import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
 import jadex.base.test.impl.ComponentTest;
 import jadex.bridge.IErrorReport;
@@ -115,12 +115,12 @@ public class ComponentTestSuite extends TestSuite
 	 * @param root	The classpath root corresponding to the path.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 * @param test	Run test components.
-	 * @param broken	Include broken components (will cause test failure if any).
+	 * @param load	Include broken components (will cause test failure if any). Also shows loadable, but not startable components as succeeded tests.
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes, boolean test, boolean broken, boolean start) throws Exception
+	public ComponentTestSuite(File path, File root, String[] excludes, boolean test, boolean load, boolean start) throws Exception
 	{
-		this(DEFARGS, path, root, excludes, test, broken, start);
+		this(DEFARGS, path, root, excludes, test, load, start);
 	}
 	
 	/**
@@ -132,7 +132,7 @@ public class ComponentTestSuite extends TestSuite
 	 * @param broken	Include broken components (will cause test failure if any).
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final boolean runtests, final boolean broken, final boolean start) throws Exception
+	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final boolean runtests, final boolean load, final boolean start) throws Exception
 	{
 		super(path.toString());
 		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
@@ -190,82 +190,78 @@ public class ComponentTestSuite extends TestSuite
 //						System.out.println("Loadable: "+abspath);
 //						if(abspath.indexOf("INeg")!=-1)
 //							System.out.println("test");
-						if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get()).booleanValue())
+						boolean	startable	= ((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get()).booleanValue();
+						
+//						System.out.println("Startable: "+abspath+", "+startable);
+						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get();
+						boolean istest = false;
+						if(model!=null && model.getReport()==null && startable)
 						{
-//							System.out.println("Startable: "+abspath);
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get();
-							boolean istest = false;
-							if(model!=null && model.getReport()==null)
+							IArgument[]	results	= model.getResults();
+							for(int i=0; !istest && i<results.length; i++)
 							{
-								IArgument[]	results	= model.getResults();
-								for(int i=0; !istest && i<results.length; i++)
+								if(results[i].getName().equals("testresults") && Testcase.class.equals(
+									results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports())))
 								{
-									if(results[i].getName().equals("testresults") && Testcase.class.equals(
-										results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports())))
-									{
-										istest	= true;
-									}
+									istest	= true;
 								}
 							}
-							
-							if(istest)
-							{
-								System.out.print(".");
+						}
+						
+						if(istest)
+						{
+							System.out.print(".");
 //								System.out.println("Test: "+abspath);
-								if(runtests)
+							if(runtests)
+							{
+								ComponentTest test = new ComponentTest(cms, model, this);
+								test.setName(abspath);
+								addTest(test);
+								if(ctimeout==Timeout.NONE || test.getTimeout()==Timeout.NONE)
 								{
-									ComponentTest test = new ComponentTest(cms, model, this);
-									test.setName(abspath);
-									addTest(test);
-									if(ctimeout==Timeout.NONE || test.getTimeout()==Timeout.NONE)
-									{
-										ctimeout	= Timeout.NONE;
-									}
-									else
-									{
-										ctimeout	+= test.getTimeout();
-									}
+									ctimeout	= Timeout.NONE;
+								}
+								else
+								{
+									ctimeout	+= test.getTimeout();
 								}
 							}
-							else if(model.getReport()!=null)
-							{
-								System.out.print(".");
-//								System.out.println("Broken: "+abspath);
-								if(broken)
-								{
-									BrokenComponentTest test = new BrokenComponentTest(abspath, model.getReport());
-									test.setName(abspath);
-									addTest(test);
-								}
-							}
-							else
-							{
-								System.out.print(".");
+						}
+						else if(startable && model.getReport()!=null)
+						{
+							System.out.print(".");
 //								System.out.println("Start: "+abspath);
-								if(start)
+							if(start)
+							{
+								ComponentStartTest test = new ComponentStartTest(cms, model, this);
+								test.setName(abspath);
+								addTest(test);
+								if(ctimeout==Timeout.NONE)
 								{
-									ComponentStartTest test = new ComponentStartTest(cms, model, this);
-									test.setName(abspath);
-									addTest(test);
-									if(ctimeout==Timeout.NONE)
-									{
-										ctimeout	= Timeout.NONE;
-									}
-									else
-									{
-										// Delay instead of timeout as start test should be finished after that.
-										ctimeout	+= test.getTimeout();
-									}
+									ctimeout	= Timeout.NONE;
+								}
+								else
+								{
+									// Delay instead of timeout as start test should be finished after that.
+									ctimeout	+= test.getTimeout();
 								}
 							}
+						}
+						else if(load)
+						{
+							System.out.print(".");
+//							System.out.println("Load: "+abspath);
+							ComponentLoadTest test = new ComponentLoadTest(model, model.getReport());
+							test.setName(abspath);
+							addTest(test);
 						}
 					}
 				}
 				catch(final RuntimeException e)
 				{
-					if(broken)
+					if(load)
 					{
-						BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
+						ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
 						{
 							public String getErrorText()
 							{
