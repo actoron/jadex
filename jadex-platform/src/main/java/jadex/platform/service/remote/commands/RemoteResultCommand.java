@@ -68,8 +68,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		boolean isref, String methodname, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
-//		if(methodname!=null && methodname.equals("method"))
-//			System.out.println("callid of getResult result: "+callid+" "+result);
+		if(methodname!=null && methodname.equals("getInputStream"))
+			System.out.println("callid of getResult result: "+callid+" "+result);
 		
 		this.result = result;
 		this.sender = sender;
@@ -121,8 +121,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		
-//		if(methodname!=null && methodname.equals("method"))
-//			System.out.println("callid of getResult result: "+callid);
+		if(methodname!=null && methodname.equals("getInputStream"))
+			System.out.println("callid of getResult result: "+callid);
 		
 		WaitingCallInfo wci = rsms.getWaitingCall(callid);
 		

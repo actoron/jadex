@@ -1227,7 +1227,7 @@ public class ComponentManagementService implements IComponentManagementService
 //		System.out.println("Terminating component: "+cid.getName());
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
-//		System.err.println("kill compo: "+cid+" "+(sc!=null? sc.getCaller(): "null"));
+//		System.out.println("kill compo: "+cid);//+" "+(sc!=null? sc.getCaller(): "null"));
 		
 //		if(cid.toString().indexOf("MegaParallel")!=-1)
 //			System.out.println("destroy: "+cid.getName());

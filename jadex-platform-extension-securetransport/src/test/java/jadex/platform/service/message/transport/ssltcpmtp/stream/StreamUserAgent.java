@@ -2,10 +2,13 @@ package jadex.platform.service.message.transport.ssltcpmtp.stream;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -96,44 +99,50 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				if(!sec)
+				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Integer>(ret)
 				{
-					performTests(testno, platform.getComponentIdentifier(), tc)
-						.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+					public void customResultAvailable(ITransportComponentIdentifier result) 
 					{
-						public void customResultAvailable(final Integer result)
+						if(!sec)
 						{
-							platform.killComponent();
-	//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-	//						{
-	//							public void customResultAvailable(Map<String, Object> v)
-	//							{
-	//								ret.setResult(result);
-	//							}
-	//						});
-							ret.setResult(result);
+							performTests(testno, result, tc)
+								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+							{
+								public void customResultAvailable(final Integer result)
+								{
+									platform.killComponent();
+			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+			//						{
+			//							public void customResultAvailable(Map<String, Object> v)
+			//							{
+			//								ret.setResult(result);
+			//							}
+			//						});
+									ret.setResult(result);
+								}
+							}));
 						}
-					}));
-				}
-				else
-				{
-					performSecureTests(testno, platform.getComponentIdentifier(), tc)
-						.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
-					{
-						public void customResultAvailable(final Integer result)
+						else
 						{
-							platform.killComponent();
-	//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-	//						{
-	//							public void customResultAvailable(Map<String, Object> v)
-	//							{
-	//								ret.setResult(result);
-	//							}
-	//						});
-							ret.setResult(result);
+							performSecureTests(testno, result, tc)
+								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+							{
+								public void customResultAvailable(final Integer result)
+								{
+									platform.killComponent();
+			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+			//						{
+			//							public void customResultAvailable(Map<String, Object> v)
+			//							{
+			//								ret.setResult(result);
+			//							}
+			//						});
+									ret.setResult(result);
+								}
+							}));
 						}
-					}));
-				}
+					}
+				});
 			}
 		}));
 		
@@ -159,22 +168,22 @@ public class StreamUserAgent extends TestAgent
 				{
 					public void customResultAvailable(final IStreamService ss)
 					{
-						testGetInputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+						testGetInputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 						{
 							public void customResultAvailable(TestReport result)
 							{
 								tc.addReport(result);
-								testGetOutputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+								testGetOutputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
 										tc.addReport(result);
-										testPassInputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+										testPassInputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
 												tc.addReport(result);
-												testPassOutputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+												testPassOutputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 												{
 													public void customResultAvailable(TestReport result)
 													{
@@ -187,13 +196,13 @@ public class StreamUserAgent extends TestAgent
 															}
 														});
 													}
-												});
+												}));
 											}
-										});
+										}));
 									}
-								});
+								}));
 							}
-						});
+						}));
 					}
 				});
 			}
@@ -276,7 +285,7 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void resultAvailable(IInputConnection con)
 			{
-//				System.out.println("received icon: "+con);
+				System.out.println("received icon: "+con);
 				StreamProviderAgent.read(con).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
 			}
 			

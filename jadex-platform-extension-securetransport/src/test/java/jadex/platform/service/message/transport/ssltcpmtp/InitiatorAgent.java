@@ -3,8 +3,10 @@ package jadex.platform.service.message.transport.ssltcpmtp;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -77,23 +79,29 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno, true)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
 				{
-					public void customResultAvailable(final TestReport result)
+					public void customResultAvailable(ITransportComponentIdentifier result) 
 					{
-						platform.killComponent()
-							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+						performTest(result, testno, true)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 						{
-							public void customResultAvailable(Map<String, Object> v)
+							public void customResultAvailable(final TestReport result)
 							{
-								platforms.remove(platform);
-								ret.setResult(result);
+								platform.killComponent()
+									.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+								{
+									public void customResultAvailable(Map<String, Object> v)
+									{
+										platforms.remove(platform);
+										ret.setResult(result);
+									}
+								});
+		//						ret.setResult(result);
 							}
-						});
-//						ret.setResult(result);
+						}));
 					}
-				}));
+				});
 			}
 		}));
 		
@@ -112,22 +120,28 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
 				{
-					public void customResultAvailable(final TestReport result)
+					public void customResultAvailable(ITransportComponentIdentifier result) 
 					{
-						platform.killComponent()
-							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+						performTest(result, testno, false)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 						{
-							public void customResultAvailable(Map<String, Object> v)
+							public void customResultAvailable(final TestReport result)
 							{
-								platforms.remove(platform);
-								ret.setResult(result);
+								platform.killComponent()
+									.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+								{
+									public void customResultAvailable(Map<String, Object> v)
+									{
+										platforms.remove(platform);
+										ret.setResult(result);
+									}
+								});
 							}
-						});
+						}));
 					}
-				}));
+				});
 			}
 		}));
 		
