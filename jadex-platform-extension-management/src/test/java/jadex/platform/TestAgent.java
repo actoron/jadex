@@ -143,7 +143,7 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(final IExternalAccess exta)
 							{
-								createProxy(cms, exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+								Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 								{
 									public void customResultAvailable(IComponentIdentifier result)
 									{
@@ -182,18 +182,6 @@ public abstract class TestAgent
 		return 2;
 	}
 
-	/**
-	 *  Create a proxy for the remote platform.
-	 */
-	protected IFuture<IComponentIdentifier>	createProxy(IComponentManagementService local, IExternalAccess remote)
-	{
-		Map<String, Object>	args = new HashMap<String, Object>();
-		args.put("component", remote.getComponentIdentifier());
-		CreationInfo ci = new CreationInfo(args);
-		return local.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null);
-
-	}
-	
 	/**
 	 * 
 	 */
@@ -371,12 +359,12 @@ public abstract class TestAgent
 //					}
 //				});
 				
-				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
 						// inverse proxy from remote to local.
-						createProxy(exta.getComponentIdentifier(), agent.getComponentIdentifier().getRoot())
+						Starter.createProxy(exta, agent.getExternalAccess())
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(IComponentIdentifier result)
@@ -411,13 +399,13 @@ public abstract class TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier())
+				Starter.createProxy(agent.getExternalAccess(), exta)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
 						// inverse proxy from remote to local.
-						createProxy(exta.getComponentIdentifier(), agent.getComponentIdentifier().getRoot())
+						Starter.createProxy(exta, agent.getExternalAccess())
 							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 						{
 							public void customResultAvailable(IComponentIdentifier result)
@@ -459,9 +447,9 @@ public abstract class TestAgent
 					for(IExternalAccess other: platforms)
 					{
 						// connect other platforms with new one
-						createProxy(other.getComponentIdentifier(), exta.getComponentIdentifier()).addResultListener(lis);
+						Starter.createProxy(other, exta).addResultListener(lis);
 						// connect this platform to all others
-						createProxy(exta.getComponentIdentifier(), other.getComponentIdentifier()).addResultListener(lis);
+						Starter.createProxy(exta, other).addResultListener(lis);
 					}
 				}
 			});
@@ -473,17 +461,6 @@ public abstract class TestAgent
 		
 		return ret;
 	}
-	
-	/**
-	 *  Create a proxy for the remote platform.
-	 */
-	protected IFuture<IComponentIdentifier>	createProxy(IComponentIdentifier root, IComponentIdentifier remote)
-	{
-		Map<String, Object>	args = new HashMap<String, Object>();
-		args.put("component", remote);
-		return createComponent("jadex/platform/service/remote/ProxyAgent.class", args, null, root, null);
-	}
-
 	
 	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
 	{

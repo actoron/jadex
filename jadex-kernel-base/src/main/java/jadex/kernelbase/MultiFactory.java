@@ -1063,7 +1063,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 													public void exceptionOccurred(Exception exception)
 													{
 //														System.out.println("Killed kernel5: " + kernelmodel+", "+exception);
-														exception.printStackTrace();
+//														exception.printStackTrace();
 														resultAvailable(null);
 													}
 												})).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
