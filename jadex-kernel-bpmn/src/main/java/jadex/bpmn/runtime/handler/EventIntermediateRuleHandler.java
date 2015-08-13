@@ -90,7 +90,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 						StringTokenizer	stok	= new StringTokenizer(procid, ":");
 						ProcessThread	thread	= null;
 //								ThreadContext	context	= instance.getThreadContext();
-						ProcessThread context = getBpmnFeature(instance).getTopLevelThread();
+						ProcessThread context = getBpmnFeature(ia).getTopLevelThread();
 						String	pid	= null;
 						while(stok.hasMoreTokens() && context!=null)
 						{
@@ -116,7 +116,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 							ret	= new Future<Void>(new RuntimeException("Process thread not found: "+procid));
 						}
 						
-						getBpmnFeature(instance).notify(activity, thread, event);
+						getBpmnFeature(ia).notify(activity, thread, event);
 						return ret;
 					}
 				});

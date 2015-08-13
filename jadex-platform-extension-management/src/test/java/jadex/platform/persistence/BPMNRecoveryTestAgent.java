@@ -35,7 +35,8 @@ import java.util.Map;
  *  Agent that tests snapshot and restore of a simple BPMN processes.
  */
 @Agent
-@Results(@Result(name="testresults", clazz=Testcase.class))
+//@Results(@Result(name="testresults", clazz=Testcase.class))
+// Todo: (re)implement persistence
 public class BPMNRecoveryTestAgent
 {
 	/** The agent. */

@@ -1,5 +1,13 @@
 package jadex.bpmn.features.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bpmn.features.IBpmnComponentFeature;
 import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
@@ -17,20 +25,10 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple3;
 import jadex.commons.future.IFuture;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Bpmn execution logic.
@@ -134,7 +132,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
             {
             	if(triggersubproc != null)
             	{
-            		ProcessThread thread = new ProcessThread(triggersubproc, bcf.getTopLevelThread(), getComponent());
+            		ProcessThread thread = new ProcessThread(triggersubproc, bcf.getTopLevelThread(), getComponent(), true);
             		bcf.getTopLevelThread().addThread(thread);
 					ProcessThread subthread = new ProcessThread(triggeractivity, thread, getComponent());
 					thread.addThread(subthread);

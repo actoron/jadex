@@ -22,7 +22,8 @@ import jadex.micro.annotation.Results;
  *  Micro agent that tries to persist itself.
  */
 @Agent
-@Results(@Result(name="testresults", clazz=Testcase.class))
+//@Results(@Result(name="testresults", clazz=Testcase.class))
+//Todo: (re)implement persistence
 public class PersistableAgent
 {
 	@Agent

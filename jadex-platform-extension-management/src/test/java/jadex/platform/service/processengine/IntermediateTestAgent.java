@@ -187,8 +187,6 @@ public class IntermediateTestAgent
 			{
 				ret.addIntermediateResult(tr);
 				
-				ret.addIntermediateResult(tr);
-				
 				testNoEventIntermediateBpmn(model, new TestReport(eventtype+"#3", "Test if bpmn rule not triggering works for: "+eventtype))
 					.addResultListener(new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
 				{

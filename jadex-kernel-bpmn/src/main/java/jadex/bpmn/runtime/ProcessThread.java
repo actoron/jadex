@@ -121,21 +121,27 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public ProcessThread(MActivity activity, ProcessThread parent, IInternalAccess instance)
 	{
-		this(null, activity, parent, instance);
+		this(activity, parent, instance, false);
 	}
 	
 	/**
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(String id, MActivity activity, ProcessThread parent, IInternalAccess instance)
+	public ProcessThread(MActivity activity, ProcessThread parent, IInternalAccess instance, boolean passive)
 	{
 		this.id	= parent!=null? parent.getNextChildId(): null;
-//		this.activity	= activity;
 		this.parent = parent;
 		this.instance = instance;
 		
-		setActivity(activity);
+		if(passive)
+		{
+			this.activity	= activity;
+		}
+		else
+		{
+			setActivity(activity);
+		}			
 	}
 	
 	//-------- methods --------
@@ -1007,7 +1013,6 @@ public class ProcessThread	implements ITaskContext
 						}
 						catch(RuntimeException e)
 						{
-							e.printStackTrace();
 							throw new RuntimeException("Error parsing parameter value: "+instance+", "+this+", "+param.getName()+", "+param.getInitialValue(), e);
 						}
 					}

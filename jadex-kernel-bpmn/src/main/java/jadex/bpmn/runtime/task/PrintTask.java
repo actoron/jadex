@@ -3,7 +3,6 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskBody;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bpmn.model.task.annotation.TaskProperty;
 
 /**
  *  Print out some text stored in variable text.

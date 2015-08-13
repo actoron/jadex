@@ -275,8 +275,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 										{
 //											BpmnInterpreter ip = (BpmnInterpreter)ia;
 											IInternalBpmnComponentFeature feat = (IInternalBpmnComponentFeature)ia.getComponentFeature(IBpmnComponentFeature.class);
-											ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), 
-												feat.getTopLevelThread(), ia);
+											ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), feat.getTopLevelThread(), ia, true);
 											feat.getTopLevelThread().addThread(thread);
 											ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ia);
 											thread.addThread(subthread);
