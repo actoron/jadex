@@ -93,7 +93,7 @@ public class UserAgent
 				tr2.setReason("Value differs more than 15 percent: "+d+" "+w+" "+wb);
 			}
 			
-			TestReport tr3 = new TestReport("#3", "Test if wait time ofservice is ok");
+			TestReport tr3 = new TestReport("#3", "Test if wait time of service is ok");
 			results.add(tr3);
 //			w = ((Long)((IService)ser).getNFPropertyValue(ExecutionTimeProperty.NAME).get()).doubleValue();
 			w = ((Long)SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), ((IService)ser).getServiceIdentifier(), ExecutionTimeProperty.NAME).get()).doubleValue();
