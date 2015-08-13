@@ -72,7 +72,7 @@ public class ComponentTestSuite extends TestSuite
 //		"-persist", "true", // for testing persistence
 //		"-niotcptransport", "false",
 //		"-tcptransport", "true",
-		"-deftimeout", "-1",
+//		"-deftimeout", "-1",
 		"-printpass", "false",
 		// Hack!!! include ssl transport if available
 		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  

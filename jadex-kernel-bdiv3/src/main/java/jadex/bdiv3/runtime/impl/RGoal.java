@@ -13,6 +13,7 @@ import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfigParameterElement;
@@ -624,6 +625,11 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public void planFinished(IInternalAccess ia, IInternalPlan rplan)
 	{
+		// Atomic block to avoid goal conditions being triggered in between
+		// Required, e.g. for writing back parameter set values into query goal -> first add value would trigger goal target, other values would not be set.
+		boolean	queue	= ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().isQueueEvents();
+		ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().setQueueEvents(true);
+		
 //		if(this.toString().indexOf("da_initiate")!=-1)
 //			System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
 
@@ -788,6 +794,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				}
 			}
 		}
+		
+		ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().setQueueEvents(queue);
 	}
 	
 //	/**
