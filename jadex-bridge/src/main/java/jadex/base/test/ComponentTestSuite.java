@@ -61,7 +61,7 @@ public class ComponentTestSuite extends TestSuite
 //		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 //		"-logging_level", "java.util.logging.Level.WARNING",
 //		"-debugfutures", "true",
-		"-nostackcompaction", "true",
+//		"-nostackcompaction", "true",
 		"-gui", "false",
 		"-awareness", "false",
 		"-saveonexit", "false",
