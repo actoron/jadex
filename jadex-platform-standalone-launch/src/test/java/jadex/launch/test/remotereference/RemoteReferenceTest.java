@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.concurrent.TimeoutException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class RemoteReferenceTest //extends TestCase
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false",
 			"-gui", "false",
-//			"-logging", "true",
+			"-logging", "true",
 			"-awareness", "false", "-printpass", "false",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
@@ -40,6 +41,7 @@ public class RemoteReferenceTest //extends TestCase
 		// Start platform2 with (remote) search service. (underscore in name assures both platforms use same password)
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			"-logging", "true",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(timeout);
 		
 		// Connect platforms by creating proxy agents.
@@ -55,9 +57,16 @@ public class RemoteReferenceTest //extends TestCase
 		// Remote reference should be mapped back to local provided service proxy.
 		Assert.assertSame(service1, service2);
 
-		// Kill platforms and end test case.
-		platform2.killComponent().get(timeout);
-		platform1.killComponent().get(timeout);
+		try
+		{
+			// Kill platforms and end test case.
+			platform2.killComponent().get(timeout);
+			platform1.killComponent().get(timeout);
+		}
+		catch(TimeoutException te)
+		{
+			te.printStackTrace();
+		}
 	}
 	
 	/**

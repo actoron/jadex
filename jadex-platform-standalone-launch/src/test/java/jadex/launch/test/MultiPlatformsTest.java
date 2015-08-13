@@ -83,7 +83,7 @@ public class MultiPlatformsTest //extends TestCase
 		}
 		
 		IExternalAccess[]	platforms	= new IExternalAccess[number];
-		long	timeout	= Starter.getScaledLocalDefaultTimeout(null, number/15.0);
+		long	timeout	= Starter.getScaledLocalDefaultTimeout(null, number);
 		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)
