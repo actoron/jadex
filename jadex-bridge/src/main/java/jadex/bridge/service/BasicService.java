@@ -3,17 +3,22 @@ package jadex.bridge.service;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.INFPropertyComponentFeature;
+import jadex.bridge.component.impl.NFPropertyComponentFeature;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -292,9 +297,29 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 //		setParent(internalaccess.getExternalAccess());
 //		
 //		// init properties when access is available
-//		initNFProperties();
+		return initNFProperties();
 		
-		return IFuture.DONE;
+//		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Init the non-functional properties (todo: move to other location?)
+	 */
+	protected IFuture<Void> initNFProperties()
+	{
+		if(getInternalAccess().getComponentFeature0(INFPropertyComponentFeature.class)!=null)
+		{
+			INFPropertyComponentFeature nfcf = getInternalAccess().getComponentFeature(INFPropertyComponentFeature.class);
+			IProvidedServicesFeature psf = getInternalAccess().getComponentFeature(IProvidedServicesFeature.class);
+			IInternalService ser = (IInternalService)getInternalAccess().getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
+			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
+			// todo: make internal interface for initProperties
+			return ((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype);
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
 	}
 
 	/**

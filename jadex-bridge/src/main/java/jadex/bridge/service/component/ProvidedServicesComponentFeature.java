@@ -786,7 +786,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param service The service.
 	 *  @param type The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IFuture<Void>	addService(String name, Class<?> type, Object service, String proxytype)
+	public IFuture<Void> addService(String name, Class<?> type, Object service, String proxytype)
 	{
 		return addService(name, type, proxytype, null, service, null, null);
 	}

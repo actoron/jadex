@@ -110,23 +110,24 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			}
 		}
 		
-		IProvidedServicesFeature psf = getComponent().getComponentFeature(IProvidedServicesFeature.class);
-		if(psf!=null)
-		{
-			Map<Class<?>, Collection<IInternalService>> sers = ((ProvidedServicesComponentFeature)psf).getServices();
-			if(sers!=null)
-			{
-				for(Class<?> type: sers.keySet())
-				{
-					for(IInternalService ser: sers.get(type))
-					{
-						cnt++;
-						Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
-						initNFProperties(ser, impltype).addResultListener(lis);
-					}
-				}
-			}
-		}
+		// now done in basic service
+//		IProvidedServicesFeature psf = getComponent().getComponentFeature(IProvidedServicesFeature.class);
+//		if(psf!=null)
+//		{
+//			Map<Class<?>, Collection<IInternalService>> sers = ((ProvidedServicesComponentFeature)psf).getServices();
+//			if(sers!=null)
+//			{
+//				for(Class<?> type: sers.keySet())
+//				{
+//					for(IInternalService ser: sers.get(type))
+//					{
+//						cnt++;
+//						Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
+//						initNFProperties(ser, impltype).addResultListener(lis);
+//					}
+//				}
+//			}
+//		}
 		
 		lis.setMax(cnt);
 		
