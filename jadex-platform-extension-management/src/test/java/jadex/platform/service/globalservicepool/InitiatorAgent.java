@@ -27,6 +27,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.TestAgent;
@@ -50,6 +52,9 @@ import java.util.Map;
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true),
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
+// Test requires starting/stopping multiple platforms and many test calls  -> increase test timeout
+@Properties(
+	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)"))
 public class InitiatorAgent extends TestAgent
 {
 	/**
