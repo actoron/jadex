@@ -75,7 +75,8 @@ public class ServiceCallTestNFClearTest
 	/**
 	 * main thread -> decoupled provided service
 	 */
-	@Test
+//	@Test
+	// Can never work as only user code is executed
 	public void testMain_toProvidedRaw()
 	{
 		IExternalAccess exta = createServiceAgent(platform1, RawServiceAgent.class);
@@ -111,7 +112,8 @@ public class ServiceCallTestNFClearTest
 	/**
 	 * agent -> raw provided service
 	 */
-	@Test
+//	@Test
+	// Can never work as only user code is executed
 	public void testAgent_toProvidedRaw()
 	{
 		testProvided(platform1, RawServiceAgent.class);
