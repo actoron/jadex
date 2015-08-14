@@ -142,7 +142,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				TestReport tr = new TestReport("#"+testno, "Tests if nflatency works.");
+				TestReport tr = new TestReport("#"+testno, "Test #"+testno+" if nflatency works.");
 				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}

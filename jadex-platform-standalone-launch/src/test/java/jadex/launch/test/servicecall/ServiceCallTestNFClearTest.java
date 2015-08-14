@@ -73,7 +73,7 @@ public class ServiceCallTestNFClearTest
 	}
 
 	/**
-	 * main thread -> decoupled provided service
+	 * main thread -> raw provided service
 	 */
 //	@Test
 	// Can never work as only user code is executed
