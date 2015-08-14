@@ -41,7 +41,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-//import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -353,7 +352,7 @@ public class BDIXMLReader extends ComponentXMLReader
 			}), new LinkingInfo(condlinker));
 		
 		// reset to not create MTrigger for metagoal goal triggers (are added as trigger goals)
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), null)); 
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), null)); 
 		
 		typeinfos.add(ti_performgoal);
 		typeinfos.add(ti_achievegoal);
@@ -916,8 +915,8 @@ public class BDIXMLReader extends ComponentXMLReader
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factchanged")), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
+//			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "assignto")), new ObjectInfo(boc), new MappingInfo(null,
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));

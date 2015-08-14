@@ -80,6 +80,15 @@ public class MTrigger
 	{
 		return goals;
 	}
+	
+	/**
+	 *  Set the goals.
+	 *  @param goals The goals to set
+	 */
+	public void setGoals(List<MGoal> goals)
+	{
+		this.goals = goals;
+	}
 
 	/**
 	 *  Add a goal trigger.
@@ -202,6 +211,15 @@ public class MTrigger
 		return goalnames;
 	}
 	
+	/**
+	 *  Set the goalnames.
+	 *  @param goalnames The goalnames to set
+	 */
+	public void setGoalNames(List<String> goalnames)
+	{
+		this.goalnames = goalnames;
+	}
+
 	/**
 	 *  Add a goal name.
 	 */

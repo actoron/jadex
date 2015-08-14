@@ -12,8 +12,10 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.APL;
+import jadex.bdiv3.runtime.impl.APL.MGoalInfo;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.IInternalPlan;
+import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
@@ -168,17 +170,21 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					ret.setResult(null);
 				}
 				// direct subgoal for goal
-				else if(cand instanceof MGoal)
+				else if(cand instanceof MGoalInfo)
 				{
-					final RGoal pagoal = (RGoal)element;
-					final MGoal mgoal = (MGoal)cand;
+					MGoalInfo mgoalinfo = (MGoalInfo)cand;
+					
+					final RProcessableElement pae = (RProcessableElement)element;
+					final RGoal pagoal = pae instanceof RGoal? (RGoal)pae: null;
+					final MGoal mgoal = mgoalinfo.getMGoal();
+					
 					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
-					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal, null, null);
-					final APL apl = element.getApplicablePlanList();
+					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal, mgoalinfo.getBinding(), null);
 					
 					// Add candidates to meta goal
 					if(mgoal.isMetagoal())
 					{
+						APL apl = element.getApplicablePlanList();
 						List<Object> allcands = apl.getCandidates();
 						if(allcands.size()==1)
 						{
@@ -228,16 +234,18 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 							}
 							else
 							{
+								pae.planFinished(ia, rgoal);
+								
 								// Set goal result on parent goal
-								pagoal.setGoalResult(res, ia.getClassLoader(), null, null, rgoal);
-								pagoal.planFinished(ia, rgoal);
+								if(pagoal!=null)
+									pagoal.setGoalResult(res, ia.getClassLoader(), null, null, rgoal);
 							}
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
 							// todo: what if meta-level reasoning fails?!
-							pagoal.planFinished(ia, rgoal);
+							pae.planFinished(ia, rgoal);
 						}
 					});
 					
