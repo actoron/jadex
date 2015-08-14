@@ -913,6 +913,7 @@ public class BDIClassReader extends MicroClassReader
 			tmpcl = tmpcl.getSuperclass();
 		}
 		
+		MTrigger mtr = null;
 		List<String> triggergoals = null;
 		Class<?>[] trgoals = goal.triggergoals();
 		if(trgoals!=null)
@@ -922,11 +923,14 @@ public class BDIClassReader extends MicroClassReader
 			{
 				triggergoals.add(trgoal.getName());
 			}
+			
+			mtr = new MTrigger();
+			mtr.setGoalNames(triggergoals);
 		}
 		
 		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
 			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.orsuccess(), goal.unique(), mdel, params,
-			spmappings.size()>0? spmappings: null, srmappings.size()>0? srmappings: null, triggergoals);
+			spmappings.size()>0? spmappings: null, srmappings.size()>0? srmappings: null, mtr);
 		
 		jadex.bdiv3.annotation.Publish pub = goal.publish();
 		if(!Object.class.equals(pub.type()))

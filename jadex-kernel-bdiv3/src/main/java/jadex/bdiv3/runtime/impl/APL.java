@@ -66,7 +66,7 @@ public class APL
 	protected List<MPlanInfo> precandidates;
 	
 	/** The mgoal candidates (in case a goal triggers another goal). */
-	protected List<MGoal> goalprecandidates;
+	protected List<MGoalInfo> goalprecandidates;
 	
 //	/** The plan instance candidates. */
 //	protected List<RPlan> planinstancecandidates;
@@ -289,7 +289,7 @@ public class APL
 		
 		if(goalprecandidates==null)
 		{
-			goalprecandidates = new ArrayList<MGoal>();
+			goalprecandidates = new ArrayList<MGoalInfo>();
 			MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 			List<MGoal> mgoals = ((MCapability)bdif.getCapability().getModelElement()).getGoals();
 			if(mgoals!=null)
@@ -297,14 +297,53 @@ public class APL
 				for(int i=0; i<mgoals.size(); i++)
 				{
 					MGoal mgoal = mgoals.get(i);
-					List<MGoal> trgoals = mgoal.getTriggerMGoals(mcapa);
+//					List<MGoal> trgoals = mgoal.getTriggerMGoals(mcapa);
+//					
+//					if(element instanceof RGoal && trgoals!=null)
+//					{
+//						if(trgoals.contains(((RGoal)element).getModelElement()))
+//						{
+//							goalprecandidates.add(mgoal);
+////						res.add(mplan);
+//						}
+//					}
 					
-					if(element instanceof RGoal && trgoals!=null)
+					MTrigger mtrigger = mgoal.getTrigger();
+					
+					if(element instanceof RGoal && mtrigger!=null)
 					{
-						if(trgoals.contains(((RGoal)element).getModelElement()))
+						List<MGoal> mtrgoals = mtrigger.getGoals();
+						if(mtrgoals!=null && mtrgoals.contains(element.getModelElement()))
 						{
-							goalprecandidates.add(mgoal);
-//							res.add(mplan);
+							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal);
+							goalprecandidates.addAll(cands);
+						}
+					}
+					else if(element instanceof RServiceCall && mtrigger!=null)
+					{
+						List<MServiceCall> msers = mtrigger.getServices();
+						if(msers!=null && msers.contains(element.getModelElement()))
+						{
+							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal);
+							goalprecandidates.addAll(cands);
+						}
+					}
+					else if(element instanceof RMessageEvent && mtrigger!=null)
+					{
+						List<MMessageEvent> msgs = mtrigger.getMessageEvents();
+						if(msgs!=null && msgs.contains(element.getModelElement()))
+						{
+							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal);
+							goalprecandidates.addAll(cands);
+						}
+					}
+					else if(element instanceof RInternalEvent && mtrigger!=null)
+					{
+						List<MInternalEvent> ievs = mtrigger.getInternalEvents();
+						if(ievs!=null && ievs.contains(element.getModelElement()))
+						{
+							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal);
+							goalprecandidates.addAll(cands);
 						}
 					}
 				}
@@ -326,7 +365,7 @@ public class APL
 		});
 		
 		// add all goal types as they do not have preconditions (until now)
-		for(final MGoal mgoal: goalprecandidates)
+		for(final MGoalInfo mgoal: goalprecandidates)
 		{
 			lis.resultAvailable(mgoal);
 		}
@@ -705,6 +744,33 @@ public class APL
 		return ret;
 	}
 	
+	/** 
+	 *  Create candidates for a matching mgoal.
+	 *  Checks precondition and evaluates bindings (if any).
+	 *  @return apl	returns new apl object in case a null apl is supplied.
+	 */
+	public static List<MGoalInfo> createMGoalCandidates(IInternalAccess agent, MGoal mgoal)
+	{
+		List<MGoalInfo> ret = new ArrayList<MGoalInfo>();
+		
+		List<Map<String, Object>> bindings = calculateBindingElements(agent, mgoal);
+		
+		if(bindings!=null)
+		{
+			for(Map<String, Object> binding: bindings)
+			{
+				ret.add(new MGoalInfo(mgoal, binding));
+			}
+		}
+		// No binding: generate one candidate.
+		else
+		{
+			ret.add(new MGoalInfo(mgoal, null));
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 *  Calculate the possible binding value combinations.
 	 *  @param state The state.
@@ -826,6 +892,72 @@ public class APL
 		public void setMPlan(MPlan mplan)
 		{
 			this.mplan = mplan;
+		}
+
+		/**
+		 *  Get the binding.
+		 *  @return The binding
+		 */
+		public Map<String, Object> getBinding()
+		{
+			return binding;
+		}
+
+		/**
+		 *  The binding to set.
+		 *  @param binding The binding to set
+		 */
+		public void setBinding(Map<String, Object> binding)
+		{
+			this.binding = binding;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class MGoalInfo
+	{
+		/** The mgoal. */
+		protected MGoal mgoal; 
+	
+		/** The bindings. */
+		protected Map<String, Object> binding;
+
+		/**
+		 *  Create a new plan info.
+		 */
+		public MGoalInfo()
+		{
+		}
+		
+		/**
+		 *  Create a new plan info.
+		 *  @param mplan
+		 *  @param binding
+		 */
+		public MGoalInfo(MGoal mgoal, Map<String, Object> binding)
+		{
+			this.mgoal = mgoal;
+			this.binding = binding;
+		}
+
+		/**
+		 *  Get the mgoal. 
+		 *  @return The mgoal
+		 */
+		public MGoal getMGoal()
+		{
+			return mgoal;
+		}
+
+		/**
+		 *  Set the mgoal.
+		 *  @param mgoal The mgoal to set
+		 */
+		public void setMGoal(MGoal mgoal)
+		{
+			this.mgoal = mgoal;
 		}
 
 		/**

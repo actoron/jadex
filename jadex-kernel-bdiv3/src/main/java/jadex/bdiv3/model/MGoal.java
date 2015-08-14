@@ -70,8 +70,9 @@ public class MGoal extends MClassBasedElement
 	protected MDeliberation deliberation;
 	
 	/** The trigger (other goals) if this goal is used as plan. */
-	protected List<String> triggergoals; // classname (pojo) or typename (xml)
-	protected List<MGoal> mtriggergoals;
+//	protected List<String> triggergoals; // classname (pojo) or typename (xml)
+//	protected List<MGoal> mtriggergoals;
+	protected MTrigger trigger;
 	
 	/** The pojo result access (field or method). */
 	protected Object pojoresultreadaccess;
@@ -111,7 +112,7 @@ public class MGoal extends MClassBasedElement
 	public MGoal(String name, String target, boolean posttoall, boolean randomselection, ExcludeMode excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
 		boolean orsuccess, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
-		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, List<String> triggergoals)
+		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, MTrigger trigger)//, List<String> triggergoals)
 	{
 		super(name, target, posttoall, randomselection, excludemode);
 		this.retry = retry;
@@ -124,7 +125,8 @@ public class MGoal extends MClassBasedElement
 		this.parameters = parameters;
 		this.spmappings = spmappings;
 		this.srmappings = srmappings;
-		this.triggergoals = triggergoals;
+		this.trigger = trigger;
+//		this.triggergoals = triggergoals;
 		
 //		System.out.println("create: "+target);
 	}
@@ -499,55 +501,73 @@ public class MGoal extends MClassBasedElement
 		return srmappings;
 	}
 
+//	/**
+//	 *  Get the triggergoals.
+//	 *  @return The triggergoals.
+//	 */
+//	public List<String> getTriggerGoals()
+//	{
+//		return triggergoals;
+//	}
+//
+//	/**
+//	 *  Set the triggergoals.
+//	 *  @param triggergoals The triggergoals to set.
+//	 */
+//	public void setTriggerGoals(List<String> triggergoals)
+//	{
+//		this.triggergoals = triggergoals;
+//	}
+//	
+//	/**
+//	 *  Add a trigger goal.
+//	 */
+//	public void addTriggerGoal(String typename)
+//	{
+//		if(triggergoals==null)
+//			triggergoals = new ArrayList<String>();
+//		triggergoals.add(typename);
+//	}
+	
 	/**
-	 *  Get the triggergoals.
-	 *  @return The triggergoals.
+	 *  Get the trigger.
+	 *  @return The trigger.
 	 */
-	public List<String> getTriggerGoals()
+	public MTrigger getTrigger()
 	{
-		return triggergoals;
+		return trigger;
 	}
 
 	/**
-	 *  Set the triggergoals.
-	 *  @param triggergoals The triggergoals to set.
+	 *  Set the trigger.
+	 *  @param trigger The trigger to set.
 	 */
-	public void setTriggerGoals(List<String> triggergoals)
+	public void setTrigger(MTrigger trigger)
 	{
-		this.triggergoals = triggergoals;
+		this.trigger = trigger;
 	}
 	
-	/**
-	 *  Add a trigger goal.
-	 */
-	public void addTriggerGoal(String typename)
-	{
-		if(triggergoals==null)
-			triggergoals = new ArrayList<String>();
-		triggergoals.add(typename);
-	}
-	
-	/**
-	 *  Get the triggergoals.
-	 *  @return The triggergoals.
-	 */
-	public List<MGoal> getTriggerMGoals(MCapability mcapa)
-	{
-		if(mtriggergoals==null && triggergoals!=null)
-		{
-			mtriggergoals = new ArrayList<MGoal>();
-			
-			for(String cl: triggergoals)
-			{
-				MGoal mgoal = mcapa.getGoal(cl);
-				if(mgoal==null)
-					throw new RuntimeException("Goal not for for pojo class: "+cl);
-				mtriggergoals.add(mgoal);
-			}
-		}
-		
-		return mtriggergoals;
-	}
+//	/**
+//	 *  Get the triggergoals.
+//	 *  @return The triggergoals.
+//	 */
+//	public List<MGoal> getTriggerMGoals(MCapability mcapa)
+//	{
+//		if(mtriggergoals==null && triggergoals!=null)
+//		{
+//			mtriggergoals = new ArrayList<MGoal>();
+//			
+//			for(String cl: triggergoals)
+//			{
+//				MGoal mgoal = mcapa.getGoal(cl);
+//				if(mgoal==null)
+//					throw new RuntimeException("Goal not for for pojo class: "+cl);
+//				mtriggergoals.add(mgoal);
+//			}
+//		}
+//		
+//		return mtriggergoals;
+//	}
 	
 	/**
 	 *  Get the build apl method.

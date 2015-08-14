@@ -131,41 +131,6 @@ public class SBDIModel
 				}
 			}
 			
-			for(MGoal goal: capa.getCapability().getGoals())
-			{
-				MGoal goal2	= new MGoal(capaname+MElement.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
-					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
-					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), null,
-					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), goal.getTriggerGoals()!=null ? new ArrayList<String>(goal.getTriggerGoals()) : null);
-				
-				// Copy parameters and convert events of dynamic parameters.
-				if(goal.getParameters()!=null)
-				{
-					for(MParameter param: goal.getParameters())
-					{
-						MParameter param2 = copyParameter(bdimodel, cl, capaname, param);
-						goal2.addParameter(param2);
-					}
-				}
-
-						
-				// Convert goal condition events
-				if(goal.getConditions()!=null)
-				{
-					for(String type: goal.getConditions().keySet())
-					{
-						List<MCondition> conds = goal.getConditions(type);
-						for(MCondition cond: conds)
-						{
-							MCondition ccond = copyCondition(bdimodel, capaname, cond);
-							goal2.addCondition(type, ccond);
-						}
-					}
-				}
-
-				bdimodel.getCapability().addGoal(goal2);
-			}
-			
 			for(MMessageEvent event : capa.getCapability().getMessageEvents())
 			{
 				MMessageEvent event2	= new MMessageEvent();
@@ -207,6 +172,43 @@ public class SBDIModel
 					}
 				}
 				bdimodel.getCapability().addInternalEvent(event2);
+			}
+			
+			for(MGoal goal: capa.getCapability().getGoals())
+			{
+				MGoal goal2	= new MGoal(capaname+MElement.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
+					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
+					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), null,
+					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), convertTrigger(bdimodel, capaname, goal.getTrigger(), true));
+				
+				goal2.setMetagoal(goal.isMetagoal());
+				
+				// Copy parameters and convert events of dynamic parameters.
+				if(goal.getParameters()!=null)
+				{
+					for(MParameter param: goal.getParameters())
+					{
+						MParameter param2 = copyParameter(bdimodel, cl, capaname, param);
+						goal2.addParameter(param2);
+					}
+				}
+
+						
+				// Convert goal condition events
+				if(goal.getConditions()!=null)
+				{
+					for(String type: goal.getConditions().keySet())
+					{
+						List<MCondition> conds = goal.getConditions(type);
+						for(MCondition cond: conds)
+						{
+							MCondition ccond = copyCondition(bdimodel, capaname, cond);
+							goal2.addCondition(type, ccond);
+						}
+					}
+				}
+
+				bdimodel.getCapability().addGoal(goal2);
 			}
 			
 			for(MPlan plan : capa.getCapability().getPlans())
