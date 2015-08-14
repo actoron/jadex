@@ -140,7 +140,7 @@ public class JettyRestServicePublishService implements IWebPublishService
                 public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
                     throws IOException, ServletException
                 {
-//                    System.out.println("handler is: "+uri.getPath());
+//                  System.out.println("handler is: "+uri.getPath());
 
                     // check if call is an intermediate result fetch
                     String callid = request.getHeader(HEADER_JADEX_CALLID);
@@ -151,7 +151,6 @@ public class JettyRestServicePublishService implements IWebPublishService
                     	if(results!=null && results.size()>0)
                     	{
                     		ResultInfo result = results.iterator().next();
-//                    		resultspercall.removeObject(callid, result);
                     		results.remove(result);
                     		
                     		writeResponse(result.getResult(), callid, result.getMappingInfo(), request, response, false);
@@ -197,8 +196,6 @@ public class JettyRestServicePublishService implements IWebPublishService
 	                        	
 	                        	Object ret = method.invoke(service, params);
 	                        
-	//                          if(ret instanceof IFuture)
-	//                          	ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
 		                        if(ret instanceof IIntermediateFuture)
 		                        {
 		                        	final AsyncContext ctx = request.startAsync();
@@ -232,7 +229,6 @@ public class JettyRestServicePublishService implements IWebPublishService
 		                        				AsyncContext ctx = cls.iterator().next();
 		                        				cls.remove(ctx);
 		                        				
-//		                        				requestspercall.removeObject(fcallid, ctx);
 //		                        				System.out.println("removed context: "+fcallid+" "+ctx);
 		                        				writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
 		                        				ctx.complete();
@@ -245,6 +241,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 		                        		
 		                        	    public void finished()
 		                        	    {
+		                        	    	// maps will be cleared when processing fin element in writeResponse
 		                        	    	intermediateResultAvailable(FINISHED);
 		                        	    }
 									});
@@ -327,21 +324,21 @@ public class JettyRestServicePublishService implements IWebPublishService
         return IFuture.DONE;
     }
 
-    /**
-     * 
-     */
-    protected boolean removeCallWhenFinished(String callid)
-    {
-    	boolean ret = false;
-    	if(requestspercall.get(callid).size()==0 && 
-    		(resultspercall.get(callid)==null || resultspercall.get(callid).size()==0))
-    	{
-    		requestspercall.remove(callid);
-    		resultspercall.remove(callid);
-    		ret = true;
-    	}
-    	return ret;
-    }
+//    /**
+//     * 
+//     */
+//    protected boolean removeCallWhenFinished(String callid)
+//    {
+//    	boolean ret = false;
+//    	if(requestspercall.get(callid).size()==0 && 
+//    		(resultspercall.get(callid)==null || resultspercall.get(callid).size()==0))
+//    	{
+//    		requestspercall.remove(callid);
+//    		resultspercall.remove(callid);
+//    		ret = true;
+//    	}
+//    	return ret;
+//    }
     
     /**
      *  Get or start an api to the http server.
@@ -679,9 +676,6 @@ public class JettyRestServicePublishService implements IWebPublishService
     {
     	List<String> sr =  null;
     	
-    	if(FINISHED.equals(ret))
-    		System.out.println("sdfsdf");
-    	
     	if(ret instanceof Response)
         {
             Response resp = (Response)ret;
@@ -843,11 +837,9 @@ public class JettyRestServicePublishService implements IWebPublishService
     /**
      *  Split the query and save the order.
      */
-//    public static Map<String, String> splitQueryString(String query)
     public static MultiCollection<String, String> splitQueryString(String query) throws Exception
     {
         MultiCollection<String, String> ret = new MultiCollection<String, String>(new LinkedHashMap<String, Collection<String>>(), ArrayList.class);
-//        Map<String, String> ret = new LinkedHashMap<String, String>();
         String[] pairs = query.split("&");
         for(String pair : pairs)
         {

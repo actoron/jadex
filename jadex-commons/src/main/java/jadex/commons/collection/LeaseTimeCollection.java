@@ -9,6 +9,8 @@ import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import jadex.commons.ICommand;
+
 /**
  *  Collection that remove elements after a lease time automatically.
  */
@@ -37,6 +39,9 @@ public class LeaseTimeCollection<E> implements Collection<E>
 
 	/** The current checker. */
 	protected Checker checker;
+	
+	/** The cleaner. */
+	protected ICommand<E> removecmd;
 
 	//-------- constructors --------
 	
@@ -52,7 +57,16 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 */
 	public LeaseTimeCollection(long leasetime)
 	{
+		this(leasetime, null);
+	}
+	
+	/**
+	 *  Create a new lease time handling object.
+	 */
+	public LeaseTimeCollection(long leasetime, ICommand<E> removed)
+	{
 		this.leasetime = leasetime;
+		this.removecmd = removed;
 	}
 	
 	//-------- methods --------
@@ -169,6 +183,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
     {
     	times.clear();
     	entries.clear();
+    	checker.cancel();
     }
 
     // Comparison and hashing
@@ -198,6 +213,15 @@ public class LeaseTimeCollection<E> implements Collection<E>
 		add(e);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Update the timestamp of e.
+	 *  @param entry The entry.
+	 */
+	public synchronized void touch(E e)
+	{
+		times.put(e, Long.valueOf(getClockTime()));
 	}
 		
 	/**
@@ -293,12 +317,14 @@ public class LeaseTimeCollection<E> implements Collection<E>
 							delta = etime+leasetime-curtime;
 							if(delta<=0)
 							{
-								System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
+//								System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
 								remove(first);
+								if(removecmd!=null)
+									removecmd.execute(first);
 							}
 							else
 							{
-								System.out.println("delta is: "+delta);
+//								System.out.println("delta is: "+delta);
 								break;
 							}
 						}
