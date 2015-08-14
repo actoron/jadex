@@ -576,14 +576,17 @@ public class SServiceProvider
 								public void customResultAvailable(IExternalAccess ea)
 								{
 									IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
-			
+									
+									final IComponentIdentifier	fcid	= cid;
+									final Class<T>	ftype	= type;
+									
 									ea.scheduleStep(new ImmediateComponentStep<T>()
 									{
 										@Classname("getService(final IInternalAccess provider, final IComponentIdentifier cid, final Class<T> type)")
 										
 										public IFuture<T> execute(IInternalAccess ia)
 										{
-											return getService(ia, cid, type, false);
+											return getService(ia, fcid, ftype, false);
 										}
 									}).addResultListener(new ComponentResultListener<T>(lis, component));
 								}
