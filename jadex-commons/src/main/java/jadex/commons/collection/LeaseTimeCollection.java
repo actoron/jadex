@@ -17,7 +17,8 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	//-------- attributes --------
 	
 	/** The entries. */
-	protected PriorityQueue<E> entries = new PriorityQueue<E>(new Comparator<E>()
+	// DEFAULT_INITIAL_CAPACITY=11, no constructor without ic in java <1.8
+	protected PriorityQueue<E> entries = new PriorityQueue<E>(11, new Comparator<E>()
 	{
 		public int compare(E e1, E e2)
 		{
@@ -342,7 +343,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 			{
 				try
 				{
-					Thread.currentThread().sleep(1000);
+					Thread.sleep(1000);
 				}
 				catch(Exception e)
 				{
@@ -355,7 +356,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 		{
 			try
 			{
-				Thread.currentThread().sleep(1000);
+				Thread.sleep(1000);
 				System.out.print(".");
 			}
 			catch(Exception e)

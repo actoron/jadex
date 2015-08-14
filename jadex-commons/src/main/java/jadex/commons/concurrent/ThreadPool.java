@@ -1,5 +1,13 @@
 package jadex.commons.concurrent;
 
+import jadex.commons.ChangeEvent;
+import jadex.commons.DefaultPoolStrategy;
+import jadex.commons.IChangeListener;
+import jadex.commons.IPoolStrategy;
+import jadex.commons.SReflect;
+import jadex.commons.collection.ArrayBlockingQueue;
+import jadex.commons.collection.IBlockingQueue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,15 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import jadex.commons.ChangeEvent;
-import jadex.commons.DefaultPoolStrategy;
-import jadex.commons.IChangeListener;
-import jadex.commons.IPoolStrategy;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.collection.ArrayBlockingQueue;
-import jadex.commons.collection.IBlockingQueue;
 
 /**
  *  A thread pool manages pool and saves resources
@@ -325,7 +324,6 @@ public class ThreadPool implements IThreadPool
 		group	= null;
 		timer	= null;
 	}
-	
 	
 	/**
 	 *  Get the string representation.

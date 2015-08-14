@@ -1,9 +1,7 @@
 package jadex.platform.service.threadpool;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -13,6 +11,10 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *  Service wrapper for a threadpool.
@@ -53,26 +55,35 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 	 */
 	public synchronized IFuture<Void>	shutdownService()
 	{
-//		System.out.println("start fini: "+threadpool+" "+Thread.currentThread());
+//		System.err.println("Shutdown threadpool: "+this+", "+new Date());
 		final Future<Void> ret = new Future<Void>();
+		
+		final Timer	t	= new Timer(true);
+		t.schedule(new TimerTask()
+		{
+			public void run()
+			{
+//				System.err.println("Shutdown threadpool timeout: "+this+", "+new Date());
+				// stop waiting for threadpool if still no notifaction
+				ret.setResultIfUndone(null);
+			}
+		}, Starter.getScaledLocalDefaultTimeout(getProviderId(), 1.0/3));	// hack!!! hard coded to 1/3 of default timeout
+		
 		threadpool.addFinishListener(new IChangeListener<Void>()
 		{
 			public void changeOccurred(ChangeEvent<Void> event)
 			{
-//				System.out.println("end fini: "+threadpool+" "+Thread.currentThread());
-				ThreadPoolService.super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret, true));
+				ThreadPoolService.super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret, true)
+				{
+					public void customResultAvailable(Void result)
+					{
+						t.cancel();
+//						System.err.println("Shutdown threadpool finished: "+this+", "+new Date());
+						super.customResultAvailable(result);
+					}
+				});
 			}
 		});
-		
-		getInternalAccess().getExternalAccess().scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				// terminate waiting for threadpool if still no notifaction
-				ret.setResultIfUndone(null);
-				return IFuture.DONE;
-			}
-		}, 8000);
 		
 		threadpool.dispose();
 		return ret;

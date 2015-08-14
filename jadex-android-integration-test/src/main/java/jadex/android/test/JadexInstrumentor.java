@@ -2,12 +2,10 @@ package jadex.android.test;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.service.JadexPlatformManager;
-import jadex.base.test.impl.BrokenComponentTest;
+import jadex.base.test.impl.ComponentLoadTest;
 import jadex.bridge.ErrorReport;
-import jadex.bridge.service.BasicService;
 
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
@@ -155,7 +153,7 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			e.printStackTrace();
 			ErrorReport errorReport = new ErrorReport();
 			errorReport.setErrorText(e.getMessage());
-			BrokenComponentTest error = new BrokenComponentTest("creation", errorReport);
+			ComponentLoadTest error = new ComponentLoadTest("creation", errorReport);
 			suite.addTest(error);
 		}
 		
@@ -188,7 +186,7 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			} catch (UnsupportedEncodingException e) {
 				errorReport.setErrorText("Error constructing testcase: \n" + t.getMessage());
 			}
-			BrokenComponentTest error = new BrokenComponentTest(testClassName, errorReport);
+			ComponentLoadTest error = new ComponentLoadTest(testClassName, errorReport);
 			testCase = error;
 		}
 		Test testCase2 = (Test) testCase;

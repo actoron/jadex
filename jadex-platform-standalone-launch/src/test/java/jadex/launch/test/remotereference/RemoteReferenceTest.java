@@ -57,16 +57,9 @@ public class RemoteReferenceTest //extends TestCase
 		// Remote reference should be mapped back to local provided service proxy.
 		Assert.assertSame(service1, service2);
 
-		try
-		{
-			// Kill platforms and end test case.
-			platform2.killComponent().get(timeout);
-			platform1.killComponent().get(timeout);
-		}
-		catch(TimeoutException te)
-		{
-			te.printStackTrace();
-		}
+		// Kill platforms and end test case.
+		platform2.killComponent().get(timeout);
+		platform1.killComponent().get(timeout);
 	}
 	
 	/**

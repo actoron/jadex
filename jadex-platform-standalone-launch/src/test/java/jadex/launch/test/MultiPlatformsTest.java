@@ -2,7 +2,6 @@ package jadex.launch.test;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.BasicService;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
@@ -59,7 +58,7 @@ public class MultiPlatformsTest //extends TestCase
 //		Thread.sleep(3000000);
 
 		
-		int	number	= 50; // 15; larger numbers cause timeout on toaster.
+		int	number	= 40; // 15; larger numbers cause timeout on toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
