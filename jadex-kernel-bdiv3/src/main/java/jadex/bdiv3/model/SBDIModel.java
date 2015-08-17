@@ -111,7 +111,7 @@ public class SBDIModel
 			for(Entry<String, String> reference: capa.getCapability().getGoalReferences().entrySet())
 			{
 				// either abstract (value==null) and contained or not abstract and not contained
-				assert bdimodel.getCapability().getGoalReferences().containsKey(capaname+MElement.CAPABILITY_SEPARATOR+reference)
+				assert bdimodel.getCapability().getGoalReferences().containsKey(capaname+MElement.CAPABILITY_SEPARATOR+reference.getKey())
 					== (reference.getValue()==null);
 				
 				if(reference.getValue()!=null)
