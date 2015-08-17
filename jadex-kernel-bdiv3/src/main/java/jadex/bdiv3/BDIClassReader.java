@@ -910,7 +910,7 @@ public class BDIClassReader extends MicroClassReader
 					params.add(param);
 				}
 			}
-			tmpcl = tmpcl.getSuperclass();
+			tmpcl = tmpcl.getSuperclass(); 
 		}
 		
 		MTrigger mtr = null;
@@ -918,14 +918,19 @@ public class BDIClassReader extends MicroClassReader
 		Class<?>[] trgoals = goal.triggergoals();
 		if(trgoals!=null)
 		{
-			triggergoals = new ArrayList<String>();
+			mtr = new MTrigger();
+//			triggergoals = new ArrayList<String>();
+			
 			for(Class<?> trgoal: trgoals)
 			{
-				triggergoals.add(trgoal.getName());
+//				triggergoals.add(trgoal.getName());
+				
+				Goal ga = getAnnotation(trgoal, Goal.class, cl);
+				MGoal mgoal = getMGoal(model, ga, trgoal, cl, pubs);
+				mtr.addGoal(mgoal);
 			}
-			
-			mtr = new MTrigger();
-			mtr.setGoalNames(triggergoals);
+
+//			mtr.setGoalNames(triggergoals);
 		}
 		
 		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
