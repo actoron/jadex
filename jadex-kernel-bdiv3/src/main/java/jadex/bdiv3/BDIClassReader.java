@@ -910,7 +910,7 @@ public class BDIClassReader extends MicroClassReader
 					params.add(param);
 				}
 			}
-			tmpcl = tmpcl.getSuperclass();
+			tmpcl = tmpcl.getSuperclass(); 
 		}
 		
 		MTrigger mtr = null;
