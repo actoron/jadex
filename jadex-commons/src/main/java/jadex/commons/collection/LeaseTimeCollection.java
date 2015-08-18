@@ -24,7 +24,27 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	{
 		public int compare(E e1, E e2)
 		{
-			return (int)(times.get(e1).longValue()-times.get(e2).longValue());
+			long t1 = times.get(e1).longValue();
+			long t2 = times.get(e2).longValue();
+			int ret = 0;
+			if(t1<=0 && t2<=0)
+				ret = 0;
+			else if(t1>0 && t2>0)
+				ret = (int)(t1-t2);
+			else if(t1>0)
+				ret = -1;
+			else
+				ret = 1;
+			
+			if(ret<0)
+				System.out.println(e1+" < "+e2);
+			else if(ret>0)
+				System.out.println(e1+" > "+e2);
+			else
+				System.out.println(e1+" = "+e2);
+			return ret;
+//			return t1>0 && t2>0? (int)(t1-t2): t1<=0 && t2<=0? 0: t1>0? 1: -1;
+//			return (int)(t1-t2);
 		}
 	});
 	
@@ -58,15 +78,24 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	public LeaseTimeCollection(long leasetime)
 	{
 		this(leasetime, null);
+//		this.leasetime = leasetime;
 	}
 	
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public LeaseTimeCollection(long leasetime, ICommand<E> removed)
+	public LeaseTimeCollection(ICommand<E> removecmd)
+	{
+		this(0, removecmd);
+	}
+	
+	/**
+	 *  Create a new lease time handling object.
+	 */
+	public LeaseTimeCollection(long leasetime, ICommand<E> removecmd)
 	{
 		this.leasetime = leasetime;
-		this.removecmd = removed;
+		this.removecmd = removecmd;
 	}
 	
 	//-------- methods --------
@@ -105,8 +134,13 @@ public class LeaseTimeCollection<E> implements Collection<E>
 
     public synchronized boolean add(E e)
     {
-    	times.put(e, Long.valueOf(getClockTime()));
-    	boolean ret =  entries.add(e);
+    	return add(e, getLeaseTime(e));
+    }
+    
+    public synchronized boolean add(E e, long leasetime)
+    {
+    	times.put(e, Long.valueOf(leasetime>0? getClockTime()+leasetime: -1));
+    	boolean ret = entries.add(e);
     
     	if(ret)
     		checkStale();
@@ -208,6 +242,16 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 */
 	public synchronized boolean update(E e)
 	{
+		return update(e, getLeaseTime(e));
+	}
+	
+	/**
+	 *  Add a new entry or update an existing entry.
+	 *  @param entry The entry.
+	 *  @return True, if new entry.
+	 */
+	public synchronized boolean update(E e, long leasetime)
+	{
 		boolean ret = !remove(e);
 		
 		add(e);
@@ -221,7 +265,20 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 */
 	public synchronized void touch(E e)
 	{
-		times.put(e, Long.valueOf(getClockTime()));
+		touch(e, getLeaseTime(e));
+	}
+	
+	/**
+	 *  Update the timestamp of e.
+	 *  @param entry The entry.
+	 */
+	public synchronized void touch(E e, long leasetime)
+	{
+		times.put(e, Long.valueOf(leasetime>0? getClockTime()+leasetime: -1));
+		// Does only reorder when element is added again :-(
+		// http://stackoverflow.com/questions/6952660/java-priority-queue-reordering-when-editing-elements
+		entries.remove(e);
+		entries.add(e);
 	}
 		
 	/**
@@ -269,11 +326,28 @@ public class LeaseTimeCollection<E> implements Collection<E>
 		return System.currentTimeMillis();
 	}
 	
+//	/**
+//	 *  Called when an entry has been deleted.
+//	 */
+//	public void entryDeleted(E entry)
+//	{
+//	}
+	
+//	/**
+//	 *  Get the entry to be saved from an entry.
+//	 *  Allows to transform the entry.
+//	 */
+//	public E getEntry(E e)
+//	{
+//		return e;
+//	}
+	
 	/**
-	 *  Called when an entry has been deleted.
+	 *  Get the leasetime for an entry.
 	 */
-	public void entryDeleted(E entry)
+	public long getLeaseTime(E e)
 	{
+		return leasetime;
 	}
 
 	/**
@@ -312,19 +386,31 @@ public class LeaseTimeCollection<E> implements Collection<E>
 						
 						if(first!=null)
 						{
+							System.out.println("entries: "+entries);
+							System.out.println("times: "+times);
+							
 							long etime = times.get(first).longValue();
-							long curtime = getClockTime();
-							delta = etime+leasetime-curtime;
-							if(delta<=0)
+							if(etime>0)
 							{
-//								System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
-								remove(first);
-								if(removecmd!=null)
-									removecmd.execute(first);
+								long curtime = getClockTime();
+								delta = etime-curtime;
+								if(delta<=0)
+								{
+									System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
+									remove(first);
+	//								entryDeleted(first);
+									if(removecmd!=null)
+										removecmd.execute(first);
+								}
+								else
+								{
+									System.out.println("delta is: "+delta+" "+first);
+									break;
+								}
 							}
 							else
 							{
-//								System.out.println("delta is: "+delta);
+								System.out.println("save value: "+first);
 								break;
 							}
 						}
@@ -361,35 +447,46 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	{
 		LeaseTimeCollection<Integer> col = new LeaseTimeCollection<Integer>(3000);
 		
-		for(int i=0; i<5; i++)
-		{
-			col.add(Integer.valueOf(i));
-			
-//			if(i%1000==0)
-			{
-				try
-				{
-					Thread.sleep(1000);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
+		col.add(1);
+		col.add(2);
+		col.add(-1,-1);
+		col.add(3);
+		col.add(-2,-2);
 		
-		while(true)
-		{
-			try
-			{
-				Thread.sleep(1000);
-				System.out.print(".");
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
+//		
+//		col.add(33, -1);
+//		
+//		for(int i=0; i<5; i++)
+//		{
+//			col.add(Integer.valueOf(i));
+//			
+////			if(i%1000==0)
+//			{
+//				try
+//				{
+//					Thread.sleep(1000);
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//
+//		col.add(44, -1);
+//		
+//		while(true)
+//		{
+//			try
+//			{
+//				Thread.sleep(1000);
+//				System.out.print(".");
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+//		}
 		
 	}
 }
