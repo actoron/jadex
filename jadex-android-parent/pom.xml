@@ -141,9 +141,9 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>bouncycastle</groupId>
-			<artifactId>bcprov-jdk15</artifactId>
-			<version>140</version>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.52</version>
 			<scope>provided</scope>
 		</dependency>	
 	</dependencies>

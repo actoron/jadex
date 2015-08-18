@@ -7,7 +7,7 @@ dependencies
 	compile project(':jadex-kernel-micro')
 	compile project(':jadex-javaparser')
 	
-	compile 'bouncycastle:bcprov-jdk15:140'
+	compile 'org.bouncycastle:bcprov-jdk15on:1.52'
 	compile 'javax.mail:mail:1.4.5'
 }
 
