@@ -1,5 +1,7 @@
 package jadex.bdiv3x.features;
 
+import java.util.Collection;
+
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDILifecycleFeature;
 import jadex.bdiv3.model.MCapability;
@@ -8,6 +10,7 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
@@ -20,8 +23,12 @@ import jadex.bridge.component.impl.ComponentLifecycleFeature;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SUtil;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Feature that ensures the bdi behavior is started.
@@ -93,6 +100,37 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	protected StartBehavior createStartBehavior()
 	{
 		return new StartBehavior(component);
+	}
+	
+	/**
+	 *  Start the end state.
+	 */
+	@Override
+	public IFuture<Void> shutdown()
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+		
+		// Abort running plans.
+		Collection<RPlan>	plans	= bdif.getCapability().getPlans();
+		IResultListener<Void>	crl	= new CounterResultListener<Void>(plans.size(), true,
+			new DelegationResultListener<Void>(ret)
+		{
+			@Override
+			public void customResultAvailable(Void result)
+			{
+				// Todo: wait for end goals and end plans
+				
+				BDIXLifecycleAgentFeature.super.shutdown()
+					.addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		for(RPlan plan: plans)
+		{
+			plan.abort().addResultListener(crl);
+		}
+		
+		return ret;
 	}
 	
 	/**

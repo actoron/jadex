@@ -109,6 +109,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 //							}
 						}
 					}
+					
+					rplan.setFinishing();
+					
 					internalInvokePart(1)
 						.addResultListener(new IResultListener<Object>()
 					{
@@ -142,6 +145,13 @@ public abstract class AbstractPlanBody implements IPlanBody
 //					System.out.println("exe abort of: "+rplan.getId());
 				
 				rplan.setException(exception);
+				
+				assert rplan.isFinishing() != (next==2);	// either finishing (due to abort) or failed.
+				if(next==2)
+				{
+					rplan.setFinishing();
+				}
+				
 				internalInvokePart(next)
 					.addResultListener(new IResultListener<Object>()
 				{

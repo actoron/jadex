@@ -727,15 +727,23 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				});
 			}
 			
+			
+			boolean	threaddeath	= false;
 			try
 			{
 				exe.blockThread(monitor);
+			}
+			catch(ThreadDeath e)
+			{
+				threaddeath	= true;
+				throw e;
 			}
 			finally
 			{
 				unblocked[0]	= true;
 				
-				assert !IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState());
+				// Todo: should also work for thread death (i.e. blocked threads terminated before component is gone).
+				assert threaddeath || !IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState());
 				
 				synchronized(this)
 				{

@@ -178,7 +178,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 //			System.out.println("plan state was: "+rplan.getProcessingState());
 			rplan.setProcessingState(PlanProcessingState.RUNNING);
 			ExecutePlanStepAction.RPLANS.set(rplan);
-			if(rplan.aborted && rplan.getLifecycleState()==PlanLifecycleState.BODY)
+			if(rplan.isFinishing() && rplan.getLifecycleState()==PlanLifecycleState.BODY)
 				ex = new PlanAbortedException();
 			if(ex!=null)
 			{

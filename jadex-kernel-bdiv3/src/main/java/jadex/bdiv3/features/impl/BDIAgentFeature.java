@@ -1803,7 +1803,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	protected void testBodyAborted(RPlan rplan)
 	{
 		// Throw error to exit body method of aborted plan.
-		if(rplan!=null && rplan.aborted && rplan.getLifecycleState()==PlanLifecycleState.BODY)
+		if(rplan!=null && rplan.isFinishing() && rplan.getLifecycleState()==PlanLifecycleState.BODY)
 		{
 //			System.out.println("aborting after block: "+rplan);
 			throw new BodyAborted();
@@ -2514,6 +2514,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			if(!allowed)
 				ret = !ret;
 //				return ret? ICondition.TRUE: ICondition.FALSE;
+			
+//			if(ret && goal.getLifecycleState()==GoalLifecycleState.OPTION)
+//			{
+//				System.out.println("dfol");
+//			}
+			
 			return new Future<Tuple2<Boolean,Object>>(ret? ICondition.TRUE: ICondition.FALSE);
 		}
 	}

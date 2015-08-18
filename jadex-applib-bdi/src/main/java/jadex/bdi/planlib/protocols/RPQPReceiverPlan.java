@@ -13,7 +13,7 @@ public class RPQPReceiverPlan extends AbstractReceiverPlan
 {
 	/**
 	 *  The body method is called on the
-	 *  instatiated plan instance from the scheduler.
+	 *  instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{

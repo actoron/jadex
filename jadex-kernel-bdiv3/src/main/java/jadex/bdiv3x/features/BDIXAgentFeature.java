@@ -924,7 +924,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	protected void testBodyAborted(RPlan rplan)
 	{
 		// Throw error to exit body method of aborted plan.
-		if(rplan!=null && rplan.aborted && rplan.getLifecycleState()==PlanLifecycleState.BODY)
+		if(rplan!=null && rplan.isFinishing() && rplan.getLifecycleState()==PlanLifecycleState.BODY)
 		{
 //			System.out.println("aborting after block: "+rplan);
 			throw new BodyAborted();

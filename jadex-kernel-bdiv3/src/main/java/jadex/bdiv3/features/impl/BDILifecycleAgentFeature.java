@@ -65,6 +65,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -127,12 +128,30 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	 */
 	public IFuture<Void> shutdown()
 	{
-		// Todo: wait for end goals and end plans
+		final Future<Void>	ret	= new Future<Void>();
+		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		
-		return super.shutdown();
+		// Abort running plans.
+		Collection<RPlan>	plans	= bdif.getCapability().getPlans();
+		IResultListener<Void>	crl	= new CounterResultListener<Void>(plans.size(), true,
+			new DelegationResultListener<Void>(ret)
+		{
+			@Override
+			public void customResultAvailable(Void result)
+			{
+				// Todo: wait for end goals and end plans
+				
+				BDILifecycleAgentFeature.super.shutdown()
+					.addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		for(RPlan plan: plans)
+		{
+			plan.abort().addResultListener(crl);
+		}
+		
+		return ret;
 	}
-	
-	
 	
 	/**
 	 *  Execute a goal method.
@@ -1815,7 +1834,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 				
 				Rule<Void> rule = new Rule<Void>("goal_activate", 
-					new CombinedCondition(new ICondition[]{
+//					new CombinedCondition(new ICondition[]{
 						new LifecycleStateCondition(RGoal.GoalLifecycleState.OPTION),
 //						new ICondition()
 //						{
@@ -1826,7 +1845,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //								return new Future<Tuple2<Boolean,Object>>(!goal.isInhibited()? ICondition.TRUE: ICondition.FALSE);
 //							}
 //						}
-					}), new IAction<Void>()
+//					}),
+					new IAction<Void>()
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{

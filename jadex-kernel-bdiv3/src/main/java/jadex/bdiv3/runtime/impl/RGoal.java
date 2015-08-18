@@ -326,7 +326,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 *  Set the lifecycle state.
 	 *  @param processingState The processingState to set.
 	 */
-	public void setLifecycleState(IInternalAccess ia, GoalLifecycleState lifecyclestate)
+	public void setLifecycleState(final IInternalAccess ia, GoalLifecycleState lifecyclestate)
 	{
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
@@ -392,9 +392,23 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			// ready to be activated via deliberation
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("option: "+ChangeEvent.GOALOPTION+"."+getId());
-			abortPlans();
-			setProcessingState(ia, GoalProcessingState.IDLE);
-			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALOPTION, getMGoal().getName()}), this));
+			abortPlans().addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					setProcessingState(ia, GoalProcessingState.IDLE);
+					getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALOPTION, getMGoal().getName()}), RGoal.this));
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// Should not fail?
+					exception.printStackTrace();
+					resultAvailable(null);	// safety-net: continue anyways
+				}
+			});
 		}
 		else if(GoalLifecycleState.SUSPENDED.equals(lifecyclestate))
 		{
@@ -402,9 +416,23 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //			if(getId().indexOf("PerformLook")==-1)
 //				System.out.println("suspending: "+getId());
 			
-			abortPlans();
-			setProcessingState(ia, GoalProcessingState.IDLE);
-			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALSUSPENDED, getMGoal().getName()}), this));
+			abortPlans().addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					setProcessingState(ia, GoalProcessingState.IDLE);
+					getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALSUSPENDED, getMGoal().getName()}), RGoal.this));
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// Should not fail?
+					exception.printStackTrace();
+					resultAvailable(null);	// safety-net: continue anyways
+				}
+			});
 		}
 		
 		if(GoalLifecycleState.DROPPING.equals(lifecyclestate))
@@ -420,8 +448,22 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
 //			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
-			abortPlans();
-			ia.getExternalAccess().scheduleStep(new DropGoalAction(this));
+			abortPlans().addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					ia.getExternalAccess().scheduleStep(new DropGoalAction(RGoal.this));
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// Should not fail?
+					exception.printStackTrace();
+					resultAvailable(null);	// safety-net: continue anyways
+				}
+			});
 		}
 		else if(GoalLifecycleState.DROPPED.equals(lifecyclestate))
 		{
@@ -442,12 +484,18 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/**
 	 *  Abort the child plans.
 	 */
-	protected void abortPlans()
+	protected IFuture<Void> abortPlans()
 	{
+		IFuture<Void>	ret;
 		if(childplan!=null)
 		{
-			childplan.abort();
+			ret	= childplan.abort();
 		}
+		else
+		{
+			ret	= IFuture.DONE;
+		}
+		return ret;
 	}
 	
 	/**
@@ -751,7 +799,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 					{
 						if(getException()==null)
 						{
-							setException(new GoalFailureException("No candidates."));
+							setException(new GoalFailureException("No more candidates: "+this));
 						}
 						setProcessingState(ia, GoalProcessingState.FAILED);
 					}
@@ -787,7 +835,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 					{
 						if(getException()==null)
 						{
-							setException(new GoalFailureException("No candidates."));
+							setException(new GoalFailureException("No more candidates: "+this));
 						}
 						setProcessingState(ia, GoalProcessingState.FAILED);
 					}
@@ -1047,23 +1095,37 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/**
 	 *  Called when the target condition of a goal triggers.
 	 */
-	public void targetConditionTriggered(IInternalAccess ia, IEvent event, IRule<Void> rule, Object context)
+	public void targetConditionTriggered(final IInternalAccess ia, IEvent event, IRule<Void> rule, Object context)
 	{
 //		System.out.println("Goal target triggered: "+RGoal.this);
 		if(getMGoal().getConditions(MGoal.CONDITION_MAINTAIN)!=null)
 		{
-			abortPlans();
-			setProcessingState(ia, GoalProcessingState.IDLE);
-			// Hack! Notify finished listeners to allow for waiting via waitForGoal
-			// Cannot use notifyListeners() because it checks isSucceeded
-			if(getListeners()!=null)
+			abortPlans().addResultListener(new IResultListener<Void>()
 			{
-				for(IResultListener<Void> lis: getListeners())
+				@Override
+				public void resultAvailable(Void result)
 				{
-					lis.resultAvailable(null);
+					setProcessingState(ia, GoalProcessingState.IDLE);
+					// Hack! Notify finished listeners to allow for waiting via waitForGoal
+					// Cannot use notifyListeners() because it checks isSucceeded
+					if(getListeners()!=null)
+					{
+						for(IResultListener<Void> lis: getListeners())
+						{
+							lis.resultAvailable(null);
+						}
+					}
+					listeners = null;
 				}
-			}
-			listeners = null;
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// Should not fail?
+					exception.printStackTrace();
+					resultAvailable(null);	// safety-net: continue anyways
+				}
+			});
 		}
 		else
 		{
