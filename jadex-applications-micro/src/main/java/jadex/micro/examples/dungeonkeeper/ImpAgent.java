@@ -1,7 +1,12 @@
 package jadex.micro.examples.dungeonkeeper;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import jadex.application.EnvironmentService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -12,19 +17,20 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.environment.space2d.action.GetPosition;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The imp agent.
  */
+@Agent
 @Properties(@NameValue(name="space", clazz=IFuture.class, value="$component.getParentAccess().getExtension(\"mygc2dspace\")"))
-public class ImpAgent extends MicroAgent
+public class ImpAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	//-------- methods --------
 	
 	/**
@@ -32,13 +38,13 @@ public class ImpAgent extends MicroAgent
 	 */
 	public IFuture<Void> executeBody()
 	{
-		final Grid2D space = (Grid2D)getProperty("space");
-		
+//		final Grid2D space = (Grid2D)getProperty("space");
+		final Grid2D space = (Grid2D) EnvironmentService.getSpace(agent, "space").get();
 		IComponentStep com = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final ISpaceObject avatar = space.getAvatar(getComponentDescription());
+				final ISpaceObject avatar = space.getAvatar(agent.getComponentDescription());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 				double dir = ((Number)avatar.getProperty("direction")).doubleValue();
 
@@ -70,7 +76,7 @@ public class ImpAgent extends MicroAgent
 				Map params = new HashMap();
 				params.put(ISpaceAction.OBJECT_ID, avatar.getId());
 				params.put(GetPosition.PARAMETER_POSITION, newpos);
-				space.performSpaceAction("move", params, createResultListener(new IResultListener()
+				space.performSpaceAction("move", params, agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -88,7 +94,7 @@ public class ImpAgent extends MicroAgent
 					}
 				}));
 				
-				waitForTick(this);
+				agent.getComponentFeature(IExecutionFeature.class).waitForTick(this);
 				
 				return IFuture.DONE;
 			}
@@ -99,7 +105,7 @@ public class ImpAgent extends MicroAgent
 			}
 		};
 		
-		waitForTick(com);
+		agent.getComponentFeature(IExecutionFeature.class).waitForTick(com);
 		
 		return new Future<Void>();
 	}
