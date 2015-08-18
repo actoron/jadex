@@ -1,4 +1,4 @@
 dependencies 
 {
-	testCompile 'bouncycastle:bcprov-jdk15:140'
+	testCompile 'org.bouncycastle:bcprov-jdk15on:1.52'
 }
