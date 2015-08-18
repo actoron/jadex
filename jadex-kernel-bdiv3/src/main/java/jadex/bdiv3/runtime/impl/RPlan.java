@@ -809,6 +809,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //				{
 //					public void execute(Boolean args)
 //					{
+						// The resume command continues the blocked plan thread and
+						// the commands are to continue all listeners on hold
+						// This is not completely clean because the agent does not wait for these threads
+				
 						ICommand<Tuple2<Boolean, Boolean>> resc = getResumeCommand();
 						if(resc!=null)
 							resc.execute(null);
