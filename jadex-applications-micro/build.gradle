@@ -1,3 +1,16 @@
+sourceSets
+{
+    main
+    {
+        java
+        {
+        	srcDir 'src/main/java'
+            exclude 'jadex/micro/examples/dungeonkeeper/**'
+        }
+    }
+}
+
+
 dependencies 
 {
 	compile project(':jadex-commons')

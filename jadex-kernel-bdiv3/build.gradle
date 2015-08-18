@@ -4,8 +4,10 @@ dependencies
 	compile project(':jadex-javaparser')
 	compile project(':jadex-bridge')
 	compile project(':jadex-kernel-base')
+	compile project(':jadex-kernel-component')
 	compile project(':jadex-kernel-micro')
 	compile project(':jadex-rules-eca')
+	compile project(':jadex-xml')
 	
 	compile 'org.ow2.asm:asm-all:5.0.3'
 }

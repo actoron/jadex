@@ -5,4 +5,5 @@ dependencies
 	compile project(':jadex-xml')
 	compile project(':jadex-kernel-component')
 	compile project(':jadex-kernel-micro')
+	compile project(':jadex-kernel-application')
 }
