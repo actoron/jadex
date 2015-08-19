@@ -45,7 +45,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
@@ -489,7 +488,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void setLifecycleState(PlanLifecycleState lifecyclestate)
 	{
 //		if(lifecyclestate.equals(PlanLifecycleState.ABORTED))
-//			System.out.println("aborted: "+this);
+		System.out.println("state: "+this+", "+lifecyclestate);
 		
 		this.lifecyclestate = lifecyclestate;
 		
@@ -821,35 +820,36 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 						subgoal.drop();
 					}
 				}
-			}
-
-			// If plan is waiting interrupt waiting
-			if(PlanProcessingState.WAITING.equals(getProcessingState()))
-			{
-//				if(this.toString().indexOf("Move")!=-1)
-//					System.out.println("performing abort: "+this);
-//				RPlan.executePlan(this, ia, new ICommand<Boolean>()
-//				{
-//					public void execute(Boolean args)
-//					{
-						// The resume command continues the blocked plan thread and
-						// the commands are to continue all listeners on hold
-						// This is not completely clean because the agent does not wait for these threads
 				
-						ICommand<Tuple2<Boolean, Boolean>> resc = getResumeCommand();
-						if(resc!=null)
-							resc.execute(null);
-						List<ICommand<Tuple2<Boolean, Boolean>>> rescoms = getResumeCommands();
-						if(rescoms!=null)
-						{
-							ICommand<Tuple2<Boolean, Boolean>>[] tmp = (ICommand<Tuple2<Boolean, Boolean>>[])rescoms.toArray(new ICommand[rescoms.size()]);
-							for(ICommand<Tuple2<Boolean, Boolean>> rescom: tmp)
+				// Stop plan execution if any.
+				body.abort();
+				
+				// If plan is waiting interrupt waiting
+				if(PlanProcessingState.WAITING.equals(getProcessingState()))
+				{
+	//				RPlan.executePlan(this, ia, new ICommand<Boolean>()
+	//				{
+	//					public void execute(Boolean args)
+	//					{
+							// The resume command continues the blocked plan thread and
+							// the commands are to continue all listeners on hold
+							// This is not completely clean because the agent does not wait for these threads
+					
+							ICommand<Tuple2<Boolean, Boolean>> resc = getResumeCommand();
+							if(resc!=null)
+								resc.execute(null);
+							List<ICommand<Tuple2<Boolean, Boolean>>> rescoms = getResumeCommands();
+							if(rescoms!=null)
 							{
-								rescom.execute(null);
+								ICommand<Tuple2<Boolean, Boolean>>[] tmp = (ICommand<Tuple2<Boolean, Boolean>>[])rescoms.toArray(new ICommand[rescoms.size()]);
+								for(ICommand<Tuple2<Boolean, Boolean>> rescom: tmp)
+								{
+									rescom.execute(null);
+								}
 							}
-						}
+	//					}
 	//				});
-//				}
+				}
 	//			// Can be currently executing and being abort due to e.g. goal condition triggering
 	//			else if(PlanProcessingState.RUNNING.equals(getProcessingState()))
 	//			{
@@ -1513,42 +1513,42 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //		return ret;
 //	}
 	
-	/**
-	 * 
-	 */
-	public <T> IFuture<T> invokeInterruptable(IResultCommand<IFuture<T>, Void> command)
-	{
-		final Future<T> ret = new BDIFuture<T>();
-		
-		final ICommand<Tuple2<Boolean, Boolean>> rescom = new ResumeCommand<T>(ret, null, false);
-//		setResumeCommand(rescom);
-		addResumeCommand(rescom);
-		
-		command.execute(null).addResultListener(getAgent().getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<T>()
-		{
-			public void resultAvailable(T result)
-			{
-//				if(rescom.equals(getResumeCommand()))
-				{
-					setDispatchedElement(result);
-					rescom.execute(null);
-//					RPlan.executePlan(RPlan.this, ia, rescom);
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-//				if(rescom.equals(getResumeCommand()))
-				{
-					setException(exception);
-					rescom.execute(null);
-//					RPlan.executePlan(RPlan.this, ia, rescom);
-				}
-			}
-		}));
-		
-		return ret;
-	}
+//	/**
+//	 * 
+//	 */
+//	public <T> IFuture<T> invokeInterruptable(IResultCommand<IFuture<T>, Void> command)
+//	{
+//		final Future<T> ret = new BDIFuture<T>();
+//		
+//		final ICommand<Tuple2<Boolean, Boolean>> rescom = new ResumeCommand<T>(ret, null, false);
+////		setResumeCommand(rescom);
+//		addResumeCommand(rescom);
+//		
+//		command.execute(null).addResultListener(getAgent().getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<T>()
+//		{
+//			public void resultAvailable(T result)
+//			{
+////				if(rescom.equals(getResumeCommand()))
+//				{
+//					setDispatchedElement(result);
+//					rescom.execute(null);
+////					RPlan.executePlan(RPlan.this, ia, rescom);
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+////				if(rescom.equals(getResumeCommand()))
+//				{
+//					setException(exception);
+//					rescom.execute(null);
+////					RPlan.executePlan(RPlan.this, ia, rescom);
+//				}
+//			}
+//		}));
+//		
+//		return ret;
+//	}
 	
 	/**
 	 * 
