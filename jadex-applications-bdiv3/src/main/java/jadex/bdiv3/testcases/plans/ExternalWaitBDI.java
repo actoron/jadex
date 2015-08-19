@@ -78,8 +78,6 @@ public class ExternalWaitBDI
 	@AgentKilled
 	public void	destroy(IInternalAccess agent)
 	{
-		System.out.println("destroy: "+agent);
-		
 		if(!tr.isFinished())
 				tr.setFailed("Plan not activated");
 		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));

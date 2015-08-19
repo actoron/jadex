@@ -128,6 +128,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			
 //			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().addPlan(rplan);
+			rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 			IPlanBody body = rplan.getBody();
 			try
 			{
