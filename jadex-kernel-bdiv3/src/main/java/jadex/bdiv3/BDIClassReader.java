@@ -1209,7 +1209,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				String val = values[i].value();
 				String clname = values[i].clazz().equals(Object.class) ? null : values[i].clazz().getName();
-				String v = (val==null || val.length()==0) ? clname!=null? clname+".class": null : val;
+				String v = (val==null || val.length()==0) ? clname!=null? clname/*+".class"*/: null : val;
 				MConfigParameterElement	elm	= new MConfigParameterElement();
 				elm.setFlatRef(v==null ? values[i].name() : v);
 				ret.add(elm);

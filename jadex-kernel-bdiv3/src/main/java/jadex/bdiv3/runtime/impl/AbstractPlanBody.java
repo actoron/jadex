@@ -251,36 +251,46 @@ public abstract class AbstractPlanBody implements IPlanBody
 				{
 					public void resultAvailable(Object result)
 					{
-						assert partfuture==ret;
-						partfuture	= null;
+						if(partfuture==ret)
+						{
+							partfuture	= null;
+						}
 						ret.setResultIfUndone(result);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						assert partfuture==ret;
-						partfuture	= null;
+						if(partfuture==ret)
+						{
+							partfuture	= null;
+						}
 						ret.setExceptionIfUndone(exception);
 					}
 				});
 			}
 			else
 			{
-				assert partfuture==ret;
-				partfuture	= null;
+				if(partfuture==ret)
+				{
+					partfuture	= null;
+				}
 				ret.setResultIfUndone(res);
 			}
 		}
 		catch(PlanFailureException e)
 		{
-			assert partfuture==ret;
-			partfuture	= null;
+			if(partfuture==ret)
+			{
+				partfuture	= null;
+			}
 			ret.setExceptionIfUndone(e);
 		}
 		catch(Exception e)
 		{
-			assert partfuture==ret;
-			partfuture	= null;
+			if(partfuture==ret)
+			{
+				partfuture	= null;
+			}
 //			e.printStackTrace();
 			StringWriter	sw	= new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
@@ -289,9 +299,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		}
 		catch(BodyAborted ba)
 		{
-			assert partfuture==ret;
-			partfuture	= null;
-			ret.setExceptionIfUndone(new PlanAbortedException());
+			assert ret.isDone() && ret.getException() instanceof PlanAbortedException;
 		}
 		
 		return ret;

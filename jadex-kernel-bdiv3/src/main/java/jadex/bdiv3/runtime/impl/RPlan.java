@@ -243,7 +243,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				}
 				else if(clazz.isAnnotationPresent(Agent.class))
 				{
-					body = new ComponentPlanBody(clazz0.getName()+".class", ia);
+					body = new ComponentPlanBody(clazz0.getName()+".class", ia, rplan);
 				}
 				else
 				{
@@ -285,7 +285,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		}
 		else if(mbody.getComponent()!=null)
 		{
-			body	= new ComponentPlanBody(mbody.getComponent(), ia);
+			body	= new ComponentPlanBody(mbody.getComponent(), ia, rplan);
 		}
 		
 		if(body==null)
@@ -488,7 +488,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void setLifecycleState(PlanLifecycleState lifecyclestate)
 	{
 //		if(lifecyclestate.equals(PlanLifecycleState.ABORTED))
-		System.out.println("state: "+this+", "+lifecyclestate);
+//		System.out.println("state: "+this+", "+lifecyclestate);
 		
 		this.lifecyclestate = lifecyclestate;
 		
