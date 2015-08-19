@@ -489,7 +489,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void setLifecycleState(PlanLifecycleState lifecyclestate)
 	{
 //		if(lifecyclestate.equals(PlanLifecycleState.ABORTED))
-//			System.out.println("aborted: "+this);
+//		System.out.println("state: "+this+", "+lifecyclestate);
 		
 		this.lifecyclestate = lifecyclestate;
 		
@@ -821,9 +821,12 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 						subgoal.drop();
 					}
 				}
-	
+				
+				// Stop plan execution if any.
+				body.abort();
+				
 				// If plan is waiting interrupt waiting
-				if(PlanProcessingState.WAITING.equals(getProcessingState()))
+//				if(PlanProcessingState.WAITING.equals(getProcessingState()))
 				{
 	//				RPlan.executePlan(this, ia, new ICommand<Boolean>()
 	//				{

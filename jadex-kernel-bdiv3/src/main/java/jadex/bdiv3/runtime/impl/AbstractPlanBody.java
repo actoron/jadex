@@ -24,6 +24,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/** The rplan. */
 	protected RPlan rplan;
 	
+	/** The currently running plan part. */
+	protected Future<Object>	partfuture;
+	
 	//-------- constructors --------
 	
 	/**
@@ -186,11 +189,26 @@ public abstract class AbstractPlanBody implements IPlanBody
 	}
 	
 	/**
+	 *  Issue abortion of the plan body, if currently running.
+	 */
+	public void abort()
+	{
+		if(partfuture!=null)
+		{
+			Future<Object>	fut	= partfuture;
+			partfuture	= null;	// Needs to be set before to allow assert if null
+			fut.setExceptionIfUndone(new PlanAbortedException());
+		}
+	}
+	
+	/**
 	 * 
 	 */
 	protected IFuture<Object> internalInvokePart(int part)
 	{
+		assert partfuture==null;
 		final Future<Object> ret = new Future<Object>();
+		partfuture	= ret;
 		
 		try
 		{			
@@ -233,35 +251,47 @@ public abstract class AbstractPlanBody implements IPlanBody
 				{
 					public void resultAvailable(Object result)
 					{
-						ret.setResult(result);
+						assert partfuture==ret;
+						partfuture	= null;
+						ret.setResultIfUndone(result);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setException(exception);
+						assert partfuture==ret;
+						partfuture	= null;
+						ret.setExceptionIfUndone(exception);
 					}
 				});
 			}
 			else
 			{
-				ret.setResult(res);
+				assert partfuture==ret;
+				partfuture	= null;
+				ret.setResultIfUndone(res);
 			}
 		}
 		catch(PlanFailureException e)
 		{
-			ret.setException(e);
+			assert partfuture==ret;
+			partfuture	= null;
+			ret.setExceptionIfUndone(e);
 		}
 		catch(Exception e)
 		{
+			assert partfuture==ret;
+			partfuture	= null;
 //			e.printStackTrace();
 			StringWriter	sw	= new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			ia.getLogger().warning("Plan '"+getBody()+"' threw exception: "+sw);
-			ret.setException(e);
+			ret.setExceptionIfUndone(e);
 		}
 		catch(BodyAborted ba)
 		{
-			ret.setException(new PlanAbortedException());
+			assert partfuture==ret;
+			partfuture	= null;
+			ret.setExceptionIfUndone(new PlanAbortedException());
 		}
 		
 		return ret;
