@@ -81,22 +81,23 @@ public class BankingService implements IBankingService
 	 *  Subscribe for account statements.
 	 *  @return Account statements whenever available.
 	 */
-	public IIntermediateFuture<AccountStatement> subscribeForAccountStatements()
+	public IIntermediateFuture<AccountStatement> subscribeForAccountStatements(long delay, int max)
 	{
 		final IntermediateFuture<AccountStatement> ret = new IntermediateFuture<AccountStatement>();
 		
 		
-		final int max = 5;
-		ret.addIntermediateResult(new AccountStatement(new String[]{"initial"}, null));
-		component.getComponentFeature(IExecutionFeature.class).waitForDelay(1500, new IComponentStep<Void>()
+		final int fmax = max>0? max: 5;
+		final long fdelay = delay>0? delay: 1500;
+//		ret.addIntermediateResult(new AccountStatement(new String[]{"initial"}, null));
+		component.getComponentFeature(IExecutionFeature.class).waitForDelay(fdelay, new IComponentStep<Void>()
 		{
 			int cnt = 0;
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if(cnt++<max)
+				if(cnt++<fmax)
 				{
 					ret.addIntermediateResult(new AccountStatement(new String[]{""+cnt}, null));
-					component.getComponentFeature(IExecutionFeature.class).waitForDelay(500, this);
+					component.getComponentFeature(IExecutionFeature.class).waitForDelay(fdelay, this);
 				}
 				else
 				{

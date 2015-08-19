@@ -60,7 +60,7 @@
 			<!-- The result of the request. -->
 			<parameter name="result" class="Object" direction="out"/>
 			<!-- The interaction state. -->
-			<parameter name="interaction_state" class="InteractionState" direction="out">
+			<parameter name="interaction_state" class="InteractionState" direction="inout">
 				<value>new InteractionState()</value>
 			</parameter>
 		</achievegoal>
@@ -72,7 +72,7 @@
 			<!-- The interaction description (content of first message). -->
 			<parameter name="interaction_description" class="Object" direction="out"/>
 			<!-- The interaction state. -->
-			<parameter name="interaction_state" class="InteractionState" direction="out">
+			<parameter name="interaction_state" class="InteractionState" direction="inout">
 				<value>new InteractionState()</value>
 			</parameter>
 			<!-- The interaction result. -->
@@ -110,7 +110,7 @@
 			<!-- The interaction description (content of first message). -->
 			<parameter name="interaction_description" class="Object" direction="out"/>
 			<!-- The interaction state should be assign from the superordinated goal. -->
-			<parameter name="interaction_state" class="InteractionState" direction="out"/>
+			<parameter name="interaction_state" class="InteractionState" direction="inout"/>
 			<!-- The result should be passed back to the superordinated goal. -->
 			<parameter name="result" class="Object" direction="out"/>
 		</performgoal>
@@ -142,7 +142,7 @@
 			<parameter name="result" class="Object" direction="out">
 				<goalmapping ref="rp_initiate.result"/>
 			</parameter>
-			<parameter name="interaction_state" class="InteractionState" direction="out">
+			<parameter name="interaction_state" class="InteractionState" direction="inout">
 				<goalmapping ref="rp_initiate.interaction_state"/>
 			</parameter>
 			<parameter name="protocol" class="String">
@@ -170,7 +170,7 @@
 				<goalmapping ref="rp_receiver_interaction.message"/>
 				<goalmapping ref="perform_interaction.message"/>
 			</parameter>
-			<parameter name="interaction_state" class="InteractionState" direction="out">
+			<parameter name="interaction_state" class="InteractionState" direction="inout">
 				<goalmapping ref="rp_receiver_interaction.interaction_state"/>
 				<goalmapping ref="perform_interaction.interaction_state"/>
 			</parameter>

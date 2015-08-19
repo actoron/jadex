@@ -67,6 +67,8 @@
 
 	function send(url, method, names, vals, types, form) 
 	{
+		var to = 5000;
+		
 		var res = document.getElementById("result");
 		if(res!=null)
 			res.innerHTML = "";
@@ -86,6 +88,8 @@
 			url = url+"?";
 			for(i=0; i<names.length; i++)
 			{
+				if(i>0)
+					url = url+"&";
 				url = url + names[i] + "=" + vals[i];
 			}
 		}
@@ -124,7 +128,7 @@
 			if(num!=0)
 			{
 				accept += ";q=0.9,*/*;q=0.8";
-				alert(accept);
+//				alert(accept);
 				http.setRequestHeader("Accept", accept);
 			}
 			// else use default browser accept header
@@ -149,33 +153,42 @@
 //			alert(http.readyState+" "+http.status+" "+http.responseText);
 			
 //			if(http.responseText!=null)
-			if(http.readyState == 4 && http.status == 200) 
+			if(http.readyState == 4) 
 			{
-//				document.getElementById("content").innerHTML = http.responseText;
-//				document.title = response.pageTitle;
-//				window.history.pushState({"html":response.html,"pageTitle":response.pageTitle},"", urlPath);
-//				window.history.pushState("some string", "Test", url);
-//				window.location.replace(url);
-//				window.history.pushState("some string", "Test", url);
+//				alert("received: "+http.status)
 				
-				var res = document.getElementById("result");
-				if(res!=null)
+				if(http.status == 200)
 				{
-					res.innerHTML += http.responseText;
+	//				document.getElementById("content").innerHTML = http.responseText;
+	//				document.title = response.pageTitle;
+	//				window.history.pushState({"html":response.html,"pageTitle":response.pageTitle},"", urlPath);
+	//				window.history.pushState("some string", "Test", url);
+	//				window.location.replace(url);
+	//				window.history.pushState("some string", "Test", url);
+					
+					var res = document.getElementById("result");
+					if(res!=null)
+					{
+						res.innerHTML += http.responseText;
+					}
+					else
+					{
+						document.open();
+						document.write(http.responseText);
+						document.close();
+					}
 				}
-				else
-				{
-					document.open();
-					document.write(http.responseText);
-					document.close();
-				}
-
+				
+//				if(http.status == 408)
+//					alert("received timeout");
+				
 				var callid = http.getResponseHeader("x-jadex-callid");
 				if(callid!=null)
 				{
 					http = new XMLHttpRequest(); 
 					http.open(method, encodeURI(url), true);
 					http.setRequestHeader("x-jadex-callid", callid);
+					http.setRequestHeader("x-jadex-clienttimeout", to);
 					http.onreadystatechange = reshandler;
 					http.send(null);
 				}
@@ -216,6 +229,8 @@
 		}
 		http.onreadystatechange = reshandler;
 		
+		// set client timeout
+		http.setRequestHeader("x-jadex-clienttimeout", to);
 		if("get"==method)
 		{
 			http.send(null);

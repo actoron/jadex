@@ -1,7 +1,5 @@
 package jadex.commons.collection;
 
-import jadex.commons.SUtil;
-
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -13,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SUtil;
 
 
 /**
@@ -28,6 +28,9 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 
 	/** The collection type. */
 	protected Class<?> type;
+	
+//	/** Alternatively the create command. */
+//	protected IResultCommand<Collection<V>, Void> createcmd;
 
 	//-------- constructors --------
 
@@ -50,13 +53,25 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 		this.map	= map;
 		this.type	= type;
 	}
+	
+//	/**
+//	 *  Create a new multi collection.
+//	 *  @param map	The undelying map.
+//	 *  @param type	The collection type to use
+//	 *    (requires public empty contstructor and has to implement java.util.Collection).
+//	 */
+//	public	MultiCollection(Map<K, Collection<V>> map, IResultCommand<Collection<V>, Void> createcmd)
+//	{
+//		this.map	= map;
+//		this.createcmd = createcmd;
+//	}
 
 	/**
 	 *  Clone a multi collection.
 	 */
 	public Object clone() throws CloneNotSupportedException
 	{
-		MultiCollection ret = (MultiCollection) super.clone();
+		MultiCollection ret = (MultiCollection)super.clone();
 		// Hack. does not work!!! map could be of other type.
 		HashMap mapcopy = new HashMap();
 		mapcopy.putAll(map);
@@ -247,22 +262,7 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 		col	= map.get(key);
 		if(col==null)
 		{
-			try
-			{
-				col	= (Collection<V>)type.newInstance();
-			}
-			catch(InstantiationException e)
-			{
-				StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				throw new RuntimeException(sw.toString());
-			}
-			catch(IllegalAccessException e)
-			{
-				StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				throw new RuntimeException(sw.toString());
-			}
+			col	= createCollection(key);
 			map.put(key, col);
 		}
 		col.add(value);
@@ -297,22 +297,7 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 		col	= map.get(key);
 		if(col==null)
 		{
-			try
-			{
-				col	= (Collection<V>)type.newInstance();
-			}
-			catch(InstantiationException e)
-			{
-				StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				throw new RuntimeException(sw.toString());
-			}
-			catch(IllegalAccessException e)
-			{
-				StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				throw new RuntimeException(sw.toString());
-			}
+			col	= createCollection(key);
 			map.put(key, col);
 		}
 		col.addAll(value);
@@ -578,6 +563,43 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 		{
 			map.remove(key);
 		}
+	}
+	
+	/**
+	 *  Create a collection instance.
+	 */
+	public Collection<V> createCollection(K key)
+	{
+		Collection<V> ret = null;
+		if(type!=null)
+		{
+			try
+			{
+				ret	= (Collection<V>)type.newInstance();
+			}
+			catch(InstantiationException e)
+			{
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				throw new RuntimeException(sw.toString());
+			}
+			catch(IllegalAccessException e)
+			{
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				throw new RuntimeException(sw.toString());
+			}
+		}
+//		else if(createcmd!=null)
+//		{
+//			ret = createcmd.execute(null);
+//		}
+		else
+		{
+			ret = new ArrayList<V>();
+		}
+		
+		return ret;
 	}
 }
 

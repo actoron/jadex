@@ -102,10 +102,11 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 //			System.out.println("executing candidate: "+rplan+" "+rgoal.getLifecycleState()+" "+rgoal.getProcessingState());
 			
 			if(!(RGoal.GoalLifecycleState.ACTIVE.equals(rgoal.getLifecycleState())
-				&& RGoal.GoalProcessingState.INPROCESS.equals(rgoal.getProcessingState())) && !rplan.aborted)
+				&& RGoal.GoalProcessingState.INPROCESS.equals(rgoal.getProcessingState())))
 			{
 				// todo: hack, how to avoid side effect
-				rplan.abort();
+//				rplan.abort();
+				return IFuture.DONE;
 			}
 		}
 		
@@ -116,7 +117,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 ////			rplan.continueAfterWait(rescom);
 //		}else if
 		// A new plan body must only be executed if it hasn't been aborted 
-		if(!rplan.aborted && RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState()))
+		if(!rplan.isFinishing() && RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState()))
 		{
 			// Set plan as child of goal
 			if(element instanceof RGoal)

@@ -158,6 +158,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/** The atomic flag. */
 	protected boolean atomic;
 	
+	/** The finished future (if finishing or finished). */
+	public Future<Void>	finished;
+	
 	/**
 	 *  Create a new rplan based on an mplan.
 	 *  
@@ -507,12 +510,18 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
 		}
 		
-		// todo: where to notify listeners
-		if(listeners!=null && listeners.size()>0)
+		if(PlanLifecycleState.PASSED.equals(lifecyclestate)
+			|| PlanLifecycleState.FAILED.equals(lifecyclestate)
+			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
 		{
-			if(PlanLifecycleState.PASSED.equals(lifecyclestate)
-				|| PlanLifecycleState.FAILED.equals(lifecyclestate)
-				|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
+			assert finished!=null;
+			if(finished!=null)
+			{
+				finished.setResult(null);
+			}
+			
+			// todo: where to notify listeners
+			if(listeners!=null && listeners.size()>0)
 			{
 				for(IPlanListener<?> lis: listeners)
 				{
@@ -744,6 +753,23 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	}
 	
 	/**
+	 *  Start the finishing of the plan.
+	 */
+	public void setFinishing()
+	{
+		assert finished==null;
+		finished	= new Future<Void>();
+	}
+	
+	/**
+	 *  Test, if the plan end state (passed/failed/aborted) is started or done. 
+	 */
+	public boolean isFinishing()
+	{
+		return finished!=null;
+	}
+	
+	/**
 	 * 
 	 */
 	public boolean isFinished()
@@ -774,29 +800,26 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		}
 	}
 	
-	public boolean aborted;
-	public Runnable abortcmd;
-	
 	/**
 	 * 
 	 */
-	public void abort()
+	public IFuture<Void>	abort()
 	{
-//		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("move")!=-1)
-//			System.out.println("abort plan: "+getId()+" "+isFinished());
-		
-		if(!isFinished())
+		if(!isFinishing())
 		{
-			aborted = true;
+			setFinishing();
 			
-//			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
-			setException(new PlanAbortedException()); // todo: BodyAborted
-			
-			if(subgoals!=null)
+			if(!isFinished())
 			{
-				for(IGoal subgoal: subgoals)
+	//			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
+				setException(new PlanAbortedException()); // todo: BodyAborted
+				
+				if(subgoals!=null)
 				{
-					subgoal.drop();
+					for(IGoal subgoal: subgoals)
+					{
+						subgoal.drop();
+					}
 				}
 			}
 
@@ -825,20 +848,22 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 								rescom.execute(null);
 							}
 						}
-//					}
-//				});
-			}
-//			// Can be currently executing and being abort due to e.g. goal condition triggering
-//			else if(PlanProcessingState.RUNNING.equals(getProcessingState()))
-//			{
-				// it will detect the abort in beforeBlock() when next future.get() is
-				// called and will avoid the next wait
-//			}
-//			else if(!PlanLifecycleState.NEW.equals(getLifecycleState()))
-//			{
-//				System.out.println("Cannot abort plan: "+getId()+" "+getProcessingState()+" "+getLifecycleState());
-//			}
+	//				});
+//				}
+	//			// Can be currently executing and being abort due to e.g. goal condition triggering
+	//			else if(PlanProcessingState.RUNNING.equals(getProcessingState()))
+	//			{
+					// it will detect the abort in beforeBlock() when next future.get() is
+					// called and will avoid the next wait
+	//			}
+	//			else if(!PlanLifecycleState.NEW.equals(getLifecycleState()))
+	//			{
+	//				System.out.println("Cannot abort plan: "+getId()+" "+getProcessingState()+" "+getLifecycleState());
+	//			}
+			}			
 		}
+		
+		return finished;
 	}
 	
 //	/**
@@ -1573,7 +1598,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	protected void testBodyAborted()
 	{
 		// Throw error to exit body method of aborted plan.
-		if(aborted && PlanLifecycleState.BODY.equals(getLifecycleState()))
+		if(isFinishing() && PlanLifecycleState.BODY.equals(getLifecycleState()))
 		{
 //			System.out.println("aborting after block: "+this);
 			throw new BodyAborted();

@@ -16,12 +16,19 @@ import jadex.commons.ICommand;
  */
 public class LeaseTimeCollection<E> implements Collection<E>
 {
+	/** Constant for no leasetime. */
+	public static final long NONE = -1;
+	
+	/** Constant for unset leasetime (use global default otherwise no leasetime). */
+	public static final long UNSET = -2;
+	
 	//-------- attributes --------
 	
 	/** The entries. */
 	// DEFAULT_INITIAL_CAPACITY=11, no constructor without ic in java <1.8
 	protected PriorityQueue<E> entries = new PriorityQueue<E>(11, new Comparator<E>()
 	{
+		// could also use simple t1-t2 if Long.MAX_VALUE would be used for no leasetime. */
 		public int compare(E e1, E e2)
 		{
 			long t1 = times.get(e1).longValue();
@@ -31,17 +38,17 @@ public class LeaseTimeCollection<E> implements Collection<E>
 				ret = 0;
 			else if(t1>0 && t2>0)
 				ret = (int)(t1-t2);
-			else if(t1>0)
-				ret = -1;
-			else
+			else if(t1<=0)
 				ret = 1;
-			
-			if(ret<0)
-				System.out.println(e1+" < "+e2);
-			else if(ret>0)
-				System.out.println(e1+" > "+e2);
 			else
-				System.out.println(e1+" = "+e2);
+				ret = -1;
+			
+//			if(ret<0)
+//				System.out.println(e1+" < "+e2);
+//			else if(ret>0)
+//				System.out.println(e1+" > "+e2);
+//			else
+//				System.out.println(e1+" = "+e2);
 			return ret;
 //			return t1>0 && t2>0? (int)(t1-t2): t1<=0 && t2<=0? 0: t1>0? 1: -1;
 //			return (int)(t1-t2);
@@ -86,7 +93,8 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 */
 	public LeaseTimeCollection(ICommand<E> removecmd)
 	{
-		this(0, removecmd);
+		// per default no general leasetime
+		this(UNSET, removecmd);
 	}
 	
 	/**
@@ -134,12 +142,12 @@ public class LeaseTimeCollection<E> implements Collection<E>
 
     public synchronized boolean add(E e)
     {
-    	return add(e, getLeaseTime(e));
+    	return add(e, getLeaseTime());
     }
     
     public synchronized boolean add(E e, long leasetime)
     {
-    	times.put(e, Long.valueOf(leasetime>0? getClockTime()+leasetime: -1));
+    	times.put(e, getExpirationTime(leasetime));
     	boolean ret = entries.add(e);
     
     	if(ret)
@@ -242,7 +250,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 */
 	public synchronized boolean update(E e)
 	{
-		return update(e, getLeaseTime(e));
+		return update(e, getLeaseTime());
 	}
 	
 	/**
@@ -265,7 +273,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 */
 	public synchronized void touch(E e)
 	{
-		touch(e, getLeaseTime(e));
+		touch(e, getLeaseTime());
 	}
 	
 	/**
@@ -274,13 +282,43 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 */
 	public synchronized void touch(E e, long leasetime)
 	{
-		times.put(e, Long.valueOf(leasetime>0? getClockTime()+leasetime: -1));
+	   	times.put(e, getExpirationTime(leasetime));
 		// Does only reorder when element is added again :-(
 		// http://stackoverflow.com/questions/6952660/java-priority-queue-reordering-when-editing-elements
 		entries.remove(e);
 		entries.add(e);
+		checkStale();
 	}
+	
+	/**
+	 *  Get the expiration time.
+	 *  @param leasetime
+	 *  @return
+	 */
+	protected Long getExpirationTime(long leasetime)
+	{
+		long ret = UNSET;
+		if(leasetime>0)
+		{
+			ret = getClockTime()+leasetime;
+		}
+		else if(NONE==leasetime)
+		{
+			ret = leasetime;
+		}
+		else if(UNSET==leasetime)
+		{
+			ret = getLeaseTime(); // global lease time
+		}
 		
+		// if no leasetime can be determine use none
+		if(UNSET==ret)
+		{
+			ret = NONE;
+		}
+		return Long.valueOf(ret);
+	}
+	
 	/**
 	 *  Start removing discovered proxies.
 	 */
@@ -343,9 +381,9 @@ public class LeaseTimeCollection<E> implements Collection<E>
 //	}
 	
 	/**
-	 *  Get the leasetime for an entry.
+	 *  Get the leasetime.
 	 */
-	public long getLeaseTime(E e)
+	public long getLeaseTime()
 	{
 		return leasetime;
 	}
@@ -386,8 +424,9 @@ public class LeaseTimeCollection<E> implements Collection<E>
 						
 						if(first!=null)
 						{
-							System.out.println("entries: "+entries);
-							System.out.println("times: "+times);
+//							System.out.println("first: "+first);
+//							System.out.println("times: "+times);
+//							System.out.println("entries: "+entries);
 							
 							long etime = times.get(first).longValue();
 							if(etime>0)
@@ -396,7 +435,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 								delta = etime-curtime;
 								if(delta<=0)
 								{
-									System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
+//									System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
 									remove(first);
 	//								entryDeleted(first);
 									if(removecmd!=null)
@@ -404,13 +443,13 @@ public class LeaseTimeCollection<E> implements Collection<E>
 								}
 								else
 								{
-									System.out.println("delta is: "+delta+" "+first);
+//									System.out.println("delta is: "+delta+" "+first);
 									break;
 								}
 							}
 							else
 							{
-								System.out.println("save value: "+first);
+//								System.out.println("save value: "+first);
 								break;
 							}
 						}
@@ -426,7 +465,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 //				}
 			}
 			
-			if(delta>0)
+			if(delta>0) 
 				cancel = doWaitFor(delta, this);
 		}
 		
@@ -447,46 +486,49 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	{
 		LeaseTimeCollection<Integer> col = new LeaseTimeCollection<Integer>(3000);
 		
-		col.add(1);
-		col.add(2);
-		col.add(-1,-1);
-		col.add(3);
-		col.add(-2,-2);
+//		col.add(1);
+//		col.add(2);
+//		col.add(-1,-1);
+//		col.add(3);
+//		col.add(-2,-2);
 		
-//		
-//		col.add(33, -1);
-//		
-//		for(int i=0; i<5; i++)
-//		{
-//			col.add(Integer.valueOf(i));
-//			
-////			if(i%1000==0)
-//			{
-//				try
-//				{
-//					Thread.sleep(1000);
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//
-//		col.add(44, -1);
-//		
-//		while(true)
-//		{
-//			try
-//			{
-//				Thread.sleep(1000);
-//				System.out.print(".");
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//			}
-//		}
+		
+		col.add(33, -1);
+		
+		for(int i=0; i<5; i++)
+		{
+			col.add(Integer.valueOf(i));
+			
+//			if(i%1000==0)
+			{
+				try
+				{
+					Thread.sleep(1000);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+
+		col.add(44, -1);
+		
+		int cnt = 0;
+		while(true)
+		{
+			try
+			{
+				if(cnt++==3)
+					col.touch(44, 1500);
+				Thread.sleep(1000);
+				System.out.print(".");
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 		
 	}
 }

@@ -39,6 +39,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
@@ -46,11 +47,14 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
+import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.LeaseTimeCollection;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -79,8 +83,12 @@ public class JettyRestServicePublishService implements IWebPublishService
 	/** Http header for the call id. */
 	public static final String HEADER_JADEX_CALLID = "x-jadex-callid";
 	
-	/** Http header for . */
+	/** Http header for the call id siganlling that this is the last response. */
 	public static final String HEADER_JADEX_CALLFINISHED = "x-jadex-callidfin";
+	
+	/** Http header for the call id. */
+	public static final String HEADER_JADEX_CLIENTTIMEOUT = "x-jadex-clienttimeout";
+
 	
 	/** Finished result marker. */
 	public static final String FINISHED = "finished";
@@ -101,12 +109,43 @@ public class JettyRestServicePublishService implements IWebPublishService
     /** The servers per port. */
     protected Map<Integer, Server> portservers;
     
-    /** The results per call. */
+    /** The results per call (coming from the called Jadex service). */
     protected MultiCollection<String, ResultInfo> resultspercall = new MultiCollection<String, ResultInfo>();
     
-    /** The requests per call. */
-    protected MultiCollection<String, AsyncContext> requestspercall = new MultiCollection<String, AsyncContext>();
-
+    /** The requests per call (coming from the rest client). 
+        Signals on ongoing conversation as long as callid is contained (results are not immediately available). */
+    protected MultiCollection<String, AsyncContext> requestspercall;
+    
+    /**
+     *  The service init.
+     */
+    @ServiceStart
+    public void init()
+    {
+    	resultspercall = new MultiCollection<String, ResultInfo>();
+    	
+    	final Long to = (Long)PlatformConfiguration.getPlatformValue(component.getComponentIdentifier(), PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT);
+		System.out.println("Using default client timeout: "+to);
+    	
+    	requestspercall = new MultiCollection<String, AsyncContext>()
+        {
+        	public java.util.Collection<AsyncContext> createCollection(final String callid) 
+        	{
+        		return new LeaseTimeCollection<AsyncContext>(to, new ICommand<AsyncContext>()
+    			{
+        			public void execute(AsyncContext ctx)
+        			{
+        				// Client timeout (nearly) occurred for the request
+        				System.out.println("sending timeout to client");
+        				writeResponse(null, Response.Status.REQUEST_TIMEOUT.getStatusCode(), callid, null, 
+        					(HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
+        				ctx.complete();
+        			}
+    			});
+        	}
+        };
+    }
+    
     /**
      *  Test if publishing a specific type is supported (e.g. web service).
      *  @param publishtype The type to test.
@@ -144,6 +183,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 
                     // check if call is an intermediate result fetch
                     String callid = request.getHeader(HEADER_JADEX_CALLID);
+                           
                     // requestpercall is used to signal an ongoing conversation
                     if(requestspercall.containsKey(callid))
                     {
@@ -158,8 +198,7 @@ public class JettyRestServicePublishService implements IWebPublishService
                     	else
                     	{
                     		AsyncContext ctx = request.startAsync();
-                    		requestspercall.add(callid, ctx);
-//                    		System.out.println("added context: "+callid+" "+ctx);
+                    		saveRequestContext(callid, ctx);
                     	}
                     }
                     else if(callid!=null)
@@ -200,7 +239,7 @@ public class JettyRestServicePublishService implements IWebPublishService
 		                        {
 		                        	final AsyncContext ctx = request.startAsync();
 		                        	final String fcallid = SUtil.createUniqueId(methodname);
-		                        	requestspercall.add(fcallid, ctx);
+		                        	saveRequestContext(fcallid, ctx);
 //		                        	System.out.println("added context: "+fcallid+" "+ctx);
 		                        	
 		                        	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(new IIntermediateResultListener<Object>()
@@ -548,9 +587,29 @@ public class JettyRestServicePublishService implements IWebPublishService
 	            	{
 	            		targetparams[i] = p;
 	            	}
-	            	else if(p instanceof String && BasicTypeConverter.isExtendedBuiltInType(ts[i]))
+	            	else if(p instanceof String && ((String)p).length()>0 && BasicTypeConverter.isExtendedBuiltInType(ts[i]))
 	            	{
 	            		targetparams[i] = BasicTypeConverter.getExtendedStringConverter(ts[i]).convertString((String)p, null);
+	            	}
+	            }
+	            
+	            // Add default values for basic types
+	            for(int i=0; i<targetparams.length; i++)
+	            {
+	            	if(targetparams[i]==null)
+	            	{
+	            		if(ts[i].equals(boolean.class))
+	        			{
+	            			targetparams[i]	= Boolean.FALSE;
+	        			}
+	        			else if(ts[i].equals(char.class))
+	        			{
+	        				targetparams[i]	= Character.valueOf((char)0);
+	        			}
+	        			else if(SReflect.getWrappedType(ts[i])!=ts[i])	// Number type
+	        			{
+	        				targetparams[i]	= Integer.valueOf(0);
+	        			}
 	            	}
 	            }
 	        }
@@ -805,6 +864,44 @@ public class JettyRestServicePublishService implements IWebPublishService
     	{
     		throw new RuntimeException(e);
     	}
+    }
+    
+    /**
+     * 
+     * @param callid
+     * @param ctx
+     */
+    protected void saveRequestContext(String callid, AsyncContext ctx)
+    {
+  		requestspercall.add(callid, ctx);
+		
+		// Set individual time if is contained in request
+		long to = getRequestTimeout((HttpServletRequest)ctx.getRequest());
+		if(to>0)
+		{
+//			System.out.println("req timeout is: "+to);
+			((LeaseTimeCollection<AsyncContext>)requestspercall.getCollection(callid)).touch(ctx, to);
+		}
+		else
+		{
+			System.out.println("no req timeout for call: "+callid);
+		}
+	}
+    
+    /**
+     *  Get the request timeout.
+     */
+    public static long getRequestTimeout(HttpServletRequest request)
+    {
+    	long ret = -1;
+    	String tostr = request.getHeader(HEADER_JADEX_CLIENTTIMEOUT);
+        Long to = tostr!=null? Long.valueOf(tostr): null;    
+		if(to!=null)
+		{
+			// wakeup 10% before client timeout 
+			ret = (long)(to.longValue()*0.9);
+		}
+		return ret;
     }
     
     /**

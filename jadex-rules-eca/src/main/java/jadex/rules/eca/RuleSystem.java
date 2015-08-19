@@ -1,20 +1,5 @@
 package jadex.rules.eca;
 
-import jadex.commons.IResultCommand;
-import jadex.commons.Tuple2;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateFuture;
-import jadex.rules.eca.annotations.Action;
-import jadex.rules.eca.annotations.Condition;
-import jadex.rules.eca.propertychange.PropertyChangeManager;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -26,6 +11,20 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.IResultCommand;
+import jadex.commons.Tuple2;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
+import jadex.rules.eca.annotations.Action;
+import jadex.rules.eca.annotations.Condition;
+import jadex.rules.eca.propertychange.PropertyChangeManager;
 
 /**
  *  The rule system is the main entry point. It contains the rulebase
@@ -50,6 +49,9 @@ public class RuleSystem
 	/** The execution mode (direct vs queue). */
 	protected boolean queueevents = true;
 	
+//	/** Flag if ruleengine is currently in processing (to avoid interleaved calls). */
+//	protected boolean processing = false;
+	
 	//-------- constructors --------
 	
 	/**
@@ -73,6 +75,392 @@ public class RuleSystem
 	}
 
 	//-------- methods --------
+		
+	/**
+	 *  Get the rulebase.
+	 *  @return The rule base.
+	 */
+	public IRulebase getRulebase()
+	{
+		return rulebase;
+	}
+	
+	/**
+	 *  Process the next event by
+	 *  - finding rules that are sensible to the event type
+	 *  - evaluate the conditions of these conditions
+	 *  - fire actions of triggered rules.
+	 */
+	public IIntermediateFuture<RuleEvent> processEvent()
+	{
+		final IntermediateFuture<RuleEvent> ret = new IntermediateFuture<RuleEvent>();
+		
+		if(pcman.hasEvents())
+		{
+			IEvent event = pcman.removeEvent(0);
+			
+//			if(event.getType().toString().indexOf("factchanged.myself")!=-1)
+//				System.out.println("sdgfsdgf");
+			
+//			if(event.getType().getType(0).indexOf("factadded")!=-1)// && event.getType().getType(1).indexOf("mybean")!=-1)
+//				&& event.getType().getType(1).indexOf("Ambu")!=-1)
+//				System.out.println("proc ev: "+event);
+				
+			List<IRule<?>> rules = rulebase.getRules(event.getType());
+			
+			if(rules!=null)
+			{
+				IRule<?>[] rs = rules.toArray(new IRule<?>[rules.size()]);
+				processRules(rs, 0, event, ret).addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						ret.setFinished();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			else
+			{
+//				System.out.println("found no rules for: "+event.getType());
+				
+				ret.setFinished();
+			}
+		}
+		else
+		{
+			ret.setFinished();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Process a given rule set.
+	 */
+	protected IFuture<Void> processRules(final IRule<?>[] rules, final int i, final IEvent event, final IntermediateFuture<RuleEvent> res)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(i<rules.length)
+		{
+			if(rules[i].getCondition()!=null)
+			{
+				rules[i].getCondition().evaluate(event).addResultListener(new IResultListener<Tuple2<Boolean,Object>>()
+				{
+					public void resultAvailable(Tuple2<Boolean, Object> result)
+					{
+						if(result.getFirstEntity().booleanValue())
+						{
+//							System.out.println("Rule triggered: "+rules[i]+", "+event);
+							
+							IFuture fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, result.getSecondEntity());
+							
+							if(fut instanceof IIntermediateFuture)
+							{
+								((IIntermediateFuture<Object>)fut).addResultListener(new IIntermediateResultListener<Object>()
+								{
+									public void intermediateResultAvailable(Object result)
+									{
+										RuleIntermediateEvent ev = new RuleIntermediateEvent(rules[i].getName(), result);
+										res.addIntermediateResult(ev);
+									}
+									
+									public void finished()
+									{
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									
+									public void resultAvailable(Collection<Object> result)
+									{
+										RuleEvent ev = new RuleEvent(rules[i].getName(), result);
+										res.addIntermediateResult(ev);
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										exception.printStackTrace();
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+								});
+							}
+							else
+							{
+								fut.addResultListener(new IResultListener<Object>()
+								{
+									public void resultAvailable(Object result) 
+									{
+										RuleEvent ev = new RuleEvent(rules[i].getName(), result);
+										res.addIntermediateResult(ev);
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										exception.printStackTrace();
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+								});
+							}
+						}
+						else
+						{
+							processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected IFuture<Void> processRules(final IRule<?>[] rules, final int i, final IEvent event, final IntermediateFuture<RuleEvent> res)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		if(i<rules.length)
+//		{
+//			Tuple2<Boolean, Object> cres = rules[i].getCondition()==null? ICondition.TRUE: rules[i].getCondition().evaluate(event);
+//			if(cres.getFirstEntity().booleanValue())
+//			{
+//				IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, cres.getSecondEntity());
+//				
+//				fut.addResultListener(new IResultListener<Object>()
+//				{
+//					public void resultAvailable(Object result) 
+//					{
+//						RuleEvent ev = new RuleEvent(rules[i].getName(), result);
+//						res.addIntermediateResult(ev);
+//						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						exception.printStackTrace();
+//						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//				});
+//			}
+//			else
+//			{
+//				processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+//			}
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+//		}
+//		
+//		return ret;
+//	}
+	
+//	/**
+//	 *  Process events until the event queue is empty or max
+//	 *  events have been processed.
+//	 */
+//	public IFuture<Void> processAllEvents()
+//	{
+////		return processAllEvents(-1);
+//		
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		final int[] opencalls = new int[1];
+//		
+//		while(pcman.hasEvents())
+//		{
+//			opencalls[0]++;
+//			
+//			processEvent().addResultListener(new IResultListener<Collection<RuleEvent>>()
+//			{
+//				Exception ex = null;
+//				public void resultAvailable(Collection<RuleEvent> result)
+//				{
+//					proceed();
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					ex = exception;
+//					proceed();
+//				}
+//				
+//				protected void proceed()
+//				{
+//					// When all events have been processed and no opencalls
+//					if(--opencalls[0]==0 && pcman.getSize()==0)
+//					{
+//						if(ex==null)
+//						{
+//							ret.setResult(null);
+//						}
+//						else
+//						{
+//							ret.setException(ex);
+//						}
+//					}
+//				}
+//			});
+//		}
+//		
+//		return ret;
+//	}
+	
+	/**
+	 *  Process events until the event queue is empty or max
+	 *  events have been processed.
+	 */
+	public IFuture<Void> processAllEvents()
+	{
+		if(pcman.hasEvents())
+		{
+			final Future<Void> ret = new Future<Void>();
+			processEvent().addResultListener(new IResultListener<Collection<RuleEvent>>()
+			{
+//				Exception ex = null;
+				public void resultAvailable(Collection<RuleEvent> result)
+				{
+					processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+//					ex = exception;
+					processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+			return ret;
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
+	}
+	
+//	/**
+//	 *  Process events until the event queue is empty or max
+//	 *  events have been processed.
+//	 *  @return True if was aborted due to reaching max events.
+//	 */
+//	public boolean processAllEvents(int max)
+//	{
+//		int i=0;
+//		
+//		for(i=0; pcman.hasEvents() && (max==-1 || i<max); i++)
+//		{
+//			processEvent();
+//		}
+//		
+//		return i==max;
+//	}
+	
+//	/**
+//	 *  Process events until the event queue is empty or max
+//	 *  events have been processed.
+//	 *  @return True if was aborted due to reaching max events.
+//	 */
+//	public boolean processAllEvents(int max)
+//	{
+//		int i=0;
+//		
+//		for(i=0; pcman.hasEvents() && (max==-1 || i<max); i++)
+//		{
+//			processEvent();
+//		}
+//		
+//		return i==max;
+//	}
+	
+	/**
+	 *  Add an event.
+	 */
+	public IFuture<Void> addEvent(IEvent event)
+	{
+//		if(event.getType().toString().indexOf("factchanged.myself")!=-1)
+//			System.out.println("added: "+event.getType()+" "+event.getContent());
+//		if(event.getType().getTypes().length==1)
+//			System.out.println("herer: "+event.getType());
+//		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
+//			&& event.getType().getType(1).indexOf("Ambu")!=-1)
+//			System.out.println("add event: "+event);
+//		if(event.getType().getType(0).indexOf("factadded")!=-1 && event.getType().getType(1).indexOf("wastebins")!=-1)
+//			System.out.println("add event: "+event);
+
+		final IFuture<Void> ret;
+		
+		pcman.addEvent(event);
+		
+		if(!queueevents)
+		{
+			// If actions add further events they will be processed as well
+//			ret = new Future<Void>();
+//			processEvent().addResultListener(new ExceptionDelegationResultListener<Collection<RuleEvent>, Void>(ret)
+//			{
+//				public void customResultAvailable(Collection<RuleEvent> result)
+//				{
+//					ret.setResult(null);
+//				}
+//			});
+			
+			// This works also if the mode is changed during execution and some events are in the queue
+			ret = processAllEvents();
+		}
+		else
+		{
+//			 ret = (Future<Void>)IFuture.DONE;
+			 ret = IFuture.DONE;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test if at least one event is available.
+	 */
+	public boolean isEventAvailable()
+	{
+		return pcman.hasEvents();
+	}
+
+	/**
+	 *  Get the queueevents.
+	 *  @return The queueevents
+	 */
+	public boolean isQueueEvents()
+	{
+		return queueevents;
+	}
+
+	/**
+	 *  The queueevents to set.
+	 *  @param queueevents The queueevents to set
+	 */
+	public void setQueueEvents(boolean queueevents)
+	{
+		this.queueevents = queueevents;
+	}
+	
 	
 	/**
 	 *  Monitor an object to the rule engine.
@@ -306,359 +694,6 @@ public class RuleSystem
 			
 			rule.setAction(new MethodAction(object, m));
 		}
-	}
-		
-	/**
-	 *  Get the rulebase.
-	 *  @return The rule base.
-	 */
-	public IRulebase getRulebase()
-	{
-		return rulebase;
-	}
-	
-	/**
-	 *  Process the next event by
-	 *  - finding rules that are sensible to the event type
-	 *  - evaluate the conditions of these conditions
-	 *  - fire actions of triggered rules.
-	 */
-	public IIntermediateFuture<RuleEvent> processEvent()
-	{
-		final IntermediateFuture<RuleEvent> ret = new IntermediateFuture<RuleEvent>();
-		
-		if(pcman.hasEvents())
-		{
-			IEvent event = pcman.removeEvent(0);
-			
-//			if(event.getType().toString().indexOf("factchanged.myself")!=-1)
-//				System.out.println("sdgfsdgf");
-			
-//			if(event.getType().getType(0).indexOf("factadded")!=-1)// && event.getType().getType(1).indexOf("mybean")!=-1)
-//				&& event.getType().getType(1).indexOf("Ambu")!=-1)
-//				System.out.println("proc ev: "+event);
-				
-			List<IRule<?>> rules = rulebase.getRules(event.getType());
-			
-			if(rules!=null)
-			{
-				IRule<?>[] rs = rules.toArray(new IRule<?>[rules.size()]);
-				processRules(rs, 0, event, ret).addResultListener(new IResultListener<Void>()
-				{
-					public void resultAvailable(Void result)
-					{
-						ret.setFinished();
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
-			}
-			else
-			{
-//				System.out.println("found no rules for: "+event.getType());
-				
-				ret.setFinished();
-			}
-		}
-		else
-		{
-			ret.setFinished();
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Process a given rule set.
-	 */
-	protected IFuture<Void> processRules(final IRule<?>[] rules, final int i, final IEvent event, final IntermediateFuture<RuleEvent> res)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(i<rules.length)
-		{
-			if(rules[i].getCondition()!=null)
-			{
-				rules[i].getCondition().evaluate(event).addResultListener(new IResultListener<Tuple2<Boolean,Object>>()
-				{
-					public void resultAvailable(Tuple2<Boolean, Object> result)
-					{
-						if(result.getFirstEntity().booleanValue())
-						{
-//							System.out.println("Rule triggered: "+rules[i]+", "+event);
-							
-							IFuture fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, result.getSecondEntity());
-							
-							if(fut instanceof IIntermediateFuture)
-							{
-								((IIntermediateFuture<Object>)fut).addResultListener(new IIntermediateResultListener<Object>()
-								{
-									public void intermediateResultAvailable(Object result)
-									{
-										RuleIntermediateEvent ev = new RuleIntermediateEvent(rules[i].getName(), result);
-										res.addIntermediateResult(ev);
-									}
-									
-									public void finished()
-									{
-										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-									}
-									
-									public void resultAvailable(Collection<Object> result)
-									{
-										RuleEvent ev = new RuleEvent(rules[i].getName(), result);
-										res.addIntermediateResult(ev);
-										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										exception.printStackTrace();
-										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-									}
-								});
-							}
-							else
-							{
-								fut.addResultListener(new IResultListener<Object>()
-								{
-									public void resultAvailable(Object result) 
-									{
-										RuleEvent ev = new RuleEvent(rules[i].getName(), result);
-										res.addIntermediateResult(ev);
-										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										exception.printStackTrace();
-										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-									}
-								});
-							}
-						}
-						else
-						{
-							processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-						}
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-					}
-				});
-			}
-			else
-			{
-				ret.setResult(null);
-			}
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
-	
-//	/**
-//	 * 
-//	 */
-//	protected IFuture<Void> processRules(final IRule<?>[] rules, final int i, final IEvent event, final IntermediateFuture<RuleEvent> res)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		if(i<rules.length)
-//		{
-//			Tuple2<Boolean, Object> cres = rules[i].getCondition()==null? ICondition.TRUE: rules[i].getCondition().evaluate(event);
-//			if(cres.getFirstEntity().booleanValue())
-//			{
-//				IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, cres.getSecondEntity());
-//				
-//				fut.addResultListener(new IResultListener<Object>()
-//				{
-//					public void resultAvailable(Object result) 
-//					{
-//						RuleEvent ev = new RuleEvent(rules[i].getName(), result);
-//						res.addIntermediateResult(ev);
-//						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						exception.printStackTrace();
-//						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-//					}
-//				});
-//			}
-//			else
-//			{
-//				processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-//			}
-//		}
-//		else
-//		{
-//			ret.setResult(null);
-//		}
-//		
-//		return ret;
-//	}
-	
-	/**
-	 *  Process events until the event queue is empty or max
-	 *  events have been processed.
-	 */
-	public IFuture<Void> processAllEvents()
-	{
-//		return processAllEvents(-1);
-
-		final Future<Void> ret = new Future<Void>();
-		
-		final int[] opencalls = new int[1];
-		
-		while(pcman.hasEvents())
-		{
-			opencalls[0]++;
-			
-			processEvent().addResultListener(new IResultListener<Collection<RuleEvent>>()
-			{
-				Exception ex = null;
-				public void resultAvailable(Collection<RuleEvent> result)
-				{
-					proceed();
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ex = exception;
-					proceed();
-				}
-				
-				protected void proceed()
-				{
-					// When all events have been processed and no opencalls
-					if(--opencalls[0]==0 && pcman.getSize()==0)
-					{
-						if(ex==null)
-						{
-							ret.setResult(null);
-						}
-						else
-						{
-							ret.setException(ex);
-						}
-					}
-				}
-			});
-		}
-		
-		return ret;
-	}
-	
-//	/**
-//	 *  Process events until the event queue is empty or max
-//	 *  events have been processed.
-//	 *  @return True if was aborted due to reaching max events.
-//	 */
-//	public boolean processAllEvents(int max)
-//	{
-//		int i=0;
-//		
-//		for(i=0; pcman.hasEvents() && (max==-1 || i<max); i++)
-//		{
-//			processEvent();
-//		}
-//		
-//		return i==max;
-//	}
-	
-//	/**
-//	 *  Process events until the event queue is empty or max
-//	 *  events have been processed.
-//	 *  @return True if was aborted due to reaching max events.
-//	 */
-//	public boolean processAllEvents(int max)
-//	{
-//		int i=0;
-//		
-//		for(i=0; pcman.hasEvents() && (max==-1 || i<max); i++)
-//		{
-//			processEvent();
-//		}
-//		
-//		return i==max;
-//	}
-	
-	/**
-	 *  Add an event.
-	 */
-	public IFuture<Void> addEvent(IEvent event)
-	{
-//		if(event.getType().toString().indexOf("factchanged.myself")!=-1)
-//			System.out.println("added: "+event.getType()+" "+event.getContent());
-//		if(event.getType().getTypes().length==1)
-//			System.out.println("herer: "+event.getType());
-//		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
-//			&& event.getType().getType(1).indexOf("Ambu")!=-1)
-//			System.out.println("add event: "+event);
-//		if(event.getType().getType(0).indexOf("factadded")!=-1 && event.getType().getType(1).indexOf("wastebins")!=-1)
-//			System.out.println("add event: "+event);
-
-		final IFuture<Void> ret;
-		
-		pcman.addEvent(event);
-		
-		if(!queueevents)
-		{
-			// If actions add further events they will be processed as well
-//			ret = new Future<Void>();
-//			processEvent().addResultListener(new ExceptionDelegationResultListener<Collection<RuleEvent>, Void>(ret)
-//			{
-//				public void customResultAvailable(Collection<RuleEvent> result)
-//				{
-//					ret.setResult(null);
-//				}
-//			});
-			
-			// This works also if the mode is changed during execution and some events are in the queue
-			ret = processAllEvents();
-		}
-		else
-		{
-//			 ret = (Future<Void>)IFuture.DONE;
-			 ret = IFuture.DONE;
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Test if at least one event is available.
-	 */
-	public boolean isEventAvailable()
-	{
-		return pcman.hasEvents();
-	}
-
-	/**
-	 *  Get the queueevents.
-	 *  @return The queueevents
-	 */
-	public boolean isQueueEvents()
-	{
-		return queueevents;
-	}
-
-	/**
-	 *  The queueevents to set.
-	 *  @param queueevents The queueevents to set
-	 */
-	public void setQueueEvents(boolean queueevents)
-	{
-		this.queueevents = queueevents;
 	}
 }
 

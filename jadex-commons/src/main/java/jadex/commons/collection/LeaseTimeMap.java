@@ -9,6 +9,7 @@ import jadex.commons.ICommand;
 
 /**
  *  Lease time map with supervised write/update access.
+ *  For every entry a (potentially different) leasetime is used. 
  *  Calling get does not lead to leasetime updates.  
  */
 public class LeaseTimeMap<K, V> implements Map<K, V>
@@ -37,7 +38,7 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 		{
 			public void execute(K args)
 			{
-				System.out.println("removed: "+args);
+//				System.out.println("removed: "+args);
 				LeaseTimeMap.this.map.remove(args);
 				if(removecmd!=null)
 					removecmd.execute(args);
@@ -165,6 +166,19 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 		}
 		return map.put(key, value);
 	}
+	
+	public V put(K key, V value, long leasetime)
+	{
+		if(map.containsKey(key))
+		{
+			times.touch(key, leasetime);
+		}
+		else
+		{
+			times.add(key, leasetime);
+		}
+		return map.put(key, value);
+	}
 
 	// Bulk Operations
 
@@ -195,6 +209,14 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 		for(Map.Entry<? extends K, ? extends V> entry: t.entrySet())
 		{
 			put(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	public void putAll(Map<? extends K, ? extends V> t, long leasetime)
+	{
+		for(Map.Entry<? extends K, ? extends V> entry: t.entrySet())
+		{
+			put(entry.getKey(), entry.getValue(), leasetime);
 		}
 	}
 
@@ -337,6 +359,8 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	public static void main(String[] args)
 	{
 		LeaseTimeMap<String, String> map = new LeaseTimeMap<String, String>(3000);
+		
+		map.put("99", "99", 10000);
 		
 		for(int i=0; i<5; i++)
 		{

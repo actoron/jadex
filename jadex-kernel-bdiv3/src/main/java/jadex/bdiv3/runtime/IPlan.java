@@ -20,7 +20,7 @@ public interface IPlan extends IParameterElement  // todo: do not extend IParame
 	/**
 	 *  Abort the plan.
 	 */
-	public void abort();
+	public IFuture<Void> abort();
 	
 	/**
 	 *  Get the exception.

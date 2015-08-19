@@ -216,7 +216,6 @@ class LongTypeConverter implements IStringObjectConverter
 	{
 		return Long.valueOf(val);
 	}
-	
 }
 
 /**

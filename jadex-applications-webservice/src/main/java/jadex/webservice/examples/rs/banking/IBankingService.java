@@ -35,7 +35,7 @@ public interface IBankingService
 	 *  Subscribe for account statements.
 	 *  @return Account statements whenever available.
 	 */
-	public IIntermediateFuture<AccountStatement> subscribeForAccountStatements();
+	public IIntermediateFuture<AccountStatement> subscribeForAccountStatements(long delay, int max);
 	
 	/**
 	 *  Add an account statement.

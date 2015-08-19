@@ -570,7 +570,7 @@ public class RCapability extends RElement
 			{
 				StringBuffer buf = new StringBuffer();
 				determineValid(plan, plan, buf);
-				if(plan.aborted)
+				if(plan.isFinishing())
 					System.out.println("aborted zombie plan: "+plan.getId());
 				
 				System.out.println(buf.toString());
@@ -588,7 +588,7 @@ public class RCapability extends RElement
 	 */
 	protected void determineValid(RPlan plan, RPlan orig, StringBuffer buf)
 	{
-		buf.append(plan.getId()+plan.aborted);
+		buf.append(plan.getId()+plan.isFinishing());
 		Object reason = plan.getReason();
 		if(reason instanceof RGoal)
 		{

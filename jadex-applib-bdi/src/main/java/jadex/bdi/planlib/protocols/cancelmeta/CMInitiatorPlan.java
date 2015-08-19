@@ -41,7 +41,7 @@ public class CMInitiatorPlan extends Plan
 		getWaitqueue().addReply(cancel);
 		sendMessage(cancel);
 		long time = getTime();
-		List	rec	= SUtil.arrayToList(message.getParameterSet(SFipa.RECEIVERS).getValues());
+		List<Object>	rec	= SUtil.arrayToList(message.getParameterSet(SFipa.RECEIVERS).getValues());
 		try
 		{
 			while(rec.size()>0)
