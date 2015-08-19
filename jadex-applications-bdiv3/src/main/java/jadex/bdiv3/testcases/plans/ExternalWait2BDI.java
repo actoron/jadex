@@ -25,7 +25,7 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 /**
- *  Test abort of externally waiting plan with invokeInterruptable
+ *  Test abort of externally waiting plan with manual "interruptable" step.
  */
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))

@@ -2,7 +2,6 @@ package jadex.bdiv3.runtime;
 
 import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.commons.IFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.ICondition;
@@ -136,10 +135,10 @@ public interface IPlan extends IParameterElement  // todo: do not extend IParame
 	 */
 	public IFuture<Void> waitForCondition(ICondition cond, String[] events, long timeout);
 	
-	/**
-	 * 
-	 */
-	public <T> IFuture<T> invokeInterruptable(IResultCommand<IFuture<T>, Void> command);
+//	/**
+//	 * 
+//	 */
+//	public <T> IFuture<T> invokeInterruptable(IResultCommand<IFuture<T>, Void> command);
 
 	/**
 	 * 
