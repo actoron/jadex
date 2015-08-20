@@ -127,7 +127,7 @@ public class GoalConditionsPlan	extends Plan
 		
 		// Now triggering goal context again to restart plan.
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
-//		waitFor(10); // Hack! Wait for consequences being executed :-(
+//		waitFor(10); // Hack! Wait for consequences being executed :-( (todo: microplansteps?)
 		report	= new TestReport("trigger_context3", "Triggering goal context again", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
 		{

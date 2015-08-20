@@ -17,6 +17,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -350,6 +351,7 @@ public class RuleSystem
 					processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
+			
 			return ret;
 		}
 		else
@@ -425,6 +427,10 @@ public class RuleSystem
 			
 			// This works also if the mode is changed during execution and some events are in the queue
 			ret = processAllEvents();
+			
+//			// Simulate microplansteps by executing all effects immediately (hack: allow configuration sync/async)
+//			// does not work :-(
+//			FutureHelper.notifyStackedListeners();
 		}
 		else
 		{

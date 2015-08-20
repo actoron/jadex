@@ -25,18 +25,25 @@ public class ComponentPlanBody implements IPlanBody
 	/** The internal access. */
 	protected IInternalAccess	ia;
 	
+	/** The plan element. */
+	protected RPlan	rplan;
+	
 	/** The created component. */
 	protected IComponentIdentifier	cid;
+	
+	/** True, when the plan was aborted. */
+	protected boolean	aborted;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a component plan body.
 	 */
-	public ComponentPlanBody(String component, IInternalAccess ia)
+	public ComponentPlanBody(String component, IInternalAccess ia, RPlan rplan)
 	{
 		this.component	= component;
 		this.ia	= ia;
+		this.rplan	= rplan;
 	}
 	
 	//-------- IPlanBody interface --------
@@ -46,7 +53,7 @@ public class ComponentPlanBody implements IPlanBody
 	 */
 	public Object getBody()
 	{
-		return null;
+		return cid;
 	}
 	
 	/**
@@ -55,6 +62,8 @@ public class ComponentPlanBody implements IPlanBody
 	public IFuture<Void> executePlan()
 	{
 		final Future<Void>	ret	= new Future<Void>();
+
+		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 		
 		IComponentManagementService cms = SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		cms.createComponent(null, component, new CreationInfo(ia.getComponentIdentifier()))
@@ -69,12 +78,14 @@ public class ComponentPlanBody implements IPlanBody
 			@Override
 			public void secondResultAvailable(Map<String, Object> result)
 			{
+				rplan.setLifecycleState(aborted ? RPlan.PlanLifecycleState.ABORTED : RPlan.PlanLifecycleState.PASSED);
 				ret.setResult(null);
 			}
 			
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+				rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
 				ret.setException(exception);
 			}
 		});
@@ -89,7 +100,9 @@ public class ComponentPlanBody implements IPlanBody
 	{
 		if(cid!=null)
 		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			// Hack!!! Use local cid as may be called from inner or outer component.
+			// todo: fix synchronous subcomponents!?
+			IComponentManagementService cms = SServiceProvider.getLocalService(IComponentIdentifier.LOCAL.get(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 			cms.destroyComponent(cid);
 		}
 	}
