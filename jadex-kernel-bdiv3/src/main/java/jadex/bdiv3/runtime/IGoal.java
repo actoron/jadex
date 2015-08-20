@@ -2,11 +2,12 @@ package jadex.bdiv3.runtime;
 
 import jadex.bdiv3x.runtime.IFinishableElement;
 import jadex.bdiv3x.runtime.IParameterElement;
+import jadex.commons.future.IFuture;
 
 /**
  *  Interface for a bdi goal.
  */
-public interface IGoal extends IParameterElement, IFinishableElement// needed for xml version of BDI
+public interface IGoal extends IParameterElement, IFinishableElement<Void>// needed for xml version of BDI
 {
 	//-------- goal states --------
 	
@@ -38,7 +39,7 @@ public interface IGoal extends IParameterElement, IFinishableElement// needed fo
 	/**
 	 *  Drop the goal.
 	 */
-	public void drop();
+	public IFuture<Void> drop();
 	
 	/**
 	 *  Get the lifecycle state.

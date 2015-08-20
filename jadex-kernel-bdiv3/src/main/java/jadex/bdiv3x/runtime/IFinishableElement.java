@@ -5,19 +5,19 @@ import jadex.commons.future.IResultListener;
 /**
  *  Interface for finishable elements.
  */
-public interface IFinishableElement
+public interface IFinishableElement<E>
 {
 	/**
 	 *  Add a new listener to get notified when the goal is finished.
 	 *  @param listener The listener.
 	 */
-	public void addListener(IResultListener<Void> listener);
+	public void addListener(IResultListener<E> listener);
 
 	/**
 	 *  Remove a listener.
 	 *  @param listener The listener.
 	 */
-	public void removeListener(IResultListener<Void> listener);
+	public void removeListener(IResultListener<E> listener);
 	
 	/**
 	 *  Get the exception.

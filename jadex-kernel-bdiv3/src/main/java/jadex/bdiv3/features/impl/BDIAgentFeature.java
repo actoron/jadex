@@ -34,7 +34,6 @@ import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
-import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
 import jadex.bdiv3.runtime.impl.CapabilityPojoWrapper;
@@ -1679,20 +1678,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			throw new RuntimeException("Plan model not found for: "+plan);
 		
 		final RPlan rplan = RPlan.createRPlan(mplan, plan, null, getComponent(), null, null);
-		rplan.addPlanListener(new IPlanListener<E>()
-		{
-			public void planFinished(E result)
-			{
-				if(rplan.getException()!=null)
-				{
-					ret.setException(rplan.getException());
-				}
-				else
-				{
-					ret.setResult(result);
-				}
-			}
-		});
+		rplan.addListener(new DelegationResultListener(ret));
 		rplan.setReason(new ChangeEvent(null, null, args, null));
 		RPlan.executePlan(rplan, getComponent());
 		return ret;

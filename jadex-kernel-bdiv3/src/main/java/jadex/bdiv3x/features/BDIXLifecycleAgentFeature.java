@@ -1,7 +1,5 @@
 package jadex.bdiv3x.features;
 
-import java.util.Collection;
-
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDILifecycleFeature;
 import jadex.bdiv3.model.MCapability;
@@ -10,7 +8,6 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
@@ -23,7 +20,6 @@ import jadex.bridge.component.impl.ComponentLifecycleFeature;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SUtil;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -60,7 +56,9 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	{
 		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		createStartBehavior().startBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability());
-
+		
+		
+		// Hack: throws initial events
 		MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 		MConfiguration mconfig = mcapa.getConfiguration(getComponent().getConfiguration());
 
@@ -103,34 +101,37 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	}
 	
 	/**
+	 *  Create the end behavior.
+	 */
+	protected EndBehavior createEndBehavior()
+	{
+		return new EndBehavior(component);
+	}
+	
+	/**
 	 *  Start the end state.
 	 */
-	@Override
 	public IFuture<Void> shutdown()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		
-		// Abort running plans.
-		Collection<RPlan>	plans	= bdif.getCapability().getPlans();
-		IResultListener<Void>	crl	= new CounterResultListener<Void>(plans.size(), true,
-			new DelegationResultListener<Void>(ret)
+		createEndBehavior().startEndBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability())
+			.addResultListener(new IResultListener<Void>()
 		{
-			@Override
-			public void customResultAvailable(Void result)
+			public void resultAvailable(Void result)
 			{
-				// Todo: wait for end goals and end plans
-				
-				BDIXLifecycleAgentFeature.super.shutdown()
-					.addResultListener(new DelegationResultListener<Void>(ret));
+				BDIXLifecycleAgentFeature.super.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				BDIXLifecycleAgentFeature.super.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
-		for(RPlan plan: plans)
-		{
-			plan.abort().addResultListener(crl);
-		}
-		
 		return ret;
+	
 	}
 	
 	/**
@@ -161,6 +162,37 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		 *  Create a new start behavior.
 		 */
 		public StartBehavior(IInternalAccess component)
+		{
+			super(component);
+		}
+		
+		/**
+		 *  Get the capability object (only for pojo).
+		 */
+		public Object getCapabilityObject(String name)
+		{
+			return null;
+		}
+		
+		/**
+		 *  Dispatch a top level goal.
+		 */
+		public IFuture<Object> dispatchTopLevelGoal(Object goal)
+		{
+			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
+			return bdif.getGoalbase().dispatchTopLevelGoal((IGoal)goal);
+		}
+	}
+	
+	/**
+	 *  Extracted end behavior. 
+	 */
+	public static class EndBehavior extends jadex.bdiv3.features.impl.BDILifecycleAgentFeature.EndBehavior
+	{
+		/**
+		 *  Create a new end behavior.
+		 */
+		public EndBehavior(IInternalAccess component)
 		{
 			super(component);
 		}

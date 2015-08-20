@@ -6,13 +6,14 @@ import java.util.Map;
 
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MProcessableElement;
+import jadex.bdiv3x.runtime.IFinishableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
 
 /**
  *  Element that can be finished with processing.
  */
-public abstract class RFinishableElement extends RProcessableElement
+public abstract class RFinishableElement extends RProcessableElement implements IFinishableElement<Void>
 {
 	//-------- attributes --------
 	

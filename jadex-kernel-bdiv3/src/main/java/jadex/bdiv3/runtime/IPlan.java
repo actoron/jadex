@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3x.runtime.IFinishableElement;
 import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
@@ -9,7 +10,7 @@ import jadex.rules.eca.ICondition;
 /**
  *  User interface for plans.
  */
-public interface IPlan extends IParameterElement  // todo: do not extend IParameterElement in case of non bdiv3x
+public interface IPlan extends IParameterElement, IFinishableElement<Object>  // todo: do not extend IParameterElement in case of non bdiv3x
 {
 	/**
 	 *  Get the id.
@@ -22,30 +23,14 @@ public interface IPlan extends IParameterElement  // todo: do not extend IParame
 	public IFuture<Void> abort();
 	
 	/**
-	 *  Get the exception.
-	 *  @return The exception.
-	 */
-	public Exception getException();
-	
-	/**
 	 *  Test if plan is passed.
 	 */
 	public boolean isPassed();
 	
 	/**
-	 *  Test if plan is failed.
-	 */
-	public boolean isFailed();
-	
-	/**
 	 *  Test if plan is aborted.
 	 */
 	public boolean isAborted();
-	
-	/**
-	 *  Test if plan is finished.
-	 */
-	public boolean isFinished();
 	
 	/**
 	 *  Get the reason.
@@ -139,10 +124,5 @@ public interface IPlan extends IParameterElement  // todo: do not extend IParame
 //	 * 
 //	 */
 //	public <T> IFuture<T> invokeInterruptable(IResultCommand<IFuture<T>, Void> command);
-
-	/**
-	 * 
-	 */
-	public void addPlanListener(IPlanListener<?> listener);
 
 }

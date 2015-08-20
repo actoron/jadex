@@ -68,6 +68,7 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
@@ -122,6 +123,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	{
 		return new StartBehavior(component);
 	}
+	
+	/**
+	 *  Create the end behavior.
+	 */
+	protected EndBehavior createEndBehavior()
+	{
+		return new EndBehavior(component);
+	}
 
 	/**
 	 *  Cleanup the agent.
@@ -129,27 +138,22 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	public IFuture<Void> shutdown()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		
-		// Abort running plans.
-		Collection<RPlan>	plans	= bdif.getCapability().getPlans();
-		IResultListener<Void>	crl	= new CounterResultListener<Void>(plans.size(), true,
-			new DelegationResultListener<Void>(ret)
+		createEndBehavior().startEndBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability())
+			.addResultListener(new IResultListener<Void>()
 		{
-			@Override
-			public void customResultAvailable(Void result)
+			public void resultAvailable(Void result)
 			{
-				// Todo: wait for end goals and end plans
-				
-				BDILifecycleAgentFeature.super.shutdown()
-					.addResultListener(new DelegationResultListener<Void>(ret));
+				BDILifecycleAgentFeature.super.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				BDILifecycleAgentFeature.super.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
-		for(RPlan plan: plans)
-		{
-			plan.abort().addResultListener(crl);
-		}
-		
 		return ret;
 	}
 	
@@ -267,7 +271,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	/**
 	 *  Extracted start behavior. 
 	 */
-	public static class StartBehavior
+	public static class LifecycleBehavior
 	{
 		/** The agent. */
 		protected IInternalAccess component;
@@ -275,7 +279,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		/**
 		 *  Create a new start behavior.
 		 */
-		public StartBehavior(IInternalAccess component)
+		public LifecycleBehavior(IInternalAccess component)
 		{
 			this.component = component;
 		}
@@ -296,6 +300,225 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		{
 			IBDIAgentFeature bdif = component.getComponentFeature(IBDIAgentFeature.class);
 			return bdif.dispatchTopLevelGoal(goal);
+		}
+		
+		/**
+		 * 
+		 */
+		protected IFuture<Void> dispatchConfigPlans(IInternalAccess component, List<MConfigParameterElement> cplans, IBDIModel bdimodel)
+		{
+			Future<Void> ret = new Future<Void>();
+			if(cplans!=null && cplans.size()>0)
+			{
+				FutureBarrier<Object> barrier = new FutureBarrier<Object>();
+				for(MConfigParameterElement cplan: cplans)
+				{
+					MPlan mplan = bdimodel.getCapability().getPlan(cplan.getRef());
+					// todo: allow Java plan constructor calls
+	//				Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
+					
+					// todo: bindings in config elems
+					
+					List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mplan);
+					
+					if(bindings!=null)
+					{
+						for(Map<String, Object> binding: bindings)
+						{
+							RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null, cplan);
+							barrier.addFuture(RPlan.executePlan(rplan, component));
+						}
+					}
+					// No binding: generate one candidate.
+					else
+					{
+						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null, cplan);
+						barrier.addFuture(RPlan.executePlan(rplan, component));
+					}
+				}
+				
+				barrier.waitFor().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+			return ret;
+		}
+		
+		/**
+		 * 
+		 */
+		protected IFuture<Void> dispatchConfigGoals(IInternalAccess component, List<MConfigParameterElement> cgoals, IBDIModel bdimodel)
+		{
+			Future<Void> ret = new Future<Void>();
+			if(cgoals!=null && cgoals.size()>0)
+			{
+				FutureBarrier<Object> barrier = new FutureBarrier<Object>();
+				
+				for(MConfigParameterElement cgoal: cgoals)
+				{
+					MGoal mgoal = null;
+					Class<?> gcl = null;
+					Object goal = null;
+					
+					// try to fetch via name
+					mgoal = bdimodel.getCapability().getGoal(cgoal.getRef());
+					if(mgoal==null && cgoal.getRef().indexOf(".")==-1)
+					{
+						// try with package
+						mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+cgoal.getRef());
+					}
+					
+					if(mgoal!=null)
+					{
+						gcl = mgoal.getTargetClass(component.getClassLoader());
+					}
+					// if not found, try expression
+					else
+					{
+						Object o = SJavaParser.parseExpression(cgoal.getRef(), component.getModel().getAllImports(), component.getClassLoader())
+							.getValue(CapabilityWrapper.getFetcher(component, cgoal.getCapabilityName()));
+						if(o instanceof Class)
+						{
+							gcl = (Class<?>)o;
+						}
+						else
+						{
+							goal = o;
+							gcl = o.getClass();
+						}
+						mgoal = bdimodel.getCapability().getGoal(gcl.getName());
+					}
+		
+//					// Create goal if expression available
+//					if(uexp.getName()!=null && uexp.getValue().length()>0)
+//					{
+//						Object o = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+//						if(o instanceof Class)
+//						{
+//							gcl = (Class<?>)o;
+//						}
+//						else
+//						{
+//							goal = o;
+//							gcl = o.getClass();
+//						}
+//					}
+//					
+//					if(gcl==null && uexp.getClazz()!=null)
+//					{
+//						gcl = uexp.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports());
+//					}
+//					if(gcl==null)
+//					{
+//						// try to fetch via name
+//						mgoal = bdimodel.getCapability().getGoal(uexp.getName());
+//						if(mgoal==null && uexp.getName().indexOf(".")==-1)
+//						{
+//							// try with package
+//							mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+uexp.getName());
+//						}
+//						if(mgoal!=null)
+//						{
+//							gcl = mgoal.getTargetClass(component.getClassLoader());
+//						}
+//					}						
+//					if(mgoal==null)
+//					{
+//						mgoal = bdimodel.getCapability().getGoal(gcl.getName());
+//					}
+					
+					// Create goal instance
+					if(goal==null && gcl!=null)
+					{
+						try
+						{
+							Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+							Class<?> agcl = agent.getClass();
+							Constructor<?>[] cons = gcl.getDeclaredConstructors();
+							for(Constructor<?> c: cons)
+							{
+								Class<?>[] params = c.getParameterTypes();
+								if(params.length==0)
+								{
+									// perfect found empty con
+									goal = gcl.newInstance();
+									break;
+								}
+								else if(params.length==1 && params[0].equals(agcl))
+								{
+									// found (first level) inner class constructor
+									goal = c.newInstance(new Object[]{agent});
+									break;
+								}
+							}
+						}
+						catch(RuntimeException e)
+						{
+							throw e;
+						}
+						catch(Exception e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+					
+					if(mgoal==null || (goal==null && gcl!=null))
+					{
+						throw new RuntimeException("Could not create goal: "+cgoal);
+					}
+					
+					List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal);
+					
+					if(goal==null)
+					{
+						// XML only
+						if(bindings!=null)
+						{
+							for(Map<String, Object> binding: bindings)
+							{
+								RGoal rgoal = new RGoal(component, mgoal, null, null, binding, cgoal);
+								barrier.addFuture(dispatchTopLevelGoal(rgoal));//.addResultListener(goallis);
+							}
+						}
+						// No binding: generate one candidate.
+						else
+						{
+							RGoal rgoal = new RGoal(component, mgoal, goal, null, null, cgoal);
+							barrier.addFuture(dispatchTopLevelGoal(rgoal));//.addResultListener(goallis);
+						}
+					}
+					else
+					{
+						// Pojo only
+						barrier.addFuture(dispatchTopLevelGoal(goal));//.addResultListener(goallis);								
+					}
+				}
+				
+				// wait for all goals being finished
+				barrier.waitFor().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+			
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Extracted start behavior. 
+	 */
+	public static class StartBehavior extends LifecycleBehavior
+	{
+		/**
+		 *  Create a new start behavior.
+		 */
+		public StartBehavior(IInternalAccess component)
+		{
+			super(component);
 		}
 		
 		/**
@@ -362,162 +585,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					
 					// Create initial goals
 					List<MConfigParameterElement> igoals = mconf.getInitialGoals();
-					if(igoals!=null)
-					{
-						for(MConfigParameterElement igoal: igoals)
-						{
-							MGoal mgoal = null;
-							Class<?> gcl = null;
-							Object goal = null;
-							
-							// try to fetch via name
-							mgoal = bdimodel.getCapability().getGoal(igoal.getRef());
-							if(mgoal==null && igoal.getRef().indexOf(".")==-1)
-							{
-								// try with package
-								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+igoal.getRef());
-							}
-							
-							if(mgoal!=null)
-							{
-								gcl = mgoal.getTargetClass(component.getClassLoader());
-							}
-							// if not found, try expression
-							else
-							{
-								Object o = SJavaParser.parseExpression(igoal.getRef(), component.getModel().getAllImports(), component.getClassLoader()).getValue(CapabilityWrapper.getFetcher(component, igoal.getCapabilityName()));
-								if(o instanceof Class)
-								{
-									gcl = (Class<?>)o;
-								}
-								else
-								{
-									goal = o;
-									gcl = o.getClass();
-								}
-								mgoal = bdimodel.getCapability().getGoal(gcl.getName());
-							}
-
-//							// Create goal if expression available
-//							if(uexp.getName()!=null && uexp.getValue().length()>0)
-//							{
-//								Object o = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
-//								if(o instanceof Class)
-//								{
-//									gcl = (Class<?>)o;
-//								}
-//								else
-//								{
-//									goal = o;
-//									gcl = o.getClass();
-//								}
-//							}
-//							
-//							if(gcl==null && uexp.getClazz()!=null)
-//							{
-//								gcl = uexp.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports());
-//							}
-//							if(gcl==null)
-//							{
-//								// try to fetch via name
-//								mgoal = bdimodel.getCapability().getGoal(uexp.getName());
-//								if(mgoal==null && uexp.getName().indexOf(".")==-1)
-//								{
-//									// try with package
-//									mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+uexp.getName());
-//								}
-//								if(mgoal!=null)
-//								{
-//									gcl = mgoal.getTargetClass(component.getClassLoader());
-//								}
-//							}						
-//							if(mgoal==null)
-//							{
-//								mgoal = bdimodel.getCapability().getGoal(gcl.getName());
-//							}
-							
-							// Create goal instance
-							if(goal==null && gcl!=null)
-							{
-								try
-								{
-									Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-									Class<?> agcl = agent.getClass();
-									Constructor<?>[] cons = gcl.getDeclaredConstructors();
-									for(Constructor<?> c: cons)
-									{
-										Class<?>[] params = c.getParameterTypes();
-										if(params.length==0)
-										{
-											// perfect found empty con
-											goal = gcl.newInstance();
-											break;
-										}
-										else if(params.length==1 && params[0].equals(agcl))
-										{
-											// found (first level) inner class constructor
-											goal = c.newInstance(new Object[]{agent});
-											break;
-										}
-									}
-								}
-								catch(RuntimeException e)
-								{
-									throw e;
-								}
-								catch(Exception e)
-								{
-									throw new RuntimeException(e);
-								}
-							}
-							
-							if(mgoal==null || (goal==null && gcl!=null))
-							{
-								throw new RuntimeException("Could not create initial goal: "+igoal);
-							}
-							
-							List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal);
-							
-							if(goal==null)
-							{
-								// XML only
-								if(bindings!=null)
-								{
-									for(Map<String, Object> binding: bindings)
-									{
-										RGoal rgoal = new RGoal(component, mgoal, null, null, binding, igoal);
-										dispatchTopLevelGoal(rgoal).addResultListener(goallis);
-									}
-								}
-								// No binding: generate one candidate.
-								else
-								{
-									RGoal rgoal = new RGoal(component, mgoal, goal, null, null, igoal);
-									dispatchTopLevelGoal(rgoal).addResultListener(goallis);
-								}
-							}
-							else
-							{
-								// Pojo only
-								dispatchTopLevelGoal(goal).addResultListener(goallis);								
-							}
-						}
-					}
+					dispatchConfigGoals(component, igoals, bdimodel);
 					
 					// Create initial plans
 					List<MConfigParameterElement> iplans = mconf.getInitialPlans();
-					if(iplans!=null)
-					{
-						for(MConfigParameterElement iplan: iplans)
-						{
-							MPlan mplan = bdimodel.getCapability().getPlan(iplan.getRef());
-							// todo: allow Java plan constructor calls
-		//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
-							
-							RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null, iplan);
-							RPlan.executePlan(rplan, component);
-						}
-					}
+					dispatchConfigPlans(component, iplans, bdimodel);
 
 					// Create initial events: todo
 //					List<MConfigParameterElement> ievents = mconf.getInitialEvents();
@@ -1896,6 +1968,82 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //				throw new RuntimeException();
 		}
 	}
+	
+	/**
+	 *  Extracted start behavior. 
+	 */
+	public static class EndBehavior extends LifecycleBehavior
+	{
+		/**
+		 *  Create a new start behavior.
+		 */
+		public EndBehavior(IInternalAccess component)
+		{
+			super(component);
+		}
+		
+		/**
+		 *  Start the end behavior.
+		 */
+		public IFuture<Void> startEndBehavior(final IBDIModel bdimodel, final RuleSystem rulesystem, final RCapability rcapa)
+		{
+			final Future<Void>	ret	= new Future<Void>();
+			final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+			
+			// Abort running goals.
+			Collection<RGoal> goals = bdif.getCapability().getGoals();
+			
+			// Abort running plans.
+			Collection<RPlan> plans = bdif.getCapability().getPlans();
+			
+			IResultListener<Void>	crl	= new CounterResultListener<Void>(goals.size()+plans.size(), true,
+				new DelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					String confname = component.getConfiguration();
+					if(confname!=null)
+					{
+						MConfiguration mconf = bdimodel.getCapability().getConfiguration(confname);
+						
+						if(mconf!=null)
+						{
+							CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
+								
+							// Create initial goals
+							List<MConfigParameterElement> igoals = mconf.getEndGoals();
+							dispatchConfigGoals(component, igoals, bdimodel).addResultListener(lis);
+							
+							// Create initial plans
+							List<MConfigParameterElement> iplans = mconf.getEndPlans();
+							dispatchConfigPlans(component, iplans, bdimodel).addResultListener(lis);
+						}
+						else
+						{
+							ret.setResult(null);
+						}
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+				}
+			});
+			
+			for(RGoal goal: goals)
+			{
+				goal.drop().addResultListener(crl);
+			}
+			
+			for(RPlan plan: plans)
+			{
+				plan.abort().addResultListener(crl);
+			}
+			
+			return ret;
+		}
+	}
+	
 }
 
 

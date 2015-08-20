@@ -34,6 +34,8 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.rules.eca.Event;
@@ -1059,16 +1061,25 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //	}
 	
 	/**
-	 * 
+	 *  Drop the goal.
 	 */
-	public void drop()
+	public IFuture<Void> drop()
 	{
+		Future<Void> ret = new Future<Void>();
+		
 		if(!GoalLifecycleState.NEW.equals(getLifecycleState())
 			&& !GoalLifecycleState.DROPPING.equals(getLifecycleState()) 
 			&& !GoalLifecycleState.DROPPED.equals(getLifecycleState()))
 		{
+			addListener(new DelegationResultListener<Void>(ret));
 			setLifecycleState(getAgent(), GoalLifecycleState.DROPPING);
 		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	/**

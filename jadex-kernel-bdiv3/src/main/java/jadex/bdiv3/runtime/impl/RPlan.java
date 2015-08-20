@@ -24,8 +24,8 @@ import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3x.runtime.IFinishableElement;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
@@ -149,7 +149,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //	protected IInternalAccess ia;
 	
 	/** The plan listeners. */
-	protected List<IPlanListener<?>> listeners;
+//	protected List<IPlanListener<?>> listeners;
+	protected List<IResultListener<Object>> listeners;
 	
 	/** The wait cnt for rule names. */
 	protected int cnt;
@@ -395,11 +396,17 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 *  Execute a plan.
 	 */
-	public static void executePlan(RPlan rplan, IInternalAccess ia)
+	public static IFuture<Object> executePlan(RPlan rplan, IInternalAccess ia)
 	{
+		Future<Object> ret = new Future<Object>();
+		
 //		executePlan(rplan, ia, null);
 		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
 		ia.getExternalAccess().scheduleStep(action);
+		
+		rplan.addListener(new DelegationResultListener<Object>(ret));
+		
+		return ret;
 	}
 	
 //	/**
@@ -520,13 +527,14 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			}
 			
 			// todo: where to notify listeners
-			if(listeners!=null && listeners.size()>0)
-			{
-				for(IPlanListener<?> lis: listeners)
-				{
-					((IPlanListener)lis).planFinished(getResult());
-				}
-			}
+			notifyListeners();
+//			if(listeners!=null && listeners.size()>0)
+//			{
+//				for(IPlanListener<?> lis: listeners)
+//				{
+//					((IPlanListener)lis).planFinished(getResult());
+//				}
+//			}
 		}
 		
 //		if(PlanLifecycleState.PASSED.equals(lifecyclestate)
@@ -535,6 +543,68 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //		{
 //			System.out.println("plan lifecycle: "+lifecyclestate+", "+this);
 //		}
+	}
+	
+	/**
+	 *  Notify the listeners.
+	 */
+	public void notifyListeners()
+	{
+		if(getListeners()!=null)
+		{
+			for(IResultListener<Object> lis: getListeners())
+			{
+				if(isSucceeded())
+				{
+					lis.resultAvailable(getResult());
+				}
+				else if(isFailed())
+				{
+					lis.exceptionOccurred(exception);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Add a new listener to get notified when the goal is finished.
+	 *  @param listener The listener.
+	 */
+	public void addListener(IResultListener<Object> listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList<IResultListener<Object>>();
+		
+		if(isSucceeded())
+		{
+			listener.resultAvailable(null);
+		}
+		else if(isFailed())
+		{
+			listener.exceptionOccurred(exception);
+		}
+		else
+		{
+			listeners.add(listener);
+		}
+	}
+	
+	/**
+	 *  Remove a listener.
+	 */
+	public void removeListener(IResultListener<Object> listener)
+	{
+		if(listeners!=null)
+			listeners.remove(listener);
+	}
+	
+	/**
+	 *  Get the listeners.
+	 *  @return The listeners.
+	 */
+	public List<IResultListener<Object>> getListeners()
+	{
+		return listeners;
 	}
 	
 	/**
@@ -804,6 +874,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void>	abort()
 	{
+		System.out.println("aborting: "+this);
+		
 		if(!isFinishing())
 		{
 			setFinishing();
@@ -1725,15 +1797,15 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	public void addPlanListener(IPlanListener<?> listener)
-	{
-		if(listeners==null)
-			listeners = new ArrayList<IPlanListener<?>>();
-		listeners.add(listener);
-	}
+//	/**
+//	 * 
+//	 */
+//	public void addPlanListener(IPlanListener<?> listener)
+//	{
+//		if(listeners==null)
+//			listeners = new ArrayList<IPlanListener<?>>();
+//		listeners.add(listener);
+//	}
 	
 	/**
 	 * 
@@ -1865,6 +1937,21 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		});
 		rule.setEvents(events);
 		getAgent().getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().updateRule(rule);
+	}
+	
+//	/**
+//	 *  Get the exception.
+//	 *  @return The exception.
+//	 */
+//	public Exception getException();
+	
+	/**
+	 *  Test if element is succeeded.
+	 *  @return True, if is succeeded.
+	 */
+	public boolean	isSucceeded()
+	{
+		return isPassed();
 	}
 	
 //	/**
