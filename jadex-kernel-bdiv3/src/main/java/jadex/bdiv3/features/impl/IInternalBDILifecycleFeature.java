@@ -16,4 +16,16 @@ public interface IInternalBDILifecycleFeature
 	 *  @param The inited state.
 	 */
 	public void setInited(boolean inited);
+	
+	/**
+	 *  Get the shutdown.
+	 *  @return The shutdown.
+	 */
+	public boolean isShutdown();
+	
+	/**
+	 *  Set the shutdown state.
+	 *  @param The shutdown state.
+	 */
+	public void setShutdown(boolean shutdown);
 }

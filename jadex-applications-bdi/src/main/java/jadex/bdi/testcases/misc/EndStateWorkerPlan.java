@@ -4,8 +4,11 @@ import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,7 @@ public class EndStateWorkerPlan extends Plan
 	 */
 	public void aborted()
 	{
-		List	reports	= new ArrayList();
+		final List<TestReport> reports = new ArrayList<TestReport>();
 		
 		// Test abortion of agenda actions (goal and plan creation actions should have been aborted).
 		waitFor(20);
@@ -100,28 +103,66 @@ public class EndStateWorkerPlan extends Plan
 		}
 		reports.add(report);
 
-		// Wait for testcases of end state elements.
-		try
-		{
-			waitForCondition("end_tests_finished", 1000);
-		}
-		catch(TimeoutException e)
-		{
-		}
-
-		TestReport[]	areports	= (TestReport[])getBeliefbase().getBeliefSet("reports").getFacts();
-		for(int i=0; i<areports.length; i++)
-		{
-			if(!areports[i].isSucceeded())
-			{
-				areports[i].setFailed("End element was not created");
-			}
-			reports.add(areports[i]);
-		}
+		getBeliefbase().getBeliefSet("myreports").addFacts(reports.toArray(new TestReport[reports.size()]));
 		
-		// Finally send reports to test agent.
-		IMessageEvent	msg	= createMessageEvent("inform_reports");
-		msg.getParameter(SFipa.CONTENT).setValue(reports);
-		sendMessage(msg).get();
+//		getAgent().getExternalAccess().scheduleStep(new IComponentStep<Void>()
+//		{
+//			boolean first = true;
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				System.out.println("xxxxx: "+first);
+//				TestReport[] areports = (TestReport[])getBeliefbase().getBeliefSet("reports").getFacts();
+//				
+//				if(!isFinished() && first)
+//				{
+//					first = false;
+//					getAgent().getExternalAccess().scheduleStep(this, 2000);
+//				}
+//				
+//				// Wait for testcases of end state elements.
+////				try
+////				{
+////					waitForCondition("end_tests_finished", 5000);
+////				}
+////				catch(TimeoutException e)
+////				{
+////					System.out.println("timeout end");
+////				}
+//
+//				for(int i=0; i<areports.length; i++)
+//				{
+//					if(!areports[i].isSucceeded())
+//					{
+//						areports[i].setFailed("End element was not created");
+//					}
+//					reports.add(areports[i]);
+//				}
+//				
+//				// Finally send reports to test agent.
+//				IMessageEvent	msg	= createMessageEvent("inform_reports");
+//				System.out.println("resports: ");
+//				for(TestReport tr: reports)
+//				{
+//					System.out.println(tr.getName()+": "+tr.isSucceeded());
+//				}
+//				msg.getParameter(SFipa.CONTENT).setValue(reports);
+//				sendMessage(msg).get();
+//				
+//				return IFuture.DONE;
+//			}
+//			
+//			protected boolean isFinished()
+//			{
+//				boolean fin = false;
+//				for(TestReport tr: reports)
+//				{
+//					if(!tr.isFinished())
+//					{
+//						break;
+//					}
+//				}
+//				return fin;
+//			}
+//		});
 	}
 }

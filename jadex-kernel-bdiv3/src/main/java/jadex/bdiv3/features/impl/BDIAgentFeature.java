@@ -2566,6 +2566,29 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			return new Future<Tuple2<Boolean,Object>>(!capa.getPlans(mplan).isEmpty()? ICondition.TRUE: ICondition.FALSE);
 		}
 	}
+	
+	/**
+	 *  Condition that tests if goal instances of an mgoal exist.
+	 */
+	public static class NotInShutdownCondition implements ICondition
+	{
+		protected IInternalAccess component;
+		
+		public NotInShutdownCondition(IInternalAccess component)
+		{
+			this.component = component;
+		}
+		
+		/**
+		 *  Test if is in shutdown.
+		 */
+		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+		{
+			IInternalBDILifecycleFeature bdil = (IInternalBDILifecycleFeature)component.getComponentFeature(ILifecycleComponentFeature.class);
+			boolean res = !bdil.isShutdown();
+			return new Future<Tuple2<Boolean,Object>>(res? ICondition.TRUE: ICondition.FALSE);
+		}
+	}
 		
 	/**
 	 *  Get the current state as events.

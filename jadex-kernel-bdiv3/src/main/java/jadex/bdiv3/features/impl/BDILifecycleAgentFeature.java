@@ -16,15 +16,19 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature.GoalsExistCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.LifecycleStateCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.PlansExistCondition;
+import jadex.bdiv3.features.impl.BDIAgentFeature.NotInShutdownCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfigBeliefElement;
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInternalEvent;
+import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MPlan;
@@ -42,6 +46,10 @@ import jadex.bdiv3.runtime.impl.RParameterElement.RParameterSet;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
+import jadex.bdiv3x.runtime.IInternalEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.RInternalEvent;
+import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -49,6 +57,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ILifecycleComponentFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
@@ -97,6 +106,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	/** Is the agent inited and allowed to execute rules? */
 	protected boolean inited;
 	
+	/** Is the agent in shutdown?. */
+	protected boolean shutdown;
+	
 	/**
 	 *  Factory method constructor for instance level.
 	 */
@@ -137,9 +149,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	 */
 	public IFuture<Void> shutdown()
 	{
+		setShutdown(true);
+		
 		final Future<Void>	ret	= new Future<Void>();
 		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
-		
+
 		createEndBehavior().startEndBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability())
 			.addResultListener(new IResultListener<Void>()
 		{
@@ -216,8 +230,27 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		this.inited = inited;
 	}
 	
-	// for xml
+
+	/**
+	 *  Get the shutdown. 
+	 *  @return The shutdown
+	 */
+	public boolean isShutdown()
+	{
+		return shutdown;
+	}
+
+	/**
+	 *  Set the shutdown.
+	 *  @param shutdown The shutdown to set
+	 */
+	public void setShutdown(boolean shutdown)
+	{
+		this.shutdown = shutdown;
+	}
 	
+	// for xml
+
 	/**
 	 *  Evaluate the condition.
 	 *  @return
@@ -300,6 +333,24 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		{
 			IBDIAgentFeature bdif = component.getComponentFeature(IBDIAgentFeature.class);
 			return bdif.dispatchTopLevelGoal(goal);
+		}
+		
+		/**
+		 *  Dispatch a message event.
+		 */
+		public IFuture<Void> sendMessageEvent(IMessageEvent message)
+		{
+			IMessageFeature mf = component.getComponentFeature(IMessageFeature.class);
+			return mf.sendMessage((Map<String, Object>)message.getMessage(), message.getMessageType());
+		}
+		
+		/**
+		 *  Dispatch an internal event.
+		 */
+		public IFuture<Void> dispatchInternalEvent(IInternalEvent event)
+		{
+			// Pojo bdi does not support internal events
+			throw new UnsupportedOperationException();
 		}
 		
 		/**
@@ -506,6 +557,39 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			return ret;
 		}
+		
+		/**
+		 * 
+		 */
+		protected IFuture<Void> dispatchConfigEvents(IInternalAccess component, List<MConfigParameterElement> cevents, IBDIModel bdimodel)
+		{
+			Future<Void> ret = new Future<Void>();
+			FutureBarrier<Void> barrier = new FutureBarrier<Void>();
+			
+			IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+			MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
+			
+			// Send initial messages
+			// Throw initial internal events
+			for(MConfigParameterElement cpe: SUtil.safeList(cevents))
+			{
+				MInternalEvent mievent = mcapa.getInternalEvent(cpe.getRef());
+				if(mievent!=null)
+				{
+					RInternalEvent rievent = new RInternalEvent(mievent, component, cpe);
+					dispatchInternalEvent(rievent);
+				}
+				else
+				{
+					MMessageEvent mmevent = mcapa.getResolvedMessageEvent(null, cpe.getRef());
+					RMessageEvent rmevent = new RMessageEvent(mmevent, component, cpe);
+					barrier.addFuture(sendMessageEvent(rmevent));
+				}
+			}
+			
+			barrier.waitFor().addResultListener(new DelegationResultListener<Void>(ret));
+			return ret;
+		}
 	}
 	
 	/**
@@ -591,28 +675,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					List<MConfigParameterElement> iplans = mconf.getInitialPlans();
 					dispatchConfigPlans(component, iplans, bdimodel);
 
-					// Create initial events: todo
-//					List<MConfigParameterElement> ievents = mconf.getInitialEvents();
-//					if(ievents!=null)
-//					{
-//						for(MConfigParameterElement ievent: ievents)
-//						{
-//							if(bdimodel.getCapability().hasInternalEvent(ievent.getName()))
-//							{
-//								IInt	bdif.getCapability().getEventbase().createInternalEvent(ievent.getName());
-//							}
-//							else
-//							{
-//								
-//							}
-//							MPlan mplan = bdimodel.getCapability().getPlan(ievent.getName());
-//							// todo: allow Java plan constructor calls
-//		//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
-//						
-//							RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null);
-//							RPlan.executePlan(rplan, component);
-//						}
-//					}
+					// Create initial events
+					List<MConfigParameterElement> ievents = mconf.getInitialEvents();
+					dispatchConfigEvents(component, ievents, bdimodel);
 				}
 			}
 			
@@ -910,7 +975,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							final Constructor<?> c = cond.getConstructorTarget().getConstructor(component.getClassLoader());
 							
 							Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-								ICondition.TRUE_CONDITION, new IAction<Void>()
+								new NotInShutdownCondition(component), new IAction<Void>()
 							{
 								public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 								{
@@ -992,7 +1057,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
 							
 							Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-								new MethodCondition(null, m)
+								new CombinedCondition(new ICondition[]{new NotInShutdownCondition(component), new MethodCondition(null, m)
 							{
 								protected Object invokeMethod(IEvent event) throws Exception
 								{
@@ -1001,7 +1066,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										mgoal, new ChangeEvent(event), null, null, component);
 									return pvals!=null? m.invoke(null, pvals): null;
 								}
-							}, new IAction<Void>()
+							}}), new IAction<Void>()
 							{
 								public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 								{
@@ -1060,7 +1125,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						else
 						{
 							Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-								new EvaluateExpressionCondition(component, cond, mgoal, null), new IAction<Void>()
+								new CombinedCondition(new ICondition[]{new NotInShutdownCondition(component), new EvaluateExpressionCondition(component, cond, mgoal, null)}), new IAction<Void>()
 							{
 								public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 								{
@@ -1578,6 +1643,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					List<String> fas = trigger.getFactAddeds();
 					if(fas!=null && fas.size()>0)
 					{
+						// todo: hmm turn off these too? new NotInShutdownCondition(component)
 						Rule<Void> rule = new Rule<Void>("create_plan_factadded_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
 						for(String fa: fas)
 						{
@@ -1623,7 +1689,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					final MCondition mcond = trigger.getCondition();
 					if(mcond!=null)
 					{
-						Rule<Void> rule = new Rule<Void>("create_plan_condition_"+mplan.getName(), new ICondition()
+						Rule<Void> rule = new Rule<Void>("create_plan_condition_"+mplan.getName(), new CombinedCondition(new ICondition[]{new NotInShutdownCondition(component), new ICondition()
 						{
 							public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 							{
@@ -1631,7 +1697,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(CapabilityWrapper.getFetcher(component, uexp.getLanguage()));
 								return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 							}
-						}, createplan);
+						}}), createplan);
 						rule.setEvents(mcond.getEvents());
 						rulesystem.getRulebase().addRule(rule);
 					}
@@ -2008,15 +2074,19 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						
 						if(mconf!=null)
 						{
-							CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
+							CounterResultListener<Void> lis = new CounterResultListener<Void>(3, new DelegationResultListener<Void>(ret));
 								
-							// Create initial goals
+							// Create end goals
 							List<MConfigParameterElement> igoals = mconf.getEndGoals();
 							dispatchConfigGoals(component, igoals, bdimodel).addResultListener(lis);
 							
-							// Create initial plans
+							// Create end plans
 							List<MConfigParameterElement> iplans = mconf.getEndPlans();
 							dispatchConfigPlans(component, iplans, bdimodel).addResultListener(lis);
+							
+							// Create end events
+							List<MConfigParameterElement> ievents = mconf.getEndEvents();
+							dispatchConfigEvents(component, ievents, bdimodel).addResultListener(lis);
 						}
 						else
 						{
@@ -2043,7 +2113,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			return ret;
 		}
 	}
-	
+
 }
 
 

@@ -36,6 +36,7 @@
 			<fact>new TestReport("capability end internal event", "Test if capability end internal event is dispatched")</fact>
 			<fact>new TestReport("capability end message event", "Test if capability end message event is sent")</fact>
 		</beliefset>
+		<beliefset name="myreports" class="TestReport"/>
 	</beliefs>
 	
 	<goals>
@@ -94,6 +95,9 @@
 			<parameter name="content" class="String"/>
 			<body class="EndStateWorkerTestPlan"/>
 		</plan>
+		<plan name="sendreports">
+			<body class="EndStateWorkerSendReportsPlan"/>
+		</plan>
 	</plans>
 	
 	<events>
@@ -131,7 +135,8 @@
 			 been triggered and therefore there is no more unsucceeded test. -->
 		<condition name="end_tests_finished">
 			(select one TestReport $report from $beliefbase.reports
-				where !$report.isSucceeded())==null
+				where !$report.isFinished())==null
+				//where !$report.isSucceeded())==null
 		</condition>
 	</expressions>
 	
@@ -153,6 +158,7 @@
 						<value>"end plan"</value>
 					</parameter>
 				</endplan>
+				<endplan ref="sendreports"/>
 			</plans>
 			<events>
 				<endinternalevent ref="endevent"/>

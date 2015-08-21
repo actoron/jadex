@@ -1,5 +1,7 @@
 package jadex.bdiv3x.features;
 
+import java.util.Map;
+
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDILifecycleFeature;
 import jadex.bdiv3.model.MCapability;
@@ -8,12 +10,15 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IInternalEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.ILifecycleComponentFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ComponentLifecycleFeature;
@@ -40,6 +45,9 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	/** Is the agent inited and allowed to execute rules? */
 	protected boolean inited;
 	
+	/** Is the agent in shutdown?. */
+	protected boolean shutdown;
+	
 	/**
 	 *  Factory method constructor for instance level.
 	 */
@@ -56,38 +64,6 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	{
 		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		createStartBehavior().startBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability());
-		
-		
-		// Hack: throws initial events
-		MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
-		MConfiguration mconfig = mcapa.getConfiguration(getComponent().getConfiguration());
-
-		if(mconfig!=null)
-		{
-			// Send initial messages
-			// Throw initial internal events
-			for(MConfigParameterElement cpe: SUtil.safeList(mconfig.getInitialEvents()))
-			{
-				MInternalEvent mievent = mcapa.getInternalEvent(cpe.getRef());
-				if(mievent!=null)
-				{
-					RInternalEvent rievent = new RInternalEvent(mievent, getComponent(), cpe);
-					bdif.getCapability().getEventbase().dispatchInternalEvent(rievent);
-				}
-				else
-				{
-					MMessageEvent mmevent = mcapa.getResolvedMessageEvent(null, cpe.getRef());
-					RMessageEvent rmevent = new RMessageEvent(mmevent, getComponent(), cpe);
-					bdif.getCapability().getEventbase().sendMessage(rmevent).addResultListener(new DefaultResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-					});
-				}
-			}
-		}
-		
 //		inited	= true;
 		return super.body();
 	}
@@ -113,6 +89,8 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	 */
 	public IFuture<Void> shutdown()
 	{
+		setShutdown(true);
+		
 		final Future<Void>	ret	= new Future<Void>();
 		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		
@@ -154,6 +132,24 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	}
 	
 	/**
+	 *  Get the shutdown. 
+	 *  @return The shutdown
+	 */
+	public boolean isShutdown()
+	{
+		return shutdown;
+	}
+
+	/**
+	 *  Set the shutdown.
+	 *  @param shutdown The shutdown to set
+	 */
+	public void setShutdown(boolean shutdown)
+	{
+		this.shutdown = shutdown;
+	}
+	
+	/**
 	 *  Extracted start behavior. 
 	 */
 	public static class StartBehavior extends jadex.bdiv3.features.impl.BDILifecycleAgentFeature.StartBehavior
@@ -181,6 +177,25 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		{
 			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
 			return bdif.getGoalbase().dispatchTopLevelGoal((IGoal)goal);
+		}
+		
+//		/**
+//		 *  Dispatch a message event.
+//		 */
+//		public IFuture<Void> dispatchMessageEvent(IMessageEvent message)
+//		{
+//			IBDIMessageFeature mf = component.getComponentFeature(IMessageFeature.class);
+//			return mf.sendMessage((Map<String, Object>)message.getMessage(), message.getMessageType());
+//		}
+		
+		/**
+		 *  Dispatch an internal event.
+		 */
+		public IFuture<Void> dispatchInternalEvent(IInternalEvent event)
+		{
+			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
+			bdif.getEventbase().dispatchInternalEvent(event);
+			return IFuture.DONE;
 		}
 	}
 	
@@ -212,6 +227,25 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		{
 			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
 			return bdif.getGoalbase().dispatchTopLevelGoal((IGoal)goal);
+		}
+		
+		/**
+//		 *  Dispatch a message event.
+//		 */
+//		public IFuture<Void> dispatchMessageEvent(IMessageEvent message)
+//		{
+//			IBDIMessageFeature mf = component.getComponentFeature(IMessageFeature.class);
+//			return mf.sendMessage((Map<String, Object>)message.getMessage(), message.getMessageType());
+//		}
+		
+		/**
+		 *  Dispatch an internal event.
+		 */
+		public IFuture<Void> dispatchInternalEvent(IInternalEvent event)
+		{
+			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
+			bdif.getEventbase().dispatchInternalEvent(event);
+			return IFuture.DONE;
 		}
 	}
 }
