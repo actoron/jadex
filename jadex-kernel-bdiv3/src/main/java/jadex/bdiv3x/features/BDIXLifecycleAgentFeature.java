@@ -1,31 +1,18 @@
 package jadex.bdiv3x.features;
 
-import java.util.Map;
-
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDILifecycleFeature;
-import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MConfigParameterElement;
-import jadex.bdiv3.model.MConfiguration;
-import jadex.bdiv3.model.MInternalEvent;
-import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IInternalEvent;
-import jadex.bdiv3x.runtime.IMessageEvent;
-import jadex.bdiv3x.runtime.RInternalEvent;
-import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.ILifecycleComponentFeature;
-import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ComponentLifecycleFeature;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -81,7 +68,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	 */
 	protected EndBehavior createEndBehavior()
 	{
-		return new EndBehavior(component);
+		return new EndBehavior(component); 
 	}
 	
 	/**
@@ -89,7 +76,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	 */
 	public IFuture<Void> shutdown()
 	{
-		setShutdown(true);
+		setShutdown(true); 
 		
 		final Future<Void>	ret	= new Future<Void>();
 		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);

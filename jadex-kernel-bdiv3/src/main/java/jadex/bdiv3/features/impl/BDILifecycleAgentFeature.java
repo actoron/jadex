@@ -2050,6 +2050,10 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		
 		/**
 		 *  Start the end behavior.
+		 *  
+		 *  todo: problem with events
+		 *  it is unclear how to wait for processing end of internal/end events 
+		 *  solution: do not allow posting end events?!
 		 */
 		public IFuture<Void> startEndBehavior(final IBDIModel bdimodel, final RuleSystem rulesystem, final RCapability rcapa)
 		{

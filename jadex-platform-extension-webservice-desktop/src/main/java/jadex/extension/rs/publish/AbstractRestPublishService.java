@@ -9,7 +9,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import javax.servlet.AsyncContext;
-import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,11 +31,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
@@ -61,7 +54,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
-import jadex.extension.rs.publish.JettyRestServicePublishService.MappingInfo.HttpMethod;
+import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
@@ -78,7 +71,7 @@ import jadex.xml.bean.JavaWriter;
  *  todo: make abstract base class without Jetty deps
  */
 @Service
-public class JettyRestServicePublishService implements IWebPublishService
+public abstract class AbstractRestPublishService implements IWebPublishService
 {
 	/** Http header for the call id. */
 	public static final String HEADER_JADEX_CALLID = "x-jadex-callid";
@@ -89,13 +82,9 @@ public class JettyRestServicePublishService implements IWebPublishService
 	/** Http header for the call id. */
 	public static final String HEADER_JADEX_CLIENTTIMEOUT = "x-jadex-clienttimeout";
 
-	
 	/** Finished result marker. */
 	public static final String FINISHED = "finished";
 	
-	// Hack constant for enabling multi-part :-(
-	private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
-
 	/** Some basic media types for service invocations. */
 	public static List<String> PARAMETER_MEDIATYPES = Arrays.asList(new String[]{MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML});
 	
@@ -103,11 +92,11 @@ public class JettyRestServicePublishService implements IWebPublishService
     @ServiceComponent
     protected IInternalAccess component;
 
-    /** The servers per service id. */
-    protected Map<IServiceIdentifier, Server> sidservers;
-
-    /** The servers per port. */
-    protected Map<Integer, Server> portservers;
+//    /** The servers per service id. */
+//    protected Map<IServiceIdentifier, Server> sidservers;
+//
+//    /** The servers per port. */
+//    protected Map<Integer, Server> portservers;
     
     /** The results per call (coming from the called Jadex service). */
     protected MultiCollection<String, ResultInfo> resultspercall = new MultiCollection<String, ResultInfo>();
@@ -157,211 +146,179 @@ public class JettyRestServicePublishService implements IWebPublishService
     }
 
     /**
+     * 
+     */
+    public void handleRequest(IService service, URI uri, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
+    {
+//    	System.out.println("handler is: "+uri.getPath());
+
+        // check if call is an intermediate result fetch
+        String callid = request.getHeader(HEADER_JADEX_CALLID);
+               
+        // requestpercall is used to signal an ongoing conversation
+        if(requestspercall.containsKey(callid))
+        {
+        	Collection<ResultInfo> results = resultspercall.get(callid);
+        	if(results!=null && results.size()>0)
+        	{
+        		ResultInfo result = results.iterator().next();
+        		results.remove(result);
+        		
+        		writeResponse(result.getResult(), callid, result.getMappingInfo(), request, response, false);
+        	}
+        	else
+        	{
+        		AsyncContext ctx = request.startAsync();
+        		saveRequestContext(callid, ctx);
+        	}
+        }
+        else if(callid!=null)
+        {
+        	writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
+        }
+        // handle new call
+        else
+        {
+            String methodname = request.getPathInfo();
+
+            if(methodname.startsWith("/"))
+                methodname = methodname.substring(1);
+
+            if(mappings.containsKey(methodname))
+            {
+                try
+                {
+//                          out.println("<h1>" + "Found method - calling service: " + mappings.get(methodname).getMethod().getName() + "</h1>");
+                    Collection<MappingInfo> mis = mappings.get(methodname);
+                    
+                    // convert and map parameters
+                    Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis);
+                    final MappingInfo mi = tup.getFirstEntity();
+                    Object[] params = tup.getSecondEntity();
+                    
+                    // invoke the service method
+                    final Method method = mi.getMethod();
+                	
+                	Object ret = method.invoke(service, params);
+                
+                    if(ret instanceof IIntermediateFuture)
+                    {
+                    	final AsyncContext ctx = request.startAsync();
+                    	final String fcallid = SUtil.createUniqueId(methodname);
+                    	saveRequestContext(fcallid, ctx);
+//                    	System.out.println("added context: "+fcallid+" "+ctx);
+                    	
+                    	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(new IIntermediateResultListener<Object>()
+						{
+                    		public void resultAvailable(Collection<Object> result)
+                    		{
+                    			for(Object res: result)
+                    			{
+                    				intermediateResultAvailable(res);
+                    			}
+                    		}
+                    		
+                    		public void exceptionOccurred(Exception exception)
+                    		{
+                    			Object result = mapResult(method, exception);
+                    			writeResponse(result, null, mi, request, response, true);
+                    		}
+                    		
+                    		public void intermediateResultAvailable(Object result)
+                    		{
+                    			result = mapResult(method, result);
+                    			
+                    			if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size()>0)
+                    			{
+                    				Collection<AsyncContext> cls = requestspercall.get(fcallid);
+                    				AsyncContext ctx = cls.iterator().next();
+                    				cls.remove(ctx);
+                    				
+//                    				System.out.println("removed context: "+fcallid+" "+ctx);
+                    				writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
+                    				ctx.complete();
+                    			}
+                    			else
+                    			{
+                    				resultspercall.add(fcallid, new ResultInfo(result, fcallid, mi));
+                    			}
+                    		}
+                    		
+                    	    public void finished()
+                    	    {
+                    	    	// maps will be cleared when processing fin element in writeResponse
+                    	    	intermediateResultAvailable(FINISHED);
+                    	    }
+						});
+                    }
+                    else if(ret instanceof IFuture)
+                    {
+                    	final AsyncContext ctx = request.startAsync();
+                    	
+                    	((IFuture)ret).addResultListener(new IResultListener<Object>()
+						{
+                    		public void resultAvailable(Object ret)
+                    		{
+                    			ret = mapResult(method, ret);
+                    			writeResponse(ret, null, mi, request, response, true);
+                    			ctx.complete();
+                    		}
+
+                    		public void exceptionOccurred(Exception exception)
+                    		{
+                    			Object result = mapResult(method, exception);
+                    			writeResponse(exception, null, mi, request, response, true);
+                    			ctx.complete();
+                    		}
+						});
+                        ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
+                    }
+                    else
+                    {
+//	                        	System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
+                    	// map the result by user defined mappers
+                    	ret = mapResult(method, ret);
+                    	// convert content and write result to servlet response
+                    	writeResponse(ret, null, mi, request, response, true);
+                    }
+                }
+                catch(Exception e)
+                {
+                	writeResponse(e, null, null, request, response, true);
+                }
+            }
+            else
+            {
+                PrintWriter out = response.getWriter();
+                
+                response.setContentType("text/html; charset=utf-8");
+                response.setStatus(HttpServletResponse.SC_OK);
+            
+                String info = getServiceInfo(service, uri, mappings);
+                out.write(info);
+                
+//                      out.println("<h1>" + "Found no method mapping, available are: " + "</h1>");
+//                      out.println("<ul>");
+//                      for(Map.Entry<String, Collection<MappingInfo>> entry: mappings.entrySet())
+//                      {
+//                      	for(MappingInfo mi: entry.getValue())
+//                      	{
+//                      		out.println(entry.getKey()+" -> "+mi.getMethod().getName()+"<br/>");
+//                      	}
+//                      }
+//                      out.println("</ul>");
+//                      System.out.println(mappings);
+            }
+        }
+    }
+    
+    /**
      *  Publish a service.
      *  @param cl The classloader.
      *  @param service The original service.
      *  @param pid The publish id (e.g. url or name).
      */
-    public IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info)
-    {
-        try
-        {
-            final URI uri = new URI(info.getPublishId());
-            Server server = getHttpServer(uri, info);
-            System.out.println("Adding http handler to server: "+uri.getPath());
-
-            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
-
-            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
-
-            ContextHandler ch = new ContextHandler()
-            {
-                public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
-                    throws IOException, ServletException
-                {
-//                  System.out.println("handler is: "+uri.getPath());
-
-                    // check if call is an intermediate result fetch
-                    String callid = request.getHeader(HEADER_JADEX_CALLID);
-                           
-                    // requestpercall is used to signal an ongoing conversation
-                    if(requestspercall.containsKey(callid))
-                    {
-                    	Collection<ResultInfo> results = resultspercall.get(callid);
-                    	if(results!=null && results.size()>0)
-                    	{
-                    		ResultInfo result = results.iterator().next();
-                    		results.remove(result);
-                    		
-                    		writeResponse(result.getResult(), callid, result.getMappingInfo(), request, response, false);
-                    	}
-                    	else
-                    	{
-                    		AsyncContext ctx = request.startAsync();
-                    		saveRequestContext(callid, ctx);
-                    	}
-                    }
-                    else if(callid!=null)
-                    {
-                    	writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
-                    }
-                    // handle new call
-                    else
-                    {
-	                    // Hack to enable multi-part
-	                    // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
-	                    if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
-	                    	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
-	                    
-	                    String methodname = request.getPathInfo();
-	
-	                    if(methodname.startsWith("/"))
-	                        methodname = methodname.substring(1);
-	
-	                    if(mappings.containsKey(methodname))
-	                    {
-	                        try
-	                        {
-	//                          out.println("<h1>" + "Found method - calling service: " + mappings.get(methodname).getMethod().getName() + "</h1>");
-	                            Collection<MappingInfo> mis = mappings.get(methodname);
-	                            
-	                            // convert and map parameters
-	                            Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis);
-	                            final MappingInfo mi = tup.getFirstEntity();
-	                            Object[] params = tup.getSecondEntity();
-	                            
-	                            // invoke the service method
-	                            final Method method = mi.getMethod();
-	                        	
-	                        	Object ret = method.invoke(service, params);
-	                        
-		                        if(ret instanceof IIntermediateFuture)
-		                        {
-		                        	final AsyncContext ctx = request.startAsync();
-		                        	final String fcallid = SUtil.createUniqueId(methodname);
-		                        	saveRequestContext(fcallid, ctx);
-//		                        	System.out.println("added context: "+fcallid+" "+ctx);
-		                        	
-		                        	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(new IIntermediateResultListener<Object>()
-									{
-		                        		public void resultAvailable(Collection<Object> result)
-		                        		{
-		                        			for(Object res: result)
-		                        			{
-		                        				intermediateResultAvailable(res);
-		                        			}
-		                        		}
-		                        		
-		                        		public void exceptionOccurred(Exception exception)
-		                        		{
-		                        			Object result = mapResult(method, exception);
-		                        			writeResponse(result, null, mi, request, response, true);
-		                        		}
-		                        		
-		                        		public void intermediateResultAvailable(Object result)
-		                        		{
-		                        			result = mapResult(method, result);
-		                        			
-		                        			if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size()>0)
-		                        			{
-		                        				Collection<AsyncContext> cls = requestspercall.get(fcallid);
-		                        				AsyncContext ctx = cls.iterator().next();
-		                        				cls.remove(ctx);
-		                        				
-//		                        				System.out.println("removed context: "+fcallid+" "+ctx);
-		                        				writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
-		                        				ctx.complete();
-		                        			}
-		                        			else
-		                        			{
-		                        				resultspercall.add(fcallid, new ResultInfo(result, fcallid, mi));
-		                        			}
-		                        		}
-		                        		
-		                        	    public void finished()
-		                        	    {
-		                        	    	// maps will be cleared when processing fin element in writeResponse
-		                        	    	intermediateResultAvailable(FINISHED);
-		                        	    }
-									});
-		                        }
-		                        else if(ret instanceof IFuture)
-		                        {
-		                        	final AsyncContext ctx = request.startAsync();
-		                        	
-		                        	((IFuture)ret).addResultListener(new IResultListener<Object>()
-									{
-		                        		public void resultAvailable(Object ret)
-		                        		{
-		                        			ret = mapResult(method, ret);
-		                        			writeResponse(ret, null, mi, request, response, true);
-		                        			ctx.complete();
-		                        		}
-		
-		                        		public void exceptionOccurred(Exception exception)
-		                        		{
-		                        			Object result = mapResult(method, exception);
-		                        			writeResponse(exception, null, mi, request, response, true);
-		                        			ctx.complete();
-		                        		}
-									});
-		                            ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
-		                        }
-		                        else
-		                        {
-	//	                        	System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
-		                        	// map the result by user defined mappers
-		                        	ret = mapResult(method, ret);
-		                        	// convert content and write result to servlet response
-		                        	writeResponse(ret, null, mi, request, response, true);
-		                        }
-	                        }
-	                        catch(Exception e)
-	                        {
-	                        	writeResponse(e, null, null, request, response, true);
-	                        }
-	                    }
-		                else
-		                {
-		                    PrintWriter out = response.getWriter();
-		                    
-		                    response.setContentType("text/html; charset=utf-8");
-		                    response.setStatus(HttpServletResponse.SC_OK);
-		                
-		                    String info = getServiceInfo(service, uri, mappings);
-		                    out.write(info);
-		                    
-		//                      out.println("<h1>" + "Found no method mapping, available are: " + "</h1>");
-		//                      out.println("<ul>");
-		//                      for(Map.Entry<String, Collection<MappingInfo>> entry: mappings.entrySet())
-		//                      {
-		//                      	for(MappingInfo mi: entry.getValue())
-		//                      	{
-		//                      		out.println(entry.getKey()+" -> "+mi.getMethod().getName()+"<br/>");
-		//                      	}
-		//                      }
-		//                      out.println("</ul>");
-		//                      System.out.println(mappings);
-		                }
-                    }
-                    baseRequest.setHandled(true);
-                }
-            };
-            ch.setContextPath(uri.getPath());
-            collhandler.addHandler(ch);
-            ch.start(); // must be started explicitly :-(((
-
-            if(sidservers==null)
-                sidservers = new HashMap<IServiceIdentifier, Server>();
-            sidservers.put(service.getServiceIdentifier(), server);
-        }
-        catch(Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-        
-        return IFuture.DONE;
-    }
+    public abstract IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info);
 
 //    /**
 //     * 
@@ -382,76 +339,28 @@ public class JettyRestServicePublishService implements IWebPublishService
     /**
      *  Get or start an api to the http server.
      */
-    public Server getHttpServer(URI uri, PublishInfo info)
-    {
-        Server server = null;
-
-        try
-        {
-//            URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
-            server = portservers==null? null: portservers.get(uri.getPort());
-
-            if(server==null)
-            {
-                System.out.println("Starting new server: "+uri.getPort());
-                server = new Server(uri.getPort());
-                server.dumpStdErr();
-
-                ContextHandlerCollection collhandler = new ContextHandlerCollection();
-                server.setHandler(collhandler);
-
-                server.start();
-//                server.join();
-
-                if(portservers==null)
-                    portservers = new HashMap<Integer, Server>();
-                portservers.put(uri.getPort(), server);
-            }
-        }
-        catch(RuntimeException e)
-        {
-            throw e;
-        }
-        catch(Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        return server;
-    }
+    public abstract Object getHttpServer(URI uri, PublishInfo info);
 
     /**
      *  Unpublish a service.
      *  @param sid The service identifier.
      */
-    public IFuture<Void> unpublishService(IServiceIdentifier sid)
-    {
-        throw new UnsupportedOperationException();
-    }
+    public abstract IFuture<Void> unpublishService(IServiceIdentifier sid);
 
     /**
      *  Publish a static page (without ressources).
      */
-    public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
-    {
-        throw new UnsupportedOperationException();
-    }
+    public abstract IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
 
     /**
      *  Publish file resources from the classpath.
      */
-    public IFuture<Void> publishResources(URI uri, String rootpath)
-    {
-        throw new UnsupportedOperationException();
-    }
+    public abstract IFuture<Void> publishResources(URI uri, String rootpath);
 
     /**
      *  Publish file resources from the file system.
      */
-    public IFuture<Void> publishExternal(URI uri, String rootpath)
-    {
-        throw new UnsupportedOperationException();
-    }
+    public abstract IFuture<Void> publishExternal(URI uri, String rootpath);
 
     /**
      *  Map the incoming uri/post/multipart parameters to the service target parameter types.
@@ -1603,8 +1512,6 @@ public class JettyRestServicePublishService implements IWebPublishService
 		{
 			this.mappingInfo = mappingInfo;
 		}
-		
     }
-    
 }
 
