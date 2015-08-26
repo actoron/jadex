@@ -187,6 +187,8 @@
 				{
 					http = new XMLHttpRequest(); 
 					http.open(method, encodeURI(url), true);
+					if(accept!=null)
+						http.setRequestHeader("Accept", accept);
 					http.setRequestHeader("x-jadex-callid", callid);
 					http.setRequestHeader("x-jadex-clienttimeout", to);
 					http.onreadystatechange = reshandler;

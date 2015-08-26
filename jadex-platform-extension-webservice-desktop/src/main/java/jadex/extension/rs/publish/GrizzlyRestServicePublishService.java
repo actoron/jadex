@@ -197,6 +197,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 				if(portservers==null)
 					portservers = new HashMap<Integer, HttpServer>();
 				portservers.put(uri.getPort(), server);
+				System.out.println("created server: "+uri.getPort());
 			}
 		}
 		catch(RuntimeException e)

@@ -54,6 +54,8 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -105,13 +107,53 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         Signals on ongoing conversation as long as callid is contained (results are not immediately available). */
     protected MultiCollection<String, AsyncContext> requestspercall;
     
+    /** The media type converters. */
+    protected MultiCollection<String, IObjectStringConverter> converters;
+    
     /**
      *  The service init.
      */
     @ServiceStart
     public void init()
     {
+    	converters = new MultiCollection<String, IObjectStringConverter>();
     	resultspercall = new MultiCollection<String, ResultInfo>();
+    	
+    	// todo: move this code out
+    	IObjectStringConverter jsonc = new IObjectStringConverter()
+		{
+			public String convertObject(Object val, Object context)
+			{
+				System.out.println("write response in json");
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader());
+				return new String(data);
+			}
+		};
+		converters.add(MediaType.APPLICATION_JSON, jsonc);
+		converters.add("*/*", jsonc);
+		
+		IObjectStringConverter xmlc = new IObjectStringConverter()
+		{
+			public String convertObject(Object val, Object context)
+			{
+				System.out.println("write response in xml");
+				byte[] data = JavaWriter.objectToByteArray(val, component.getClassLoader());
+				return new String(data);
+			}
+		};
+		converters.add(MediaType.APPLICATION_XML, xmlc);
+		converters.add("*/*", xmlc);
+		
+		IObjectStringConverter tostrc = new IObjectStringConverter()
+		{
+			public String convertObject(Object val, Object context)
+			{
+				System.out.println("write response in plain text (toString)");
+				return val.toString();
+			}
+		};
+		converters.add(MediaType.TEXT_PLAIN, tostrc);
+		converters.add("*/*", tostrc);
     	
     	final Long to = (Long)PlatformConfiguration.getPlatformValue(component.getComponentIdentifier(), PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT);
 		System.out.println("Using default client timeout: "+to);
@@ -133,6 +175,29 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     			});
         	}
         };
+    }
+    
+    /**
+     *  Add a converter for one or multiple types.
+     */
+    public void addConverter(String[] mediatypes, IObjectStringConverter converter)
+    {
+    	for(String mediatype: mediatypes)
+    	{
+    		converters.add(mediatype, converter);
+    	}
+    }
+    
+    /**
+     *  Remove a converter.
+     *  @param converter The converter.
+     */
+    public void removeConverter(String[] mediatypes, IObjectStringConverter converter)
+    {
+    	for(String mediatype: mediatypes)
+    	{
+    		converters.remove(mediatype, converter);
+    	}
     }
     
     /**
@@ -181,14 +246,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         {
             String methodname = request.getPathInfo();
 
-            if(methodname.startsWith("/"))
+            if(methodname!=null && methodname.startsWith("/"))
                 methodname = methodname.substring(1);
 
             if(mappings.containsKey(methodname))
             {
                 try
                 {
-//                          out.println("<h1>" + "Found method - calling service: " + mappings.get(methodname).getMethod().getName() + "</h1>");
+//                  out.println("<h1>" + "Found method - calling service: " + mappings.get(methodname).getMethod().getName() + "</h1>");
                     Collection<MappingInfo> mis = mappings.get(methodname);
                     
                     // convert and map parameters
@@ -682,6 +747,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
             if(sr.size()==0)
                 System.out.println("found no acceptable return types.");
+            else
+            	System.out.println("acceptable return types: "+sr+" ("+cl+")");
             
             if(callid!=null)
             {
@@ -717,54 +784,82 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        PrintWriter out = response.getWriter();
 	        if(result!=null)
 	        {
+	        	String ret = null;
+	        	String mt = null;
+	        	for(String mediatype: sr)
+	        	{
+	        		mt = mediatype;
+	        		Collection<IObjectStringConverter> convs = converters.get(sr);
+	        		if(convs!=null && convs.size()>0)
+	        		{
+	        			ret = convs.iterator().next().convertObject(result, null);
+	        			break;
+	        		}
+	        	}
+	        	
+	        	if(mt!=null)
+		        {
+		        	if(response.getHeader("Content-Type")==null)
+		        		response.setHeader("Content-Type", mt);
+			        out.write(ret);
+		        }
+	        	else
+	  	        {
+	        		System.out.println("cannot convert result: "+result);
+	  	        }
+	        	
 	            // for testing with browser
 	            // http://brockallen.com/2012/04/27/change-firefoxs-default-accept-header-to-prefer-json-over-xml/
 	
-	            if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
-	            {
-	                byte[] data = JsonTraverser.objectToByteArray(result, component.getClassLoader());
-	                if(response.getHeader("Content-Type")==null)
-	                	response.setHeader("Content-Type", MediaType.APPLICATION_JSON);
-	                out.write(new String(data));
-	            }
-	            else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
-	            {
-	            	byte[] data = JavaWriter.objectToByteArray(result, component.getClassLoader());
-	            	if(response.getHeader("Content-Type")==null)
-	            		response.setHeader("Content-Type", MediaType.APPLICATION_XML);
-	          
-	            	// this code below writes <?xml... prolog only once>
-//	            	byte[] data;
+//	            if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
+//	            {
+//	            	System.out.println("write response in json");
+//	                byte[] data = JsonTraverser.objectToByteArray(result, component.getClassLoader());
+//	                if(response.getHeader("Content-Type")==null)
+//	                	response.setHeader("Content-Type", MediaType.APPLICATION_JSON);
+//	                out.write(new String(data));
+//	            }
+//	            else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
+//	            {
+//	            	System.out.println("write response in xml");
+//	            	byte[] data = JavaWriter.objectToByteArray(result, component.getClassLoader());
 //	            	if(response.getHeader("Content-Type")==null)
-//	            	{
 //	            		response.setHeader("Content-Type", MediaType.APPLICATION_XML);
-//	            		data = JavaWriter.objectToByteArray(result, component.getClassLoader());
-//	            	}
-//	            	else
-//	            	{
-//	            		// write without xml prolog
-//	            		data = JavaWriter.objectToByteArray(result, null, component.getClassLoader(), null);
-//	            	}
-	            	out.write(new String(data));
-	            }
-	            else if(SReflect.isStringConvertableType(result.getClass()))
-	            {
-	            	if(response.getHeader("Content-Type")==null)
-	            		response.setContentType("text/plain; charset=utf-8");
-	                out.write(result.toString());
-	            }
-	            else if(sr!=null && sr.contains("*/*"))
-	            {
-	                // use json if all is allowed
-	            	if(response.getHeader("Content-Type")==null)
-	                 	response.setHeader("Content-Type", MediaType.APPLICATION_JSON);
-	                byte[] data = JsonTraverser.objectToByteArray(result, component.getClassLoader());
-	                out.write(new String(data));
-	            }
-	            else
-	            {
-	                System.out.println("cannot convert result: "+result);
-	            }
+//	          
+//	            	// this code below writes <?xml... prolog only once>
+////	            	byte[] data;
+////	            	if(response.getHeader("Content-Type")==null)
+////	            	{
+////	            		response.setHeader("Content-Type", MediaType.APPLICATION_XML);
+////	            		data = JavaWriter.objectToByteArray(result, component.getClassLoader());
+////	            	}
+////	            	else
+////	            	{
+////	            		// write without xml prolog
+////	            		data = JavaWriter.objectToByteArray(result, null, component.getClassLoader(), null);
+////	            	}
+//	            	out.write(new String(data));
+//	            }
+//	            else if(sr!=null && sr.contains("*/*"))
+//	            {
+//	            	System.out.println("write response as json cause all is allowed");
+//	                // use json if all is allowed
+//	            	if(response.getHeader("Content-Type")==null)
+//	                 	response.setHeader("Content-Type", MediaType.APPLICATION_JSON);
+//	                byte[] data = JsonTraverser.objectToByteArray(result, component.getClassLoader());
+//	                out.write(new String(data));
+//	            }
+//	            else if(sr!=null && sr.contains(MediaType.TEXT_PLAIN)) // SReflect.isStringConvertableType(result.getClass())
+//	            {
+//	            	System.out.println("write response as string");
+//	            	if(response.getHeader("Content-Type")==null)
+//	            		response.setContentType("text/plain; charset=utf-8");
+//	                out.write(result.toString());
+//	            }
+//	            else
+//	            {
+//	                System.out.println("cannot convert result: "+result);
+//	            }
 	            
 	            out.flush();
 	        }
