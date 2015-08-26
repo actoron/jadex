@@ -2,7 +2,12 @@ package jadex.platform.service.message;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SReflect;
 import jadex.micro.annotation.Agent;
@@ -33,10 +38,65 @@ import jadex.platform.service.message.transport.ITransport;
 	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="strictcom", clazz=boolean.class, defaultvalue="false"),
 })
-@ProvidedServices(@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new jadex.platform.service.message.MessageService($component, $component.getLogger(), new jadex.platform.service.message.transport.ITransport[]{$args.localtransport? new jadex.platform.service.message.transport.localmtp.LocalTransport($component): null, $args.tcptransport? new jadex.platform.service.message.transport.tcpmtp.TCPTransport($component, $args.tcpport): null, $args.niotcptransport? new jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport($component, $args.niotcpport, $component.getLogger()): null, $args.ssltcptransport? jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component, $args.ssltcpport): null, $args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress, $args.relaysecurity): null, MessageAgent.createTransport(\"com.actoron.platform.service.message.transport.udpmtp.UdpTransport\", $component)}, new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, $args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, $args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory(), $args.strictcom)", proxytype=Implementation.PROXYTYPE_RAW)))
+//@ProvidedServices(@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new jadex.platform.service.message.MessageService($component, $component.getLogger(), new jadex.platform.service.message.transport.ITransport[]{$args.localtransport? new jadex.platform.service.message.transport.localmtp.LocalTransport($component): null, $args.tcptransport? new jadex.platform.service.message.transport.tcpmtp.TCPTransport($component, $args.tcpport): null, MessageAgent.createTransport(\"niotcpmtp.NIOTCPTransport\", new Object[] {$args.niotcptransport, $component, $args.niotcpport, $component.getLogger()}), $args.ssltcptransport? jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component, $args.ssltcpport): null, $args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress, $args.relaysecurity): null, MessageAgent.createTransport(\"udpmtp.UdpTransport\", $component)}, new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, $args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, $args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory(), $args.strictcom)", proxytype=Implementation.PROXYTYPE_RAW)))
+@ProvidedServices(@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new jadex.platform.service.message.MessageService($component, $component.getLogger(), MessageAgent.createTransports($component, $args), new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, $args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, $args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory(), $args.strictcom)", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class MessageAgent
 {
+	/** Transport configuration
+	 *  Format: <Fully-qualified Classname> <Enable Flag in Arguments> <Constructor arguments from component args or "component" for component itself or "componentlogger" for logger>
+	 */
+	public static final String[] TPCONF = new String[]
+	{//  Class																		EnableArg			Constructor Args
+		"jadex.platform.service.message.transport.localmtp.LocalTransport",			"localtransport",	"component",
+		"jadex.platform.service.message.transport.tcpmtp.TCPTransport",				"tcptransport",		"component,tcpport",
+		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport", 		"niotcptransport",	"component,niotcpport,componentlogger",
+		"jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", 		"ssltcptransport",	"component,ssltcpport",
+		"jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport",	"relaytransport",	"component,relayaddress,relaysecurity",
+		"com.actoron.platform.service.message.transport.udpmtp.UdpTransport", 		"null",				"component"
+	};
+	
+	/**
+	 *  Initializes the transports.
+	 *  
+	 *  @param ia Component.
+	 *  @param args The component arguments.
+	 *  @return Set of transports.
+	 */
+	public static ITransport[] createTransports(IInternalAccess ia, LinkedHashMap<String, Object> args)
+	{
+		if (TPCONF.length % 3 != 0)
+		{
+			throw new IllegalArgumentException("Transport configuration broken.");
+		}
+		ITransport[] transports = new ITransport[TPCONF.length / 3];
+		
+		for (int i = 0; i < TPCONF.length; i = i + 3)
+		{
+			String clazz = TPCONF[i];
+			if (!Boolean.FALSE.equals(args.get(TPCONF[i + 1])))
+			{
+				List<Object> conargs = new ArrayList<Object>();
+				String[] tokens = TPCONF[i + 2].split(",");
+				for (int j = 0; j < tokens.length; ++j)
+				{
+					if (tokens[j].length() > 0)
+					{
+						if ("component".equals(tokens[j].trim()))
+							conargs.add(ia);
+						else if ("componentlogger".equals(tokens[j].trim()))
+							conargs.add(ia.getLogger());
+						else
+							conargs.add(args.get(tokens[j].trim()));
+					}
+				}
+				
+				transports[i / 3] = createTransport(clazz, conargs.toArray());
+			}
+		}
+		return transports;
+	}
+	
 	/**
 	 *  Attempts to instantiate a transport from a class name and arguments only.
 	 *  
@@ -50,7 +110,15 @@ public class MessageAgent
 		
 		try
 		{
-			Class<?> clazz = SReflect.classForName(classname, null);
+			Class<?> clazz = SReflect.classForName0(classname, null);
+			if (clazz == null)
+			{
+				clazz = SReflect.classForName0("jadex.platform.service.message.transport." + classname, null);
+			}
+			if (clazz == null)
+			{
+				clazz = SReflect.classForName("com.actoron.platform.service.message.transport." + classname, null);
+			}
 			Constructor<?> con = null;
 			Object[] args = null;
 			if (arguments != null)
