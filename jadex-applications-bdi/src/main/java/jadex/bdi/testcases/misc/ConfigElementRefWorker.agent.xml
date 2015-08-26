@@ -40,11 +40,29 @@
 				<goalfinished cref="configrefcap.testgoal"/>
 			</waitqueue>
 		</plan>
+		<plan name="configelementrefendworker_plan">
+			<body class="ConfigElementRefEndWorkerPlan"/>
+			<waitqueue>
+				<internalevent ref="testevent"/>
+				<internalevent cref="configrefcap.testevent"/>
+				<messageevent ref="testmsg"/>
+				<messageevent cref="configrefcap.testmsg"/>
+				<goalfinished ref="testgoal"/>
+				<goalfinished cref="configrefcap.testgoal"/>
+			</waitqueue>
+		</plan>
 		<plan name="testplan">
 			<parameter name="wait" class="long">
 				<value>3000</value>
 			</parameter>
 			<body class="ResultPlan"/>
+		</plan>
+		<plan name="successplan">
+			<body class="ResultPlan"/>
+			<trigger>
+			    <goal ref="testgoal"/>
+			    <goal cref="configrefcap.testgoal"/>
+			</trigger>
 		</plan>
 	</plans>
 	
@@ -58,7 +76,7 @@
 				<value>"test message event"</value>
 			</parameter>
 			<parameter name="conversation_id" class="String" direction="fixed">
-				<value>"test converstaion"</value>
+				<value>"test conversation"</value>
 			</parameter>
 			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$scope.getComponentIdentifier()</value>
@@ -93,7 +111,8 @@
 			<plans>
 				<initialplan	ref="configelementrefworker_plan"/>
  				<initialplan	ref="testplan" name="namedinitialplan"/>
-				<endplan		ref="testplan" name="namedendplan"/>
+				<endplan		ref="configelementrefendworker_plan"/>
+ 				<endplan		ref="testplan" name="namedendplan"/>
 			</plans>
  			<events>
 				<initialinternalevent	ref="testevent"		name="namedinitialevent"/>

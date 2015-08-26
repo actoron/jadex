@@ -69,6 +69,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -356,7 +357,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		/**
 		 * 
 		 */
-		protected IFuture<Void> dispatchConfigPlans(IInternalAccess component, List<MConfigParameterElement> cplans, IBDIModel bdimodel)
+		protected IFuture<Void> dispatchConfigPlans(final IInternalAccess component, List<MConfigParameterElement> cplans, IBDIModel bdimodel)
 		{
 			Future<Void> ret = new Future<Void>();
 			if(cplans!=null && cplans.size()>0)
@@ -388,7 +389,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					}
 				}
 				
-				barrier.waitFor().addResultListener(new DelegationResultListener<Void>(ret));
+				barrier.waitForIgnoreFailures(new ICommand<Exception>()
+				{
+					@Override
+					public void execute(Exception e)
+					{
+						component.getLogger().severe("Failure during config plan execution: "+SUtil.getExceptionStacktrace(e));
+					}
+				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else
 			{
@@ -400,7 +408,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		/**
 		 * 
 		 */
-		protected IFuture<Void> dispatchConfigGoals(IInternalAccess component, List<MConfigParameterElement> cgoals, IBDIModel bdimodel)
+		protected IFuture<Void> dispatchConfigGoals(final IInternalAccess component, List<MConfigParameterElement> cgoals, IBDIModel bdimodel)
 		{
 			Future<Void> ret = new Future<Void>();
 			if(cgoals!=null && cgoals.size()>0)
@@ -548,7 +556,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				}
 				
 				// wait for all goals being finished
-				barrier.waitFor().addResultListener(new DelegationResultListener<Void>(ret));
+				barrier.waitForIgnoreFailures(new ICommand<Exception>()
+				{
+					@Override
+					public void execute(Exception e)
+					{
+						component.getLogger().severe("Failure during config goal processing: "+SUtil.getExceptionStacktrace(e));
+					}
+				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else
 			{
@@ -667,14 +682,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						}
 					}
 					
+					// Create initial plans (create plans before other elements as they might want to react to these)
+					List<MConfigParameterElement> iplans = mconf.getInitialPlans();
+					dispatchConfigPlans(component, iplans, bdimodel);
+					
 					// Create initial goals
 					List<MConfigParameterElement> igoals = mconf.getInitialGoals();
 					dispatchConfigGoals(component, igoals, bdimodel);
 					
-					// Create initial plans
-					List<MConfigParameterElement> iplans = mconf.getInitialPlans();
-					dispatchConfigPlans(component, iplans, bdimodel);
-
 					// Create initial events
 					List<MConfigParameterElement> ievents = mconf.getInitialEvents();
 					dispatchConfigEvents(component, ievents, bdimodel);
@@ -2060,14 +2075,26 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			final Future<Void>	ret	= new Future<Void>();
 			final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 			
+			// Barrier to wait for all body processing.
+			FutureBarrier<Void>	bodyend	= new FutureBarrier<Void>();
+			
 			// Abort running goals.
 			Collection<RGoal> goals = bdif.getCapability().getGoals();
+//			System.out.println(component.getComponentIdentifier()+" dropping body goals: "+goals);
+			for(RGoal goal: goals)
+			{
+				bodyend.addFuture(goal.drop());
+			}
 			
 			// Abort running plans.
 			Collection<RPlan> plans = bdif.getCapability().getPlans();
+//			System.out.println(component.getComponentIdentifier()+" dropping body plans: "+plans);
+			for(final RPlan plan: plans)
+			{
+				bodyend.addFuture(plan.abort());
+			}
 			
-			IResultListener<Void>	crl	= new CounterResultListener<Void>(goals.size()+plans.size(), true,
-				new DelegationResultListener<Void>(ret)
+			bodyend.waitFor().addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
@@ -2078,18 +2105,18 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						
 						if(mconf!=null)
 						{
-							CounterResultListener<Void> lis = new CounterResultListener<Void>(3, new DelegationResultListener<Void>(ret));
+							final CounterResultListener<Void> lis = new CounterResultListener<Void>(3, new DelegationResultListener<Void>(ret));
 								
-							// Create end goals
-							List<MConfigParameterElement> igoals = mconf.getEndGoals();
-							dispatchConfigGoals(component, igoals, bdimodel).addResultListener(lis);
-							
 							// Create end plans
-							List<MConfigParameterElement> iplans = mconf.getEndPlans();
+							final List<MConfigParameterElement> iplans = mconf.getEndPlans();
 							dispatchConfigPlans(component, iplans, bdimodel).addResultListener(lis);
 							
+							// Create end goals
+							final List<MConfigParameterElement> igoals = mconf.getEndGoals();
+							dispatchConfigGoals(component, igoals, bdimodel).addResultListener(lis);
+							
 							// Create end events
-							List<MConfigParameterElement> ievents = mconf.getEndEvents();
+							final List<MConfigParameterElement> ievents = mconf.getEndEvents();
 							dispatchConfigEvents(component, ievents, bdimodel).addResultListener(lis);
 						}
 						else
@@ -2103,16 +2130,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					}
 				}
 			});
-			
-			for(RGoal goal: goals)
-			{
-				goal.drop().addResultListener(crl);
-			}
-			
-			for(RPlan plan: plans)
-			{
-				plan.abort().addResultListener(crl);
-			}
 			
 			return ret;
 		}

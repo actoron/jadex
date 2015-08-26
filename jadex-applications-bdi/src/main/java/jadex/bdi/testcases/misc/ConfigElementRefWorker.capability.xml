@@ -26,7 +26,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="content" class="String" direction="fixed">
-				<value>"capability end message event"</value>
+				<value>"capability test message event"</value>
 			</parameter>
 			<parameter name="conversation_id" class="String" direction="fixed">
 				<value>"capability test conversation"</value>

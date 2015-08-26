@@ -16,6 +16,7 @@ import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
@@ -25,7 +26,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
-import jadex.bdiv3x.runtime.IFinishableElement;
+import jadex.bdiv3.runtime.IGoal.GoalProcessingState;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
@@ -46,6 +47,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
@@ -341,15 +343,45 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				rplan.internalSetupEventsRule(events);
 			}
 			
-			List<MMessageEvent> mevents = wqtr.getMessageEvents();
-			if(mevents!=null)
+			for(String trigger: SUtil.safeList(wqtr.getFactAddeds()))
 			{
-				for(MMessageEvent mevent: mevents)
-				{
-					WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
-					wa.addModelElement(mevent);
-				}
+				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
+				wa.addChangeEventType(ChangeEvent.FACTADDED+"."+trigger);
 			}
+			for(String trigger: SUtil.safeList(wqtr.getFactRemoveds()))
+			{
+				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
+				wa.addChangeEventType(ChangeEvent.FACTREMOVED+"."+trigger);
+			}
+			for(String trigger: SUtil.safeList(wqtr.getFactChangeds()))
+			{
+				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
+				wa.addChangeEventType(ChangeEvent.FACTCHANGED+"."+trigger);
+			}
+			
+			for(MGoal trigger: SUtil.safeList(wqtr.getGoalFinisheds()))
+			{
+				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
+				wa.addModelElement(trigger);	// Todo: differentiate finished and process events?
+			}
+			
+			for(MInternalEvent mevent: SUtil.safeList(wqtr.getInternalEvents()))
+			{
+				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
+				wa.addModelElement(mevent);
+			}
+			for(MMessageEvent mevent: SUtil.safeList(wqtr.getMessageEvents()))
+			{
+				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
+				wa.addModelElement(mevent);
+			}
+			
+			// Todo: not for waitqueue, like goals...?
+//			for(MServiceCall mevent: SUtil.safeList(wqtr.getServices()))
+//			{
+//				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
+//				wa.addModelElement(mevent);
+//			}
 		}
 		
 		rplan.setBody(body);
@@ -747,7 +779,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public boolean isWaitqueueWaitingFor(Object procelem)
 	{
-		return waitqueuewa!=null && waitqueuewa.isWaitingFor(procelem);
+		// Do not dispatch process goals to waitqueue. (Hack? not allowed for v2, but would be easily possible for v3)
+		boolean	processgoal	= procelem instanceof RGoal && ((RGoal)procelem).getProcessingState()==GoalProcessingState.INPROCESS;
+		
+		return !processgoal && waitqueuewa!=null && waitqueuewa.isWaitingFor(procelem);
 	}
 	
 //	/**
@@ -874,7 +909,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void>	abort()
 	{
-		System.out.println("aborting: "+this);
+//		System.out.println("aborting: "+this);
 		
 		if(!isFinishing())
 		{

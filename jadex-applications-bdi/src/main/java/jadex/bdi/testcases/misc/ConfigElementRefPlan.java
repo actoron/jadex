@@ -33,10 +33,19 @@ public class ConfigElementRefPlan extends Plan
 		cms.createComponent("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml",
 			new CreationInfo(args, getComponentIdentifier())).getFirstResult();
 		
-		// Wait for reports from worker agent.
+		// Wait for init reports from worker agent.
 		IMessageEvent	msg	= waitForMessageEvent("inform_reports");
 		getWaitqueue().removeMessageEvent("inform_reports");
 		List<?>	reports	= (List<?>)msg.getParameter(SFipa.CONTENT).getValue();
+		for(int i=0; i<reports.size(); i++)
+		{
+			getBeliefbase().getBeliefSet("testcap.reports").addFact(reports.get(i));
+		}
+		
+		// Wait for end reports from worker agent.
+		msg	= waitForMessageEvent("inform_reports");
+		getWaitqueue().removeMessageEvent("inform_reports");
+		reports	= (List<?>)msg.getParameter(SFipa.CONTENT).getValue();
 		for(int i=0; i<reports.size(); i++)
 		{
 			getBeliefbase().getBeliefSet("testcap.reports").addFact(reports.get(i));

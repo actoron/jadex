@@ -333,6 +333,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
+//		System.out.println(ia.getComponentIdentifier()+" setLifecycleState: "+this+", "+lifecyclestate);
+		
 //		if(this.toString().indexOf("docnt")!=-1 && GoalLifecycleState.DROPPING.equals(lifecyclestate))
 //			System.out.println("setting life: "+this+" "+lifecyclestate);
 		

@@ -56,7 +56,7 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 	{
 //		System.out.println("Select app cands for: "+element.getId());
 		
-//		if(element!=null && element.toString().indexOf("ancel")!=-1)
+//		if(element!=null && element.toString().indexOf("testgoal")!=-1)
 //			System.out.println("find applicable candidates: "+element);
 		final Future<Void> ret = new Future<Void>();
 		
