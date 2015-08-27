@@ -1,6 +1,7 @@
 package jadex.webservice.examples.rs.banking;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,7 +79,12 @@ public class AccountStatement
 		this.request = request;
 	}
 	
-    public static void main(String[] args) 
+	public String toString()
+	{
+		return "AccountStatement [data=" + Arrays.toString(data) +"]";
+	}
+
+	public static void main(String[] args) 
     {
         try 
         {

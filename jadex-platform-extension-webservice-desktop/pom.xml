@@ -24,15 +24,32 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-extension-webservice</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-json</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>9.3.1.v20150714</version>
-		</dependency>
+			<groupId>javax.ws.rs</groupId>
+    		<artifactId>javax.ws.rs-api</artifactId>
+    		<version>2.0</version>
+		</dependency> 
 		
 		<dependency>
 			<groupId>javassist</groupId>
@@ -45,13 +62,22 @@
 			<artifactId>activation</artifactId>
 			<version>1.1</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.0.1</version>
 		</dependency>
-		
+	
+		<dependency>
+     		<groupId>org.glassfish.grizzly</groupId>
+     		<artifactId>grizzly-http-servlet</artifactId>
+     		<version>2.3.22</version>
+		</dependency>
+		<dependency>
+     		<groupId>org.glassfish.grizzly</groupId>
+     		<artifactId>grizzly-http-server-multipart</artifactId>
+     		<version>2.3.16</version>
+		</dependency>
 		<dependency>
 			<groupId>org.glassfish.grizzly</groupId>
 			<artifactId>grizzly-http-server</artifactId>
@@ -59,24 +85,13 @@
 		</dependency>
 		
 		<dependency>
-     		<groupId>org.glassfish.grizzly</groupId>
-     		<artifactId>grizzly-http-server-multipart</artifactId>
-     		<version>2.3.16</version>
-		</dependency>
-		
-		<!-- <dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-grizzly2</artifactId>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-multipart</artifactId>
 			<version>${jersey.version}</version>
-		</dependency>  -->
+		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-grizzly2-http</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-multipart</artifactId>
 			<version>${jersey.version}</version>
 		</dependency>
 		<dependency>
@@ -89,30 +104,11 @@
 		    <artifactId>jersey-media-moxy</artifactId>
 		    <version>${jersey.version}</version>
 		</dependency>
-		<!--<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-			<version>2.5</version>
-		</dependency>
+		
 		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-processing</artifactId>
-			<version>2.5</version>
-		</dependency> 
-		<dependency>
-			<groupId>org.glassfish.grizzly</groupId>
-			<artifactId>grizzly-http-server</artifactId>
-			<version>2.3.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.grizzly</groupId>
-			<artifactId>grizzly-http-servlet</artifactId>
-			<version>2.3.8</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-core</artifactId>
-			<version>${jersey.version}</version>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.3.1.v20150714</version>
 		</dependency>
 		
 		<dependency>
@@ -120,65 +116,6 @@
 			<artifactId>jsr311-api</artifactId>
 			<version>1.1.1</version>
 		</dependency> 
-		-->
-		
-		<dependency>
-			<groupId>javax.ws.rs</groupId>
-    		<artifactId>javax.ws.rs-api</artifactId>
-    		<version>2.0</version>
-		</dependency> 
-		
-		<!--<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-bundle</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		 
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-server</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.sun.jersey.contribs</groupId>
-			<artifactId>jersey-multipart</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		-->
-		
-		<!-- <dependency>
-			<groupId>net.minidev</groupId>
-			<artifactId>json-smart</artifactId>
-			<version>2.0-RC3</version>
-		</dependency> -->
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-json</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-component</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-            
 	</dependencies>
 	
 	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->

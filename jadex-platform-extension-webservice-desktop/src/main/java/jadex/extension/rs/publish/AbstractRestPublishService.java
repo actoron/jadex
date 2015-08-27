@@ -9,6 +9,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -220,6 +221,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // check if call is an intermediate result fetch
         String callid = request.getHeader(HEADER_JADEX_CALLID);
                
+        Enumeration<String> hs = request.getHeaderNames();
+        for(String s=hs.nextElement(); hs.hasMoreElements(); s=hs.nextElement())
+        {
+        	System.out.println("header: "+s+" "+request.getHeader(s));
+        }
+        
         // requestpercall is used to signal an ongoing conversation
         if(requestspercall.containsKey(callid))
         {
@@ -789,7 +796,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        	for(String mediatype: sr)
 	        	{
 	        		mt = mediatype;
-	        		Collection<IObjectStringConverter> convs = converters.get(sr);
+	        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
 	        		if(convs!=null && convs.size()>0)
 	        		{
 	        			ret = convs.iterator().next().convertObject(result, null);

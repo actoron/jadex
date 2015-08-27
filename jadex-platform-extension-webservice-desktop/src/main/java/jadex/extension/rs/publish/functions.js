@@ -130,6 +130,7 @@
 				accept += ";q=0.9,*/*;q=0.8";
 //				alert(accept);
 				http.setRequestHeader("Accept", accept);
+				http.setRequestHeader("Content-Type", accept); // assumption: sent params are of same type
 			}
 			// else use default browser accept header
 //			http.setRequestHeader("Accept", "text/html,application/json;q=0.9,*/*;q=0.8");
@@ -188,7 +189,10 @@
 					http = new XMLHttpRequest(); 
 					http.open(method, encodeURI(url), true);
 					if(accept!=null)
+					{
 						http.setRequestHeader("Accept", accept);
+						http.setRequestHeader("Content-Type", accept); // assumption: sent params are of same type
+					}
 					http.setRequestHeader("x-jadex-callid", callid);
 					http.setRequestHeader("x-jadex-clienttimeout", to);
 					http.onreadystatechange = reshandler;
