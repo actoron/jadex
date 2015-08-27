@@ -58,7 +58,7 @@ public class MultiPlatformsTest //extends TestCase
 //		Thread.sleep(3000000);
 
 		
-		int	number	= 40; // 15; larger numbers cause timeout on toaster.
+		int	number	= 30; // 15; larger numbers cause timeout on toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
