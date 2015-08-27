@@ -124,10 +124,12 @@ public class GoalConditionsPlan	extends Plan
 //		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
+		// Required: allow work plan to be aborted, such that goal is no longer in process.
+		// Is correct to use waitFor() here, because other user code is executed (WorkPlan.aborted()), which should not interleaved with this plan.
+		waitFor(10);
 		
 		// Now triggering goal context again to restart plan.
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
-//		waitFor(10); // Hack! Wait for consequences being executed :-( (todo: microplansteps?)
 		report	= new TestReport("trigger_context3", "Triggering goal context again", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
 		{
