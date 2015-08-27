@@ -91,7 +91,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+//				exception.printStackTrace();
 				BDIXLifecycleAgentFeature.super.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
