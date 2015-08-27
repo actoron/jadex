@@ -299,29 +299,21 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			List<EventType> events = new ArrayList<EventType>();
 			
-			List<String> fas = wqtr.getFactAddeds();
-			if(fas!=null && !fas.isEmpty())
+			for(String belname: SUtil.safeList(wqtr.getFactAddeds()))
 			{
-				for(String belname: fas)
-				{
-					events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
-				}
+				events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
 			}
-			List<String> frs = wqtr.getFactRemoveds();
-			if(frs!=null && !frs.isEmpty())
+			for(String belname: SUtil.safeList(wqtr.getFactRemoveds()))
 			{
-				for(String belname: frs)
-				{
-					events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
-				}
+				events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
 			}
-			List<String> fcs = wqtr.getFactChangeds();
-			if(fcs!=null && !fcs.isEmpty())
+			for(String belname: SUtil.safeList(wqtr.getFactChangeds()))
 			{
-				for(String belname: fcs)
-				{
-					events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}));
-				}
+				events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}));
+			}			
+			for(MGoal goal: SUtil.safeList(wqtr.getGoalFinisheds()))
+			{
+				events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED, goal.getName()}));
 			}
 			
 			if(!events.isEmpty())
@@ -341,28 +333,6 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //				ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
 				
 				rplan.internalSetupEventsRule(events);
-			}
-			
-			for(String trigger: SUtil.safeList(wqtr.getFactAddeds()))
-			{
-				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
-				wa.addChangeEventType(ChangeEvent.FACTADDED+"."+trigger);
-			}
-			for(String trigger: SUtil.safeList(wqtr.getFactRemoveds()))
-			{
-				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
-				wa.addChangeEventType(ChangeEvent.FACTREMOVED+"."+trigger);
-			}
-			for(String trigger: SUtil.safeList(wqtr.getFactChangeds()))
-			{
-				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
-				wa.addChangeEventType(ChangeEvent.FACTCHANGED+"."+trigger);
-			}
-			
-			for(MGoal trigger: SUtil.safeList(wqtr.getGoalFinisheds()))
-			{
-				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
-				wa.addModelElement(trigger);	// Todo: differentiate finished and process events?
 			}
 			
 			for(MInternalEvent mevent: SUtil.safeList(wqtr.getInternalEvents()))
@@ -1965,7 +1935,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 			{
-//				System.out.println("Added to waitqueue: "+event);
+				System.out.println("Added to waitqueue: "+event);
 				addToWaitqueue(new ChangeEvent(event));				
 				return IFuture.DONE;
 			}

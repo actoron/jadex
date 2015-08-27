@@ -51,7 +51,7 @@ public class CMTestPlan extends Plan
 		// Wait for goal to be finished and check the result.
 		try
 		{
-			waitForGoal(request);
+			waitForGoalFinished(request);
 		}
 		catch(GoalFailureException gfe){}
 		InteractionState	state	= (InteractionState)request.getParameter("interaction_state").getValue();
@@ -95,7 +95,7 @@ public class CMTestPlan extends Plan
 		TestReport	report	= new TestReport("test_abort", "Test if interaction can be aborted on receiver side.");
 		try
 		{
-			waitForGoal(request, 3000);
+			waitForGoalFinished(request, 3000);
 			report.setFailed("Goal unexpectedly succeeded.");
 		}
 		catch(GoalFailureException e)

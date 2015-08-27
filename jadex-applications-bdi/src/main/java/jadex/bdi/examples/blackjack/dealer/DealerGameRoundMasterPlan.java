@@ -39,7 +39,7 @@ public class DealerGameRoundMasterPlan extends Plan
 			goals[i] = createGoal("play_with_player");
 			goals[i].getParameter("player").setValue(players[i]);
 //			getWaitqueue().addSubgoal(goals[i]);
-			getWaitqueue().addGoal(goals[i]);
+			getWaitqueue().addGoalFinished(goals[i]);
 			dispatchSubgoal(goals[i]);
 			getLogger().info("Playing with player: "+players[i]);
 		}
@@ -109,7 +109,7 @@ public class DealerGameRoundMasterPlan extends Plan
 		for(int i=0; i<players.length; i++)
 		{
 //			waitForSubgoal(goals[i]);
-			waitForGoal(goals[i]);
+			waitForGoalFinished(goals[i]);
 		}
 
 		// Store history.

@@ -25,7 +25,7 @@ public class ParallelActivationPlan extends Plan
 		
 		for (int i = 0; i < goals.length; ++i)
 		{
-			waitForGoal(goals[i]);
+			waitForGoalFinished(goals[i]);
 			if (!goals[i].isSucceeded())
 			{
 				for (int j = 0; j < goals.length; ++j)

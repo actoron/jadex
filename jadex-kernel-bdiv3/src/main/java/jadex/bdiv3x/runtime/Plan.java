@@ -189,9 +189,9 @@ public abstract class Plan
 	 *  Wait for a goal.
 	 *  @param type The goal type.
 	 */
-	public IGoal waitForGoal(String type)
+	public IGoal waitForGoalFinished(String type)
 	{
-		return waitForGoal(type, -1);
+		return waitForGoalFinished(type, -1);
 	}
 
 	/**
@@ -199,7 +199,7 @@ public abstract class Plan
 	 *  @param type The goal type.
 	 *  @param timeout The timeout.
 	 */
-	public IGoal waitForGoal(String type, long timeout)
+	public IGoal waitForGoalFinished(String type, long timeout)
 	{
 		checkNotInAtomic();
 		
@@ -208,17 +208,15 @@ public abstract class Plan
 		BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
 		MGoal mgoal = model.getCapability().getResolvedGoal(rplan.getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addModelElement(mgoal);
-		
+		wa.addChangeEventType(ChangeEvent.GOALDROPPED+"."+mgoal.getName());
 
-		IGoal res = (IGoal)rplan.getFromWaitqueue(wa);
+		ChangeEvent res = (ChangeEvent)rplan.getFromWaitqueue(wa);
 		if(res!=null)
 		{
-			return res;
+			return (IGoal)res.getValue();
 		}
 		else
 		{
-			// todo: add scope name if is in capa
 			rplan.setWaitAbstraction(wa);
 			return ret.get(timeout);
 		}
@@ -228,16 +226,16 @@ public abstract class Plan
 	 *  Wait for a goal to be finished.
 	 *  @param goal The goal.
 	 */
-	public void waitForGoal(IGoal goal)
+	public void waitForGoalFinished(IGoal goal)
 	{
-		waitForGoal(goal, -1);
+		waitForGoalFinished(goal, -1);
 	}
 	
 	/**
 	 *  Wait for a goal to be finished.
 	 *  @param goal The goal.
 	 */
-	public void waitForGoal(IGoal goal, long timeout)
+	public void waitForGoalFinished(IGoal goal, long timeout)
 	{
 		checkNotInAtomic();
 		if(goal==null)
@@ -1239,7 +1237,7 @@ public abstract class Plan
 		/**
 		 *  Add the goal to wait for.
 		 */
-		public void addGoal(IGoal goal)
+		public void addGoalFinished(IGoal goal)
 		{
 			getWaitAbstraction().addRuntimeElement((RElement)goal);
 		}
@@ -1247,9 +1245,40 @@ public abstract class Plan
 		/**
 		 *  Remove the goal to wait for.
 		 */
-		public void removeGoal(IGoal goal)
+		public void removeGoalFinished(IGoal goal)
 		{
 			getWaitAbstraction().removeRuntimeElement((RElement)goal);
+		}
+		
+		/**
+		 *  Add the goal to wait for.
+		 */
+		public void addGoalFinished(String type)
+		{
+			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
+			MGoal mgoal = model.getCapability().getResolvedGoal(
+				getRPlan().getModelElement().getCapabilityName(), type);
+			addChangeEventType(ChangeEvent.GOALDROPPED+"."+mgoal.getName());
+		}
+		
+		/**
+		 *  Remove the goal to wait for.
+		 */
+		public void removeGoalFinished(String type)
+		{
+			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
+			MGoal mgoal = model.getCapability().getResolvedGoal(
+				getRPlan().getModelElement().getCapabilityName(), type);
+			removeChangeEventType(ChangeEvent.GOALDROPPED+"."+mgoal.getName());
+		}
+		
+		/**
+		 *  Add a fact changed.
+		 *  @param belief The belief.
+		 */
+		public void addFactChanged(String beliefset)
+		{
+			addChangeEventType(ChangeEvent.FACTCHANGED+"."+beliefset);
 		}
 		
 		/**
@@ -1265,6 +1294,7 @@ public abstract class Plan
 		 *  Add a fact removed.
 		 *  @param beliefset The beliefset.
 		 */
+		// Todo: currently not supported -> requires belief change rules in any agent (speed?)
 		public void addFactRemoved(String beliefset)
 		{
 			addChangeEventType(ChangeEvent.FACTREMOVED+"."+beliefset);
@@ -1307,47 +1337,6 @@ public abstract class Plan
 		}
 		
 //		/**
-//		 *  Add a goal.
-//		 *  @param type The type.
-//		 */
-//		public void addGoal(MGoal mgoal)
-//		{
-//		}
-	//
-//		/**
-//		 *  Add a goal.
-//		 *  @param goal The goal.
-//		 */
-//		public void addGoal(RGoal rgoal)
-//		{
-//		}
-
-//		/**
-//		 *  Add a fact changed.
-//		 *  @param belief The belief or beliefset.
-//		 */
-//		public void addFactChanged(String belief)
-//		{
-//		}
-	//
-//		/**
-//		 *  Add a fact added.
-//		 *  @param beliefset The beliefset.
-//		 */
-//		public IWaitAbstraction addFactAdded(String beliefset)
-//		{
-//		}
-
-
-//		/**
-//		 *  Add a fact removed.
-//		 *  @param beliefset The beliefset.
-//		 */
-//		public IWaitAbstraction addFactRemoved(String beliefset)
-//		{
-//		}
-	//	
-//		/**
 //		 *  Add a condition.
 //		 *  @param condition the condition name.
 //		 */
@@ -1364,6 +1353,42 @@ public abstract class Plan
 //		}
 
 		//-------- remover methods --------
+		
+		/**
+		 *  Remove a fact changed.
+		 *  @param belief The belief.
+		 */
+		public void removeFactChanged(String beliefset)
+		{
+			removeChangeEventType(ChangeEvent.FACTCHANGED+"."+beliefset);
+		}
+		
+		/**
+		 *  Remove a fact added.
+		 *  @param beliefset The beliefset.
+		 */
+		public void removeFactAdded(String beliefset)
+		{
+			removeChangeEventType(ChangeEvent.FACTADDED+"."+beliefset);
+		}
+		
+		/**
+		 *  Remove a fact removed.
+		 *  @param beliefset The beliefset.
+		 */
+		public void removeFactRemoved(String beliefset)
+		{
+			removeChangeEventType(ChangeEvent.FACTREMOVED+"."+beliefset);
+		}
+		
+		/**
+		 *  Remove a belief change type.
+		 *  @param belief The belief.
+		 */
+		public void removeBeliefChanged(String belief)
+		{
+			removeChangeEventType(ChangeEvent.BELIEFCHANGED+"."+belief);
+		}
 
 		/**
 		 *  Remove a message event.
@@ -1460,7 +1485,7 @@ public abstract class Plan
 		 *  Add a change event type.
 		 *  @param eventtype The change event type.
 		 */
-		public void addChangeEventType(String eventtype)
+		protected void addChangeEventType(String eventtype)
 		{
 			getWaitAbstraction().addChangeEventType(eventtype);
 			rplan.setupEventsRule(getWaitAbstraction().getChangeeventtypes());
@@ -1470,7 +1495,7 @@ public abstract class Plan
 		 *  Remove a change event type.
 		 *  @param eventtype The change event type.
 		 */
-		public void removeChangeEventType(String eventtype)
+		protected void removeChangeEventType(String eventtype)
 		{
 			getWaitAbstraction().removeChangeEventType(eventtype);
 			rplan.setupEventsRule(getWaitAbstraction().getChangeeventtypes());

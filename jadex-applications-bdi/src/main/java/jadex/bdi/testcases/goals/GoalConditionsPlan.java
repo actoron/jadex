@@ -74,7 +74,7 @@ public class GoalConditionsPlan	extends Plan
 		getBeliefbase().getBelief("drop").setFact(Boolean.TRUE);
 		try
 		{
-			waitForGoal(goal); // wait till goal is dropped.
+			waitForGoalFinished(goal); // wait till goal is dropped.
 		}
 		catch(GoalFailureException gfe){}
 		report	= new TestReport("trigger_drop", "Triggering goal drop condition", true, null);

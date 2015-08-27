@@ -35,7 +35,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		TestReport	report	= new TestReport("initial goal", "Check if the initial goal is correctly named.");
 		try
 		{
-			/*IGoal	goal	= */waitForGoal("testgoal", 100);
+			/*IGoal	goal	= */waitForGoalFinished("testgoal", 100);
 //			if(goal.getName().equals("namedinitialgoal"))
 //			{
 				report.setSucceeded(true);
@@ -101,7 +101,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("initial capa goal", "Check if initial goal from capability is correctly named.");
 		try
 		{
-			/*IGoal	goal	= */waitForGoal("configrefcap.testgoal", 100);
+			/*IGoal	goal	= */waitForGoalFinished("configrefcap.testgoal", 100);
 //			if(goal.getName().equals("namedcapinitialgoal"))
 //			{
 				report.setSucceeded(true);

@@ -52,7 +52,7 @@ public class HandleDisasterPlan extends Plan
 		
 		for(IGoal subgoal: subgoals)
 		{
-			waitForGoal(subgoal);
+			waitForGoalFinished(subgoal);
 		}
 	}
 }
