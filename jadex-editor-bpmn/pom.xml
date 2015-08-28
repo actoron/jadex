@@ -97,15 +97,6 @@
 			</plugin>
 			
 			<plugin>
-			      <groupId>org.apache.maven.plugins</groupId>
-			      <artifactId>maven-javadoc-plugin</artifactId>
-			      <configuration>
-<!-- 			      Java 8 compiler is too strict on javadoc errors -->
-			        <additionalparam>-Xdoclint:none</additionalparam>
-			      </configuration>
-	    	</plugin>
-
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
         		<version>2.1.2</version>
