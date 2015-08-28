@@ -69,6 +69,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 	 */
 	public IFuture<IService> determineTarget(final IServiceIdentifier sid, final IExternalAccess agent, IServiceIdentifier broken)
 	{
+//		System.err.println("-------------+++++++++++++--------------- determineTarget ");
 //		System.out.println("Called service pool resolver: "+sid+" "+(services==null? 0: services.size()));
 		final Future<IService> ret = new Future<IService>();
 
