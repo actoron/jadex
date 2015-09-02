@@ -37,7 +37,7 @@
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/scriptaculous.js' defer='defer'></script>
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/accordion.js' defer='defer'></script>
  -->
-<%	if(request.getParameter("title")!=null && request.getParameter("title").toLowerCase().indexOf("history")!=-1) { %>
+<%	/*if(request.getParameter("title")!=null && request.getParameter("title").toLowerCase().indexOf("history")!=-1) {*/ %>
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
 	<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,7 +58,7 @@
 			});
 		});
 	</script>
-<%	} %>
+<%	/*}*/ %>
 
 </HEAD>
 <BODY id="body"
