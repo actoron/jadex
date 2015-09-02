@@ -57,6 +57,12 @@ public class BpmnEditor
 	/** Main Logger. */
 	public static final Logger LOGGER = Logger.getLogger(APP_NAME);
 	
+	static
+	{
+		// Avoids a GUI bug on modern Linux systems.
+		System.setProperty("sun.java2d.xrender", "true");
+	}
+	
 	/** The style sheets. */
 	@SuppressWarnings("unchecked")
 	// Hack!!! generics expression doesn't compile on build servers (JDK 1.6/1.7/1.8 ???)
