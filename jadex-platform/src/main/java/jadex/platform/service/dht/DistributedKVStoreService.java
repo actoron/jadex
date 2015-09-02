@@ -278,7 +278,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 		{
 
 			@Override
-			public void customResultAvailable(IFinger result) {
+			public void customResultAvailable(IFinger result) throws Exception {
 				ret.setResult(result.getNodeId());
 				super.customResultAvailable(result);
 			}

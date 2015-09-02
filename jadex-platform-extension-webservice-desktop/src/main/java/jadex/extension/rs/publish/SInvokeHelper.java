@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,43 +46,22 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class SInvokeHelper 
 {
 	/**
-	 *  Convert a multimap to normal map.
+	 *  Convert a multimap to normal map, flattening single values, if any.
 	 */
 	public static Map<String, Object> convertMultiMap(MultivaluedMap<String, String> vals)
 	{
-		Map<String, Object> ret = new HashMap<String, Object>();
-		
-		boolean multimap = false;
-		for(Map.Entry<String, List<String>> e: vals.entrySet())
-		{
-			List<String> val = e.getValue();
-			multimap = val!=null && val.size()>1;
-			if(multimap)
-				break;
-		}
+		Map<String, Object> ret = new LinkedHashMap<String, Object>();
 		
 		for(Map.Entry<String, List<String>> e: vals.entrySet())
 		{
 			List<String> val = e.getValue();
-			if(val==null || val.size()==0)
+			if(val!=null && val.size()==1)
 			{
-				ret.put(e.getKey(), null);
+				ret.put(e.getKey(), val.get(0));
 			}
 			else
 			{
-				if(multimap)
-				{
-					String[] va = new String[val.size()]; 
-					for(int i=0; i<va.length; i++)
-					{
-						va[i] = val.get(i);
-					}				
-					ret.put(e.getKey(), va);
-				}
-				else
-				{
-					ret.put(e.getKey(), val.iterator().next());
-				}
+				ret.put(e.getKey(), val);
 			}
 		}
 		
@@ -89,35 +69,22 @@ public class SInvokeHelper
 	}
 	
 	/**
-	 *  Convert a map with arrays to normal map when no multi values exist.
+	 *  Convert a map with arrays to normal map where single values are flattened.
 	 */
 	public static Map<String, Object> convertMultiMap(Map<String, String[]> vals)
 	{
-		Map<String, Object> ret = (Map)vals;
+		Map<String, Object> ret = new LinkedHashMap<String, Object>();
 		
-		boolean multimap = false;
 		for(Map.Entry<String, String[]> e: vals.entrySet())
 		{
 			String[] val = e.getValue();
-			multimap = val!=null && val.length>1;
-			if(multimap)
-				break;
-		}
-		
-		if(!multimap)
-		{
-			ret = new HashMap<String, Object>();
-			for(Map.Entry<String, String[]> e: vals.entrySet())
+			if(val!=null && val.length==1)
 			{
-				String[] val = e.getValue();
-				if(val==null || val.length==0)
-				{
-					ret.put(e.getKey(), null);
-				}
-				else
-				{
-					ret.put(e.getKey(),val[0]);
-				}
+				ret.put(e.getKey(), val[0]);
+			}
+			else
+			{
+				ret.put(e.getKey(), val);
 			}
 		}
 		
