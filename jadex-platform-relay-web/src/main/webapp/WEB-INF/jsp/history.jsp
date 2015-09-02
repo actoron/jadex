@@ -66,22 +66,11 @@ if(infos.length>0)
 			var map = L.map('map', {center: latlng, zoom: 13, layers: [tiles]});
 	
 			var markers = L.markerClusterGroup({ chunkedLoading: true });
-			
-			var server_icon = L.icon({
-			    iconUrl: 'resources/server.png',
-			    shadowUrl: 'resources/server_shadow.png',
-
-			    iconSize:     [64, 64], // size of the icon
-			    shadowSize:   [64, 64], // size of the shadow
-			    iconAnchor:   [30, 48], // point of the icon which will correspond to marker's location
-			    shadowAnchor: [30, 48],  // the same for the shadow
-			    popupAnchor:  [1, -50] // point from which the popup should open relative to the iconAnchor
-			});
-			
+						
 			for (var i = 0; i < addressPoints.length; i++) {
 				var a = addressPoints[i];
 				var title = a[2];
-				var marker = L.marker(L.latLng(a[0], a[1]), { title: title, icon: server_icon });
+				var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
 				marker.bindPopup(title);
 				markers.addLayer(marker);
 			}

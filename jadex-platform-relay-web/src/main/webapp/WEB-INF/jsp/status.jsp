@@ -144,8 +144,8 @@ if(rmarkers.size()>0 || pmarkers.size()>0)
 
 		    iconSize:     [64, 64], // size of the icon
 		    shadowSize:   [64, 64], // size of the shadow
-		    iconAnchor:   [30, 48], // point of the icon which will correspond to marker's location
-		    shadowAnchor: [30, 48],  // the same for the shadow
+		    iconAnchor:   [15, 50], // point of the icon which will correspond to marker's location
+		    shadowAnchor: [15, 50],  // the same for the shadow
 		    popupAnchor:  [1, -50] // point from which the popup should open relative to the iconAnchor
 		});
 		
