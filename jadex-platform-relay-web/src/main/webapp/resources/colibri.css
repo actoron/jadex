@@ -325,6 +325,7 @@ th {
       background-image: -o-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
       background-image: -ms-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
       background-image: linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+	border-radius: 4px 4px 0px 0px;
 }
 tr.even {
 	background-color: #FFFFFF;

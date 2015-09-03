@@ -106,7 +106,7 @@ if(rmarkers.size()>0 || pmarkers.size()>0)
 { %>
 	<!-- map styles: examples.map-i86nkdio, examples.map-qfyrx5r8 -->
 	<div id="mapcontainer">
-		<div id="map">Please wait while the history is loading...</div>
+		<div id="map">Map</div>
 	</div>
 	<script type="text/javascript">
 	var rmarkers = [

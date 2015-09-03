@@ -39,3 +39,17 @@
 .ui-resizable-helper {
 	border: 1px dotted gray;
 }
+
+/* from colibri <th> */
+#map {
+	font-weight: 700;
+	/* background-color: rgb(243, 243, 243);*/
+	background-color: #ECECEC;
+      background-image: -moz-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: -webkit-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: -o-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: -ms-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+	border-radius: 4px 4px 0px 4px;
+	text-align: center;
+}
