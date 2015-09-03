@@ -28,8 +28,10 @@
 }
 
 #mapcontainer {
-	width: 520px; 
-	height: 390px;
+/*	width: 520px; 
+	height: 390px; */
+	width: 800px; 
+	height: 480px;
 	padding-right: 0.5em;
     padding-bottom: 0.5em;
 }

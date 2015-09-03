@@ -34,7 +34,7 @@ if(peers.length>0)
 	{
 		if(peers[i].getPosition()!=null)
 		{
-			String	marker	= pmarkers.get(pos);
+			String	marker	= rmarkers.get(peers[i].getPosition());
 			if(marker==null)
 			{
 				marker	= peers[i].getLocation()+"\", \"<h3>"+peers[i].getLocation()+"</h3>";
@@ -43,8 +43,9 @@ if(peers.length>0)
 			{
 				marker	+= "<br/>";
 			}
-			marker	+= (i<25 ? "Relay "+(char)('B'+i)+": ": "Relay: ") + url;
-			rmarkers.put(pos, marker);
+			marker	+= (i<25 ? "Relay "+(char)('B'+i)+": ": "Relay: ")
+				+ RelayConnectionManager.httpAddress(peers[i].getUrl());
+			rmarkers.put(peers[i].getPosition(), marker);
 		}
 	}
 }
@@ -142,23 +143,25 @@ if(rmarkers.size()>0 || pmarkers.size()>0)
 		    iconUrl: 'resources/server.png',
 		    shadowUrl: 'resources/server_shadow.png',
 
-		    iconSize:     [64, 64], // size of the icon
-		    shadowSize:   [64, 64], // size of the shadow
-		    iconAnchor:   [15, 50], // point of the icon which will correspond to marker's location
-		    shadowAnchor: [15, 50],  // the same for the shadow
-		    popupAnchor:  [1, -50] // point from which the popup should open relative to the iconAnchor
+		    iconSize:     [17, 43], // size of the icon
+		    shadowSize:   [32, 43], // size of the shadow
+		    iconAnchor:   [-2, 41], // point of the icon which will correspond to marker's location
+		    shadowAnchor: [-2, 41],  // the same for the shadow
+		    popupAnchor:  [17, -45] // point from which the popup should open relative to the iconAnchor
 		});
 		
+		var group = [];
 		for (var i=0; i<rmarkers.length; i++)
 		{
 			var a = rmarkers[i];
 			var marker = L.marker(L.latLng(a[0], a[1]), { title: a[2], icon: server_icon });
 			marker.bindPopup(a[3]);
 			marker.addTo(map);
+			group.push(marker);
 		}
 		
 		var pmarkergroup = L.markerClusterGroup({ chunkedLoading: true });
-		
+		group.push(pmarkergroup);
 		for (var i = 0; i < pmarkers.length; i++) {
 			var a = pmarkers[i];
 			var title = a[2];
@@ -168,7 +171,7 @@ if(rmarkers.size()>0 || pmarkers.size()>0)
 		}
 
 		map.addLayer(pmarkergroup);
-		map.fitBounds(pmarkergroup.getBounds());
+		map.fitBounds(L.featureGroup(group).getBounds());
 		
 		$("#mapcontainer").on("resizestop", function(event, ui)
 		{
@@ -192,16 +195,17 @@ String	loc	= GeoIPService.getGeoIPService().getLocation(host);
 
 <table>
 	<tr>
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
-		<th>Relay</th>
+		<th colspan="3">Relay</th>
 		<th>Location</th>
 		<th>Connected</th>
 		<th># of Platforms</th>
 	</tr>
 	
 	<tr>
-		<td>A</td>
+		<td>
+			<img src="<%=request.getContextPath()%>/resources/server.png" style="vertical-align:middle"/>
+			A
+		</td>
 		<td>
 			<%
 				if(cc!=null)
@@ -225,8 +229,9 @@ String	loc	= GeoIPService.getGeoIPService().getLocation(host);
 	%>
 		<tr title="<%= peers[i].getDebugText() %>">
 			<td>
+				<img src="<%=request.getContextPath()%>/resources/server.png" style="vertical-align:middle"/>
 				<%= (char)('B'+i) %>
-				</td>
+			</td>
 			<td>
 				<%
 					if(peers[i].getCountryCode()!=null)
@@ -256,9 +261,7 @@ if(cnt>0)
 %>
 	<table>
 		<tr>
-			<th rowspan="2">&nbsp;</th>
-			<th rowspan="2">&nbsp;</th>
-			<th rowspan="2">Platform</th>
+			<th rowspan="2" colspan="3">Platform</th>
 			<th rowspan="2">Host</th>
 			<th rowspan="2">Location</th>
 			<th rowspan="2">Connected Since</th>

@@ -26,7 +26,7 @@
 
 	<licenses>
 		<license>
-			<name>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</name>
+			<name>GNU GENERAL PUBLIC LICENSE Version 3 or later</name>
 			<url>http://www.activecomponents.org/bin/view/Download/License</url>
 			<distribution>repo</distribution>
 		</license>
@@ -52,6 +52,20 @@
 			<name>Lars</name>
 			<email>braubach@gmx.net</email>
 			<url>http://vsis-www.informatik.uni-hamburg.de/members/info.php/80
+			</url>
+			<organization>University of Hamburg</organization>
+			<organizationUrl>http://vsis-www.informatik.uni-hamburg.de/
+			</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>kai</id>
+			<name>Kai Jander</name>
+			<email>kai.jander@googlemail.com</email>
+			<url>http://vsis-www.informatik.uni-hamburg.de/members/info.php/974
 			</url>
 			<organization>University of Hamburg</organization>
 			<organizationUrl>http://vsis-www.informatik.uni-hamburg.de/

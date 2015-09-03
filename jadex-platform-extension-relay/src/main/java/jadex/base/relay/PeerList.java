@@ -111,7 +111,7 @@ public class PeerList
 	
 	/**
 	 *  Add peers from a servers list.
-	 *  @param peers	The remote peer urls (comma separated).
+	 *  @param peerurls	The remote peer urls (comma separated).
 	 *  @param initial	Denotes an initial peer as specified in the properties of this relay. Initial peers are not removed when they are offline.
 	 */
 	public void	addPeers(String peerurls, boolean initial)
