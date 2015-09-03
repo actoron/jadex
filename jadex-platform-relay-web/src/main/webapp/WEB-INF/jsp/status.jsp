@@ -150,16 +150,18 @@ if(rmarkers.size()>0 || pmarkers.size()>0)
 		    popupAnchor:  [17, -45] // point from which the popup should open relative to the iconAnchor
 		});
 		
+		var group = [];
 		for (var i=0; i<rmarkers.length; i++)
 		{
 			var a = rmarkers[i];
 			var marker = L.marker(L.latLng(a[0], a[1]), { title: a[2], icon: server_icon });
 			marker.bindPopup(a[3]);
 			marker.addTo(map);
+			group.push(marker);
 		}
 		
 		var pmarkergroup = L.markerClusterGroup({ chunkedLoading: true });
-		
+		group.push(pmarkergroup);
 		for (var i = 0; i < pmarkers.length; i++) {
 			var a = pmarkers[i];
 			var title = a[2];
@@ -169,7 +171,7 @@ if(rmarkers.size()>0 || pmarkers.size()>0)
 		}
 
 		map.addLayer(pmarkergroup);
-		map.fitBounds(pmarkergroup.getBounds());
+		map.fitBounds(L.featureGroup(group).getBounds());
 		
 		$("#mapcontainer").on("resizestop", function(event, ui)
 		{
