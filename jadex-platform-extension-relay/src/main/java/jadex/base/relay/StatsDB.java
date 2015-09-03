@@ -660,8 +660,6 @@ public class StatsDB
 	/**
 	 *  Get cumulated platform infos per ip to use for display (sorted by recency, newest first).
 	 *  @param limit	Limit the number of results (-1 for no limit);
-	 *  @param startid	Start id (-1 for all entries);
-	 *  @param endid	End id (-1 for all entries);
 	 *  @return Up to limit platform infos.
 	 */
 	public PlatformInfo[]	getPlatformInfos(int limit)
