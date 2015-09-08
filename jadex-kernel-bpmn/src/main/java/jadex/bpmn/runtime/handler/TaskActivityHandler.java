@@ -48,11 +48,9 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				thread.setTask(task);
 				thread.setCanceled(false);
 				
-				// FIXME: Really bad! Some task use un-generified futures to return values in the callback
-				//		  despite Void-definition in interface.
-				task.execute(thread, instance).addResultListener(new IResultListener()
+				task.execute(thread, instance).addResultListener(new IResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
 						if(!thread.isCanceled())
 							getBpmnFeature(instance).notify(activity, thread, null);
