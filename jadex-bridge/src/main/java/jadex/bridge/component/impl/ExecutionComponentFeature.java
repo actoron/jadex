@@ -1058,7 +1058,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else
 				{
-					ex = new RuntimeException(!stateok? "Step omitted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep());
+					getComponent().getLogger().warning(!stateok? "Step omitted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep());
+					ex = new StepAborted();
 //					{
 //						public void printStackTrace() 
 //						{
