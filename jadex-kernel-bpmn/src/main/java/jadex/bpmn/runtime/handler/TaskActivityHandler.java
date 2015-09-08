@@ -1,7 +1,10 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.List;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.exttask.ExternalTaskWrapper;
 import jadex.bpmn.runtime.task.PojoTaskWrapper;
@@ -48,11 +51,9 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				thread.setTask(task);
 				thread.setCanceled(false);
 				
-				// FIXME: Really bad! Some task use un-generified futures to return values in the callback
-				//		  despite Void-definition in interface.
-				task.execute(thread, instance).addResultListener(new IResultListener()
+				task.execute(thread, instance).addResultListener(new IResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
 						if(!thread.isCanceled())
 							getBpmnFeature(instance).notify(activity, thread, null);
@@ -68,6 +69,28 @@ public class TaskActivityHandler extends DefaultActivityHandler
 						}	
 					}
 				});
+				
+				MActivity	timer	= null;
+				List<MActivity> handlers = activity.getEventHandlers();
+				for(int i=0; timer==null && handlers!=null && i<handlers.size(); i++)
+				{
+					MActivity	handler	= handlers.get(i);
+					if(handler.getActivityType().equals("EventIntermediateTimer"))
+					{
+						timer	= handler;
+					}
+				}
+				
+				if(timer!=null)
+				{
+					final IActivityHandler th = getBpmnFeature(instance).getActivityHandler(timer);
+					// handler sets timer as waitinfo (should maybe add cancelables)
+					th.execute(timer, instance, thread);
+				}
+//				else
+//				{
+//					thread.setWaiting(true);
+//				}
 			}
 			catch(Exception e)
 			{

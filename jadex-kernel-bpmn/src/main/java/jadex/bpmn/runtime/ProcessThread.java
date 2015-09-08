@@ -1,5 +1,18 @@
 package jadex.bpmn.runtime;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import jadex.bpmn.features.IBpmnComponentFeature;
 import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
@@ -37,19 +50,6 @@ import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  *  Representation of a single control flow in a BPMN process instance,
@@ -1038,43 +1038,48 @@ public class ProcessThread	implements ITaskContext
 		
 		// Try to find data edges
 		List<MDataEdge> ds = getActivity().getIncomingDataEdges();
-		if(ds!=null)
+		if(ds!=null && dataedges!=null)
 		{
-			passedparams = new HashMap<String, Object>();
+			passedparams	= new HashMap<String, Object>();
+			Set<String>	missedparams	= new HashSet<String>();	// Parameters with in edge where no value is available (yet), e.g., tasks after xor join may need value from at least one of many edges.
 			
 			for(MDataEdge de: ds)
 			{
-				if(dataedges!=null)
+				if(!passedparams.containsKey(de.getTargetParameter()) && dataedges.containsKey(de.getId()))
 				{
-					if(dataedges.containsKey(de.getId()))
+					String pname = de.getTargetParameter();
+					// Value is consumed -> remove?!
+					Object val = dataedges.remove(de.getId());
+				
+					// if already contains value must be identical
+					if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
+						throw new RuntimeException("Different edges have different values");
+				
+					passedparams.put(pname, val);
+					missedparams.remove(de.getTargetParameter());
+				}
+				else if (de.getSource() == null)
+				{
+					// Argument data edge
+					passedparams.put(de.getTargetParameter(), instance.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get(de.getSourceParameter()));
+					missedparams.remove(de.getTargetParameter());
+				}
+				else
+				{
+					String pname = de.getTargetParameter();
+					if (getActivity().getParameters() == null ||
+						getActivity().getParameters().get(pname) == null ||
+						getActivity().getParameters().get(pname).getInitialValueString() == null ||
+						getActivity().getParameters().get(pname).getInitialValueString().length()==0)
 					{
-						String pname = de.getTargetParameter();
-						// Value is consumed -> remove?!
-						Object val = dataedges.remove(de.getId());
-					
-						// if already contains value must be identical
-						if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
-							throw new RuntimeException("Different edges have different values");
-					
-						passedparams.put(pname, val);
-					}
-					else if (de.getSource() == null)
-					{
-						// Argument data edge
-						passedparams.put(de.getTargetParameter(), instance.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get(de.getSourceParameter()));
-					}
-					else
-					{
-						String pname = de.getTargetParameter();
-						if (getActivity().getParameters() == null ||
-							getActivity().getParameters().get(pname) == null ||
-							getActivity().getParameters().get(pname).getInitialValueString() == null ||
-							getActivity().getParameters().get(pname).getInitialValueString().length()==0)
-						{
-							throw new RuntimeException("Could not find data edge value for: "+de.getId());
-						}
+						missedparams.add(pname);
 					}
 				}
+			}
+			
+			if(!missedparams.isEmpty())
+			{
+				instance.getLogger().warning("Could not find data edge value for: "+missedparams);
 			}
 		}
 		
@@ -1166,9 +1171,7 @@ public class ProcessThread	implements ITaskContext
 					}
 					else
 					{
-						if(dataedges==null)
-							dataedges = new HashMap<String, Object>();
-						dataedges.put(de.getId(), value);
+						setDataEdgeValue(de.getId(), value);
 					}
 				}
 			}
