@@ -631,6 +631,13 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 						if(isCurrentActivity(activity, thread))
 						{
 //							System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
+							
+							//TODO: Hack!? Cancel here or somewhere else?
+							if (!activity.equals(thread.getActivity()) && thread.getTask() != null && thread.isWaiting())
+							{
+								thread.getTask().cancel(component).get();
+							}
+							
 							step(activity, getComponent(), thread, event);
 							thread.setNonWaiting();
 							if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
@@ -692,13 +699,13 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 				ret = edge.getTarget().equals(activity);
 			}
 		}
-		if(!ret && thread.getActivity()!=null && MBpmnModel.SUBPROCESS.equals(thread.getActivity().getActivityType()))
+		if(!ret && thread.getActivity()!=null)
 		{
 			List<MActivity> handlers = thread.getActivity().getEventHandlers();
 			for(int i=0; !ret && handlers!=null && i<handlers.size(); i++)
 			{
 				MActivity handler = handlers.get(i);
-				ret	= activity.equals(handler) && handler.getActivityType().equals("EventIntermediateTimer");
+				ret	= activity.equals(handler);// && handler.getActivityType().equals("EventIntermediateTimer");
 			}
 		}
 		return ret;

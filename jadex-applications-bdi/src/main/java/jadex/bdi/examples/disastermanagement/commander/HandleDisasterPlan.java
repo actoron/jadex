@@ -31,9 +31,9 @@ public class HandleDisasterPlan extends Plan
 		tv.getParameter("disaster").setValue(disaster);
 		dispatchSubgoal(tv);
 		
-		waitForGoal(cc);
-		waitForGoal(ef);
-		waitForGoal(tv);
+		waitForGoalFinished(cc);
+		waitForGoalFinished(ef);
+		waitForGoalFinished(tv);
 	}
 	
 //	public void aborted()

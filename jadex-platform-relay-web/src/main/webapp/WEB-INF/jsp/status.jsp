@@ -14,101 +14,61 @@
 	PeerHandler[]	peers	= (PeerHandler[])request.getAttribute("peers");
 	String	url	= RelayConnectionManager.httpAddress((String)request.getAttribute("url"));
 	String	host	= new URL(url).getHost();
-	StringBuffer markers	= new StringBuffer();
-	String[]	colors	= new String[]{"black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"};
-	Set<String> positions	= new HashSet<String>();
+	Map<String, String> rmarkers	= new LinkedHashMap<String, String>();
+	Map<String, String> pmarkers	= new LinkedHashMap<String, String>();
 %>
 
 <%
-// Add labelled marker A for own location.
+// Add marker for own location.
 String	pos	= GeoIPService.getGeoIPService().getPosition(host);
 if(pos!=null)
 {
-	markers.append("&markers=label:");
-	markers.append('A');
-	markers.append("|color:");
-	markers.append(colors[Math.abs(url.hashCode())%colors.length]);
-	markers.append("|");
-	markers.append(pos);
-	positions.add(pos);
+	String	marker	= GeoIPService.getGeoIPService().getLocation(host)+"\", \"<h3>"+GeoIPService.getGeoIPService().getLocation(host)+"</h3>Relay A: "+url;
+	rmarkers.put(pos, marker);
 }
 
 // Add markers for relay servers
 if(peers.length>0)
 {
-	for(int i=0; i<peers.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
+	for(int i=0; i<peers.length; i++) 
 	{
-		if(peers[i].getPosition()!=null && !positions.contains(peers[i].getPosition()))
+		if(peers[i].getPosition()!=null)
 		{
-			if(i<25)
+			String	marker	= rmarkers.get(peers[i].getPosition());
+			if(marker==null)
 			{
-				// Add labelled markers for first B..Z entries
-				markers.append("&markers=label:");
-				markers.append((char)('B'+i));
-				markers.append("|color:");
-				markers.append(colors[Math.abs(peers[i].getUrl().hashCode())%colors.length]);
-				markers.append("|");
-				markers.append(peers[i].getPosition());
-				positions.add(peers[i].getPosition());
-			}
-			else if(i==25)
-			{
-				// Add unlabelled markers for each unique position of remaining entries
-				markers.append("&markers=color:");
-				markers.append(colors[Math.abs(peers[i].getUrl().hashCode())%colors.length]);
-				markers.append("|");
-				markers.append(peers[i].getPosition());
-				positions.add(peers[i].getPosition());
+				marker	= peers[i].getLocation()+"\", \"<h3>"+peers[i].getLocation()+"</h3>";
 			}
 			else
 			{
-				// Add unlabelled markers for each unique position of remaining entries
-				markers.append("|");
-				markers.append(peers[i].getPosition());
-				positions.add(peers[i].getPosition());
+				marker	+= "<br/>";
 			}
+			marker	+= (i<25 ? "Relay "+(char)('B'+i)+": ": "Relay: ")
+				+ RelayConnectionManager.httpAddress(peers[i].getUrl());
+			rmarkers.put(peers[i].getPosition(), marker);
 		}
 	}
 }
-
-positions.clear();
 
 // Add markers for locally connected platforms
 boolean	unlabelled	= false;
 if(infos.length>0)
 {
-	for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
+	for(int i=0; i<infos.length; i++) 
 	{
-		if(infos[i].getPosition()!=null && !positions.contains(infos[i].getPosition()))
+		if(infos[i].getPosition()!=null)
 		{
-			if(i<9)
+			String	marker	= pmarkers.get(infos[i].getPosition());
+			if(marker==null)
 			{
-				// Add labelled markers for first 1..9 entries
-				markers.append("&markers=size:mid|label:");
-				markers.append(i+1);
-				markers.append("|color:");
-				markers.append(colors[Math.abs(url.hashCode())%colors.length]);
-				markers.append("|");
-				markers.append(infos[i].getPosition());
-				positions.add(infos[i].getPosition());
-			}
-			else if(!unlabelled)
-			{
-				// Add first unlabelled marker for unique position of remaining entries
-				markers.append("&markers=size:mid|color:");
-				markers.append(colors[Math.abs(url.hashCode())%colors.length]);
-				markers.append("|");
-				markers.append(infos[i].getPosition());
-				positions.add(infos[i].getPosition());
-				unlabelled	= true;
+				marker	= infos[i].getLocation()+"\", \"<h3>"+infos[i].getLocation()+"</h3>";
 			}
 			else
 			{
-				// Add unlabelled markers for each unique position of remaining entries
-				markers.append("|");
-				markers.append(infos[i].getPosition());
-				positions.add(infos[i].getPosition());
+				marker	+= "<br/>";
 			}
+			marker	+= (i+1)+": "+infos[i].getId()+" ("+infos[i].getHostName()+")";
+			pmarkers.put(infos[i].getPosition(), marker);
 		}
 	}
 }
@@ -117,53 +77,117 @@ int	cnt	= infos.length;
 // Add markers for remotely connected platforms
 if(peers.length>0)
 {
-	for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 
+	for(int j=0; j<peers.length; j++) 
 	{
 		PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
-		for(int i=0; i<infos2.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
+		for(int i=0; i<infos2.length; i++) 
 		{
-			if(infos2[i].getPosition()!=null && !positions.contains(infos2[i].getPosition()))
+			if(infos2[i].getPosition()!=null)
 			{
-				if(i+cnt<9)
+				String	marker	= pmarkers.get(infos2[i].getPosition());
+				if(marker==null)
 				{
-					// Add labelled markers for first 1..9 entries
-					markers.append("&markers=size:mid|label:");
-					markers.append(i+cnt+1);
-					markers.append("|color:");
-					markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
-					markers.append("|");
-					markers.append(infos2[i].getPosition());
-					positions.add(infos2[i].getPosition());
-				}
-				else if(!unlabelled)
-				{
-					// Add first unlabelled marker for unique position of remaining entries
-					markers.append("&markers=size:mid|color:");
-					markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
-					markers.append("|");
-					markers.append(infos2[i].getPosition());
-					positions.add(infos2[i].getPosition());
-					unlabelled	= true;
+					marker	= infos2[i].getLocation()+"\", \"<h3>"+infos2[i].getLocation()+"</h3>";
 				}
 				else
 				{
-					// Add unlabelled markers for each unique position of remaining entries
-					markers.append("|");
-					markers.append(infos2[i].getPosition());
-					positions.add(infos2[i].getPosition());
+					marker	+= "<br/>";
 				}
+				marker	+= (i+1)+": "+infos2[i].getId()+" ("+infos2[i].getHostName()+")";
+				pmarkers.put(infos2[i].getPosition(), marker);
 			}
 		}
 		cnt	+= infos2.length;
 	}
 }
 
-if(markers.length()>0)
-{
-%>
-	<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%=markers%>"/>
+
+if(rmarkers.size()>0 || pmarkers.size()>0)
+{ %>
+	<!-- map styles: examples.map-i86nkdio, examples.map-qfyrx5r8 -->
+	<div id="mapcontainer">
+		<div id="map">Map</div>
+	</div>
+	<script type="text/javascript">
+	var rmarkers = [
+   	    <% for(Map.Entry<String, String> marker: rmarkers.entrySet()) { %>       
+   			[<%= marker.getKey()%>, "<%= marker.getValue() %>"],
+   		<% } %>
+   		];
+	
+	var pmarkers = [
+   	    <% for(Map.Entry<String, String> marker: pmarkers.entrySet()) { %>       
+   			[<%= marker.getKey()%>, "<%= marker.getValue() %>"],
+   		<% } %>
+   		];
+		
+//		var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+		var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//		var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//		var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.dark/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//		var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//		var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//		var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets-basic/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//		var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.outdoors/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//		var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				minZoom: 0,
+				maxZoom: 19,
+				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+//				attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+			}),
+			latlng = L.latLng(53.550556, 9.993333);
+
+		var map = L.map('map', {center: latlng, zoom: 13, layers: [tiles]});
+
+		var server_icon = L.icon({
+		    iconUrl: 'resources/server.png',
+		    shadowUrl: 'resources/server_shadow.png',
+
+		    iconSize:     [17, 43], // size of the icon
+		    shadowSize:   [32, 43], // size of the shadow
+		    iconAnchor:   [-2, 41], // point of the icon which will correspond to marker's location
+		    shadowAnchor: [-2, 41],  // the same for the shadow
+		    popupAnchor:  [17, -45] // point from which the popup should open relative to the iconAnchor
+		});
+		
+		var group = [];
+		for (var i=0; i<rmarkers.length; i++)
+		{
+			var a = rmarkers[i];
+			var marker = L.marker(L.latLng(a[0], a[1]), { title: a[2], icon: server_icon });
+			marker.bindPopup(a[3]);
+			marker.addTo(map);
+			group.push(marker);
+		}
+		
+		var pmarkergroup = L.markerClusterGroup({ chunkedLoading: true });
+		group.push(pmarkergroup);
+		for (var i = 0; i < pmarkers.length; i++) {
+			var a = pmarkers[i];
+			var title = a[2];
+			var marker = L.marker(L.latLng(a[0], a[1]), { title: a[2] });
+			marker.bindPopup(a[3]);
+			pmarkergroup.addLayer(marker);
+		}
+
+		map.addLayer(pmarkergroup);
+		map.fitBounds(L.featureGroup(group).getBounds());
+		
+		$("#mapcontainer").on("resizestop", function(event, ui)
+		{
+			var mapwidth	= $("#mapcontainer").outerWidth(true); // Map size with margins, padding, etc.
+			var parentwidth	= $("#mapcontainer").parent().width();
+			if(mapwidth>parentwidth)
+			{
+				var gap	= mapwidth - $("#mapcontainer").width(); // Calc. size of margins, padding, etc.
+				$("#mapcontainer").width(parentwidth-gap);			
+			}
+			map.invalidateSize();
+		});
+	</script>
 <%
 }
+
 
 String	cc	= GeoIPService.getGeoIPService().getCountryCode(host);
 String	loc	= GeoIPService.getGeoIPService().getLocation(host);
@@ -171,16 +195,17 @@ String	loc	= GeoIPService.getGeoIPService().getLocation(host);
 
 <table>
 	<tr>
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
-		<th>Relay</th>
+		<th colspan="3">Relay</th>
 		<th>Location</th>
 		<th>Connected</th>
 		<th># of Platforms</th>
 	</tr>
 	
 	<tr>
-		<td>A</td>
+		<td>
+			<img src="<%=request.getContextPath()%>/resources/server.png" style="vertical-align:middle"/>
+			A
+		</td>
 		<td>
 			<%
 				if(cc!=null)
@@ -204,8 +229,9 @@ String	loc	= GeoIPService.getGeoIPService().getLocation(host);
 	%>
 		<tr title="<%= peers[i].getDebugText() %>">
 			<td>
+				<img src="<%=request.getContextPath()%>/resources/server.png" style="vertical-align:middle"/>
 				<%= (char)('B'+i) %>
-				</td>
+			</td>
 			<td>
 				<%
 					if(peers[i].getCountryCode()!=null)
@@ -235,9 +261,7 @@ if(cnt>0)
 %>
 	<table>
 		<tr>
-			<th rowspan="2">&nbsp;</th>
-			<th rowspan="2">&nbsp;</th>
-			<th rowspan="2">Platform</th>
+			<th rowspan="2" colspan="3">Platform</th>
 			<th rowspan="2">Host</th>
 			<th rowspan="2">Location</th>
 			<th rowspan="2">Connected Since</th>

@@ -197,7 +197,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     {
     	for(String mediatype: mediatypes)
     	{
-    		converters.remove(mediatype, converter);
+    		converters.removeObject(mediatype, converter);
     	}
     }
     

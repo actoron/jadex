@@ -25,7 +25,7 @@ public class DropGoalPlan extends Plan
 		TestReport	report	= new TestReport("drop_wait", "Test waiting for a dropped goal.");
 		try
 		{
-			waitForGoal(goal, 1000);
+			waitForGoalFinished(goal, 1000);
 			report.setSucceeded(true);
 		}
 		catch(GoalFailureException gfee)

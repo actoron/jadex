@@ -33,7 +33,7 @@ public class ParameterProtectionPlan extends Plan
 		testInProcess(subgoal);
 		try
 		{
-			waitForGoal(subgoal, 2000);
+			waitForGoalFinished(subgoal, 2000);
 		}
 		catch(GoalFailureException e)
 		{

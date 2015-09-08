@@ -67,7 +67,7 @@ public class CMHandlerPlan extends Plan
 			interaction_goal.drop();
 			try
 			{
-				waitForGoal(interaction_goal);	// Will never return as plan gets aborted.
+				waitForGoalFinished(interaction_goal);	// Will never return as plan gets aborted.
 			}
 			catch(GoalFailureException e)
 			{

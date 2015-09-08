@@ -64,7 +64,7 @@ public class MaintainTestPlan extends Plan
 		getLogger().info("Waiting for goal to finish (500 millis).");
 		try
 		{
-			waitForGoal(maintain, 3000);
+			waitForGoalFinished(maintain, 3000);
 			report.setSucceeded(true);
 		}
 		catch(TimeoutException e)

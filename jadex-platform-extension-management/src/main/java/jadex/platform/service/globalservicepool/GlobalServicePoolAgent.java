@@ -1,6 +1,15 @@
 package jadex.platform.service.globalservicepool;
 
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
@@ -34,15 +43,6 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.servicepool.IServicePoolService;
 import jadex.platform.service.servicepool.PoolServiceInfo;
 import jadex.platform.service.servicepool.ServicePoolAgent;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  The global service pool agent can be used to handle services in a pooled manner.

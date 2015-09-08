@@ -757,7 +757,7 @@ public class DhtViewerPanel extends JPanel
 											cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IDistributedKVStoreService>(fut) {
 												@Override
 												public void customResultAvailable(
-														IExternalAccess result) {
+														IExternalAccess result) throws Exception {
 													SServiceProvider.getService(result, IDistributedKVStoreService.class).addResultListener(new DelegationResultListener<IDistributedKVStoreService>(fut));
 													super.customResultAvailable(result);
 												}

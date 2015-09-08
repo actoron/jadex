@@ -15,7 +15,7 @@ public class BetterFileChooser extends JFileChooser
 {
 	/**
 	 *  Creates a new file chooser.
-	 *  @param dir A suggested starting location (may be a file).
+	 *  @param location A suggested starting location (may be a file).
 	 */
 	public BetterFileChooser(File location)
 	{

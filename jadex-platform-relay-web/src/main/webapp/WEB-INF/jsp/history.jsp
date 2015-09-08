@@ -8,7 +8,7 @@
 <%@ page import="java.util.*" %>
 <%
 	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
-	long	start	= System.nanoTime();
+//	long	start	= System.nanoTime();
 %>
 
 
@@ -46,17 +46,27 @@ if(infos.length>0)
 				[<%= marker.getKey()%>, "<%= marker.getValue() %>"],
 			<% } %>
 			];
-			var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png', {
+			
+//			var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+			var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//			var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//			var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.dark/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//			var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//			var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//			var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets-basic/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//			var tiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.outdoors/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicG9rYWhyIiwiYSI6ImFjNzdjOTc0MzVkODQwNDUxNDdiNTZlMWExNDU4MTA3In0.J_4j3K-Ydp5lPJiTWa6fsA', {
+//			var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 					minZoom: 0,
 					maxZoom: 19,
-					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+//					attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 				}),
 				latlng = L.latLng(53.550556, 9.993333);
 	
 			var map = L.map('map', {center: latlng, zoom: 13, layers: [tiles]});
 	
 			var markers = L.markerClusterGroup({ chunkedLoading: true });
-			
+						
 			for (var i = 0; i < addressPoints.length; i++) {
 				var a = addressPoints[i];
 				var title = a[2];
@@ -121,7 +131,7 @@ if(infos.length>0)
 					<%= infos[i].getMessageCount() %>
 			</tr>
 	<%	} 
-		System.out.println("took c: "+((System.nanoTime()-start)/1000000)+" ms");
+//		System.out.println("took c: "+((System.nanoTime()-start)/1000000)+" ms");
 	%>
 </table>
 

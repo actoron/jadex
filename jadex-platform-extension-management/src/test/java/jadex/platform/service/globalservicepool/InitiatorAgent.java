@@ -1,5 +1,11 @@
 package jadex.platform.service.globalservicepool;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -10,10 +16,8 @@ import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -33,12 +37,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.TestAgent;
 import jadex.platform.service.servicepool.PoolServiceInfo;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -119,7 +117,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(Void result) 
 			{
-				performTest(pls.get(0).getComponentIdentifier(), testno, false)
+				performTest(pls.get(1).getComponentIdentifier(), testno, false)
 					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
@@ -158,6 +156,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
+//				System.err.println("-------------+++++++++++++--------------- created global service pool #"+testno);
 				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			
@@ -174,7 +173,7 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Call the service methods.
 	 */
-	protected IFuture<TestReport> callService(final IComponentIdentifier cid, int testno, final long to)
+	protected IFuture<TestReport> callService(final IComponentIdentifier cid, final int testno, final long to)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
@@ -195,6 +194,7 @@ public class InitiatorAgent extends TestAgent
 			public void intermediateResultAvailable(ITestService result)
 			{
 				System.out.println("found: "+((IService)result).getServiceIdentifier());
+//				System.err.println("-------------+++++++++++++--------------- found #"+testno+", "+result);
 				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
 				{
 					called = true;
@@ -233,6 +233,13 @@ public class InitiatorAgent extends TestAgent
 						if(tr.getReason()==null)
 							tr.setSucceeded(true);
 						ret.setResult(tr);
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.err.println("-------------+++++++++++++--------------- call returned with exception #"+testno+", "+exception);
+						super.exceptionOccurred(exception);
 					}
 				});
 				
