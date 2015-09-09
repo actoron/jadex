@@ -1,0 +1,13 @@
+dependencies 
+{
+	compile project(':jadex-distribution-minimal')
+	compile project(':jadex-model-bpmn')
+	compile project(':jadex-kernel-bpmn')
+	compile project(':jadex-kernel-component')
+	compile project(':jadex-kernel-application')
+	compile project(':jadex-kernel-bdiv3')
+	compile project(':jadex-applib-bdi')
+	compile project(':jadex-platform')
+	compile project(':jadex-platform-extension-webservice')
+	compile project(':jadex-platform-extension-webservice-desktop')
+}

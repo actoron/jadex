@@ -52,7 +52,11 @@ include 'jadex-applications-bdi',
 'jadex-platform-extension-securetransport',
 'jadex-platform-extension-management',
 'jadex-platform-extension-maven',
-'jadex-editor-gpmn'
+'jadex-editor-gpmn',
+'jadex-distribution-minimal',
+'jadex-distribution-server',
+'jadex-distribution-standard',
+'jadex-distribution-pro'
 // android-specific modules:
 if (androidSdkExists()) {
     include 'jadex-android-antlr',
