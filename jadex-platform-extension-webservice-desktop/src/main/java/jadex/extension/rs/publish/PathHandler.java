@@ -50,39 +50,46 @@ public class PathHandler implements IRequestHandler
 		if(idx!=-1)
 			host	= host.substring(0, idx);
 		
-		Tuple2<String, IRequestHandler> subhandlertuple = subhandlercache.get(new Tuple2<String, String>(host, path));
-		if(subhandlertuple == null)
-			subhandlertuple = subhandlercache.get(new Tuple2<String, String>(null, path));
+		Tuple2<String, IRequestHandler> tup = subhandlercache.get(new Tuple2<String, String>(host, path));
+		if(tup == null)
+			tup = subhandlercache.get(new Tuple2<String, String>(null, path));
 		
 		int pidx = path.lastIndexOf('/');
-		if(subhandlertuple == null && pidx > 0 && pidx <= path.length() - 1)
+		if(tup == null && pidx > 0 && pidx <= path.length() - 1)
 		{
 			String cpath = path.substring(0, pidx);
-			subhandlertuple = subhandlercache.get(new Tuple2<String, String>(host, cpath));
+			tup = subhandlercache.get(new Tuple2<String, String>(host, cpath));
 		}
 		
-		if(subhandlertuple == null)
+		if(tup == null)
 		{
-			subhandlertuple = findSubhandler(host, path);
-			if(subhandlertuple == null)
+			tup = findSubhandler(host, path);
+			if(tup == null)
 			{
-				subhandlertuple = findSubhandler(null, path);
+				tup = findSubhandler(null, path);
 			}
 			
-			if(subhandlertuple != null)
+			if(tup != null)
 			{
-				subhandlercache.put(new Tuple2<String, String>(host, path), subhandlertuple);
+				subhandlercache.put(new Tuple2<String, String>(host, path), tup);
 			}
 		}
 		
-		if(subhandlertuple == null)
+		if(tup == null)
 			throw new RuntimeException("No handler found for path: " + path);
 		
-		Method setcontextpath = Request.class.getDeclaredMethod("setContextPath", new Class<?>[]{String.class});
-		setcontextpath.setAccessible(true);
-		setcontextpath.invoke(request, subhandlertuple.getFirstEntity());
+//		Method setcontextpath = request.getClass().getDeclaredMethod("setContextPath", new Class<?>[]{String.class});
+//		setcontextpath.setAccessible(true);
+//		setcontextpath.invoke(request, subhandlertuple.getFirstEntity());
 		
-		subhandlertuple.getSecondEntity().handleRequest(request, response, args);
+		HttpServletRequestWrapper wr = new HttpServletRequestWrapper(request);
+		wr.setContextPath(tup.getFirstEntity());
+		String opi = request.getPathInfo();
+		idx = opi.indexOf(tup.getFirstEntity())+tup.getFirstEntity().length();
+		String npi = opi.substring(idx);
+		wr.setPathInfo(npi);
+		
+		tup.getSecondEntity().handleRequest(wr, response, args);
 	}
 	
 	/**
@@ -95,10 +102,7 @@ public class PathHandler implements IRequestHandler
 	public void addSubhandler(String vhost, String path, IRequestHandler subhandler)
 	{
 		subhandlers.put(new Tuple2<String, String>(vhost, path), new Tuple2<String, IRequestHandler>(path, subhandler));
-		synchronized (subhandlers)
-		{
-			subhandlercache = Collections.synchronizedMap(new HashMap<Tuple2<String,String>, Tuple2<String, IRequestHandler>>(subhandlers));
-		}
+		subhandlercache = new HashMap<Tuple2<String,String>, Tuple2<String, IRequestHandler>>(subhandlers);
 	}
 	
 	/**
@@ -131,10 +135,7 @@ public class PathHandler implements IRequestHandler
 	public void removeSubhandler(String vhost, String path)
 	{
 		subhandlers.remove(new Tuple2<String, String>(vhost, path));
-		synchronized (subhandlers)
-		{
-			subhandlercache = new HashMap<Tuple2<String,String>, Tuple2<String, IRequestHandler>>(subhandlers);
-		}			
+		subhandlercache = new HashMap<Tuple2<String,String>, Tuple2<String, IRequestHandler>>(subhandlers);
 	}
 	
 	/**
@@ -150,7 +151,7 @@ public class PathHandler implements IRequestHandler
 		do
 		{
 			int pidx = path.lastIndexOf('/');
-			if (pidx >= 0)
+			if(pidx >= 0)
 			{
 				path = path.substring(0, pidx);
 				ret = subhandlercache.get(new Tuple2<String, String>(host, path));
