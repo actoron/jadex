@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -19,7 +22,8 @@ import jadex.commons.future.IFuture;
 /**
  *  Rest publish service that works with an external web server.
  */
-public class ExternalRestPublishService extends AbstractRestPublishService implements IRequestHandler
+@Service
+public class ExternalRestPublishService extends AbstractRestPublishService implements IRequestHandlerService
 {
 	/** The servers per service id. */
 	protected Map<IServiceIdentifier, Tuple2<PathHandler, URI>> sidservers;
@@ -27,13 +31,36 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	/** The servers per port. */
 	protected Map<Integer, PathHandler> portservers;
 	
+	/** Inited flag because impl is used for 2 services. */
+	protected boolean inited;
+	
+	 /**
+     *  The service init.
+     */
+    @ServiceStart
+    public IFuture<Void> init()
+    {
+    	if(!inited)
+    	{
+    		inited = true;
+    		super.init();
+    	
+    		IProvidedServicesFeature psf = component.getComponentFeature(IProvidedServicesFeature.class);
+    		return psf.addService("requesthandlerser", IRequestHandlerService.class, this);
+    	}
+    	else
+    	{
+    		return IFuture.DONE;
+    	}
+    }
+	
 	/**
 	 *  Handle the request.
 	 *  @param request The request.
 	 *  @param response The response.
 	 *  @param args Container specific args.
 	 */
-	public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
+	public IFuture<Void> handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 	{
 		String err = null;
 		if(portservers!=null)
@@ -65,6 +92,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	        out.write("<html><head></head><body>"+err+"</body></html>");
 	        out.flush();
 		}
+		
+		return IFuture.DONE;
 	}
 	
 	/**

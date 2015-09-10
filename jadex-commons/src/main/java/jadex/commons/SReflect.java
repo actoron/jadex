@@ -829,6 +829,8 @@ public class SReflect
 	/**
 	 *  Get all methods of a class including public, protected
 	 *  and private methods of the class and its superclasses. 
+	 *  @return Array of all methods starting from the current
+	 *  	class upwards towards Object.class.
 	 */
 	public static Method[]	getAllMethods(Class clazz)
 	{

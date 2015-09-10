@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -151,7 +152,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				}
 				
 				// Fail on duplicate annotation if not from overridden method.
-				else if(!SUtil.equals(methods[i].getParameterTypes(), found.getParameterTypes()))
+				else if(!Arrays.equals(methods[i].getParameterTypes(), found.getParameterTypes()))
 				{
 					ret.setException(new RuntimeException("Duplicate annotation @"+annotation.getSimpleName()+" in methods "+methods[i]+" and "+found));
 				}

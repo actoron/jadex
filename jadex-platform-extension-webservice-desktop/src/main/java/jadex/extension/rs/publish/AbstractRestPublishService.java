@@ -115,7 +115,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      *  The service init.
      */
     @ServiceStart
-    public void init()
+    public IFuture<Void> init()
     {
     	converters = new MultiCollection<String, IObjectStringConverter>();
     	resultspercall = new MultiCollection<String, ResultInfo>();
@@ -176,6 +176,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     			});
         	}
         };
+        
+        return IFuture.DONE;
     }
     
     /**
