@@ -223,11 +223,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // check if call is an intermediate result fetch
         String callid = request.getHeader(HEADER_JADEX_CALLID);
                
-        Enumeration<String> hs = request.getHeaderNames();
-        for(String s=hs.nextElement(); hs.hasMoreElements(); s=hs.nextElement())
-        {
-        	System.out.println("header: "+s+" "+request.getHeader(s));
-        }
+//        Enumeration<String> hs = request.getHeaderNames();
+//        for(String s=hs.nextElement(); hs.hasMoreElements(); s=hs.nextElement())
+//        {
+//        	System.out.println("header: "+s+" "+request.getHeader(s));
+//        }
         
         // requestpercall is used to signal an ongoing conversation
         if(requestspercall.containsKey(callid))
@@ -242,7 +242,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         	}
         	else
         	{
-        		AsyncContext ctx = request.startAsync();
+        		AsyncContext ctx = getAsyncContext(request);
         		saveRequestContext(callid, ctx);
         	}
         }
@@ -277,7 +277,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 
                     if(ret instanceof IIntermediateFuture)
                     {
-                    	final AsyncContext ctx = request.startAsync();
+                    	final AsyncContext ctx = getAsyncContext(request);
                     	final String fcallid = SUtil.createUniqueId(methodname);
                     	saveRequestContext(fcallid, ctx);
 //                    	System.out.println("added context: "+fcallid+" "+ctx);
@@ -327,7 +327,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     }
                     else if(ret instanceof IFuture)
                     {
-                    	final AsyncContext ctx = request.startAsync();
+                    	final AsyncContext ctx = getAsyncContext(request);
                     	
                     	((IFuture)ret).addResultListener(new IResultListener<Object>()
 						{
@@ -349,7 +349,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     }
                     else
                     {
-//	                        	System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
+//	                    System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
                     	// map the result by user defined mappers
                     	ret = mapResult(method, ret);
                     	// convert content and write result to servlet response
@@ -371,17 +371,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 String info = getServiceInfo(service, uri, mappings);
                 out.write(info);
                 
-//                      out.println("<h1>" + "Found no method mapping, available are: " + "</h1>");
-//                      out.println("<ul>");
-//                      for(Map.Entry<String, Collection<MappingInfo>> entry: mappings.entrySet())
-//                      {
-//                      	for(MappingInfo mi: entry.getValue())
-//                      	{
-//                      		out.println(entry.getKey()+" -> "+mi.getMethod().getName()+"<br/>");
-//                      	}
-//                      }
-//                      out.println("</ul>");
-//                      System.out.println(mappings);
+                if(request.isAsyncStarted())
+                	request.getAsyncContext().complete();
             }
         }
     }
@@ -436,6 +427,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      */
     public abstract IFuture<Void> publishExternal(URI uri, String rootpath);
 
+    /**
+     *  Get the async
+     */
+    protected AsyncContext getAsyncContext(HttpServletRequest request)
+    {
+       	return request.isAsyncStarted()? request.getAsyncContext(): request.startAsync();
+    }
+    
     /**
      *  Map the incoming uri/post/multipart parameters to the service target parameter types.
      */

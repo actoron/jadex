@@ -17,6 +17,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -60,40 +61,53 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	 *  @param response The response.
 	 *  @param args Container specific args.
 	 */
-	public IFuture<Void> handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
+	public IFuture<Void> handleRequest(HttpServletRequest request, HttpServletResponse response, Object args)
 	{
-		String err = null;
-		if(portservers!=null)
+		System.out.println("service received: "+request.getRequestURL().toString());
+		
+		final Future<Void> ret = new Future<Void>();
+		
+		try
 		{
-			PathHandler ph = portservers.get(Integer.valueOf(request.getLocalPort()));
-			if(ph!=null)
+			String err = null;
+			if(portservers!=null)
 			{
-				ph.handleRequest(request, response, args);
+				PathHandler ph = portservers.get(Integer.valueOf(request.getLocalPort()));
+				if(ph!=null)
+				{
+					ph.handleRequest(request, response, args);
+				}
+				else
+				{
+					err = "No service registered to handle the request.";
+				}
 			}
 			else
 			{
-				err = "No service registered to handle the request.";
+				err = "No server at port: "+request.getLocalPort();
 			}
-		}
-		else
-		{
-			err = "No server at port: "+request.getLocalPort();
-		}
-		
-		if(err!=null)
-		{
-//			System.out.println("resp is: "+response.hashCode());
 			
-			// Set response content type
-	        response.setContentType("text/html");
-
-	        // Actual logic goes here.
-	        Writer out = response.getWriter();
-	        out.write("<html><head></head><body>"+err+"</body></html>");
-	        out.flush();
+			if(err!=null)
+			{
+	//			System.out.println("resp is: "+response.hashCode());
+				
+				// Set response content type
+		        response.setContentType("text/html");
+	
+		        // Actual logic goes here.
+		        Writer out = response.getWriter();
+		        out.write("<html><head></head><body>"+err+"</body></html>");
+		        out.flush();
+			}
+			
+			ret.setResult(null);
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
 		}
 		
-		return IFuture.DONE;
+		return ret;
 	}
 	
 	/**

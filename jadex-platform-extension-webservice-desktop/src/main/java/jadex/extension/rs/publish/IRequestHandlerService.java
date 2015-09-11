@@ -19,5 +19,6 @@ public interface IRequestHandlerService
 	 *  @param response The response.
 	 *  @param args Container specific args.
 	 */
-	public IFuture<Void> handleRequest(@Reference HttpServletRequest request, @Reference HttpServletResponse response, @Reference Object args) throws Exception;
+	public IFuture<Void> handleRequest(@Reference HttpServletRequest request, @Reference HttpServletResponse response, 
+		@Reference Object args);
 }

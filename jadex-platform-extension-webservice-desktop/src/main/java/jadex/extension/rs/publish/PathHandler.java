@@ -1,14 +1,10 @@
 package jadex.extension.rs.publish;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.glassfish.grizzly.http.server.Request;
 
 import jadex.commons.Tuple2;
 
@@ -83,10 +79,11 @@ public class PathHandler implements IRequestHandler
 //		setcontextpath.invoke(request, subhandlertuple.getFirstEntity());
 		
 		HttpServletRequestWrapper wr = new HttpServletRequestWrapper(request);
-		wr.setContextPath(tup.getFirstEntity());
-		String opi = request.getPathInfo();
-		idx = opi.indexOf(tup.getFirstEntity())+tup.getFirstEntity().length();
-		String npi = opi.substring(idx);
+		String cp = tup.getFirstEntity();
+		wr.setContextPath(cp);
+		String full = request.getRequestURI();
+		idx = full.indexOf(cp)+cp.length();
+		String npi = full.substring(idx);
 		wr.setPathInfo(npi);
 		
 		tup.getSecondEntity().handleRequest(wr, response, args);
