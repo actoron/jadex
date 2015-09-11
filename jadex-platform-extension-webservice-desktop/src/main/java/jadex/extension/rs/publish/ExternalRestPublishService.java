@@ -67,44 +67,59 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		try
+		String err = null;
+		if(portservers!=null)
 		{
-			String err = null;
-			if(portservers!=null)
+			PathHandler ph = portservers.get(Integer.valueOf(request.getLocalPort()));
+			if(ph!=null)
 			{
-				PathHandler ph = portservers.get(Integer.valueOf(request.getLocalPort()));
-				if(ph!=null)
+				try
 				{
 					ph.handleRequest(request, response, args);
 				}
-				else
+				catch(Exception e)
 				{
-					err = "No service registered to handle the request.";
+					err = getServicesInfo(ph);
 				}
 			}
 			else
 			{
-				err = "No server at port: "+request.getLocalPort();
+				err = "No service registered to handle the request.";
 			}
+		}
+		else
+		{
+			err = "No server at port: "+request.getLocalPort();
+		}
+		
+		if(err!=null)
+		{
+//			System.out.println("resp is: "+response.hashCode());
 			
-			if(err!=null)
-			{
-	//			System.out.println("resp is: "+response.hashCode());
-				
-				// Set response content type
-		        response.setContentType("text/html");
-	
-		        // Actual logic goes here.
+			// Set response content type
+	        response.setContentType("text/html");
+
+	        // Actual logic goes here.
+	        try
+	        {
 		        Writer out = response.getWriter();
 		        out.write("<html><head></head><body>"+err+"</body></html>");
 		        out.flush();
-			}
-			
-			ret.setResult(null);
+		        
+		        // hack? todo: where to handle this complete?
+		        if(request.isAsyncStarted())
+		        	request.getAsyncContext().complete();
+		        
+		        ret.setResult(null);
+	        }
+	        catch(Exception e)
+	        {
+	        	ret.setException(e);
+	        }
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			ret.setResult(null);
 		}
 		
 		return ret;
@@ -248,5 +263,68 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	public IFuture<Void> shutdownHttpServer(URI uri)
 	{
 	    throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 */
+	public String getServicesInfo(PathHandler ph)
+	{
+		StringBuffer ret = new StringBuffer();
+		
+		try
+		{
+			String functionsjs = loadFunctionJS();
+			String stylecss = loadStyleCSS();
+			
+			ret.append("<html>");
+			ret.append("\n");
+			ret.append("<head>");
+			ret.append("\n");
+			ret.append(stylecss);
+			ret.append("\n");
+			ret.append(functionsjs);
+			ret.append("\n");
+	//		ret.append("<script src=\"functions.js\" type=\"text/javascript\"/>");
+			ret.append("</head>");
+			ret.append("\n");
+			ret.append("<body>");
+			ret.append("\n");
+			
+			ret.append("<div class=\"header\">");
+			ret.append("\n");
+			ret.append("<h1>");//Service Info for: ");
+			ret.append("Published Services Info");
+			ret.append("</h1>");
+			ret.append("\n");
+			ret.append("</div>");
+			ret.append("\n");
+
+			ret.append("<div class=\"middle\">");
+			ret.append("\n");
+			
+			Map<Tuple2<String, String>, Tuple2<String, IRequestHandler>> subhandlers = ph.getSubhandlers();
+			for(Tuple2<String, String> key: subhandlers.keySet())
+			{
+				ret.append("<div id=\"method\">");
+				ret.append("host: ").append(key.getFirstEntity()).append(" path: ").append(key.getSecondEntity());
+				ret.append("</div>");
+			}
+			
+			ret.append("</div>");
+			ret.append("\n");
+			
+			ret.append("<div id=\"result\"></div>");
+			
+			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">Jadex Active Components</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>\n");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+		ret.append("</body>\n</html>\n");
+
+		return ret.toString();
 	}
 }

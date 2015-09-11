@@ -161,4 +161,13 @@ public class PathHandler implements IRequestHandler
 		while (ret == null && path != null && path.length() > 0);
 		return ret;
 	}
+
+	/**
+	 *  Get the subhandlers. 
+	 *  @return The subhandlers
+	 */
+	public Map<Tuple2<String, String>, Tuple2<String, IRequestHandler>> getSubhandlers()
+	{
+		return subhandlers;
+	}
 }
