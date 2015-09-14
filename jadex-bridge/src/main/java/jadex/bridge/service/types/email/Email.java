@@ -49,6 +49,14 @@ public class Email
 	/**
 	 *  Create an email.
 	 */
+	public Email(String sender, String content, String subject, String[] receivers)
+	{
+		this(sender, content, "text/plain", subject, receivers, null, null);
+	}
+	
+	/**
+	 *  Create an email.
+	 */
 	public Email(String sender, String content, String contenttype, String subject, String[] receivers,
 		String[] ccs, String[] bccs)
 	{

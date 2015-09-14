@@ -38,6 +38,9 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	/** The path info. */
 	protected String pathinfo;
 	
+	/** The servlet path. */
+	protected String servletpath;
+	
 	/**
 	 *  Create a new wrapper.
 	 */
@@ -324,7 +327,7 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 
 	public String getServletPath()
 	{
-		return request.getServletPath();
+		return servletpath!=null? servletpath: request.getServletPath();
 	}
 	    
 	public HttpSession getSession(boolean create)
@@ -414,6 +417,15 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	public void setPathInfo(String pathinfo)
 	{
 		this.pathinfo = pathinfo;
+	}
+
+	/**
+	 *  Set the servletpath.
+	 *  @param servletpath The servletpath to set
+	 */
+	public void setServletPath(String servletpath)
+	{
+		this.servletpath = servletpath;
 	}
 	
 }

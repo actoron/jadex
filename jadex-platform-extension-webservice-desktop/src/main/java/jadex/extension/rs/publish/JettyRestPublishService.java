@@ -78,7 +78,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
                     if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
                     	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
                 	
-                	handleRequest(service, uri, mappings, request, response, new Object[]{target, baseRequest});
+                	handleRequest(service, mappings, request, response, new Object[]{target, baseRequest});
                 	
 //                  System.out.println("handler is: "+uri.getPath());
                     baseRequest.setHandled(true);

@@ -79,7 +79,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 				}
 				catch(Exception e)
 				{
-					err = getServicesInfo(ph);
+					err = getServicesInfo(request, ph);
 				}
 			}
 			else
@@ -155,7 +155,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 			{
 				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 				{
-					ExternalRestPublishService.this.handleRequest(service, uri, mappings, request, response, null);
+					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
 				}
 			};
 			ph.addSubhandler(null, uri.getPath(), rh);
@@ -267,7 +267,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	
 	/**
 	 */
-	public String getServicesInfo(PathHandler ph)
+	public String getServicesInfo(HttpServletRequest request, PathHandler ph)
 	{
 		StringBuffer ret = new StringBuffer();
 		
@@ -305,8 +305,10 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 			Map<Tuple2<String, String>, Tuple2<String, IRequestHandler>> subhandlers = ph.getSubhandlers();
 			for(Tuple2<String, String> key: subhandlers.keySet())
 			{
-				ret.append("<div id=\"method\">");
-				ret.append("host: ").append(key.getFirstEntity()).append(" path: ").append(key.getSecondEntity());
+				ret.append("<div class=\"method\">");
+				ret.append("Host: ").append(key.getFirstEntity()!=null? key.getFirstEntity(): "-").append(" Path: ").append(key.getSecondEntity()).append("<br/>");
+				String url = getServletHost(request)+key.getSecondEntity();
+				ret.append("<a href=\"").append(url).append("\">").append(url).append("</a>");
 				ret.append("</div>");
 			}
 			

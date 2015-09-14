@@ -374,7 +374,7 @@ public class UpdateAgent implements IUpdateService
 			{
 				public void resultAvailable(IEmailService emailser)
 				{
-					Email eml = new Email(null, text, "platform update notification", null);
+					Email eml = new Email(null, text, "platform update notification", (String)null);
 					eml.setReceivers(receivers);
 					emailser.sendEmail(eml, account).addResultListener(new DelegationResultListener<Void>(secret));
 				}

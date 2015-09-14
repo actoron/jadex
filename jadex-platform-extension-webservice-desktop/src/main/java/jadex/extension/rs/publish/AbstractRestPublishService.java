@@ -216,7 +216,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     /**
      * 
      */
-    public void handleRequest(IService service, URI uri, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
+    public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {
 //    	System.out.println("handler is: "+uri.getPath());
 
@@ -368,7 +368,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 response.setContentType("text/html; charset=utf-8");
                 response.setStatus(HttpServletResponse.SC_OK);
             
-                String info = getServiceInfo(service, uri, mappings);
+               
+                
+                String info = getServiceInfo(service, getServletUrl(request), mappings);
                 out.write(info);
                 
                 if(request.isAsyncStarted())
@@ -1050,13 +1052,55 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     }
 
     /**
+     *  Get the servlet base url.
+     *  @param req The request.
+     *  @return The servlet base url.
+     */
+    public static String getServletUrl(HttpServletRequest req)
+    {
+    	 StringBuffer url = new StringBuffer(getServletHost(req));
+         String cp = req.getContextPath(); // deploy directory
+         String serp = req.getServletPath(); // name of servlet
+         
+         if(cp!=null)
+        	 url.append(cp);
+         if(serp!=null)
+        	 url.append(serp);
+
+         return url.toString();
+    }
+    
+    /**
+     *  Get the servlet base url.
+     *  @param req The request.
+     *  @return The servlet base url.
+     */
+    public static String getServletHost(HttpServletRequest req)
+    {
+    	 StringBuffer url = new StringBuffer();
+         String scheme = req.getScheme();
+         int port = req.getServerPort();
+         
+         url.append(scheme);
+         url.append("://");
+         url.append(req.getServerName());
+         if ((scheme.equals ("http") && port != 80)
+         || (scheme.equals ("https") && port != 443)) {
+             url.append (':');
+             url.append (req.getServerPort());
+         }
+
+         return url.toString();
+    }
+    
+    /**
 	 *  Functionality blueprint for get service info web method.
 	 *  Creates a html page with css for style and javascript for ajax post requests.
 	 *  The service info site contains a section for each published method. 
 	 *  @param params The parameters.
 	 *  @return The result.
 	 */
-	public String getServiceInfo(Object service, URI baseuri, MultiCollection<String, MappingInfo> mappings)
+	public String getServiceInfo(Object service, String baseuri, MultiCollection<String, MappingInfo> mappings)
 	{
 		StringBuffer ret = new StringBuffer();
 		
@@ -1153,9 +1197,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						ret.append("<i>");
 						
 						if(consumed!=PARAMETER_MEDIATYPES)
+						{
 							ret.append("Consumes: ");
+						}
 						else
+						{
 							ret.append("Consumes [not declared by the service]: ");
+						}
 						ret.append("</i>");
 						for(int j=0; j<consumed.size(); j++)
 						{
@@ -1169,11 +1217,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					if(produced!=null && produced.size()>0)
 					{
 						ret.append("<i>");
-						ret.append("Produces: ");
 						if(produced!=PARAMETER_MEDIATYPES)
+						{
 							ret.append("Produces: ");
+						}
 						else
+						{
 							ret.append("Produces [not declared by the service]: ");
+						}
 						ret.append("</i>");
 						for(int j=0; j<produced.size(); j++)
 						{

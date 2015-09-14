@@ -122,7 +122,7 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
 //			        request.setNote(SERVLET_REQUEST_NOTE, servletRequest);
 //			        request.setNote(SERVLET_RESPONSE_NOTE, servletResponse);
 
-                	handleRequest(service, uri, mappings, req, res, null);
+                	handleRequest(service, mappings, req, res, null);
                 	
 //                  System.out.println("handler is: "+uri.getPath());
 				}
@@ -295,25 +295,21 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
         throw new UnsupportedOperationException();
     }
 
-	@Override
 	public IFuture<Void> publishRedirect(URI uri, String html)
 	{
         throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public IFuture<Void> unpublish(String vhost, URI uri)
 	{
         throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public IFuture<Void> mirrorHttpServer(URI sourceserveruri, URI targetserveruri, PublishInfo info)
 	{
         throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public IFuture<Void> shutdownHttpServer(URI uri)
 	{
         throw new UnsupportedOperationException();
