@@ -109,6 +109,8 @@ public class RootComponentConfiguration
 	public static final String RELAYADDRESS = "relayaddress"; // class: String default: jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
 	/** Flag if relay should use HTTPS for receiving messages. **/
 	public static final String RELAYSECURITY = "relaysecurity"; // class: boolean default: $args.relayaddress.indexOf("https://")==-1 ? false : true
+	/** Flag if only awareness messages should be sent through relay. **/
+	public static final String RELAYAWAONLY = "relayawaonly"; // class: boolean default: false
 	/** Flag if ssltcp transport should enabled (requires Jadex Pro add-on). **/
 	public static final String SSLTCPTRANSPORT = "ssltcptransport"; // class: boolean default: false
 	/** Port for SSL TCP transport. **/

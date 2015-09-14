@@ -131,6 +131,9 @@ public class HttpRelayTransport implements ITransport
 	/** Flag if receiver connection should use https. */
 	protected boolean	secure;
 	
+	/** Flag if only awareness messages should be sent through relay. */
+	protected boolean	awaonly;
+	
 	/** The connection manager. */
 	protected RelayConnectionManager	conman;
 	
@@ -154,10 +157,11 @@ public class HttpRelayTransport implements ITransport
 	/**
 	 *  Create a new relay transport.
 	 */
-	public HttpRelayTransport(IInternalAccess component, String defaddresses, boolean secure)
+	public HttpRelayTransport(IInternalAccess component, String defaddresses, boolean secure, boolean awaonly)
 	{
 		this.component	= component;
 		this.secure	= secure;
+		this.awaonly	= awaonly;
 		this.addresses	= Collections.synchronizedMap(new HashMap<String, Long>());	// Todo: cleanup unused addresses!?
 		this.workers	= new HashMap<String, Integer>();
 		this.readyqueue	= new HashMap<String, Collection<ISendTask>>();
@@ -400,9 +404,10 @@ public class HttpRelayTransport implements ITransport
 		boolean	applicable	= false;
 		for(int i=0; !applicable && i<getServiceSchemas().length; i++)
 		{
-			applicable	= address.startsWith(getServiceSchemas()[i]);
+			applicable	= address.startsWith(getServiceSchemas()[i])
+				&& (!awaonly || address.endsWith("awareness"));
 		}
-		return applicable;		
+		return applicable;
 	}
 	
 	/**
@@ -517,7 +522,7 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public String[] getAddresses()
 	{
-		return receiver.getAddresses();
+		return awaonly ? SUtil.EMPTY_STRING_ARRAY : receiver.getAddresses();
 	}
 	
 	/**
