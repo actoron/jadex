@@ -1043,9 +1043,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				int endstart = ((IInternalExecutionFeature)getComponent().getComponentFeature(IExecutionFeature.class)).getEndstateStart();
 				boolean stateok  = priostep || endstart==-1 || step.getStepCount()>=endstart;
 				
-				if(!stateok)
-					System.out.println(getComponent().getComponentIdentifier()+" dropping step: "+step.getStep());
-
 				// for test execution to ensure that not dropped steps cause problems
 //				stateok = true;
 				

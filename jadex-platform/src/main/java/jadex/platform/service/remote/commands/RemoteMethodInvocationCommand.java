@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.interceptors.CallAccess;
@@ -228,9 +229,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		// todo: non-functional props
 		
 		// RMS acts as representative of remote caller.
-//		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
-//		IComponentIdentifier.LOCAL.set(caller);
-//		IComponentAdapter.LOCAL.set(null);	// No adapter for remote component.
+		IInternalAccess	ada	= IInternalExecutionFeature.LOCAL.get();
+		IComponentIdentifier.LOCAL.set(caller);
+		IInternalExecutionFeature.LOCAL.set(null);	// No adapter for remote component.
 		Map<String, Object> props = getNonFunctionalProperties();
 		
 //		props.put("method3", method.getName());
@@ -247,7 +248,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		CallAccess.resetNextInvocation();
 		
 		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
-//		IComponentAdapter.LOCAL.set(ada);
+		IInternalExecutionFeature.LOCAL.set(ada);
 		
 		return ret;
 	}
