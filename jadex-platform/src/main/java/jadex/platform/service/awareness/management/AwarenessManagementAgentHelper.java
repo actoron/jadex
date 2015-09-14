@@ -137,7 +137,7 @@ public class AwarenessManagementAgentHelper
 			@Classname("refreshSettings")
 			public IFuture<AwarenessSettingsData> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				AwarenessSettingsData ret = new AwarenessSettingsData();
 				// Object[] ai = agent.getAddressInfo();
 				// ret.address = (InetAddress)ai[0];

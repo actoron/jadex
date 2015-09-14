@@ -131,6 +131,9 @@ public class HttpRelayTransport implements ITransport
 	/** Flag if receiver connection should use https. */
 	protected boolean	secure;
 	
+	/** Flag if only awareness messages should be sent through relay. */
+	protected boolean	awaonly;
+	
 	/** The connection manager. */
 	protected RelayConnectionManager	conman;
 	
@@ -154,10 +157,11 @@ public class HttpRelayTransport implements ITransport
 	/**
 	 *  Create a new relay transport.
 	 */
-	public HttpRelayTransport(IInternalAccess component, String defaddresses, boolean secure)
+	public HttpRelayTransport(IInternalAccess component, String defaddresses, boolean secure, boolean awaonly)
 	{
 		this.component	= component;
 		this.secure	= secure;
+		this.awaonly	= awaonly;
 		this.addresses	= Collections.synchronizedMap(new HashMap<String, Long>());	// Todo: cleanup unused addresses!?
 		this.workers	= new HashMap<String, Integer>();
 		this.readyqueue	= new HashMap<String, Collection<ISendTask>>();
@@ -175,13 +179,13 @@ public class HttpRelayTransport implements ITransport
 			defs.append(secure ? RelayConnectionManager.secureAddress(adr) : adr);
 				
 			boolean	found	= false;
-			for(int i=0; !found && i<getServiceSchemas().length; i++)
+			for(int i=0; !found && i<internalGetServiceSchemas().length; i++)
 			{
-				found	= adr.startsWith(getServiceSchemas()[i]);
+				found	= adr.startsWith(internalGetServiceSchemas()[i]);
 			}
 			if(!found)
 			{
-				throw new RuntimeException("Address does not match supported service schemes: "+adr+", "+SUtil.arrayToString(getServiceSchemas()));
+				throw new RuntimeException("Address does not match supported service schemes: "+adr+", "+SUtil.arrayToString(internalGetServiceSchemas()));
 			}
 		}
 		
@@ -398,11 +402,12 @@ public class HttpRelayTransport implements ITransport
 	public boolean	isApplicable(String address)
 	{
 		boolean	applicable	= false;
-		for(int i=0; !applicable && i<getServiceSchemas().length; i++)
+		for(int i=0; !applicable && i<internalGetServiceSchemas().length; i++)
 		{
-			applicable	= address.startsWith(getServiceSchemas()[i]);
+			applicable	= address.startsWith(internalGetServiceSchemas()[i])
+				&& (!awaonly || address.endsWith("awareness"));
 		}
-		return applicable;		
+		return applicable;
 	}
 	
 	/**
@@ -506,6 +511,15 @@ public class HttpRelayTransport implements ITransport
 	 *  @return Transport prefix.
 	 */
 	public String[] getServiceSchemas()
+	{
+		return awaonly ? SUtil.EMPTY_STRING_ARRAY : internalGetServiceSchemas();
+	}
+	
+	/**
+	 *  Returns the prefix of this transport
+	 *  @return Transport prefix.
+	 */
+	protected String[] internalGetServiceSchemas()
 	{
 		return SRelay.ADDRESS_SCHEMES;
 	}

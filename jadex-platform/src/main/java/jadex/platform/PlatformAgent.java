@@ -106,6 +106,7 @@ import static jadex.base.RootComponentConfiguration.*;
 	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
 	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
+	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=SSLTCPPORT, clazz=int.class, defaultvalue="44334"),
 
@@ -341,6 +342,7 @@ import static jadex.base.RootComponentConfiguration.*;
 			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
 			@NameValue(name="relayaddress", value="$args.relayaddress"),
 			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
+			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
 			@NameValue(name="binarymessages", value="$args.binarymessages"),
 			@NameValue(name="strictcom", value="$args.strictcom"),
 		}),

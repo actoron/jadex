@@ -3,7 +3,6 @@ package jadex.platform.service.message;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -35,6 +34,7 @@ import jadex.platform.service.message.transport.ITransport;
 	@Argument(name="ssltcpport", clazz=int.class),
 	@Argument(name="relayaddress", clazz=String.class),
 	@Argument(name="relaysecurity", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="relayawaonly", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="strictcom", clazz=boolean.class, defaultvalue="false"),
 })
@@ -52,7 +52,7 @@ public class MessageAgent
 		"jadex.platform.service.message.transport.tcpmtp.TCPTransport",				"tcptransport",		"component,tcpport",
 		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport", 		"niotcptransport",	"component,niotcpport,componentlogger",
 		"jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", 		"ssltcptransport",	"component,ssltcpport",
-		"jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport",	"relaytransport",	"component,relayaddress,relaysecurity",
+		"jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport",	"relaytransport",	"component,relayaddress,relaysecurity,relayawaonly",
 		"com.actoron.platform.service.message.transport.udpmtp.UdpTransport", 		"null",				"component"
 	};
 	
@@ -91,7 +91,7 @@ public class MessageAgent
 					}
 				}
 				
-				transports[i / 3] = createTransport(clazz, conargs.toArray());
+				transports[i / 3] = createTransport(ia, clazz, conargs.toArray());
 			}
 		}
 		return transports;
@@ -104,20 +104,20 @@ public class MessageAgent
 	 *  @param arguments Constructor arguments to match as array or single object for a single object constructor, can be null.
 	 *  @return Object of the class or null on failure.
 	 */
-	public static ITransport createTransport(String classname, Object arguments)
+	public static ITransport createTransport(IInternalAccess ia, String classname, Object arguments)
 	{
 		ITransport ret = null;
 		
 		try
 		{
-			Class<?> clazz = SReflect.classForName0(classname, null);
+			Class<?> clazz = SReflect.classForName0(classname, ia.getClassLoader());
 			if (clazz == null)
 			{
-				clazz = SReflect.classForName0("jadex.platform.service.message.transport." + classname, null);
+				clazz = SReflect.classForName0("jadex.platform.service.message.transport." + classname, ia.getClassLoader());
 			}
 			if (clazz == null)
 			{
-				clazz = SReflect.classForName("com.actoron.platform.service.message.transport." + classname, null);
+				clazz = SReflect.classForName("com.actoron.platform.service.message.transport." + classname, ia.getClassLoader());
 			}
 			Constructor<?> con = null;
 			Object[] args = null;
@@ -174,6 +174,7 @@ public class MessageAgent
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 		}
 		
 		return ret;

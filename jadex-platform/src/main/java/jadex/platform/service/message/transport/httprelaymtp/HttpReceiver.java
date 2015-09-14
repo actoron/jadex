@@ -1,5 +1,18 @@
 package jadex.platform.service.message.transport.httprelaymtp;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -18,20 +31,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.micro.annotation.Binding;
 import jadex.platform.service.message.MapSendTask;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
