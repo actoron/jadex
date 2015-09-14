@@ -28,8 +28,8 @@ import jadex.micro.annotation.Publish;
 	@ProvidedService(name="banking1", type=IBankingService.class, implementation=@Implementation(BankingService.class),
 		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8081/banking1",
 		properties={
-			@NameValue(name=PublishInfo.WP_URL, value="\"http://localhost:8080/test\""),
-			@NameValue(name=PublishInfo.WP_APPNAME, value="\"bank\""),
+//			@NameValue(name=PublishInfo.WP_URL, value="\"http://localhost:8080/test\""),
+//			@NameValue(name=PublishInfo.WP_APPNAME, value="\"bank\""),
 			@NameValue(name="formats", value="new javax.ws.rs.core.MediaType[]{javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE}")
 		}))
 	
