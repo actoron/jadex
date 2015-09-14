@@ -1,0 +1,13 @@
+dependencies 
+{
+	compile project(':jadex-distribution-server')
+
+	compile project(':jadex-runtimetools-swing')
+	compile project(':jadex-tools-bdi')
+	compile project(':jadex-tools-bpmn')
+	compile project(':jadex-tools-comanalyzer')
+	compile project(':jadex-rules-tools')
+
+	compile project(':jadex-kernel-extension-agr')
+	compile project(':jadex-kernel-extension-envsupport')
+}

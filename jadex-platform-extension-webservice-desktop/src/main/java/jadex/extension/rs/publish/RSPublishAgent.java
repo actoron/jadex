@@ -14,11 +14,12 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @ProvidedServices(
 {
-	@ProvidedService(name="publish_rs", type=IWebPublishService.class, 
-		implementation=@Implementation(GrizzlyRestServicePublishService.class))
 //	@ProvidedService(name="publish_rs", type=IWebPublishService.class, 
+//		implementation=@Implementation(GrizzlyRestServicePublishService.class))
+	@ProvidedService(name="publish_rs", type=IWebPublishService.class, 
 //		implementation=@Implementation(JettyRestPublishService.class))
 //		implementation=@Implementation(GrizzlyRestPublishService.class))
+		implementation=@Implementation(ExternalRestPublishService.class))
 })
 @Properties(@NameValue(name="system", value="true"))
 public class RSPublishAgent

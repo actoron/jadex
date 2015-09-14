@@ -174,25 +174,25 @@ public class JettyRestPublishService extends AbstractRestPublishService
         throw new UnsupportedOperationException();
     }
 
-	@Override
+	
 	public IFuture<Void> publishRedirect(URI uri, String html)
 	{
         throw new UnsupportedOperationException();
 	}
 
-	@Override
+
 	public IFuture<Void> unpublish(String vhost, URI uri)
 	{
         throw new UnsupportedOperationException();
 	}
 
-	@Override
+	
 	public IFuture<Void> mirrorHttpServer(URI sourceserveruri, URI targetserveruri, PublishInfo info)
 	{
         throw new UnsupportedOperationException();
 	}
 
-	@Override
+
 	public IFuture<Void> shutdownHttpServer(URI uri)
 	{
         throw new UnsupportedOperationException();

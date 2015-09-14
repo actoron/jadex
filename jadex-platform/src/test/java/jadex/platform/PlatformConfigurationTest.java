@@ -114,10 +114,10 @@ public class PlatformConfigurationTest
 	}
 	
 	@Test
-	public void testMinimalPlatform() {
+	public void testMinimalPlatform() 
+	{
 		PlatformConfiguration minimal = PlatformConfiguration.getMinimal();
 		Starter.createPlatform(minimal).get();
-		
 	}
 
 	private Map<String,Method> getSettersByName(Class<RootComponentConfiguration> class1, Set<String> names)

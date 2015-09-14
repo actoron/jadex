@@ -1,6 +1,8 @@
 apply plugin: 'signing'
 apply plugin: 'java-library-distribution'
-apply plugin: 'maven-publish' // PublishToMavenLocal
+apply plugin: 'maven-publish' // publishToMavenLocal
+apply plugin: 'maven' // use gradle install to install in local .m2 
+// gradle install -x test -i    for fast local install without tests (-x test i program args)
 
 //if(file('gradle.properties').exists())
 //{

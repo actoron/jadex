@@ -211,6 +211,16 @@ public class Starter
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
 	 */
+	public static IFuture<IExternalAccess> createPlatform()
+	{
+		return createPlatform(PlatformConfiguration.getDefault());
+	}
+	
+	/**
+	 *  Create the platform.
+	 *  @param args The command line arguments.
+	 *  @return The external access of the root component.
+	 */
 	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config)
 	{
 		RootComponentConfiguration rootConfig = config.getRootConfig();
