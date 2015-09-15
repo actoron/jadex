@@ -45,11 +45,6 @@ import java.util.Map;
 @Properties(@NameValue(name="system", value="true"))
 public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarenessService
 {
-	//-------- attributes --------
-	
-	/** True, if currently sending an info. */
-	protected boolean	sending;
-	
 	//-------- agent methods --------
 	
 	/**
@@ -143,10 +138,8 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 	protected IFuture<Void>	sendInfo(final boolean offline)
 	{
 		IFuture<Void>	ret;
-		if(offline || (!sending && isStarted()))
+		if(offline || isStarted())
 		{
-			sending	= true;
-			
 			agent.getLogger().info("Sending awareness info to server...");
 			final Future<Void>	fut	= new Future<Void>();
 			IFuture<IMessageService>	msfut =	agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
@@ -178,7 +171,6 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 								{
 									public void customResultAvailable(final AwarenessInfo awainfo)
 									{
-										sending	= false;	// Subsequent updates trigger new send.
 										awainfo.setDelay(-1);	// no delay required
 										if(offline)
 											awainfo.setState(AwarenessInfo.STATE_OFFLINE);
@@ -217,7 +209,6 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					sending	= false;
 					if(!(exception instanceof ComponentTerminatedException))
 					{
 //						exception.printStackTrace();
@@ -289,4 +280,14 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 		super.setExcludes(excludes);
 		sendInfo(false);
 	}
+	
+	/**
+	 *  Republish the awareness info.
+	 *  Called when some important property has changed, e.g. platform addresses.
+	 */
+	public void republish()
+	{
+		sendInfo(false);
+	}
+
 }

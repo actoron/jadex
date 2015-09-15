@@ -28,4 +28,10 @@ public interface IDiscoveryService
 	 *  @param excludes The excludes.
 	 */
 	public void setExcludes(String[] excludes);
+	
+	/**
+	 *  Republish the awareness info.
+	 *  Called when some important property has changed, e.g. platform addresses.
+	 */
+	public void republish();
 }

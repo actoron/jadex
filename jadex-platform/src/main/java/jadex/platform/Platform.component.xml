@@ -114,6 +114,8 @@
 		<argument name="relayaddress" class="String">jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS</argument>
 		<!-- Flag if relay should use HTTPS for receiving messages. -->
 		<argument name="relaysecurity" class="boolean">$args.relayaddress.indexOf("https://")==-1 ? false : true</argument>
+		<!-- Flag if relay should only be used for awareness and not for messages. -->
+		<argument name="relayawaonly" class="boolean">false</argument>
 		<!-- Flag if ssltcp transport should enabled (requires Jadex Pro add-on). -->
 		<argument name="ssltcptransport" class="boolean">false</argument>
 		<!-- Port for SSL TCP transport. -->
@@ -343,6 +345,7 @@
 						<argument name="ssltcpport">$args.ssltcpport</argument>
 						<argument name="relayaddress">$args.relayaddress</argument>
 						<argument name="relaysecurity">$args.relaysecurity</argument>
+						<argument name="relayawaonly">$args.relayawaonly</argument>
 						<argument name="binarymessages">$args.binarymessages</argument>
 						<argument name="strictcom">$args.strictcom</argument>
 					</arguments>
@@ -436,6 +439,7 @@
 						<argument name="ssltcpport">$args.ssltcpport</argument>
 						<argument name="relayaddress">$args.relayaddress</argument>
 						<argument name="relaysecurity">$args.relaysecurity</argument>
+						<argument name="relayawaonly">$args.relayawaonly</argument>
 						<argument name="binarymessages">$args.binarymessages</argument>
 						<argument name="strictcom">$args.strictcom</argument>
 					</arguments>

@@ -1,12 +1,11 @@
 package jadex.bridge.service.types.awareness;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.Collection;
 
 /**
  *  Service for managing discovery infos.

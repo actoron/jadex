@@ -228,6 +228,15 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 	{
 	}
 	
+	/**
+	 *  Republish the awareness info.
+	 *  Called when some important property has changed, e.g. platform addresses.
+	 */
+	public void republish()
+	{
+		postInfo();
+	}
+	
 	protected void postInfo()
 	{
 //		final String awa = SReflect.getInnerClassName(this.getClass());

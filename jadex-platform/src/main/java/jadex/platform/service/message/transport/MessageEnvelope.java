@@ -1,14 +1,15 @@
 package jadex.platform.service.message.transport;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.annotations.Alias;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  *  The message envelope holding the native message,
@@ -72,7 +73,7 @@ public class MessageEnvelope
 	 * Get the receivers.
 	 */
 	// Legacy compatibility hack. Should be ITransportComponentIdentifier
-	public ComponentIdentifier[] getReceivers()
+	public IComponentIdentifier[] getReceivers()
 	{
 		return receivers==null? new ComponentIdentifier[0]: receivers.toArray(new ComponentIdentifier[receivers.size()]);
 	}
@@ -81,14 +82,14 @@ public class MessageEnvelope
 	 * Get the receivers.
 	 */
 	// Legacy compatibility hack. Should be ITransportComponentIdentifier
-	public void setReceivers(ComponentIdentifier[] receivers)
+	public void setReceivers(IComponentIdentifier[] receivers)
 	{
 		this.receivers = new ArrayList<ITransportComponentIdentifier>();
 		if(receivers!=null)
 		{
 			for(int i=0; i<receivers.length; i++)
 			{
-				this.receivers.add(receivers[i]);
+				this.receivers.add((ITransportComponentIdentifier)receivers[i]);
 			}
 		}
 	}

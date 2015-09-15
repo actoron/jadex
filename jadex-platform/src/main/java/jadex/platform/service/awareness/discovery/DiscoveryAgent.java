@@ -1,5 +1,9 @@
 package jadex.platform.service.awareness.discovery;
 
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -30,16 +34,11 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.message.MapSendTask;
-
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  *  Base class for different kinds of discovery agents.
@@ -58,7 +57,7 @@ import java.util.TimerTask;
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
 })*/
 @ProvidedServices(
-	@ProvidedService(type=IDiscoveryService.class, implementation=@Implementation(DiscoveryService.class))
+	@ProvidedService(type=IDiscoveryService.class)
 )
 @RequiredServices(
 {
@@ -67,7 +66,7 @@ import java.util.TimerTask;
 	@RequiredService(name="threadpool", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="management", type=IAwarenessManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-public abstract class DiscoveryAgent
+public abstract class DiscoveryAgent	implements IDiscoveryService
 {
 	//-------- attributes --------
 	
@@ -405,6 +404,15 @@ public abstract class DiscoveryAgent
 	public boolean isFast()
 	{
 		return this.fast;
+	}
+	
+	/**
+	 *  Republish the awareness info.
+	 *  Called when some important property has changed, e.g. platform addresses.
+	 */
+	public void republish()
+	{
+		// Empty default implementation.
 	}
 	
 	/**

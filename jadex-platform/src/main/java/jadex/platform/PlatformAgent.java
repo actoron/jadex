@@ -262,6 +262,7 @@ import static jadex.base.RootComponentConfiguration.*;
 			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
 			@NameValue(name="relayaddress", value="$args.relayaddress"),
 			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
+			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
 			@NameValue(name="binarymessages", value="$args.binarymessages"),
 			@NameValue(name="strictcom", value="$args.strictcom"),
 		}),

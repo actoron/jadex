@@ -59,6 +59,7 @@ import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
+import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -84,6 +85,7 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.STransformation;
@@ -1364,6 +1366,10 @@ public class MessageService extends BasicService implements IMessageService
 	public IFuture<Void> refreshAddresses()
 	{
 		addresses	= null;
+		for(IDiscoveryService ds: SServiceProvider.getLocalServices(component, IDiscoveryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		{
+			ds.republish();
+		}
 
 		// this is suboptimal currently because internalGetAddresses has to rebuild addresses immediately so
 		// it could be done here
@@ -2831,10 +2837,10 @@ public class MessageService extends BasicService implements IMessageService
 					if(!errors.isEmpty())
 					{
 						logger.warning("Ignored errors during message decoding: "+errors);
-//											for(Exception e: errors)
-//											{
-//												e.printStackTrace();
-//											}
+//						for(Exception e: errors)
+//						{
+//							e.printStackTrace();
+//						}
 					}
 					fmessage.put(name, val);
 				}

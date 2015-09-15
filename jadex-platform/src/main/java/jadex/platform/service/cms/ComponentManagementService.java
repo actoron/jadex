@@ -2008,9 +2008,6 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal)
 	{
-//		if(cid.getName().indexOf("cms")!=-1)
-//			System.out.println("getExternalAccess: "+this+", "+cid);
-		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 //		ret.addResultListener(new IResultListener<IExternalAccess>()
@@ -2036,6 +2033,10 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		if(isRemoteComponent(cid))
 		{
+			if(cid.getName().indexOf("chat")!=-1)
+			{
+				System.out.println("getExternalAccess: "+this+", "+cid+", "+ServiceCall.getCurrentInvocation().getCaller());
+			}
 //			System.out.println("getExternalAccess: remote");
 			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IExternalAccess>(ret)
