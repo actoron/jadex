@@ -674,6 +674,16 @@ public class RootComponentConfiguration
 		setValue(RELAYSECURITY, value);
 	}
 
+	public boolean getRelayAwaonly()
+	{
+		return Boolean.TRUE.equals(getValue(RELAYAWAONLY));
+	}
+
+	public void setRelayAwaonly(boolean value)
+	{
+		setValue(RELAYAWAONLY, value);
+	}
+
 	public boolean getSSLTCPTRANSPORT()
 	{
 		return Boolean.TRUE.equals(getValue(SSLTCPTRANSPORT));

@@ -1,5 +1,12 @@
 package jadex.bridge.service.search;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
 import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
@@ -20,6 +27,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
@@ -36,13 +44,6 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 
 /**
  *  Static helper class for searching services.
@@ -550,6 +551,7 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Void result)
 			{
+				// component itself?
 				if(cid.equals(component.getComponentIdentifier()))
 				{
 					T res = (T)component.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
@@ -564,7 +566,9 @@ public class SServiceProvider
 						ret.setException(new ServiceNotFoundException(""+type));
 					}
 				}
-				else
+				
+				// local component?
+				else if(cid.getRoot().equals(component.getComponentIdentifier().getRoot()))
 				{
 					SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
@@ -593,6 +597,16 @@ public class SServiceProvider
 							});
 						}
 					});
+				}
+					
+				// For remote use rms, to allow correct security settings due to not using getExternalAccess()
+				else
+				{
+					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
+					
+					IRemoteServiceManagementService rms	= SServiceProvider.getLocalService(component, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					rms.getServiceProxy(component.getComponentIdentifier(), cid, type, RequiredServiceInfo.SCOPE_LOCAL, null)
+						.addResultListener(new ComponentResultListener<T>(lis, component));
 				}
 			}
 		});

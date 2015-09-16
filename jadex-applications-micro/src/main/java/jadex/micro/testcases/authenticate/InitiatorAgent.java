@@ -70,7 +70,7 @@ public class InitiatorAgent extends TestAgent
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
 		{
-			public void customResultAvailable(ISecurityService sec)
+			public void customResultAvailable(final ISecurityService sec)
 			{
 				sec.addVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix())
 					.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
@@ -82,7 +82,14 @@ public class InitiatorAgent extends TestAgent
 						{
 							public void customResultAvailable(final TestReport result)
 							{
-								ret.setResult(result);
+								sec.removeVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix()).
+									addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+								{
+									public void customResultAvailable(Void v) throws Exception
+									{
+										ret.setResult(result);
+									}
+								});
 							}
 						}));
 					}

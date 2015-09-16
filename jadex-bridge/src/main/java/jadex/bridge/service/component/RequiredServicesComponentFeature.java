@@ -20,7 +20,6 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -561,27 +560,15 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		final Future<T>	fut	= new Future<T>();
 		
-		// Local?
-		if(cid.getRoot().equals(getComponent().getComponentIdentifier().getRoot()))
-		{
-			SServiceProvider.getService(getComponent(), cid, type).addResultListener(new DelegationResultListener<T>(fut));
-	//		{
-	//			// Not necessary any longer
-	//			public void customResultAvailable(Object result)
-	//			{
-	//				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-	//					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
-	//			}
-	//		});
-		}
-		
-		// For remote use rms, to allow correct security settings due to not using getExternalAccess()
-		else
-		{
-			IRemoteServiceManagementService rms	= SServiceProvider.getLocalService(getComponent(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			rms.getServiceProxy(getComponent().getComponentIdentifier(), cid, type, RequiredServiceInfo.SCOPE_LOCAL, null)
-				.addResultListener(new DelegationResultListener<T>(fut));
-		}
+		SServiceProvider.getService(getComponent(), cid, type).addResultListener(new DelegationResultListener<T>(fut));
+//		{
+//			// Not necessary any longer (done in SServiceProvider)
+//			public void customResultAvailable(Object result)
+//			{
+//				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
+//					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
+//			}
+//		});
 		
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}
