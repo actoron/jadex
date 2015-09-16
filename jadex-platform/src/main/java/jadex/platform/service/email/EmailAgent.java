@@ -146,6 +146,12 @@ public class EmailAgent implements IEmailService
 			return ret;
 		}
 		
+		if(email.getReceivers()==null || email.getReceivers().length==0)
+		{
+			ret.setException(new RuntimeException("No receivers given."));
+			return ret;
+		}
+		
 //		System.out.println("email agent trying to send email");
 		final EmailAccount account = acc!=null? acc: this.account;
 		
