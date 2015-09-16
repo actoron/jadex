@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import jadex.commons.SUtil;
+
 /**
  *  Email account data.
  */
@@ -310,6 +312,23 @@ public class EmailAccount
 		try 
 		{
 			readAccount(new FileInputStream(filename));
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Read account data from property file.
+	 */
+	public static EmailAccount createAccount(String filename, ClassLoader cl)
+	{
+		try 
+		{
+			EmailAccount ret = new EmailAccount();
+			ret.readAccount(SUtil.getResource(filename, cl));
+			return ret;
 		}
 		catch(Exception e)
 		{

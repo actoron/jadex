@@ -22,4 +22,6 @@ dependencies
 	compile 'org.glassfish.jersey.media:jersey-media-moxy:2.11'
 
 	compile 'org.eclipse.jetty:jetty-server:9.3.1.v20150714'
+	
+	compile 'org.ow2.asm:asm-all:5.0.3' // for getParameterNames() :-(
 }

@@ -179,6 +179,18 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 //		return ret==null? Collections.EMPTY_LIST: ret;
 		return ret;
 	}
+	
+	/**
+	 *  Get first object for a key (unwraps from collection).
+	 *  @param key The key.
+	 *  @return The (first) value or null.
+	 */
+	public V getObject(Object key)
+	{
+		Collection<V> ret = map.get(key);
+		return ret!=null && ret.size()>0? ret.iterator().next(): null;
+	}
+
 
 	// Modification Operations
 

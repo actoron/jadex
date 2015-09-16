@@ -110,6 +110,12 @@
 			<version>9.3.1.v20150714</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>5.0.3</version>
+		</dependency>
+		
 		<!-- <dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>jsr311-api</artifactId>

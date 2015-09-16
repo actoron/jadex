@@ -45,7 +45,9 @@ import com.mxgraph.util.mxRectangle;
  */
 public class SHelper
 {
-
+	// Should be in SReflect but requires asm
+    // and also exists in SHelper
+	
 	/**
 	 *  Get parameter names via asm reader.
 	 *  @param m The method.

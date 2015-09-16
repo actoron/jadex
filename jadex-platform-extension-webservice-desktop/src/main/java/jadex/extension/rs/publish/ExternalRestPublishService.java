@@ -63,7 +63,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	 */
 	public IFuture<Void> handleRequest(HttpServletRequest request, HttpServletResponse response, Object args)
 	{
-		System.out.println("service received: "+request.getRequestURL().toString());
+		System.out.println("service received: "+request.getRequestURL().toString()+" "+request.getParameterMap());
 		
 		final Future<Void> ret = new Future<Void>();
 		

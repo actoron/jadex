@@ -3,13 +3,13 @@ package jadex.extension.rs.publish;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +33,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.LocalVariableNode;
+import org.objectweb.asm.tree.MethodNode;
+
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.annotation.ParameterInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -56,7 +63,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
-import jadex.commons.transformation.IStringObjectConverter;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -509,7 +515,28 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        if(sr.size()==0)
 	            System.out.println("found no acceptable in types.");
 	        
-	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: inparamsmap.getObjects();
+	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: new Object[inparamsmap.size()];
+	        
+	        if(inparamsmap!=null)
+	        {
+	        	List<String> pnames = getParameterNames(method);
+	        	if(pnames!=null)
+	        	{
+		        	int i = 0;
+		        	for(String pname: pnames)
+		        	{
+		        		inparams[i++] = inparamsmap.getObject(pname);
+		        	}
+	        	}
+	        	else
+	        	{
+	        		int i = 0;
+	        		for(Map.Entry<String, Collection<String>> entry: inparamsmap.entrySet())
+	        		{
+	        			inparams[i++] = entry.getValue();
+	        		}
+	        	}
+	        }
 	        
 	        for(int i=0; i<inparams.length; i++)
 	        {
@@ -1690,5 +1717,101 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			this.mappingInfo = mappingInfo;
 		}
     }
+    
+    // Should be in SReflect but requires asm
+    // and also exists in SHelper
+    
+    /**
+	 *  Get parameter names via asm reader.
+	 *  @param m The method.
+	 *  @return The list of parameter names or null
+	 */
+	public static List<String> getParameterNames(Method m)
+	{
+		List<String> ret = null;
+		
+		// Try to find via annotation
+		boolean anused = false;
+		Annotation[][] annos = m.getParameterAnnotations();
+		if(annos.length>0)
+		{
+			ret = new ArrayList<String>();
+			for(Annotation[] ans: annos)
+			{
+				boolean found = false;
+				for(Annotation an: ans)
+				{
+					if(an instanceof ParameterInfo)
+					{
+						ret.add(((ParameterInfo)an).value());
+						found = true;
+						anused = true;
+						break;
+					}
+				}
+				if(!found)
+					ret.add(null);
+			}
+		}
+		
+		// Try to find via debug info
+		if(!anused)
+		{
+			Class<?> deccl = m.getDeclaringClass();
+			String mdesc = Type.getMethodDescriptor(m);
+			String url = Type.getType(deccl).getInternalName() + ".class";
+	
+			InputStream is = deccl.getClassLoader().getResourceAsStream(url);
+			if(is!=null)
+			{
+				ClassNode cn = null;
+				try
+				{
+					cn = new ClassNode();
+					ClassReader cr = new ClassReader(is);
+					cr.accept(cn, 0);
+				}
+				catch(Exception e)
+				{
+				}
+				finally
+				{
+					try
+					{
+						is.close();
+					}
+					catch(Exception e)
+					{
+					}
+				}
+		
+				if(cn!=null)
+				{
+					List<MethodNode> methods = cn.methods;
+					ret = new ArrayList<String>();
+					for(MethodNode method: methods)
+					{
+						if(method.name.equals(m.getName()) && method.desc.equals(mdesc))
+						{
+							Type[] argtypes = Type.getArgumentTypes(method.desc);
+			
+							List<LocalVariableNode> lvars = method.localVariables;
+							if(lvars!=null && lvars.size()>0)
+							{
+								for(int i=0; i<argtypes.length; i++)
+								{
+									// first local variable represents the "this" object
+									ret.add(lvars.get(i+1).name);
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
 }
 
