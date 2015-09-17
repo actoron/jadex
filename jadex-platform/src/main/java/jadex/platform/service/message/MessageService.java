@@ -2847,7 +2847,7 @@ public class MessageService extends BasicService implements IMessageService
 				catch(Exception e)
 				{
 //					System.out.println("classloader: "+cl);
-					e.printStackTrace();
+//					e.printStackTrace();
 					if(!(e instanceof ContentException))
 					{
 						// Todo: find out why 50MB sized messages are sent... 
