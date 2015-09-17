@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jadex-distribution-server</artifactId>
+	<packaging>jar</packaging>
+	<name>jadex-distribution-server</name>
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-parent-pro</artifactId>
+		<version> 2.5-SNAPSHOT </version>
+		<relativePath>../jadex-parent-pro/pom.xml</relativePath>
+	</parent>
+
+	<description>
+		The server distribution of the Jadex middleware includes
+		useful modules for running server side jadex applications.
+	</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-distribution-minimal</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+ 		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-model-bpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-application</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdiv3</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applib-bdi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-extension-webservice</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-extension-webservice-desktop</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.3</version>
+		</dependency>
+	</dependencies>
+</project>

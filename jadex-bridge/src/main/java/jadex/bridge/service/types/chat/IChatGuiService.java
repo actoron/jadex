@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.chat;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -67,7 +66,7 @@ public interface IChatGuiService
 	/**
 	 *  Post a status change.
 	 *  @param status The new status or null for no change.
-	 *  @param image The new avatar iamge or null for no change.
+	 *  @param image The new avatar image or null for no change.
 	 */
 	public IIntermediateFuture<IChatService> status(String status, byte[] image, IComponentIdentifier[] receivers);
 
