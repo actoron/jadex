@@ -162,7 +162,7 @@ public class EmailAgent implements IEmailService
 		props.put("mail.smtp.host", account.getSmtpHost());
 		props.put("mail.from", email.getSender());
 		
-		props.put("mail.debug", "true");
+//		props.put("mail.debug", "true");
 		
 		// Hack!!! bypass certificate check.
 //		props.setProperty("mail.smtp.ssl.trust", account.getSmtpHost());

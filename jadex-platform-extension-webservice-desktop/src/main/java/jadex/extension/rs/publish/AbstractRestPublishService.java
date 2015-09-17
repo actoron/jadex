@@ -40,7 +40,6 @@ import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import jadex.base.PlatformConfiguration;
-import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -177,7 +176,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         				System.out.println("sending timeout to client");
         				writeResponse(null, Response.Status.REQUEST_TIMEOUT.getStatusCode(), callid, null, 
         					(HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
-        				ctx.complete();
+//        				ctx.complete();
         			}
     			});
         	}
@@ -255,6 +254,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         else if(callid!=null)
         {
         	writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
+        
+//        	if(request.isAsyncStarted())
+//        		request.getAsyncContext().complete();
         }
         // handle new call
         else
@@ -316,7 +318,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     				
 //                    				System.out.println("removed context: "+fcallid+" "+ctx);
                     				writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
-                    				ctx.complete();
+//                    				ctx.complete();
                     			}
                     			else
                     			{
@@ -335,23 +337,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     {
                     	final AsyncContext ctx = getAsyncContext(request);
                     	
+                    	// todo: use timeout listener
                     	((IFuture)ret).addResultListener(new IResultListener<Object>()
 						{
                     		public void resultAvailable(Object ret)
                     		{
                     			ret = mapResult(method, ret);
                     			writeResponse(ret, null, mi, request, response, true);
-                    			ctx.complete();
+//                    			ctx.complete();
                     		}
 
                     		public void exceptionOccurred(Exception exception)
                     		{
                     			Object result = mapResult(method, exception);
-                    			writeResponse(exception, null, mi, request, response, true);
-                    			ctx.complete();
+                    			writeResponse(exception, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
+//                    			ctx.complete();
                     		}
 						});
-                        ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
+//                        ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
                     }
                     else
                     {
@@ -364,7 +367,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 }
                 catch(Exception e)
                 {
-                	writeResponse(e, null, null, request, response, true);
+                	writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
                 }
             }
             else
@@ -373,8 +376,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 
                 response.setContentType("text/html; charset=utf-8");
                 response.setStatus(HttpServletResponse.SC_OK);
-            
-               
                 
                 String info = getServiceInfo(service, getServletUrl(request), mappings);
                 out.write(info);
@@ -728,14 +729,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	   }
 	   else
 	   {
+		   List<String> sr = writeResponseHeader(result, status, callid, mi, request, response, fin);
+		   writeResponseContent(result, request, response, sr);
+		   
 		   if(fin)
 		   {
 			   requestspercall.remove(callid);
 			   resultspercall.remove(callid);
 		   }
-		   
-		   List<String> sr = writeResponseHeader(result, status, callid, mi, request, response, fin);
-		   writeResponseContent(result, request, response, sr);
 	   }
    }
     
@@ -898,8 +899,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //	                System.out.println("cannot convert result: "+result);
 //	            }
 	            
-	            out.flush();
+	        	// causes tomcat 8 to throw nullpointer?
+//	            out.flush();
 	        }
+	        
+	        if(request.isAsyncStarted())
+            	request.getAsyncContext().complete();
     	}
     	catch(Exception e)
     	{
