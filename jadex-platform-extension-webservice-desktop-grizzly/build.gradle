@@ -1,0 +1,14 @@
+//def jersey_version	= 2.11
+
+dependencies 
+{
+	compile project(':jadex-platform-extension-webservice-desktop')
+
+	compile 'org.glassfish.grizzly:grizzly-http-servlet:2.3.22'
+	compile 'org.glassfish.jersey.media:jersey-media-multipart:2.11'
+	compile 'org.glassfish.grizzly:grizzly-http-server-multipart:2.3.16'
+	compile 'org.glassfish.grizzly:grizzly-http-server:2.3.16'
+	compile 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.11'
+	compile 'org.glassfish.jersey.core:jersey-client:2.11'
+	compile 'org.glassfish.jersey.media:jersey-media-moxy:2.11'
+}

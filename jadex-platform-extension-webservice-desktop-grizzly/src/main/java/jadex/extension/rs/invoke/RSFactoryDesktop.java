@@ -1,7 +1,7 @@
-package jadex.extension.rs;
+package jadex.extension.rs.invoke;
 
 import jadex.bridge.IInternalAccess;
-import jadex.extension.rs.invoke.RestServiceWrapperInvocationHandler;
+import jadex.extension.rs.RSFactory;
 
 import java.lang.reflect.InvocationHandler;
 

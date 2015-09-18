@@ -1,0 +1,7 @@
+//def jersey_version	= 2.11
+
+dependencies 
+{
+	compile project(':jadex-platform-extension-webservice-desktop')
+	compile 'org.eclipse.jetty:jetty-server:9.3.1.v20150714'
+}
