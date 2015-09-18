@@ -14,5 +14,6 @@ public interface IRequestHandler
 	 *  @param response The response.
 	 *  @param args Container specific args.
 	 */
-	public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception;
+	public void handleRequest(HttpServletRequest request, HttpServletResponse response, 
+		Object args) throws Exception;
 }

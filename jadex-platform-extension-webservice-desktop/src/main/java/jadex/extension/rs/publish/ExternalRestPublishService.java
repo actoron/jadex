@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,7 +36,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	/** Inited flag because impl is used for 2 services. */
 	protected boolean inited;
 	
-	 /**
+	/**
      *  The service init.
      */
     @ServiceStart
@@ -106,9 +107,10 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		        out.write("<html><head></head><body>"+err+"</body></html>");
 		        out.flush();
 		        
-		        // hack? todo: where to handle this complete?
-		        if(request.isAsyncStarted())
-		        	request.getAsyncContext().complete();
+		        complete(request, response);
+//		         hack? todo: where to handle this complete?
+//		        if(request.isAsyncStarted())
+//		        	request.getAsyncContext().complete();
 		        
 		        ret.setResult(null);
 	        }

@@ -81,6 +81,10 @@ import jadex.xml.bean.JavaWriter;
 @Service
 public abstract class AbstractRestPublishService implements IWebPublishService
 {
+	/** Async context info. */
+	public static final String ASYNC_CONTEXT_INFO = "__cinfo";
+	
+	
 	/** Http header for the call id. */
 	public static final String HEADER_JADEX_CALLID = "x-jadex-callid";
 	
@@ -350,7 +354,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     		public void exceptionOccurred(Exception exception)
                     		{
                     			Object result = mapResult(method, exception);
-                    			writeResponse(exception, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
+                    			writeResponse(exception, Response.Status.NOT_ACCEPTABLE.getStatusCode(), null, mi, request, response, true);
+//                    			writeResponse(exception, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
 //                    			ctx.complete();
                     		}
 						});
@@ -367,7 +372,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 }
                 catch(Exception e)
                 {
-                	writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
+                	writeResponse(e, Response.Status.NOT_ACCEPTABLE.getStatusCode(), null, null, request, response, true);
                 }
             }
             else
@@ -723,6 +728,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     */
    protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin) 
    {
+	   // Only write response on first exception
+	   if(isComplete(request, response))
+		   return;
+	   
 	   if(FINISHED.equals(result))
 	   {
 		   writeResponse(null, status, callid, mi, request, response, true);
@@ -784,9 +793,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
             }
 
             if(sr.size()==0)
+            {
                 System.out.println("found no acceptable return types.");
+            }
             else
+            {
             	System.out.println("acceptable return types: "+sr+" ("+cl+")");
+            }
             
             if(callid!=null)
             {
@@ -812,7 +825,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     }
     
     /**
-     *
+     *  Write the response content.
      */
     protected void writeResponseContent(Object result, HttpServletRequest request, HttpServletResponse response, List<String> sr) 
     {
@@ -843,7 +856,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        }
 	        	else
 	  	        {
-	        		System.out.println("cannot convert result: "+result);
+	        		System.out.println("cannot convert result, writing as string: "+result);
+	        		response.setHeader("Content-Type", MediaType.TEXT_PLAIN);
+	        		out.write(result.toString());
 	  	        }
 	        	
 	            // for testing with browser
@@ -903,8 +918,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //	            out.flush();
 	        }
 	        
-	        if(request.isAsyncStarted())
-            	request.getAsyncContext().complete();
+	       complete(request, response);
     	}
     	catch(Exception e)
     	{
@@ -1485,6 +1499,33 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 		return ret;
 	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @param cinfo
+	 */
+	protected void complete(HttpServletRequest request, HttpServletResponse response)
+	{
+		IAsyncContextInfo cinfo = (IAsyncContextInfo)request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO);
+		if(cinfo==null)
+			System.out.println("xxxxx cinfo null");
+		if(request.isAsyncStarted() && request.getAsyncContext()!=null && !isComplete(request, response))
+		{
+			request.getAsyncContext().complete();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @param cinfo
+	 */
+	protected boolean isComplete(HttpServletRequest request, HttpServletResponse response)
+	{
+		IAsyncContextInfo cinfo = (IAsyncContextInfo)request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO);
+		return cinfo!=null? cinfo.isComplete(): response.isCommitted();
+	}
     
     /**
      *
@@ -1757,6 +1798,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				if(!found)
 					ret.add(null);
 			}
+			if(!anused)
+				ret = null;
 		}
 		
 		// Try to find via debug info
@@ -1793,16 +1836,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				if(cn!=null)
 				{
 					List<MethodNode> methods = cn.methods;
-					ret = new ArrayList<String>();
+					
 					for(MethodNode method: methods)
 					{
 						if(method.name.equals(m.getName()) && method.desc.equals(mdesc))
 						{
 							Type[] argtypes = Type.getArgumentTypes(method.desc);
-			
 							List<LocalVariableNode> lvars = method.localVariables;
 							if(lvars!=null && lvars.size()>0)
 							{
+								ret = new ArrayList<String>();
 								for(int i=0; i<argtypes.length; i++)
 								{
 									// first local variable represents the "this" object
