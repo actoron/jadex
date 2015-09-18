@@ -389,8 +389,8 @@ public class ComponentManagementService implements IComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 
-//		if(name!=null && name.indexOf("abc")!=-1)
-//			System.out.println("create compo: "+modelname+" "+info);
+		if(name!=null && name.indexOf("rspub")!=-1)
+			System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();

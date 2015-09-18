@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +34,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.LocalVariableNode;
-import org.objectweb.asm.tree.MethodNode;
+//import org.objectweb.asm.ClassReader;
+//import org.objectweb.asm.Type;
+//import org.objectweb.asm.tree.ClassNode;
+//import org.objectweb.asm.tree.LocalVariableNode;
+//import org.objectweb.asm.tree.MethodNode;
 
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IInternalAccess;
@@ -385,8 +386,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 String info = getServiceInfo(service, getServletUrl(request), mappings);
                 out.write(info);
                 
-                if(request.isAsyncStarted())
-                	request.getAsyncContext().complete();
+                complete(request, response);
             }
         }
     }
@@ -570,7 +570,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	                    if(SReflect.isSupertype(ts[0], Map.class))
 	                    {
 	                        targetparams[0] = inparamsmap;
-	                        ((Map)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
+	                        ((Map)targetparams[0]).putAll(extractCallerValues(request));
 	                    }
 	//                    else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
 	//                    {
@@ -1496,9 +1496,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void complete(HttpServletRequest request, HttpServletResponse response)
 	{
-		IAsyncContextInfo cinfo = (IAsyncContextInfo)request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO);
-		if(cinfo==null)
-			System.out.println("xxxxx cinfo null");
 		if(request.isAsyncStarted() && request.getAsyncContext()!=null && !isComplete(request, response))
 		{
 			request.getAsyncContext().complete();
@@ -1513,6 +1510,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	protected boolean isComplete(HttpServletRequest request, HttpServletResponse response)
 	{
 		IAsyncContextInfo cinfo = (IAsyncContextInfo)request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO);
+		if(cinfo==null)
+			System.out.println("warning, async context info is null: "+request.getRequestURL());
 		return cinfo!=null? cinfo.isComplete(): response.isCommitted();
 	}
     
@@ -1791,64 +1790,98 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 ret = null;
         }
 
+        // only works when compiled with debug info
         // Try to find via debug info
-        if(!anused)
-        {
-            Class<?> deccl = m.getDeclaringClass();
-            String mdesc = Type.getMethodDescriptor(m);
-            String url = Type.getType(deccl).getInternalName() + ".class";
-
-            InputStream is = deccl.getClassLoader().getResourceAsStream(url);
-            if(is!=null)
-            {
-                ClassNode cn = null;
-                try
-                {
-                    cn = new ClassNode();
-                    ClassReader cr = new ClassReader(is);
-                    cr.accept(cn, 0);
-                }
-                catch(Exception e)
-                {
-                }
-                finally
-                {
-                    try
-                    {
-                        is.close();
-                    }
-                    catch(Exception e)
-                    {
-                    }
-                }
-
-                if(cn!=null)
-                {
-                    List<MethodNode> methods = cn.methods;
-
-                    for(MethodNode method: methods)
-                    {
-                        if(method.name.equals(m.getName()) && method.desc.equals(mdesc))
-                        {
-                            Type[] argtypes = Type.getArgumentTypes(method.desc);
-                            List<LocalVariableNode> lvars = method.localVariables;
-                            if(lvars!=null && lvars.size()>0)
-                            {
-                                ret = new ArrayList<String>();
-                                for(int i=0; i<argtypes.length; i++)
-                                {
-                                    // first local variable represents the "this" object
-                                    ret.add(lvars.get(i+1).name);
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+//        if(!anused)
+//        {
+//            Class<?> deccl = m.getDeclaringClass();
+//            String mdesc = Type.getMethodDescriptor(m);
+//            String url = Type.getType(deccl).getInternalName() + ".class";
+//
+//            InputStream is = deccl.getClassLoader().getResourceAsStream(url);
+//            if(is!=null)
+//            {
+//                ClassNode cn = null;
+//                try
+//                {
+//                    cn = new ClassNode();
+//                    ClassReader cr = new ClassReader(is);
+//                    cr.accept(cn, 0);
+//                }
+//                catch(Exception e)
+//                {
+//                }
+//                finally
+//                {
+//                    try
+//                    {
+//                        is.close();
+//                    }
+//                    catch(Exception e)
+//                    {
+//                    }
+//                }
+//
+//                if(cn!=null)
+//                {
+//                    List<MethodNode> methods = cn.methods;
+//
+//                    for(MethodNode method: methods)
+//                    {
+//                        if(method.name.equals(m.getName()) && method.desc.equals(mdesc))
+//                        {
+//                            Type[] argtypes = Type.getArgumentTypes(method.desc);
+//                            List<LocalVariableNode> lvars = method.localVariables;
+//                            if(lvars!=null && lvars.size()>0)
+//                            {
+//                                ret = new ArrayList<String>();
+//                                for(int i=0; i<argtypes.length; i++)
+//                                {
+//                                    // first local variable represents the "this" object
+//                                    ret.add(lvars.get(i+1).name);
+//                                }
+//                            }
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         return ret;
+	}
+	
+	/**
+	 *  Extract caller values like ip and browser.
+	 *  @param request The requrest.
+	 *  @param vals The values.
+	 */
+	public Map<String, String> extractCallerValues(Object request)
+	{
+		Map<String, String> ret = new HashMap<String, String>();
+		
+		// add request to map as internal parameter
+		// cannot put request into map because map is cloned via service call
+		if(request!=null)
+		{
+//			if(request instanceof Request)
+//			{
+//				Request greq = (Request)request;
+//				ret.put("ip", greq.getRemoteAddr());
+//				ret.put("browser", greq.getHeader("User-Agent"));
+//				ret.put("querystring", greq.getQueryString());
+//			}
+//			else 
+				if(request instanceof HttpServletRequest)
+			{
+				HttpServletRequest sreq = (HttpServletRequest)request;
+				ret.put("ip", sreq.getRemoteAddr());
+				ret.put("browser", sreq.getHeader("User-Agent"));
+				ret.put("querystring", sreq.getQueryString());
+			}
+		}
+		
+		return ret;
 	}
 }
 

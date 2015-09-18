@@ -65,9 +65,16 @@
 			<scope>provided</scope>
 		</dependency>
 		 
-		<dependency>
+<!-- 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-extension-webservice-desktop</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency> -->
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-extension-webservice-desktop-grizzly</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>

@@ -121,6 +121,7 @@ public class RootComponentConfiguration
 	
 	/** Flag if rest service publishing is enabled. **/
 	public static final String RSPUBLISH = "rspublish"; // class: boolean default: false
+	public static final String RSPUBLISHCLASS = "rspublishclass"; // class: boolean default: false
 	
 	/** The name(s) of kernel(s) to load (separated by comma).
 	      Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
