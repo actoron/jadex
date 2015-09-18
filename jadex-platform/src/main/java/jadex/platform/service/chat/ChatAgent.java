@@ -23,7 +23,7 @@ import jadex.micro.annotation.RequiredServices;
 @Description("This agent offers a chat service.")
 @ProvidedServices({
 	@ProvidedService(name="chat", type=IChatService.class, implementation=@Implementation(ChatService.class)),
-	@ProvidedService(type=IChatGuiService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"chat\")"))
+	@ProvidedService(name="chatgui", type=IChatGuiService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"chat\")"))
 })
 @RequiredServices(
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,

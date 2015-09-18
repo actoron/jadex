@@ -525,22 +525,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        
 	        if(inparamsmap!=null)
 	        {
+	        	int i = 0;
 	        	List<String> pnames = getParameterNames(method);
-	        	if(pnames!=null)
+	        	for(String pname: pnames!=null ? pnames : inparamsmap.keySet())
 	        	{
-		        	int i = 0;
-		        	for(String pname: pnames)
-		        	{
-		        		inparams[i++] = inparamsmap.getObject(pname);
-		        	}
-	        	}
-	        	else
-	        	{
-	        		int i = 0;
-	        		for(Map.Entry<String, Collection<String>> entry: inparamsmap.entrySet())
-	        		{
-	        			inparams[i++] = entry.getValue();
-	        		}
+	        		inparams[i++] = inparamsmap.getObject(pname);
 	        	}
 	        }
 	        
@@ -1774,92 +1763,92 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	public static List<String> getParameterNames(Method m)
 	{
-		List<String> ret = null;
-		
-		// Try to find via annotation
-		boolean anused = false;
-		Annotation[][] annos = m.getParameterAnnotations();
-		if(annos.length>0)
-		{
-			ret = new ArrayList<String>();
-			for(Annotation[] ans: annos)
-			{
-				boolean found = false;
-				for(Annotation an: ans)
-				{
-					if(an instanceof ParameterInfo)
-					{
-						ret.add(((ParameterInfo)an).value());
-						found = true;
-						anused = true;
-						break;
-					}
-				}
-				if(!found)
-					ret.add(null);
-			}
-			if(!anused)
-				ret = null;
-		}
-		
-		// Try to find via debug info
-		if(!anused)
-		{
-			Class<?> deccl = m.getDeclaringClass();
-			String mdesc = Type.getMethodDescriptor(m);
-			String url = Type.getType(deccl).getInternalName() + ".class";
-	
-			InputStream is = deccl.getClassLoader().getResourceAsStream(url);
-			if(is!=null)
-			{
-				ClassNode cn = null;
-				try
-				{
-					cn = new ClassNode();
-					ClassReader cr = new ClassReader(is);
-					cr.accept(cn, 0);
-				}
-				catch(Exception e)
-				{
-				}
-				finally
-				{
-					try
-					{
-						is.close();
-					}
-					catch(Exception e)
-					{
-					}
-				}
-		
-				if(cn!=null)
-				{
-					List<MethodNode> methods = cn.methods;
-					
-					for(MethodNode method: methods)
-					{
-						if(method.name.equals(m.getName()) && method.desc.equals(mdesc))
-						{
-							Type[] argtypes = Type.getArgumentTypes(method.desc);
-							List<LocalVariableNode> lvars = method.localVariables;
-							if(lvars!=null && lvars.size()>0)
-							{
-								ret = new ArrayList<String>();
-								for(int i=0; i<argtypes.length; i++)
-								{
-									// first local variable represents the "this" object
-									ret.add(lvars.get(i+1).name);
-								}
-							}
-							break;
-						}
-					}
-				}
-			}
-		}
-		
-		return ret;
+        List<String> ret = null;
+
+        // Try to find via annotation
+        boolean anused = false;
+        Annotation[][] annos = m.getParameterAnnotations();
+        if(annos.length>0)
+        {
+            ret = new ArrayList<String>();
+            for(Annotation[] ans: annos)
+            {
+                boolean found = false;
+                for(Annotation an: ans)
+                {
+                    if(an instanceof ParameterInfo)
+                    {
+                        ret.add(((ParameterInfo)an).value());
+                        found = true;
+                        anused = true;
+                        break;
+                    }
+                }
+                if(!found)
+                    ret.add(null);
+            }
+            if(!anused)
+                ret = null;
+        }
+
+        // Try to find via debug info
+        if(!anused)
+        {
+            Class<?> deccl = m.getDeclaringClass();
+            String mdesc = Type.getMethodDescriptor(m);
+            String url = Type.getType(deccl).getInternalName() + ".class";
+
+            InputStream is = deccl.getClassLoader().getResourceAsStream(url);
+            if(is!=null)
+            {
+                ClassNode cn = null;
+                try
+                {
+                    cn = new ClassNode();
+                    ClassReader cr = new ClassReader(is);
+                    cr.accept(cn, 0);
+                }
+                catch(Exception e)
+                {
+                }
+                finally
+                {
+                    try
+                    {
+                        is.close();
+                    }
+                    catch(Exception e)
+                    {
+                    }
+                }
+
+                if(cn!=null)
+                {
+                    List<MethodNode> methods = cn.methods;
+
+                    for(MethodNode method: methods)
+                    {
+                        if(method.name.equals(m.getName()) && method.desc.equals(mdesc))
+                        {
+                            Type[] argtypes = Type.getArgumentTypes(method.desc);
+                            List<LocalVariableNode> lvars = method.localVariables;
+                            if(lvars!=null && lvars.size()>0)
+                            {
+                                ret = new ArrayList<String>();
+                                for(int i=0; i<argtypes.length; i++)
+                                {
+                                    // first local variable represents the "this" object
+                                    ret.add(lvars.get(i+1).name);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return ret;
 	}
 }
 

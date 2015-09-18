@@ -9,19 +9,17 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
- *  Agent that publishes the rs publication service.
+ *  Agent that publishes the external rs publication service.
+ *  Requires somebody
  */
 @Agent
 @ProvidedServices(
 {
-//	@ProvidedService(name="publish_rs", type=IWebPublishService.class, 
-//		implementation=@Implementation(GrizzlyRestServicePublishService.class))
 	@ProvidedService(name="publish_rs", type=IWebPublishService.class, 
-//		implementation=@Implementation(JettyRestPublishService.class))
-		implementation=@Implementation(GrizzlyRestPublishService.class))
+		implementation=@Implementation(ExternalRestPublishService.class))
 })
 @Properties(@NameValue(name="system", value="true"))
-public class RSPublishAgent
+public class ExternalRSPublishAgent
 {
 }
 
