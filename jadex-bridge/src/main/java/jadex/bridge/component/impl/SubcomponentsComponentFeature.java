@@ -23,6 +23,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.beans.Expression;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -202,7 +203,8 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 					RequiredServiceBinding[] bindings = components[i].getBindings();
 					// todo: rid
 //					System.out.println("curcall: "+getName(components[i], model, j+1)+" "+CallAccess.getCurrentInvocation().getCause());
-					cms.createComponent(getName(components[i], model, j+1), type.getName(),
+//					cms.createComponent(getName(components[i], model, j+1), type.getName(),
+					cms.createComponent(getName(components[i], model, j+1), getFilename(components[i], model),
 						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getComponentIdentifier(),
 						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null), null).addResultListener(crl);
 				}
@@ -216,6 +218,26 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		{
 			fut.setResult(null);
 		}
+	}
+	
+	/**
+	 *  Get the number of components to start.
+	 *  Allows filename to be dynamically evaluated.
+	 *  @return The number.
+	 */
+	protected String getFilename(ComponentInstanceInfo component, IModelInfo model)
+	{
+		String ret = null;
+		SubcomponentTypeInfo si = component.getType(model);
+		try
+		{
+			ret = (String)SJavaParser.evaluateExpression(si.getFilename(), model.getAllImports(), this.component.getFetcher(), this.component.getClassLoader());
+		}
+		catch(Exception e)
+		{
+			ret = si.getFilename();
+		}
+		return ret;
 	}
 	
 	/**
