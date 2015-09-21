@@ -38,11 +38,9 @@ public class SUtilTest //extends TestCase
 	@Test
 	public void	testFileZippingAndHashing() throws Exception
 	{
-//		File	src	= new File("../jadex-applications-micro/target/classes");
-		File	src1	= new File("../jadex-commons/target/classes");	// maven
-		File	src2	= new File("../jadex-commons/build/classes/main");	// gradle
-		File	src	= src1.exists() ? src1 : src2;
+		File	src	= new File("../jadex-commons/src/main/java");
 		File	dest	= new File("temp", "test.jar");
+//		System.out.println("zipping: "+dest.getAbsolutePath());
 		dest.getParentFile().mkdirs();
 		
 		FileOutputStream	fos	= new FileOutputStream(dest);
