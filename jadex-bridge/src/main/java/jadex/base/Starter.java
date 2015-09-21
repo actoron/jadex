@@ -39,6 +39,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
@@ -69,6 +70,25 @@ public class Starter
 //	{
 //		return shutdown;
 //	}
+	
+	// Try adding startcom ssl certificate
+	static
+	{
+		try
+		{
+			Class<?> cl = SReflect.findClass0("jadex.platform.service.security.SSecurity", null, null);
+			if(cl!=null)
+			{
+				Method m = cl.getMethod("addStartSSLToTrustStore", new Class[]{String.class});
+				m.invoke(null, new Object[]{"changeit"});
+				System.out.println("Successfully added startssl certificate.");
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("Error adding startssl certificate to truststore: "+e.getMessage());
+		}
+	}
 	
 	/**
 	 *  Unescape a string.

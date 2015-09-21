@@ -1,8 +1,5 @@
 package jadex.platform.service.security;
 
-import jadex.commons.Base64;
-import jadex.commons.SUtil;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,9 +33,12 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
 
+import jadex.commons.Base64;
+import jadex.commons.SUtil;
+
 
 /**
- * 
+ *  Class with static helper methods for security functions.
  */
 public class SSecurity
 {
@@ -75,9 +75,12 @@ public class SSecurity
 			{
 				if(fis!=null)
 					fis.close();
-				if(!loaded || !ks.containsAlias(alias))
+				if(!loaded || (alias!=null && !ks.containsAlias(alias)))
 					initKeystore(ks, storepath, storepass, keypass, alias);
+				
+				addStartSSLCertificate(ks, storepath, storepass);
 			}
+	
 			return ks;
 		}
 		catch(Exception e)
@@ -114,6 +117,75 @@ public class SSecurity
 				{
 				}
 			}
+		}
+	}
+	
+	/**
+	 *  Add the start ssl cert to the Java trust store.
+	 */
+	public static void addStartSSLToTrustStore(String storepass)
+	{
+		String storepath = System.getProperty("java.home") + "/lib/security/cacerts";
+		KeyStore ks = getKeystore(storepath, storepass, null, null);
+		addStartSSLCertificate(ks, storepath, storepass);
+	}
+	
+	/**
+	 *  Add the startssl.com root certificate to the used store.
+	 */
+	public static void addStartSSLCertificate(KeyStore ks, String storepath, String storepass)
+	{
+		try
+		{
+			if(!ks.containsAlias("startcom.ca")) 
+			{
+				CertificateFactory cf = CertificateFactory.getInstance("X.509");
+				InputStream is = null;
+				
+				try
+				{
+					is = SUtil.getResource("jadex/platform/service/security/ca.crt", null);
+					Certificate cert = cf.generateCertificate(is);
+					ks.setCertificateEntry("startcom.ca", cert);
+				}
+				catch(Exception e)
+				{
+				}
+				finally 
+				{
+					if(is!=null)
+						is.close();
+				}
+				
+				try
+				{
+					is = SUtil.getResource("jadex/platform/service/security/sub.class1.server.ca.crt", null);
+					Certificate cert = cf.generateCertificate(is);
+					ks.setCertificateEntry("startcom.ca.sub", cert);
+				}
+				catch(Exception e)
+				{
+				}
+				finally 
+				{
+					if(is!=null)
+						is.close();
+				}
+				
+//				try
+//				{
+					saveKeystore(ks, storepath, storepass);
+//				}
+//				catch(Exception e)
+//				{
+//					// trust store holds certificates for validation (key store mainly holds (private) keys)
+//					System.out.println("Could not save trust store: "+e.getMessage());
+//				}
+			}
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
 		}
 	}
 	

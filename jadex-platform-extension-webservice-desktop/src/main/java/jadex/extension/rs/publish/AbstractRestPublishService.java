@@ -355,8 +355,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     		public void exceptionOccurred(Exception exception)
                     		{
                     			Object result = mapResult(method, exception);
-                    			writeResponse(exception, Response.Status.NOT_ACCEPTABLE.getStatusCode(), null, mi, request, response, true);
-//                    			writeResponse(exception, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
+                    			writeResponse(exception, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
 //                    			ctx.complete();
                     		}
 						});
@@ -373,7 +372,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 }
                 catch(Exception e)
                 {
-                	writeResponse(e, Response.Status.NOT_ACCEPTABLE.getStatusCode(), null, null, request, response, true);
+                	writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
                 }
             }
             else
