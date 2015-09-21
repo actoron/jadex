@@ -72,23 +72,31 @@ public class Starter
 //	}
 	
 	// Try adding startcom ssl certificate
-	static
-	{
-		try
-		{
-			Class<?> cl = SReflect.findClass0("jadex.platform.service.security.SSecurity", null, null);
-			if(cl!=null)
-			{
-				Method m = cl.getMethod("addStartSSLToTrustStore", new Class[]{String.class});
-				m.invoke(null, new Object[]{"changeit"});
-				System.out.println("Successfully added startssl certificate.");
-			}
-		}
-		catch(Exception e)
-		{
-			System.out.println("Error adding startssl certificate to truststore: "+e.getMessage());
-		}
-	}
+	// Does not work because 'cacerts' file cannot be written in Java home (privileges) :-(
+	//
+	// https://forum.startcom.org/viewtopic.php?f=15&t=1815&st=0&sk=t&sd=a&sid=90c5f7662b53041a50063813eb121d98&start=15
+	// manual addition:
+	// wget http://www.startssl.com/certs/ca.crt
+	// keytool -import -trustcacerts -alias startcom.ca -file ca.crt
+	// // wget http://www.startssl.com/certs/sub.class1.server.ca.crt
+	// // keytool -import -alias startcom.ca.sub -file sub.class1.server.ca.crt
+//	static
+//	{
+//		try
+//		{
+//			Class<?> cl = SReflect.findClass0("jadex.platform.service.security.SSecurity", null, null);
+//			if(cl!=null)
+//			{
+//				Method m = cl.getMethod("addStartSSLToTrustStore", new Class[]{String.class});
+//				m.invoke(null, new Object[]{"changeit"});
+//				System.out.println("Startssl certificate is installed in truststore.");
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//			System.out.println("Error adding startssl certificate to truststore: "+e.getMessage());
+//		}
+//	}
 	
 	/**
 	 *  Unescape a string.
