@@ -1,1 +1,1 @@
-java -jar lib\jadex-backup-2.5-SNAPSHOT.jar
+java -jar lib\jadex-backup-3.0-SNAPSHOT.jar

@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar lib/jadex-platform-standalone-launch-2.5-SNAPSHOT.jar $@
+java -jar lib/jadex-platform-standalone-launch-3.0-SNAPSHOT.jar $@

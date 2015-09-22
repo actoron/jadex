@@ -6,9 +6,9 @@ Make sure that:
 - ADF checker works and is released
 
 Bump Revision:
-- set version number in poms (search '<version> 2.5-SNAPSHOT </version>')
-- set version number in example pom (search '<jadex.version> 2.5-SNAPSHOT </jadex.version>')
-- set version number in bats, shs, settings, txts (search '-2.5-SNAPSHOT.jar')
+- set version number in poms (search '<version> 3.0-SNAPSHOT </version>')
+- set version number in example pom (search '<jadex.version> 3.0-SNAPSHOT </jadex.version>')
+- set version number in bats, shs, settings, txts (search '-3.0-SNAPSHOT.jar')
 - set javadoc link in platform xml (search 'docs/jadex-2.5-javadoc') 
 - set version number in XMLs, XSDs (search '-2.5.xsd')
 - rename XSDs to reflect version number (search 'jadex' in *.xsd)

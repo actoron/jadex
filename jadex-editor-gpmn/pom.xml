@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-editor-gpmn</artifactId>
 	<packaging>jar</packaging>
-	<version> 2.5-SNAPSHOT </version>
+	<version> 3.0-SNAPSHOT </version>
 	<name>jadex-editor-gpmn</name>
 	<url>http://jadex.sourceforge.net</url>
 

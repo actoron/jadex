@@ -2,6 +2,7 @@ apply plugin: 'signing'
 apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
 apply plugin: 'maven' // use gradle install to install in local .m2 
+apply plugin: 'net.researchgate.release'
 // gradle install -x test -i    for fast local install without tests (-x test i program args)
 
 //if(file('gradle.properties').exists())
@@ -56,16 +57,18 @@ buildscript {
     repositories
     {
         mavenCentral()
+        jcenter()
     }
     dependencies
     {
         classpath 'com.android.tools.build:gradle:0.14.4'
+        classpath 'net.researchgate:gradle-release:2.2.2'
     }
 }
 
 allprojects
 {
-    version = '2.5-SNAPSHOT'
+    //version = '3.0-SNAPSHOT'
     group = 'net.sourceforge.jadex'
     
     configurations
@@ -687,4 +690,10 @@ task buildDistGpmnEditor(type: Zip, dependsOn: srcZipGpmnEditor) {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.1'
+}
+
+task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor, //clean, 
+	buildDistMaven, buildDistManagement, buildDistSecureTransport, buildDistRelay, buildDistWebservice,
+	buildDist3d, buildDistPro, buildDist, buildDistAndroid, uploadArchives]) << {
+	println "built all";
 }

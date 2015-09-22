@@ -18,7 +18,7 @@ For all examples similar .bat files can be found. Of course,
 the examples can also be started directly via Java. In order
 start the helloworld example you can use the following command:
 
-java -cp jadex-rules-applications-2.5-SNAPSHOT.jar jadex.rules.examples.helloworld.OAVHelloWorld
+java -cp jadex-rules-applications-3.0-SNAPSHOT.jar jadex.rules.examples.helloworld.OAVHelloWorld
 
 Notes: 
 - execute this command in the 'lib' directory

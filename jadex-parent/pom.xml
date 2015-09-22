@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-parent</artifactId>
 	<packaging>pom</packaging>
-	<version> 2.5-SNAPSHOT </version>
+	<version> 3.0-SNAPSHOT </version>
 	<name>jadex-parent</name>
 	<url>http://jadex.sourceforge.net</url>
 
