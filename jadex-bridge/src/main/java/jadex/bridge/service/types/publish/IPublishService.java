@@ -18,6 +18,14 @@ public interface IPublishService
 	/** The publish type rest service. */
 	public static final String PUBLISH_RS = "rs";
 	
+	/** The default publish implementations for rest. */
+	public static final String[] DEFAULT_RSPUBLISH_CLASSES = new String[]
+	{
+		"jadex.extension.rs.publish.JettyRSPublishAgent",
+		"jadex.extension.rs.publish.GrizzlyRSPublishAgent",
+		"jadex.extension.rs.publish.ExternalRSPublishAgent"
+	};
+	
 	/**
 	 *  Test if publishing a specific type is supported (e.g. web service).
 	 *  @param publishtype The type to test.

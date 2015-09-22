@@ -121,6 +121,8 @@ public class RootComponentConfiguration
 	
 	/** Flag if rest service publishing is enabled. **/
 	public static final String RSPUBLISH = "rspublish"; // class: boolean default: false
+
+	/** Optionally provide alternative rs publish implementation.  **/
 	public static final String RSPUBLISHCLASS = "rspublishclass"; // class: boolean default: false
 	
 	/** The name(s) of kernel(s) to load (separated by comma).
@@ -725,6 +727,16 @@ public class RootComponentConfiguration
 		setValue(RSPUBLISH, value);
 	}
 
+	public String getRsPublishClass()
+	{
+		return (String)getValue(RSPUBLISHCLASS);
+	}
+
+	public void setRsPublishClass(String value)
+	{
+		setValue(RSPUBLISHCLASS, value);
+	}
+	
 	public KERNEL[] getKernels()
 	{
 		return kernels;

@@ -605,6 +605,33 @@ public class SReflect
 	}
 	
 	/**
+	 *  Select the first available class name from a choice of potential classes.
+	 *  Allows, e.g. swapping alternative implementations in the classpath. 
+	 */
+	public static String	chooseAvailableClassName(String... choices)
+	{
+		return chooseAvailableClassName(SReflect.class.getClassLoader(), choices);
+	}
+	
+	/**
+	 *  Select the first available class name from a choice of potential classes.
+	 *  Allows, e.g. swapping alternative implementations in the classpath. 
+	 */
+	public static String	chooseAvailableClassName(ClassLoader cl, String... choices)
+	{
+		String	ret	= null;
+		for(String choice: choices)
+		{
+			Class<?>	clazz	= classForName0(choice, cl);
+			if(clazz!=null)
+			{
+				ret	= clazz.getName();
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get the generic signature of a method.
 	 *  @param method The method.
 	 *  @return The signature name.
@@ -989,9 +1016,10 @@ public class SReflect
 		int	cnt	= 0;	// Number of matches.
 		for(int i=0; i<paramtypes.length; i++)
 		{
-			if(paramtypes[i].length==argtypes.length)
+			boolean	varargs	= false;
+			if(paramtypes[i].length<=argtypes.length)
 			{
-				for(int j=0; j<argtypes.length && matches[i]!=-1; j++)
+				for(int j=0; j<paramtypes[i].length && matches[i]!=-1; j++)
 				{
 					// Check if parameter type matches argument type.
 					if(argtypes[j]!=null)
@@ -999,7 +1027,21 @@ public class SReflect
 						// No match.
 						if(!SReflect.isSupertype(paramtypes[i][j], argtypes[j]))
 						{
-							matches[i]	= -1;
+							// Special case varargs: last parameter is array and remaining arguments match array base type.
+							if(j==paramtypes[i].length-1 && paramtypes[i][j].isArray())
+							{
+								varargs	= true;
+								Class<?>	basetype	= paramtypes[i][j].getComponentType();
+								for(int k=j; varargs && k<argtypes.length; k++)
+								{
+									varargs	= argtypes[k]==null || SReflect.isSupertype(basetype, argtypes[k]);
+								}
+							}
+							
+							if(!varargs)
+							{
+								matches[i]	= -1;
+							}
 						}
 
 						// Exact match.
@@ -1013,10 +1055,16 @@ public class SReflect
 						}
 					}
 				}
-
+				
+				if(!varargs && paramtypes[i].length!=argtypes.length)
+				{
+					matches[i]	= -1;
+				}
+				
 				if(matches[i]!=-1)
 					cnt++;
 			}
+			
 			else
 			{
 				matches[i]	= -1;
@@ -1040,6 +1088,36 @@ public class SReflect
 		return ret;
 	}
 
+	/**
+	 *  Map arguments to parameters using varargs, if necessary.
+	 */
+	public static Object[]	fillArguments(Object[] args, Class<?>[] paramtypes)
+	{
+		// Special handling for varargs, otherwise just return original args
+		if(paramtypes.length>0 && paramtypes[paramtypes.length-1].isArray() && !SReflect.isSupertype(paramtypes[paramtypes.length-1], args[paramtypes.length-1].getClass()))
+		{
+			Class<?> basetype	= paramtypes[paramtypes.length-1].getComponentType();
+			if(args.length>paramtypes.length || args[paramtypes.length-1]!=null && SReflect.isSupertype(basetype, args[paramtypes.length-1].getClass()))
+			{
+				Object	varargs	= Array.newInstance(basetype, args.length-(paramtypes.length-1));
+				for(int i=0; i<Array.getLength(varargs); i++)
+				{
+					Array.set(varargs, i, args[i+(paramtypes.length-1)]);
+				}
+				
+				if(args.length!=paramtypes.length)
+				{
+					Object[]	tmp	= new Object[paramtypes.length];
+					System.arraycopy(args, 0, tmp, 0, paramtypes.length-1);
+					args	= tmp;
+				}
+				args[paramtypes.length-1]	= varargs;
+			}
+		}
+		
+		return args;
+	}
+	
 	/**
 	 *  Check if a class is a supertype of, or the same as another class.
 	 *  Maps basic types to wrapped types, and respects
