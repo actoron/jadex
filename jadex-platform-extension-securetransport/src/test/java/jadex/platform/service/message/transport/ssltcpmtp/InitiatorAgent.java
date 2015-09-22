@@ -88,11 +88,13 @@ public class InitiatorAgent extends TestAgent
 						{
 							public void customResultAvailable(final TestReport result)
 							{
+//								System.out.println("killing: "+platform.getComponentIdentifier());
 								platform.killComponent()
 									.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
 								{
 									public void customResultAvailable(Map<String, Object> v)
 									{
+//										System.out.println("killed: "+platform.getComponentIdentifier());
 										platforms.remove(platform);
 										ret.setResult(result);
 									}

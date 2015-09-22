@@ -1094,7 +1094,7 @@ public class SReflect
 	public static Object[]	fillArguments(Object[] args, Class<?>[] paramtypes)
 	{
 		// Special handling for varargs, otherwise just return original args
-		if(paramtypes.length>0 && paramtypes[paramtypes.length-1].isArray() && !SReflect.isSupertype(paramtypes[paramtypes.length-1], args[paramtypes.length-1].getClass()))
+		if(paramtypes.length>0 && paramtypes[paramtypes.length-1].isArray() && (args.length>paramtypes.length || args[paramtypes.length-1]!=null && !SReflect.isSupertype(paramtypes[paramtypes.length-1], args[paramtypes.length-1].getClass())))
 		{
 			Class<?> basetype	= paramtypes[paramtypes.length-1].getComponentType();
 			if(args.length>paramtypes.length || args[paramtypes.length-1]!=null && SReflect.isSupertype(basetype, args[paramtypes.length-1].getClass()))
