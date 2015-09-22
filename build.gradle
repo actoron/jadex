@@ -553,7 +553,9 @@ def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
         task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
         task.from('build/jadex-example-project.zip')
         task.from('docs/jcc.settings.xml')
-        task.from('docs/jadex.bat')
+        task.from('docs/jadex.bat'){
+			filter{String line -> line.replaceAll("$version", version)}
+        }
         task.from('docs/jadex_no_awareness.bat')
         task.from('docs/jadex.sh')
         task.from('docs/jadex_no_awareness.sh')

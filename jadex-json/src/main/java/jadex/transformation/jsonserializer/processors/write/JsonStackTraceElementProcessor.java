@@ -42,12 +42,21 @@ public class JsonStackTraceElementProcessor implements ITraverseProcessor
 		StackTraceElement ste = (StackTraceElement)object;
 		
 		wr.write("{");
-		wr.writeNameString("classname", ste.getClassName());
-		wr.write(",");
-		wr.writeNameString("methodname", ste.getMethodName());
-		wr.write(",");
-		wr.writeNameString("filename", ste.getFileName());
-		wr.write(",");
+		if(ste.getClassName()!=null && ste.getClassName().length()>0)
+		{
+			wr.writeNameString("classname", ste.getClassName());
+			wr.write(",");
+		}
+		if(ste.getMethodName()!=null && ste.getMethodName().length()>0)
+		{
+			wr.writeNameString("methodname", ste.getMethodName());
+			wr.write(",");
+		}
+		if(ste.getFileName()!=null && ste.getFileName().length()>0)
+		{
+			wr.writeNameString("filename", ste.getFileName());
+			wr.write(",");
+		}
 		wr.writeNameValue("linenumber", ste.getLineNumber());
 
 		if(wr.isWriteClass())
