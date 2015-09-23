@@ -86,42 +86,52 @@
 		<file>
 			<source>docs/default.settings.xml</source>
 			<outputDirectory>jadex-${version}</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jadex.bat</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jadex_no_awareness.bat</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jadex.sh</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jadex_no_awareness.sh</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jadex-relay.bat</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jadex-relay.sh</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/bpmn_editor.bat</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/bpmn_editor.sh</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/howtostart.txt</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 	</files>
 

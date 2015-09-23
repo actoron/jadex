@@ -75,11 +75,11 @@
 	<rootPathEntries>
 		<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="29" __len="4">
 			<entries>
-				<p1:String __ID="30">lib/jadex-applications-bdi-$version.jar</p1:String>
-				<p1:String __ID="30">lib/jadex-applications-bdiv3-$version.jar</p1:String>
-				<!-- <p1:String __ID="31">lib/jadex-applications-bdibpmn-$version.jar</p1:String>-->
-				<p1:String __ID="32">lib/jadex-applications-bpmn-$version.jar</p1:String>
-				<p1:String __ID="34">lib/jadex-applications-micro-$version.jar</p1:String>
+				<p1:String __ID="30">lib/jadex-applications-bdi-${jadex_build_version}.jar</p1:String>
+				<p1:String __ID="30">lib/jadex-applications-bdiv3-${jadex_build_version}.jar</p1:String>
+				<!-- <p1:String __ID="31">lib/jadex-applications-bdibpmn-${jadex_build_version}.jar</p1:String>-->
+				<p1:String __ID="32">lib/jadex-applications-bpmn-${jadex_build_version}.jar</p1:String>
+				<p1:String __ID="34">lib/jadex-applications-micro-${jadex_build_version}.jar</p1:String>
 			</entries>
 		</p1:String__1>
 	</rootPathEntries>
