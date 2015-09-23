@@ -20,7 +20,7 @@ public abstract class RSFactory
 			clazz = SReflect.classForName0("jadex.extension.rs.RSFactoryAndroid", null);
 			if(clazz == null) 
 			{
-				clazz = SReflect.classForName0("jadex.extension.rs.RSFactoryDesktop", null);
+				clazz = SReflect.classForName0("jadex.extension.rs.invoke.RSFactoryDesktop", null);
 			}
 			if(clazz != null) 
 			{

@@ -1,4 +1,4 @@
-package jadex.extension.rs.publish;
+package jadex.extension.rs.invoke;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

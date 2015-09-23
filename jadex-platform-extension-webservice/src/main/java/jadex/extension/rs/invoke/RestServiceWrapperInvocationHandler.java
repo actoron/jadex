@@ -19,7 +19,6 @@ import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.invoke.annotation.ParameterMappers;
 import jadex.extension.rs.invoke.annotation.ParametersInURL;
-import jadex.extension.rs.publish.RSJAXAnnotationHelper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
@@ -49,7 +48,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.glassfish.jersey.client.ClientConfig;
+//import org.glassfish.jersey.client.ClientConfig;
 
 /**
  *  Create a new web service wrapper invocation handler.
@@ -191,7 +190,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											if(m.isAnnotationPresent(ResultMapper.class))
 												rmapper = m.getAnnotation(ResultMapper.class).value();
 											
-											ClientConfig cc = new ClientConfig();
+//											ClientConfig cc = new ClientConfig();
 //											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 //											cc.register(JadexXMLBodyWriter.class);
 											
@@ -231,7 +230,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 												targetparams = mv;
 											}
 											
-											Client client = ClientBuilder.newClient(cc);
+											Client client = ClientBuilder.newClient();//cc);
 											WebTarget wt = client.target(baseuri);
 											wt = wt.path(methodname);
 											

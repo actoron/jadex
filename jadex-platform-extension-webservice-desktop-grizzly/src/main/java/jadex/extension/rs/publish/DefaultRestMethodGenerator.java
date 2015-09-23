@@ -3,6 +3,7 @@ package jadex.extension.rs.publish;
 import jadex.bridge.service.IService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.extension.rs.invoke.RSJAXAnnotationHelper;
 import jadex.extension.rs.publish.annotation.MethodMapper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;

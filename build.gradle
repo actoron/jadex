@@ -552,7 +552,7 @@ def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
         task.from('docs/junit-3.8.1.jar'){ into('lib') }
         task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
         task.from('build/jadex-example-project.zip')
-        task.from('docs/jcc.settings.xml')
+        task.from('docs/jcc.settings.xml') {filter{String line -> line.replaceAll('\\$version', version)}}
         task.from('docs/jadex.bat') {filter{String line -> line.replaceAll('\\$version', version)}}
         task.from('docs/jadex_no_awareness.bat') {filter{String line -> line.replaceAll('\\$version', version)}}
         task.from('docs/jadex.sh') {filter{String line -> line.replaceAll('\\$version', version)}}
