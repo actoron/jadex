@@ -1,5 +1,5 @@
 Jadex
-Copyright (C) 2002-2013 Lars Braubach, Alexander Pokahr, Kai Jander
+Copyright (C) 2002-2015 Lars Braubach, Alexander Pokahr, Kai Jander
 University of Hamburg
 
 This program is free software: you can redistribute it and/or modify

@@ -1,1 +1,1 @@
-java -jar lib\jadex-platform-standalone-launch-3.0-SNAPSHOT.jar
+java -jar lib\jadex-platform-standalone-launch-$version.jar

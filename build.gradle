@@ -482,7 +482,7 @@ task buildExampleProject(type: Zip) {
 	destinationDir = new File(project.distsDir, "standard-version")
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	archiveName = 'jadex-example-project.zip'
-	from('docs/jadex-example-project')
+	from('docs/jadex-example-project') {filter{String line -> line.replaceAll('\\$version', version)}}
 }
 
 /**
@@ -510,7 +510,7 @@ task buildAndroidExampleProject(type: Zip) {
 }
 
 def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
-	//println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
+	println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
 
 	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
@@ -535,7 +535,7 @@ def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
 		}
 		else
 		{
-//			println("Excluded: "+subproject.name)
+			println("Excluded: "+subproject.name)
 		}
 	}
 	 	
@@ -543,27 +543,32 @@ def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
     //from('subprojects.jar'){ into('lib') }
     //from('sourceSets.main.allSource') { into('src') }
 
-    task.from('docs/readme.txt')
+    task.from('docs/readme.txt') 
     task.from('docs/license.txt')
     task.from('docs/api-changes.txt')
     task.from('docs/default.settings.xml')
 
-    if (configuration == "desktopDistribution") {
+    if(configuration == "desktopDistribution") {
         task.from('docs/junit-3.8.1.jar'){ into('lib') }
         task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
         task.from('build/jadex-example-project.zip')
         task.from('docs/jcc.settings.xml')
-        task.from('docs/jadex.bat'){
-			filter{String line -> line.replaceAll("$version", version)}
-        }
-        task.from('docs/jadex_no_awareness.bat')
-        task.from('docs/jadex.sh')
-        task.from('docs/jadex_no_awareness.sh')
-        task.from('docs/bpmn_editor.bat')
-        task.from('docs/bpmn_editor.sh')
-        task.from('docs/howtostart.txt')
+        task.from('docs/jadex.bat') {filter{String line -> line.replaceAll('\\$version', version)}}
+        task.from('docs/jadex_no_awareness.bat') {filter{String line -> line.replaceAll('\\$version', version)}}
+        task.from('docs/jadex.sh') {filter{String line -> line.replaceAll('\\$version', version)}}
+        task.from('docs/jadex_no_awareness.sh') {filter{String line -> line.replaceAll('\\$version', version)}}
+        task.from('docs/bpmn_editor.bat') {filter{String line -> line.replaceAll('\\$version', version)}}
+        task.from('docs/bpmn_editor.sh') {filter{String line -> line.replaceAll('\\$version', version)}}
+        task.from('docs/howtostart.txt') {filter{String line -> line.replaceAll('\\$version', version)}}
     }
 }
+
+/*task ttt(type: Zip){
+	archiveName = 'ttt-' + project.version + '.zip'
+	destinationDir = new File(project.distsDir, "testest")
+	from('docs/jadex.sh') {filter{String line -> line.replaceAll('\\$version', version)}}
+	from('docs/jadex.bat') {filter{String line -> line.replaceAll('\\$version', version)}}
+}*/
 
 task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip, buildAndroidExampleProject]) {
     archiveName = 'jadex-android-' + project.version + '.zip'
@@ -603,8 +608,8 @@ task buildDistPro(type: Zip, dependsOn: [srcZipPro, copyArchives]) {
 	destinationDir = new File(project.distsDir, "pro-version")
 	buildDistribution(buildDistPro, proexcl, null)
 	from(srcZipPro.archivePath)
-	from('docs/jadex-relay.bat')
-	from('docs/jadex-relay.sh')
+	from('docs/jadex-relay.bat') {filter{String line -> line.replaceAll('\\$version', version)}}
+	from('docs/jadex-relay.sh') {filter{String line -> line.replaceAll('\\$version', version)}}
 	from('jadex-platform-extension-management/win') { into('win') }
 }
 
@@ -637,8 +642,8 @@ task buildDistRelay(type: Zip, dependsOn: srcZipRelay) {
 	from(project(":jadex-platform-extension-relay-standalone").jar) { into('lib') }
 	from(project(":jadex-platform-extension-relay-standalone").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
 	from(srcZipRelay.archivePath)
-	from('docs/jadex-relay.bat')
-	from('docs/jadex-relay.sh')
+	from('docs/jadex-relay.bat') {filter{String line -> line.replaceAll('\\$version', version)}}
+	from('docs/jadex-relay.sh') {filter{String line -> line.replaceAll('\\$version', version)}}
 }
 
 task buildDistSecureTransport(type: Zip, dependsOn: srcZipSecureTransport) {
@@ -694,8 +699,7 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.1'
 }
 
-task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor, //clean, 
+task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor,
 	buildDistMaven, buildDistManagement, buildDistSecureTransport, buildDistRelay, buildDistWebservice,
 	buildDist3d, buildDistPro, buildDist, buildDistAndroid, uploadArchives]) << {
-	println "built all";
 }

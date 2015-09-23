@@ -1,0 +1,23 @@
+apply plugin: 'java'
+
+dependencies {
+	compile 'net.sourceforge.jadex:jadex-distribution-standard:$version' 
+	//compile 'net.sourceforge.jadex:jadex-distribution-minimal:$version'
+	//compile 'net.sourceforge.jadex:jadex-distribution-server:$version'
+	//compile 'net.sourceforge.jadex:jadex-distribution-pro:$version'
+}
+
+repositories {
+	mavenCentral()
+//	maven {
+//		url "http://www.activecomponents.org/nexus/content/repositories/snapshots"
+//	}
+//	maven {
+//		url "http://www.activecomponents.org/nexus/content/repositories/pro-snapshots"
+//	}
+//	maven {
+//		url "http://www.activecomponents.org/nexus/content/repositories/pro-releases"
+//	}
+}
+
+
