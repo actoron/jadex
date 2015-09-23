@@ -14,3 +14,13 @@ dependencies
 	compile 'com.toedter:jcalendar:1.3.2' 
 	compile 'de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0' 
 }
+
+//processResources
+//{
+//	println "pR" + it
+//	filesMatching('**/*.agent.xml')
+//	{
+//		println "file"+it
+//		filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-2.5.xsd', 'xxxxxx')}
+//	}
+//}

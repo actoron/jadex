@@ -95,6 +95,27 @@ allprojects
         desktopDistribution.extendsFrom runtime
     }
 
+//	processResources
+//	{
+//		println "aaa" + it
+////		FileCollection fc ->
+////		filter{String line -> line.replaceAll('\\$version', version)}
+//		filesMatching('**/*') 
+//		{
+////			FileCollection fc ->
+////			File f ->
+////			println "file: "+f
+//			println "bbb"//+fc
+//			filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-2.5.xsd', 'xxxxxx')}
+//		}
+//	}
+	
+//	processResources {
+//		filesMatching('foo/*.html') {
+//			filter(ReplaceTokens, tokens: [key: 'value'])
+//		}
+//	}
+	
     dependencies
     {
         deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
@@ -533,10 +554,10 @@ def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
                 task.from(subproject.jar) { into('lib') }
             }
 		}
-		else
-		{
-			println("Excluded: "+subproject.name)
-		}
+//		else
+//		{
+//			println("Excluded: "+subproject.name)
+//		}
 	}
 	 	
     //from(subprojects.configurations.runtime){ into('lib') }
