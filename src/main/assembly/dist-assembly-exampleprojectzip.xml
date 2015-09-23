@@ -15,6 +15,7 @@
 		<fileSet>
 			<directory>docs/jadex-example-project</directory>
 			<outputDirectory>jadex-example-project</outputDirectory>
+			<filtered>true</filtered>
 		</fileSet>
 	</fileSets>	
 

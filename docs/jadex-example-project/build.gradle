@@ -1,10 +1,10 @@
 apply plugin: 'java'
 
 dependencies {
-	compile 'net.sourceforge.jadex:jadex-distribution-standard:$version' 
-	//compile 'net.sourceforge.jadex:jadex-distribution-minimal:$version'
-	//compile 'net.sourceforge.jadex:jadex-distribution-server:$version'
-	//compile 'net.sourceforge.jadex:jadex-distribution-pro:$version'
+	compile 'net.sourceforge.jadex:jadex-distribution-standard:${jadex_build_version}' 
+	//compile 'net.sourceforge.jadex:jadex-distribution-minimal:${jadex_build_version}'
+	//compile 'net.sourceforge.jadex:jadex-distribution-server:${jadex_build_version}'
+	//compile 'net.sourceforge.jadex:jadex-distribution-pro:${jadex_build_version}'
 }
 
 repositories {

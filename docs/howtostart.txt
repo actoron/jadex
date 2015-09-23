@@ -1,7 +1,7 @@
 Jadex V2 can be launched in the following ways:
 
 a) directly via java from the distribution directory:
-java -jar lib/jadex-platform-standalone-launch-$version.jar
+java -jar lib/jadex-platform-standalone-launch-${jadex_build_version}.jar
 
 b) on Windows machines also via the batch file:
 jadex.bat

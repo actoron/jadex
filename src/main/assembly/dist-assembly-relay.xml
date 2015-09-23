@@ -29,10 +29,12 @@
 		<file>
 			<source>docs/jadex-relay.bat</source>
 			<outputDirectory>/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jadex-relay.sh</source>
 			<outputDirectory>/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>target/sources-relay.zip</source>

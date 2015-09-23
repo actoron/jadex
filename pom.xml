@@ -21,6 +21,7 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
+						
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -30,7 +31,10 @@
 					<archiverConfig>
 						<duplicateBehavior>skip</duplicateBehavior>
 					</archiverConfig>
-				</configuration>
+					<filters>
+						<filter>gradle.properties</filter>
+					</filters>
+            	</configuration>
 			</plugin>
 		</plugins>
 	</build>	
@@ -382,6 +386,8 @@
 				<module>jadex-json</module>
 				<module>jadex-platform-extension-webservice</module>
 				<module>jadex-platform-extension-webservice-desktop</module>
+				<module>jadex-platform-extension-webservice-desktop-grizzly</module>
+				<module>jadex-platform-extension-webservice-desktop-jetty</module>
 				<module>jadex-distribution-server</module>
 		    </modules>
 		</profile>

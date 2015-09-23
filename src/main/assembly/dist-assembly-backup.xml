@@ -29,14 +29,17 @@
 		<file>
 			<source>docs/jadex-backup.bat</source>
 			<outputDirectory>/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jadex-backup.sh</source>
 			<outputDirectory>/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>target/sources-backup.zip</source>
 			<outputDirectory>/</outputDirectory>
+			<filtered>true</filtered>
 		</file>
 	</files>
 
