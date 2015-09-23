@@ -667,7 +667,7 @@ public class ReflectNode	extends ExpressionNode
 		Object	ret	= null;
 		try
 		{
-			ret	= con.newInstance(args);
+			ret	= con.newInstance(SReflect.fillArguments(args, con.getParameterTypes()));
 		}
 		catch(InvocationTargetException e)
 		{
@@ -745,7 +745,7 @@ public class ReflectNode	extends ExpressionNode
 		Object	ret	= null;
 		try
 		{
-			ret	= invmeth.invoke(ref, args);
+			ret	= invmeth.invoke(ref, SReflect.fillArguments(args, invmeth.getParameterTypes()));
 		}
 		catch(InvocationTargetException e)
 		{

@@ -113,8 +113,7 @@ import static jadex.base.RootComponentConfiguration.*;
 	@Argument(name=WSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 	
 	@Argument(name=RSPUBLISH, clazz=boolean.class, defaultvalue="false"),
-//	@Argument(name=RSPUBLISHCLASS, clazz=Class.class, defaultvalue="jadex.extension.rs.publish.ExternalRSPublishAgent.class"),
-	@Argument(name=RSPUBLISHCLASS, clazz=String.class, defaultvalue="\"jadex.extension.rs.publish.ExternalRSPublishAgent.class\""),
+	@Argument(name=RSPUBLISHCLASS, clazz=String.class, defaultvalue="jadex.commons.SReflect.chooseAvailableClassName(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_CLASSES)+\".class\""),
 
 	@Argument(name=KERNELS, clazz=String.class, defaultvalue="\"multi\""),
 	

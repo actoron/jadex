@@ -246,6 +246,10 @@ public class MathNode	extends ExpressionNode
 		{
 			return ((String)left) + right;
 		}
+		else if(left==null && right instanceof String && op==ADD)
+		{
+			return ((String)left) + right;
+		}
 		// System.out.println("left: "+left);
 		// System.out.println("right: "+right);
 		// Hack !!! Support booleans for bitwise AND, OR, XOR.

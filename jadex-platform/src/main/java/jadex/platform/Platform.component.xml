@@ -127,6 +127,9 @@
 		<!-- Flag if rest service publishing is enabled. -->
 		<argument name="rspublish" class="boolean">false</argument>
 		
+		<!-- Rest publish implementation. -->
+		<argument name="rspublishclass" class="String">jadex.commons.SReflect.chooseAvailableClassName(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_CLASSES)+".class"</argument>
+		
 		<!-- The name(s) of kernel(s) to load (separated by comma).
 		     Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
 		     Alternatively, the 'multi' can be used to start any available kernels on demand.
