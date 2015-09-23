@@ -181,9 +181,10 @@ subprojects
         from new File(projectDir, 'build/docs')
     }
 	
+	// Replace version in agent/capability xmls 
 	processResources {
 		println "pR" + it
-		filesMatching('**/*')
+		filesMatching('**/*.agent.xml')
 		{
 			println "file"+it
 			filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-2.5.xsd', 'xxxxxx')}
