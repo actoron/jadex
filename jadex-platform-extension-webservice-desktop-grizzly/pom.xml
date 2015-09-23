@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jadex-platform-extension-webservice-desktop</artifactId>
+	<artifactId>jadex-platform-extension-webservice-desktop-grizzly</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-platform-extension-webservice-desktop</name>
+	<name>jadex-platform-extension-webservice-desktop-grizzly</name>
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-parent</artifactId>
@@ -18,6 +18,7 @@
 	</description>
 	
 	<properties>
+		<grizzly.version>2.3.22</grizzly.version>
 		<jersey.version>2.11</jersey.version>
 	</properties>
 
@@ -25,68 +26,30 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform</artifactId>
+			<artifactId>jadex-platform-extension-webservice-desktop</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-component</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-extension-webservice</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-json</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>javax.ws.rs</groupId>
-    		<artifactId>javax.ws.rs-api</artifactId>
-    		<version>2.0</version>
-		</dependency> 
-		
-		<dependency>
-			<groupId>javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.12.1.GA</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
 		</dependency>
 	
-<!--  		<dependency>
+  		<dependency>
      		<groupId>org.glassfish.grizzly</groupId>
      		<artifactId>grizzly-http-servlet</artifactId>
-     		<version>2.3.22</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-multipart</artifactId>
-			<version>${jersey.version}</version>
+     		<version>${grizzly.version}</version>
 		</dependency>
 		<dependency>
      		<groupId>org.glassfish.grizzly</groupId>
      		<artifactId>grizzly-http-server-multipart</artifactId>
-     		<version>2.3.22</version>
+     		<version>${grizzly.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.grizzly</groupId>
 			<artifactId>grizzly-http-server</artifactId>
-			<version>2.3.22</version>
+			<version>${grizzly.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-multipart</artifactId>
+			<version>${jersey.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
@@ -102,26 +65,8 @@
 		    <groupId>org.glassfish.jersey.media</groupId>
 		    <artifactId>jersey-media-moxy</artifactId>
 		    <version>${jersey.version}</version>
-		</dependency>-->
-		
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>9.3.1.v20150714</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.ow2.asm</groupId>
-			<artifactId>asm-all</artifactId>
-			<version>5.0.3</version>
-		</dependency>
-		
-		<!-- <dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>jsr311-api</artifactId>
-			<version>1.1.1</version>
-		</dependency>  -->
-		
+				
 	</dependencies>
 	
 	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->

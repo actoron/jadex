@@ -382,6 +382,8 @@
 				<module>jadex-json</module>
 				<module>jadex-platform-extension-webservice</module>
 				<module>jadex-platform-extension-webservice-desktop</module>
+				<module>jadex-platform-extension-webservice-desktop-grizzly</module>
+				<module>jadex-platform-extension-webservice-desktop-jetty</module>
 				<module>jadex-distribution-server</module>
 		    </modules>
 		</profile>
