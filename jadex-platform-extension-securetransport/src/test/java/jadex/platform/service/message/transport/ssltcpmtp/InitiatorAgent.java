@@ -136,7 +136,10 @@ public class InitiatorAgent extends TestAgent
 								{
 									public void customResultAvailable(Map<String, Object> v)
 									{
-										platforms.remove(platform);
+										if(platforms!=null)	// Todo: Race condition during cleanup!?
+										{
+											platforms.remove(platform);
+										}
 										ret.setResult(result);
 									}
 								});
