@@ -1,3 +1,6 @@
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 apply plugin: 'signing'
 apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
@@ -14,6 +17,9 @@ apply plugin: 'net.researchgate.release'
 //{
 //	println("upload detected")
 //}
+
+def date = new Date()
+def timestamp = date.format('yyyyMMdd.HHmmss')
 
 def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey', 
 	'-launch', '-web', '-distribution-', '-webservice', '-securetransport', '-relay', '-android'] //*:*-relay-standalone
@@ -52,7 +58,50 @@ def androidIncl = ['jadex-android-commons',
                 'jadex-applications-android:jadex-applications-android:puzzle'
 ]
 
-buildscript {
+def filterSpec = copySpec
+{
+	if(jadex_lastbuild_version!=null)
+	{
+		// Replace version in agent/capability xmls, xsds
+		filesMatching('**/*.agent.xml')
+		{
+//			println "file"+it
+			filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+jadex_lastbuild_version+'.xsd',
+				'http://jadex.sourceforge.net/jadex-bdi-'+jadex_build_version+'.xsd')}
+		}
+		filesMatching('**/*.capability.xml')
+		{
+//			println "file"+it
+			filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+jadex_lastbuild_version+'.xsd',
+				'http://jadex.sourceforge.net/jadex-bdi-'+jadex_build_version+'.xsd')}
+		}
+		filesMatching('**/*.xsd')
+		{
+//			println "file"+it
+			filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+jadex_lastbuild_version+'.xsd',
+				'http://jadex.sourceforge.net/jadex-bdi-'+jadex_build_version+'.xsd')}
+		}
+		// Replace doc link
+		filesMatching('**/Platform.component.xml')
+		{
+//			println "file"+it
+			filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+jadex_lastbuild_version+'-javadoc/index.html',
+				'http://www.activecomponents.org/docs/jadex-'+jadex_build_version+'-javadoc/index.html')}
+		}
+	}
+	// Update version properties
+	filesMatching('**/version.properties')
+	{
+//		println "file"+it
+		filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}
+		filter{String line -> line.replaceAll('\\$\\{timestamp\\}', timestamp)}
+	}
+}
+// make filterSpec variable accessible for all projects via putting it into the root project :-(
+project.ext.filterSpec=filterSpec
+
+buildscript 
+{
     apply from: 'util.gradle'
     repositories
     {
@@ -181,14 +230,10 @@ subprojects
         from new File(projectDir, 'build/docs')
     }
 	
-	// Replace version in agent/capability xmls 
+	
 	processResources {
-		println "pR" + it
-		filesMatching('**/*.agent.xml')
-		{
-			println "file"+it
-			filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-2.5.xsd', 'xxxxxx')}
-		}
+//		println "pR" + it + " " + filterSpec
+		with filterSpec
 	}
 
     javadocJar.onlyIf { calledWithTask("uploadArchives") || calledWithTask("install") }
@@ -474,10 +519,12 @@ def buildDistributionSource(task, excl, incl, name, opengl) {
         if ((excl != null && !isExcluded(excl, subproject.name))
                 || (incl != null && incl.contains(subproject.name)))
         {
-        	//println('including: '+task.name+" "+subproject.projectDir.name)
-			task.from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
-			task.from(getSourceDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
-			task.from(getResourcesDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
+//        	println('including: '+task.name+" "+subproject.projectDir.name+" "+rootProject.filterSpec) //rootProject.filterSpec
+//			def ttt = it 
+//			println ttt + ttt.getClass()
+			task.from(subproject.projectDir.name) {def cs=it;  include 'build.gradle' into 'sources/'+subproject.projectDir.name}
+			task.from(getSourceDir(subproject)) {into 'sources/'+subproject.projectDir.name+'/src/main/java' with rootProject.filterSpec}
+			task.from(getResourcesDir(subproject)) {def cs=it; into 'sources/'+subproject.projectDir.name+'/src/main/resources' with rootProject.filterSpec}
 		}
 	} 
 	
