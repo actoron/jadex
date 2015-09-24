@@ -18,6 +18,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 	</imports>
@@ -28,11 +29,16 @@
 	</capabilities>
 
 	<beliefs>
+		<!-- The environment. -->
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
+		
 		<!-- The agent's avatar in the environment. -->
 		<beliefref name="myself">
 			<concrete ref="move.myself"/>
 		</beliefref>
-
+		
 		<!-- The seen targets. -->
 		<beliefsetref name="my_targets">
 			<concrete ref="move.my_targets"/>
@@ -64,8 +70,11 @@
 			<!-- Suspend the goal when some other target is nearer to the agent. -->
 			<contextcondition>
 				(select one ISpaceObject $target from $beliefbase.my_targets
-				order by $beliefbase.my_location.getDistance($target.getLocation()))
-				== $goal.target
+					order by $beliefbase.environment.getDistance(
+						(IVector2)$beliefbase.myself.getProperty(Space2D.PROPERTY_POSITION),
+						(IVector2)$target.getProperty(Space2D.PROPERTY_POSITION)
+					)
+				) == $goal.target
 			</contextcondition>
 			<!-- Drop the goal on mission end. -->
 			<dropcondition>

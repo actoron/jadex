@@ -98,7 +98,7 @@
 					<env:property name="text" class="String" dynamic="true">
 						"Collected ore: "+$object.getProperty("ore")+" \n"+
 						"Remaining time: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0, $object.getProperty("missiontime")
-							- ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())))
+							- ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())))
 					</env:property>
 				</env:objecttype>
 			</env:objecttypes>
@@ -273,7 +273,7 @@
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								300000 + ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+								300000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target">
@@ -357,7 +357,7 @@
 						<env:object type="homebase">
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								3000000 + ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+								3000000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target" number="20">
