@@ -2,6 +2,7 @@ package jadex.commons.transformation;
 
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.ILRUEntryCleaner;
@@ -246,16 +247,34 @@ public abstract class Test extends TestCase
 		{
 			if(comp.compare(wo, ro)!=0)
 			{
-				throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
-					+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
+				if(wo instanceof String && ro instanceof String)
+				{
+					throw new RuntimeException("Strings not equal: "+wo+", "+ro+"\n"
+						+SUtil.arrayToString(((String)wo).getBytes())+", "+SUtil.arrayToString(((String)ro).getBytes())+" \n"
+						+SUtil.arrayToString(written));
+				}
+				else
+				{
+					throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
+						+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
+				}
 			}
 		}
 		else
 		{
 			if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.deepEquals((Object[])wo, (Object[])ro)))
 			{
-				throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
-					+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
+				if(wo instanceof String && ro instanceof String)
+				{
+					throw new RuntimeException("Strings not equal: "+wo+", "+ro+"\n"
+						+SUtil.arrayToString(((String)wo).getBytes())+", "+SUtil.arrayToString(((String)ro).getBytes())+" \n"
+						+SUtil.arrayToString(written));
+				}
+				else
+				{
+					throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
+						+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
+				}
 			}
 		}
 	}
