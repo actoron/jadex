@@ -29,11 +29,6 @@
 	</capabilities>
 
 	<beliefs>
-		<!-- The environment. -->
-		<beliefref name="environment">
-			<concrete ref="move.environment"/>
-		</beliefref>
-		
 		<!-- The agent's avatar in the environment. -->
 		<beliefref name="myself">
 			<concrete ref="move.myself"/>
@@ -70,10 +65,7 @@
 			<!-- Suspend the goal when some other target is nearer to the agent. -->
 			<contextcondition>
 				(select one ISpaceObject $target from $beliefbase.my_targets
-					order by $beliefbase.environment.getDistance(
-						(IVector2)$beliefbase.myself.getProperty(Space2D.PROPERTY_POSITION),
-						(IVector2)$target.getProperty(Space2D.PROPERTY_POSITION)
-					)
+					order by $beliefbase.myself.position.getDistance($target.position).getAsDouble()
 				) == $goal.target
 			</contextcondition>
 			<!-- Drop the goal on mission end. -->

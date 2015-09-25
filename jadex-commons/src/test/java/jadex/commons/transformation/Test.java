@@ -2,6 +2,7 @@ package jadex.commons.transformation;
 
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.ILRUEntryCleaner;
@@ -254,8 +255,43 @@ public abstract class Test extends TestCase
 		{
 			if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.deepEquals((Object[])wo, (Object[])ro)))
 			{
-				throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
-					+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
+				if(wo instanceof String && ro instanceof String)
+				{
+					char[]	woc	= ((String)wo).toCharArray();
+					StringBuffer	wocs	= new StringBuffer();
+					wocs.append("[");
+					for(int i=0; i<woc.length; i++)
+					{
+						wocs.append(Integer.toHexString(woc[i] | 0x10000).substring(1));
+						if(i<woc.length-1)
+						{
+							wocs.append(",");
+						}
+					}
+					wocs.append("]");
+
+					char[]	roc	= ((String)ro).toCharArray();
+					StringBuffer	rocs	= new StringBuffer();
+					rocs.append("[");
+					for(int i=0; i<roc.length; i++)
+					{
+						rocs.append(Integer.toHexString(roc[i] | 0x10000).substring(1));
+						if(i<roc.length-1)
+						{
+							rocs.append(",");
+						}
+					}
+					rocs.append("]");
+
+					throw new RuntimeException("Strings not equal2: "+wo+", "+ro+"\n"
+						+wocs+", "+rocs+" \n"
+						+SUtil.arrayToString(written));
+				}
+				else
+				{
+					throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
+						+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
+				}
 			}
 		}
 	}
