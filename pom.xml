@@ -73,7 +73,6 @@
 <!-- 	<module>jadex-applications-bdibpmn</module>
 		<module>jadex-applications-gpmn</module> -->
 		<module>jadex-applications-web</module>
-		<module>jadex-applications-java8</module>
 		
 		<module>jadex-rules</module>
 		<module>jadex-rules-eca</module>
@@ -649,6 +648,18 @@
 		        <module>jadex-servletfilter-web</module>
 		    </modules>
 		</profile>
-		
+
+		<!-- ======== java 8 modules ======== -->
+				
+		<profile>
+		    <id>jadex-java8</id>
+	        <activation>
+	        	<jdk>1.8</jdk>
+	        </activation>
+	        <modules>
+				<module>jadex-applications-java8</module>
+		    </modules>
+		</profile>
+				
 	</profiles>
 </project>
