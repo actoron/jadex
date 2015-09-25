@@ -249,7 +249,8 @@ public abstract class Test extends TestCase
 			{
 				if(wo instanceof String && ro instanceof String)
 				{
-					throw new RuntimeException("Strings not equal: "+wo+", "+ro+"\n"
+					throw new RuntimeException("Strings not equal1: "+wo+", "+ro+"\n"
+						+SUtil.arrayToString(((String)wo).toCharArray())+", "+SUtil.arrayToString(((String)ro).toCharArray())+" \n"
 						+SUtil.arrayToString(((String)wo).getBytes())+", "+SUtil.arrayToString(((String)ro).getBytes())+" \n"
 						+SUtil.arrayToString(written));
 				}
@@ -266,7 +267,8 @@ public abstract class Test extends TestCase
 			{
 				if(wo instanceof String && ro instanceof String)
 				{
-					throw new RuntimeException("Strings not equal: "+wo+", "+ro+"\n"
+					throw new RuntimeException("Strings not equal2: "+wo+", "+ro+"\n"
+						+SUtil.arrayToString(((String)wo).toCharArray())+", "+SUtil.arrayToString(((String)ro).toCharArray())+" \n"
 						+SUtil.arrayToString(((String)wo).getBytes())+", "+SUtil.arrayToString(((String)ro).getBytes())+" \n"
 						+SUtil.arrayToString(written));
 				}
