@@ -59,50 +59,54 @@ def androidIncl = ['jadex-android-commons',
 ]
 
 // http://stackoverflow.com/questions/30250923/how-do-i-build-a-war-file-with-gradle-using-a-copyspec-containing-filesmatching
-def filterSpec = copySpec
-{
-//	filter {
-		println "filterSpec"
-		if(rootProject.jadex_lastbuild_version!=null)
-		{
-			// Replace version in agent/capability xmls, xsds
-			filesMatching('**/*.agent.xml')
-			{
-				println "file"+it
-				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-			}
-			filesMatching('**/*.capability.xml')
-			{
-	//			println "file"+it
-				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-			}
-			filesMatching('**/*.xsd')
-			{
-	//			println "file"+it
-				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-			}
-			// Replace doc link
-			filesMatching('**/Platform.component.xml')
-			{
-	//			println "file"+it
-				filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
-					'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
-			}
-		}
-		// Update version properties
-		filesMatching('**/version.properties')
-		{
-	//		println "file"+it
-			filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
-			filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
-		}
-//	}
-}
+//def filterSpec = copySpec
+//{
+////	copy
+////	{
+//		filter 
+//		{
+////			println "filterSpec"
+//			if(rootProject.jadex_lastbuild_version!=null)
+//			{
+//				// Replace version in agent/capability xmls, xsds
+//				filesMatching('**/*.agent.xml')
+//				{
+//					println "file"+it
+//					filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
+//						'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
+//				}
+//				filesMatching('**/*.capability.xml')
+//				{
+//		//			println "file"+it
+//					filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
+//						'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
+//				}
+//				filesMatching('**/*.xsd')
+//				{
+//		//			println "file"+it
+//					filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
+//						'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
+//				}
+//				// Replace doc link
+//				filesMatching('**/Platform.component.xml')
+//				{
+//		//			println "file"+it
+//					filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
+//						'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
+//				}
+//			}
+//			// Update version properties
+//			filesMatching('**/version.properties')
+//			{
+//		//		println "file"+it
+//				filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
+//				filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
+//			}
+//		}
+////	}
+//}
 // make filterSpec variable accessible for all projects via putting it into the root project :-(
-project.ext.filterSpec=filterSpec
+//project.ext.filterSpec=filterSpec
 project.ext.jadex_build_version=jadex_build_version
 project.ext.jadex_lastbuild_version=jadex_lastbuild_version
 project.ext.timestamp=timestamp
@@ -237,49 +241,48 @@ subprojects
         from new File(projectDir, 'build/docs')
     }
 	
-	
 	processResources {
 //		println "pR" + it + " " + filterSpec
-		with filterSpec 
+//		with filterSpec 
 		
 //		println "filterSpec: "+project
-//		if(rootProject.jadex_lastbuild_version!=null)
-//		{
+		if(rootProject.jadex_lastbuild_version!=null)
+		{
 //			println "filterSpec2: "+project
-//			// Replace version in agent/capability xmls, xsds
-//			filesMatching('**/*.agent.xml')
-//			{
+			// Replace version in agent/capability xmls, xsds
+			filesMatching('**/*.agent.xml')
+			{
 //				println "file"+it
-//				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-//					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-//			}
-//			filesMatching('**/*.capability.xml')
-//			{
-//	//			println "file"+it
-//				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-//					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-//			}
-//			filesMatching('**/*.xsd')
-//			{
-//	//			println "file"+it
-//				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-//					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-//			}
-//			// Replace doc link
-//			filesMatching('**/Platform.component.xml')
-//			{
-//	//			println "file"+it
-//				filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
-//					'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
-//			}
-//		}
-//		// Update version properties
-//		filesMatching('**/version.properties')
-//		{
-//	//		println "file"+it
-//			filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
-//			filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
-//		}
+				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
+					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
+			}
+			filesMatching('**/*.capability.xml')
+			{
+	//			println "file"+it
+				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
+					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
+			}
+			filesMatching('**/*.xsd')
+			{
+	//			println "file"+it
+				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
+					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
+			}
+			// Replace doc link
+			filesMatching('**/Platform.component.xml')
+			{
+	//			println "file"+it
+				filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
+					'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
+			}
+		}
+		// Update version properties
+		filesMatching('**/version.properties')
+		{
+	//		println "file"+it
+			filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
+			filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
+		}
 	}
 
     javadocJar.onlyIf { calledWithTask("uploadArchives") || calledWithTask("install") }
@@ -568,9 +571,40 @@ def buildDistributionSource(task, excl, incl, name, opengl) {
 //        	println('including: '+task.name+" "+subproject.projectDir.name+" "+rootProject.filterSpec) //rootProject.filterSpec
 //			def ttt = it 
 //			println ttt + ttt.getClass()
-			task.from(subproject.projectDir.name) {def cs=it;  include 'build.gradle' into 'sources/'+subproject.projectDir.name}
-			task.from(getSourceDir(subproject)) {into 'sources/'+subproject.projectDir.name+'/src/main/java' with rootProject.filterSpec}
-			task.from(getResourcesDir(subproject)) {def cs=it; into 'sources/'+subproject.projectDir.name+'/src/main/resources' with rootProject.filterSpec}
+			task.from(subproject.projectDir.name) {include 'build.gradle' into 'sources/'+subproject.projectDir.name}
+			
+			
+			
+			// todo: replace version etc in source code 
+			task.from(getSourceDir(subproject)) {into 'sources/'+subproject.projectDir.name+'/src/main/java'}// with rootProject.filterSpec}
+			task.from(getResourcesDir(subproject)) {into 'sources/'+subproject.projectDir.name+'/src/main/resources'}// with rootProject.filterSpec}
+		
+			// todo: replace with copySpec in gradle 3.0
+			task.eachFile {
+				if(rootProject.jadex_lastbuild_version!=null)
+				{
+					println "filterSpec2: "+it.name
+					// Replace version in agent/capability xmls, xsds
+					if(it.name.endsWith('.agent.xml') || it.name.endsWith('.capability.xml') || it.name.endsWith('.xsd'))
+					{
+		//				println "file"+it
+						filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
+							'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
+					}
+					// Replace doc link
+					if(it.name=='Platform.component.xml')
+					{
+			//			println "file"+it
+						filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
+							'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
+					}
+				}
+				if(it.name=='version.properties')
+				{
+					filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
+					filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
+				}
+			}
 		}
 	} 
 	
@@ -807,13 +841,17 @@ task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor,
 	buildDist3d, buildDistPro, buildDist, buildDistAndroid, uploadArchives]) << {
 }
 	
-def fs = copySpec {
-	from("docs/readme.txt")
-	into("ttt")
-	//filter{String line -> line.replaceAll('a','b')}
-}	
-task ttt(type: Copy) {
-	with fs 
-//	filter{String line -> line.replaceAll('a','b')}
-}
+// Problems with copySpec -> 3.0: https://github.com/gradle/gradle/blob/master/design-docs/gradle-3.0.md
+//def fi = copySpec {
+//	from("docs/readme.txt")
+//	into("ttt")
+//	filesMatching("**/readme.txt") {
+//		String line -> line.replaceAll('a','b')
+//	}
+//}	
+
+//task mycopy (type: Copy) {
+//	into("ttt")
+//	with fi
+//}
 	

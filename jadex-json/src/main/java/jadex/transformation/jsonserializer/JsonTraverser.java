@@ -156,6 +156,25 @@ public class JsonTraverser extends Traverser
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader)
 	{
+		return objectToByteArray(val, classloader, null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep)
+	{
+		return objectFromByteArray(val, classloader, rep, null);
+	}
+	
+	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc)
+	{
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(true);
 		
@@ -163,13 +182,17 @@ public class JsonTraverser extends Traverser
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			traverser.traverse(val, null, writeprocs, null, wr);
-			byte[] ret = wr.getString().getBytes();
+			byte[] ret = enc==null? wr.getString().getBytes(): wr.getString().getBytes(enc);
 			bos.close();
 			return ret;
 		}
-		catch (Exception e)
+		catch(RuntimeException e)
 		{
-			e.printStackTrace();
+			throw e;
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
 			// System.out.println("Exception writing: "+val);
 			throw new RuntimeException(e);
 		}
@@ -181,14 +204,27 @@ public class JsonTraverser extends Traverser
 	 *  @param classloader The class loader.
 	 *  @return The decoded object.
 	 */
-	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep)
+	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep, String enc)
 	{
-		JsonValue value = Json.parse(new String(val));
-		JsonTraverser traverser = getReadTraverser();
-		JsonReadContext rc = new JsonReadContext();
-		Object ret = traverser.traverse(value, null, readprocs, null, rc);
-//		System.out.println("rc: "+rc.knownobjects);
-		return ret;
+		try
+		{
+			JsonValue value = Json.parse(enc==null? new String(val): new String(val, enc));
+			JsonTraverser traverser = getReadTraverser();
+			JsonReadContext rc = new JsonReadContext();
+			Object ret = traverser.traverse(value, null, readprocs, null, rc);
+	//		System.out.println("rc: "+rc.knownobjects);
+			return ret;
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch (Exception e)
+		{
+//			e.printStackTrace();
+			// System.out.println("Exception writing: "+val);
+			throw new RuntimeException(e);
+		}
 	}
 }
 
