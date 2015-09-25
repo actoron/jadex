@@ -16,7 +16,7 @@ public class JsonTest extends jadex.commons.transformation.Test
 	 */
 	public Object doWrite(Object wo)
 	{
-		return JsonTraverser.objectToByteArray(wo, null, StandardCharsets.UTF_8.name());
+		return JsonTraverser.objectToByteArray(wo, null, StandardCharsets.UTF_8.name()); 
 	}
 
 	/**
