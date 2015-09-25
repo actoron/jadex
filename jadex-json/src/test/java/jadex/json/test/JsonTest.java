@@ -1,7 +1,5 @@
 package jadex.json.test;
 
-import java.nio.charset.StandardCharsets;
-
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -16,7 +14,7 @@ public class JsonTest extends jadex.commons.transformation.Test
 	 */
 	public Object doWrite(Object wo)
 	{
-		return JsonTraverser.objectToByteArray(wo, null, StandardCharsets.UTF_8.name()); 
+		return JsonTraverser.objectToByteArray(wo, null, /*StandardCharsets.UTF_8.name()*/"UTF-8"); 
 	}
 
 	/**
@@ -24,7 +22,7 @@ public class JsonTest extends jadex.commons.transformation.Test
 	 */
 	public Object doRead(Object ro)
 	{
-		return JsonTraverser.objectFromByteArray((byte[])ro, null, null, StandardCharsets.UTF_8.name());
+		return JsonTraverser.objectFromByteArray((byte[])ro, null, null, /*StandardCharsets.UTF_8.name()*/"UTF-8");
 	}
 
 	/**

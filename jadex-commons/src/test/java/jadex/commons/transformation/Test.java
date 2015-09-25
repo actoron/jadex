@@ -285,7 +285,7 @@ public abstract class Test extends TestCase
 
 					throw new RuntimeException("Strings not equal2: "+wo+", "+ro+"\n"
 						+wocs+", "+rocs+" \n"
-						+SUtil.arrayToString(written));
+						+SUtil.arrayToString(written)+", "+new String((byte[])written));
 				}
 				else
 				{

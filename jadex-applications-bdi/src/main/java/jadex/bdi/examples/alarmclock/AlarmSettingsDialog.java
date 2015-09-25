@@ -64,7 +64,7 @@ public class AlarmSettingsDialog extends JDialog
 	protected Alarm alarm;
 
 	/** The mode. */
-	protected JComboBox<?> mode;
+	protected JComboBox mode;
 
 	/** The date. */
 	protected JDateChooser date;
@@ -100,7 +100,7 @@ public class AlarmSettingsDialog extends JDialog
 		//content.setBorder(BorderFactory.createTitledBorder(
 		//BorderFactory.createEtchedBorder(), "Alarm settings"));
 
-		mode = new JComboBox<Object>(Alarm.ALARMS);
+		mode = new JComboBox(Alarm.ALARMS);
 		date = new JDateChooser();
 		time = new TimeSpinner();
 		JButton now = new JButton("Now");

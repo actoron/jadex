@@ -10,7 +10,7 @@ import javax.swing.ListCellRenderer;
 /**
  *  Cell renderer for blocks.
  */
-public class BlockCellRenderer	extends JLabel	implements ListCellRenderer<Block>
+public class BlockCellRenderer	extends JLabel	implements ListCellRenderer//<Block> // java 7
 {
 	//-------- constructors --------
 
@@ -24,7 +24,7 @@ public class BlockCellRenderer	extends JLabel	implements ListCellRenderer<Block>
 
 	//-------- ListCellRenderer interface ---------
 
-	public Component getListCellRendererComponent(JList<? extends Block> list, Block value, int index, boolean isSelected, boolean cellHasFocus)
+	public Component getListCellRendererComponent(JList/*<? extends Block>*/ list, Object/*Block*/ value, int index, boolean isSelected, boolean cellHasFocus)
 	{
 		Block	block	= (Block)value;
 		setText(block.toString());

@@ -140,17 +140,17 @@ public class BlocksworldGui	extends JFrame
 						});
 
 						// Create target option panel.
-						final DefaultListModel<Block>	newblocks	= new DefaultListModel<Block>();
+						final DefaultListModel/*<Block>*/	newblocks	= new DefaultListModel/*<Block>*/();
 						for(int i=0; i<blocks.length; i++)
 							newblocks.addElement(new Block(blocks[i].number, blocks[i].getColor(), null));
-						final JList<Block>	selblocks	= new JList<Block>(newblocks);
+						final JList/*<Block>*/	selblocks	= new JList/*<Block>*/(newblocks);
 						selblocks.setVisibleRowCount(3);
 						selblocks.setCellRenderer(new BlockCellRenderer());
 						JScrollPane	ssp	= new JScrollPane(selblocks);
 						ssp.setBorder(new BevelBorder(BevelBorder.LOWERED));
-						final DefaultComboBoxModel<Block>	addblocks	= new DefaultComboBoxModel<Block>();
+						final DefaultComboBoxModel/*<Block>*/	addblocks	= new DefaultComboBoxModel/*<Block>*/();
 						addblocks.addElement(newtable);
-						final JComboBox<Block>	addtarget	= new JComboBox<Block>(addblocks);
+						final JComboBox/*<Block>*/	addtarget	= new JComboBox/*<Block>*/(addblocks);
 						addtarget.setRenderer(new BlockCellRenderer());
 						selblocks.addMouseListener(new MouseAdapter()
 						{
@@ -272,10 +272,10 @@ public class BlocksworldGui	extends JFrame
 						final JLabel	showcol	= new JLabel(" color ");
 						showcol.setOpaque(true);
 						showcol.setBackground(new Color(240, 128, 16));
-						final DefaultComboBoxModel<Block>	delblocks	= new DefaultComboBoxModel<Block>();
+						final DefaultComboBoxModel/*<Block>*/	delblocks	= new DefaultComboBoxModel/*<Block>*/();
 						for(int i=0; i<blocks.length; i++)
 							delblocks.addElement(blocks[i]);
-						final JComboBox<Block>	delblock	= new JComboBox<Block>(delblocks);
+						final JComboBox/*<Block>*/	delblock	= new JComboBox/*<Block>*/(delblocks);
 						delblock.setRenderer(new BlockCellRenderer());
 						JButton	create	= new JButton("create block");
 						create.addActionListener(new ActionListener()
@@ -361,7 +361,7 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						// Execution mode components
-						final JComboBox<String>	mode	= new JComboBox<String>(new String[]
+						final JComboBox/*<String>*/	mode	= new JComboBox/*<String>*/(new String[]
 							{StackBlocksPlan.MODE_NORMAL, StackBlocksPlan.MODE_STEP, StackBlocksPlan.MODE_SLOW});
 						
 						mode.setSelectedItem(md);
@@ -419,7 +419,7 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						// Bucket components
-						final JList<Block> bucket = new JList<Block>();
+						final JList/*<Block>*/ bucket = new JList/*<Block>*/();
 						bucket.setModel(new BlocksListModel(buck));
 //						agent.getBeliefbase().getBeliefFact("bucket").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
 //						{

@@ -11,7 +11,7 @@ import javax.swing.DefaultListModel;
  *  A list model representing a collection of blocks
  *  on a table or in a bucket.
  */
-public class BlocksListModel	extends DefaultListModel<Block>
+public class BlocksListModel	extends DefaultListModel//<Block> // java 7
 {
 	/**
 	 *  Create a list model for the given table.
