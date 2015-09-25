@@ -247,17 +247,8 @@ public abstract class Test extends TestCase
 		{
 			if(comp.compare(wo, ro)!=0)
 			{
-				if(wo instanceof String && ro instanceof String)
-				{
-					throw new RuntimeException("Strings not equal: "+wo+", "+ro+"\n"
-						+SUtil.arrayToString(((String)wo).getBytes())+", "+SUtil.arrayToString(((String)ro).getBytes())+" \n"
-						+SUtil.arrayToString(written));
-				}
-				else
-				{
-					throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
-						+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
-				}
+				throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
+					+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
 			}
 		}
 		else
@@ -266,8 +257,34 @@ public abstract class Test extends TestCase
 			{
 				if(wo instanceof String && ro instanceof String)
 				{
-					throw new RuntimeException("Strings not equal: "+wo+", "+ro+"\n"
-						+SUtil.arrayToString(((String)wo).getBytes())+", "+SUtil.arrayToString(((String)ro).getBytes())+" \n"
+					char[]	woc	= ((String)wo).toCharArray();
+					StringBuffer	wocs	= new StringBuffer();
+					wocs.append("[");
+					for(int i=0; i<woc.length; i++)
+					{
+						wocs.append(Integer.toHexString(woc[i] | 0x10000).substring(1));
+						if(i<woc.length-1)
+						{
+							wocs.append(",");
+						}
+					}
+					wocs.append("]");
+
+					char[]	roc	= ((String)ro).toCharArray();
+					StringBuffer	rocs	= new StringBuffer();
+					rocs.append("[");
+					for(int i=0; i<roc.length; i++)
+					{
+						rocs.append(Integer.toHexString(roc[i] | 0x10000).substring(1));
+						if(i<roc.length-1)
+						{
+							rocs.append(",");
+						}
+					}
+					rocs.append("]");
+
+					throw new RuntimeException("Strings not equal2: "+wo+", "+ro+"\n"
+						+wocs+", "+rocs+" \n"
 						+SUtil.arrayToString(written));
 				}
 				else
