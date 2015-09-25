@@ -752,7 +752,7 @@ public class MCapability extends MElement
 	 *  Get the conditions.
 	 *  @return The conditions.
 	 */
-	public List<UnparsedExpression> getConditions()
+	public List<MCondition> getConditions()
 	{
 		return conditions==null? Collections.EMPTY_LIST: conditions;
 	}
