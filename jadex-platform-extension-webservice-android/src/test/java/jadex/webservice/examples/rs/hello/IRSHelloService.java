@@ -47,7 +47,7 @@ public interface IRSHelloService
 	// @ParameterMapper(value="chl",
 	// mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
 	// @ParameterMapper(value="chco",
-	// mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())"))
+	// mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapperAndroid())"))
 	// Color[] colors);
 	// //
 	// /**
@@ -71,7 +71,7 @@ public interface IRSHelloService
 	// @ParameterMapper(value="chl",
 	// mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
 	// @ParameterMapper(value="chco",
-	// mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())"))
+	// mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapperAndroid())"))
 	// Color[] colors);
 
 	// -------- alternatives --------
@@ -106,7 +106,7 @@ public interface IRSHelloService
 	// @ParamMapper(value="chl",
 	// mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
 	// @ParamMapper(value="chco",
-	// mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())"))
+	// mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapperAndroid())"))
 	// Color[] colors);
 
 	// https://chart.googleapis.com/chart?

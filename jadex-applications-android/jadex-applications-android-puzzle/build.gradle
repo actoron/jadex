@@ -4,7 +4,7 @@ dependencies
 
     debugProvided project(':jadex-android-commons')
     debugProvided project(':jadex-kernel-bpmn')
-    debugProvided project(':jadex-kernel-bdi')
+//    debugProvided project(':jadex-kernel-bdi')
     debugProvided project(':jadex-kernel-bdiv3-android')
     debugProvided project(':jadex-kernel-bdiv3')
     debugProvided project(':jadex-runtimetools-android')
@@ -12,7 +12,7 @@ dependencies
 
     releaseProvided project(':jadex-android-commons')
     releaseProvided project(':jadex-kernel-bpmn')
-    releaseProvided project(':jadex-kernel-bdi')
+//    releaseProvided project(':jadex-kernel-bdi')
     releaseProvided project(':jadex-kernel-bdiv3-android')
     releaseProvided project(':jadex-kernel-bdiv3')
     releaseProvided project(':jadex-runtimetools-android')

@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javassist.bytecode.ByteArray;
-
 import jadex.android.bluetooth.CustomTestRunner;
 import jadex.android.bluetooth.connection.AConnection.ConnectedThread;
 import jadex.android.bluetooth.device.AndroidBluetoothAdapterWrapper;

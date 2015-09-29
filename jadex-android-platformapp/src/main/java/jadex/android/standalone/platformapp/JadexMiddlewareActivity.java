@@ -309,7 +309,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.FILL_PARENT);
 		linearLayout.setLayoutParams(params);
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
-		linearLayout.setId(4000);
+		linearLayout.setId(fragmentContainerId);
 		setContentView(linearLayout);
 //		setContentView(R.layout.loaderlayout);
 		ta.commit();

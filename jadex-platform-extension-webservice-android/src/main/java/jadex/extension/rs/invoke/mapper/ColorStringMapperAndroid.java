@@ -5,7 +5,7 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 /**
  *  Color to hex string mapper.
  */
-public class ColorStringMapper implements IValueMapper
+public class ColorStringMapperAndroid implements IValueMapper
 {
 	/**
 	 *  Convert the given value.

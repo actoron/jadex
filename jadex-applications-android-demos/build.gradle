@@ -4,7 +4,7 @@ dependencies
     compile project(':jadex-android-commons')
     compile project(':jadex-kernel-component')
     compile project(':jadex-kernel-bpmn')
-    compile project(':jadex-kernel-bdi')
+//    compile project(':jadex-kernel-bdi')
     compile project(':jadex-kernel-bdiv3-android')
     compile project(':jadex-runtimetools-android')
     compile project(':jadex-platform-extension-webservice-android')

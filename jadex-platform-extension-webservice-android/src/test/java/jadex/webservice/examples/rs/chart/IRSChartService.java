@@ -31,7 +31,7 @@ public interface IRSChartService
 		@ParameterMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
 		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Integer[] colors);
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapperAndroid())")) Integer[] colors);
 
 	/**
 	 *  Get a line chart.
@@ -45,7 +45,7 @@ public interface IRSChartService
 		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 //		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
 		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Integer[] colors);
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapperAndroid())")) Integer[] colors);
 	
 	/**
 	 *  Get a pie chart.
@@ -59,7 +59,7 @@ public interface IRSChartService
 		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 //		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
 		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Integer[] colors);
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapperAndroid())")) Integer[] colors);
 
 	
 	//-------- alternatives --------
@@ -86,7 +86,7 @@ public interface IRSChartService
 //		@ParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
 //		@ParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 //		@ParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-//		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
+//		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapperAndroid())")) Color[] colors);
 	
 //	https://chart.googleapis.com/chart?
 //	    This is the base URL for all chart requests. (However, see Improving Performance on Pages with Many Charts below for an optional variation for pages with multiple charts.)
