@@ -43,25 +43,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	public JadexPlatformService()
 	{
 		jadexPlatformManager = JadexPlatformManager.getInstance();
-		
-		// make sure default kernels all exist in classpath
-		ArrayList<String> kernelList = new ArrayList<String>();
-		ClassLoader myCL = getClass().getClassLoader();
-		if (SReflect.classForName0("jadex.component.ComponentComponentFactory", myCL) != null) {
-			kernelList.add(JadexPlatformManager.KERNEL_COMPONENT);
-		}
-		if (SReflect.classForName0("jadex.micro.MicroAgentFactory", myCL) != null) {
-			kernelList.add(JadexPlatformManager.KERNEL_MICRO);
-		}
-		if (SReflect.classForName0("jadex.bpmn.BpmnFactory", myCL) != null) {
-			kernelList.add(JadexPlatformManager.KERNEL_BPMN);
-		}
-		if (SReflect.classForName0("jadex.bdiv3.BDIAgentFactory", myCL) != null) {
-			kernelList.add(JadexPlatformManager.KERNEL_MICRO);
-		}
-		
-		int size = kernelList.size();
-		platformKernels = kernelList.toArray(new String[size]);
+		platformKernels = DEFAULT_KERNELS;
 	}
 
 	@Override
@@ -174,7 +156,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	
 	final protected IFuture<IExternalAccess> startPlatform()
 	{
-		Logger.i("Starting with " + Arrays.toString(platformKernels));
+		Logger.i("Requested kernels: " + Arrays.toString(platformKernels));
 		return startJadexPlatform(platformKernels, platformName, platformOptions);
 	}
 	

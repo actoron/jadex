@@ -2,6 +2,7 @@ package jadex.android.service;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.commons.Logger;
+import jadex.android.exception.JadexAndroidError;
 import jadex.base.PlatformConfiguration;
 import jadex.base.RootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
@@ -14,6 +15,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.platform.IJadexPlatformManager;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -26,6 +28,7 @@ import jadex.commons.transformation.annotations.Classname;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,7 +51,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			// " -relaytransport true" +
 			// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
 			// +
-			" -autoshutdown false" + " -saveonexit true" + " -gui false" + " -chat false";
+			" -autoshutdown false" + " -saveonexit true" + " -gui false" + " -chat false" + " -debugfutures true";
 	
 	private PlatformConfiguration defaultConfiguration;
 	
@@ -68,6 +71,17 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	public static JadexPlatformManager getInstance()
 	{
 		return instance;
+	}
+
+	private static Map<RootComponentConfiguration.KERNEL, String> kernelClassNames = new HashMap<RootComponentConfiguration.KERNEL, String>();
+
+	static {
+		kernelClassNames.put(RootComponentConfiguration.KERNEL.micro, "jadex.micro.MicroAgentFactory");
+		kernelClassNames.put(RootComponentConfiguration.KERNEL.v3, "jadex.bdiv3.BDIAgentFactory");
+		kernelClassNames.put(RootComponentConfiguration.KERNEL.bpmn, "jadex.bpmn.BpmnFactory");
+		kernelClassNames.put(RootComponentConfiguration.KERNEL.component, "jadex.component.ComponentComponentFactory");
+		kernelClassNames.put(RootComponentConfiguration.KERNEL.bdi, "jadex.bdiv3x.BDIXComponentFactory");
+		kernelClassNames.put(RootComponentConfiguration.KERNEL.multi, "jadex.kernelbase.MultiFactory");
 	}
 
 	private JadexPlatformManager()
@@ -224,11 +238,9 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	 * @return Future of the service.
 	 */
 	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz, final String scope) {
-		return getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<S>()
-		{
+		return getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<S>() {
 			@Classname("create-component")
-			public IFuture<S> execute(IInternalAccess ia)
-			{
+			public IFuture<S> execute(IInternalAccess ia) {
 				Future<S> ret = new Future<S>();
 				SServiceProvider
 						.getService(ia, serviceClazz, scope)
@@ -276,6 +288,9 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		{
 			public void run()
 			{
+
+				checkKernels(kernels);
+
 				final StringBuffer kernelString = new StringBuffer("\"");
 				String sep = "";
 				for (int i = 0; i < kernels.length; i++)
@@ -285,6 +300,8 @@ public class JadexPlatformManager implements IJadexPlatformManager
 					sep = ",";
 				}
 				kernelString.append("\"");
+
+				Logger.i("Used kernels: " + kernelString.toString());
 
 				final String usedOptions = DEFAULT_OPTIONS + " -kernels " + kernelString.toString() + " -platformname "
 						+ (platformName != null ? platformName : getRandomPlatformName()) + (options == null ? "" : " " + options);
@@ -339,6 +356,27 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		// }
 
 		return ret;
+	}
+
+	private void checkKernels(String[] kernels) {
+		// make sure default kernels all exist in classpath
+		ArrayList<String> kernelList = new ArrayList<String>();
+		ClassLoader myCL = getClass().getClassLoader();
+
+		for (String kernel : kernels) {
+			RootComponentConfiguration.KERNEL k = RootComponentConfiguration.KERNEL.valueOf(kernel);
+			String className = kernelClassNames.get(k);
+			boolean found = false;
+			if (className != null) {
+				Class<?> clazz = SReflect.classForName0(className, myCL);
+				if (clazz != null) {
+					found = true;
+				}
+			}
+			if (!found) {
+				throw new JadexAndroidError("Could not find factory for requested kernel: " + kernel);
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")

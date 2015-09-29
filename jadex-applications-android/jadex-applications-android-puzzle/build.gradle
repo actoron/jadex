@@ -17,4 +17,50 @@ dependencies
     releaseProvided project(':jadex-kernel-bdiv3')
     releaseProvided project(':jadex-runtimetools-android')
     releaseProvided project(':jadex-platform-extension-webservice-android')
+
+
+    compile project(':jadex-android-maven-plugin')
 }
+
+//buildscript {
+//    repositories {
+//        mavenCentral()
+//    }
+//    dependencies {
+//
+////        compile project(':jadex-android-maven-plugin')
+//        classpath project(':jadex-kernel-bdiv3')
+//        classpath project(':jadex-android-maven-plugin')
+//
+//    }
+//}
+//
+//
+//apply plugin: JadexPlugin
+//
+//jadex {
+//    message = "hi"
+//    greeter = "gradle"
+//}
+//
+//task A << {
+//    def obj = new jadex.bdiv3.MavenBDIClassReader()
+//    def obj2 = new jadex.bdiv3.BDIClassReader()
+//}
+//
+//class JadexPlugin implements Plugin<Project> {
+//    void apply(Project project) {
+//        project.extensions.create("jadex", JadexPluginExtension)
+//        project.task('hello') << {
+//            println "${project.jadex.message} from ${project.jadex.greeter}"
+//
+////            def obj = new jadex.maven.GenerateBDIMojo()
+//        }
+//
+//    }
+//}
+//
+//class JadexPluginExtension {
+//    String message
+//    String greeter
+//}

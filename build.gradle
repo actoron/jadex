@@ -121,7 +121,7 @@ buildscript
     }
     dependencies
     {
-        classpath 'com.android.tools.build:gradle:0.14.4'
+        classpath 'com.android.tools.build:gradle:1.3.0'
         classpath 'net.researchgate:gradle-release:2.2.2'
     }
 }
@@ -426,7 +426,6 @@ subprojects
         dependencies 
         {
             compile libraries.android
-            androidTestCompile 'com.pivotallabs:robolectric:1.0'
         }
 
         // dummy tasks to allow dependencies on tasks that are missing in android-plugin

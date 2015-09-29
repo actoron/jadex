@@ -362,7 +362,7 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	/**
 	 * Called right after the platform is started.
 	 * 
-	 * @param result
+	 * @param platform
 	 *            The external access to the platform
 	 */
 	protected void onPlatformStarted(IExternalAccess platform)

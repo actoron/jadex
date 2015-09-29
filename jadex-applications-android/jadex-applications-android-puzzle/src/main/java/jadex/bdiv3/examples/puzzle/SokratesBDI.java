@@ -78,15 +78,15 @@ public class SokratesBDI
 	public SokratesBDI()
 	{
 		super();
-		gui_proxy = new GuiProxy(board, gui_listener);
 	}
-	
+
 	/**
 	 *  Setup the gui and start playing.
 	 */
 	@AgentBody
 	public IFuture<Void>	body(IInternalAccess agent)
 	{
+		gui_proxy = new GuiProxy(board, gui_listener);
 		final Future<Void>	ret	= new Future<Void>();
 
 		strategy = agent.getConfiguration();
