@@ -17,9 +17,6 @@ dependencies
     releaseProvided project(':jadex-kernel-bdiv3')
     releaseProvided project(':jadex-runtimetools-android')
     releaseProvided project(':jadex-platform-extension-webservice-android')
-
-
-    compile project(':jadex-android-maven-plugin')
 }
 
 buildscript {
