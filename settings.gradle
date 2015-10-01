@@ -58,7 +58,9 @@ include 'jadex-applications-bdi',
 'jadex-distribution-minimal',
 'jadex-distribution-server',
 'jadex-distribution-standard',
-'jadex-distribution-pro'
+'jadex-distribution-pro',
+//'jadex-android-maven-plugin',
+'jadex-gradle-plugin'
 // android-specific modules:
 if (androidSdkExists()) {
     include 'jadex-android-antlr',
@@ -66,7 +68,7 @@ if (androidSdkExists()) {
     'jadex-android-xmlpull',
     'jadex-android-bluetooth',
 //    'jadex-android-integration-test',
-    'jadex-android-maven-plugin',
+//    'jadex-android-maven-plugin',
     'jadex-android-platformclient',
 //    'jadex-android-testlauncher',
     'jadex-applications-android-demos',

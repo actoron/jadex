@@ -116,6 +116,7 @@ buildscript
     apply from: 'util.gradle'
     repositories
     {
+        mavenLocal()
         mavenCentral()
         jcenter()
     }

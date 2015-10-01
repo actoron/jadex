@@ -51,7 +51,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			// " -relaytransport true" +
 			// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
 			// +
-			" -autoshutdown false" + " -saveonexit true" + " -gui false" + " -chat false" + " -debugfutures true";
+			" -autoshutdown false" + " -saveonexit true" + " -gui false" + " -chat false"; // + " -debugfutures true";
 	
 	private PlatformConfiguration defaultConfiguration;
 	

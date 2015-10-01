@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -293,7 +294,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		String	gn	= null;
 		try
 		{
-			Field	gnf	= obj.getClass().getField("__globalname");
+			Field	gnf	= obj.getClass().getField(IBDIClassGenerator.GLOBALNAME_FIELD_NAME);
 			gnf.setAccessible(true);
 			gn	= (String)gnf.get(obj);
 		}

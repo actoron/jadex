@@ -52,7 +52,7 @@ public class BDIDemoActivity extends JadexAndroidActivity
 	protected void onPlatformStarted(IExternalAccess result)
 	{
 		super.onPlatformStarted(result);
-		startBDIAgent("HelloWorldAgent", "jadex/android/applications/demos/bdi/HelloWorld.agent.xml").addResultListener(
+		startBDIAgent("HelloWorldAgent", "jadex/android/applications/demos/bdi/HelloWorldBDI.class").addResultListener(
 				bdiCreatedResultListener);
 	}
 
