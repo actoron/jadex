@@ -81,9 +81,9 @@ if (androidSdkExists()) {
     'jadex-runtimetools-android'
 
 
-    def pluginBootstrap = System.getProperty('jadexPluginBootstrap')
+    def pluginBootstrap = System.getProperty('gradlePluginBootstrap')
 
-    if (!pluginBootstrap && !calledWithTask('uploadGradlePlugin')) {
+    if (!pluginBootstrap && !calledWithTask('uploadGradlePluginArchives')) {
         include\
         'jadex-applications-android:jadex-applications-android-chat',
         'jadex-applications-android:jadex-applications-android-puzzle',

@@ -192,6 +192,16 @@ allprojects
 configurations
 {
 	excludeset
+    gradlePluginArchives
+}
+
+task gradlePluginJar(type: Jar) {
+    baseName "jadex-gradle-plugin"
+    from project(":jadex-gradle-plugin").sourceSets.main.output
+}
+
+artifacts {
+    gradlePluginArchives gradlePluginJar
 }
 
 subprojects
@@ -298,7 +308,7 @@ subprojects
 		}
 	}
 
-    javadocJar.onlyIf { calledWithTask("uploadArchives") || calledWithTask("install") }
+    javadocJar.onlyIf { calledWithTask("uploadArchives") || calledWithTask("install") || calledWithTask("uploadGradlePluginArchives") }
 
 	//sourcesJar.onlyIf { calledWithTask("uploadArchives") }
 	
@@ -368,6 +378,40 @@ subprojects
         }
     }
 }
+
+// upload task for gradle plugin and its dependencies
+uploadGradlePluginArchives {
+    repositories {
+        repositories.mavenDeployer {
+            beforeDeployment
+            {
+                MavenDeployment deployment -> signing.signPom(deployment)
+            }
+
+            snapshotRepository(url: reposnapshoturl)
+            {
+                authentication(userName: repouser, password: repopassword)
+            }
+            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            {
+                authentication(userName: repouser, password: repopassword)
+            }
+        }
+    }
+}
+
+// add dependencies -> upload them when uploadgradlePluginArchives executes
+uploadGradlePluginArchives.dependsOn = \
+ [project(':jadex-kernel-bdiv3').uploadArchives,
+  project(':jadex-kernel-component').uploadArchives,
+  project(':jadex-xml').uploadArchives,
+  project(':jadex-kernel-base').uploadArchives,
+  project(':jadex-kernel-micro').uploadArchives,
+  project(':jadex-bridge').uploadArchives,
+  project(':jadex-rules-eca').uploadArchives,
+  project(':jadex-commons').uploadArchives,
+  project(':jadex-javaparser').uploadArchives
+]
 
 // additional android config
 subprojects 
@@ -845,38 +889,17 @@ task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor,
 	buildDist3d, buildDistPro, buildDist, buildDistAndroid, uploadArchives]) << {
 }
 
-configurations {
-    gradlePlugin
-}
 
-task gradlePluginJar(type: Jar) {
-    baseName "jadex-gradle-plugin"
-    from project(":jadex-gradle-plugin").sourceSets.main.output
-}
+//uploadGradlePluginArchives.dependsOn project(':jadex-kernel-bdiv3').uploadArchives
 
-uploadGradlePlugin {
-  repositories {
-      repositories.mavenDeployer {
-          beforeDeployment
-          {
-              MavenDeployment deployment -> signing.signPom(deployment)
-          }
 
-          snapshotRepository(url: reposnapshoturl)
-          {
-              authentication(userName: repouser, password: repopassword)
-          }
-          repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
-          {
-              authentication(userName: repouser, password: repopassword)
-          }
-      }
-  }
-}
-
-artifacts {
-    gradlePlugin gradlePluginJar
-}
+//subprojects.each {sub ->
+//    if (sub.name == 'jadex-kernel-bdiv3') {
+//        sub.artifacts {
+//            gradlePlugin jar
+//        }
+//    }
+//}
 
 // Problems with copySpec -> 3.0: https://github.com/gradle/gradle/blob/master/design-docs/gradle-3.0.md
 //def fi = copySpec {
