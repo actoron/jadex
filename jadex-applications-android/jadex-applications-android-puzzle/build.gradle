@@ -26,13 +26,15 @@ buildscript {
     }
     dependencies {
 
-        classpath project(':jadex-kernel-bdiv3')
+//        classpath project(':jadex-kernel-bdiv3')
+//        classpath project(':jadex-gradle-plugin')
 
-        classpath group: 'net.sourceforge.jadex', name: 'jadex-gradle-plugin',
-                version: '1.0-SNAPSHOT'
+//        classpath group: 'net.sourceforge.jadex', name: 'jadex-gradle-plugin',
+//                version: '1.0-SNAPSHOT'
 
     }
 }
 
-apply plugin: 'jadex-bdi'
+//apply plugin: jadex.gradle.BDIPlugin
+//apply plugin: 'jadex-bdi'
 

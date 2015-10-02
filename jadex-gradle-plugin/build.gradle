@@ -23,12 +23,3 @@ repositories {
     mavenLocal()
     mavenCentral()
 }
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: uri('../repo'))
-//            snapshotRepository(url: uri('../repo'))
-        }
-    }
-}
