@@ -1,10 +1,10 @@
 package jadex.launch.test;
 
-import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SReflect;
-
 import java.io.File;
 
+import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import junit.framework.Test;
 
 
@@ -20,17 +20,17 @@ public class BDITest	extends	ComponentTestSuite
 	 */
 	public BDITest() throws Exception 
 	{
-		this("../jadex-applications-bdi/target/classes");
+		this(SUtil.findBuildDir(new File("../jadex-applications-bdi")));
 	}
 
 	/**
 	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
-	public BDITest(String cpRoot)	throws Exception
+	public BDITest(File cproot)	throws Exception
 	{
 		// Use BDI classes directory as classpath root,
-		super(new File(SReflect.isAndroid() ? "jadex.bdi.testcases" : "../jadex-applications-bdi/target/classes"),
-			new File(cpRoot),
+		super(SReflect.isAndroid() ? new File("jadex.bdi.testcases") : cproot,
+			cproot,
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{

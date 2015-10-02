@@ -1,13 +1,5 @@
 package jadex.rules.parser.conditions.javagrammar;
 
-import jadex.rules.rulesystem.ICondition;
-import jadex.rules.rulesystem.rules.AndCondition;
-import jadex.rules.rulesystem.rules.BoundConstraint;
-import jadex.rules.rulesystem.rules.ObjectCondition;
-import jadex.rules.rulesystem.rules.Variable;
-import jadex.rules.state.OAVObjectType;
-import jadex.rules.state.OAVTypeModel;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,6 +9,15 @@ import java.util.List;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
+
+import jadex.commons.SUtil;
+import jadex.rules.rulesystem.ICondition;
+import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.ObjectCondition;
+import jadex.rules.rulesystem.rules.Variable;
+import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.OAVTypeModel;
 
 
 /**
@@ -48,7 +49,7 @@ public class JavaParserTest
 			JavaJadexParser parser = new JavaJadexParser(tokens);
 		
 			ClassLoader	cl	= new URLClassLoader(new URL[]{
-				new File("../jadex-applications-bdi/target/classes").toURI().toURL()});
+				SUtil.findBuildDir(new File("../jadex-applications-bdi")).toURI().toURL()});
 			OAVTypeModel	tmodel	= new OAVTypeModel("cleanertypes", cl);
 
 			OAVObjectType	locatype	= tmodel.getObjectType("jadex.bdi.examples.cleanerworld.Location");

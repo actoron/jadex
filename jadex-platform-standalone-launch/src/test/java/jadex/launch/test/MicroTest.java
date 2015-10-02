@@ -1,10 +1,10 @@
 package jadex.launch.test;
 
-import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SReflect;
-
 import java.io.File;
 
+import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import junit.framework.Test;
 
 /**
@@ -19,18 +19,17 @@ public class MicroTest	extends ComponentTestSuite
 	 */
 	public MicroTest() 	throws Exception
 	{
-		this("../jadex-applications-micro/target/classes");
+		this(SUtil.findBuildDir(new File("../jadex-applications-micro")));
 	}
 	
 	/**
 	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
-	public MicroTest(String cpRoot)	throws Exception
+	public MicroTest(File cproot)	throws Exception
 	{
 		// Use micro application classes directory as classpath root,
-		super(new File(SReflect.isAndroid() ? "jadex.micro.testcases" : "../jadex-applications-micro/target/classes/"),
-//		super(new File(SReflect.isAndroid() ? "jadex.micro.testcases" : "../jadex-applications-micro/target/classes/jadex/micro/testcases/tuplefuture"),
-			new File(cpRoot),
+		super(SReflect.isAndroid() ? new File("jadex.micro.testcases") : cproot,
+			cproot,
 			// Exclude failing tests to allow maven build.
 			new String[]
 		{

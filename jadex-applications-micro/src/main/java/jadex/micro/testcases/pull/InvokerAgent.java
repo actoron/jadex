@@ -20,6 +20,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -35,6 +36,7 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -168,48 +170,55 @@ public class InvokerAgent
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
 		
 		// Start platform
-		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
-//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-		Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//			"-logging_level", "java.util.logging.Level.INFO",
-			"-gui", "false", "-simulation", "false", "-printpass", "false"
-		}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
+		try
 		{
-			public void customResultAvailable(final IExternalAccess platform)
+			String url	= "new String[]{\""+SUtil.findBuildDir(new File("../jadex-applications-micro")).toURI().toURL().toString()+"\"}";	// Todo: support RID for all loaded models.
+	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
+			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+	//			"-logging_level", "java.util.logging.Level.INFO",
+				"-gui", "false", "-simulation", "false", "-printpass", "false"
+			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+				new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
 			{
-				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport[]>(ret)
+				public void customResultAvailable(final IExternalAccess platform)
 				{
-					public void customResultAvailable(final ITransportComponentIdentifier result) 
+					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport[]>(ret)
 					{
-						performTestA(result, testno, delay, max)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+						public void customResultAvailable(final ITransportComponentIdentifier result) 
 						{
-							public void customResultAvailable(final TestReport result1)
+							performTestA(result, testno, delay, max)
+								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 							{
-								performTestB(result, testno+1, delay, max)
-									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+								public void customResultAvailable(final TestReport result1)
 								{
-									public void customResultAvailable(final TestReport result2)
+									performTestB(result, testno+1, delay, max)
+										.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
-										platform.killComponent();
-			//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-			//							{
-			//								public void customResultAvailable(Map<String, Object> v)
-			//								{
-			//									ret.setResult(result);
-			//								}
-			//							});
-										ret.setResult(new TestReport[]{result1, result2});
-									}
-								}));
-							}
-						}));
-					}
-				});
-			}
-		}));
+										public void customResultAvailable(final TestReport result2)
+										{
+											platform.killComponent();
+				//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+				//							{
+				//								public void customResultAvailable(Map<String, Object> v)
+				//								{
+				//									ret.setResult(result);
+				//								}
+				//							});
+											ret.setResult(new TestReport[]{result1, result2});
+										}
+									}));
+								}
+							}));
+						}
+					});
+				}
+			}));
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}

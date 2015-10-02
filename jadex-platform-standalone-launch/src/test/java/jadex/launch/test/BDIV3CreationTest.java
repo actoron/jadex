@@ -8,6 +8,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -38,7 +39,7 @@ public class BDIV3CreationTest //extends TestCase
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
 			"-logging", "false",
-			"-libpath", "new String[]{\""+new File("../jadex-applications-bdiv3/target/classes").toURI().toURL().toString()+"\"}",
+			"-libpath", "new String[]{\""+SUtil.findBuildDir(new File("../jadex-applications-bdiv3")).toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",

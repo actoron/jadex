@@ -1,9 +1,9 @@
 package jadex.platform.service;
 
-import jadex.base.test.ComponentTestSuite;
-
 import java.io.File;
 
+import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SUtil;
 import junit.framework.Test;
 
 /**
@@ -14,15 +14,24 @@ public class ManagementExtensionTest extends ComponentTestSuite
 	/**
 	 *  Constructor called by Maven JUnit runner.
 	 */
-	public ManagementExtensionTest() throws Exception
+	public ManagementExtensionTest()	throws Exception
 	{
-		super(new File("target/test-classes"), new File("target/test-classes"),
+		this(SUtil.findBuildDir(new File("."), true));
+	}
+	
+	/**
+	 *  Constructor called by JadexInstrumentor for Android tests.
+	 */
+	public ManagementExtensionTest(File cproot)	throws Exception
+	{
+		super(cproot, cproot,
+			// Exclude failing tests to allow maven build.
 			new String[]
-			{
-				"ManualUser",	// extends user to allow manual testing with gui.
-				"TestSubprocessStartEvent",	// part of test and sometimes produces exception when started alone.
-				"TestIntermediateEvent"	// part of test and sometimes produces exception when started alone.
-			});
+		{
+			"ManualUser",	// extends user to allow manual testing with gui.
+			"TestSubprocessStartEvent",	// part of test and sometimes produces exception when started alone.
+			"TestIntermediateEvent"	// part of test and sometimes produces exception when started alone.
+		});
 	}
 	
 	/**
