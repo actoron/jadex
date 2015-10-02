@@ -1044,12 +1044,11 @@ public class SReflect
 							}
 						}
 
-						// Exact match.
-						else if(getWrappedType(paramtypes[i][j])
-							== getWrappedType(argtypes[j]))
+						// Subtype or exact match.
+						else
 						{
 							// Increase quality.
-							matches[i]++;
+							matches[i]	+= getWrappedType(paramtypes[i][j])==getWrappedType(argtypes[j]) ? 2 : 1;
 							if(matches[i]>hq)
 								hq	= matches[i];
 						}
