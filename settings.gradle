@@ -58,10 +58,10 @@ include 'jadex-applications-bdi',
 'jadex-distribution-minimal',
 'jadex-distribution-server',
 'jadex-distribution-standard',
-'jadex-distribution-pro'
+'jadex-distribution-pro',
 // the plugins depend on other projects to be deployed, so they have to be standalone
 //'jadex-android-maven-plugin',
-//'jadex-gradle-plugin'
+'jadex-gradle-plugin'
 // android-specific modules:
 if (androidSdkExists()) {
     include 'jadex-android-antlr',

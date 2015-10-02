@@ -376,12 +376,12 @@ subprojects
     if(isAndroidProject(project))
     {
         android {
-            compileSdkVersion 21
-            buildToolsVersion "21.1.0"
+            compileSdkVersion android_compileSdkVersion
+            buildToolsVersion android_buildToolsVersion
 
             defaultConfig {
-                minSdkVersion 8
-                targetSdkVersion 21
+                minSdkVersion android_minSdkVersion
+                targetSdkVersion android_targetSdkVersion
                 versionCode 1
                 versionName project.version
             }

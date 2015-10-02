@@ -33,21 +33,32 @@ class BDIPluginTest {
         project.pluginManager.apply 'com.android.application'
         project.pluginManager.apply 'jadex-bdi'
 
+//        project.pluginManager.apply 'jadex.gradle.BDIPlugin'
         android = project.android
 
-        android.buildToolsVersion "21.0.0"
-        android.compileSdkVersion 21
+        def props = new Properties()
+
+        def file = new File("../gradle.properties")
+        if (!file.exists())  {
+            file = new File("gradle.properties")
+        }
+
+        props.load(new FileReader(file))
+
+        android.buildToolsVersion props.getProperty("android_buildToolsVersion")
+//        android.buildToolsVersion '22.0.1'
+        android.compileSdkVersion props.getProperty("android_compileSdkVersion")
 
     }
 
     @Test
     public void BDIPluginCanBeAppliedToAndroid() {
-
     }
 
     @Test
     public void BDIPluginCreatesTasksWithCorrectDependencies() {
-        project.evaluate()
+        evaluateProject()
+
         def BDIPlugin bdiPlugin = project.plugins.findPlugin(BDIPlugin.class)
 
 
@@ -73,7 +84,7 @@ class BDIPluginTest {
 //        project.logging.captureStandardOutput(LogLevel.INFO)
 //        project.logging.level = LogLevel.INFO
 
-        project.evaluate()
+        evaluateProject()
         def JadexBdiEnhanceTask task = project.tasks.getByName("jadexBdiEnhanceDebug")
 
         // use DummyBDI to test enhancements
@@ -93,5 +104,15 @@ class BDIPluginTest {
 //        def clazz = cl.loadClass("jadex.gradle.DummyBDI")
 //        def field = clazz.getField(IBDIClassGenerator.AGENT_FIELD_NAME);
 //        assertNotNull(field)
+    }
+
+    def void evaluateProject() {
+        try {
+            project.evaluate()
+        } catch (IllegalStateException e) {
+            e.printStackTrace()
+            System.err.println('If Test Exceptions occur, verify that buildTools are available in the version specified!')
+        }
+
     }
 }
