@@ -298,12 +298,6 @@ subprojects
 		}
 	}
 
-    // Do NOT use condition inside onlyIf - it will be lazy evaluated when javadocJar runs,
-    // which means the task is always 'javadocJar'.
-//    if (!calledWithTask("uploadArchives") && !calledWithTask("install")) {
-//        javadocJar.onlyIf { false }
-//    }
-
     javadocJar.onlyIf { calledWithTask("uploadArchives") || calledWithTask("install") }
 
 	//sourcesJar.onlyIf { calledWithTask("uploadArchives") }
@@ -850,7 +844,40 @@ task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor,
 	buildDistMaven, buildDistManagement, buildDistSecureTransport, buildDistRelay, buildDistWebservice,
 	buildDist3d, buildDistPro, buildDist, buildDistAndroid, uploadArchives]) << {
 }
-	
+
+configurations {
+    gradlePlugin
+}
+
+task gradlePluginJar(type: Jar) {
+    baseName "jadex-gradle-plugin"
+    from project(":jadex-gradle-plugin").sourceSets.main.output
+}
+
+uploadGradlePlugin {
+  repositories {
+      repositories.mavenDeployer {
+          beforeDeployment
+          {
+              MavenDeployment deployment -> signing.signPom(deployment)
+          }
+
+          snapshotRepository(url: reposnapshoturl)
+          {
+              authentication(userName: repouser, password: repopassword)
+          }
+          repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
+          {
+              authentication(userName: repouser, password: repopassword)
+          }
+      }
+  }
+}
+
+artifacts {
+    gradlePlugin gradlePluginJar
+}
+
 // Problems with copySpec -> 3.0: https://github.com/gradle/gradle/blob/master/design-docs/gradle-3.0.md
 //def fi = copySpec {
 //	from("docs/readme.txt")

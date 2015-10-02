@@ -1,3 +1,5 @@
+apply from: 'util.gradle'
+
 include 'jadex-applications-bdi',
 'jadex-applications-bdiv3',
 //'jadex-applications-bdibpmn',
@@ -81,7 +83,7 @@ if (androidSdkExists()) {
 
     def pluginBootstrap = System.getProperty('jadexPluginBootstrap')
 
-    if (!pluginBootstrap) {
+    if (!pluginBootstrap && !calledWithTask('uploadGradlePlugin')) {
         include\
         'jadex-applications-android:jadex-applications-android-chat',
         'jadex-applications-android:jadex-applications-android-puzzle',
