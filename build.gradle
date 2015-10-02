@@ -341,7 +341,7 @@ subprojects
 
 			//println("repouser: "+repouser+" pass: "+repopassword)
 			            
-            snapshotRepository(url: "http://localhost/nexus/content/repositories/snapshots")
+            snapshotRepository(url: reposnapshoturl)
             {
             	//<id>jadex-public-snapshots</id>
                 authentication(userName: repouser, password: repopassword)
