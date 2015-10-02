@@ -579,34 +579,36 @@ def buildDistributionSource(task, excl, incl, name, opengl) {
 			task.from(getSourceDir(subproject)) {into 'sources/'+subproject.projectDir.name+'/src/main/java'}// with rootProject.filterSpec}
 			task.from(getResourcesDir(subproject)) {into 'sources/'+subproject.projectDir.name+'/src/main/resources'}// with rootProject.filterSpec}
 		
-			// todo: replace with copySpec in gradle 3.0
-			task.eachFile {
-				if(rootProject.jadex_lastbuild_version!=null)
-				{
-					println "filterSpec2: "+it.name
-					// Replace version in agent/capability xmls, xsds
-					if(it.name.endsWith('.agent.xml') || it.name.endsWith('.capability.xml') || it.name.endsWith('.xsd'))
-					{
-		//				println "file"+it
-						filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-							'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-					}
-					// Replace doc link
-					if(it.name=='Platform.component.xml')
-					{
-			//			println "file"+it
-						filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
-							'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
-					}
-				}
-				if(it.name=='version.properties')
-				{
-					filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
-					filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
-				}
-			}
+
 		}
-	} 
+	}
+
+    // todo: replace with copySpec in gradle 3.0
+    task.eachFile {
+        if(rootProject.jadex_lastbuild_version!=null)
+        {
+//            println "filterSpec2: "+it.name
+            // Replace version in agent/capability xmls, xsds
+            if(it.name.endsWith('.agent.xml') || it.name.endsWith('.capability.xml') || it.name.endsWith('.xsd'))
+            {
+                //				println "file"+it
+                filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
+                        'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
+            }
+            // Replace doc link
+            if(it.name=='Platform.component.xml')
+            {
+                //			println "file"+it
+                filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
+                        'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
+            }
+        }
+        if(it.name=='version.properties')
+        {
+            filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
+            filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
+        }
+    }
 	
 	if(opengl)
 	{
@@ -647,19 +649,13 @@ task buildAndroidExampleProject(type: Zip) {
 }
 
 def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
-	println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
-
 	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
 	subprojects.each {subproject ->
 		if ((excl != null && !isExcluded(excl, subproject.name))
             || (incl != null && incl.contains(subproject.name)))
 		{
-//            if (android) {
                 task.from(subproject.configurations[configuration]) { into('lib') }
-//            } else {
-//                task.from(subproject.configurations[configuration]) { into('lib') }
-//            }
 
             if (isAndroidProject(subproject) && !isAndroidLibraryProject(subproject)) {
                 subproject.afterEvaluate {
@@ -670,10 +666,6 @@ def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
                 task.from(subproject.jar) { into('lib') }
             }
 		}
-//		else
-//		{
-//			println("Excluded: "+subproject.name)
-//		}
 	}
 	 	
     //from(subprojects.configurations.runtime){ into('lib') }
