@@ -15,7 +15,7 @@ dependencies {
 }
 
 group = 'net.sourceforge.jadex'
-version = '1.0-SNAPSHOT'
+version = gradleplugin_build_version
 
 //apply plugin: 'maven'
 

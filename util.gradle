@@ -98,7 +98,8 @@ def isExcluded(excl, name)
 
 def calledWithTask(fulltaskname)
 {
-    gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains(fulltaskname)
+    def result = gradle.startParameter.taskNames.any {taskName -> taskName.contains(fulltaskname)}
+    return result
 }
 
 // make functions externally visible

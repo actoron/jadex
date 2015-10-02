@@ -175,6 +175,18 @@ allprojects
         //    }
         //}
     }
+
+    buildscript {
+        repositories {
+            mavenLocal()
+            mavenCentral()
+            maven
+            {
+                name 'www2'
+                url 'http://www2.activecomponents.org/nexus/content/repositories/snapshots/'
+            }
+        }
+    }
 }
 
 configurations
@@ -285,6 +297,12 @@ subprojects
 			filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
 		}
 	}
+
+    // Do NOT use condition inside onlyIf - it will be lazy evaluated when javadocJar runs,
+    // which means the task is always 'javadocJar'.
+//    if (!calledWithTask("uploadArchives") && !calledWithTask("install")) {
+//        javadocJar.onlyIf { false }
+//    }
 
     javadocJar.onlyIf { calledWithTask("uploadArchives") || calledWithTask("install") }
 

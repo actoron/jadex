@@ -3,7 +3,8 @@
 dependencies 
 {
 	compile project(':jadex-commons')
-	testCompile project(':jadex-commons').sourceSets.test.output
+//	testCompile project(':jadex-commons').sourceSets.test.output
+	testCompile files(project(':jadex-commons').sourceSets.test.output)
 }
 
 //publishing 
