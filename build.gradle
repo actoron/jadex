@@ -207,7 +207,7 @@ subprojects
     else 
     {
         apply plugin: 'java'
-        apply plugin: 'java-library-distribution'
+//        apply plugin: 'java-library-distribution' // TODO: needed?
         allSource   = sourceSets.main.allSource
         sourceSets.main.resources.srcDirs    mainSrcDir
         sourceSets.test.resources.srcDirs    testSrcDir

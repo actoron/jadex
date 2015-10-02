@@ -29,14 +29,18 @@ repositories {
 configurations {
     gradlePluginArchives
 }
-
-task gradlePluginJar(type: Jar) {
-    baseName "jadex-gradle-plugin"
-    from project(":jadex-gradle-plugin").sourceSets.main.output
-}
+//
+//task gradlePluginJar(type: Jar, dependsOn: 'classes') {
+//    baseName "jadex-gradle-plugin"
+//    from sourceSets.main.output
+//}
+//
+//artifacts {
+//    gradlePluginArchives gradlePluginJar
+//}
 
 artifacts {
-    gradlePluginArchives gradlePluginJar
+    archives jar
 }
 
 // upload task for gradle plugin and its dependencies
@@ -70,5 +74,6 @@ uploadGradlePluginArchives.dependsOn = \
   project(':jadex-bridge').uploadArchives,
   project(':jadex-rules-eca').uploadArchives,
   project(':jadex-commons').uploadArchives,
-  project(':jadex-javaparser').uploadArchives
+  project(':jadex-javaparser').uploadArchives,
+  uploadArchives
 ]
