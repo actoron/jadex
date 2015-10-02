@@ -52,7 +52,7 @@ import jadex.commons.SUtil;
  */
 public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 {
-    protected static Method methoddc1; 
+    protected static Method methoddc1;
     protected static Method methoddc2;
 
 	static
@@ -199,7 +199,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 									{
 										visitInsn(Opcodes.POP);
 										visitVarInsn(Opcodes.ALOAD, 0);
-										super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(IInternalAccess.class));
+										super.visitFieldInsn(Opcodes.GETFIELD, iclname, AGENT_FIELD_NAME, Type.getDescriptor(IInternalAccess.class));
 									}
 									else
 									{
@@ -259,7 +259,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //							{
 //								// on stack: arrayref, index, value 
 //								visitVarInsn(Opcodes.ALOAD, 0);
-//								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
+//								super.visitFieldInsn(Opcodes.GETFIELD, iclname, AGENT_FIELD_NAME, Type.getDescriptor(BDIAgent.class));
 //
 //								// invoke method
 //								visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "writeArrayField", "(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bridge/IInternalAccess;)V");
@@ -294,8 +294,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				public void visitEnd()
 				{
 					if(isagentorcapa)
-						visitField(Opcodes.ACC_PUBLIC, "__agent", Type.getDescriptor(IInternalAccess.class), null, null);
-					visitField(Opcodes.ACC_PUBLIC, "__globalname", Type.getDescriptor(String.class), null, null);
+						visitField(Opcodes.ACC_PUBLIC, AGENT_FIELD_NAME, Type.getDescriptor(IInternalAccess.class), null, null);
+					visitField(Opcodes.ACC_PUBLIC, GLOBALNAME_FIELD_NAME, Type.getDescriptor(String.class), null, null);
 					super.visitEnd();
 				}
 			};
@@ -400,9 +400,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		mn.access = mn.access - Opcodes.ACC_NATIVE;
 		InsnList nl = new InsnList();
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bridge/IInternalAccess;"));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, AGENT_FIELD_NAME, "Ljadex/bridge/IInternalAccess;"));
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__globalname", "Ljava/lang/String;"));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, GLOBALNAME_FIELD_NAME, "Ljava/lang/String;"));
 		nl.add(new LdcInsnNode(belname));
 		
 		if(ret.getClassName().equals("byte"))
@@ -543,9 +543,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		mn.access = mn.access - Opcodes.ACC_NATIVE;
 		InsnList nl = new InsnList();
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bridge/IInternalAccess;"));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, AGENT_FIELD_NAME, "Ljadex/bridge/IInternalAccess;"));
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__globalname", "Ljava/lang/String;"));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, GLOBALNAME_FIELD_NAME, "Ljava/lang/String;"));
 		nl.add(new LdcInsnNode(belname));
 		
 		makeObject(nl, arg);
@@ -571,7 +571,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 		InsnList nl = new InsnList();
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
-		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(IInternalAccess.class)));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, AGENT_FIELD_NAME, Type.getDescriptor(IInternalAccess.class)));
 		nl.add(new LdcInsnNode(belname));
 		nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "unobserveValue", 
 //			"(Ljava/lang/String;)V"));
@@ -593,7 +593,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		nl.add(new InsnNode(Opcodes.ACONST_NULL)); // no index/key
 		
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the agent object
-		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(IInternalAccess.class)));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, AGENT_FIELD_NAME, Type.getDescriptor(IInternalAccess.class)));
 		
 		nl.add(new LdcInsnNode(belname));
 		
@@ -841,7 +841,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 						String belname = belnames.get(0);
 						
 						newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
-	//					newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+	//					newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, AGENT_FIELD_NAME, Type.getDescriptor(BDIAgent.class)));
 						newins.add(new LdcInsnNode(belname));
 	//					newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "writeArrayField", 
 	//						"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bridge/IInternalAccess;Ljava/lang/String;)V"));

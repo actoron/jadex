@@ -17,50 +17,29 @@ dependencies
     releaseProvided project(':jadex-kernel-bdiv3')
     releaseProvided project(':jadex-runtimetools-android')
     releaseProvided project(':jadex-platform-extension-webservice-android')
-
-
-    compile project(':jadex-android-maven-plugin')
 }
 
-//buildscript {
-//    repositories {
-//        mavenCentral()
-//    }
-//    dependencies {
-//
-////        compile project(':jadex-android-maven-plugin')
-//        classpath project(':jadex-kernel-bdiv3')
-//        classpath project(':jadex-android-maven-plugin')
-//
-//    }
-//}
-//
-//
-//apply plugin: JadexPlugin
-//
-//jadex {
-//    message = "hi"
-//    greeter = "gradle"
-//}
-//
-//task A << {
-//    def obj = new jadex.bdiv3.MavenBDIClassReader()
-//    def obj2 = new jadex.bdiv3.BDIClassReader()
-//}
-//
-//class JadexPlugin implements Plugin<Project> {
-//    void apply(Project project) {
-//        project.extensions.create("jadex", JadexPluginExtension)
-//        project.task('hello') << {
-//            println "${project.jadex.message} from ${project.jadex.greeter}"
-//
-////            def obj = new jadex.maven.GenerateBDIMojo()
-//        }
-//
-//    }
-//}
-//
-//class JadexPluginExtension {
-//    String message
-//    String greeter
-//}
+buildscript {
+    repositories {
+        mavenLocal() // needed because else gradle looks in android-sdk/m2repository :(
+        mavenCentral()
+    }
+    dependencies {
+
+        // this would be easy - but does not work:
+//        classpath project(':jadex-gradle-plugin')
+
+        // this works only if the plugin exists in maven repo
+//        classpath group: 'net.sourceforge.jadex', name: 'jadex-gradle-plugin',
+//                version: '1.0-SNAPSHOT'
+
+        // for compilation together with the plugin, we need to directly point to the classes:
+        classpath files(project(':jadex-gradle-plugin').sourceSets.main.output)
+        // add possible dependencies of the plugin to buildpath
+        classpath files(project(':jadex-gradle-plugin').sourceSets.main.runtimeClasspath)
+    }
+}
+
+apply plugin: jadex.gradle.BDIPlugin
+//apply plugin: 'jadex-bdi'
+

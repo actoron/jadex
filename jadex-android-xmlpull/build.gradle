@@ -7,5 +7,7 @@ dependencies
     compile(project(':jadex-xml')) {
         exclude module: 'bcprov-jdk15'
     }
+//    testCompile(project(':jadex-commons:test-jar'))
+    testCompile files(project(':jadex-commons').sourceSets.test.output)
 //    testCompile('net.sourceforge.jadex:jadex-commons:3.0-SNAPSHOT:test-jar')
 }

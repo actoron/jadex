@@ -9,6 +9,16 @@ import jadex.bdiv3.model.BDIModel;
  */
 public interface IBDIClassGenerator
 {
+	/**
+	 * Name of the field that is injected for agent name
+	 */
+	public final static String AGENT_FIELD_NAME = "__agent";
+
+	/**
+	 * Name of the field that is injected for globalname
+	 */
+	public final static  String GLOBALNAME_FIELD_NAME = "__globalname";
+
 	public final static String DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX = "__update";
 	
 	public final static String INIT_EXPRESSIONS_METHOD_PREFIX = "__init_expressions";

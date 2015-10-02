@@ -20,7 +20,7 @@ jadex-platform-standalone-launch/highscore.dmp
 /jadex-platform-android/tmp/cached-robolectric-classes.jar
 /jadex-platform-standalone-launch/.repoindices/Maven Central
 /docs/keys/random_seed
-/.gradle
+**/.gradle
 /jadex-platform-extension-relay-standalone/.relaystats
 **/.idea
 *.iml

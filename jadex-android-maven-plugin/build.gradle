@@ -1,19 +1,19 @@
-// workaround for javadoc exclusion in main build.gradle
-project.javadocJar.enabled=true
-project.javadocJar.onlyIf={true}
+ext.props = new Properties()
+props.load(new FileReader(file("../gradle.properties")))
 
 dependencies
 {
     ext.maven_api = "3.1.1"
 
-	compile project(':jadex-bridge')
-    compile project(':jadex-platform')
-    compile project(':jadex-kernel-bdiv3')
+	compile 'net.sourceforge.jadex:jadex-bridge:' + props.jadex_build_version
+    compile 'net.sourceforge.jadex:jadex-platform:' + props.jadex_build_version
+    compile 'net.sourceforge.jadex:jadex-kernel-bdiv3:' + props.jadex_build_version
 
     compile 'org.apache.maven:maven-artifact:' + maven_api
     compile 'org.apache.maven:maven-model:' + maven_api
     compile 'org.apache.maven:maven-core:' + maven_api
     compile 'org.apache.maven:maven-plugin-api:' + maven_api
+    compile 'org.sonatype.plexus:plexus-build-api:0.0.7'
     compile 'org.apache.commons:commons-io:1.3.2'
 }
 

@@ -31,7 +31,7 @@ import jadex.rules.eca.EventType;
 
 
 /**
- * 
+ * ASM Generator base class
  */
 public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 {
@@ -94,7 +94,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						
 						// Fetch agent object to invoke method on.
 						nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bridge/IInternalAccess;"));
+						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, IBDIClassGenerator.AGENT_FIELD_NAME, "Ljadex/bridge/IInternalAccess;"));
 						if(m.getDeclaringClass().equals(IBDIAgentFeature.class))
 						{
 							nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "getBDIAgentFeature", "(Ljadex/bridge/IInternalAccess;)Ljadex/bdiv3/features/IBDIAgentFeature;", false));
@@ -446,8 +446,8 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	{
 		boolean isEnhanced = false;
 		try {
-//			Field field = clazz.getField("__agent");
-			Field field = clazz.getField("__globalname");
+//			Field field = clazz.getField(AGENT_FIELD_NAME);
+			Field field = clazz.getField(GLOBALNAME_FIELD_NAME);
 			isEnhanced = true;
 		} catch (NoSuchFieldException ex) {
 		}
@@ -463,7 +463,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		// check if agentclass is bytecode enhanced
 		try
 		{
-			clazz.getField("__agent");
+			clazz.getField(AGENT_FIELD_NAME);
 		}
 		catch(Exception e)
 		{

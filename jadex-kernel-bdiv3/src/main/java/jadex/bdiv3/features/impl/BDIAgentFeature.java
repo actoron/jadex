@@ -353,7 +353,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			try
 			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, "__agent");
+				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //					System.out.println("res: "+res);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 			}
@@ -484,7 +484,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			try
 			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, "__agent");
+				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //					System.out.println("res: "+res);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 			}
@@ -824,7 +824,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		String	gn	= null;
 		try
 		{
-			Field	gnf	= obj.getClass().getField("__globalname");
+			Field	gnf	= obj.getClass().getField(IBDIClassGenerator.GLOBALNAME_FIELD_NAME);
 			gnf.setAccessible(true);
 			gn	= (String)gnf.get(obj);
 		}
@@ -852,7 +852,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			try
 			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, "__agent");
+				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //						System.out.println("res: "+res);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 			}
@@ -950,7 +950,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			try
 			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, "__agent");
+				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //					System.out.println("res: "+res);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 			}
@@ -1106,11 +1106,11 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			try
 			{
-				Field field = agcl.getDeclaredField("__agent");
+				Field field = agcl.getDeclaredField(IBDIClassGenerator.AGENT_FIELD_NAME);
 				field.setAccessible(true);
 				field.set(agent, pa);
 				
-				field = agcl.getDeclaredField("__globalname");
+				field = agcl.getDeclaredField(IBDIClassGenerator.GLOBALNAME_FIELD_NAME);
 				field.setAccessible(true);
 				field.set(agent, globalname);
 				agcl = agcl.getSuperclass();
@@ -1404,7 +1404,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				String globalname;
 				try
 				{
-					Field	g	= agent.getClass().getDeclaredField("__globalname");
+					Field	g	= agent.getClass().getDeclaredField(IBDIClassGenerator.GLOBALNAME_FIELD_NAME);
 					g.setAccessible(true);
 					globalname	= (String)g.get(agent);
 					globalname	= globalname==null ? f.getName() : globalname+MElement.CAPABILITY_SEPARATOR+f.getName();
