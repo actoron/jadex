@@ -1,22 +1,9 @@
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 apply plugin: 'signing'
 apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
 apply plugin: 'maven' // use gradle install to install in local .m2 
 apply plugin: 'net.researchgate.release'
 // gradle install -x test -i    for fast local install without tests (-x test i program args)
-
-//if(file('gradle.properties').exists())
-//{
-	//apply from: "gradle.properties"
-//}
-
-//if(gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives"))
-//{
-//	println("upload detected")
-//}
 
 def date = new Date()
 def timestamp = date.format('yyyyMMdd.HHmmss')
@@ -192,16 +179,6 @@ allprojects
 configurations
 {
 	excludeset
-    gradlePluginArchives
-}
-
-task gradlePluginJar(type: Jar) {
-    baseName "jadex-gradle-plugin"
-    from project(":jadex-gradle-plugin").sourceSets.main.output
-}
-
-artifacts {
-    gradlePluginArchives gradlePluginJar
 }
 
 subprojects
@@ -379,39 +356,7 @@ subprojects
     }
 }
 
-// upload task for gradle plugin and its dependencies
-uploadGradlePluginArchives {
-    repositories {
-        repositories.mavenDeployer {
-            beforeDeployment
-            {
-                MavenDeployment deployment -> signing.signPom(deployment)
-            }
 
-            snapshotRepository(url: reposnapshoturl)
-            {
-                authentication(userName: repouser, password: repopassword)
-            }
-            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            {
-                authentication(userName: repouser, password: repopassword)
-            }
-        }
-    }
-}
-
-// add dependencies -> upload them when uploadgradlePluginArchives executes
-uploadGradlePluginArchives.dependsOn = \
- [project(':jadex-kernel-bdiv3').uploadArchives,
-  project(':jadex-kernel-component').uploadArchives,
-  project(':jadex-xml').uploadArchives,
-  project(':jadex-kernel-base').uploadArchives,
-  project(':jadex-kernel-micro').uploadArchives,
-  project(':jadex-bridge').uploadArchives,
-  project(':jadex-rules-eca').uploadArchives,
-  project(':jadex-commons').uploadArchives,
-  project(':jadex-javaparser').uploadArchives
-]
 
 // additional android config
 subprojects 

@@ -25,3 +25,50 @@ repositories {
     mavenLocal()
     mavenCentral()
 }
+
+configurations {
+    gradlePluginArchives
+}
+
+task gradlePluginJar(type: Jar) {
+    baseName "jadex-gradle-plugin"
+    from project(":jadex-gradle-plugin").sourceSets.main.output
+}
+
+artifacts {
+    gradlePluginArchives gradlePluginJar
+}
+
+// upload task for gradle plugin and its dependencies
+uploadGradlePluginArchives {
+    repositories {
+        repositories.mavenDeployer {
+            beforeDeployment
+                    {
+                        MavenDeployment deployment -> signing.signPom(deployment)
+                    }
+
+            snapshotRepository(url: reposnapshoturl)
+                    {
+                        authentication(userName: repouser, password: repopassword)
+                    }
+            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                    {
+                        authentication(userName: repouser, password: repopassword)
+                    }
+        }
+    }
+}
+
+// add dependencies -> upload them when uploadgradlePluginArchives executes
+uploadGradlePluginArchives.dependsOn = \
+ [project(':jadex-kernel-bdiv3').uploadArchives,
+  project(':jadex-kernel-component').uploadArchives,
+  project(':jadex-xml').uploadArchives,
+  project(':jadex-kernel-base').uploadArchives,
+  project(':jadex-kernel-micro').uploadArchives,
+  project(':jadex-bridge').uploadArchives,
+  project(':jadex-rules-eca').uploadArchives,
+  project(':jadex-commons').uploadArchives,
+  project(':jadex-javaparser').uploadArchives
+]
