@@ -1,9 +1,9 @@
 package jadex.platform.service.message.transport.ssltcpmtp;
 
-import jadex.base.test.ComponentTestSuite;
-
 import java.io.File;
 
+import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SUtil;
 import junit.framework.Test;
 
 /**
@@ -16,18 +16,22 @@ public class SSLTest	extends ComponentTestSuite
 	 */
 	public SSLTest()	throws Exception
 	{
-		// Use micro application classes directory as classpath root,
-		super(new File("target/test-classes/"),
-//		super(new File("../jadex-applications-micro/target/classes/jadex/micro/testcases/intermediate/InvokerAgent.class"),
-			new File("target/test-classes"),
+		this(SUtil.findBuildDir(new File("."), true));
+	}
+	
+	/**
+	 *  Constructor called by JadexInstrumentor for Android tests.
+	 */
+	public SSLTest(File cproot)	throws Exception
+	{
+		super(cproot, cproot,
 			// Exclude failing tests to allow maven build.
 			new String[]
 		{
 //			"Provider",  // Shows junit assert method not found "filename" ???
-//		});
-		}, true, false, false);
+		});
 	}
-	
+
 	/**
 	 *  Static method called by eclipse JUnit runner.
 	 */

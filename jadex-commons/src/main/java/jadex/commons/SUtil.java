@@ -4654,7 +4654,7 @@ public class SUtil
 	/**
 	 *  Recursively get the newest last modified of a file or directory tree.
 	 */
-	protected static long	getLastModified(File f)
+	public static long	getLastModified(File f)
 	{
 		long ret;
 		if(f.isDirectory())
@@ -4692,7 +4692,7 @@ public class SUtil
 	/**
 	 *  Recursively get the newest last modified of a file or directory tree.
 	 */
-	protected static long	getLastModified(File f, boolean nocache)
+	public static long	getLastModified(File f, boolean nocache)
 	{
 		long ret;
 		if(f.isDirectory())
@@ -4869,5 +4869,42 @@ public class SUtil
 			return Collections.emptyMap();
 		}
 	}
+
+	/**
+	 *  Try to find the correct classpath root directory for current build tool chain.
+	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
+	 *  and uses the directory with the newest file.
+	 */
+	public static File	findBuildDir(File projectroot)
+	{
+		return findBuildDir(projectroot, false);
+	}
 	
+	/**
+	 *  Try to find the correct classpath root directory for current build tool chain.
+	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
+	 *  and uses the directory with the newest file.
+	 *  @param test	Find test directory instead of main.
+	 */
+	public static File	findBuildDir(File projectroot, boolean test)
+	{
+		List<File>	candidates	= new ArrayList<File>();
+		candidates.add(new File(projectroot, "bin"));
+		candidates.add(new File(new File(new File(projectroot, "build"), "classes"), test ? "test" : "main"));
+		candidates.add(new File(new File(projectroot, "target"), test ? "test-classes" : "classes"));
+		
+		File	ret	= null;
+		long	retmod	= -1;
+		for(File cand: candidates)
+		{
+			long	mod	= SUtil.getLastModified(cand);
+			if(mod>retmod)
+			{
+				ret	= cand;
+				retmod	= mod;
+			}
+		}
+		
+		return ret;
+	}
 }

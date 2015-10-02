@@ -1,5 +1,7 @@
 package jadex.micro.testcases.recfutures;
 
+import java.io.File;
+
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -20,6 +22,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -200,41 +203,48 @@ public class UserAgent
 		final Future<TestReport> ret = new Future<TestReport>();
 		
 		// Start platform
-		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
-//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-		Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//			"-logging_level", "java.util.logging.Level.INFO",
-			"-gui", "false", "-simulation", "false", "-printpass", "false"
-		}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+		try
 		{
-			public void customResultAvailable(final IExternalAccess platform)
+			String url	= "new String[]{\""+SUtil.findBuildDir(new File("../jadex-applications-micro")).toURI().toURL().toString()+"\"}";	// Todo: support RID for all loaded models.
+	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
+			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+	//			"-logging_level", "java.util.logging.Level.INFO",
+				"-gui", "false", "-simulation", "false", "-printpass", "false"
+			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 			{
-				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-                {
-                    public void customResultAvailable(ITransportComponentIdentifier result)
-                    { 
-						performTest(result, testno, delay, max)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
-						{
-							public void customResultAvailable(final TestReport result)
+				public void customResultAvailable(final IExternalAccess platform)
+				{
+					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+	                {
+	                    public void customResultAvailable(ITransportComponentIdentifier result)
+	                    { 
+							performTest(result, testno, delay, max)
+								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 							{
-								platform.killComponent();
-		//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-		//						{
-		//							public void customResultAvailable(Map<String, Object> v)
-		//							{
-		//								ret.setResult(result);
-		//							}
-		//						});
-								ret.setResult(result);
-							}
-						}));
-                    }
-                });
-			}
-		}));
+								public void customResultAvailable(final TestReport result)
+								{
+									platform.killComponent();
+			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+			//						{
+			//							public void customResultAvailable(Map<String, Object> v)
+			//							{
+			//								ret.setResult(result);
+			//							}
+			//						});
+									ret.setResult(result);
+								}
+							}));
+	                    }
+	                });
+				}
+			}));
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}

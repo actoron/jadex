@@ -7,6 +7,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
 import java.io.File;
@@ -25,7 +26,7 @@ public class BPMNStartElementsTest //extends TestCase
 //				"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 				"-simulation", "true",
 				"-asyncexecution", "true",
-				"-libpath", "new String[]{\""+new File("../jadex-applications-bpmn/target/classes").toURI().toURL().toString()+"\"}",
+				"-libpath", "new String[]{\""+SUtil.findBuildDir(new File("../jadex-applications-bpmn")).toURI().toURL().toString()+"\"}",
 //				"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
 				"-logging_level", "java.util.logging.Level.WARNING",
 //				"-debugfutures", "true",
