@@ -7,8 +7,6 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
-//    compile 'net.sourceforge.jadex:jadex-kernel-bdiv3:' + props.jadex_build_version
-
     compile project(':jadex-kernel-bdiv3')
     compile 'com.android.tools.build:gradle:1.3.0'
     compile 'commons-io:commons-io:2.4'
@@ -16,8 +14,6 @@ dependencies {
 
 group = 'net.sourceforge.jadex'
 version = gradleplugin_build_version
-
-//apply plugin: 'maven'
 
 test.testLogging.showStandardStreams = true
 
@@ -76,4 +72,21 @@ uploadGradlePluginArchives.dependsOn = \
   project(':jadex-commons').uploadArchives,
   project(':jadex-javaparser').uploadArchives,
   uploadArchives
+]
+
+task installGradlePluginArchives {
+
+}
+
+installGradlePluginArchives.dependsOn = \
+ [project(':jadex-kernel-bdiv3').install,
+  project(':jadex-kernel-component').install,
+  project(':jadex-xml').install,
+  project(':jadex-kernel-base').install,
+  project(':jadex-kernel-micro').install,
+  project(':jadex-bridge').install,
+  project(':jadex-rules-eca').install,
+  project(':jadex-commons').install,
+  project(':jadex-javaparser').install,
+  install
 ]
