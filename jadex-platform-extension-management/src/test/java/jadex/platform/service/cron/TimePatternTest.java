@@ -3,8 +3,10 @@ package jadex.platform.service.cron;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -394,7 +396,9 @@ public class TimePatternTest //extends TestCase
 	protected Tuple2<Long, Long> createStartAndEnd()
 	{
 		GregorianCalendar cal = new GregorianCalendar(2012, 1, 1); // month from 0 -> feb :-(
+		cal.setTimeZone(TimeZone.getTimeZone(ZoneId.of("GMT+1"))); // the expected results were created with GMT+1 :(
 		long start = cal.getTimeInMillis();
+		System.out.println(start);
 		cal.set(GregorianCalendar.YEAR, 2023);
 		long end = cal.getTimeInMillis();
 		
