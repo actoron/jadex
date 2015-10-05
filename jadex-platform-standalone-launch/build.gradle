@@ -37,6 +37,7 @@ dependencies
 	// Tests
 	testCompile project(':jadex-applications-micro')
 	testCompile project(':jadex-applications-bdiv3')
+	testCompile project(':jadex-applications-bdi')
 	testCompile project(':jadex-applications-bpmn')
 }
 
