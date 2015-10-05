@@ -869,7 +869,16 @@ release {
 //    newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
 //    tagTemplate = '${version}'
     versionPropertyFile = 'gradle.properties'
+    failOnUpdateNeeded = true
+    revertOnFail = true
+//    preCommitText = ''
+//    preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
+//    tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
+//    newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
+//    tagTemplate = '${version}'
+    versionPropertyFile = 'gradle.properties'
     versionProperties = ['jadex_build_version', 'gradleplugin_build_version']
+    buildTasks = [\
     buildTasks = [\
             'installGradlePluginArchives',
             'build',
