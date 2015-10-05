@@ -859,7 +859,7 @@ task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor,
 release {
     failOnCommitNeeded = true
     failOnPublishNeeded = false
-    failOnSnapshotDependencies = false // sadly, we have jmonkey snapshot dependencies...
+    failOnSnapshotDependencies = false // sadly, jmonkey has snapshot dependencies...
     failOnUnversionedFiles = false
     failOnUpdateNeeded = true
     revertOnFail = true
@@ -878,7 +878,7 @@ release {
 //    tagTemplate = '${version}'
     versionPropertyFile = 'gradle.properties'
     versionProperties = ['jadex_build_version', 'gradleplugin_build_version']
-    buildTasks = [\
+//    versionProperties = ['jadex_build_version', 'gradleplugin_build_version']
     buildTasks = [\
             'installGradlePluginArchives',
             'build',
@@ -902,7 +902,7 @@ release {
     ]
 
     git {
-        requireBranch = 'master'
+        requireBranch = 'local'
 //        pushToRemote = 'origin'
         pushToRemote = false
 //        pushToCurrentBranch = false
