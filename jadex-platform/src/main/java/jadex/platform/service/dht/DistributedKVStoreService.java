@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,7 +71,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService, ID
 	 */
 	public DistributedKVStoreService()
 	{
-		this.keyMap = new HashMap<String, StoreEntry>();
+		this.keyMap = new ConcurrentHashMap<String, StoreEntry>();
 		this.logger = Logger.getLogger(this.getClass().getName());
 	}
 	

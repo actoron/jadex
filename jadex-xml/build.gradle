@@ -5,9 +5,9 @@ dependencies
 	compile project(':jadex-commons')
 //	testCompile project(':jadex-commons').sourceSets.test.output
 	testCompile files(project(':jadex-commons').sourceSets.test.output)
+	testRuntime files(project(':jadex-commons').sourceSets.test.runtimeClasspath)
 }
-
-//publishing 
+//publishing
 //{
 //   publications 
 //    {

@@ -825,26 +825,11 @@ task buildDistGpmnEditor(type: Zip, dependsOn: srcZipGpmnEditor) {
 	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING')
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
-}
-
 task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor,
 	buildDistMaven, buildDistManagement, buildDistSecureTransport, buildDistRelay, buildDistWebservice,
 	buildDist3d, buildDistPro, buildDist, buildDistAndroid, uploadArchives]) << {
 }
 
-
-//uploadGradlePluginArchives.dependsOn project(':jadex-kernel-bdiv3').uploadArchives
-
-
-//subprojects.each {sub ->
-//    if (sub.name == 'jadex-kernel-bdiv3') {
-//        sub.artifacts {
-//            gradlePlugin jar
-//        }
-//    }
-//}
 
 // Problems with copySpec -> 3.0: https://github.com/gradle/gradle/blob/master/design-docs/gradle-3.0.md
 //def fi = copySpec {
