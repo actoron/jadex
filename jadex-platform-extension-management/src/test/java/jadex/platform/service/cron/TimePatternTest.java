@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -57,6 +58,12 @@ public class TimePatternTest //extends TestCase
 				cur+=60000;
 			}
 		}
+	}
+
+	@Before
+	public void setUpGlobaleTimeZone() {
+		// the expected results were created with Europe/Berlin :(
+		TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Berlin")));
 	}
 	
 	/**
@@ -396,9 +403,7 @@ public class TimePatternTest //extends TestCase
 	protected Tuple2<Long, Long> createStartAndEnd()
 	{
 		GregorianCalendar cal = new GregorianCalendar(2012, 1, 1); // month from 0 -> feb :-(
-		cal.setTimeZone(TimeZone.getTimeZone(ZoneId.of("GMT+1"))); // the expected results were created with GMT+1 :(
 		long start = cal.getTimeInMillis();
-		System.out.println(start);
 		cal.set(GregorianCalendar.YEAR, 2023);
 		long end = cal.getTimeInMillis();
 		
