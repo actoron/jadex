@@ -3,7 +3,6 @@ package jadex.platform.service.cron;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -63,7 +62,7 @@ public class TimePatternTest //extends TestCase
 	@Before
 	public void setUpGlobaleTimeZone() {
 		// the expected results were created with Europe/Berlin :(
-		TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Berlin")));
+		TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
 	}
 	
 	/**
