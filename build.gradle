@@ -1,3 +1,5 @@
+import java.util.regex.Matcher
+
 apply plugin: 'signing'
 apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
@@ -453,8 +455,7 @@ subprojects
 		        exclude '**/R.java'
 		
 		        // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-		        def javaVersion = JavaVersion.current()
-		        if (javaVersion >= JavaVersion.VERSION_1_8) {
+		        if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
 		            options.addStringOption('Xdoclint:none', '-quiet')
 		        } else {
 		            options.addStringOption('-quiet')
@@ -501,13 +502,16 @@ task docs(type: Javadoc) {
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
     // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-    def javaVersion = JavaVersion.current()
-    if (javaVersion >= JavaVersion.VERSION_1_8) {
+    if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
         options.addStringOption('Xdoclint:none', '-quiet')
     } else {
         options.addStringOption('-quiet')
     }
 }
+
+//  ---------------------------------
+//      DISTRIBUTION TASKS/CONFIG
+//  ---------------------------------
 
 task srcAndroidZip(type: Zip) {
     buildDistributionSource(srcAndroidZip, null, androidIncl, "sourcesAndroid.zip", false)
@@ -563,6 +567,7 @@ def buildDistributionSource(task, excl, incl, name, opengl) {
     //from sourceSets*.allSource.srcDirs*.collect { relativePath(it) }.flatten()
     
     task.from('build.gradle'){ into('sources') }
+    task.from('util.gradle'){ into('sources') }
     task.from('settings.gradle'){ into('sources') }
     
     subprojects.each {subproject ->
@@ -676,9 +681,9 @@ def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
     task.from('docs/readme.txt') 
     task.from('docs/license.txt')
     task.from('docs/api-changes.txt')
-    task.from('docs/default.settings.xml')
 
     if(configuration == "desktopDistribution") {
+        task.from('docs/default.settings.xml')
         task.from('docs/junit-3.8.1.jar'){ into('lib') }
         task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
         task.from('build/jadex-example-project.zip')
@@ -844,4 +849,57 @@ task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor,
 //	into("ttt")
 //	with fi
 //}
-	
+
+
+
+//  ---------------------------------
+//      RELEASE TASKS/CONFIG
+//  ---------------------------------
+
+release {
+    failOnCommitNeeded = true
+    failOnPublishNeeded = false
+    failOnSnapshotDependencies = false // sadly, we have jmonkey snapshot dependencies...
+    failOnUnversionedFiles = false
+    failOnUpdateNeeded = true
+    revertOnFail = true
+//    preCommitText = ''
+//    preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
+//    tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
+//    newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
+//    tagTemplate = '${version}'
+    versionPropertyFile = 'gradle.properties'
+    versionProperties = ['jadex_build_version', 'gradleplugin_build_version']
+    buildTasks = [\
+            'installGradlePluginArchives',
+            'build',
+            'docs',
+            'buildDistGpmnEditor',
+            'buildDistMaven',
+            'buildDistManagement',
+            'buildDistSecureTransport',
+            'buildDistRelay',
+            'buildDistWebservice',
+            'buildDist3d',
+            'buildDistPro',
+            'buildDist',
+            'buildDistAndroid'
+    ]
+    versionPatterns = [
+        /(\d+)([^\d]*$)/: { Matcher m, Project p -> m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") }
+    ]
+    scmAdapters = [
+        net.researchgate.release.GitAdapter
+    ]
+
+    git {
+        requireBranch = 'master'
+//        pushToRemote = 'origin'
+        pushToRemote = false
+//        pushToCurrentBranch = false
+
+    }
+
+}
+
+//afterReleaseBuild.dependsOn uploadArchives
