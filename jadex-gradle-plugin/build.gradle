@@ -25,15 +25,6 @@ repositories {
 configurations {
     gradlePluginArchives
 }
-//
-//task gradlePluginJar(type: Jar, dependsOn: 'classes') {
-//    baseName "jadex-gradle-plugin"
-//    from sourceSets.main.output
-//}
-//
-//artifacts {
-//    gradlePluginArchives gradlePluginJar
-//}
 
 artifacts {
     archives jar
@@ -60,33 +51,54 @@ uploadGradlePluginArchives {
     }
 }
 
-// add dependencies -> upload them when uploadgradlePluginArchives executes
-uploadGradlePluginArchives.dependsOn = \
- [project(':jadex-kernel-bdiv3').uploadArchives,
-  project(':jadex-kernel-component').uploadArchives,
-  project(':jadex-xml').uploadArchives,
-  project(':jadex-kernel-base').uploadArchives,
-  project(':jadex-kernel-micro').uploadArchives,
-  project(':jadex-bridge').uploadArchives,
-  project(':jadex-rules-eca').uploadArchives,
-  project(':jadex-commons').uploadArchives,
-  project(':jadex-javaparser').uploadArchives,
-  uploadArchives
-]
+uploadGradlePluginArchives.dependsOn += uploadArchives
 
-task installGradlePluginArchives {
+task installGradlePluginArchives(dependsOn:'install') {
 
 }
 
-installGradlePluginArchives.dependsOn = \
- [project(':jadex-kernel-bdiv3').install,
-  project(':jadex-kernel-component').install,
-  project(':jadex-xml').install,
-  project(':jadex-kernel-base').install,
-  project(':jadex-kernel-micro').install,
-  project(':jadex-bridge').install,
-  project(':jadex-rules-eca').install,
-  project(':jadex-commons').install,
-  project(':jadex-javaparser').install,
-  install
-]
+afterEvaluate {
+    def deps = getTransitiveJadexDependencies(getConfigurations().getByName('compile'), project.group)
+// add dependencies -> install them when installGradlePluginArchives executes
+    addTaskDependencies(installGradlePluginArchives, deps, "install")
+    // add dependencies -> upload them when uploadgradlePluginArchives executes
+    addTaskDependencies(uploadGradlePluginArchives, deps, "uploadArchives")
+}
+
+/**
+ * Add depTaskName tasks of given depProjects as dependency to given task.
+ *
+ * @param task
+ * @param depProjectList
+ * @param depTaskName
+ * @return
+ */
+def addTaskDependencies(Task task, depProjects, String depTaskName) {
+    depProjects.each {dep ->
+        println "adding: ${dep.name}.${depTaskName} to task ${task}"
+        task.dependsOn.add project(":${dep.name}")."${depTaskName}"
+    }
+}
+
+/**
+ * Get all transitive dependencies of 'conf' that have given 'jadexGroup'.
+ * Returns a Collection with items: [group, name, version]
+ * @param conf
+ * @param jadexGroup
+ * @return
+ */
+def Collection<Dependency> getTransitiveJadexDependencies(Configuration conf, String jadexGroup) {
+    def firstLevelDeps = conf.resolvedConfiguration.firstLevelModuleDependencies.findAll({it.moduleGroup == jadexGroup})
+    def result = []
+    getTransitiveJadexDependencies_recursive(firstLevelDeps, result, jadexGroup)
+    return result.unique()
+}
+
+def getTransitiveJadexDependencies_recursive(Collection<ResolvedDependency> deps, result, String jadexGroup) {
+    deps.each {dep ->
+        if (dep.moduleGroup == jadexGroup) {
+            result.add([group: dep.moduleGroup, name: dep.moduleName, version: dep.moduleVersion])
+            getTransitiveJadexDependencies_recursive(dep.getChildren(), result, jadexGroup)
+        }
+    }
+}
