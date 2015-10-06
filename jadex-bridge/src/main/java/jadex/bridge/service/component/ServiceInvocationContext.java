@@ -15,6 +15,7 @@ import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -202,7 +203,14 @@ public class ServiceInvocationContext
 			Boolean inh = currentcall!=null? (Boolean)currentcall.getProperty(ServiceCall.INHERIT): null;
 			if(inh!=null && inh.booleanValue())
 			{
-				props = new HashMap<String, Object>(currentcall.getProperties());
+				try
+				{
+					props = new HashMap<String, Object>(currentcall.getProperties());
+				}
+				catch(ConcurrentModificationException e)
+				{
+					throw new RuntimeException("Dreck: "+this+"\n "+IComponentIdentifier.LOCAL.get() , e);
+				}
 				props.remove(ServiceCall.CAUSE); // remove cause as it has to be adapted
 			}
 			else
