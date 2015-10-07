@@ -57,6 +57,9 @@ public class ServiceCall
 	/** The service call properties. */
 	protected Map<String, Object> properties;
 	
+	// hack for debugging concurrent modification
+	public IComponentIdentifier	lastmod;
+	
 	//-------- constructors --------
 	
 //	static Set<Integer> sprops = Collections.synchronizedSet(new HashSet<Integer>());
@@ -181,6 +184,7 @@ public class ServiceCall
 //				System.out.println("abgsdoyi: "+ret);
 ////				Thread.dumpStack();
 //			}
+			ret.lastmod	= IComponentIdentifier.LOCAL.get();
 			ret.properties.putAll(props);
 		}
 		return ret;
@@ -221,6 +225,7 @@ public class ServiceCall
 	{
 //		if(((String)properties.get("method")).indexOf("service")!=-1)
 //			System.out.println("sdfjbsdfjk");
+		lastmod	= IComponentIdentifier.LOCAL.get();
 		properties.put(TIMEOUT, Long.valueOf(to));
 	}
 	
@@ -239,6 +244,7 @@ public class ServiceCall
 	 */
 	public void setRealtime(Boolean realtime)
 	{
+		lastmod	= IComponentIdentifier.LOCAL.get();
 		properties.put(REALTIME, realtime);
 	}
 	
@@ -271,6 +277,7 @@ public class ServiceCall
 	 */
 	public void setCause(Cause cause)
 	{
+		lastmod	= IComponentIdentifier.LOCAL.get();
 		properties.put(CAUSE, cause);
 	}
 	
@@ -298,6 +305,7 @@ public class ServiceCall
 //			else if(properties.get("method")==null)
 //				System.out.println("setting unknown tout: "+val);
 //		}
+		lastmod	= IComponentIdentifier.LOCAL.get();
 		this.properties.put(name, val);
 	}
 	
@@ -305,8 +313,9 @@ public class ServiceCall
 	 *  Remove a property.
 	 *  @param name The property name.
 	 */
-	public void setProperty(String name)
+	public void removeProperty(String name)
 	{
+		lastmod	= IComponentIdentifier.LOCAL.get();
 		this.properties.remove(name);
 	}
 	

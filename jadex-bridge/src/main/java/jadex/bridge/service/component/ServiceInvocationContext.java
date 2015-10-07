@@ -209,7 +209,12 @@ public class ServiceInvocationContext
 				}
 				catch(ConcurrentModificationException e)
 				{
-					throw new RuntimeException("Dreck: "+this+"\n "+IComponentIdentifier.LOCAL.get() , e);
+					throw new RuntimeException("Dreck: "+this
+						+"\nlocal: "+IComponentIdentifier.LOCAL.get()
+						+"\ncurrentcall: "+currentcall
+						+"\ncause: "+currentcall.getCause()
+						+"\nmethod: "+method
+						+"\n: lastmod"+currentcall.lastmod, e);
 				}
 				props.remove(ServiceCall.CAUSE); // remove cause as it has to be adapted
 			}
