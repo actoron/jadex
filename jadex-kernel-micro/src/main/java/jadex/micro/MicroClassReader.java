@@ -1719,6 +1719,7 @@ public class MicroClassReader
 	// todo: make use of cache
 	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
+		String	oclname	= clname;
 		Class ret = SReflect.findClass0(clname, imports, classloader);
 //		System.out.println(clname+" "+ret+" "+classloader);
 		int idx;
@@ -1738,7 +1739,7 @@ public class MicroClassReader
 		}
 		if(ret == null)
 		{
-			throw new RuntimeException("Micro agent class not found: " + clname);
+			throw new RuntimeException("Micro agent class not found: " + oclname + ", " + SUtil.arrayToString(imports));
 		}
 		else
 		{
