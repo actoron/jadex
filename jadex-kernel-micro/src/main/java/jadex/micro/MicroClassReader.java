@@ -1739,7 +1739,7 @@ public class MicroClassReader
 		}
 		if(ret == null)
 		{
-			throw new RuntimeException("Micro agent class not found: " + oclname + ", " + SUtil.arrayToString(imports));
+			throw new RuntimeException("Micro agent class not found: " + oclname + ", " + SUtil.arrayToString(imports) + ", " + classloader);
 		}
 		else
 		{
