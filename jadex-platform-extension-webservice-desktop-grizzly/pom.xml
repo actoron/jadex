@@ -66,7 +66,14 @@
 		    <artifactId>jersey-media-moxy</artifactId>
 		    <version>${jersey.version}</version>
 		</dependency>
-				
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>		
+		
 	</dependencies>
 	
 	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->
@@ -81,20 +88,6 @@
 					<scope>provided</scope>
 				</dependency>
 				
-				<dependency>
-					<groupId>javax.activation</groupId>
-					<artifactId>activation</artifactId>
-					<version>1.1</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>net.sourceforge.jadex</groupId>
-					<artifactId>jadex-platform</artifactId>
-					<version>${project.version}</version>
-					<scope>provided</scope>
-				</dependency>
-		
 				<dependency>
 					<groupId>net.sourceforge.jadex</groupId>
 					<artifactId>jadex-kernel-component</artifactId>
