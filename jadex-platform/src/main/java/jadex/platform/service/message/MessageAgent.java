@@ -82,6 +82,8 @@ public class MessageAgent
 				{
 					if (tokens[j].length() > 0)
 					{
+						if ("null".equals(tokens[j].trim()))
+							conargs.add(null);
 						if ("component".equals(tokens[j].trim()))
 							conargs.add(ia);
 						else if ("componentlogger".equals(tokens[j].trim()))
