@@ -37,7 +37,7 @@ class Convert {
 //                println "found zipfile: ${f.fileName}"
                 def zip = new ZipFile(f.toFile())
                 def List<ZipEntry> found = zip.entries().findAll {entry ->
-                    entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml")// && entry.name.contains("Overview")
+                    entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml")// && entry.name.contains("05 Security")
                 }
 
                 found.each {it ->
@@ -235,7 +235,7 @@ class Convert {
 
     def mdReplacements = [
             img: [
-                    pattern: ~/!\[([^\]]*@\w*.\w*)\]\(([^\]]*)@(\w*.\w*)\)/,
+                    pattern: ~/!\[([^\]]*@.*.\w*)\]\(([^\]]*)@(\w*.\w*)\)/,
                     replacement: '!\\[$1\\]\\($3\\)'
                     ],
             headlinks: [
