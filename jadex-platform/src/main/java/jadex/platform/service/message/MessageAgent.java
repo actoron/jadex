@@ -53,7 +53,7 @@ public class MessageAgent
 		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport", 		"niotcptransport",	"component,niotcpport,componentlogger",
 		"jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", 		"ssltcptransport",	"component,ssltcpport",
 		"jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport",	"relaytransport",	"component,relayaddress,relaysecurity,relayawaonly",
-		"com.actoron.platform.service.message.transport.udpmtp.UdpTransport", 		"null",				"component"
+		"com.actoron.platform.service.message.transport.udpmtp.UdpTransport", 		"null",				"component,false,true"
 	};
 	
 	/**
@@ -84,7 +84,11 @@ public class MessageAgent
 					{
 						if ("null".equals(tokens[j].trim()))
 							conargs.add(null);
-						if ("component".equals(tokens[j].trim()))
+						else if ("true".equals(tokens[j].trim()))
+							conargs.add(Boolean.TRUE);
+						else if ("false".equals(tokens[j].trim()))
+							conargs.add(Boolean.FALSE);
+						else if ("component".equals(tokens[j].trim()))
 							conargs.add(ia);
 						else if ("componentlogger".equals(tokens[j].trim()))
 							conargs.add(ia.getLogger());
