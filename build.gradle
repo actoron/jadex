@@ -209,6 +209,7 @@ subprojects
     else 
     {
         apply plugin: 'java'
+        compileJava.options.encoding = 'UTF-8'
 //        apply plugin: 'java-library-distribution' // TODO: needed?
         allSource   = sourceSets.main.allSource
         sourceSets.main.resources.srcDirs    mainSrcDir
