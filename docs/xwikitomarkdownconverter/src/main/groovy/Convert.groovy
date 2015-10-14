@@ -6,7 +6,6 @@ import javax.xml.parsers.SAXParser
 import javax.xml.parsers.SAXParserFactory
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -38,28 +37,49 @@ class Convert {
 //                println "found zipfile: ${f.fileName}"
                 def zip = new ZipFile(f.toFile())
                 def List<ZipEntry> found = zip.entries().findAll {entry ->
-                    entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml") //&& entry.name.contains("01 Introduction")
+                    entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml")// && entry.name.contains("Overview")
                 }
 
                 found.each {it ->
-                    println "parsing ${it.name}"
-                    convertXwikiToMarkdown(zip.getInputStream(it), it.name)
+                    def fileName = it.name
+                    println "parsing ${fileName}"
+
+                    def outPath = new File(fileName).toPath()
+                    def targetDir = Paths.get("build/markdown", outPath.parent.toFile().name)
+                    targetDir.toFile().mkdirs()
+                    def outFile = targetDir.resolve(outPath.subpath(1, outPath.nameCount))
+                    def newName = outFile.fileName.toString().replace(".xml", ".md")
+                    def mdOutputFile = outFile.resolveSibling(newName);
+
+
+                    def content = readXWikiContent(zip.getInputStream(it), targetDir)
+                    // write attachments
+                    content.attachments.each {it.writeToPath(targetDir)}
+
+                    def processedString = content.stringContent
+                    processedString = preprocessXwikiString(content.stringContent)
+                    processedString = xwikiConverter.convert(processedString)
+                    processedString = convertHTMLStringToMarkdownString(processedString)
+                    processedString = postProcessMarkdownString(processedString, mdReplacements)
+
+//                    def all = processedString.replaceAll("[ ]", "?")
+//                    all.each {println "unprintable: ${it}"}
+
+                    println "writing converted markdown to ${mdOutputFile}"
+                    mdOutputFile.write(processedString)
                 }
             }
         }
     }
 
-    def public convertXwikiToMarkdown(InputStream is, String fileName) {
+    def public XWikiContent readXWikiContent(InputStream is, Path targetDir) {
 
-        def StringBuilder stringContent
+        def result = new XWikiContent()
+
+        def StringBuilder stringContent = new StringBuilder()
         def Attachment attachment
         def String attachmentFilename;
 
-        def outPath = new File(fileName).toPath()
-        def targetDir = Paths.get("build/markdown", outPath.parent.toFile().name)
-        targetDir.toFile().mkdirs()
-        def outFile = targetDir.resolve(outPath.subpath(1, outPath.nameCount))
-        def newName = outFile.fileName.toString().replace(".xml", ".md")
 
         parser.parse(is, new DefaultHandler() {
             def boolean contentParsing = false;
@@ -69,14 +89,15 @@ class Convert {
             @Override
             void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                 super.startElement(uri, localName, qName, attributes)
+//                println "StartElement ${qName}, ${attributes}"
                 if (qName.equals("content")) {
                     contentParsing =true
 //                    println "startContent"
-                    stringContent = new StringBuilder()
                 } else if (qName.equals("attachment")) {
                     attachmentParsing = true;
 //                    println "startAttachment"
-                    attachment = new Attachment();
+                    attachment = new Attachment()
+                    result.attachments.add(attachment)
                 } else if (qName.equals("filename")) {
                     filenameParsing = true;
                     attachmentFilename = new String()
@@ -93,15 +114,11 @@ class Convert {
                     if (attachmentParsing) {
 
                     } else {
-                        def convertedString = convertWikiStringToMarkdownString(stringContent.toString())
-                        convertedString = postProcessMarkdown(convertedString, mdReplacements)
-                        def mdOutputFile = outFile.resolveSibling(newName);
-                        println "writing converted markdown to ${mdOutputFile}"
-                        mdOutputFile.write(convertedString)
+                        // end
+                        result.stringContent = stringContent.toString()
                     }
                 } else if (qName.equals("attachment")) {
                     attachmentParsing = false
-                    attachment.writeToFile(targetDir)
 //                    println "stopAttachment"
                 } else if (qName.equals("filename")) {
                     filenameParsing = false;
@@ -120,33 +137,20 @@ class Convert {
                     }
                 } else {
                     if (contentParsing) {
-                        if (length > 1) {
-                            stringContent.append new String(ch, start, length)
-                        }
+                        def s = new String(ch, start, length)
+                        def oldString = stringContent.toString();
+                        stringContent.append s
                     }
                 }
-
-
 
             }
         })
 
-
-
-//        return result
+        return result
     }
 
-    def int macroCounter
-    def Queue<String[]> macroContent
+    String convertHTMLStringToMarkdownString(String htmlString) {
 
-    String convertWikiStringToMarkdownString(String s) {
-        macroCounter = 0;
-        macroContent = new LinkedBlockingQueue<String[]>()
-
-//        s = applyReplacements(s, preprocessReplacements);
-        s = preprocessXwiki(s)
-
-        def htmlString = xwikiConverter.convert(s)
         def builder = new ProcessBuilder('/usr/bin/pandoc', '-f', 'html', '-t', 'markdown', '--no-wrap');
         builder.redirectErrorStream(true)
         def p = builder.start();
@@ -163,10 +167,14 @@ class Convert {
         readerThread.join()
 
         return bytes.toString()
-//        return htmlString
     }
 
-    String preprocessXwiki(String s) {
+    def int macroCounter
+    def Queue<String[]> macroContent
+
+    String preprocessXwikiString(String s) {
+        macroCounter = 0;
+        macroContent = new LinkedBlockingQueue<String[]>()
 
         def matcher = preprocessReplacements.codeMacro.pattern.matcher(s);
         def sb = new StringBuffer()
@@ -188,7 +196,7 @@ class Convert {
         return applyReplacements(sb.toString(), preprocessReplacements)
     }
 
-    String postProcessMarkdown(String s, replacements) {
+    String postProcessMarkdownString(String s, replacements) {
         def pattern = ~/XXXCODEBLOCKXXX/
         def matcher = pattern.matcher(s)
 
@@ -196,7 +204,7 @@ class Convert {
         while (matcher.find()) {
             def codeBlock = macroContent.remove()
             def String lang = codeBlock[0]? codeBlock[0] : ""
-            def String replacement = "\n```${lang}\n${codeBlock[1]}\n```"
+            def String replacement = "\n```${lang}\n${codeBlock[1]}\n```\n"
             matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
             macroCounter++;
         }
@@ -218,7 +226,11 @@ class Convert {
             singleTagMacroWorkaround: [ // {{toc start="2" depth="2"/}}
                     pattern: ~/\{\{(\w*) ([^\}]*)\\/\}\}/,
                     replacement: 'BEGIN MACRO: $1 param: $2 END MACRO: $1'
-            ]
+            ],
+            newlines: [
+                    pattern: Pattern.compile("\\\\\\\\"),
+                    replacement: '\n'
+            ],
     ]
 
     def mdReplacements = [
@@ -230,10 +242,10 @@ class Convert {
                     pattern: ~/\{#.*\}/,
                     replacement: ''
                     ],
-            newlines: [
-                    pattern: Pattern.compile("\\\\"),
-                    replacement: '\n'
-            ],
+//            newlines: [
+//                    pattern: Pattern.compile("\\\\\\\\"),
+//                    replacement: '\n'
+//            ],
             linksRelative: [
                     pattern: ~/([^!])\[([^\]]*)\]\((?:doc:){0}([^h][^t][^t][^p][\S]*)\.([\S]*)\)/,
                     replacement: '$1[$2]($3/$4)'
@@ -254,6 +266,11 @@ class Convert {
 //                    pattern: ~/XXXBACKTICKSXXX/,
 //                    replacement: '```'
 //            ]
+            anchors: [
+                    pattern: ~/\{#[^\}]+\}/,
+                    replacement: ''
+            ]
+
 
 
     ]

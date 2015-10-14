@@ -13,7 +13,7 @@ class Attachment {
         attachmentContent = new StringBuilder()
     }
 
-    void writeToFile(Path path) {
+    void writeToPath(Path path) {
         path = path.resolve(fileName)
         println "writing attachment to ${path}"
         def decoder = new Base64.Decoder(false, false)
