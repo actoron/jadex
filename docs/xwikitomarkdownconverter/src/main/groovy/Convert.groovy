@@ -11,6 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
+import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
 class Convert {
@@ -36,7 +37,12 @@ class Convert {
         p.eachFile {Path f ->
             if (f.toFile().isFile() && f.fileName.toFile().name.endsWith(".xar") ) {
 //                println "found zipfile: ${f.fileName}"
-                def zip = new ZipFile(f.toFile())
+                try {
+                    def zip = new ZipFile(f.toFile())
+                } catch (ZipException e ) {
+                    println "Error opening: $f"
+                    e.printStrackTrace()
+                }
                 def List<ZipEntry> found = zip.entries().findAll {entry ->
                     entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml") //&& entry.name.contains("01 Introduction")
                 }
