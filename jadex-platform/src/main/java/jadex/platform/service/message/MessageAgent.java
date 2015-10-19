@@ -52,8 +52,8 @@ public class MessageAgent
 		"jadex.platform.service.message.transport.tcpmtp.TCPTransport",				"tcptransport",		"component,tcpport",
 		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport", 		"niotcptransport",	"component,niotcpport,componentlogger",
 		"jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", 		"ssltcptransport",	"component,ssltcpport",
-		"jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport",	"relaytransport",	"component,relayaddress,relaysecurity,relayawaonly",
-		"com.actoron.platform.service.message.transport.udpmtp.UdpTransport", 		"null",				"component,false,true"
+		"com.actoron.platform.service.message.transport.udpmtp.UdpTransport", 		"null",				"component,false,true",
+		"jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport",	"relaytransport",	"component,relayaddress,relaysecurity,relayawaonly"
 	};
 	
 	/**
