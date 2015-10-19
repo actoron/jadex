@@ -18,6 +18,8 @@ class Convert {
     def private SAXParser parser
     def private XWikiConverter xwikiConverter
 
+    def private boolean dockerdownloaded = false
+
     public static void main(String[] args) {
         def c = new Convert()
         c.unzipAll(new File("xwiki").toPath())
@@ -39,17 +41,17 @@ class Convert {
 //                println "found zipfile: ${f.fileName}"
                 try {
                     def zip = new ZipFile(f.toFile())
+                    def List<ZipEntry> found = zip.entries().findAll {entry ->
+                        entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml") //&& entry.name.contains("01 Introduction")
+                    }
+
+                    found.each {it ->
+                        println "parsing ${it.name}"
+                        convertXwikiToMarkdown(zip.getInputStream(it), it.name)
+                    }
                 } catch (ZipException e ) {
                     println "Error opening: $f"
                     e.printStrackTrace()
-                }
-                def List<ZipEntry> found = zip.entries().findAll {entry ->
-                    entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml") //&& entry.name.contains("01 Introduction")
-                }
-
-                found.each {it ->
-                    println "parsing ${it.name}"
-                    convertXwikiToMarkdown(zip.getInputStream(it), it.name)
                 }
             }
         }
@@ -153,13 +155,17 @@ class Convert {
         s = preprocessXwiki(s)
 
         def htmlString = xwikiConverter.convert(s)
-        def builder = new ProcessBuilder('/usr/bin/pandoc', '-f', 'html', '-t', 'markdown', '--no-wrap');
-        builder.redirectErrorStream(true)
+
+        def builder = getPandocProcessBuilder()
+
+//        builder.redirectErrorStream(true)
         def p = builder.start();
 
         def bytes = new ByteArrayOutputStream()
         def readerThread = new StreamGobbler(p.inputStream, "", bytes);
         readerThread.start()
+        def errorReaderThread = new StreamGobbler(p.errorStream, "", null, true);
+        errorReaderThread.start()
 
         def outWriter = p.out.newWriter()
         outWriter.write(htmlString)
@@ -168,8 +174,44 @@ class Convert {
 
         readerThread.join()
 
+        p.waitFor()
+
+        if (p.exitValue() != 0) {
+            println bytes.toString()
+            System.exit(p.exitValue())
+        }
+
         return bytes.toString()
 //        return htmlString
+    }
+
+    def ProcessBuilder getPandocProcessBuilder() {
+        def ProcessBuilder result;
+        def pandoc = "which pandoc".execute().text.trim()
+        def docker = "which docker".execute().text.trim()
+        if (pandoc != null && !pandoc.empty) {
+            result = new ProcessBuilder(pandoc, '-f', 'html', '-t', 'markdown', '--no-wrap');
+        } else if (docker != null && !docker.empty) {
+            if (!dockerdownloaded) {
+                println "Downloading pandoc docker image..."
+                def builder = new ProcessBuilder(docker, 'pull', 'jagregory/pandoc:latest')
+                builder.redirectErrorStream(true)
+                def p = builder.start()
+                def gobbler = new StreamGobbler(p.inputStream, "", null, true)
+                gobbler.start()
+                gobbler.join()
+                p.out.close()
+                p.waitFor()
+                if (p.exitValue() != 0) {
+                    System.exit(p.exitValue())
+                }
+                dockerdownloaded = true
+            }
+
+            result = new ProcessBuilder(docker, 'run', '-i', '-a', 'stdin', '-a', 'stdout', 'jagregory/pandoc', '-f', 'html', '-t', 'markdown', '--no-wrap');
+        }
+
+        return result;
     }
 
     String preprocessXwiki(String s) {

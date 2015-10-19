@@ -12,6 +12,7 @@ class StreamGobbler extends Thread
     InputStream is;
     String type;
     OutputStream os;
+    boolean print;
 
     StreamGobbler(InputStream is, String type)
     {
@@ -20,9 +21,15 @@ class StreamGobbler extends Thread
 
     StreamGobbler(InputStream is, String type, OutputStream redirect)
     {
+        this(is, type, redirect, false);
+    }
+
+    StreamGobbler(InputStream is, String type, OutputStream redirect, boolean print)
+    {
         this.is = is;
         this.type = type;
         this.os = redirect;
+        this.print = print;
     }
 
     /** creates readers to handle the text created by the external program
@@ -42,7 +49,9 @@ class StreamGobbler extends Thread
             {
                 if (pw != null)
                     pw.println(line);
-//                System.out.println(type + ">" + line);
+                if (print) {
+                    System.out.println(type + ">" + line);
+                }
             }
             if (pw != null)
                 pw.flush();
