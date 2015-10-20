@@ -1,0 +1,13 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-bridge')
+	compile project(':jadex-tools-base-swing')
+	compile project(':jadex-kernel-micro')
+	compile project(':jadex-kernel-component')
+	compile project(':jadex-kernel-application')
+	compile project(':jadex-platform')
+	compile project(':jadex-kernel-extension-envsupport')
+}
+
+sourceCompatibility = 1.8

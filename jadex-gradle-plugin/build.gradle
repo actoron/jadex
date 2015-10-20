@@ -75,7 +75,7 @@ afterEvaluate {
  */
 def addTaskDependencies(Task task, depProjects, String depTaskName) {
     depProjects.each {dep ->
-        println "adding: ${dep.name}.${depTaskName} to task ${task}"
+//        println "adding: ${dep.name}.${depTaskName} to task ${task}"
         task.dependsOn.add project(":${dep.name}")."${depTaskName}"
     }
 }

@@ -61,6 +61,10 @@ include 'jadex-applications-bdi',
 'jadex-distribution-server',
 'jadex-distribution-standard',
 'jadex-distribution-pro'
+
+if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
+    include 'jadex-applications-java8'
+}
 // the plugins depend on other projects to be deployed, so they have to be standalone
 //'jadex-android-maven-plugin',
 // android-specific modules:

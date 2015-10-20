@@ -10,11 +10,14 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
+import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
 class Convert {
     def private SAXParser parser
     def private XWikiConverter xwikiConverter
+
+    def private boolean dockerdownloaded = false
 
     public static void main(String[] args) {
         def c = new Convert()
@@ -35,6 +38,7 @@ class Convert {
         p.eachFile {Path f ->
             if (f.toFile().isFile() && f.fileName.toFile().name.endsWith(".xar") ) {
 //                println "found zipfile: ${f.fileName}"
+<<<<<<< HEAD
                 def zip = new ZipFile(f.toFile())
                 def List<ZipEntry> found = zip.entries().findAll {entry ->
                     entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml")// && entry.name.contains("05 Security")
@@ -67,6 +71,21 @@ class Convert {
 
                     println "writing converted markdown to ${mdOutputFile}"
                     mdOutputFile.write(processedString)
+=======
+                try {
+                    def zip = new ZipFile(f.toFile())
+                    def List<ZipEntry> found = zip.entries().findAll {entry ->
+                        entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml") //&& entry.name.contains("01 Introduction")
+                    }
+
+                    found.each {it ->
+                        println "parsing ${it.name}"
+                        convertXwikiToMarkdown(zip.getInputStream(it), it.name)
+                    }
+                } catch (ZipException e ) {
+                    println "Error opening: $f"
+                    e.printStrackTrace()
+>>>>>>> 887f528d0d8845ebbb545c1a95d5cc2ccb83d7cc
                 }
             }
         }
@@ -151,13 +170,23 @@ class Convert {
 
     String convertHTMLStringToMarkdownString(String htmlString) {
 
+<<<<<<< HEAD
         def builder = new ProcessBuilder('/usr/bin/pandoc', '-f', 'html', '-t', 'markdown', '--no-wrap');
         builder.redirectErrorStream(true)
+=======
+        def htmlString = xwikiConverter.convert(s)
+
+        def builder = getPandocProcessBuilder()
+
+//        builder.redirectErrorStream(true)
+>>>>>>> 887f528d0d8845ebbb545c1a95d5cc2ccb83d7cc
         def p = builder.start();
 
         def bytes = new ByteArrayOutputStream()
         def readerThread = new StreamGobbler(p.inputStream, "", bytes);
         readerThread.start()
+        def errorReaderThread = new StreamGobbler(p.errorStream, "", null, true);
+        errorReaderThread.start()
 
         def outWriter = p.out.newWriter()
         outWriter.write(htmlString)
@@ -166,15 +195,55 @@ class Convert {
 
         readerThread.join()
 
+        p.waitFor()
+
+        if (p.exitValue() != 0) {
+            println bytes.toString()
+            System.exit(p.exitValue())
+        }
+
         return bytes.toString()
     }
 
+<<<<<<< HEAD
     def int macroCounter
     def Queue<String[]> macroContent
 
     String preprocessXwikiString(String s) {
         macroCounter = 0;
         macroContent = new LinkedBlockingQueue<String[]>()
+=======
+    def ProcessBuilder getPandocProcessBuilder() {
+        def ProcessBuilder result;
+        def pandoc = "which pandoc".execute().text.trim()
+        def docker = "which docker".execute().text.trim()
+        if (pandoc != null && !pandoc.empty) {
+            result = new ProcessBuilder(pandoc, '-f', 'html', '-t', 'markdown', '--no-wrap');
+        } else if (docker != null && !docker.empty) {
+            if (!dockerdownloaded) {
+                println "Downloading pandoc docker image..."
+                def builder = new ProcessBuilder(docker, 'pull', 'jagregory/pandoc:latest')
+                builder.redirectErrorStream(true)
+                def p = builder.start()
+                def gobbler = new StreamGobbler(p.inputStream, "", null, true)
+                gobbler.start()
+                gobbler.join()
+                p.out.close()
+                p.waitFor()
+                if (p.exitValue() != 0) {
+                    System.exit(p.exitValue())
+                }
+                dockerdownloaded = true
+            }
+
+            result = new ProcessBuilder(docker, 'run', '-i', '-a', 'stdin', '-a', 'stdout', 'jagregory/pandoc', '-f', 'html', '-t', 'markdown', '--no-wrap');
+        }
+
+        return result;
+    }
+
+    String preprocessXwiki(String s) {
+>>>>>>> 887f528d0d8845ebbb545c1a95d5cc2ccb83d7cc
 
         def matcher = preprocessReplacements.codeMacro.pattern.matcher(s);
         def sb = new StringBuffer()
