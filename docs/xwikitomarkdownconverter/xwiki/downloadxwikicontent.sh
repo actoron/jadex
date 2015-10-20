@@ -41,4 +41,5 @@ for line in $(cat pages.txt); do
 	
 done;
 
+rm cookies.txt
 echo "Done."

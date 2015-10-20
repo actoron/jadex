@@ -38,54 +38,45 @@ class Convert {
         p.eachFile {Path f ->
             if (f.toFile().isFile() && f.fileName.toFile().name.endsWith(".xar") ) {
 //                println "found zipfile: ${f.fileName}"
-<<<<<<< HEAD
-                def zip = new ZipFile(f.toFile())
-                def List<ZipEntry> found = zip.entries().findAll {entry ->
-                    entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml")// && entry.name.contains("05 Security")
-                }
 
-                found.each {it ->
-                    def fileName = it.name
-                    println "parsing ${fileName}"
-
-                    def outPath = new File(fileName).toPath()
-                    def targetDir = Paths.get("build/markdown", outPath.parent.toFile().name)
-                    targetDir.toFile().mkdirs()
-                    def outFile = targetDir.resolve(outPath.subpath(1, outPath.nameCount))
-                    def newName = outFile.fileName.toString().replace(".xml", ".md")
-                    def mdOutputFile = outFile.resolveSibling(newName);
-
-
-                    def content = readXWikiContent(zip.getInputStream(it), targetDir)
-                    // write attachments
-                    content.attachments.each {it.writeToPath(targetDir)}
-
-                    def processedString = content.stringContent
-                    processedString = preprocessXwikiString(content.stringContent)
-                    processedString = xwikiConverter.convert(processedString)
-                    processedString = convertHTMLStringToMarkdownString(processedString)
-                    processedString = postProcessMarkdownString(processedString, mdReplacements)
-
-//                    def all = processedString.replaceAll("[ ]", "?")
-//                    all.each {println "unprintable: ${it}"}
-
-                    println "writing converted markdown to ${mdOutputFile}"
-                    mdOutputFile.write(processedString)
-=======
                 try {
                     def zip = new ZipFile(f.toFile())
                     def List<ZipEntry> found = zip.entries().findAll {entry ->
-                        entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml") //&& entry.name.contains("01 Introduction")
+                        entry.name.endsWith(".xml") && !entry.name.endsWith("package.xml")// && entry.name.contains("05 Security")
                     }
 
-                    found.each {it ->
-                        println "parsing ${it.name}"
-                        convertXwikiToMarkdown(zip.getInputStream(it), it.name)
+                    found.each { it ->
+                        def fileName = it.name
+                        println "parsing ${fileName}"
+
+                        def outPath = new File(fileName).toPath()
+                        def targetDir = Paths.get("build/markdown", outPath.parent.toFile().name)
+                        targetDir.toFile().mkdirs()
+                        def outFile = targetDir.resolve(outPath.subpath(1, outPath.nameCount))
+                        def newName = outFile.fileName.toString().replace(".xml", ".md")
+                        def mdOutputFile = outFile.resolveSibling(newName);
+
+
+                        def content = readXWikiContent(zip.getInputStream(it), targetDir)
+                        // write attachments
+                        content.attachments.each { it.writeToPath(targetDir) }
+
+                        def processedString = content.stringContent
+                        processedString = preprocessXwikiString(content.stringContent)
+                        processedString = xwikiConverter.convert(processedString)
+                        processedString = convertHTMLStringToMarkdownString(processedString)
+                        processedString = postProcessMarkdownString(processedString, mdReplacements)
+
+                        //                    def all = processedString.replaceAll("[ ]", "?")
+                        //                    all.each {println "unprintable: ${it}"}
+
+                        println "writing converted markdown to ${mdOutputFile}"
+                        mdOutputFile.write(processedString)
                     }
+
                 } catch (ZipException e ) {
                     println "Error opening: $f"
                     e.printStrackTrace()
->>>>>>> 887f528d0d8845ebbb545c1a95d5cc2ccb83d7cc
                 }
             }
         }
@@ -170,16 +161,9 @@ class Convert {
 
     String convertHTMLStringToMarkdownString(String htmlString) {
 
-<<<<<<< HEAD
-        def builder = new ProcessBuilder('/usr/bin/pandoc', '-f', 'html', '-t', 'markdown', '--no-wrap');
-        builder.redirectErrorStream(true)
-=======
-        def htmlString = xwikiConverter.convert(s)
-
         def builder = getPandocProcessBuilder()
 
 //        builder.redirectErrorStream(true)
->>>>>>> 887f528d0d8845ebbb545c1a95d5cc2ccb83d7cc
         def p = builder.start();
 
         def bytes = new ByteArrayOutputStream()
@@ -205,14 +189,6 @@ class Convert {
         return bytes.toString()
     }
 
-<<<<<<< HEAD
-    def int macroCounter
-    def Queue<String[]> macroContent
-
-    String preprocessXwikiString(String s) {
-        macroCounter = 0;
-        macroContent = new LinkedBlockingQueue<String[]>()
-=======
     def ProcessBuilder getPandocProcessBuilder() {
         def ProcessBuilder result;
         def pandoc = "which pandoc".execute().text.trim()
@@ -242,8 +218,10 @@ class Convert {
         return result;
     }
 
-    String preprocessXwiki(String s) {
->>>>>>> 887f528d0d8845ebbb545c1a95d5cc2ccb83d7cc
+    def Queue<String[]> macroContent
+
+    String preprocessXwikiString(String s) {
+        macroContent = new LinkedBlockingQueue<String[]>()
 
         def matcher = preprocessReplacements.codeMacro.pattern.matcher(s);
         def sb = new StringBuffer()
@@ -259,7 +237,6 @@ class Convert {
             macroContent.add([lang, content] as String[])
             def String replacement = "XXXCODEBLOCKXXX"
             matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-            macroCounter++;
         }
         matcher.appendTail(sb)
         return applyReplacements(sb.toString(), preprocessReplacements)
@@ -275,7 +252,6 @@ class Convert {
             def String lang = codeBlock[0]? codeBlock[0] : ""
             def String replacement = "\n```${lang}\n${codeBlock[1]}\n```\n"
             matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-            macroCounter++;
         }
         matcher.appendTail(sb)
 
