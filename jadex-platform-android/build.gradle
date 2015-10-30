@@ -7,6 +7,7 @@ dependencies
         exclude group: 'javax.mail', module: 'mail'
     }
     compile project(':jadex-android-commons')
+    testCompile libraries.junit
     testCompile libraries.robotium
     testCompile libraries.robolectric
 }

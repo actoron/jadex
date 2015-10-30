@@ -106,11 +106,4 @@ if (androidSdkExists()) {
 
 //include 'jadex-test'
 
-def androidSdkExists() {
-    def androidHome = System.env.'ANDROID_HOME'
-    if (androidHome != null && !androidHome.isEmpty()) {
-        def adb = new File(androidHome + File.separator + "platform-tools")
-        return adb.exists() && adb.isDirectory();
-    }
-    return false;
-}
+

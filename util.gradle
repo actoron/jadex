@@ -102,6 +102,15 @@ def calledWithTask(fulltaskname)
     return result
 }
 
+def androidSdkExists() {
+    def androidHome = System.env.'ANDROID_HOME'
+    if (androidHome != null && !androidHome.isEmpty()) {
+        def adb = new File(androidHome + File.separator + "platform-tools")
+        return adb.exists() && adb.isDirectory();
+    }
+    return false;
+}
+
 // make functions externally visible
 
 ext {
@@ -115,4 +124,5 @@ ext {
     getCompileClassPath = this.&getCompileClassPath
     isExcluded = this.&isExcluded
     calledWithTask = this.&calledWithTask
+    androidSdkExists = this.&androidSdkExists
 }

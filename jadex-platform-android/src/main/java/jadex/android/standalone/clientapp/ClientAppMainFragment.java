@@ -45,9 +45,11 @@ public class ClientAppMainFragment extends ActivityAdapterFragment
 	{
 	}
 
-	protected Context getContext()
+	@Override
+	public Context getContext()
 	{
-		return getActivity().getApplicationContext();
+//		return getActivity().getApplicationContext();
+		return super.getContext();
 	}
 	
 	/**

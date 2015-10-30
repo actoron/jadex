@@ -3,8 +3,6 @@ package jadex.webservice.examples.rs.chart;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
-import java.awt.Color;
-
 /**
  *  Interface for 
  */

@@ -171,8 +171,8 @@ allprojects
             mavenCentral()
             maven
             {
-                name 'www2'
-                url 'http://www2.activecomponents.org/nexus/content/repositories/snapshots/'
+                name 'Active Components Nexus'
+                url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
             }
         }
     }
@@ -200,18 +200,22 @@ subprojects
         {
             apply plugin: 'com.android.application'
         }
+        // include all resources that are placed inside src dirs
+        android.sourceSets.main.resources.srcDirs mainSrcDir
+        android.sourceSets.test.resources.srcDirs testSrcDir
         allSource   = android.sourceSets.main.java.srcDirs
         dependencies
         {
             androidTestCompile junit
         }
-    } 
+    }
     else 
     {
         apply plugin: 'java'
         compileJava.options.encoding = 'UTF-8'
 //        apply plugin: 'java-library-distribution' // TODO: needed?
         allSource   = sourceSets.main.allSource
+        // include all resources that are placed inside src dirs
         sourceSets.main.resources.srcDirs    mainSrcDir
         sourceSets.test.resources.srcDirs    testSrcDir
         dependencies
@@ -393,8 +397,9 @@ subprojects
 {
     // library definitions to be used in subprojects
     ext.libraries = [
-            android_support: "com.google.android:support-v4:r7",
-            android_compat: "com.android.support:appcompat-v7:19.0.1",
+//            android_support: "com.google.android:support-v4:r7",
+            android_support: "com.android.support:support-v4:23.1.0",
+            android_compat: "com.android.support:appcompat-v7:23.1.0",
             android: 'com.google.android:android:2.2.1',
             android_test: "com.google.android:android-test:2.2.1",
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
