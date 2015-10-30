@@ -10,11 +10,12 @@ apply plugin: 'com.android.application'
 
 repositories {
     jcenter()
+    mavenLocal()
     mavenCentral()
     maven
     {
         name 'jadexsnapshots'
-        url 'http://www2.activecomponents.org/nexus/content/repositories/snapshots/'
+        url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
     }
 }
 

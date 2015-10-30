@@ -6,15 +6,15 @@ if(file('gradle.properties').exists())
 dependencies
 {
     compile project(':jadex-android-platformclient')
-    releaseProvided project(':jadex-platform-android')
-    releaseProvided project(':jadex-kernel-component')
-    releaseProvided project(':jadex-android-commons')
-    releaseProvided project(':jadex-platform-extension-webservice-android')
+    provided project(':jadex-platform-android')
+    provided project(':jadex-kernel-component')
+    provided project(':jadex-android-commons')
+    provided project(':jadex-platform-extension-webservice-android')
 
-    debugProvided project(':jadex-platform-android')
-    debugProvided project(':jadex-kernel-component')
-    debugProvided project(':jadex-android-commons')
-    debugProvided project(':jadex-platform-extension-webservice-android')
+//    debugProvided project(':jadex-platform-android')
+//    debugProvided project(':jadex-kernel-component')
+//    debugProvided project(':jadex-android-commons')
+//    debugProvided project(':jadex-platform-extension-webservice-android')
 
 //    compile project(':jadex-kernel-bpmn')
 //    compile project(':jadex-kernel-bdibpmn')

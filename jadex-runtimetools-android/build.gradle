@@ -1,6 +1,6 @@
 dependencies 
 {
-    provided libraries.android
+    compile libraries.android
     compile(project(':jadex-platform-android')) {
         exclude module: 'bcprov-jdk15'
         exclude module: 'junit'

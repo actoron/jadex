@@ -1,5 +1,5 @@
 dependencies 
 {
-    provided libraries.android
+    compile libraries.android
     compile libraries.android_support
 }

@@ -1,6 +1,6 @@
 dependencies 
 {
-    provided libraries.android
+    compile libraries.android
     compile project(':jadex-kernel-bdiv3')
     compile project(':jadex-android-commons')
 }

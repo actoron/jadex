@@ -1,6 +1,6 @@
 dependencies 
 {
-    provided libraries.android
+    compile libraries.android
     compile libraries.android_support
 	compile(project(':jadex-bridge')) {
         exclude module: 'bcprov-jdk15'
