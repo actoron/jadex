@@ -373,10 +373,14 @@ subprojects
             configuration = configurations.deployerJars
 
 			//println("repouser: "+repouser+" pass: "+repopassword)
-			            
+
+			if (reposnapshoturl.isEmpty()) {
+                reposnapshoturl = repositories.mavenLocal().getUrl()
+            }
+
             snapshotRepository(url: reposnapshoturl)
             {
-            	//<id>jadex-public-snapshots</id>
+                //<id>jadex-public-snapshots</id>
                 authentication(userName: repouser, password: repopassword)
                 //authentication(userName: "deployment", password: "laxlax")
             }
