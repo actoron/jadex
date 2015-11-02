@@ -1,42 +1,33 @@
 package jadex.android.service;
 
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.os.IBinder;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.android.AndroidContextManager;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ITuple2Future;
-import jadex.commons.future.ITuple2ResultListener;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.future.TupleResult;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.os.IBinder;
-import android.util.Log;
 
 /**
  * Android Service to start/stop Jadex Platforms. Platforms are terminated on
@@ -146,18 +137,13 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 
 	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz)
 	{
-		return jadexPlatformManager.getService(platformId, serviceClazz);
+		return getService(platformId, serviceClazz, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 
 	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz, String scope)
 	{
 		return jadexPlatformManager.getService(platformId, serviceClazz, scope);
 	}
-
-//	public IFuture<IExternalAccess> startJadexPlatform()
-//	{
-//		return startJadexPlatform();
-//	}
 
 	public final IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
 	{
@@ -186,14 +172,16 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 			@Override
 			public void resultAvailable(final IExternalAccess result) {
 				// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-						JadexMultiPlatformService.this.onPlatformStarted(result);
-						ret.setResult(result);
-					}
-				}).start();
+//				new Thread(new Runnable() {
+//					@Override
+//					public void run() {
+//						ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+//						JadexMultiPlatformService.this.onPlatformStarted(result);
+//						ret.setResult(result);
+//					}
+//				}).start();
+				JadexMultiPlatformService.this.onPlatformStarted(result);
+				ret.setResult(result);
 			}
 			
 			@Override
@@ -276,23 +264,24 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 					public void firstResultAvailable(final IComponentIdentifier cid) {
 						this.cid = cid;
 						// schedule to component to allow suspending
-						cms.getExternalAccess(cid).addResultListener(new  DefaultResultListener<IExternalAccess>()
-						{
-							public void resultAvailable(IExternalAccess access)
-							{
-								access.scheduleStep(new IComponentStep<Void>()
-								{
+//						cms.getExternalAccess(cid).addResultListener(new  DefaultResultListener<IExternalAccess>()
+//						{
+//							public void resultAvailable(IExternalAccess access)
+//							{
+//								access.scheduleStep(new IComponentStep<Void>()
+//								{
+//
+//									@Override
+//									public IFuture<Void> execute(IInternalAccess ia)
+//									{
+//										ret.setResult(cid);
+//										return Future.DONE;
+//									}
+//
+//								});
+//							}
+//						});
 
-									@Override
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										ret.setResult(cid);
-										return Future.DONE;
-									}
-									
-								});
-							}
-						});
 						// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
 //						new Thread(new Runnable() {
 //							@Override
@@ -301,6 +290,8 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 //								ret.setResult(result);
 //							}
 //						}).start();
+
+						ret.setResult(cid);
 					}
 
 					@Override
@@ -315,24 +306,27 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 //								}
 //							}
 //						}).start();
-						cms.getExternalAccess(cid).addResultListener(new  DefaultResultListener<IExternalAccess>()
-						{
-							public void resultAvailable(IExternalAccess access)
-							{
-								access.scheduleStep(new IComponentStep<Void>()
-								{
-
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										if (terminationListener != null) {
-											terminationListener.resultAvailable(result);
-										}
-										return Future.DONE;
-									}
-									
-								});
-							}
-						});
+//						cms.getExternalAccess(cid).addResultListener(new  DefaultResultListener<IExternalAccess>()
+//						{
+//							public void resultAvailable(IExternalAccess access)
+//							{
+//								access.scheduleStep(new IComponentStep<Void>()
+//								{
+//
+//									public IFuture<Void> execute(IInternalAccess ia)
+//									{
+//										if (terminationListener != null) {
+//											terminationListener.resultAvailable(result);
+//										}
+//										return Future.DONE;
+//									}
+//
+//								});
+//							}
+//						});
+						if (terminationListener != null) {
+							terminationListener.resultAvailable(result);
+						}
 					}
 
 					@Override

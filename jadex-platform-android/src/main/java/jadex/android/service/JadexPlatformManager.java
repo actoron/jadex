@@ -224,7 +224,8 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	 * @return Future of the service.
 	 */
 	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz) {
-		return getService(platformId, serviceClazz, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<S> service = getService(platformId, serviceClazz, RequiredServiceInfo.SCOPE_PLATFORM);
+		return service;
 	}
 	
 	/**
@@ -241,12 +242,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		return getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<S>() {
 			@Classname("create-component")
 			public IFuture<S> execute(IInternalAccess ia) {
-				Future<S> ret = new Future<S>();
-				SServiceProvider
-						.getService(ia, serviceClazz, scope)
-						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<S>(ret)));
-
-				return ret;
+				return SServiceProvider.getService(ia, serviceClazz, scope);
 			}
 		});
 	}
