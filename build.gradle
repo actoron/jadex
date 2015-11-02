@@ -428,10 +428,10 @@ subprojects
 
             sourceSets {
                 main {
-                    manifest.srcFile 'AndroidManifest.xml'
+                    manifest.srcFile 'src/main/AndroidManifest.xml'
                     resources.srcDirs = ['src/main/java']
                     aidl.srcDirs = ['src/main/java']
-                    res.srcDirs = ['res']
+                    res.srcDirs = ['src/main/res']
                 }
             }
 
