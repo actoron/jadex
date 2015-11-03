@@ -135,22 +135,27 @@ public class MyJadexService extends JadexPlatformService
 	{
 		num++;
 
-		startComponent("HelloWorldAgent " + num, MyAgent.class).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
-			public void resultAvailable(IComponentIdentifier result) {
-				if (listener != null) {
-					listener.onHelloWorldAgentStarted(result.toString());
-				}
-				System.out.println("calling Agent");
-				IAgentInterface agent = getsService(IAgentInterface.class);
+		new Thread() {
+			@Override
+			public void run() {
+				startComponent("HelloWorldAgent " + num, MyAgent.class).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
+					public void resultAvailable(IComponentIdentifier result) {
+						if (listener != null) {
+							listener.onHelloWorldAgentStarted(result.toString());
+						}
+						System.out.println("calling Agent");
+						IAgentInterface agent = getsService(IAgentInterface.class);
 
-				agent.callAgent("Hello Agent!");
+						agent.callAgent("Hello Agent!");
 
-				System.out.println("Getting string");
-				IFuture<String> string = agent.getString();
-				String string2 = string.get();
-				System.out.println(string2);
+						System.out.println("Getting string");
+						IFuture<String> string = agent.getString();
+						String string2 = string.get();
+						System.out.println(string2);
+					}
+				});
 			}
-		});
+		}.start();
 
 	}
 }

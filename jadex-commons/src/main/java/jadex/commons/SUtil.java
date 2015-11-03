@@ -4236,7 +4236,7 @@ public class SUtil
 		{
 			synchronized (SUtil.class)
 			{
-				if(androidutils == null && SReflect.isAndroid()) 
+				if(androidutils == null && SReflect.isAndroid())
 				{
 					Class<?> clazz = SReflect.classForName0("jadex.android.commons.AndroidUtilsImpl", SReflect.class.getClassLoader());
 					try
@@ -4311,6 +4311,12 @@ public class SUtil
 		 * @throws IOException
 		 */
 		Enumeration<String> getDexEntries(File dexFile) throws IOException;
+
+		/**
+		 * Check whether the current Thread is the android UI thread.
+		 * @return true, if current thread is ui main thread.
+		 */
+		boolean runningOnUiThread();
 	}
 	
 //	/**

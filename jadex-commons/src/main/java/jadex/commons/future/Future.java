@@ -4,6 +4,7 @@ package jadex.commons.future;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
@@ -189,9 +190,15 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	{
     	boolean suspend = false;
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
-	   	if(caller==null)
-	   		caller = new ThreadSuspendable();
-	   	
+
+		if(caller==null ) {
+			if (!SReflect.isAndroid() || !SUtil.androidUtils().runningOnUiThread()) {
+				caller = new ThreadSuspendable();
+			} else {
+				throw new RuntimeException("Cannot suspend Android UI main thread. Try executing your calls from a different thread!");
+			}
+		}
+
     	synchronized(this)
     	{
 	    	if(!isDone())
@@ -486,7 +493,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 * Add an functional result listener, which is only called on success.
 	 * Exceptions will be handled by DefaultResultListener.
 	 * 
-	 * @param listener The listener.
+	 * @param sucListener The listener.
 	 */
 	public void addResultListener(IFunctionalResultListener<E> sucListener)
 	{
@@ -919,7 +926,6 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.
-	 *  @param function Function that takes the result of this future as input and delivers future(t). 
 	 *  @param futuretype The type of the result future (cannot be automatically determined).
 	 *  @return Future of the result of the second async call.
 	 */

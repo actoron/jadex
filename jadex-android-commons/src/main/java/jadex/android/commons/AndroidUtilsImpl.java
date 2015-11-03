@@ -17,6 +17,7 @@ import dalvik.system.PathClassLoader;
 import jadex.bridge.service.types.library.ISimpleDelegationClassLoader;
 import jadex.commons.SUtil.AndroidUtils;
 import android.os.Build;
+import android.os.Looper;
 
 public class AndroidUtilsImpl implements AndroidUtils
 {
@@ -203,7 +204,9 @@ public class AndroidUtilsImpl implements AndroidUtils
 	{
 		return new DexFile(dexFile).entries();
 	}
-	
-	
 
+	@Override
+	public boolean runningOnUiThread() {
+		return Looper.myLooper() == Looper.getMainLooper();
+	}
 }
