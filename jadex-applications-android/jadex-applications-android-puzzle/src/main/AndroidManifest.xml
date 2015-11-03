@@ -14,16 +14,19 @@
         android:icon="@drawable/puzzle20x20"
         android:label="Puzzle"
         android:screenOrientation="portrait" >
-        <activity android:name="jadex.android.puzzle.SokratesApplication" >
+        <activity android:name="jadex.android.puzzle.SokratesLoaderActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="jadex.android.puzzle.SokratesFragment" >
+        </activity>
         
         <service
-            android:name="jadex.android.puzzle.MyService"
-            android:label="MyService" >
+            android:name="jadex.android.puzzle.SokratesService"
+            android:label="SokratesService" >
         </service>
         
     </application>

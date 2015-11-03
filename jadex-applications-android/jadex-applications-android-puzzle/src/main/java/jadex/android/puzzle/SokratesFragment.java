@@ -8,6 +8,8 @@ import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.bdiv3.examples.puzzle.Move;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.ThreadSuspendable;
+
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -18,7 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SokratesFragment extends ClientAppMainFragment implements ServiceConnection
+public class SokratesFragment extends Activity implements ServiceConnection
 {
 	protected static final String BDI = "BDI";
 	protected static final String BDIBenchmark = "BDIBenchmark";
@@ -35,25 +37,20 @@ public class SokratesFragment extends ClientAppMainFragment implements ServiceCo
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		serviceIntent = new Intent(getContext(), SokratesService.class);
+		setTitle(R.string.app_title);
+		serviceIntent = new Intent(this, SokratesService.class);
+		setContentView(R.layout.sokrates);
+		sokratesView = (SokratesView) findViewById(R.id.sokrates_gameView);
+		statusTextView = (TextView) findViewById(R.id.sokrates_statusTextView);
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
-		View view = inflater.inflate(R.layout.sokrates, container, false);
-		return view;
-	}
-	
+
 	@Override
 	public void onResume()
 	{
 		super.onResume();
-		setTitle(R.string.app_title);
+
 		bindService(serviceIntent, this, 0);
-		View view = getView();
-		sokratesView = (SokratesView) view.findViewById(R.id.sokrates_gameView);
-		statusTextView = (TextView) view.findViewById(R.id.sokrates_statusTextView);
 		statusTextView.setText("starting Platform...");
 	}
 	
@@ -61,8 +58,8 @@ public class SokratesFragment extends ClientAppMainFragment implements ServiceCo
 	public void onPause()
 	{
 		super.onPause();
-		if (!isRemoving()) {
-			// if isRemoving, onDestroy will be called where
+		if (!this.isFinishing()) {
+			// if isFinishing, onDestroy will be called where
 			// we want to stop sokrates before unbinding
 			unbindService(this);
 		}
