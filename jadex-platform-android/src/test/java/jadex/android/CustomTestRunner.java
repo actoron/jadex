@@ -23,7 +23,7 @@ public class CustomTestRunner extends RobolectricTestRunner {
     @Override
 	protected AndroidManifest getAppManifest(
 			org.robolectric.annotation.Config arg0) {
-		String manifestProperty = "AndroidManifest.xml";
+		String manifestProperty = "src/main/AndroidManifest.xml";
 		String resProperty = "src/main/res";
 		
 		// calls that could potentially fail later:
