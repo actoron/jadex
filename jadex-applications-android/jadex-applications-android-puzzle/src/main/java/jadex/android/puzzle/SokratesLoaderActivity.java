@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
@@ -49,8 +47,8 @@ public class SokratesLoaderActivity extends Activity implements ServiceConnectio
 
 			@Override
 			public void onClick(View v) {
-				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesFragment.class);
-				i.putExtra("mode", SokratesFragment.BDI);
+				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesGameActivity.class);
+				i.putExtra("mode", SokratesGameActivity.BDI);
 				startActivity(i);
 			}
 		});
@@ -60,8 +58,8 @@ public class SokratesLoaderActivity extends Activity implements ServiceConnectio
 
 			@Override
 			public void onClick(View v) {
-				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesFragment.class);
-				i.putExtra("mode", SokratesFragment.BDIV3);
+				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesGameActivity.class);
+				i.putExtra("mode", SokratesGameActivity.BDIV3);
 				startActivity(i);
 			}
 		});
@@ -72,8 +70,8 @@ public class SokratesLoaderActivity extends Activity implements ServiceConnectio
 
 			@Override
 			public void onClick(View v) {
-				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesFragment.class);
-				i.putExtra("mode", SokratesFragment.BDIBenchmark);
+				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesGameActivity.class);
+				i.putExtra("mode", SokratesGameActivity.BDIBenchmark);
 				startActivity(i);
 			}
 		});
@@ -85,8 +83,8 @@ public class SokratesLoaderActivity extends Activity implements ServiceConnectio
 			@Override
 			public void onClick(View v)
 			{
-				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesFragment.class);
-				i.putExtra("mode", SokratesFragment.BDIV3Benchmark);
+				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesGameActivity.class);
+				i.putExtra("mode", SokratesGameActivity.BDIV3Benchmark);
 				startActivity(i);
 			}
 		});

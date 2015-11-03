@@ -124,28 +124,34 @@ public class SokratesService extends JadexPlatformService
 			final Future<Void> result = new Future<Void>();
 			if (platformId != null && sokratesComponent != null)
 			{
-				getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-				{
-
+				new Thread() {
 					@Override
-					public void resultAvailable(IComponentManagementService cms)
-					{
-						cms.destroyComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String, Object>>()
+					public void run() {
+						getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
 						{
 
 							@Override
-							public void resultAvailable(Map<String, Object> cmsResult)
+							public void resultAvailable(IComponentManagementService cms)
 							{
-								result.setResult(null);
-							}
-							
-							@Override
-							public void exceptionOccurred(Exception exception) {
-								result.setResult(null);
+								cms.destroyComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String, Object>>()
+								{
+
+									@Override
+									public void resultAvailable(Map<String, Object> cmsResult)
+									{
+										result.setResult(null);
+									}
+
+									@Override
+									public void exceptionOccurred(Exception exception) {
+										result.setResult(null);
+									}
+								});
 							}
 						});
+
 					}
-				});
+				}.start();
 			} else {
 				result.setResult(null);
 			}

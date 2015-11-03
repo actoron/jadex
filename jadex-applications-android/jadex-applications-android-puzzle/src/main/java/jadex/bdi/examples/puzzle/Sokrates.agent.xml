@@ -19,7 +19,7 @@
 	package="jadex.bdi.examples.puzzle">
 
 	<imports>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
 		<import>jadex.android.puzzle.ui.GuiProxy</import>
 		<import>jadex.bdiv3.examples.puzzle.IBoard</import>
 		<import>jadex.bdiv3.examples.puzzle.Move</import>

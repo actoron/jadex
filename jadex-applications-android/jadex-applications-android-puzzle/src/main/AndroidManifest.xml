@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="jadex.android.puzzle.SokratesFragment" >
+        <activity android:name=".SokratesGameActivity" >
         </activity>
         
         <service

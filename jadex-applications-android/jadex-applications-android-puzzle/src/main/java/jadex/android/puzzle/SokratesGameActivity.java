@@ -3,11 +3,10 @@ package jadex.android.puzzle;
 import jadex.android.puzzle.SokratesService.PlatformBinder;
 import jadex.android.puzzle.SokratesService.SokratesListener;
 import jadex.android.puzzle.ui.SokratesView;
-import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.bdiv3.examples.puzzle.Move;
 import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.future.DefaultResultListener;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -15,12 +14,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SokratesFragment extends Activity implements ServiceConnection
+public class SokratesGameActivity extends Activity implements ServiceConnection
 {
 	protected static final String BDI = "BDI";
 	protected static final String BDIBenchmark = "BDIBenchmark";
@@ -95,12 +91,16 @@ public class SokratesFragment extends Activity implements ServiceConnection
 	@Override
 	public void onDestroy()
 	{
-		super.onDestroy();
 		if (service != null)
 		{
-			service.stopSokrates().get();
-			unbindService(this);
+			service.stopSokrates().addResultListener(new DefaultResultListener<Void>() {
+				@Override
+				public void resultAvailable(Void result) {
+					unbindService(SokratesGameActivity.this);
+				}
+			});
 		}
+		super.onDestroy();
 	}
 
 	SokratesListener sokratesListener = new SokratesListener()
