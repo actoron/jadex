@@ -148,7 +148,7 @@ import static jadex.base.RootComponentConfiguration.*;
 	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
 	@ComponentType(name="kernel_micro", clazz=KernelMicroAgent.class), // filename="jadex/micro/KernelMicroAgent.class"),
 	@ComponentType(name="kernel_bdiv3", filename="jadex/bdiv3/KernelBDIV3Agent.class"),
-	@ComponentType(name="kernel_bdi", filename="jadex/bdi/KernelBDI.component.xml"),
+	@ComponentType(name="kernel_bdi", filename="jadex/bdiv3x/KernelBDIX.component.xml"),
 	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
 //	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
 	@ComponentType(name="kernel_bpmn", filename="jadex/micro/KernelBpmnAgent.class"),

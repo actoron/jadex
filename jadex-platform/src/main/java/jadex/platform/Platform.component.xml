@@ -186,7 +186,7 @@
 		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
 		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
 		<componenttype filename="jadex/micro/KernelMicro.component.xml" name="kernel_micro"/>
-		<componenttype filename="jadex/bdi/KernelBDI.component.xml" name="kernel_bdi"/>
+		<componenttype filename="jadex/bdiv3x/KernelBDIX.component.xml" name="kernel_bdi"/>
 		<componenttype filename="jadex/bdiv3/KernelBDIV3.component.xml" name="kernel_bdiv3"/>
 		<componenttype filename="jadex/bdibpmn/KernelBDIBPMN.component.xml" name="kernel_bdibpmn"/>
 		<componenttype filename="jadex/bpmn/KernelBPMN.component.xml" name="kernel_bpmn"/>
