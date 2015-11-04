@@ -626,6 +626,7 @@ public class SReflect
 			if(clazz!=null)
 			{
 				ret	= clazz.getName();
+				break;
 			}
 		}
 		return ret;
