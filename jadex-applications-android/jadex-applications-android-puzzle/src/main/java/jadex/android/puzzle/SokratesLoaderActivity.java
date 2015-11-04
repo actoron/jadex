@@ -1,22 +1,21 @@
 package jadex.android.puzzle;
 
-import jadex.android.puzzle.R;
-import jadex.android.puzzle.SokratesService.PlatformBinder;
-import jadex.android.puzzle.SokratesService.PlatformListener;
-import jadex.android.standalone.clientapp.ClientAppMainFragment;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class SokratesLoaderActivity extends ClientAppMainFragment implements ServiceConnection, PlatformListener
+import jadex.android.puzzle.SokratesService.PlatformBinder;
+import jadex.android.puzzle.SokratesService.PlatformListener;
+
+public class SokratesLoaderActivity extends Activity implements ServiceConnection, PlatformListener
 {
 	private TextView statusTextView;
 
@@ -36,76 +35,65 @@ public class SokratesLoaderActivity extends ClientAppMainFragment implements Ser
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		serviceIntent = new Intent(getContext(), SokratesService.class);
+		serviceIntent = new Intent(this, SokratesService.class);
 		startService(serviceIntent);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setTitle(R.string.app_title);
+		this.setContentView(R.layout.mainapp);
+
+		statusTextView = (TextView) findViewById(R.id.statusTextView);
+		startBDIButton = (Button) findViewById(R.id.startBDI);
+		startBDIButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesGameActivity.class);
+				i.putExtra("mode", SokratesGameActivity.BDI);
+				startActivity(i);
+			}
+		});
+
+		startBDIV3Button = (Button) findViewById(R.id.startBDIV3);
+		startBDIV3Button.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesGameActivity.class);
+				i.putExtra("mode", SokratesGameActivity.BDIV3);
+				startActivity(i);
+			}
+		});
+
+		startBDIBenchmarkButton = (Button) findViewById(R.id.startBDIBenchmark);
+
+		startBDIBenchmarkButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesGameActivity.class);
+				i.putExtra("mode", SokratesGameActivity.BDIBenchmark);
+				startActivity(i);
+			}
+		});
+
+		startBDIV3BenchmarkButton = (Button) findViewById(R.id.startBDIV3Benchmark);
+		startBDIV3BenchmarkButton.setOnClickListener(new OnClickListener()
+		{
+
+			@Override
+			public void onClick(View v)
+			{
+				final Intent i = new Intent(SokratesLoaderActivity.this, SokratesGameActivity.class);
+				i.putExtra("mode", SokratesGameActivity.BDIV3Benchmark);
+				startActivity(i);
+			}
+		});
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
-		setTitle(R.string.app_title);
-		int userlayout = R.layout.mainapp;
-		View view = inflater.inflate(userlayout, container, false);
-		return view;
-	}
-	
 	@Override
 	public void onResume()
 	{
 		super.onResume();
-		View view = getView();
-		statusTextView = (TextView) view.findViewById(R.id.statusTextView);
-		
-		final Intent i = new Intent(getContext(), SokratesFragment.class);
-		
-		startBDIButton = (Button) view.findViewById(R.id.startBDI);
-		startBDIButton.setOnClickListener(new OnClickListener()
-		{
-			
-			@Override
-			public void onClick(View v)
-			{
-				i.putExtra("mode", SokratesFragment.BDI);
-				startActivity(i);
- 			}
-		});
-		
-		startBDIV3Button = (Button) view.findViewById(R.id.startBDIV3);
-		startBDIV3Button.setOnClickListener(new OnClickListener()
-		{
-			
-			@Override
-			public void onClick(View v)
-			{
-				i.putExtra("mode", SokratesFragment.BDIV3);
-				startActivity(i);
- 			}
-		});
-		
-		startBDIBenchmarkButton = (Button) view.findViewById(R.id.startBDIBenchmark);
-		startBDIBenchmarkButton.setOnClickListener(new OnClickListener()
-		{
-			
-			@Override
-			public void onClick(View v)
-			{
-				i.putExtra("mode", SokratesFragment.BDIBenchmark);
-				startActivity(i);
- 			}
-		});
-		
-		startBDIV3BenchmarkButton = (Button) view.findViewById(R.id.startBDIV3Benchmark);
-		startBDIV3BenchmarkButton.setOnClickListener(new OnClickListener()
-		{
-			
-			@Override
-			public void onClick(View v)
-			{
-				i.putExtra("mode", SokratesFragment.BDIV3Benchmark);
-				startActivity(i);
- 			}
-		});
-		
 		startBDIButton.setEnabled(false);
 		startBDIV3Button.setEnabled(false);
 		startBDIBenchmarkButton.setEnabled(false);
@@ -131,7 +119,7 @@ public class SokratesLoaderActivity extends ClientAppMainFragment implements Ser
 		if (service != null)
 		{
 			unbindService(this);
-			Intent intent = new Intent(getContext(), SokratesService.class);
+			Intent intent = new Intent(this, SokratesService.class);
 			stopService(intent);
 		}
 	}

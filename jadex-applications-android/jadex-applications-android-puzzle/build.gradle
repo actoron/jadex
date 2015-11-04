@@ -1,13 +1,14 @@
 dependencies
 {
-    compile project(':jadex-android-platformclient')
+    compile project(':jadex-platform-android')
+    compile project(':jadex-android-commons')
+    compile project(':jadex-android-xmlpull')
+    compile project(':jadex-android-antlr')
+    compile project(':jadex-runtimetools-android')
+    compile project(':jadex-kernel-bdiv3-android')
+    compile project(':jadex-kernel-bpmn')
 
-    provided project(':jadex-android-commons')
-    provided project(':jadex-kernel-bpmn')
-    provided project(':jadex-kernel-bdiv3-android')
-    provided project(':jadex-kernel-bdiv3')
-    provided project(':jadex-runtimetools-android')
-    provided project(':jadex-platform-extension-webservice-android')
+//    compile project(':jadex-platform-extension-webservice-android')
 
 //    releaseProvided project(':jadex-android-commons')
 //    releaseProvided project(':jadex-kernel-bpmn')

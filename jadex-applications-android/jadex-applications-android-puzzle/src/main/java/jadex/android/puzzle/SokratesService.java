@@ -52,9 +52,10 @@ public class SokratesService extends JadexPlatformService
 	public SokratesService()
 	{
 		setPlatformAutostart(false);
-		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDIV3);
+		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDIV3,
+				JadexPlatformOptions.KERNEL_BDI);
 		setPlatformName("Sokrates");
-		setSharedPlatform(true);
+		setSharedPlatform(false);
 		handler = new Handler();
 	}
 
@@ -123,28 +124,34 @@ public class SokratesService extends JadexPlatformService
 			final Future<Void> result = new Future<Void>();
 			if (platformId != null && sokratesComponent != null)
 			{
-				getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-				{
-
+				new Thread() {
 					@Override
-					public void resultAvailable(IComponentManagementService cms)
-					{
-						cms.destroyComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String, Object>>()
+					public void run() {
+						getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
 						{
 
 							@Override
-							public void resultAvailable(Map<String, Object> cmsResult)
+							public void resultAvailable(IComponentManagementService cms)
 							{
-								result.setResult(null);
-							}
-							
-							@Override
-							public void exceptionOccurred(Exception exception) {
-								result.setResult(null);
+								cms.destroyComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String, Object>>()
+								{
+
+									@Override
+									public void resultAvailable(Map<String, Object> cmsResult)
+									{
+										result.setResult(null);
+									}
+
+									@Override
+									public void exceptionOccurred(Exception exception) {
+										result.setResult(null);
+									}
+								});
 							}
 						});
+
 					}
-				});
+				}.start();
 			} else {
 				result.setResult(null);
 			}
@@ -177,7 +184,7 @@ public class SokratesService extends JadexPlatformService
 	{
 		if (!sokratesRunning)
 		{
-			CreationInfo ci = new CreationInfo();
+			final CreationInfo ci = new CreationInfo();
 			HashMap<String, Object> args = new HashMap<String, Object>();
 			args.put("gui_listener", soListener);
 			long delay = 500;
@@ -186,33 +193,39 @@ public class SokratesService extends JadexPlatformService
 			}
 			args.put("delay", delay);
 			ci.setArguments(args);
-			IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
-					"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci, new DefaultResultListener<Map<String,Object>>() {
+
+			new Thread() {
+				@Override
+				public void run() {
+					IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
+							"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci, new DefaultResultListener<Map<String,Object>>() {
+
+								@Override
+								public void resultAvailable(Map<String, Object> result) {
+									sokratesComponent = null;
+									sokratesRunning = false;
+								}
+							});
+
+					future.addResultListener(new DefaultResultListener<IComponentIdentifier>() {
 
 						@Override
-						public void resultAvailable(Map<String, Object> result) {
-							sokratesComponent = null;
-							sokratesRunning = false;
+						public void resultAvailable(IComponentIdentifier result) {
+							sokratesComponent = result;
+						}
+
+						@Override
+						public void exceptionOccurred(Exception exception) {
+							exception.printStackTrace();
 						}
 					});
 
-			future.addResultListener(new DefaultResultListener<IComponentIdentifier>()
-			{
-
-				@Override
-				public void resultAvailable(IComponentIdentifier result)
-				{
-					sokratesComponent = result;
+					sokratesRunning = true;
 				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					exception.printStackTrace();
-				}
-			});
+			}.start();
 
-			sokratesRunning = true;
+
+
 		}
 		return IFuture.DONE;
 
@@ -222,7 +235,7 @@ public class SokratesService extends JadexPlatformService
 	{
 		if (!sokratesRunning)
 		{
-			CreationInfo ci = new CreationInfo();
+			final CreationInfo ci = new CreationInfo();
 			HashMap<String, Object> args = new HashMap<String, Object>();
 			args.put("gui_listener", soListener);
 			long delay = 500;
@@ -231,20 +244,24 @@ public class SokratesService extends JadexPlatformService
 			}
 			args.put("delay", delay);
 			ci.setArguments(args);
-			IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
-					SokratesBDI.class, ci);
-
-			future.addResultListener(new DefaultResultListener<IComponentIdentifier>()
-			{
-
+			new Thread() {
 				@Override
-				public void resultAvailable(IComponentIdentifier result)
-				{
-					sokratesComponent = result;
-				}
-			});
+				public void run() {
+					IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
+							SokratesBDI.class, ci);
 
-			sokratesRunning = true;
+					future.addResultListener(new DefaultResultListener<IComponentIdentifier>() {
+
+						@Override
+						public void resultAvailable(IComponentIdentifier result) {
+							sokratesComponent = result;
+						}
+					});
+
+					sokratesRunning = true;
+
+				}
+			}.start();
 		}
 		return IFuture.DONE;
 
