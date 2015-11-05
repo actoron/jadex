@@ -3,7 +3,8 @@
 dependencies 
 {
 	compile project(':jadex-platform-extension-webservice-desktop')
-	// Incompatible with Java 7
-	//compile 'org.eclipse.jetty:jetty-server:9.3.1.v20150714'
-	compile 'org.eclipse.jetty:jetty-server:9.2.13.v20150730'
+	compile 'org.eclipse.jetty:jetty-server:9.+'
+	
+	// Last release compatible with Java 7
+	//compile 'org.eclipse.jetty:jetty-server:9.2.13.v20150730'
 }
