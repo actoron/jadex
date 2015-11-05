@@ -16,7 +16,6 @@
 
 package jadex.android.puzzle.ui;
 
-import jadex.android.puzzle.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -25,6 +24,8 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
+
+import jadex.android.exampleproject.bdiv3.R;
 
 
 /**
@@ -85,8 +86,6 @@ public class TileView extends View {
         this(context, attrs, 0);
     }
 
-    
-    
     /**
      * Rests the internal array of Bitmaps used for drawing tiles, and
      * sets the maximum index of tiles to be inserted

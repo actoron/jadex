@@ -2,9 +2,7 @@ dependencies
 {
     compile libraries.android
     compile(project(':jadex-platform')) {
-        exclude module: 'bcprov-jdk15'
-        exclude module: 'junit'
-        exclude group: 'javax.mail', module: 'mail'
+        exclude group: 'junit', module: 'junit'
     }
     compile project(':jadex-android-commons')
     testCompile libraries.junit

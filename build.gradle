@@ -47,6 +47,9 @@ def androidIncl = ['jadex-android-commons',
                 'jadex-applications-android:jadex-applications-android:puzzle'
 ]
 
+// collect all aar project names in this list
+def aarProjects = []
+
 // http://stackoverflow.com/questions/30250923/how-do-i-build-a-war-file-with-gradle-using-a-copyspec-containing-filesmatching
 //def filterSpec = copySpec
 //{
@@ -195,6 +198,7 @@ subprojects
         if (isAndroidLibraryProject(project)) 
         {
             apply plugin: 'android-library'
+            aarProjects.add project.name
         } 
         else 
         {
@@ -390,6 +394,18 @@ subprojects
             	authentication(userName: repouser, password: repopassword)
                 //authentication(userName: "deployment", password: "laxlax")
             }
+
+            // gradle does not add type: aar for android library dependencies automatically:
+            // https://discuss.gradle.org/t/repositories-mavendeployer-dont-add-dependency-type-attribute-to-the-result-pom-xml/1297
+            pom.whenConfigured {pom ->
+                dependencies.findAll {dep ->
+                    if (dep.groupId == project.group
+                        && aarProjects.contains(dep.artifactId)) {
+                        println "configured dependency $dep.artifactId as aar for pom generation"
+                        dep.type = 'aar'
+                    }
+                }
+            }
         }
     }
 }
@@ -458,9 +474,9 @@ subprojects
             all*.exclude group:'org.javassist', module:'javassist'
             all*.exclude group:'javax.mail', module:'mail'
             all*.exclude group:'org.antlr', module:'antlr-runtime'
-            all*.exclude group:'bouncycastle', module:'bcprov-jdk15'
+            all*.exclude group:'org.bouncycastle', module:'bcprov-jdk15on'
             all*.exclude group:'org.ow2.asm', module:'asm-all'
-            runtime.exclude module:'junit' // no junit in runtime classpath
+            runtime.exclude group: 'junit', module:'junit' // no junit in runtime classpath
         }
 
         // general dependencies for all android modules
@@ -674,21 +690,16 @@ task buildAndroidExampleProject(type: Zip) {
     destinationDir = new File(project.distsDir, "standard-version")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveName = 'jadex-android-example-projects.zip'
-    from('docs/android/jadex-android-example-project-maven') {into ('jadex-android-example-project-maven')}
-    // non-maven and gradle example project:
-    from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
+    // eclipse and gradle example project:
+//    from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
     from('docs/android/jadex-android-example-project-gradle') {into ('jadex-android-example-project-gradle')}
-    // Copy sources from maven example project to non-maven example project
-    from('docs/android/jadex-android-example-project-maven/src/main/java') {into ('jadex-android-example-project/src')}
-    from('docs/android/jadex-android-example-project-maven/src/main/java') {into ('jadex-android-example-project-gradle/src/main/java')}
-    // Copy resources from maven example project to non-maven example project
-    from('docs/android/jadex-android-example-project-maven/res') {into ('jadex-android-example-project/res')}
-    from('docs/android/jadex-android-example-project-maven/res') {into ('jadex-android-example-project-gradle/src/main/res')}
-    // Copy Manifest from maven example project to non-maven example project
-    from('docs/android/jadex-android-example-project-maven/AndroidManifest.xml') {into ('jadex-android-example-project/')}
-    from('docs/android/jadex-android-example-project-maven/AndroidManifest.xml') {into ('jadex-android-example-project-gradle/src/main/')}
-
-    from('docs/android/jadex-android-clientapp-example-maven') {into ('jadex-android-clientapp-example-maven')}
+    from('docs/android/jadex-android-example-project-bdiv3-gradle') {into ('jadex-android-example-project-bdiv3-gradle')}
+    // Copy sources from gradle example project to eclipse example project
+//    from('docs/android/jadex-android-example-project-gradle/src/main/java') {into ('jadex-android-example-project/src')}
+    // Copy resources from gradle example project to eclipse example project
+//    from('docs/android/jadex-android-example-project-gradle/src/main/res') {into ('jadex-android-example-project/res')}
+    // Copy Manifest from gradle example project to eclipse example project
+//    from('docs/android/jadex-android-example-project-gradle/src/main/AndroidManifest.xml') {into ('jadex-android-example-project/')}
 }
 
 def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
@@ -698,12 +709,17 @@ def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
 		if ((excl != null && !isExcluded(excl, subproject.name))
             || (incl != null && incl.contains(subproject.name)))
 		{
-                task.from(subproject.configurations[configuration]) { into('lib') }
+            task.from(subproject.configurations[configuration]) { into('lib') }
 
-            if (isAndroidProject(subproject) && !isAndroidLibraryProject(subproject)) {
+            if (isAndroidProject(subproject)) {
                 subproject.afterEvaluate {
-                    def releaseApkVariant = getReleaseVariant(subproject).outputs.find({o -> o.name.contains('release')})
-                    task.from(releaseApkVariant.outputFile) {into('apk')}
+                    def releaseApkVariant = getReleaseVariant(subproject).outputs.find({ o -> o.name.contains('release') })
+                    if (isAndroidLibraryProject(subproject)) {
+                        println "adding " + releaseApkVariant.outputFile
+                        task.from(releaseApkVariant.outputFile) { into('lib').rename('(.*)-release\\.(.*)', '$1-' + subproject.version + '.$2') }
+                    } else {
+                        task.from(releaseApkVariant.outputFile) { into('apk').rename('(.*)-release\\.(.*)', '$1-' + subproject.version + '.$2') }
+                    }
                 }
             } else {
                 task.from(subproject.jar) { into('lib') }

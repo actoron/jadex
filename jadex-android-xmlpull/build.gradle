@@ -1,9 +1,7 @@
 dependencies
 {
     provided libraries.android
-    compile(project(':jadex-xml')) {
-        exclude module: 'bcprov-jdk15'
-    }
+    compile(project(':jadex-xml'))
 //    testCompile(project(':jadex-commons:test-jar'))
     testCompile files(project(':jadex-commons').sourceSets.test.output)
 }

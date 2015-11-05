@@ -73,12 +73,17 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	{
 		super.onDestroy();
 		// TODO: check for shared platform
-		jadexPlatformManager.shutdownJadexPlatforms();
-		Context base = this.getBaseContext();
-		if (base != null) {
-			// if base is null, this service was not started through android
-			AndroidContextManager.getInstance().setAndroidContext(null);
-		}
+		new Thread() {
+			@Override
+			public void run() {
+				jadexPlatformManager.shutdownJadexPlatforms();
+				Context base = getBaseContext();
+				if (base != null) {
+					// if base is null, this service was not started through android
+					AndroidContextManager.getInstance().setAndroidContext(null);
+				}
+			}
+		}.start();
 	}
 	
 	@Override
