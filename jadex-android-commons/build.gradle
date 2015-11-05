@@ -3,8 +3,6 @@ dependencies
     compile libraries.android
     compile libraries.android_support
 	compile(project(':jadex-bridge')) {
-        exclude module: 'bcprov-jdk15'
-        exclude module: 'junit'
-        exclude module: 'hamcrest-core'
+        exclude group: 'junit', module: 'junit'
     }
 }
