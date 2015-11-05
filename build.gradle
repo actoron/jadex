@@ -691,14 +691,15 @@ task buildAndroidExampleProject(type: Zip) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveName = 'jadex-android-example-projects.zip'
     // eclipse and gradle example project:
-    from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
+//    from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
     from('docs/android/jadex-android-example-project-gradle') {into ('jadex-android-example-project-gradle')}
+    from('docs/android/jadex-android-example-project-bdiv3-gradle') {into ('jadex-android-example-project-bdiv3-gradle')}
     // Copy sources from gradle example project to eclipse example project
-    from('docs/android/jadex-android-example-project-gradle/src/main/java') {into ('jadex-android-example-project/src')}
+//    from('docs/android/jadex-android-example-project-gradle/src/main/java') {into ('jadex-android-example-project/src')}
     // Copy resources from gradle example project to eclipse example project
-    from('docs/android/jadex-android-example-project-gradle/src/main/res') {into ('jadex-android-example-project/res')}
+//    from('docs/android/jadex-android-example-project-gradle/src/main/res') {into ('jadex-android-example-project/res')}
     // Copy Manifest from gradle example project to eclipse example project
-    from('docs/android/jadex-android-example-project-gradle/src/main/AndroidManifest.xml') {into ('jadex-android-example-project/')}
+//    from('docs/android/jadex-android-example-project-gradle/src/main/AndroidManifest.xml') {into ('jadex-android-example-project/')}
 }
 
 def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
