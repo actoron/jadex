@@ -268,7 +268,7 @@ subprojects
     	classpath = configurations.compile
     	destinationDir = file("./doc/")
     	options.addStringOption('Xdoclint:none', '-quiet')
-    	options.charSet = 'UTF-8'
+    	options.addStringOption('charSet', 'UTF-8')
   	}
 
     task sourcesJar(type: Jar, dependsOn: 'classes') {
