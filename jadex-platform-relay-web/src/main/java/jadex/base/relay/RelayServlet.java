@@ -338,7 +338,7 @@ public class RelayServlet extends HttpServlet
 		// Use scale=2 for larger pictures in spite of 640 pixel limitS
 		int	width	= Integer.valueOf(request.getParameter("width"))/2;
 		int	height	= Integer.valueOf(request.getParameter("height"))/2;
-		String	url	= "http://maps.googleapis.com/maps/api/staticmap?scale=2&size="+width+"x"+height+"&sensor=false"+markers;
+		String	url	= "https://maps.googleapis.com/maps/api/staticmap?scale=2&size="+width+"x"+height+"&sensor=false"+markers;
 		
 		// Copy content to output stream. (against google policies?)
 //		HttpURLConnection	con	= (HttpURLConnection)new URL(url).openConnection();

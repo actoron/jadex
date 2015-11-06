@@ -38,8 +38,8 @@
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/accordion.js' defer='defer'></script>
  -->
 <%	/*if(request.getParameter("title")!=null && request.getParameter("title").toLowerCase().indexOf("history")!=-1) {*/ %>
-	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
-	<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/resources/markercluster/MarkerCluster.css" />

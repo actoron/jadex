@@ -161,7 +161,7 @@ if(peers.length>0)
 if(markers.length()>0)
 {
 %>
-	<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%=markers%>"/>
+	<img class="map" src="https://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%=markers%>"/>
 <%
 }
 

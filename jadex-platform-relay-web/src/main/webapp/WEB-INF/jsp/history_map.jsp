@@ -13,8 +13,8 @@
 <link rel="shortcut icon" type="image/ico" href="resources/jadex_icon.ico" />
 <link rel="stylesheet" type="text/css" href="resources/colibri.css" media="all" />
 
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
-<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="stylesheet" href="resources/markercluster/MarkerCluster.css" />
 <link rel="stylesheet" href="resources/markercluster/MarkerCluster.Default.css" />
