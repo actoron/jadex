@@ -556,6 +556,7 @@ task docs(type: Javadoc) {
     classpath = files(subprojects.collect {project -> project.getCompileClassPath(project)})
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.charSet = 'UTF-8'
     // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
     if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
         options.addStringOption('Xdoclint:none', '-quiet')
