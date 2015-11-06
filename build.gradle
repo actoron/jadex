@@ -245,10 +245,11 @@ subprojects
                         // provide same libs that are used in the default boot classpath
                         options.bootClasspath = \
                             ["resources.jar", "rt.jar", "sunrsasign.jar", "jsse.jar", "jce.jar", "charsets.jar", "jfr.jar"]\
-                            .collect {"$requestedHome/jre/lib/$it"}\
-                            .join(":") +
-                            ":$requestedHome/jre/classes"
+                            .collect {"$requestedHome"+java.io.File.separator+"jre"+java.io.File.separator+"lib"+java.io.File.separator+"$it"}\
+                            .join(java.io.File.pathSeparator) +
+                            ":$requestedHome"+java.io.File.separator+"jre"+java.io.File.separator+"classes"
 //                        options.fork = true
+						println "Bootclasspath: " + options.bootClasspath
                     }
                 }
             }
