@@ -267,8 +267,14 @@ subprojects
     	//source = sourceSets.main.allJava
     	classpath = configurations.compile
     	destinationDir = file("./doc/")
-    	options.addStringOption('Xdoclint:none', '-quiet')
-    	options.addStringOption('charSet', 'UTF-8')
+	    options.charSet = 'UTF-8'
+	    options.encoding = 'UTF-8'
+	    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+	    if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
+	        options.addStringOption('Xdoclint:none', '-quiet')
+	    } else {
+	        options.addStringOption('-quiet')
+	    }
   	}
 
     task sourcesJar(type: Jar, dependsOn: 'classes') {
@@ -557,6 +563,7 @@ task docs(type: Javadoc) {
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
     options.charSet = 'UTF-8'
+    options.encoding = 'UTF-8'
     // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
     if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
         options.addStringOption('Xdoclint:none', '-quiet')
