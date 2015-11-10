@@ -3,6 +3,7 @@ package jadex.android;
 import jadex.android.exception.JadexAndroidError;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.android.exception.WrongEventClassError;
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -51,9 +52,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	protected IComponentIdentifier platformId;
 	
 	private boolean platformAutostart;
-	private String[] platformKernels;
-	private String platformOptions;
-	private String platformName;
+	private PlatformConfiguration platformConfiguration;
 
 	/**
 	 * Constructor
@@ -62,8 +61,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	{
 		super();
 		platformAutostart = false;
-		platformKernels = IJadexPlatformManager.DEFAULT_KERNELS;
-		platformOptions = "";
+		platformConfiguration = PlatformConfiguration.getAndroidDefault();
 	}
 	
 	protected void onCreate(Bundle savedInstanceState)
@@ -99,22 +97,39 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 			throw new IllegalStateException("Cannot set autostart, platform already running!");
 		}
 	}
+
+	/**
+	 * Sets platform configuration.
+	 * @param config
+	 */
+	protected void setPlatformConfiguration(PlatformConfiguration config) {
+		this.platformConfiguration = config;
+	}
+
+	/**
+	 * Get the platform configuration
+	 * @return
+	 */
+	protected PlatformConfiguration getPlatformConfiguration() {
+		return platformConfiguration;
+	}
 	
 	/**
 	 * Sets the Kernels.
-	 * See {@link JadexPlatformManager} Constants for available Kernels.
+	 * See {@link jadex.base.RootComponentConfiguration.KERNEL} Constants for available Kernels.
 	 * @param kernels
 	 */
 	protected void setPlatformKernels(String ... kernels) {
-		this.platformKernels = kernels;
+		this.platformConfiguration.getRootConfig().setKernels(kernels);
 	}
 	
 	/**
 	 * Sets platform options.
 	 * @param options
+	 * @deprecated use setPlatformConfiguration
 	 */
 	protected void setPlatformOptions(String options) {
-		this.platformOptions = options;
+		this.platformConfiguration.enhanceWith(PlatformConfiguration.processArgs(options));
 	}
 	
 	/**
@@ -122,7 +137,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 * @param name
 	 */
 	protected void setPlatformName(String name) {
-		this.platformName = name;
+		this.platformConfiguration.setPlatformName(name);
 	}
 
 	public boolean isPlatformRunning()
@@ -383,7 +398,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	final protected void startPlatform()
 	{
 		onPlatformStarting();
-		IFuture<IExternalAccess> platform = platformService.startJadexPlatform(platformKernels, platformName, platformOptions);
+		IFuture<IExternalAccess> platform = platformService.startJadexPlatform(platformConfiguration);
 		
 		platform.addResultListener(new DefaultResultListener<IExternalAccess>()
 		{

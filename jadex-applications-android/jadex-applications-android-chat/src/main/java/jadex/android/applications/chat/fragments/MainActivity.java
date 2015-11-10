@@ -5,7 +5,6 @@ import jadex.android.applications.chat.model.ITypedObserver;
 import jadex.android.applications.chat.model.TypedObservable;
 import jadex.android.applications.chat.service.AndroidChatService;
 import jadex.android.applications.chat.service.IAndroidChatService;
-import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import jadex.bridge.IComponentIdentifier;
 import jadex.platform.service.chat.ChatService;
 
@@ -18,6 +17,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -26,7 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
-public class MainFragment extends ClientAppMainFragment implements ServiceConnection, ChatServiceProvider {
+public class MainActivity extends FragmentActivity implements ServiceConnection, ChatServiceProvider {
 	
 	private DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
 	private ViewPager mViewPager;
@@ -36,27 +36,40 @@ public class MainFragment extends ClientAppMainFragment implements ServiceConnec
 	private boolean connected;
 	private TypedObservable<Boolean> connectedObservable = new TypedObservable<Boolean>();
 	
-	@Override
-	public void onPrepare(Activity mainActivity)
-	{
-		super.onPrepare(mainActivity);
-		mainActivity.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-	}
-	
 	/**
 	 * Called when the activity is first created.
 	 */
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		startService(new Intent(getActivity(), AndroidChatService.class));
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		startService(new Intent(this, AndroidChatService.class));
 		setTitle("Jadex Chat");
+
+		setContentView(R.layout.main);
+
+		// ViewPager and its adapters use support library
+		// fragments, so use getSupportFragmentManager.
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		System.out.println(classLoader);
+		try {
+			String name = DemoCollectionPagerAdapter.class.getName();
+			Class<?> loadClass = classLoader.loadClass(name);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		mDemoCollectionPagerAdapter =
+				new DemoCollectionPagerAdapter(
+						getSupportFragmentManager());
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setAdapter(mDemoCollectionPagerAdapter);
 	};
 	
 	@Override
 	public void onResume() {
 		super.onResume();
 		setProgressBarIndeterminateVisibility(true);
-		bindService(new Intent(getActivity(), AndroidChatService.class), this, BIND_AUTO_CREATE);
+		bindService(new Intent(this, AndroidChatService.class), this, BIND_AUTO_CREATE);
 	}
 	
 	@Override
@@ -97,32 +110,7 @@ public class MainFragment extends ClientAppMainFragment implements ServiceConnec
 		this.connected = b;
 	}
 	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.main, container, false);
-		
-		
-		 // ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
-		ClassLoader classLoader = this.getClass().getClassLoader();
-		System.out.println(classLoader);
-		try {
-			String name = DemoCollectionPagerAdapter.class.getName();
-			Class<?> loadClass = classLoader.loadClass(name);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        mDemoCollectionPagerAdapter =
-                new DemoCollectionPagerAdapter(
-                        getActivity().getSupportFragmentManager());
-        mViewPager = (ViewPager) view.findViewById(R.id.pager);
-        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-		
-		return view;
-	}
-	
+
 	public class DemoCollectionPagerAdapter extends FragmentPagerAdapter {
 	    public DemoCollectionPagerAdapter(FragmentManager fm) {
 	        super(fm);

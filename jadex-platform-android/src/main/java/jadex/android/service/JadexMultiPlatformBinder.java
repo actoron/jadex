@@ -2,6 +2,8 @@ package jadex.android.service;
 
 import java.util.Map;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -25,7 +27,7 @@ public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatf
 
 	/**
 	 * Constructor
-	 * @param context
+	 * @param service
 	 */
 	public JadexMultiPlatformBinder(IJadexMultiPlatformBinder service)
 	{
@@ -113,22 +115,22 @@ public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatf
 
 	public IFuture<IExternalAccess> startJadexPlatform()
 	{
-		return startJadexPlatform(JadexPlatformManager.DEFAULT_KERNELS);
+		return service.startJadexPlatform();
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
+	public IFuture<IExternalAccess> startJadexPlatform(RootComponentConfiguration.KERNEL[] kernels)
 	{
 		return service.startJadexPlatform(kernels);
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
+	public IFuture<IExternalAccess> startJadexPlatform(RootComponentConfiguration.KERNEL[] kernels, String platformId)
 	{
 		return service.startJadexPlatform(kernels, platformId);
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
+	public IFuture<IExternalAccess> startJadexPlatform(PlatformConfiguration config)
 	{
-		return service.startJadexPlatform(kernels, platformId, options);
+		return service.startJadexPlatform(config);
 	}
 
 	public IResourceIdentifier getResourceIdentifier() {

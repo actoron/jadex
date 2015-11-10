@@ -13,28 +13,30 @@
 	    android:screenOrientation="portrait" 
 	    android:theme="@android:style/Theme.Light"
 	    android:label="@string/app_name">
-		<activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter"/>
-		<service android:name="AndroidChatService" android:label="AndroidChatService"/>
+		<!--<activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter"/>-->
+		<service android:name=".service.AndroidChatService" android:label="AndroidChatService"/>
 		
-		<activity android:name=".JadexChatApplication"
+		<activity android:name=".fragments.MainActivity"
 		    android:launchMode="singleTask">
 		    <intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
-			
-	      	<intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-			    <data android:mimeType="application/*" />
-			    <data android:mimeType="audio/*" />
-			    <data android:mimeType="image/*" />
-			    <data android:mimeType="message/*" />
-			    <data android:mimeType="multipart/*" />
-			    <data android:mimeType="text/*" />
-			    <data android:mimeType="video/*" />
-            </intent-filter>
+		</activity>
+
+		<activity android:name=".filetransfer.SendFileActivity">
+			<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<action android:name="android.intent.action.SEND_MULTIPLE" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="application/*" />
+				<data android:mimeType="audio/*" />
+				<data android:mimeType="image/*" />
+				<data android:mimeType="message/*" />
+				<data android:mimeType="multipart/*" />
+				<data android:mimeType="text/*" />
+				<data android:mimeType="video/*" />
+			</intent-filter>
 		</activity>
 		
 	</application>
