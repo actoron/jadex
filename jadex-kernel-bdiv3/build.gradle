@@ -11,3 +11,14 @@ dependencies
 	
 	compile 'org.ow2.asm:asm-all:5.0.3'
 }
+
+assemble << {
+	ant.xslt(
+		basedir: "${projectDir}/src/main/config/",
+		destdir: "${buildDir}/schemadocs/",
+		extension: ".html",
+		force: "true",
+		style: "${projectDir}/../docs/xs3p.xsl",
+		includes: "*.xsd"
+	)
+}
