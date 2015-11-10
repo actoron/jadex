@@ -1,8 +1,10 @@
 package jadex.xml.reader;
 
-import jadex.commons.staxwrapper.IStaxReaderWrapper;
-import jadex.commons.staxwrapper.XmlTag;
-import jadex.commons.staxwrapper.XmlUtil;
+import jadex.xml.stax.ILocation;
+import jadex.xml.stax.Location;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.XmlTag;
+import jadex.xml.stax.XmlUtil;
 import jadex.xml.SXML;
 
 import java.io.IOException;
@@ -17,14 +19,19 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-public class StaxReaderWrapper implements IStaxReaderWrapper
+public class PullParserWrapper implements IXMLReader
 {
 	private static final Map<Integer, Integer> EVENT_TYPE_MAPPING = new HashMap<Integer, Integer>();
 	static
 	{
 		EVENT_TYPE_MAPPING.put(XmlPullParser.START_TAG, XmlUtil.START_ELEMENT);
 		EVENT_TYPE_MAPPING.put(XmlPullParser.END_TAG, XmlUtil.END_ELEMENT);
+
 		EVENT_TYPE_MAPPING.put(XmlPullParser.TEXT, XmlUtil.CHARACTERS);
+		EVENT_TYPE_MAPPING.put(XmlPullParser.CDSECT, XmlUtil.CDATA);
+		EVENT_TYPE_MAPPING.put(XmlPullParser.ENTITY_REF, XmlUtil.CHARACTERS);
+
+		EVENT_TYPE_MAPPING.put(XmlPullParser.COMMENT, XmlUtil.COMMENT);
 	}
 	
 	/** The input stream reader. */
@@ -48,7 +55,7 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 	/** The current attributes. */
 	Map<String, String> attrs;
 	
-	public StaxReaderWrapper(InputStream in)
+	public PullParserWrapper(InputStream in)
 	{
 		XmlPullParserFactory factory;
 		try
@@ -82,6 +89,11 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 		}
 		hasnext = true;
 	}
+
+	public PullParserWrapper(XmlPullParser parser) {
+		this.parser = parser;
+		hasnext = true;
+	}
 	
 	/**
 	 *  Gets the XML event type.
@@ -107,11 +119,11 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 	/**
 	 *  Selects the next event.
 	 */
-	public void next()
+	public int next()
 	{
 		try
 		{
-			inttype = parser.next();
+			inttype = parser.nextToken();
 		}
 		catch (Exception e)
 		{
@@ -147,6 +159,8 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 		{
 			closedtag = tagstack.removeFirst();
 		}
+
+		return getEventType();
 	}
 	
 	/**
@@ -206,10 +220,57 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 	{
 		try
 		{
-			isreader.close();
+			if (isreader != null) {
+				isreader.close();
+			}
 		}
 		catch (IOException e)
 		{
 		}
+	}
+
+	/**
+	 * Returns the current parser location.
+	 * @return Location
+	 */
+	public ILocation getLocation()
+	{
+		return new Location(parser.getLineNumber(),
+				parser.getColumnNumber(), 0, null, null);
+	}
+
+	@Override
+	public String getLocalName() {
+		return parser.getName();
+	}
+
+	@Override
+	public int getAttributeCount() {
+		return parser.getAttributeCount();
+	}
+
+	@Override
+	public String getAttributeLocalName(int i) {
+		return parser.getAttributeName(i);
+	}
+
+	@Override
+	public String getAttributeValue(int i) {
+		return parser.getAttributeValue(i);
+	}
+
+	@Override
+	public QName getName() {
+		return new QName(parser.getNamespace(), parser.getName(), parser.getPrefix());
+	}
+
+	@Override
+	public String getAttributePrefix(int i) {
+		return parser.getAttributePrefix(i);
+	}
+
+	@Override
+	public String getAttributeNamespace(int i) {
+		return parser.getAttributeNamespace(i);
 	}
 }

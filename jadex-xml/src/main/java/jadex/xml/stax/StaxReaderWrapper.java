@@ -1,4 +1,4 @@
-package jadex.commons.staxwrapper;
+package jadex.xml.stax;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -13,11 +13,13 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import jadex.xml.reader.IXMLReader;
+
 /**
  *  Wrapper for the Java stax interface.
  *
  */
-public class StaxReaderWrapper implements IStaxReaderWrapper
+public class StaxReaderWrapper implements IXMLReader
 {
 	/** The stream. */
 	protected BufferedInputStream bis;
@@ -46,6 +48,10 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 		{
 			throw new RuntimeException(e);
 		}
+	}
+
+	public StaxReaderWrapper(XMLStreamReader reader) {
+		this.reader = reader;
 	}
 	
 	/**
@@ -78,19 +84,19 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 	/**
 	 *  Selects the next event.
 	 */
-	public void next()
+	public int next()
 	{
 		try
 		{
-			reader.next();
-			
-			if (reader.getEventType() == XMLStreamConstants.START_ELEMENT && reader.getName() != null)
+			int next = reader.next();
+
+			if (next == XMLStreamConstants.START_ELEMENT && reader.getName() != null)
 			{
 				QName qname = reader.getName();
 				tagstack.push(new XmlTag(qname.getNamespaceURI(), qname.getLocalPart()));
 			}
 			
-			if (reader.getEventType() == XMLStreamConstants.END_ELEMENT && reader.getName() != null)
+			if (next == XMLStreamConstants.END_ELEMENT && reader.getName() != null)
 			{
 				XmlTag tag = tagstack.peek();
 				if (tag != null)
@@ -103,7 +109,7 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 				}
 			}
 	    	
-	    	if (reader.getEventType() == XMLStreamConstants.START_ELEMENT &&
+	    	if (next == XMLStreamConstants.START_ELEMENT &&
 	    		reader.getAttributeCount() > 0)
 	    	{
 	    		attrs = new HashMap<String, String>(reader.getAttributeCount());
@@ -121,6 +127,8 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 		{
 			throw new RuntimeException(e);
 		}
+
+		return getEventType();
 	}
 	
 	/**
@@ -187,10 +195,50 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 		}
 		try
 		{
-			bis.close();
+			if (bis != null) {
+				bis.close();
+			}
 		}
 		catch (IOException e)
 		{
 		}
+	}
+
+	/**
+	 * Returns the current parser location.
+	 * @return Location
+	 */
+	public ILocation getLocation()
+	{
+		return StaxLocationWrapper.fromLocation(reader.getLocation());
+	}
+
+	public String getLocalName() {
+		return reader.getLocalName();
+	}
+
+	public int getAttributeCount() {
+		return reader.getAttributeCount();
+	}
+
+	public String getAttributeLocalName(int i) {
+		return reader.getAttributeLocalName(i);
+	}
+
+	public String getAttributeValue(int i) {
+		return reader.getAttributeValue(i);
+	}
+
+	public jadex.xml.stax.QName getName() {
+		QName name = reader.getName();
+		return new jadex.xml.stax.QName(name.getNamespaceURI(), name.getLocalPart(), name.getPrefix());
+	}
+
+	public String getAttributePrefix(int i) {
+		return reader.getAttributePrefix(i);
+	}
+
+	public String getAttributeNamespace(int i) {
+		return reader.getAttributeNamespace(i);
 	}
 }

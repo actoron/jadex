@@ -28,20 +28,6 @@ public class MovePlan extends Plan
 
 	private GuiProxy proxy;
 
-	//-------- constrcutors --------
-
-	/**
-	 *  Create a new move plan.
-	 */
-	public MovePlan()
-	{
-		this.move = (Move)getParameter("move").getValue();
-		this.depth = ((Integer)getParameter("depth").getValue()).intValue();
-		this.delay = ((Long)getBeliefbase().getBelief("delay").getFact()).longValue();
-		this.board = (IBoard)getBeliefbase().getBelief("board").getFact();
-		this.proxy = (GuiProxy) getBeliefbase().getBelief("gui_proxy").getFact();
-		
-	}
 
 	//-------- methods --------
 
@@ -50,15 +36,21 @@ public class MovePlan extends Plan
 	 */
 	public void body()
 	{
+		this.proxy = (GuiProxy) getBeliefbase().getBelief("gui_proxy").getFact();
+		this.move = (Move)getParameter("move").getValue();
+		this.depth = ((Integer)getParameter("depth").getValue()).intValue();
+		this.delay = ((Long)getBeliefbase().getBelief("move_delay").getFact()).longValue();
+		this.board = (IBoard)getBeliefbase().getBelief("board").getFact();
+		
 		int triescnt = ((Integer)getBeliefbase().getBelief("triescnt").getFact()).intValue()+1;
 		getBeliefbase().getBelief("triescnt").setFact(Integer.valueOf(triescnt));
 		print("Trying "+move+" ("+triescnt+") ", depth);
 
 		// Atomic block is required, because a micro plan step occurs when property change event
 		// from the board occurs. This means that no further bean listeners will be notified (e.g gui).
-//		startAtomic();
+		startAtomic();
 		board.move(move);
-//		endAtomic();
+		endAtomic();
 		
 		waitFor(delay);
 		
@@ -100,7 +92,7 @@ public class MovePlan extends Plan
 			Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();
 			if(endmem==null)
 			{
-				endmem	= new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+				endmem	= Long.valueOf(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 				getBeliefbase().getBelief("endmem").setFact(endmem);
 			}
 		}
@@ -124,7 +116,7 @@ public class MovePlan extends Plan
             sb.append(" ");
         }
         sb.append(text);
-        
+
         proxy.showMessage(sb.toString());
     }
 }

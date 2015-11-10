@@ -1,4 +1,4 @@
-package jadex.commons.staxwrapper;
+package jadex.xml.stax;
 
 public class XmlTag
 {

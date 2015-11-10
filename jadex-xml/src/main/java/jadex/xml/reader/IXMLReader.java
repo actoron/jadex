@@ -1,9 +1,15 @@
-package jadex.commons.staxwrapper;
+package jadex.xml.reader;
 
+import java.io.*;
+import java.io.Reader;
 import java.util.LinkedList;
 import java.util.Map;
 
-public interface IStaxReaderWrapper
+import jadex.xml.stax.ILocation;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.XmlTag;
+
+public interface IXMLReader
 {
 	/**
 	 *  Gets the XML event type.
@@ -22,7 +28,7 @@ public interface IStaxReaderWrapper
 	/**
 	 *  Selects the next event.
 	 */
-	public void next();
+	public int next();
 	
 	/**
 	 *  Get the XML tag struct.
@@ -63,4 +69,25 @@ public interface IStaxReaderWrapper
 	 *  Closes the reader.
 	 */
 	public void close();
+
+	/**
+	 * Returns the current parser location.
+	 * @return Location
+	 */
+	public ILocation getLocation();
+
+	String getLocalName();
+
+	int getAttributeCount();
+
+	String getAttributeLocalName(int i);
+
+	String getAttributeValue(int i);
+
+	QName getName();
+
+	String getAttributePrefix(int i);
+
+	String getAttributeNamespace(int i);
+
 }
