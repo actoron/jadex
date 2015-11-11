@@ -286,7 +286,7 @@ As a little highlight we now extend our scenario from F3 to become a real multi-
 
 </div>
 
-{![](scenariof4.png})
+{![scenariof4.png](scenariof4.png)
 
 \~Figure 1 The multi-agent scenario\~
 

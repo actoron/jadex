@@ -217,7 +217,7 @@ getActiveComponent().scheduleStep(new IComponentStep<String[]>()
 -   Go to the component viewer of the **other** platform (not running the chat bot). This platform should automatically connect to the platform running the chat bot.
 -   Unfold the remote platform node and double-click on the remote chat bot to open its GUI (you may have to wait a little after opening the component viewer tool or the platform node due to inter-process communication). The GUI should behave exactly the same as in the local case.
 
-![07 External Access@jccremoteviewer.png](XMLClassname): tutorial.BotGuiF3\$1*\
+![07 External Access@jccremoteviewer.png](jccremoteviewer.png): tutorial.BotGuiF3\$1*\
 This warning indicates a potential problem due to the Java language specification not describing a naming scheme for anonymous inner classes. Each java compiler decides for itself how to name an inner class (typically *OuterClass\$1*, *OuterClass\$2*, ...). This can cause incompatibilities when two platforms communicate that have been compiled using a different compiler (e.g. javac vs. eclipse). To allow proper mapping of inner classes you can specify an additional identifier using the *@XMLClassname* annotation.
 
 -   Copy the F3 files into new F4 files, changing the all occurrences of F3 to F4 accordingly.

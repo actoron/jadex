@@ -1,0 +1,172 @@
+import java.nio.file.CopyOption
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributes
+
+enum ACTION {serve, build}
+
+defaultTasks 'buildDoc'
+
+task buildDoc (type: MkDocsTask) {
+    action=ACTION.build
+}
+
+task serveDoc (type: MkDocsTask) {
+    action=ACTION.serve
+}
+
+task buildPdf (type:PandocTask) {
+
+}
+
+class PandocTask extends DockerTask {
+    static String PANDOCIMAGE_NAME = 'jadexpandoc'
+
+    @TaskAction
+    def action() {
+        println "rm -r work".execute().text
+        println "cp -r docs work".execute().text
+
+        java.nio.file.Path target = Paths.get("work")
+        Files.walkFileTree(target, new SimpleFileVisitor<java.nio.file.Path>() {
+
+            @Override
+            FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
+                if (file.toFile().getName().endsWith(".png")) {
+                    def targetFile = target.resolve(file.toFile().getName())
+                    if (!targetFile.toFile().exists()) {
+                        Files.copy(file, targetFile);
+                    }
+                }
+                return super.visitFile(file, attrs)
+            }
+
+        })
+
+
+//        def p = "find work/ -name '*.png' -exec 'mv {} work/' \\;".execute()
+//        p.errorStream.eachLine{println it}
+
+        def builder = getPandocProcessBuilder()
+        builder.directory(new File("work"))
+        launchDockerProcess(builder)
+        println "cp work/doc.pdf .".execute().text
+    }
+
+    def ProcessBuilder getPandocProcessBuilder() {
+        if ("which pandoc".execute().text.trim().empty
+                && docker != null
+                && !docker.empty) {
+            // remove old image
+            println "Removing old pandoc docker image..."
+            println "$docker rmi $PANDOCIMAGE_NAME".execute().text
+            println "Building pandoc docker image..."
+            def p = "$docker build -t $PANDOCIMAGE_NAME .".execute()
+            p.inputStream.eachLine{println it}
+            p.waitFor()
+        }
+        def pwd = "pwd".execute().text.trim();
+
+        def String[] dockerArgs = ["--rm", "-v", "$pwd/work/:/source/"];
+        def String[] args = ["-s", "**/*.md", "-f", "markdown", "-t", "latex", "-o", "doc.pdf"]
+        return getProcessBuilderForCommand("pandoc", args, PANDOCIMAGE_NAME, dockerArgs, false)
+    }
+}
+
+class MkDocsTask extends DockerTask {
+
+    def ACTION action = ACTION.serve
+
+    @TaskAction
+    def action() {
+        def builder = getMkdocsProcessBuilder();
+        if (action == ACTION.serve) {
+            builder.command.add("serve")
+        } else if (action == ACTION.build) {
+            builder.command.add("build")
+        }
+
+        launchDockerProcess(builder)
+    }
+
+    def ProcessBuilder getMkdocsProcessBuilder() {
+        def pwd = "pwd".execute().text.trim();
+        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$pwd/:/workspace/"];
+        return getProcessBuilderForCommand("mkdocsx", null, "andrglo/mkdocs:latest", dockerArgs)
+    }
+}
+
+
+class DockerTask extends DefaultTask {
+
+    def docker = "which docker".execute().text.trim()
+    def DOCKERCONTAINERNAME = 'jadextempdocker'
+
+    def launchDockerProcess(builder) {
+        println "Executing $builder.command"
+        def p = builder.start()
+        if (builder.command().first().contains("docker")) {
+            Runtime.runtime.addShutdownHook {
+                println "shutting down - please be patient"
+                def stopProcess = "$docker stop $DOCKERCONTAINERNAME".execute()
+                stopProcess.waitFor();
+                println stopProcess.text
+                if (stopProcess.exitValue() == 0) {
+                    println "stopped docker container"
+                }
+            }
+        }
+        p.inputStream.eachLine {println it}
+        p.errorStream.eachLine {println it}
+        p.waitFor();
+    }
+
+    def ProcessBuilder getProcessBuilderForCommand(String cmd, String[] args, String dockerimg, String[] dockerArgs, boolean pullFirst = true) {
+        def ProcessBuilder result;
+        def cmdPath = "which $cmd".execute().text.trim()
+
+        if (args == null) {
+            args = []
+        }
+        if (cmdPath != null && !cmdPath.empty) {
+            def allArgs = [cmdPath]
+            allArgs.addAll(args)
+            result = new ProcessBuilder(allArgs);
+            result.redirectErrorStream(true)
+        } else if (docker != null && !docker.empty) {
+            println "No $cmd binary found, but you have docker!"
+            if (pullFirst) {
+                println "Downloading $dockerimg docker image..."
+                pullDockerImage(dockerimg);
+            }
+
+            def allArgs = [docker, 'run', '--name=' + DOCKERCONTAINERNAME]
+            allArgs.addAll(dockerArgs)
+            allArgs.add(dockerimg)
+            allArgs.addAll(args)
+
+    //            println "Executing: $allArgs"
+
+            result = new ProcessBuilder(allArgs);
+            result.redirectErrorStream(true)
+        } else {
+            println "No $cmd binary or docker found! Install $cmd or docker to continue."
+        }
+
+        return result;
+    }
+
+    def void pullDockerImage(dockerimg) {
+        def builder = new ProcessBuilder(docker, 'pull', dockerimg)
+        builder.redirectErrorStream(true)
+        def p = builder.start()
+        p.waitFor()
+        if (p.exitValue() != 0) {
+            println p.text
+            System.exit(p.exitValue())
+        }
+    }
+
+}
