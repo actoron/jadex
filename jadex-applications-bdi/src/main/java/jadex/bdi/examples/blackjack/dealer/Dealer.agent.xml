@@ -341,18 +341,18 @@
 		
 		<!-- Check if it is the dealer's first turn. -->
 		<condition name="dealers_first_turn">
-			$beliefbase.myself.cardCnt==0 &amp;&amp;
+			$beliefbase.myself.getCardCnt()==0 &amp;&amp;
 			(select one Player $player from $beliefbase.players
-				where $player.playingstate!="idle"
-				&amp;&amp; $player.cardCnt!=2
+				where $player.getState()!=Player.STATE_IDLE
+				&amp;&amp; $player.getCardCnt()!=2
 			)==null
 		</condition>
 		
 		<!-- Check if it is the dealer's second turn. -->
 		<condition name="dealers_second_turn">
 			(select one Player $player from $beliefbase.players
-				where $player.playingstate!="idle"
-				&amp;&amp; $player.playingstate!="finished"
+				where $player.getState()!=Player.STATE_IDLE
+				&amp;&amp; $player.getState()!=Player.STATE_FINISHED
 			)==null
 		</condition>
 
@@ -360,21 +360,21 @@
 		<condition name="players_turn">
 			// All players must be idle, playing, or finished.
 			(select one Player $p0 from $beliefbase.players
-				where $p0.playingstate!="idle"
-				&amp;&amp; $p0.playingstate!="playing"
-				&amp;&amp; $p0.playingstate!="finished"
+				where $p0.getState()!=Player.STATE_IDLE
+				&amp;&amp; $p0.getState()!=Player.STATE_PLAYING
+				&amp;&amp; $p0.getState()!=Player.STATE_FINISHED
 			)==null
 
 			&amp;&amp;
 			// And $player must be playing. (todo return value?)
 			(select one Player $player from $beliefbase.players
-				where $player.playingstate=="playing")!=null
+				where $player.getState()==Player.STATE_PLAYING)!=null
 			
 			&amp;&amp;
 			// And no playing player has less cards than $player.
 			(select one Player $p2 from $beliefbase.players
-				where $p2.playingstate=="playing"
-				&amp;&amp; $p2.cardCnt &lt; $player.cardCnt
+				where $p2.getState()==Player.STATE_PLAYING
+				&amp;&amp; $p2.getCardCnt() &lt; $player.getCardCnt()
 			)==null
 		</condition>
 

@@ -815,6 +815,7 @@ public class ReflectNode	extends ExpressionNode
 			args0	= new Object[]{getText()};
 		}
 
+		// Bean access no longer supported: use getXyz() instead of .xyz (why?)
 		// Try bean property
 //		else
 //		{
