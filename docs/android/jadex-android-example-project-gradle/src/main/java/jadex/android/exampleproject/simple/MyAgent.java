@@ -7,6 +7,8 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Description;
 
 /**
@@ -22,7 +24,8 @@ public class MyAgent
 	/**
 	 *  Called when the agent is started.
 	 */
-	public IFuture<Void> executeBody(IInternalAccess agent)
+	@AgentBody
+	public IFuture<Void> body(IInternalAccess agent)
 	{
 		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying hello!", agent);
 		return IFuture.DONE;
@@ -32,6 +35,7 @@ public class MyAgent
 	/**
 	 *  Called when the agent is killed.
 	 */
+	@AgentKilled
 	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
 		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying goodbye!", agent);
