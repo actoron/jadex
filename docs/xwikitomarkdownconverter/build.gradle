@@ -36,3 +36,10 @@ dependencies {
 compileJava {
     sourceCompatibility = '1.8'
 }
+
+defaultTasks 'build', 'run'
+
+task run(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main="Convert"
+}

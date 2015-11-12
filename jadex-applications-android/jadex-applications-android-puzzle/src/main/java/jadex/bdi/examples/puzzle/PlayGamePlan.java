@@ -10,17 +10,12 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class PlayGamePlan extends Plan
 {
-	
-	private GuiProxy proxy;
-	public PlayGamePlan()
-	{
-		proxy = (GuiProxy) getBeliefbase().getBelief("gui_proxy").getFact();
-	}
 	/**
 	 *  The plan body.
 	 */
 	public void body()
 	{
+		GuiProxy proxy = (GuiProxy) getBeliefbase().getBelief("gui_proxy").getFact();
 		proxy.showMessage("Now puzzling:");
 		long	start	= getTime();
 		long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
@@ -29,25 +24,25 @@ public class PlayGamePlan extends Plan
 		try
 		{
 			dispatchSubgoalAndWait(play);
-//			proxy.showMessage("Found a solution: "
+//			System.out.println("Found a solution: "
 //				+board.getMoves().size()+" "+board.getMoves());
 		}
 //		catch(GoalFailureException gfe)
 		catch(Exception gfe)
 		{
-			proxy.showMessage("No solution found :-( "+gfe);
+			proxy.showMessage("No solution found :-( " + gfe);
 		}
 		
 		long end = getTime();
-		proxy.showMessage("Needed: "+(end-start)+" millis for " + getBeliefbase().getBelief("triescnt").getFact() + "moves");
-		if(getBeliefbase().containsBelief("endmem"))
-		{
-			Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();
-			if(endmem!=null)
-			{
-				proxy.showMessage("Needed: "+(((endmem.longValue()-startmem)*10/1024)/1024)/10.0+" Mb.");
-			}
-		}
+		proxy.showMessage("Needed: " + (end - start) + " millis for " + getBeliefbase().getBelief("triescnt").getFact() + "moves");
+//		if(getBeliefbase().containsBelief("endmem"))
+//		{
+//			Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();
+//			if(endmem!=null)
+//			{
+//				proxy.showMessage("Needed: " + (((endmem.longValue() - startmem) * 10 / 1024) / 1024) / 10.0 + " Mb.");
+//			}
+//		}
 
 		killAgent();
 	}

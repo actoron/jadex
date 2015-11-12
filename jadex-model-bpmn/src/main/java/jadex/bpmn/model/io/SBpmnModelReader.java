@@ -27,9 +27,9 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
-import jadex.commons.staxwrapper.IStaxReaderWrapper;
-import jadex.commons.staxwrapper.XmlTag;
-import jadex.commons.staxwrapper.XmlUtil;
+import jadex.xml.reader.IXMLReader;
+import jadex.xml.stax.XmlTag;
+import jadex.xml.stax.XmlUtil;
 import jadex.javaparser.SJavaParser;
 
 import java.awt.geom.Point2D;
@@ -123,18 +123,18 @@ public class SBpmnModelReader
 //		BufferedInputStream fis = new BufferedInputStream(in);
 //		XMLInputFactory fac = XMLInputFactory.newInstance(); 
 //		XMLStreamReader reader = fac.createXMLStreamReader(fis);
-		IStaxReaderWrapper reader = null;
+		IXMLReader reader = null;
 		if (!SReflect.isAndroid())
 		{
-			Class<?> clazz = SReflect.classForName("jadex.commons.staxwrapper.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
+			Class<?> clazz = SReflect.classForName("jadex.xml.stax.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
 			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
-			reader = (IStaxReaderWrapper) con.newInstance(new Object[] { in });
+			reader = (IXMLReader) con.newInstance(new Object[] { in });
 		}
 		else
 		{
-			Class<?> clazz = SReflect.classForName("jadex.xml.reader.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
+			Class<?> clazz = SReflect.classForName("jadex.xml.reader.PullParserWrapper", SBpmnModelReader.class.getClassLoader());
 			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
-			reader = (IStaxReaderWrapper) con.newInstance(new Object[] { in });
+			reader = (IXMLReader) con.newInstance(new Object[] { in });
 		}
 		
 //		LinkedList<XmlTag> tagstack = new LinkedList<XmlTag>();

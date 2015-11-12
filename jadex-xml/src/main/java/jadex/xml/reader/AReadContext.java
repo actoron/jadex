@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  *  Context for reader that stores all relevant information of the read process.
  */
-public abstract class AReadContext implements IContext
+public class AReadContext implements IContext
 {
 	//-------- attributes --------
 	
@@ -27,7 +27,7 @@ public abstract class AReadContext implements IContext
 	protected IObjectReaderHandler defaulthandler;
 	
 	/** The parser. */
-	protected Object parser;
+	protected IXMLReader parser;
 	
 	/** The parser. */
 	protected XMLReporter reporter;
@@ -63,11 +63,11 @@ public abstract class AReadContext implements IContext
 	protected MultiCollection<Object, LinkData> children;
 	
 	//-------- constructors --------
-	
+
 	/**
 	 * @param parser
 	 */
-	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, Object parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
+	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, IXMLReader parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
 	{
 		this(pathmanager, handler, parser, reporter, callcontext, classloader, null, new ArrayList<StackElement>(), 
 			null, null, new HashMap<String, Object>(), 0, new MultiCollection<Integer, IPostProcessorCall>());
@@ -82,8 +82,8 @@ public abstract class AReadContext implements IContext
 	 * @param comment
 	 * @param readobjects
 	 */
-	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, Object parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, 
-		Object root, List<StackElement> stack, StackElement topse, String comment, Map<String, Object> readobjects, int readignore, MultiCollection<Integer, IPostProcessorCall> postprocessors)
+	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, IXMLReader parser, XMLReporter reporter, Object callcontext, ClassLoader classloader,
+						Object root, List<StackElement> stack, StackElement topse, String comment, Map<String, Object> readobjects, int readignore, MultiCollection<Integer, IPostProcessorCall> postprocessors)
 	{
 		this.pathmanager = pathmanager;
 		this.defaulthandler = handler;
@@ -106,7 +106,7 @@ public abstract class AReadContext implements IContext
 	 *  Get the parser.
 	 *  @return The parser.
 	 */
-	public Object getParser()
+	public IXMLReader getParser()
 	{
 		return parser;
 	}
@@ -253,12 +253,6 @@ public abstract class AReadContext implements IContext
 	{
 		return stack.size();
 	}
-	
-	/**
-	 * Returns the current parser location.
-	 * @return Location
-	 */
-	public abstract ILocation getLocation();
 	
 	/**
 	 *  Get the comment.
@@ -449,5 +443,9 @@ public abstract class AReadContext implements IContext
 	public StackElement[] getStack()
 	{
 		return (StackElement[])stack.toArray(new StackElement[stack.size()]);
+	}
+
+	public ILocation getLocation() {
+		return parser.getLocation();
 	}
 }

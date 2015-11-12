@@ -279,7 +279,7 @@ class Convert {
     ]
 
     def mdReplacements = [
-            img: [
+            img: [ //to remove } at the end: sed 's/{\(.*\)(\(.*\)})/\1(\2)/g'
                     pattern: ~/!\[([^\]]*@.*.\w*)\]\(([^\]]*)@(\w*.\w*)\)/,
                     replacement: '!\\[$1\\]\\($3\\)'
                     ],

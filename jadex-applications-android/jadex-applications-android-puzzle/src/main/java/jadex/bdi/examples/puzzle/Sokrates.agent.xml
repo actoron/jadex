@@ -46,7 +46,7 @@
 			<fact>0</fact>
 		</belief>
 		<!-- The delay in milliseconds between two moves. -->
-		<belief name="delay" class="long">
+		<belief name="move_delay" class="long">
 			<fact>500L</fact>
 		</belief>
 		<!-- The meta-level strategy for choosing moves
@@ -57,24 +57,13 @@
 			<fact>"same_long"</fact>
 		</belief>
 	</beliefs>
-	
 
 	<goals>
 		<!-- The goal to make a move on the board that is the solution. -->
 		<achievegoal name="makemove" recalculate="false">
 			<parameter name="depth" class="int"/>
-			<targetcondition language="jcl">
+			<targetcondition>
 				$beliefbase.board.isSolution()
-				
-				// $beliefbase.getBelief("board").getFact().isSolution()
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?board))
-				// ?mbelief = (mbelief (melement_has_name "board"))
-				// ?board = (IBoard (solution true))
-				
-				// ?rbelief = (belief (element_has_model.melement_has_name "board") (belief_has_fact ?board))
-				// ?board = (IBoard (solution true))
-
-				// ?rbelief = (belief (element_has_model.melement_has_name "board") (belief_has_fact.IBoard:solution true))
 			</targetcondition>
  		</achievegoal>
 

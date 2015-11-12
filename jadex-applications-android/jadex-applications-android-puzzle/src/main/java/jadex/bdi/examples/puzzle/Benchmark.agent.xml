@@ -15,7 +15,11 @@
 	package="jadex.bdi.examples.puzzle">
 
 	<imports>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
+		<import>jadex.android.puzzle.ui.GuiProxy</import>
+		<import>jadex.bdiv3.examples.puzzle.IBoard</import>
+		<import>jadex.bdiv3.examples.puzzle.Move</import>
+		<import>jadex.bdiv3.examples.puzzle.Position</import>
 	</imports>
 
 	<beliefs>
@@ -23,6 +27,11 @@
 			take back moves and keep track of the game history. -->
 		<belief name="board" class="IBoard">
 			<fact>new JackBoard()</fact>
+		</belief>
+		<belief name="gui_listener" class="jadex.android.puzzle.SokratesService$SokratesListener" exported="true" argument="true">
+		</belief>
+		<belief name="gui_proxy" class="jadex.android.puzzle.ui.GuiProxy">
+			<fact>new jadex.android.puzzle.ui.GuiProxy($beliefbase.board, $beliefbase.gui_listener)</fact>
 		</belief>
 		<!-- The number of moves already tried. -->
 		<belief name="triescnt" class="int">
@@ -37,7 +46,8 @@
 			same_long=prefer long moves of same color, alter_long=prefer
 			long move of alternate color. -->
 		<belief name="ml" class="String" exported="true">
-			<fact>"alter_long"</fact>
+			<!-- <fact>"alter_long"</fact>-->
+			<fact>"same_long"</fact>
 		</belief>
 		
 		<!-- The memory used when the solution is found. -->
@@ -48,7 +58,7 @@
 		<!-- The goal to make a move on the board that is the solution. -->
 		<achievegoal name="makemove" recalculate="false">
 			<parameter name="depth" class="int"/>
-			<targetcondition language="jcl">
+			<targetcondition>
 				$beliefbase.board.isSolution()
 			</targetcondition>
  		</achievegoal>
@@ -103,16 +113,6 @@
 	</properties>
 
 	<configurations>
-		<configuration name="alter-long">
-			<beliefs>
-				<initialbelief ref="ml">
- 					<fact>"alter_long"</fact>
-				</initialbelief>
-			</beliefs>
-			<plans>
-				<initialplan ref="play_game_plan"/>
-			</plans>
-		</configuration>
 		<configuration name="none">
 			<beliefs>
 				<initialbelief ref="ml">
@@ -137,6 +137,16 @@
 			<beliefs>
 				<initialbelief ref="ml">
  					<fact>"same_long"</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="play_game_plan"/>
+			</plans>
+		</configuration>
+		<configuration name="alter-long">
+			<beliefs>
+				<initialbelief ref="ml">
+ 					<fact>"alter_long"</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>
