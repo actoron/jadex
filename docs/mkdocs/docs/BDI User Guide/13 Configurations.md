@@ -36,7 +36,7 @@ It is possible to declare any number of configurations for a single agent or cap
 
 </div>
 
-{![](jadexconfigurationsadf.png})
+![](jadexconfigurationsadf.png)
 
 \~The Jadex configurations XML schema part\~
 
@@ -59,7 +59,7 @@ The \\&lt;capabilities\\&gt; tag allows to configure included capabilities. For 
 
 </div>
 
-{![](jadexconfigurationscapabilitiesadf.png})
+![](jadexconfigurationscapabilitiesadf.png)
 
 \~The Jadex initial capabilities XML schema part\~
 
@@ -119,7 +119,7 @@ In the \\&lt;beliefs\\&gt; section the initial facts of beliefs and belief sets 
 </div>
 
 \
-{![](jadexconfigurationsbeliefsadf.png})
+![](jadexconfigurationsbeliefsadf.png)
 
 \~The Jadex initial beliefs XML schema part\~
 
@@ -171,7 +171,7 @@ In the \\&lt;goals\\&gt; section  initial and end goals can be specified. Initi
 
 </div>
 
-{![](jadexconfigurationsgoalsadf.png})
+![](jadexconfigurationsgoalsadf.png)
 
 \~The Jadex initial and end goals XML schema part\~
 
@@ -216,7 +216,7 @@ In the example below is depicted how an initial and end goal can be created. Bot
 
 In the \\&lt;plans\\&gt; section initial and end plans can be specified. This means that a new plan instance is created for each declared initial and end plan. The specification of an \\&lt;initialplan\\&gt; and \\&lt;endplan\\&gt; requires the connection to the underlying plan template which is used for instantiation. For this purpose the \~ref\~ attribute is used. Optionally, further parameter(set) values can be declared by using the corresponding \\&lt;parameter\\&gt; and \\&lt;parameterset\\&gt; tags.
 
-{![](jadexconfigurationsplansadf.png})\
+![](jadexplansadf.png)\
 \~The Jadex initial and end plans XML schema part\~
 
 In the example is depicted how an initial and end plan can be used. In this case an initial "print\_hello" plan is declared which refers to the "print\_hello" plan template of the agent. As result the agent will print "Hello World!" to the console on start-up. On the contrary it will also print "Goodbye World" when the agent gets terminated by creating the corresponding end plan.
@@ -257,7 +257,7 @@ Finally, in the \\&lt;events\\&gt; section initial and end events can be specifi
 
   
 
-{![](jadexconfigurationseventsadf.png})
+![](jadexconfigurationseventsadf.png)
 
 \~The Jadex initial and end events XML schema part\~
 

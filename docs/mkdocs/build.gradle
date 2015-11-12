@@ -5,15 +5,39 @@ import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 
+
+buildscript {
+    repositories
+    {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven
+                {
+                    name 'Active Components Nexus'
+                    url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
+                }
+    }
+    dependencies {
+        classpath 'net.sourceforge.jadex:jadex-commons:3.0-SNAPSHOT'
+        classpath 'commons-io:commons-io:2.4'
+    }
+}
+
+
+//apply plugin: 'java'
+//
+//sourceCompatibility = 1.8
+
 enum ACTION {serve, build}
 
 defaultTasks 'buildDoc'
 
-task buildDoc (type: MkDocsTask) {
+task buildDocs (type: MkDocsTask) {
     action=ACTION.build
 }
 
-task serveDoc (type: MkDocsTask) {
+task serveDocs (type: MkDocsTask) {
     action=ACTION.serve
 }
 
@@ -26,23 +50,30 @@ class PandocTask extends DockerTask {
 
     @TaskAction
     def action() {
-        println "rm -r work".execute().text
-        println "cp -r docs work".execute().text
-
         java.nio.file.Path target = Paths.get("work")
+
+        jadex.commons.SUtil.deleteDirectory(target.toFile())
+
+        org.apache.commons.io.FileUtils.copyDirectory(Paths.get("docs").toFile(), target.toFile())
+
+        List<String> mdFiles = [];
+
         Files.walkFileTree(target, new SimpleFileVisitor<java.nio.file.Path>() {
 
             @Override
             FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
-                if (file.toFile().getName().endsWith(".png")) {
+                def fileName = file.toFile().getName().toLowerCase()
+                if (fileName.endsWith(".png") || fileName.endsWith(".jpg")) {
                     def targetFile = target.resolve(file.toFile().getName())
                     if (!targetFile.toFile().exists()) {
-                        Files.copy(file, targetFile);
+//                        Files.copy(file, targetFile);
+                        Files.move(file, targetFile)
                     }
+                } else if (file.toFile().getName().endsWith(".md")) {
+                    mdFiles.add(target.relativize(file).toString())
                 }
                 return super.visitFile(file, attrs)
             }
-
         })
 
 
@@ -50,9 +81,19 @@ class PandocTask extends DockerTask {
 //        p.errorStream.eachLine{println it}
 
         def builder = getPandocProcessBuilder()
-        builder.directory(new File("work"))
+        builder.directory(target.toFile().getAbsoluteFile())
+        builder.command.addAll(mdFiles)
+//        println target.toFile().getAbsoluteFile()
+//        def ps = builder.command("ls").start();
+//        ps.inputStream.eachLine{println it}
+//        ps.waitFor()
+
         launchDockerProcess(builder)
-        println "cp work/doc.pdf .".execute().text
+
+        def pdfFile = target.resolve("doc.pdf")
+        def targetFile = Paths.get("doc.pdf")
+        Files.deleteIfExists(targetFile)
+        Files.copy(pdfFile, targetFile)
     }
 
     def ProcessBuilder getPandocProcessBuilder() {
@@ -70,7 +111,7 @@ class PandocTask extends DockerTask {
         def pwd = "pwd".execute().text.trim();
 
         def String[] dockerArgs = ["--rm", "-v", "$pwd/work/:/source/"];
-        def String[] args = ["-s", "**/*.md", "-f", "markdown", "-t", "latex", "-o", "doc.pdf"]
+        def String[] args = ["-s", "-f", "markdown", "-t", "latex", "-o", "doc.pdf"]
         return getProcessBuilderForCommand("pandoc", args, PANDOCIMAGE_NAME, dockerArgs, false)
     }
 }
@@ -79,9 +120,12 @@ class MkDocsTask extends DockerTask {
 
     def ACTION action = ACTION.serve
 
+
     @TaskAction
     def action() {
-        def builder = getMkdocsProcessBuilder();
+        def pwd = "pwd".execute().text.trim();
+        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$pwd/:/workspace/"];
+        def builder =  getProcessBuilderForCommand("mkdocs", null, "andrglo/mkdocs:latest", dockerArgs, true)
         if (action == ACTION.serve) {
             builder.command.add("serve")
         } else if (action == ACTION.build) {
@@ -91,18 +135,15 @@ class MkDocsTask extends DockerTask {
         launchDockerProcess(builder)
     }
 
-    def ProcessBuilder getMkdocsProcessBuilder() {
-        def pwd = "pwd".execute().text.trim();
-        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$pwd/:/workspace/"];
-        return getProcessBuilderForCommand("mkdocsx", null, "andrglo/mkdocs:latest", dockerArgs)
-    }
 }
 
 
 class DockerTask extends DefaultTask {
 
-    def docker = "which docker".execute().text.trim()
-    def DOCKERCONTAINERNAME = 'jadextempdocker'
+    protected String docker = "which docker".execute().text.trim()
+    private final static String DOCKERCONTAINERNAME = 'jadextempdocker'
+
+    def boolean forceDocker = project.hasProperty('forceDocker') ? project.property('forceDocker') : false
 
     def launchDockerProcess(builder) {
         println "Executing $builder.command"
@@ -126,15 +167,13 @@ class DockerTask extends DefaultTask {
     def ProcessBuilder getProcessBuilderForCommand(String cmd, String[] args, String dockerimg, String[] dockerArgs, boolean pullFirst = true) {
         def ProcessBuilder result;
         def cmdPath = "which $cmd".execute().text.trim()
+        def allArgs
 
         if (args == null) {
             args = []
         }
-        if (cmdPath != null && !cmdPath.empty) {
-            def allArgs = [cmdPath]
-            allArgs.addAll(args)
-            result = new ProcessBuilder(allArgs);
-            result.redirectErrorStream(true)
+        if (cmdPath != null && !cmdPath.empty && !forceDocker) {
+            allArgs = [cmdPath]
         } else if (docker != null && !docker.empty) {
             println "No $cmd binary found, but you have docker!"
             if (pullFirst) {
@@ -142,19 +181,16 @@ class DockerTask extends DefaultTask {
                 pullDockerImage(dockerimg);
             }
 
-            def allArgs = [docker, 'run', '--name=' + DOCKERCONTAINERNAME]
+            allArgs = [docker, 'run', '--name=' + DOCKERCONTAINERNAME]
             allArgs.addAll(dockerArgs)
             allArgs.add(dockerimg)
-            allArgs.addAll(args)
-
-    //            println "Executing: $allArgs"
-
-            result = new ProcessBuilder(allArgs);
-            result.redirectErrorStream(true)
         } else {
             println "No $cmd binary or docker found! Install $cmd or docker to continue."
         }
 
+        allArgs.addAll(args)
+        result = new ProcessBuilder(allArgs);
+        result.redirectErrorStream(true)
         return result;
     }
 
@@ -170,3 +206,7 @@ class DockerTask extends DefaultTask {
     }
 
 }
+
+
+
+

@@ -21,12 +21,13 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 	
-WGET="$WGET --load-cookies cookies.txt --show-progress -N"
+#WGET="$WGET --load-cookies cookies.txt --show-progress -N"
+WGET="$WGET --load-cookies cookies.txt -N"
 
 for line in $(cat pages.txt); do
 	site=${line%%.*}
 	page=${line##*.}
-	#echo "DOWNLOADING $site.$page"
+	echo "DOWNLOADING $site.$page"
 	filename=$site.$page.xar
 	if [ ! -s "$filename" ]; then
 		url="https://$HOST.activecomponents.org/bin/export/AC+Tool+Guide/01+Introduction?format=xar&pages=$site.$page&name=$site"

@@ -14,7 +14,7 @@ In this section the visualization concepts between components and space objects 
 
 </div>
 
-{![](visualization.png})
+![](visualization.png)
 
 \~Visualization xml schema part of the environment space type\~
 
@@ -32,7 +32,7 @@ In this section the visualization concepts between components and space objects 
 
 The EnvSupport visualization is clearly decoupled from the domain and interaction aspects. It is defined using \~perspectives\~, whereby multiple perspectives can be specified for the same domain model. At runtime between these perspectives can be switched as needed. A perspective has an identifying \~name\~ attribute and is composed of \~property\~ elements as well as arbitrary many darwables and pre- and postlayers. 
 
-{![](perspectives.png})
+![](perspectives.png)
 
 \~Perspectives declaration part of XML schema\~
 
@@ -50,7 +50,7 @@ The EnvSupport visualization is clearly decoupled from the domain and interactio
 
 1.1.1 Drawable
 
-{![](drawable.png})
+![](drawable.png)
 
 \~Drawable declaration part of XML schema\~
 
@@ -204,7 +204,7 @@ Moreover, some elements have certain special properties, which are not applicabl
 
 </div>
 
-{![](drawableexample.png|135|135})
+![](drawableexample.png)
 
 <div class="wikimodel-emptyline">
 
@@ -256,7 +256,7 @@ In the example above, one drawable is declared. As you can see in the first line
 
 1.1.1 Pre and post layers
 
-{![](prelayers.png})
+![](prelayers.png)
 
 \~Pre and postlayer declarations part of XML schema\~
 

@@ -18,7 +18,7 @@ All space types are defined with the \\&lt;spacetypes\\&gt; section of Jadex app
 
 </div>
 
-{![](envspacetype.png})
+![](envspacetype.png)
 
 \~XML schema part for the environment space type\~
 
@@ -53,7 +53,7 @@ the borders and enter the field on the other side.
 
 1.1.1 Object Type
 
-{![](objecttype.png})
+![](objecttype.png)
 
 \~Object type xml schema part\~
 
@@ -98,7 +98,7 @@ In the following code snippet a short example for an object type is shown. It is
 
 1.1.1 Task Type
 
-{![](tasktype.png})
+![](tasktype.png)
 
 \~Task type xml schema part\~
 
@@ -175,7 +175,7 @@ public class MoveTask extends AbstractTask\
 
 1.1.1 Process Type
 
-{![](processtype.png})
+![](processtype.png)
 
 \~Process type xml schema part\~
 
@@ -229,7 +229,7 @@ One frequent use case is the creation of domain objects by an environment proces
 
 1.1.1 Data View
 
-{![](dataviewtype.png})
+![](dataviewtype.png)
 
 \~Data view type xml schema part\~
 

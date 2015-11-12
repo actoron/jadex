@@ -60,7 +60,7 @@ Jadex facilitates using the BDI model in the context mainstream programming, by 
 
 </div>
 
-{![](jadexabstractarchitecture.png})
+![](jadexabstractarchitecture.png)
 
 \~Figure 1: Jadex abstract architecture\~
 
@@ -126,7 +126,7 @@ Unlike traditional BDI systems, which treat goals merely as a special kind of ev
 
 </div>
 
-{![](goallifecycle.png})
+![](goallifecycle.png)
 
 \~Figure 2: Goal life cycle\~
 
@@ -224,7 +224,7 @@ This sections shows the operation of the reasoning component, given the Jadex BD
 </div>
 
 \
-{![](interpreter.png})
+![](interpreter.png)
 
 \~Figure 3: Jadex BDI interpreter architecture\~
 

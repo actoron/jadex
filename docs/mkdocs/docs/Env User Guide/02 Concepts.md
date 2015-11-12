@@ -1,7 +1,7 @@
 \$xwiki.ssx.use("XWiki.Lightbox")\
 \$xwiki.jsx.use("XWiki.Lightbox")\
 &lt;a href="\$doc.getAttachmentURL('envsupportconcepts.png')" rel="lightbox" title="Environment Concepts"&gt;\
-{![](envsupportconceptssmall.png})
+![](envsupportconceptssmall.png)
 
 &lt;/a&gt;\
 \~Figure 1: Main conceptual building blocks of EnvSupport\~

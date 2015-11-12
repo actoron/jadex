@@ -11,7 +11,7 @@ An important property of agents is the ability to react timely to different kind
 </div>
 
 \
-{![](jadexeventsadf.png})
+![](jadexeventsadf.png)
 
 \~Figure 1: The Jadex events XML schema part\~
 

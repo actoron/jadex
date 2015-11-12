@@ -14,7 +14,7 @@ In this section the interaction concepts between components and space objects ar
 
 </div>
 
-{![](interaction.png})
+![](interaction.png)
 
 \~Interaction xml schema part of the environment space type\~
 
@@ -32,9 +32,9 @@ In this section the interaction concepts between components and space objects ar
 
 1.1.1 Avatar Mapping
 
-{![](avatarmapping.png})
+![](avatarmapping.png)
 
-{![](avatarmappingattributes.png})
+![](avatarmappingattributes.png)
 
 \~Avatar mappings xml schema part\~
 
@@ -61,7 +61,7 @@ The code snippet below shows a fictitious robot example, which creates robot age
 
 1.1.1 Percept Types
 
-{![](percepttypes.png})
+![](percepttypes.png)
 
 \~Percept types xml schema part\~
 
@@ -232,7 +232,7 @@ In the code snippet above an example for a vision processor specification is sho
 
 1.1.1 Action Type
 
-{![](actiontype.png})
+![](actiontype.png)
 
 \~Action type xml schema part\~
 

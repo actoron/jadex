@@ -12,7 +12,7 @@ To develop applications with Jadex, the programmer has to create two types of fi
 
 </div>
 
-{![](jadexagent.png})
+![](jadexagent.png)
 
 \~Figure 1: Jadex BDI agent components\~
 
@@ -66,7 +66,7 @@ The head of an ADF looks like shown in Figure 2. First, the agent tag specifies 
 </div>
 
  \
-{![](jadexagentadf.png})
+![](jadexagentadf.png)
 
 \~Figure 3: Jadex top level ADF elements\~
 

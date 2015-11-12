@@ -14,7 +14,7 @@ This section describes how an environment space instance can be created based on
 
 </div>
 
-{![](envspace.png})
+![](envspace.png)
 
 \~The environment instance schema definition\~
 
@@ -34,7 +34,7 @@ An environment space has two mandatory attributes. The \~name\~ is used for iden
 
 1.1 Objects
 
-{![](object.png})
+![](object.png)
 
 \~Object schema definition\~
 
@@ -54,7 +54,7 @@ An object in an instance of a space object type. It is defined using the \~type\
 
 1.1 Processes
 
-{![](process.png})
+![](process.png)
 
 \~Process schema definition\~
 
@@ -74,7 +74,7 @@ A process instance is defined very similar to an object. In the same way the \~t
 
 1.1 Observers
 
-{![](observer.png})
+![](observer.png)
 
 \~Observer schema definition\~
 
@@ -117,7 +117,7 @@ The evaluation of environment data is done by specifying data providers and data
 
 1.1 Data Providers
 
-{![](dataproviders.png})
+![](dataproviders.png)
 
 \~Data provider schema part\~
 
@@ -165,7 +165,7 @@ Finally, the concrete data model is specified using columns similar to a relatio
 
 1.1 Data Consumers
 
-{![](dataconsumers.png})
+![](dataconsumers.png)
 
 \~Data consumers schema part\~
 

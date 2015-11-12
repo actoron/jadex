@@ -213,7 +213,7 @@ The idea is that the Android Service can invoke methods on the Agent through an 
 Communication with the activity will not be mentioned in this tutorial, as it is recommended to **handle all agent-based communication in a service**, since activities are pause/resumed/destroyed on a regular basis and thus are not reliable.\
 The image below shows an overview of the communication model:
 
-![](fragment-service-platform-communication.gif)
+![](fragment-service-platform-communication.png)
 
 <span>Android Service to Agent</span> 
 -------------------------------------

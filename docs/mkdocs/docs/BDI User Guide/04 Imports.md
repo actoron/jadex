@@ -8,7 +8,7 @@ The \\&lt;imports\\&gt; tag is used to specify, which classes and packages can b
 
 </div>
 
-{![](jadeximportsadf.png})
+![](jadeximportsadf.png)
 
 \~Figure 1: The Jadex imports XML schema part\~
 

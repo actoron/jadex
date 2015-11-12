@@ -23,7 +23,7 @@ Figure 1 shows that a specific tag for each goal kind exists. Additionally, the 
 </div>
 
 \
-{![](jadexgoalsadf.png})
+![](jadexgoalsadf.png)
 
 \~Figure 1: The Jadex goals XML schema part\~
 
@@ -68,7 +68,7 @@ Whenever a goal instance of the declared type is created and dispatched to the s
 
 </div>
 
-{![](jadexbasegoaladf.png})
+![](jadexbasegoaladf.png)
 
 \~Figure 2: The Jadex common goal features\~
 
@@ -374,7 +374,7 @@ One aspect of rational behavior is that agents can pursue multiple goals in para
 
 </div>
 
-{![](easydeliberation.png})
+![](easydeliberation.png)
 
 \~Figure 3: Easy deliberation strategy\~
 
@@ -422,7 +422,7 @@ shows the dependencies between the goals of a cleaner agent (cf. package jadex.b
 
 </div>
 
-{![](cleanergoals.png})
+![](cleanergoals.png)
 
 \~Figure 4: Example goal dependencies (taken from Cleanerworld scenario)\~
 
@@ -497,7 +497,7 @@ With the trigger tag, it is specified for which kind of event or goal the meta g
 
 </div>
 
-{![](jadexmetagoaltriggeradf.png})
+![](jadexmetagoaltriggeradf.png)
 
 \~Figure 5: Meta goal trigger tag\~
 
