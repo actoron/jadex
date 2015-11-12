@@ -50,11 +50,11 @@ class PandocTask extends DockerTask {
 
     @TaskAction
     def action() {
-        java.nio.file.Path target = Paths.get("work")
+        java.nio.file.Path target = Paths.get(projectDir,"work")
 
         jadex.commons.SUtil.deleteDirectory(target.toFile())
 
-        org.apache.commons.io.FileUtils.copyDirectory(Paths.get("docs").toFile(), target.toFile())
+        org.apache.commons.io.FileUtils.copyDirectory(Paths.get(projectDir, "docs").toFile(), target.toFile())
 
         List<String> mdFiles = [];
 
@@ -91,7 +91,7 @@ class PandocTask extends DockerTask {
         launchDockerProcess(builder)
 
         def pdfFile = target.resolve("doc.pdf")
-        def targetFile = Paths.get("doc.pdf")
+        def targetFile = Paths.get(projectDir, "doc.pdf")
         Files.deleteIfExists(targetFile)
         Files.copy(pdfFile, targetFile)
     }
@@ -108,9 +108,8 @@ class PandocTask extends DockerTask {
             p.inputStream.eachLine{println it}
             p.waitFor()
         }
-        def pwd = "pwd".execute().text.trim();
 
-        def String[] dockerArgs = ["--rm", "-v", "$pwd/work/:/source/"];
+        def String[] dockerArgs = ["--rm", "-v", "$project.projectDir/work/:/source/"];
         def String[] args = ["-s", "-f", "markdown", "-t", "latex", "-o", "doc.pdf"]
         return getProcessBuilderForCommand("pandoc", args, PANDOCIMAGE_NAME, dockerArgs, false)
     }
@@ -123,13 +122,13 @@ class MkDocsTask extends DockerTask {
 
     @TaskAction
     def action() {
-        def pwd = "pwd".execute().text.trim();
-        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$pwd/:/workspace/"];
+        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$project.projectDir/:/workspace/"];
         def builder =  getProcessBuilderForCommand("mkdocs", null, "andrglo/mkdocs:latest", dockerArgs, true)
         if (action == ACTION.serve) {
             builder.command.add("serve")
         } else if (action == ACTION.build) {
             builder.command.add("build")
+            builder.command.add("--clean")
         }
 
         launchDockerProcess(builder)
@@ -185,12 +184,13 @@ class DockerTask extends DefaultTask {
             allArgs.addAll(dockerArgs)
             allArgs.add(dockerimg)
         } else {
-            println "No $cmd binary or docker found! Install $cmd or docker to continue."
+            System.err.println("No $cmd binary or docker found! Install $cmd or docker to continue.")
         }
 
         allArgs.addAll(args)
         result = new ProcessBuilder(allArgs);
         result.redirectErrorStream(true)
+        result.directory(project.projectDir)
         return result;
     }
 
