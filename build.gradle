@@ -121,6 +121,8 @@ buildscript
 
 allprojects
 {
+	apply plugin: 'eclipse-wtp'	// Hack!!! broken eclipse gradle integration: https://issues.gradle.org/browse/GRADLE-1880
+	
     version = jadex_build_version // Set the project version property, otherwise install does not work
     group = 'net.sourceforge.jadex'
     

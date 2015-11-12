@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -284,6 +285,26 @@ public class RelayServlet extends HttpServlet
         	if(mimetype!=null)
         	{
         		response.setContentType(mimetype);
+        	}
+        	else	// see e.g. https://github.com/bertramdev/karman/issues/3
+        	{
+//                css: 'text/css',
+//                gz: 'application/x-compressed',
+//                js: 'application/javascript',
+//                pdf: 'application/pdf',
+//                eot: 'application/vnd.ms-fontobject',
+//                otf: 'font/opentype',
+//                svg: 'image/svg+xml',
+//                ttf: 'application/x-font-ttf',
+//                woff: 'application/x-font-woff'
+        		if(file.getName().toLowerCase().endsWith(".css"))
+        		{
+        			response.setContentType("text/css");
+        		}
+        		else if(file.getName().toLowerCase().endsWith(".js"))
+            	{
+            		response.setContentType("application/javascript");
+            	}
         	}
         	
 			// Copy file content to output stream.
