@@ -1677,9 +1677,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		if(mplan==null)
 			throw new RuntimeException("Plan model not found for: "+plan);
 		
-		final RPlan rplan = RPlan.createRPlan(mplan, plan, null, getComponent(), null, null);
+		final RPlan rplan = RPlan.createRPlan(mplan, plan, new ChangeEvent(null, null, args, null), getComponent(), null, null);
 		rplan.addListener(new DelegationResultListener(ret));
-		rplan.setReason(new ChangeEvent(null, null, args, null));
 		RPlan.executePlan(rplan, getComponent());
 		return ret;
 	}

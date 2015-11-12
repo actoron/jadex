@@ -34,6 +34,7 @@ import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3x.BDIXModel;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
