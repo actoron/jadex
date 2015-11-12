@@ -45,6 +45,13 @@ task buildPdf (type:PandocTask) {
 
 }
 
+task buildDocsZip (type: Zip, dependsOn: buildDocs) {
+    from "site/"
+    baseName = 'mkdocs'
+    destinationDir = file("$project.projectDir")
+    outputs.upToDateWhen { false }
+}
+
 class PandocTask extends DockerTask {
     static String PANDOCIMAGE_NAME = 'jadexpandoc'
 
