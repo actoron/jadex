@@ -294,7 +294,7 @@ public class GuiPanel extends JPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
-				bia.getBeliefbase().getBeliefSet("negotiantion_reports").addBeliefSetListener(new IBeliefListener<Object>()
+				bia.getBeliefbase().getBeliefSet("negotiation_reports").addBeliefSetListener(new IBeliefListener<Object>()
 				{
 					public void beliefChanged(ChangeInfo<Object> info)
 					{

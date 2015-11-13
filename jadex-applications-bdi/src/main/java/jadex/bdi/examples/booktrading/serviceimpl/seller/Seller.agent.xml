@@ -96,9 +96,9 @@
 		
 		<plan name="execute_order">
 			<parameter name="cfp" class="String">
-				<goalmapping ref="cnp_make_proposal.cfp"/>
+				<goalmapping ref="cnp_execute_task.cfp"/>
 			</parameter>
-			<parameter name="proposal" class="String">
+			<parameter name="proposal" class="int">
 				<goalmapping ref="cnp_execute_task.proposal"/>
 			</parameter>
 			<body class="ExecuteOrderPlan" />

@@ -29,8 +29,6 @@ public class PurchaseBookPlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("PurchaseBookPlan");
-		
 		// Get order properties and calculate acceptable price.
 		Order order = (Order)getParameter("order").getValue();
 		double time_span = order.getDeadline().getTime() - order.getStartTime();
@@ -38,6 +36,8 @@ public class PurchaseBookPlan extends Plan
 		double price_span = order.getLimit() - order.getStartPrice();
 		int acceptable_price = (int)(price_span * elapsed_time / time_span)
 			+ order.getStartPrice();
+
+//		System.out.println("PurchaseBookPlan: "+order);
 
 		// Find available seller agents.
 		IBuyBookService[] services = getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
