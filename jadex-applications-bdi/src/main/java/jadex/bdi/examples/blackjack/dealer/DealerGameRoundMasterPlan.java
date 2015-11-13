@@ -22,9 +22,6 @@ public class DealerGameRoundMasterPlan extends Plan
 	 */
 	public void body()
 	{
-//		long timeout = ((Long)getBeliefbase().getBelief("playerwaitmillis").getFact()).longValue();
-//		System.out.println("playerwaitmillis: "+timeout);
-		
 		CardSet	cardset	= new CardSet();
 		getBeliefbase().getBelief("cardset").setFact(cardset);
 		Dealer	me	= (Dealer)getBeliefbase().getBelief("myself").getFact();

@@ -49,11 +49,11 @@
 		<achievegoal name="sell_book" recur="true" recurdelay="10000000">
 			<parameter name="order" class="Order">
 			    <bindingoptions>
-			        select Order $order from $beliefbase.orders where $order.getState()==Order.OPEN
+			        select Order $order from $beliefbase.initial_orders where $order.getState()==Order.OPEN
 			    </bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition beliefs="orders">
+			<creationcondition beliefs="initial_orders">
 				true
 			</creationcondition>
 			<dropcondition>

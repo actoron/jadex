@@ -38,7 +38,7 @@
 		
 		<!-- The number of seconds to wait for answers from players. -->
 		<belief name="playerwaitmillis" class="long">
-			<fact>10000</fact>
+			<fact>jadex.base.Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
 		<!-- The time to wait between rounds.
@@ -366,9 +366,8 @@
 			)==null
 
 			&amp;&amp;
-			// And $player must be playing. (todo return value?)
-			(select one Player $player from $beliefbase.players
-				where $player.getState()==Player.STATE_PLAYING)!=null
+			// And $player must be playing.
+			$player.getState()==Player.STATE_PLAYING
 			
 			&amp;&amp;
 			// And no playing player has less cards than $player.
@@ -413,7 +412,7 @@
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
 								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"),
 								20000)
@@ -437,7 +436,7 @@
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
 								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"),
 								20000)

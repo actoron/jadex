@@ -54,7 +54,7 @@
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
 								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"),
 								20000)

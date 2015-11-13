@@ -138,7 +138,7 @@
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
 								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 								.createDFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg"),
 								20000)

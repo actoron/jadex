@@ -1,8 +1,11 @@
 package jadex.bdiv3x.runtime;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import jadex.bdiv3.annotation.PlanAPI;
@@ -34,7 +37,6 @@ import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3x.BDIXModel;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -1066,8 +1068,20 @@ public abstract class Plan
 	/**
 	 *  Wait for a condition.
 	 *  @param name The name of the condition.
+	 *  @param timeout The wait timeout.
 	 */
 	public void waitForCondition(String name, long timeout)
+	{
+		waitForCondition(name, timeout, null);
+	}
+	
+	/**
+	 *  Wait for a condition.
+	 *  @param name The name of the condition.
+	 *  @param timeout The wait timeout.
+	 *  @param values Extra parameter values for the condition, if any.
+	 */
+	public void waitForCondition(String name, long timeout, final Map<String, Object> values)
 	{
 		checkNotInAtomic();
 		
@@ -1075,29 +1089,46 @@ public abstract class Plan
 		final MCondition mcond = bdif.getCapability().getMCapability().getCondition(name);
 		if(mcond==null)
 			throw new RuntimeException("Unknown condition: "+name);
-		final Future<Void> ret = new Future<Void>();
-		Rule<Void> rule = new Rule<Void>("plan_condition_"+rplan.getId()+"_"+mcond.getName(), new ICondition()
+		
+		boolean	nowait	= false;
+		final IParsedExpression	exp	= SJavaParser.parseExpression(mcond.getExpression(), getAgent().getModel().getAllImports(), getAgent().getClassLoader());
+		try
 		{
-			public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-			{
-				UnparsedExpression uexp = mcond.getExpression();
-				Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), 
-					getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage()));
-				return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
-			}
-		}, new IAction<Void>()
+			nowait = ((Boolean)exp.getValue(CapabilityWrapper.getFetcher(getAgent(), mcond.getExpression().getLanguage(), values))).booleanValue();
+		}
+		catch(Exception e)
 		{
-			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+			StringWriter	sw	= new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			agent.getLogger().warning("Condition evaluation failed due to: "+sw);
+		}
+
+		if(!nowait)
+		{
+			final Future<Void> ret = new Future<Void>();
+			Rule<Void> rule = new Rule<Void>("plan_condition_"+rplan.getId()+"_"+mcond.getName(), new ICondition()
 			{
-				// Remove rule and continue after wait
-				bdif.getRuleSystem().getRulebase().removeRule(rule.getName());
-				ret.setResult(null);
-				return IFuture.DONE;
-			}
-		});
-		rule.setEvents(mcond.getEvents());
-		bdif.getRuleSystem().getRulebase().addRule(rule);
-		ret.get(timeout);
+				public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+				{
+					UnparsedExpression uexp = mcond.getExpression();
+					Boolean ret = (Boolean)SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), 
+						getAgent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getAgent(), uexp.getLanguage(), values));
+					return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
+				}
+			}, new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+				{
+					// Remove rule and continue after wait
+					bdif.getRuleSystem().getRulebase().removeRule(rule.getName());
+					ret.setResult(null);
+					return IFuture.DONE;
+				}
+			});
+			rule.setEvents(mcond.getEvents());
+			bdif.getRuleSystem().getRulebase().addRule(rule);
+			ret.get(timeout);
+		}
 	}
 	
 	/**
