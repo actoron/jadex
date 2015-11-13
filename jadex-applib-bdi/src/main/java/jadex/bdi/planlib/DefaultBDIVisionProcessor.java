@@ -1,7 +1,10 @@
 package jadex.bdi.planlib;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -24,10 +27,6 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Default bdi agent vision processor.
@@ -134,14 +133,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("add")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-											Object[]	facts	= bdif.getCapability().getBeliefbase().getBeliefSet(name).getFacts();
+											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											
 											if(!SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
 											{
-												bdif.getCapability().getBeliefbase().getBeliefSet(name).addFact(percept);
+												bdif.getBeliefbase().getBeliefSet(name).addFact(percept);
 //												System.out.println("added: "+percept+" to: "+belset);
 											}
 											return IFuture.DONE;
@@ -155,14 +154,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("remove")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-											Object[]	facts	= bdif.getCapability().getBeliefbase().getBeliefSet(name).getFacts();
+											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											
 											if(SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
 											{
-												bdif.getCapability().getBeliefbase().getBeliefSet(name).removeFact(percept);
+												bdif.getBeliefbase().getBeliefSet(name).removeFact(percept);
 //												System.out.println("removed: "+percept+" from: "+belset);
 											}
 											return IFuture.DONE;
@@ -176,14 +175,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("set")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-											Object	fact	= bdif.getCapability().getBeliefbase().getBelief(name).getFact();
+											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											Object	fact	= bdif.getBeliefbase().getBelief(name).getFact();
 											if(cond!=null)
 												fetcher.setValue("$fact", fact);
 											
 											if(cond==null || evaluate(cond, fetcher))
 											{
-												bdif.getCapability().getBeliefbase().getBelief(name).setFact(percept);
+												bdif.getBeliefbase().getBelief(name).setFact(percept);
 //												System.out.println("set: "+percept+" on: "+belset);
 											}
 											return IFuture.DONE;
@@ -197,14 +196,14 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("unset")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-											Object	fact	= bdif.getCapability().getBeliefbase().getBelief(name).getFact();
+											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											Object	fact	= bdif.getBeliefbase().getBelief(name).getFact();
 											if(cond!=null)
 												fetcher.setValue("$fact", fact);
 											
 											if(cond==null || evaluate(cond, fetcher))
 											{
-												bdif.getCapability().getBeliefbase().getBelief(name).setFact(null);
+												bdif.getBeliefbase().getBelief(name).setFact(null);
 //												System.out.println("unset: "+percept+" on: "+belset);
 											}
 											return IFuture.DONE;
@@ -218,8 +217,8 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("removeoutdated")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
-											Object[]	facts	= bdif.getCapability().getBeliefbase().getBeliefSet(name).getFacts();
+											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											
@@ -237,7 +236,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 													if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
 													{
 //														System.out.println("Removing disappeared object: "+percept+", "+known[j]);
-														bdif.getCapability().getBeliefbase().getBeliefSet(name).removeFact(known[j]);
+														bdif.getBeliefbase().getBeliefSet(name).removeFact(known[j]);
 													}
 												}
 											}

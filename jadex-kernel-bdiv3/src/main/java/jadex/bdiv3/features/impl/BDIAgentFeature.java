@@ -2299,19 +2299,26 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					if(parent instanceof ReflectNode)
 					{
 						ReflectNode	ref	= (ReflectNode)parent;
-						if(ref.getType()==ReflectNode.METHOD)
+						if(ref.getType()==ReflectNode.METHOD && ref.jjtGetChild(1).jjtGetNumChildren()==1)
 						{
-							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
-							if("getGoals".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							try
 							{
-								String	name	= (String)arg.getConstantValue();
-								addEvent(events, new EventType(ChangeEvent.GOALACTIVE, name));
-								addEvent(events, new EventType(ChangeEvent.GOALADOPTED, name));
-								addEvent(events, new EventType(ChangeEvent.GOALDROPPED, name));
-								addEvent(events, new EventType(ChangeEvent.GOALINPROCESS, name));
-								addEvent(events, new EventType(ChangeEvent.GOALNOTINPROCESS, name));
-								addEvent(events, new EventType(ChangeEvent.GOALOPTION, name));
-								addEvent(events, new EventType(ChangeEvent.GOALSUSPENDED, name));
+								ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+								if("getGoals".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+								{
+									String	name	= (String)arg.getConstantValue();
+									addEvent(events, new EventType(ChangeEvent.GOALACTIVE, name));
+									addEvent(events, new EventType(ChangeEvent.GOALADOPTED, name));
+									addEvent(events, new EventType(ChangeEvent.GOALDROPPED, name));
+									addEvent(events, new EventType(ChangeEvent.GOALINPROCESS, name));
+									addEvent(events, new EventType(ChangeEvent.GOALNOTINPROCESS, name));
+									addEvent(events, new EventType(ChangeEvent.GOALOPTION, name));
+									addEvent(events, new EventType(ChangeEvent.GOALSUSPENDED, name));
+								}
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
 							}
 						}
 					}
