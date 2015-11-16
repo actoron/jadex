@@ -16,6 +16,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
 		<import>jadex.bdiv3.runtime.interpreter.*</import>
 		<import>jadex.bdi.examples.disastermanagement.*</import>
 		<import>jadex.bdi.examples.disastermanagement.movement.*</import>
@@ -57,11 +58,11 @@
 		<!-- Goal to move home when nothing else to do. -->
 		<achievegoal name="go_home">
 			<creationcondition>
-				$goalbase.getGoals().length==0 &amp;&amp; $beliefbase.home!=null &amp;&amp; $beliefbase.position!=null &amp;&amp;
+				$goalbase.getGoals("go_home").length==0 &amp;&amp; $goalbase.getGoals("treat_victims").length==0 &amp;&amp; $beliefbase.home!=null &amp;&amp; $beliefbase.position!=null &amp;&amp;
 				$beliefbase.environment.getDistance($beliefbase.home, $beliefbase.position).getAsDouble()&gt;0.001
 			</creationcondition>
 			<dropcondition>
-				$goalbase.getGoals().length>1
+				$goalbase.getGoals("treat_victims").length>1
 			</dropcondition>
 		</achievegoal>
 
@@ -69,8 +70,8 @@
 		<achievegoal name="treat_victims">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<dropcondition>
-				($goal).goal_has_lifecyclestate==OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION
-				&amp;&amp; $goalbase.getGoals(($goal).element_has_model.melement_has_name).length>1
+				$goal.getLifecycleState()==GoalLifecycleState.OPTION
+				&amp;&amp; $goalbase.getGoals("treat_victims").length>1
 			</dropcondition>
 			<!-- <deliberation cardinality="1"/> -->
 			<deliberation cardinalityone="true"/>

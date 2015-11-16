@@ -23,7 +23,7 @@
 			<concrete ref="shopcap.shopname"/>
 		</beliefref>
 		
-		<beliefsetref name="catalog">
+		<beliefsetref name="catalog" argument="true">
 			<concrete ref="shopcap.catalog"/>
 		</beliefsetref>
 	</beliefs>

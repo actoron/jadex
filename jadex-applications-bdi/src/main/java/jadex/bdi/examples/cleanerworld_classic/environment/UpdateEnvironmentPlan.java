@@ -10,6 +10,8 @@ import jadex.bdi.examples.cleanerworld_classic.Wastebin;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -84,31 +86,18 @@ public class UpdateEnvironmentPlan extends Plan
 	 */
 	protected void searchEnvironmentAgent()
 	{
-		IDF df = (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
-		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
-
-		// Use a subgoal to search for  agent
-		IGoal ft = createGoal("df_search");
-		ft.getParameter("description").setValue(ad);
-		if(getBeliefbase().getBelief("df").getFact()!=null)
-			ft.getParameter("df").setValue(getBeliefbase().getBelief("df").getFact());
 		try
 		{
-			dispatchSubgoalAndWait(ft);
-			//Object result = ft.getResult();
-			Object result = ft.getParameterSet("result").getValues();
-
-			if(result instanceof IDFComponentDescription[])
-			{
-				IDFComponentDescription[] tas = (IDFComponentDescription[])result;
+			IDF df = (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
+			IDFComponentDescription ad = new DFComponentDescription(null, sd);
+			IDFComponentDescription[] tas = df.search(ad, null).get();
 	
-				if(tas.length!=0)
-				{
-					getBeliefbase().getBelief("environmentagent").setFact(tas[0].getName());
-					if(tas.length>1)
-						System.out.println("WARNING: more than environment agent found.");
-				}
+			if(tas.length!=0)
+			{
+				getBeliefbase().getBelief("environmentagent").setFact(tas[0].getName());
+				if(tas.length>1)
+					System.out.println("WARNING: more than environment agent found.");
 			}
 		}
 		catch(GoalFailureException gfe)

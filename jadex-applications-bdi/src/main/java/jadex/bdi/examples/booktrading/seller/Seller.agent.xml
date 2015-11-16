@@ -80,14 +80,6 @@
 		<achievegoalref name="cnp_execute_task">
 			<concrete ref="procap.cnp_execute_task"/>
 		</achievegoalref>
-		
-		<achievegoalref name="df_register">
-			<concrete ref="dfcap.df_register"/>
-		</achievegoalref>
-		
-		<achievegoalref name="df_deregister">
-			<concrete ref="dfcap.df_deregister"/>
-		</achievegoalref>
 	</goals>
 
 	<plans>

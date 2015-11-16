@@ -107,15 +107,6 @@
 		<performgoal name="play_with_player">
 			<parameter name="player" class="Player"/>
 		</performgoal>
-
-		<!-- Used for registering the dealer at the df. -->
-		<achievegoalref name="df_register">
-			<concrete ref="dfcap.df_register"/>
-		</achievegoalref>
-		<!-- Used for deregistering the dealer at the df. -->
-		<achievegoalref name="df_deregister">
-			<concrete ref="dfcap.df_deregister"/>
-		</achievegoalref>
 	</goals>
 	
 	<!-- 
@@ -422,7 +413,6 @@
 			</plans>
 			<goals>
 				<initialgoal ref="play_game"/>
-				<endgoal ref="df_deregister"/>
 			</goals>
 		</configuration>
 		
@@ -446,7 +436,6 @@
 			</plans>
 			<goals>
 				<initialgoal ref="play_game"/>
-				<endgoal ref="df_deregister"/>
 			</goals>
 		</configuration>
 	</configurations>

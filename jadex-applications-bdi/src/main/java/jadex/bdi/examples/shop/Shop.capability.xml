@@ -37,7 +37,7 @@
 			<parameter name="price" class="double">
 				<goalmapping ref="sell.price"/>
 			</parameter>
-			<parameter name="result" class="Object" direction="out">
+			<parameter name="result" class="ItemInfo" direction="out">
 				<goalmapping ref="sell.result"/>
 			</parameter>
 			<body class="SellItemPlan"/>

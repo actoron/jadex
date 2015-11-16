@@ -64,7 +64,7 @@
 		
 		<achievegoal name="clear_chemicals" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="Object"/>
+			<parameterset name="units" class="Object" direction="inout"/>
 			<deliberation>
 				<inhibits ref="treat_victims">
 					$goal.disaster==$ref.disaster
@@ -75,13 +75,13 @@
 		
 		<achievegoal name="extinguish_fires" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="Object"/>
+			<parameterset name="units" class="Object" direction="inout"/>
 			<targetcondition>$goal.disaster.getProperty("fire")==0</targetcondition>
 		</achievegoal>
 		
 		<achievegoal name="treat_victims" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="Object"/>
+			<parameterset name="units" class="Object" direction="inout"/>
 			<targetcondition>$goal.disaster.getProperty("victims")==0</targetcondition>
 		</achievegoal>
 		

@@ -5,6 +5,8 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.IComponentAction;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -62,18 +64,10 @@ public abstract class RemoteActionPlan extends Plan
 		if(res==null)
 		{
 			IDF df = (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-			IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
-			IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
-				
-			// Use a subgoal to search for a translation agent
-			IGoal ft = createGoal("df_search");
-			ft.getParameter("description").setValue(ad);
-			if(getBeliefbase().containsBelief("df"))
-				ft.getParameter("df").setValue(getBeliefbase().getBelief("df").getFact());
-			dispatchSubgoalAndWait(ft);
-			//Object result = ft.getResult();
-			IDFComponentDescription[] tas = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
-
+			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
+			IDFComponentDescription ad = new DFComponentDescription(null, sd);
+			IDFComponentDescription[] tas = df.search(ad, null).get();
+			
 			if(tas.length!=0)
 			{
 				// Found.

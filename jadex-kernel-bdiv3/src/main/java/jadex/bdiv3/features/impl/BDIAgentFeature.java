@@ -2339,7 +2339,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 							addEvent(events, new EventType(ChangeEvent.VALUEREMOVED, owner.getName(), ref.getText()));
 						}
 						
-						else if(ref.getType()==ReflectNode.METHOD)
+						else if(ref.getType()==ReflectNode.METHOD && ref.jjtGetChild(1).jjtGetNumChildren()==1)
 						{
 							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
 							if("getParameter".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)

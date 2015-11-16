@@ -437,33 +437,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	//-------- helper methods --------
 
 	/**
-	 *  Search for a dealer.
-	 * /
-	 protected ComponentIdentifier	searchLocalDealer()
-	 {
-	 // Create a service description to search for.
-	 ServiceDescription sd = new ServiceDescription();
-	 sd.setType("blackjack");
-	 ComponentIdentifier dfadesc = new ComponentIdentifier();
-	 dfadesc.addService(sd);
-
-	 // Use a subgoal to search for a translation agent
-	 IGoal ft = createGoal("df_search");
-	 ft.getParameter("description").setValue(dfadesc);
-
-	 IEvent event = dispatchSubgoalAndWait(ft);
-	 Object result = ft.getResult();
-
-	 if((result != null) && (result instanceof ComponentIdentifier[]))
-	 {
-	 ComponentIdentifier[] desc = (ComponentIdentifier[])result;
-	 if(desc.length > 0)
-	 return desc[0];
-	 }
-	 return null;
-	 }*/
-
-	/**
 	 * Start a local dealer agent.
 	 */
 	protected void startLocalDealer()
