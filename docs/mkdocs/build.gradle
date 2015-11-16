@@ -44,10 +44,11 @@ task buildDocs (type: MkDocsTask) {
 }
 
 task buildDocsZip (type: Zip, dependsOn: buildDocs) {
-    from "site${File.separator}"
+    from "${project.buildDir}${File.separator}site${File.separator}"
     baseName = 'jadex-mkdocs'
     version = jadex_build_version
-    destinationDir = file("$project.projectDir")
+    into "$baseName-${version.replaceAll('-SNAPSHOT','')}"
+    destinationDir = file("$project.buildDir")
     outputs.upToDateWhen { false }
 }
 
@@ -61,7 +62,7 @@ task serveDocs (type: MkDocsTask) {
 /**
  * Build a PDF from docs.
  */
-task buildPdf (type:PandocTask, dependsOn: 'buildPandocDockerImage') {
+task buildDocsPdf (type:PandocTask, dependsOn: 'buildPandocDockerImage') {
     baseName = 'jadex-mkdocs'
     version = jadex_build_version
     dockerImageName = 'jadexpandoc'
@@ -79,7 +80,7 @@ class PandocTask extends DockerTask {
     @TaskAction
     def action() {
         // copy doc source to work dir
-        java.nio.file.Path target = Paths.get(project.projectDir.path,"work")
+        java.nio.file.Path target = Paths.get(project.buildDir.path,"work")
         jadex.commons.SUtil.deleteDirectory(target.toFile())
         org.apache.commons.io.FileUtils.copyDirectory(Paths.get(project.projectDir.path, "docs").toFile(), target.toFile())
 
@@ -145,13 +146,13 @@ class PandocTask extends DockerTask {
             targetName = "${baseName}-${version}.pdf"
         }
 
-        def targetFile = project.projectDir.toPath().resolve(targetName)
+        def targetFile = project.buildDir.toPath().resolve(targetName)
         Files.deleteIfExists(targetFile)
         Files.copy(pdfFile, targetFile)
     }
 
     def ProcessBuilder getPandocProcessBuilder() {
-        def String[] dockerArgs = ["--rm", "-v", "$project.projectDir${File.separator}work${File.separator}:/source/"];
+        def String[] dockerArgs = ["--rm", "-v", "$project.buildDir${File.separator}work${File.separator}:/source/"];
         def String[] args = ["-s", "-f", "markdown", "-t", "latex", "-o", "doc.pdf"]
         return getProcessBuilderForCommand("pandoc", args, dockerArgs, false)
     }
@@ -187,6 +188,8 @@ class MkDocsTask extends DockerTask {
         } else if (action == ACTION.build) {
             builder.command.add("build")
             builder.command.add("--clean")
+            builder.command.add("--site-dir")
+            builder.command.add("build/site")
         }
 
         launchDockerProcess(builder)
