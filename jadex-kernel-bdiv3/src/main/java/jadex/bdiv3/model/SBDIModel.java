@@ -262,6 +262,19 @@ public class SBDIModel
 				firstconf	= false;
 			}
 			
+			for(MCondition cond : capa.getCapability().getConditions())
+			{
+				MCondition	cond2	= copyCondition(bdimodel, capaname, cond);
+				bdimodel.getCapability().addCondition(cond2);
+			}
+			for(UnparsedExpression exp : capa.getCapability().getExpressions())
+			{
+				String	cname	= exp.getName()==null ? null : capaname!=null ? capaname+MElement.CAPABILITY_SEPARATOR+exp.getName() : exp.getName();
+				UnparsedExpression	exp2	= copyExpression(capaname, exp);
+				exp2.setName(cname);
+				bdimodel.getCapability().addExpression(exp2);
+			}
+
 			// Todo: non-bdi elements from subcapabilities.
 //			capa.getModelInfo().getFeatures()
 //			capa.getModelInfo().getNFProperties()

@@ -959,7 +959,7 @@ public abstract class Plan
 			}
 			finally
 			{
-				bdif.removeBeliefListener(belname, lis);
+				bdif.removeBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+belname : belname, lis);
 			}
 		}
 	}

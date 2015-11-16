@@ -478,7 +478,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				if(!isFinished())
 				{
 					setProcessingState(GoalProcessingState.FAILED);
-					setException(new GoalFailureException());
+					setException(new GoalFailureException(this.toString()));
 				}
 				super.notifyListeners();
 			}

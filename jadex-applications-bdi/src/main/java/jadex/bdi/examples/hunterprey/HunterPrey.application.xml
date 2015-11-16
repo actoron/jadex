@@ -40,7 +40,9 @@
 				</env:objecttype>
 				<env:objecttype name="obstacle" />
 				<env:objecttype name="food" >
-					<env:property name="size" dynamic="true">
+				    <env:property name="clock" />
+				    <env:property name="creation_age" />
+				    <env:property name="size" dynamic="true">
 						new Vector2Double
 						(
 							Math.min(1, ($object.clock.getTick()-
@@ -447,41 +449,5 @@
 	 			</env:envspace>
 			</extensions>
  		</configuration>
-		<!-- 
-		<configuration name="debug">
-			<components>
-				<component type="CleverPrey" name="testprey" />
-				<component type="CleverPrey" name="foodprey" />
-			</components>
-
-			<env:envspace name="my2dspace" type="2dspace">
-				<env:avatars>
-					<env:avatar type="prey" owner="testprey">
-						<env:property name="position">new Vector2Int(10, 10)</env:property>
-					</env:avatar>
-					<env:avatar type="prey" owner="foodprey">
-						<env:property name="position">new Vector2Int(6, 10)</env:property>
-					</env:avatar>
-				</env:avatars>
-				
-				<env:objects>
-					<env:object type="food">
-						<env:property name="position">new Vector2Int(12, 10)</env:property>
-						<env:property name="creation_age">new Double($space.getContext().getPlatform().getService(IClockService.class).getTick()-40)</env:property>
-						<env:property name="clock">$space.getContext().getPlatform().getService(IClockService.class)</env:property>
-					</env:object>
-					<env:object type="food">
-						<env:property name="position">new Vector2Int(8, 10)</env:property>
-						<env:property name="creation_age">new Double($space.getContext().getPlatform().getService(IClockService.class).getTick()-40)</env:property>
-						<env:property name="clock">$space.getContext().getPlatform().getService(IClockService.class)</env:property>
-					</env:object>
-				</env:objects>
-
-				<env:observers>
-					<env:observer name="HunterPrey World" dataview="view_all" perspective="icons"/>
-				</env:observers>
- 			</env:envspace>
- 		</configuration>
-		 -->
 	</configurations>
 </applicationtype>
