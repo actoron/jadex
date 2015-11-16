@@ -1,6 +1,6 @@
 # Builds an image containing pandoc and latex to generate PDFs from Markdown.
 
-FROM jagregory/pandoc:latest
+FROM jagregory/pandoc
 
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
