@@ -1,70 +1,91 @@
 apply from: 'util.gradle'
 
-include 'jadex-applications-bdi',
-'jadex-applications-bdiv3',
-//'jadex-applications-bdibpmn',
-'jadex-applications-bpmn',
-//'jadex-applications-gpmn',
-'jadex-applications-micro',
-'jadex-applications-mixed',
-'jadex-applications-web',
-'jadex-applications-webservice',
-'jadex-applications-wfms',
-'jadex-commons',
-'jadex-javaparser',
-'jadex-bridge',
-'jadex-xml',
-'jadex-json',
-'jadex-platform',
-'jadex-kernel-micro',
-'jadex-rules-eca',
-'jadex-kernel-base',
-'jadex-platform-standalone-launch',
-'jadex-kernel-bpmn',
-'jadex-kernel-application',
-//'jadex-kernel-gpmn',
-'jadex-kernel-component',
-//'jadex-kernel-bdibpmn',
-'jadex-applib-bdi',
-//'jadex-kernel-bdi',
-'jadex-kernel-bdiv3',
-'jadex-model-bpmn',
-'jadex-editor-bpmn',
-'jadex-runtimetools-swing',
-'jadex-tools-bdi',
-'jadex-tools-bpmn',
-'jadex-tools-comanalyzer',
-'jadex-rules',
-'jadex-rules-tools',
-'jadex-kernel-extension-agr',
-'jadex-kernel-extension-envsupport',
-'jadex-kernel-extension-envsupport-opengl',
-'jadex-kernel-extension-envsupport-jmonkey',
-'jadex-tools-base-swing',
-'jadex-tools-base',
-'jadex-tools-benchmarks',
-'jadex-servletfilter',
-'jadex-servletfilter-web',
-'jadex-rules-applications',
-'jadex-platform-relay-web',
-'jadex-platform-extension-relay',
-'jadex-platform-extension-relay-standalone',
-'jadex-platform-extension-webservice',
-'jadex-platform-extension-webservice-desktop',
-'jadex-platform-extension-webservice-desktop-grizzly',
-'jadex-platform-extension-webservice-desktop-jetty',
-'jadex-platform-extension-securetransport',
-'jadex-platform-extension-management',
-'jadex-platform-extension-maven',
-'jadex-editor-gpmn',
-'jadex-distribution-minimal',
-'jadex-distribution-server',
-'jadex-distribution-standard',
-'jadex-distribution-pro'
-
-if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
-    include 'jadex-applications-java8'
+/* Read the buildconfigs.csv and generate data structures */
+BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + 'buildconfigs.csv')))
+def disttargets = new ArrayList<String>()
+def allbuildartifacts = new HashSet<String>()
+//def builddeps = new HashSet<String>()
+gradle.ext.distartmap = new HashMap<String, Set<String>>();
+boolean firstline = true
+br.eachLine { line ->
+	if (firstline)
+	{
+		line.split(',').each { tok ->
+			if (tok.trim().length() > 0)
+			{
+				disttargets.add(tok)
+				gradle.ext.distartmap.put(tok, new HashSet<String>())
+			}
+		}
+		firstline = false;
+	}
+	else
+	{
+		String[] toks = line.split(',');
+		if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || !toks[0].endsWith('-java8'))
+		{
+			allbuildartifacts.add(toks[0])
+			for (int i = 1; i < toks.length; ++i)
+			{
+				if ('X'.equals(toks[i].trim().toUpperCase()))
+				{
+					Set<String> arts = gradle.ext.distartmap.get(disttargets.get(i - 1))
+					arts.add(toks[0]);
+				}
+			}
+		}
+	}
 }
+br.close()
+disttargets = null
+
+/* Determine selected distributions */
+gradle.ext.selecteddists = new ArrayList<String>()
+String selectedstr = gradle.startParameter.getProjectProperties().get('dist')
+selectedstr = selectedstr != null? selectedstr : 'everything'
+selectedstr.split(',').each {
+	gradle.ext.selecteddists.add(it)
+}
+System.out.println('Selected distributions: ' + gradle.ext.selecteddists.toString())
+gradle.ext.maindistartifacts = new HashSet()
+gradle.ext.selecteddists.each {
+	gradle.ext.maindistartifacts.addAll(gradle.ext.distartmap.get(it.trim()))
+}
+
+gradle.ext.includeartifacts = new HashSet<String>()
+
+if (gradle.startParameter.getTaskNames().contains('genDepList'))
+{
+	include allbuildartifacts.toArray(new String[allbuildartifacts.size()])
+}
+else
+{
+	def depconfreader = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + 'dependencies.conf')))
+	def subproj = ''
+	def projdeps = new HashMap<String, Set<String>>()
+	depconfreader.eachLine { line ->
+		if (line.startsWith('### '))
+			subproj = line.substring(4)
+		else
+		{
+			def deps = projdeps.get(subproj)
+			if (deps == null)
+			{
+				deps = new HashSet<String>()
+				projdeps.put(subproj, deps)
+			}
+			deps.add(line)	
+		}
+	}
+	depconfreader.close()
+	
+	gradle.ext.maindistartifacts.each { mainart ->
+		addDependency(mainart, projdeps, gradle.ext.includeartifacts)
+	}
+	
+	include gradle.ext.includeartifacts.toArray(new String[gradle.ext.includeartifacts.size()])
+}
+
 // the plugins depend on other projects to be deployed, so they have to be standalone
 //'jadex-android-maven-plugin',
 // android-specific modules:
@@ -106,4 +127,13 @@ if (androidSdkExists()) {
 
 //include 'jadex-test'
 
-
+def addDependency(artifact, projdeps, includeartifacts)
+{
+	if (!includeartifacts.contains(artifact))
+	{
+		includeartifacts.add(artifact)
+		projdeps.get(artifact).each { artdep ->
+			addDependency(artdep, projdeps, includeartifacts)
+		}
+	}
+}
