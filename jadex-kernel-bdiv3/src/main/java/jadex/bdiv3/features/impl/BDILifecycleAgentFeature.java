@@ -1226,7 +1226,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 											{
 												if(!goal.isFinished())
 												{
-													goal.setException(new GoalFailureException("drop condition: "+cond.getExpression().getName()));
+													goal.setException(new GoalFailureException("drop condition: "+goal));
 													goal.setProcessingState(component, RGoal.GoalProcessingState.FAILED);
 												}
 											}

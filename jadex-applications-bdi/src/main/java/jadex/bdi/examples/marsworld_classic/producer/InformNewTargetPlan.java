@@ -1,11 +1,13 @@
 package jadex.bdi.examples.marsworld_classic.producer;
 
 import jadex.bdi.examples.marsworld_classic.Target;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.fipa.SearchConstraints;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
@@ -55,21 +57,13 @@ public class InformNewTargetPlan extends Plan
 		// Search for Production_Service
 		// Create a service description to search for.
 		IDF	df	= (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IDFServiceDescription sd = df.createDFServiceDescription("service_sentry", null, null);
-		IDFComponentDescription dfadesc = df.createDFComponentDescription(null, sd);
+		IDFServiceDescription sd = new DFServiceDescription("service_sentry", null, null);
+		IDFComponentDescription dfadesc = new DFComponentDescription(null, sd);
 
 		// A hack - default is 2! to reach more Agents, we have
 		// to increase the number of possible results.
-		ISearchConstraints constraints = df.createSearchConstraints(-1, 0);
-
-		// Use a subgoal to search
-		IGoal ft = createGoal("dfcap.df_search");
-		ft.getParameter("description").setValue(dfadesc);
-		ft.getParameter("constraints").setValue(constraints);
-
-		dispatchSubgoalAndWait(ft);
-		//Object result = ft.getResult();
-		IDFComponentDescription[] sentries = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
+		ISearchConstraints constraints = new SearchConstraints(-1, 0);
+		IDFComponentDescription[] sentries = df.search(dfadesc, constraints).get();
 
 		if(sentries.length>0)
 		{

@@ -622,7 +622,7 @@ public class BDIClassReader extends MicroClassReader
 			
 			for(int j=0; j<fcs.length; j++)
 			{
-				tr.addFactChangeds(fcs[j]);
+				tr.addFactChanged(fcs[j]);
 			}
 			
 			MServiceCall sc = getServiceCall(bdimodel, st);

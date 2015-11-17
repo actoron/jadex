@@ -250,7 +250,6 @@ public class MTrigger
 	{
 		if(factaddeds==null)
 			this.factaddeds = new ArrayList<String>();
-		fact = fact.replace(".", MElement.CAPABILITY_SEPARATOR); // Hack as long as capability separator is /
 		factaddeds.add(fact);
 	}
 	
@@ -261,18 +260,16 @@ public class MTrigger
 	{
 		if(factremoveds==null)
 			this.factremoveds = new ArrayList<String>();
-		fact = fact.replace(".", MElement.CAPABILITY_SEPARATOR);
 		factremoveds.add(fact);
 	}
 	
 	/**
 	 *  Add a fact changed belief trigger. 
 	 */
-	public void addFactChangeds(String fact)
+	public void addFactChanged(String fact)
 	{
 		if(factchangeds==null)
 			this.factchangeds = new ArrayList<String>();
-		fact = fact.replace(".", MElement.CAPABILITY_SEPARATOR);
 		factchangeds.add(fact);
 	}
 	
