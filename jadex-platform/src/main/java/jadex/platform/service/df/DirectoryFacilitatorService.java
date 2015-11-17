@@ -82,7 +82,7 @@ public class DirectoryFacilitatorService	implements IDF
 		{
 			// Automatically throws exception, when key exists.
 			if(components.containsKey(clone.getName()))
-				throw new RuntimeException("Componentomponent already registered: "+cdesc.getName());
+				throw new RuntimeException("Component already registered: "+cdesc.getName());
 			components.add(clone.getName(), clone);
 //				System.out.println("registered: "+clone.getName());
 			
@@ -90,7 +90,7 @@ public class DirectoryFacilitatorService	implements IDF
 		}
 		else
 		{
-			ret.setException(new RuntimeException("Componentomponent not registered: "+clone.getName()));
+			ret.setException(new RuntimeException("Component not registered: "+clone.getName()));
 //			System.out.println("not registered: "+clone.getName());			
 		}
 		

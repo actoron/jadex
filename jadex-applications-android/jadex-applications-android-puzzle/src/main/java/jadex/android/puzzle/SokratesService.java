@@ -180,7 +180,7 @@ public class SokratesService extends JadexPlatformService
 		handler.post(runnable);
 	}
 
-	private synchronized IFuture<Void> createSokratesGame(boolean benchmark)
+	private synchronized IFuture<Void> createSokratesGame(final boolean benchmark)
 	{
 		if (!sokratesRunning)
 		{
@@ -197,8 +197,14 @@ public class SokratesService extends JadexPlatformService
 			new Thread() {
 				@Override
 				public void run() {
+					String agentXml;
+					if (benchmark) {
+						agentXml = "jadex/bdi/examples/puzzle/Benchmark.agent.xml";
+					} else {
+						agentXml = "jadex/bdi/examples/puzzle/Sokrates.agent.xml";
+					}
 					IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
-							"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci, new DefaultResultListener<Map<String,Object>>() {
+							agentXml, ci, new DefaultResultListener<Map<String,Object>>() {
 
 								@Override
 								public void resultAvailable(Map<String, Object> result) {

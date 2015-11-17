@@ -1,3 +1,4 @@
+<%@page contentType="text/html; charset=UTF-8" %>
 <%@page import="java.net.URL"%>
 <%@page import="jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager"%>
 <%@page import="jadex.bridge.service.types.awareness.AwarenessInfo"%>
@@ -5,8 +6,8 @@
 <jsp:include page="header.jsp">
 	<jsp:param name="title" value="Relay Transport - Live Platforms" />	
 </jsp:include>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ page import="jadex.base.relay.*" %>
 <%@ page import="java.util.*" %>
 <%
@@ -161,7 +162,7 @@ if(peers.length>0)
 if(markers.length()>0)
 {
 %>
-	<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%=markers%>"/>
+	<img class="map" src="https://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%=markers%>"/>
 <%
 }
 

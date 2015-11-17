@@ -5,7 +5,6 @@ import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -61,40 +60,12 @@ public class ShopService implements IShopService
 	 */
 	public IFuture<ItemInfo> buyItem(final String item, final double price)
 	{
-		final Future<ItemInfo> ret = new Future<ItemInfo>();
-		
 		IBDIXAgentFeature capa = comp.getComponentFeature(IBDIXAgentFeature.class);
 		
 		final IGoal sell = capa.getGoalbase().createGoal("sell");
 		sell.getParameter("name").setValue(item);
 		sell.getParameter("price").setValue(Double.valueOf(price));
-//		sell.addGoalListener(new IGoalListener()
-//		{
-//			public void goalFinished(AgentEvent ae)
-//			{
-//				if(sell.isSucceeded())
-//					ret.setResult((ItemInfo)sell.getParameter("result").getValue());
-//				else
-//					ret.setException(sell.getException());
-//			}
-//			
-//			public void goalAdded(AgentEvent ae)
-//			{
-//			}
-//		});
-		IFuture<Void> fut = capa.getGoalbase().dispatchTopLevelGoal(sell);
-		fut.addResultListener(new ExceptionDelegationResultListener<Void, ItemInfo>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				if(sell.isSucceeded())
-					ret.setResult((ItemInfo)sell.getParameter("result").getValue());
-				else
-					ret.setException(sell.getException());
-			}
-		});
-		
-		return ret;
+		return capa.getGoalbase().dispatchTopLevelGoal(sell);
 	}
 	
 	/**

@@ -13,6 +13,7 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.gui.GuiCreator;
 
@@ -77,7 +78,7 @@ public class PlayerPlayGameRoundPlan extends Plan
 			IMessageEvent draw_request = getEventbase().createReply(querybet, "request_draw");
 			draw_request.getParameter(SFipa.CONTENT).setValue(rd);	
 			// Hack!!! Use large timeout because other players might also draw cards.
-			IMessageEvent ans = sendMessageAndWait(draw_request, timeout*10);
+			IMessageEvent ans = sendMessageAndWait(draw_request, timeout!=Timeout.NONE?timeout*10:timeout);
 			Card[] cards = ((RequestDraw)((Done)ans.getParameter(SFipa.CONTENT).getValue()).getAction()).getCards();
 			me.setCards(cards);
 		}
@@ -90,7 +91,7 @@ public class PlayerPlayGameRoundPlan extends Plan
 		finished.getParameter(SFipa.CONTENT).setValue(rf);
 		// Hack!!! Use large timeout because other players might still draw cards.
 //		System.out.println("Sent: "+finished.getParameter(SFipa.CONTENT).getValue());
-		IMessageEvent resultmsg	= sendMessageAndWait(finished, timeout*10);
+		IMessageEvent resultmsg	= sendMessageAndWait(finished, timeout!=Timeout.NONE?timeout*10:timeout);
 //		System.out.println("Rec: "+resultmsg.getParameter(SFipa.CONTENT).getValue());
 
 		// When player has won the game, increment account.

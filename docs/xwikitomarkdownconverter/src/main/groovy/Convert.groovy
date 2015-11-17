@@ -21,7 +21,7 @@ class Convert {
 
     public static void main(String[] args) {
         def c = new Convert()
-        c.unzipAll(new File("xwiki").toPath())
+        c.convertAll(new File("xwiki").toPath())
     }
 
     def public Convert() {
@@ -34,7 +34,7 @@ class Convert {
 
     }
 
-    def public unzipAll(Path p) {
+    def public convertAll(Path p) {
         p.eachFile {Path f ->
             if (f.toFile().isFile() && f.fileName.toFile().name.endsWith(".xar") ) {
 //                println "found zipfile: ${f.fileName}"
@@ -279,7 +279,12 @@ class Convert {
     ]
 
     def mdReplacements = [
-            img: [
+            // fix image links like {![](interpreter.png})
+            imgError: [
+                   pattern: ~/\{!(\[[^\]]*\]).*\((.*)\}\)/,
+                   replacement: '!$1\\($2\\)'
+            ],
+            img: [ //to remove } at the end: sed 's/{\(.*\)(\(.*\)})/\1(\2)/g'
                     pattern: ~/!\[([^\]]*@.*.\w*)\]\(([^\]]*)@(\w*.\w*)\)/,
                     replacement: '!\\[$1\\]\\($3\\)'
                     ],

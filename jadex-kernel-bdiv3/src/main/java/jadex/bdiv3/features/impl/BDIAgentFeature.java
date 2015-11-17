@@ -1677,9 +1677,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		if(mplan==null)
 			throw new RuntimeException("Plan model not found for: "+plan);
 		
-		final RPlan rplan = RPlan.createRPlan(mplan, plan, null, getComponent(), null, null);
+		final RPlan rplan = RPlan.createRPlan(mplan, plan, new ChangeEvent(null, null, args, null), getComponent(), null, null);
 		rplan.addListener(new DelegationResultListener(ret));
-		rplan.setReason(new ChangeEvent(null, null, args, null));
 		RPlan.executePlan(rplan, getComponent());
 		return ret;
 	}
@@ -2300,19 +2299,26 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					if(parent instanceof ReflectNode)
 					{
 						ReflectNode	ref	= (ReflectNode)parent;
-						if(ref.getType()==ReflectNode.METHOD)
+						if(ref.getType()==ReflectNode.METHOD && ref.jjtGetChild(1).jjtGetNumChildren()==1)
 						{
-							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
-							if("getGoals".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							try
 							{
-								String	name	= (String)arg.getConstantValue();
-								addEvent(events, new EventType(ChangeEvent.GOALACTIVE, name));
-								addEvent(events, new EventType(ChangeEvent.GOALADOPTED, name));
-								addEvent(events, new EventType(ChangeEvent.GOALDROPPED, name));
-								addEvent(events, new EventType(ChangeEvent.GOALINPROCESS, name));
-								addEvent(events, new EventType(ChangeEvent.GOALNOTINPROCESS, name));
-								addEvent(events, new EventType(ChangeEvent.GOALOPTION, name));
-								addEvent(events, new EventType(ChangeEvent.GOALSUSPENDED, name));
+								ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+								if("getGoals".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+								{
+									String	name	= (String)arg.getConstantValue();
+									addEvent(events, new EventType(ChangeEvent.GOALACTIVE, name));
+									addEvent(events, new EventType(ChangeEvent.GOALADOPTED, name));
+									addEvent(events, new EventType(ChangeEvent.GOALDROPPED, name));
+									addEvent(events, new EventType(ChangeEvent.GOALINPROCESS, name));
+									addEvent(events, new EventType(ChangeEvent.GOALNOTINPROCESS, name));
+									addEvent(events, new EventType(ChangeEvent.GOALOPTION, name));
+									addEvent(events, new EventType(ChangeEvent.GOALSUSPENDED, name));
+								}
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
 							}
 						}
 					}
@@ -2333,7 +2339,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 							addEvent(events, new EventType(ChangeEvent.VALUEREMOVED, owner.getName(), ref.getText()));
 						}
 						
-						else if(ref.getType()==ReflectNode.METHOD)
+						else if(ref.getType()==ReflectNode.METHOD && ref.jjtGetChild(1).jjtGetNumChildren()==1)
 						{
 							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
 							if("getParameter".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)

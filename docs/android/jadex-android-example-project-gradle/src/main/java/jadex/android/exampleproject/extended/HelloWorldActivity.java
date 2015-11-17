@@ -173,20 +173,15 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 				if (isJadexPlatformRunning())
 				{
 					startPlatformButton.setEnabled(false);
-					Thread thread = new Thread() {
-						public void run() {
-							myService.stopPlatforms();
-							runOnUiThread(new Runnable()
-							{
-								public void run()
-								{
-									refreshButtons();
-									startPlatformButton.setEnabled(true);
-								}
-							});
-						};
-					};
-					thread.start();
+					myService.stopPlatforms();
+					runOnUiThread(new Runnable()
+					{
+						public void run()
+						{
+							refreshButtons();
+							startPlatformButton.setEnabled(true);
+						}
+					});
 				} else
 				{
 					startPlatformButton.setEnabled(false);

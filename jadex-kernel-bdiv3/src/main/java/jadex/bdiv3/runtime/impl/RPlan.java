@@ -221,9 +221,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			}
 		}
 		
-		final RPlan rplan = new RPlan(mplan, candidate, ia, mappingvals, config); //mappingvals==null? new RPlan(mplan, candidate, ia): 
+		final RPlan rplan = new RPlan(mplan, candidate, reason, ia, mappingvals, config); //mappingvals==null? new RPlan(mplan, candidate, ia): 
 //		rplan.setInternalAccess(ia);
-		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);
 		
 		MBody mbody = mplan.getBody();
@@ -433,12 +432,25 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 *  Create a new plan.
 	 */
-	public RPlan(MPlan mplan, Object candidate, IInternalAccess agent, Map<String, Object> mappingvals, MConfigParameterElement config)
+	public RPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess agent, Map<String, Object> mappingvals, MConfigParameterElement config)
 	{
 		super(mplan, agent, mappingvals, config);
 		this.candidate = candidate;
+		this.reason = reason;
 		setLifecycleState(PlanLifecycleState.NEW);
 		setProcessingState(PlanProcessingState.READY);
+		
+		// Tricky, requires reason to be set before initing parameters.
+		super.initParameters(mappingvals, config);
+	}
+	
+	/**
+	 *  Create the parameters from model spec.
+	 */
+	@Override
+	public void initParameters(Map<String, Object> vals, MConfigParameterElement config)
+	{
+		// do nothing in super constructor init 
 	}
 	
 	/**
@@ -616,15 +628,6 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public Object getReason()
 	{
 		return reason;
-	}
-
-	/**
-	 *  Set the reason.
-	 *  @param reason The reason to set.
-	 */
-	public void setReason(Object reason)
-	{
-		this.reason = reason;
 	}
 
 	/**

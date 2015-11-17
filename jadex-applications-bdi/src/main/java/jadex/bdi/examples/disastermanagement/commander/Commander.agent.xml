@@ -64,7 +64,7 @@
 		
 		<achievegoal name="clear_chemicals" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="Object"/>
+			<parameterset name="units" class="Object" direction="inout"/>
 			<deliberation>
 				<inhibits ref="treat_victims">
 					$goal.disaster==$ref.disaster
@@ -75,13 +75,13 @@
 		
 		<achievegoal name="extinguish_fires" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="Object"/>
+			<parameterset name="units" class="Object" direction="inout"/>
 			<targetcondition>$goal.disaster.getProperty("fire")==0</targetcondition>
 		</achievegoal>
 		
 		<achievegoal name="treat_victims" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="Object"/>
+			<parameterset name="units" class="Object" direction="inout"/>
 			<targetcondition>$goal.disaster.getProperty("victims")==0</targetcondition>
 		</achievegoal>
 		
@@ -110,7 +110,7 @@
 				<goalmapping ref="clear_chemicals.disaster"/>
 			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
-				<goalmapping ref="handle_disaster.units"/>
+				<goalmapping ref="clear_chemicals.units"/>
 			</parameterset>
 			<body class="HandleFireBrigadesClearChemicalsPlan"/>
 			<trigger>
@@ -123,7 +123,7 @@
 				<goalmapping ref="extinguish_fire.disaster"/>
 			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
-				<goalmapping ref="handle_disaster.units"/>
+				<goalmapping ref="extinguish_fires.units"/>
 			</parameterset>
 			<body class="HandleFireBrigadesExtinguishFiresPlan"/>
 			<trigger>
@@ -133,10 +133,10 @@
 		
 		<plan name="treat_victims_plan">
 			<parameter name="disaster" class="ISpaceObject">
-				<goalmapping ref="extinguish_fire.disaster"/>
+				<goalmapping ref="treat_victims.disaster"/>
 			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
-				<goalmapping ref="handle_disaster.units"/>
+				<goalmapping ref="treat_victims.units"/>
 			</parameterset>
 			<body class="HandleAmbulancesPlan"/>
 			<trigger>

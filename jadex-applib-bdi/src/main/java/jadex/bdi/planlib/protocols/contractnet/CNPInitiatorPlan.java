@@ -544,7 +544,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 
 		if(nr.getProposals().length==0 || (executeall && nr.getProposals().length!=acceptables.length))
 		{
-			getLogger().info(getComponentName()+" (I)CNPPlan failed: ");//+convid);
+			getLogger().info("(I)CNPPlan failed: ");//+convid);
 			fail();
 		}
 	}

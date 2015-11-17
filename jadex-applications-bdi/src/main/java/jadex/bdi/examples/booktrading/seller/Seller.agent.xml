@@ -58,11 +58,11 @@
 		<achievegoal name="sell_book" recur="true" recurdelay="10000000">
 			<parameter name="order" class="Order">
 			    <bindingoptions>
-			        select Order $order from $beliefbase.orders where $order.getState()==Order.OPEN
+			        select Order $order from $beliefbase.initial_orders where $order.getState()==Order.OPEN
 			    </bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition beliefs="orders">
+			<creationcondition beliefs="initial_orders">
 				true
 			</creationcondition>
 			<dropcondition>
@@ -79,14 +79,6 @@
 		
 		<achievegoalref name="cnp_execute_task">
 			<concrete ref="procap.cnp_execute_task"/>
-		</achievegoalref>
-		
-		<achievegoalref name="df_register">
-			<concrete ref="dfcap.df_register"/>
-		</achievegoalref>
-		
-		<achievegoalref name="df_deregister">
-			<concrete ref="dfcap.df_deregister"/>
 		</achievegoalref>
 	</goals>
 
@@ -177,7 +169,7 @@
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
 								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 								.createDFServiceDescription("sell", "service_seller", "UniHH"),
 								20000)

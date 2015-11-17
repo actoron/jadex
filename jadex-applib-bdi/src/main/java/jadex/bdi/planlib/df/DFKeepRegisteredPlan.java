@@ -23,16 +23,12 @@ public class DFKeepRegisteredPlan	extends Plan
 		}
 		
 		IDF	df = SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		do
+		df.register(desc).get();
+		while(lease!=-1)
 		{
-			df.register(desc).get();
-			
-			if(lease!=-1)
-			{
-				waitFor((long)(lease*0.8));
-				desc.setLeaseTime(new Date(getTime()+lease));
-			}
+			waitFor((long)(lease*0.8));
+			desc.setLeaseTime(new Date(getTime()+lease));
+			df.modify(desc).get();
 		}
-		while(lease!=-1);
 	}
 }

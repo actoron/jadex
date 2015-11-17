@@ -51,9 +51,10 @@ public class DebugException extends RuntimeException
 	
 	public synchronized Throwable fillInStackTrace()
 	{
+		Throwable throwable = super.fillInStackTrace();
 		StringWriter	sw	= new StringWriter();
 		printStackTrace(new PrintWriter(sw));
 		stacktrace	= sw.toString();
-		return super.fillInStackTrace();
+		return throwable;
 	}
 }

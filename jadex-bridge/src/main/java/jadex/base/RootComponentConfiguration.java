@@ -3,7 +3,9 @@ package jadex.base;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -173,7 +175,7 @@ public class RootComponentConfiguration
 	public static final String ADDRESS = "address"; // class: boolean default: true
 	/** Flag if dht storage ring should be provided. **/
 	public static final String DHT_PROVIDE = PlatformConfiguration.DHT_PROVIDE; // class: boolean default: false
-	
+
 	/**
 	 * Kernel names enum.
 	 */
@@ -195,7 +197,8 @@ public class RootComponentConfiguration
 		multicast,
 		message,
 		relay,
-		local
+		local,
+//		bluetooth
 	}
 
 	/** All configured parameters as map. **/
@@ -742,6 +745,18 @@ public class RootComponentConfiguration
 		return kernels;
 	}
 
+	/**
+	 * @param value
+	 */
+	public void setKernels(String... value) {
+		List<KERNEL> kernelList = new ArrayList<KERNEL>();
+		for (String kernel : value)
+		{
+			kernelList.add(KERNEL.valueOf(kernel));
+		}
+		setKernels(kernelList.toArray(new KERNEL[kernelList.size()]));
+	}
+
 	public void setKernels(KERNEL... value)
 	{
 		kernels = value;
@@ -927,5 +942,16 @@ public class RootComponentConfiguration
 		setValue(DHT_PROVIDE, value);
 	}
 
+
+	/**
+	 * Enhance this config with given other config.
+	 * Will overwrite all values that are set in the other config.
+	 * @param other
+	 */
+	public void enhanceWith(RootComponentConfiguration other) {
+		for (Map.Entry<String, Object> entry : other.rootargs.entrySet()) {
+			this.setValue(entry.getKey(), entry.getValue());
+		}
+	}
 
 }

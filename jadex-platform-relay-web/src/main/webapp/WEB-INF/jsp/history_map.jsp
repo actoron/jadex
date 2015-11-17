@@ -1,10 +1,11 @@
+<%@page contentType="text/html; charset=UTF-8" %>
 <%@ page session="false"%>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.net.InetAddress"%>
 <%@ page import="jadex.base.relay.*" %>
 <%@ page import="java.util.*" %>
 
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -13,8 +14,8 @@
 <link rel="shortcut icon" type="image/ico" href="resources/jadex_icon.ico" />
 <link rel="stylesheet" type="text/css" href="resources/colibri.css" media="all" />
 
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
-<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="stylesheet" href="resources/markercluster/MarkerCluster.css" />
 <link rel="stylesheet" href="resources/markercluster/MarkerCluster.Default.css" />
@@ -74,7 +75,7 @@ if(infos.length>0)
 			var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v3/examples.map-qfyrx5r8/{z}/{x}/{y}.png', {
 					minZoom: 0,
 					maxZoom: 19,
-					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery Â© <a href="http://mapbox.com">Mapbox</a>'
 				}),
 				latlng = L.latLng(53.550556, 9.993333);
 	

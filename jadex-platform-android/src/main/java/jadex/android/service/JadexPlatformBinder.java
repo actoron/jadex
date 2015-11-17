@@ -25,7 +25,7 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 	@Override
 	public IFuture<IExternalAccess> startJadexPlatform()
 	{
-		return service.startJadexPlatform(service.getPlatformKernels());
+		return service.startJadexPlatform(service.getPlatformConfiguration());
 	}
 
 	public void shutdownJadexPlatform()

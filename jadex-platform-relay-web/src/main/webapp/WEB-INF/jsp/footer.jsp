@@ -1,3 +1,4 @@
+<%@page contentType="text/html; charset=UTF-8" %>
 <%@page session="false"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -91,9 +92,11 @@
 				</DIV>
 			</DIV>
 			<P style="text-align: center; color: black;">
-				Copyright (C) 2002-<%= new SimpleDateFormat("yyyy").format(new Date()) %> Lars Braubach, Alexander Pokahr, Kai Jander</br>
+				Copyright (C) 2002-<%= new SimpleDateFormat("yyyy").format(new Date()) %> Lars Braubach, Alexander Pokahr, Kai Jander<br>
 				Version <%= VersionInfo.getInstance().getVersion()+" from "+VersionInfo.getInstance().getNumberDateString() %>
 			</P>
+		</DIV>
+	</DIV>
 		</DIV>
 	</DIV>
  </BODY>

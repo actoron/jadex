@@ -14,8 +14,8 @@ public class ControlCenterDemoActivity extends JadexAndroidActivity
 	public ControlCenterDemoActivity()
 	{
 		setPlatformAutostart(true);
-		setPlatformKernels(JadexPlatformOptions.DEFAULT_KERNELS);
-		setPlatformOptions("-awareness true");
+//		setPlatformKernels(JadexPlatformOptions.DEFAULT_KERNELS);
+		getPlatformConfiguration().getRootConfig().setAwareness(true);
 	}
 	
 	@Override

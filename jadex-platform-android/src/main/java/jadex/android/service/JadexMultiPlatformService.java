@@ -13,6 +13,8 @@ import jadex.android.AndroidContextManager;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -150,27 +152,38 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		return jadexPlatformManager.getService(platformId, serviceClazz, scope);
 	}
 
-	public final IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
-	{
-		return startJadexPlatform(kernels, jadexPlatformManager.getRandomPlatformName());
+	@Override
+	public IFuture<IExternalAccess> startJadexPlatform(RootComponentConfiguration.KERNEL[] kernels) {
+		PlatformConfiguration config = PlatformConfiguration.getDefault();
+		config.getRootConfig().setKernels(kernels);
+		return startJadexPlatform(config);
 	}
 
-	public final IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
-	{
-		return startJadexPlatform(kernels, platformId, null);
+	@Override
+	public IFuture<IExternalAccess> startJadexPlatform(RootComponentConfiguration.KERNEL[] kernels, String platformId) {
+		PlatformConfiguration config = PlatformConfiguration.getDefault();
+		config.getRootConfig().setKernels(kernels);
+		config.setPlatformName(platformId);
+		return startJadexPlatform(config);
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
+	public IFuture<IExternalAccess> startJadexPlatform() {
+		return startJadexPlatform(PlatformConfiguration.getAndroidDefault());
+	}
+
+	public IFuture<IExternalAccess> startJadexPlatform(PlatformConfiguration config)
 	{
 		onPlatformStarting();
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
-		IFuture<IExternalAccess> internalFut;
+		IFuture<IExternalAccess> internalFut = null;
 		if (useSharedPlatform) {
 			Logger.i("Using shared Platform - options will be ignored!");
-			internalFut = jadexPlatformManager.startSharedJadexPlatform();
+			Logger.e("Shared platform not supported in Jadex 3.0!");
+			System.exit(1);
+//			internalFut = jadexPlatformManager.startSharedJadexPlatform();
 		} else {
-			internalFut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
+			internalFut = jadexPlatformManager.startJadexPlatform(config);
 		}
 		
 		internalFut.addResultListener(new DefaultResultListener<IExternalAccess>() {

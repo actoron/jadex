@@ -2,6 +2,8 @@ package jadex.bridge.service.types.platform;
 
 import java.util.Map;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -29,7 +31,7 @@ public interface IJadexMultiPlatformBinder
 	/**
 	 * Checks whether a jadex platform is running.
 	 * 
-	 * @param the IComponenntIdentifier of the platform to check.
+	 * @param platformID the IComponenntIdentifier of the platform to check.
 	 * @return true, when runnning, else false.
 	 */
 	public boolean isPlatformRunning(IComponentIdentifier platformID);
@@ -98,7 +100,7 @@ public interface IJadexMultiPlatformBinder
 	 * 
 	 * @return IFuture<IExternalAccess> The external platform access
 	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels);
+	public IFuture<IExternalAccess> startJadexPlatform(final RootComponentConfiguration.KERNEL[] kernels);
 
 	/**
 	 * Starts a Jadex Platform.
@@ -110,24 +112,25 @@ public interface IJadexMultiPlatformBinder
 	 *            Identifier of the new platform
 	 * @return IFuture<IExternalAccess> The external platform access
 	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId);
+	public IFuture<IExternalAccess> startJadexPlatform(final RootComponentConfiguration.KERNEL[] kernels, final String platformId);
+
+	/**
+	 * Starts a Jadex Platform with default configuration
+	 *
+	 * @return IFuture<IExternalAccess> The external platform access
+	 */
+	public IFuture<IExternalAccess> startJadexPlatform();
 
 	/**
 	 * Starts a Jadex Platform.
 	 * 
-	 * @param kernels
-	 *            String array of kernel Identifiers (see constants in
-	 *            {@link JadexPlatformManager}).
-	 * 
-	 * @param platformId
-	 *            Identifier of the new platform
-	 * @param options
+	 * @param config
 	 *            additional options that are passed directly to the platform
 	 *            starter.
 	 * 
 	 * @return IFuture<IExternalAccess> The external platform access
 	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options);
+	public IFuture<IExternalAccess> startJadexPlatform(final PlatformConfiguration config);
 
 	/**
 	 * Terminates all running jadex platforms.
@@ -211,7 +214,7 @@ public interface IJadexMultiPlatformBinder
 	 *            Identifier of the jadex platform
 	 * @param name
 	 *            name of the newly created agent
-	 * @param modelPath
+	 * @param clazz
 	 *            Path to the bpmn model file of the new agent
 	 * @return ComponentIdentifier of the created agent.
 	 */

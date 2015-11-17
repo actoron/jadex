@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -285,6 +286,26 @@ public class RelayServlet extends HttpServlet
         	{
         		response.setContentType(mimetype);
         	}
+        	else	// see e.g. https://github.com/bertramdev/karman/issues/3
+        	{
+//                css: 'text/css',
+//                gz: 'application/x-compressed',
+//                js: 'application/javascript',
+//                pdf: 'application/pdf',
+//                eot: 'application/vnd.ms-fontobject',
+//                otf: 'font/opentype',
+//                svg: 'image/svg+xml',
+//                ttf: 'application/x-font-ttf',
+//                woff: 'application/x-font-woff'
+        		if(file.getName().toLowerCase().endsWith(".css"))
+        		{
+        			response.setContentType("text/css");
+        		}
+        		else if(file.getName().toLowerCase().endsWith(".js"))
+            	{
+            		response.setContentType("application/javascript");
+            	}
+        	}
         	
 			// Copy file content to output stream.
         	FileInputStream	in	= null;
@@ -338,7 +359,7 @@ public class RelayServlet extends HttpServlet
 		// Use scale=2 for larger pictures in spite of 640 pixel limitS
 		int	width	= Integer.valueOf(request.getParameter("width"))/2;
 		int	height	= Integer.valueOf(request.getParameter("height"))/2;
-		String	url	= "http://maps.googleapis.com/maps/api/staticmap?scale=2&size="+width+"x"+height+"&sensor=false"+markers;
+		String	url	= "https://maps.googleapis.com/maps/api/staticmap?scale=2&size="+width+"x"+height+"&sensor=false"+markers;
 		
 		// Copy content to output stream. (against google policies?)
 //		HttpURLConnection	con	= (HttpURLConnection)new URL(url).openConnection();

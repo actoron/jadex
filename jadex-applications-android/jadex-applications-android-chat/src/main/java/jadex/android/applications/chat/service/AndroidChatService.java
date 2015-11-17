@@ -6,6 +6,8 @@ import jadex.android.applications.chat.model.UserModel;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.exception.JadexAndroidException;
 import jadex.android.service.JadexPlatformService;
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -99,16 +101,33 @@ public class AndroidChatService extends JadexPlatformService
 
 		setPlatformAutostart(true);
 		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
-		setPlatformOptions(
-			"-awareness true " +
-			"-chat true " +
-			"-log false " +
-			"-niotcptransport false " +
-			"-networkname \"jadexnetwork\" " +
-			"-networkpass \"laxlax\" " + 
-			"-bluetoothtransport true " + 
-			"-awamechanisms \"Broadcast, Multicast, Message, Relay, Local, Bluetooth\"");
+		PlatformConfiguration config = PlatformConfiguration.getMinimalRelayAwareness();
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+		rootConfig.setChat(true);
+		rootConfig.setLogging(false);
+		rootConfig.setNioTcpTransport(false);
+		rootConfig.setNetworkName("jadexnetwork");
+		rootConfig.setNetworkPass("laxlax");
+		rootConfig.setAwaMechanisms(
+				RootComponentConfiguration.AWAMECHANISM.broadcast,
+				RootComponentConfiguration.AWAMECHANISM.multicast,
+				RootComponentConfiguration.AWAMECHANISM.message,
+				RootComponentConfiguration.AWAMECHANISM.relay,
+				RootComponentConfiguration.AWAMECHANISM.local
+//				RootComponentConfiguration.AWAMECHANISM.bluetooth)
+		);
 
+//		setPlatformOptions(
+//				"-awareness true " +
+//						"-chat true " +
+//						"-log false " +
+//						"-niotcptransport false " +
+//						"-networkname \"jadexnetwork\" " +
+//						"-networkpass \"laxlax\" " +
+//						"-bluetoothtransport true " +
+//						"-awamechanisms \"Broadcast, Multicast, Message, Relay, Local, Bluetooth\"");
+
+		setPlatformConfiguration(config);
 		uiHandler = new Handler();
 	}
 

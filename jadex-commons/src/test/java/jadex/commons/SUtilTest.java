@@ -46,7 +46,8 @@ public class SUtilTest //extends TestCase
 		}
 
 		System.out.println(src.getAbsolutePath());
-		File	dest	= new File("temp", "test.jar");
+		File dest = File.createTempFile("jadextemp", ".jar");
+//		File	dest	= new File("temp", "test.jar");
 //		System.out.println("zipping: "+dest.getAbsolutePath());
 		dest.getParentFile().mkdirs();
 		

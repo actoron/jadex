@@ -1,16 +1,19 @@
 package jadex.bdi.examples.blackjack.player;
 
+import java.util.Random;
+
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.fipa.DFServiceDescription;
+import jadex.bridge.fipa.SearchConstraints;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
-
-import java.util.Random;
 
 /**
  *
@@ -28,16 +31,10 @@ public class PlayerSearchDealerPlan extends Plan
 		//System.out.println("Searching dealer...");
 		// Create a service description to search for.
 		IDF df = (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IDFServiceDescription sd = df.createDFServiceDescription(null, "blackjack", null);
-		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
-		ISearchConstraints sc = df.createSearchConstraints(-1, 0);
-		
-		// Use a subgoal to search for a dealer-agent
-		IGoal ft = createGoal("df_search");
-		ft.getParameter("description").setValue(ad);
-		ft.getParameter("constraints").setValue(sc);
-		dispatchSubgoalAndWait(ft);
-		IDFComponentDescription[]	result	= (IDFComponentDescription[])ft.getParameterSet("result").getValues();
+		IDFServiceDescription sd = new DFServiceDescription(null, "blackjack", null);
+		IDFComponentDescription ad = new DFComponentDescription(null, sd);
+		ISearchConstraints sc = new SearchConstraints(-1, 0);
+		IDFComponentDescription[]	result	= df.search(ad, sc).get();
 
 		if(result==null || result.length==0)
 		{

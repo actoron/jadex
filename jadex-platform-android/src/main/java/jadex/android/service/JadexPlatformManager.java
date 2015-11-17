@@ -29,7 +29,9 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -41,18 +43,6 @@ import android.util.Log;
  */
 public class JadexPlatformManager implements IJadexPlatformManager
 {
-	public static final String DEFAULT_OPTIONS = "-logging_level java.util.logging.Level.INFO" 
-			+ " -extensions null" 
-			//+ " -awareness false"
-			+ " -wspublish false" + " -rspublish false" + " -android true" + " -binarymessages true"
-			+ " -conf jadex.platform.PlatformAgent" +
-			// " -tcptransport false" +
-			// " -niotcptransport false" +
-			// " -relaytransport true" +
-			// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
-			// +
-			" -autoshutdown false" + " -saveonexit true" + " -gui false" + " -chat false"; // + " -debugfutures true";
-	
 	private PlatformConfiguration defaultConfiguration;
 	
 	// --------- attributes -----------
@@ -248,36 +238,30 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	}
 	
 	
-	public IFuture<IExternalAccess> startSharedJadexPlatform() {
-		final Future<IExternalAccess> result = new Future<IExternalAccess>();
-		
-		if (sharedPlatformAccess != null) {
-			Logger.i("Found running platform - using it.");
-			result.setResult(sharedPlatformAccess);
-		} else {
-			Logger.i("Starting up new shared platform.");
-			startJadexPlatform(ALL_KERNELS, getRandomPlatformName(), DEFAULT_OPTIONS).addResultListener(new DefaultResultListener<IExternalAccess>()
-			{
-				@Override
-				public void resultAvailable(IExternalAccess ea)
-				{
-					sharedPlatformAccess = ea;
-					result.setResult(sharedPlatformAccess);
-				}
-			});
-		}
-		
-		return result;
-		
-	}
+//	public IFuture<IExternalAccess> startSharedJadexPlatform() {
+//		final Future<IExternalAccess> result = new Future<IExternalAccess>();
+//
+//		if (sharedPlatformAccess != null) {
+//			Logger.i("Found running platform - using it.");
+//			result.setResult(sharedPlatformAccess);
+//		} else {
+//			Logger.i("Starting up new shared platform.");
+//			startJadexPlatform(ALL_KERNELS, getRandomPlatformName(), PlatformConfiguration.getAndroidDefault()).addResultListener(new DefaultResultListener<IExternalAccess>()
+//			{
+//				@Override
+//				public void resultAvailable(IExternalAccess ea)
+//				{
+//					sharedPlatformAccess = ea;
+//					result.setResult(sharedPlatformAccess);
+//				}
+//			});
+//		}
+//
+//		return result;
+//
+//	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformName, final String options)
-	{
-		return startJadexPlatform(kernels, platformName, options, true);
-	}
-
-	public synchronized IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformName, final String options,
-			final boolean chat)
+	public synchronized IFuture<IExternalAccess> startJadexPlatform(final PlatformConfiguration config)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		new Thread(new Runnable()
@@ -285,24 +269,27 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			public void run()
 			{
 
-				checkKernels(kernels);
+				checkKernels(config.getRootConfig().getKernels());
 
-				final StringBuffer kernelString = new StringBuffer("\"");
-				String sep = "";
-				for (int i = 0; i < kernels.length; i++)
-				{
-					kernelString.append(sep);
-					kernelString.append(kernels[i]);
-					sep = ",";
+//				final String usedOptions = DEFAULT_OPTIONS + " -kernels " + kernelString.toString() + " -platformname "
+//						+ (platformName != null ? platformName : getRandomPlatformName()) + (options == null ? "" : " " + options);
+
+				if (config.getPlatformName() == null) {
+					config.setPlatformName(getRandomPlatformName());
 				}
-				kernelString.append("\"");
 
-				Logger.i("Used kernels: " + kernelString.toString());
+//				List<RootComponentConfiguration.KERNEL> kernelList = new ArrayList<RootComponentConfiguration.KERNEL>();
+//				if (kernels != null) {
+//					for (int i =0; i < kernels.length; i++) {
+//						RootComponentConfiguration.KERNEL kernel = RootComponentConfiguration.KERNEL.valueOf(kernels[i]);
+//						kernelList.add(kernel);
+//					}
+//					config.getRootConfig().setKernels(kernelList.toArray(new RootComponentConfiguration.KERNEL[kernelList.size()]));
+//				}
 
-				final String usedOptions = DEFAULT_OPTIONS + " -kernels " + kernelString.toString() + " -platformname "
-						+ (platformName != null ? platformName : getRandomPlatformName()) + (options == null ? "" : " " + options);
+				Logger.i("Used kernels: " + Arrays.toString(config.getRootConfig().getKernels()));
 
-				IFuture<IExternalAccess> future = createPlatformWithClassloader((usedOptions).split("\\s+"), this.getClass().getClassLoader());
+				IFuture<IExternalAccess> future = createPlatformWithClassloader(config, this.getClass().getClassLoader());
 				Logger.d("Waiting for platform startup...");
 				
 				future.addResultListener(new IResultListener<IExternalAccess>()
@@ -354,13 +341,12 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		return ret;
 	}
 
-	private void checkKernels(String[] kernels) {
+	private void checkKernels(RootComponentConfiguration.KERNEL[] kernels) {
 		// make sure default kernels all exist in classpath
 		ArrayList<String> kernelList = new ArrayList<String>();
 		ClassLoader myCL = getClass().getClassLoader();
 
-		for (String kernel : kernels) {
-			RootComponentConfiguration.KERNEL k = RootComponentConfiguration.KERNEL.valueOf(kernel);
+		for (RootComponentConfiguration.KERNEL k : kernels) {
 			String className = kernelClassNames.get(k);
 			boolean found = false;
 			if (className != null) {
@@ -370,20 +356,21 @@ public class JadexPlatformManager implements IJadexPlatformManager
 				}
 			}
 			if (!found) {
-				throw new JadexAndroidError("Could not find factory for requested kernel: " + kernel);
+				throw new JadexAndroidError("Could not find factory for requested kernel: " + k);
 			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	protected static IFuture<IExternalAccess> createPlatformWithClassloader(String[] options, ClassLoader cl)
+	protected static IFuture<IExternalAccess> createPlatformWithClassloader(PlatformConfiguration config, ClassLoader cl)
 	{
 		try
 		{
+//			System.out.println(config);
 			Class<?> starter = cl.loadClass("jadex.base.Starter");
-			Method createPlatform = starter.getMethod("createPlatform", String[].class); // =
+			Method createPlatform = starter.getMethod("createPlatform", PlatformConfiguration.class); // =
 																							// Starter.createPlatform();
-			return (IFuture<IExternalAccess>) createPlatform.invoke(null, (Object) options);
+			return (IFuture<IExternalAccess>) createPlatform.invoke(null, (Object) config);
 		}
 		catch (Exception e)
 		{

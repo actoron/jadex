@@ -38,16 +38,16 @@
 	<plans>
 		<plan name="buyplan">
 			<parameter name="shop" class="IShopService">
-				<goalmapping ref="sell.shop"/>
+				<goalmapping ref="buy.shop"/>
 			</parameter>
 			<parameter name="name" class="String">
-				<goalmapping ref="sell.name"/>
+				<goalmapping ref="buy.name"/>
 			</parameter>
 			<parameter name="price" class="double">
-				<goalmapping ref="sell.price"/>
+				<goalmapping ref="buy.price"/>
 			</parameter>
 			<parameter name="result" class="Object" direction="out">
-				<goalmapping ref="sell.result"/>
+				<goalmapping ref="buy.result"/>
 			</parameter>
 			<body class="BuyItemPlan"></body>
 			<trigger>

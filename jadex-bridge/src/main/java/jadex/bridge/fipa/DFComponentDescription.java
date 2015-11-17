@@ -3,6 +3,7 @@ package jadex.bridge.fipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.types.df.IProperty;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -84,6 +85,22 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 		if(ontologies != null)
 			for(int i = 0; i < ontologies.length; i++)
 				this.addOntology(ontologies[i]);
+	}
+
+	/**
+	 *  Convenience constructor for searching/registering.
+	 */
+	public DFComponentDescription(IComponentIdentifier name, IDFServiceDescription service)
+	{
+		this(name, new IDFServiceDescription[]{service}, null, null, null, null);
+	}
+
+	/**
+	 *  Convenience constructor for searching/registering.
+	 */
+	public DFComponentDescription(IComponentIdentifier name, IDFServiceDescription service, Date leasetime)
+	{
+		this(name, new IDFServiceDescription[]{service}, null, null, null, leasetime);
 	}
 
 	//-------- accessor methods --------

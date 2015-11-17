@@ -1,5 +1,7 @@
 package jadex.bdi.examples.booktrading.buyer;
 
+import java.util.Date;
+
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
 import jadex.bdi.planlib.protocols.NegotiationRecord;
@@ -8,12 +10,12 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
-
-import java.util.Date;
 
 /**
  * The plan tries to purchase a book.
@@ -41,13 +43,9 @@ public class PurchaseBookPlan extends Plan
 		// Find available seller agents.
 //		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get();
 		IDF	df	= (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("dfservice").get();
-		IDFServiceDescription	service	= df.createDFServiceDescription(null, "service_seller", null);
-		IDFComponentDescription	desc	= df.createDFComponentDescription(null, service);
-		IGoal df_search = createGoal("df_search");
-		df_search.getParameter("description").setValue(desc);
-		dispatchSubgoalAndWait(df_search);
-		IDFComponentDescription[] result = (IDFComponentDescription[])df_search
-			.getParameterSet("result").getValues();
+		IDFServiceDescription	service	= new DFServiceDescription(null, "service_seller", null);
+		IDFComponentDescription	desc	= new DFComponentDescription(null, service);
+		IDFComponentDescription[] result = df.search(desc, null).get();
 		if(result.length == 0)
 		{
 //			System.out.println("No seller found, purchase failed.");

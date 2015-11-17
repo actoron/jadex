@@ -4,6 +4,7 @@ import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -33,17 +34,15 @@ import android.os.IBinder;
 public class JadexPlatformService extends JadexMultiPlatformService implements JadexPlatformOptions, IJadexPlatformBinder
 {
 	
-	private String[] platformKernels;
-	private String platformOptions;
+	private PlatformConfiguration platformConfiguration;
 	private boolean platformAutostart;
-	private String platformName;
 
 	private IComponentIdentifier platformId;
 
 	public JadexPlatformService()
 	{
 		jadexPlatformManager = JadexPlatformManager.getInstance();
-		platformKernels = DEFAULT_KERNELS;
+		platformConfiguration = PlatformConfiguration.getAndroidDefault();
 	}
 
 	@Override
@@ -86,50 +85,56 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		}
 	}
 	
-	
-	/**
-	 * Gets the Kernels.
-	 * See {@link JadexPlatformManager} constants for available Kernels.
-	 * @return String[] of kernels.
-	 */
-	protected String[] getPlatformKernels()
-	{
-		return platformKernels;
-	}
-
 	/**
 	 * Sets the Kernels.
 	 * See {@link JadexPlatformManager} constants for available Kernels.
 	 * @param kernels
 	 */
 	protected void setPlatformKernels(String ... kernels) {
-		this.platformKernels = kernels;
+		this.platformConfiguration.getRootConfig().setKernels(kernels);
 	}
 	
 	/**
 	 * Returns the platform options of newly created platforms.
 	 * @return String[] of options
 	 */
-	protected String getPlatformOptions()
-	{
-		return platformOptions;
-	}
+//	protected String getPlatformOptions()
+//	{
+//		return platformConfiguration.getRootConfig().;
+//	}
 
 	/**
 	 * Sets platform options.
 	 * @param options
+	 * @deprecated use setPlatformConfiguration
 	 */
 	protected void setPlatformOptions(String options) {
-		this.platformOptions = options;
+		this.platformConfiguration.enhanceWith(PlatformConfiguration.processArgs(options));
 	}
-	
+
+	/**
+	 * Sets platform configuration.
+	 * @param config
+	 */
+	protected void setPlatformConfiguration(PlatformConfiguration config) {
+		this.platformConfiguration = config;
+	}
+
+	/**
+	 * Get the platform configuration
+	 * @return
+	 */
+	protected PlatformConfiguration getPlatformConfiguration() {
+		return platformConfiguration;
+	}
+
 	/**
 	 * Returns the name which is used to create the next jadex platform.
 	 * @return {@link String} name
 	 */
 	public String getPlatformName()
 	{
-		return platformName;
+		return platformConfiguration.getPlatformName();
 	}
 	
 	/**
@@ -151,13 +156,13 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	 * @param name
 	 */
 	protected void setPlatformName(String name) {
-		this.platformName = name;
+		this.platformConfiguration.setPlatformName(name);
 	}
 	
 	final protected IFuture<IExternalAccess> startPlatform()
 	{
-		Logger.i("Requested kernels: " + Arrays.toString(platformKernels));
-		return startJadexPlatform(platformKernels, platformName, platformOptions);
+		Logger.i("Requested kernels: " + Arrays.toString(platformConfiguration.getRootConfig().getKernels()));
+		return startJadexPlatform(platformConfiguration);
 	}
 	
 	public IFuture<IMessageService> getMS()

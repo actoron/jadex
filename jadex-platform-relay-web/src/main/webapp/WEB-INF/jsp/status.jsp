@@ -1,12 +1,12 @@
-<%@page import="java.net.URL"%>
-<%@page import="jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager"%>
-<%@page import="jadex.bridge.service.types.awareness.AwarenessInfo"%>
-<%@page session="false"%>
-<jsp:include page="header.jsp">
+<%@page import="java.net.URL"
+%><%@page import="jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager"
+%><%@page import="jadex.bridge.service.types.awareness.AwarenessInfo"
+%><%@page session="false"
+%><jsp:include page="header.jsp">
 	<jsp:param name="title" value="Relay Transport - Live Platforms" />	
 </jsp:include>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ page import="jadex.base.relay.*" %>
 <%@ page import="java.util.*" %>
 <%
@@ -132,7 +132,7 @@ if(rmarkers.size()>0 || pmarkers.size()>0)
 //		var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 				minZoom: 0,
 				maxZoom: 19,
-				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery Â© <a href="http://mapbox.com">Mapbox</a>'
 //				attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 			}),
 			latlng = L.latLng(53.550556, 9.993333);

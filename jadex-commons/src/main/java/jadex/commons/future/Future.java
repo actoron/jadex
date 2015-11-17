@@ -13,7 +13,6 @@ import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -192,11 +191,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
 
 		if(caller==null ) {
-			if (!SReflect.isAndroid() || !SUtil.androidUtils().runningOnUiThread()) {
-				caller = new ThreadSuspendable();
-			} else {
-				throw new RuntimeException("Cannot suspend Android UI main thread. Try executing your calls from a different thread!");
-			}
+			caller = new ThreadSuspendable();
 		}
 
     	synchronized(this)
@@ -214,6 +209,12 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	
     	if(suspend)
 		{
+			if (SReflect.isAndroid()
+					&& ISuspendable.SUSPENDABLE.get() == null
+					&& !SUtil.androidUtils().runningOnUiThread()) {
+				new Exception("Should not suspend Android UI main thread. Try executing your calls from a different thread! (see stacktrace)").printStackTrace();
+			}
+
 	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
 	    	synchronized(mon)
 	    	{

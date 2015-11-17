@@ -1,5 +1,7 @@
 package jadex.bdi.examples.blackjack.dealer;
 
+import java.util.Collections;
+
 import jadex.bdi.examples.blackjack.Card;
 import jadex.bdi.examples.blackjack.CardSet;
 import jadex.bdi.examples.blackjack.Dealer;
@@ -12,6 +14,7 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.annotation.Timeout;
 
 /**
  *  Play a game round with the given player.
@@ -109,7 +112,7 @@ public class DealerGameRoundPlayerPlan extends Plan
 
 		// Wait for dealer to finish, too.
 		getLogger().info("Waiting for dealer to finish: "+player);
-		waitForCondition("dealer_finished", timeout*10);	// Hmmm... use timeout???
+		waitForCondition("dealer_finished", timeout!=Timeout.NONE?timeout*10:timeout);	// Hmmm... use timeout???
 
 		// Check if the player won or lost and inform player about result.
 		GameResult gr = new GameResult();
@@ -189,7 +192,8 @@ public class DealerGameRoundPlayerPlan extends Plan
 //		turn.setParameter("$player", player);
 		
 //		System.out.println("Waiting for players turn: "+player);
-		waitForCondition("players_turn", timeout*10);	// Hmmm... use timeout???
+		waitForCondition("players_turn", timeout!=Timeout.NONE?timeout*10:timeout,	// Hmmm... use timeout???
+			Collections.singletonMap("$player", (Object)player));
 //		System.out.println("Its players turn: "+player);
 
 		// Wait until allowed to draw card (step-mode or delay).

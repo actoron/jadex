@@ -1,14 +1,14 @@
 package jadex.bdi.examples.puzzle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.bdiv3.examples.puzzle.Move;
 import jadex.bdiv3.examples.puzzle.Piece;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Meta-level reasoning plan for choosing between applicable plans.
@@ -58,20 +58,13 @@ public class ChooseMovePlan extends Plan
 	protected ICandidateInfo selectPlan(ICandidateInfo[] apps, IBoard board, boolean same, boolean jump,
 		boolean consider_color, boolean consider_jump)
 	{
-		List sel_col = new ArrayList();
+		List<ICandidateInfo> sel_col = new ArrayList<ICandidateInfo>();
 		if(consider_color)
 		{
 			for(int i=0; i<apps.length; i++)
 			{
 				Move tmpmove = null;
-				try
-				{
-					tmpmove = (Move)apps[i].getPlan().getParameter("move").getValue();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+				tmpmove = (Move)apps[i].getPlan().getParameter("move").getValue();
 				if(matchColor(board, tmpmove, same))
 				{
 					sel_col.add(apps[i]);
@@ -83,7 +76,7 @@ public class ChooseMovePlan extends Plan
 			sel_col = SUtil.arrayToList(apps);
 		}
 
-		List sel_jump = new ArrayList();
+		List<ICandidateInfo> sel_jump = new ArrayList<ICandidateInfo>();
 		if(consider_jump)
 		{
 			for(int i=0; i<sel_col.size(); i++)

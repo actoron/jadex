@@ -37,6 +37,7 @@
 					<env:property name="victims" class="int"/>
 					<env:property name="fire" class="int"/>
 					<env:property name="chemicals" class="int"/>
+					<env:property name="position"/>
 				</env:objecttype>
 
 				<env:objecttype name="firestation"/>
@@ -45,6 +46,7 @@
 					<env:property name="extinguished" class="double">0</env:property>
 					<env:property name="cleared" class="double">0</env:property>
 					<env:property name="state" class="String"></env:property>
+					<env:property name="position"/>
 				</env:objecttype>
 				
 				<env:objecttype name="hospital"/>
@@ -53,6 +55,7 @@
 					<env:property name="treated" class="double">0</env:property>
 					<env:property name="patient" class="boolean">false</env:property>
 					<env:property name="state" class="String"></env:property>
+					<env:property name="position"/>
 				</env:objecttype>
 			</env:objecttypes>
 			

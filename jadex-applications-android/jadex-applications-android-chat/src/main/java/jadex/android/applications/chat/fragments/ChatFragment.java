@@ -60,11 +60,6 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 	// -------- methods --------
 	
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-	}
-	
-	@Override
 	public void onAttachMainFragment(ClientAppMainFragment mainFragment) {
 		this.chatServiceProvider = (ChatServiceProvider) mainFragment;
 		chatServiceProvider.addObserver(this);

@@ -38,7 +38,7 @@
 		
 		<!-- The number of seconds to wait for answers from players. -->
 		<belief name="playerwaitmillis" class="long">
-			<fact>10000</fact>
+			<fact>jadex.base.Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
 		<!-- The time to wait between rounds.
@@ -107,15 +107,6 @@
 		<performgoal name="play_with_player">
 			<parameter name="player" class="Player"/>
 		</performgoal>
-
-		<!-- Used for registering the dealer at the df. -->
-		<achievegoalref name="df_register">
-			<concrete ref="dfcap.df_register"/>
-		</achievegoalref>
-		<!-- Used for deregistering the dealer at the df. -->
-		<achievegoalref name="df_deregister">
-			<concrete ref="dfcap.df_deregister"/>
-		</achievegoalref>
 	</goals>
 	
 	<!-- 
@@ -341,18 +332,18 @@
 		
 		<!-- Check if it is the dealer's first turn. -->
 		<condition name="dealers_first_turn">
-			$beliefbase.myself.cardCnt==0 &amp;&amp;
+			$beliefbase.myself.getCardCnt()==0 &amp;&amp;
 			(select one Player $player from $beliefbase.players
-				where $player.playingstate!="idle"
-				&amp;&amp; $player.cardCnt!=2
+				where $player.getState()!=Player.STATE_IDLE
+				&amp;&amp; $player.getCardCnt()!=2
 			)==null
 		</condition>
 		
 		<!-- Check if it is the dealer's second turn. -->
 		<condition name="dealers_second_turn">
 			(select one Player $player from $beliefbase.players
-				where $player.playingstate!="idle"
-				&amp;&amp; $player.playingstate!="finished"
+				where $player.getState()!=Player.STATE_IDLE
+				&amp;&amp; $player.getState()!=Player.STATE_FINISHED
 			)==null
 		</condition>
 
@@ -360,21 +351,20 @@
 		<condition name="players_turn">
 			// All players must be idle, playing, or finished.
 			(select one Player $p0 from $beliefbase.players
-				where $p0.playingstate!="idle"
-				&amp;&amp; $p0.playingstate!="playing"
-				&amp;&amp; $p0.playingstate!="finished"
+				where $p0.getState()!=Player.STATE_IDLE
+				&amp;&amp; $p0.getState()!=Player.STATE_PLAYING
+				&amp;&amp; $p0.getState()!=Player.STATE_FINISHED
 			)==null
 
 			&amp;&amp;
-			// And $player must be playing. (todo return value?)
-			(select one Player $player from $beliefbase.players
-				where $player.playingstate=="playing")!=null
+			// And $player must be playing.
+			$player.getState()==Player.STATE_PLAYING
 			
 			&amp;&amp;
 			// And no playing player has less cards than $player.
 			(select one Player $p2 from $beliefbase.players
-				where $p2.playingstate=="playing"
-				&amp;&amp; $p2.cardCnt &lt; $player.cardCnt
+				where $p2.getState()==Player.STATE_PLAYING
+				&amp;&amp; $p2.getCardCnt() &lt; $player.getCardCnt()
 			)==null
 		</condition>
 
@@ -413,7 +403,7 @@
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
 								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"),
 								20000)
@@ -423,7 +413,6 @@
 			</plans>
 			<goals>
 				<initialgoal ref="play_game"/>
-				<endgoal ref="df_deregister"/>
 			</goals>
 		</configuration>
 		
@@ -437,7 +426,7 @@
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription(null,
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
 								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"),
 								20000)
@@ -447,7 +436,6 @@
 			</plans>
 			<goals>
 				<initialgoal ref="play_game"/>
-				<endgoal ref="df_deregister"/>
 			</goals>
 		</configuration>
 	</configurations>

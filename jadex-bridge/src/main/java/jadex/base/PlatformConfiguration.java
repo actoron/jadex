@@ -255,6 +255,22 @@ public class PlatformConfiguration
 		rootConfig.setDhtProvide(false);
 		return config;
 	}
+
+	/**
+	 * Returns a PlatformConfiguration with the default parameters.
+	 * @return
+	 */
+	public static PlatformConfiguration getAndroidDefault()
+	{
+		PlatformConfiguration config = getDefault();
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+		rootConfig.setGui(false);
+		rootConfig.setChat(false);
+		rootConfig.setKernels(KERNEL.component, KERNEL.micro, KERNEL.bpmn, KERNEL.v3);
+		rootConfig.setLoggingLevel(Level.INFO);
+//		config.setDebugFutures(true);
+		return config;
+	}
 	
 	/**
 	 * Returns a minimal platform configuration without any network connectivity.
@@ -330,7 +346,7 @@ public class PlatformConfiguration
 	 * (which can be a Map or a String array).
 	 * @param args
 	 */
-	public PlatformConfiguration(String[] args)
+	private PlatformConfiguration(String[] args)
 	{
 		this();
 		rootconfig.setProgramArguments(args);
@@ -517,7 +533,7 @@ public class PlatformConfiguration
 	
 	/**
 	 * Set the main configuration file, e.g. path to PlatformAgent.
-	 * @param Path to configuration file
+	 * @param value Path to configuration file
 	 */
 	public void setConfigurationFile(String value)
 	{
@@ -732,8 +748,6 @@ public class PlatformConfiguration
 	/**
 	 *  Get a global platform value.
 	 *  @param platform The platform name.
-	 *  @param key The key.
-	 *  @param value The value.
 	 */
 	public static synchronized void removePlatformMemory(IComponentIdentifier platform)
 	{
@@ -902,9 +916,19 @@ public class PlatformConfiguration
 //		}
 //		return config;
 //	}
-	
+
 	/**
-	 *  Create the platform.
+	 *  Create a platform configuration.
+	 *  @param args The command line arguments.
+	 *  @return PlatformConfiguration
+	 */
+	public static PlatformConfiguration processArgs(String args)
+	{
+		return processArgs(args.split("\\s+"));
+	}
+
+	/**
+	 *  Create a platform configuration.
 	 *  @param args The command line arguments.
 	 *  @return PlatformConfiguration
 	 */
@@ -997,5 +1021,47 @@ public class PlatformConfiguration
 		{
 			config.setValue(key, value);
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("");
+
+		Set<Map.Entry<String, Object>> entries = cmdargs.entrySet();
+
+		for (Map.Entry<String, Object> arg: entries) {
+			if (!(arg.getValue() == null || arg.getValue().equals(false))) {
+				sb.append(arg.getKey());
+				sb.append(": ");
+				sb.append(arg.getValue());
+				sb.append("\n");
+			}
+		}
+
+		entries = rootconfig.getArgs().entrySet();
+
+		for (Map.Entry<String, Object> arg: entries) {
+			if (!(arg.getValue() == null || arg.getValue().equals(false))) {
+				sb.append(arg.getKey());
+				sb.append(": ");
+				sb.append(arg.getValue());
+				sb.append("\n");
+			}
+		}
+
+		sb.append(rootconfig.toString());
+		return sb.toString();
+	}
+
+	/**
+	 * Enhance this config with given other config.
+	 * Will overwrite all values that are set in the other config.
+	 * @param other
+	 */
+	public void enhanceWith(PlatformConfiguration other) {
+		for (Map.Entry<String, Object> entry : other.cmdargs.entrySet()) {
+			this.setValue(entry.getKey(), entry.getValue());
+		}
+		rootconfig.enhanceWith(other.rootconfig);
 	}
 }

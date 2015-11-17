@@ -1,5 +1,5 @@
 apply plugin: 'war'
-apply plugin: 'eclipse-wtp'
+//apply plugin: 'eclipse-wtp'
 
 dependencies 
 {

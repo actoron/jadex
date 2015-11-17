@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +64,21 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	public void init()
 	{	
 		Map<String, Object> args = getAgent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+		
+		// Find concrete beliefs for mapped belief references used as arguments in outmost capability.
+		Map<String, Object> capargs	= null;
+		for(Map.Entry<String, String> ref: getMCapability().getBeliefReferences().entrySet())
+		{
+			if(args.containsKey(ref.getKey()))
+			{
+				if(capargs==null)
+				{
+					capargs	= new LinkedHashMap<String, Object>();
+				}
+				capargs.put(ref.getValue(), args.get(ref.getKey()));
+			}
+		}
+		
 		Map<String, MConfigBeliefElement> inibels = new HashMap<String, MConfigBeliefElement>();
 		
 		String confname = getAgent().getConfiguration();
@@ -100,6 +116,11 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 					if(args.containsKey(mbel.getName())) // mbel.isExported() && 
 					{	
 						inival	= args.get(mbel.getName());
+						hasinival	= true;
+					}
+					else if(capargs!=null && capargs.containsKey(mbel.getName())) // mbel.isExported() && 
+					{	
+						inival	= capargs.get(mbel.getName());
 						hasinival	= true;
 					}
 					else if(inibels.containsKey(mbel.getName()))

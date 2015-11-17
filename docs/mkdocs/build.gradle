@@ -1,0 +1,275 @@
+import java.nio.file.CopyOption
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributes
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+
+Properties props = new Properties()
+props.load(new FileInputStream("${project.projectDir}${File.separator}..${File.separator}..${File.separator}gradle.properties"))
+
+def jadex_build_version = props.getProperty('jadex_build_version')
+
+buildscript {
+    repositories
+    {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven
+                {
+                    name 'Active Components Nexus'
+                    url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
+                }
+    }
+    dependencies {
+        classpath 'net.sourceforge.jadex:jadex-commons:3.0-SNAPSHOT'
+        classpath 'commons-io:commons-io:2.4'
+    }
+}
+
+enum ACTION {serve, build}
+
+defaultTasks 'buildDocs'
+
+/**
+ * Build static pages with mkdocs
+ */
+task buildDocs (type: MkDocsTask) {
+    action=ACTION.build
+    dockerImageName = 'andrglo/mkdocs:latest'
+}
+
+task buildDocsZip (type: Zip, dependsOn: buildDocs) {
+    from "${project.buildDir}${File.separator}site${File.separator}"
+    baseName = 'jadex-mkdocs'
+    version = jadex_build_version
+    into "$baseName-${version.replaceAll('-SNAPSHOT','')}"
+    destinationDir = file("$project.buildDir")
+    outputs.upToDateWhen { false }
+}
+
+/**
+ * Serve docs on localhost:8000 for live development
+ */
+task serveDocs (type: MkDocsTask) {
+    action=ACTION.serve
+}
+
+/**
+ * Build a PDF from docs.
+ */
+task buildDocsPdf (type:PandocTask, dependsOn: 'buildPandocDockerImage') {
+    baseName = 'jadex-mkdocs'
+    version = jadex_build_version
+    dockerImageName = 'jadexpandoc'
+}
+
+task buildPandocDockerImage (type: BuildPandocImageTask) {
+    dockerImageName = 'jadexpandoc'
+}
+
+class PandocTask extends DockerTask {
+
+    def String baseName = "docs"
+    def String version = ""
+
+    @TaskAction
+    def action() {
+        // copy doc source to work dir
+        java.nio.file.Path target = Paths.get(project.buildDir.path,"work")
+        jadex.commons.SUtil.deleteDirectory(target.toFile())
+        org.apache.commons.io.FileUtils.copyDirectory(Paths.get(project.projectDir.path, "docs").toFile(), target.toFile())
+
+        Map<String,List<String>> mdFiles = new HashMap<String,List<String>>()
+
+        // 1. move all images to base work dir, because else latex cannot find them
+        // 2. collect MD sources and collect them by chapter (folder)
+        Files.walkFileTree(target, new SimpleFileVisitor<java.nio.file.Path>() {
+
+            @Override
+            FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
+                def fileName = file.toFile().getName().toLowerCase()
+                if (fileName.endsWith(".png") || fileName.endsWith(".jpg")) {
+                    def targetFile = target.resolve(file.toFile().getName())
+                    if (!targetFile.toFile().exists()) {
+                        Files.move(file, targetFile)
+                    }
+                } else if (file.toFile().getName().endsWith(".md")) {
+                    def chapter = file.getParent().toFile().getName()
+                    def list = mdFiles.get(chapter);
+                    if (list == null) {
+                        list = new ArrayList<String>()
+                        mdFiles.put(chapter, list)
+                    }
+                    list.add(target.relativize(file).toString())
+                }
+                return super.visitFile(file, attrs)
+            }
+        })
+
+        // check index.md for chapter ordering and extract it
+        List<String> mdArgs = [];
+        def mainList = mdFiles.get('work')
+        if (mainList == null || mainList.empty) {
+            throw new RuntimeException("main dir should contain index.md")
+        }
+        String indexMd = mainList.get(0)
+        String indexContents = new File(target.toFile(), indexMd).text
+        mdArgs.add(indexMd)
+
+        Pattern matchChapter = Pattern.compile('^\\[[^\\]]*\\]\\((.*)\\/.*\\)', Pattern.MULTILINE)
+        def matcher = matchChapter.matcher(indexContents)
+        while (matcher.find()) {
+            def mds = mdFiles.get(matcher.group(1))
+            if (mds != null) {
+                for (md in mds.sort()) {
+                    mdArgs.add(md)
+                }
+            }
+        }
+
+        // build command and execute
+        def builder = getPandocProcessBuilder()
+        builder.directory(target.toFile().getAbsoluteFile())
+        builder.command.addAll(mdArgs)
+
+        launchDockerProcess(builder)
+
+        // copy result to docs/mkdocs/
+        def pdfFile = target.resolve("doc.pdf")
+        String targetName = "${baseName}.pdf";
+        if (!version.empty) {
+            targetName = "${baseName}-${version}.pdf"
+        }
+
+        def targetFile = project.buildDir.toPath().resolve(targetName)
+        Files.deleteIfExists(targetFile)
+        Files.copy(pdfFile, targetFile)
+    }
+
+    def ProcessBuilder getPandocProcessBuilder() {
+        def String[] dockerArgs = ["--rm", "-v", "$project.buildDir${File.separator}work${File.separator}:/source/"];
+        def String[] args = ["-s", "-f", "markdown", "-t", "latex", "-o", "doc.pdf"]
+        return getProcessBuilderForCommand("pandoc", args, dockerArgs, false)
+    }
+}
+
+class BuildPandocImageTask extends DockerTask {
+    @TaskAction
+    def action() {
+        if ("which pandoc".execute().text.trim().empty
+                && docker != null
+                && !docker.empty) {
+            // remove old image
+//            println "Removing old pandoc docker image..."
+//            println "$docker rmi $dockerImageName".execute().text
+            println "Building pandoc docker image..."
+            def p = "$docker build -t $dockerImageName .".execute()
+            p.inputStream.eachLine{println it}
+            p.waitFor()
+        }
+    }
+}
+
+class MkDocsTask extends DockerTask {
+
+    def ACTION action = ACTION.serve
+
+    @TaskAction
+    def action() {
+        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$project.projectDir${File.separator}:/workspace/"];
+        def builder =  getProcessBuilderForCommand("mkdocs", null, dockerArgs, true)
+        if (action == ACTION.serve) {
+            builder.command.add("serve")
+        } else if (action == ACTION.build) {
+            builder.command.add("build")
+            builder.command.add("--clean")
+            builder.command.add("--site-dir")
+            builder.command.add("build/site")
+        }
+
+        launchDockerProcess(builder)
+    }
+
+}
+
+
+class DockerTask extends DefaultTask {
+
+    String dockerImageName
+
+    protected String docker = "which docker".execute().text.trim()
+    private final static String DOCKERCONTAINERNAME = 'jadextempdocker'
+
+    def boolean forceDocker = project.hasProperty('forceDocker') ? project.property('forceDocker') : false
+
+    def launchDockerProcess(builder) {
+        println "Executing $builder.command"
+        def p = builder.start()
+        if (builder.command().first().contains("docker")) {
+            Runtime.runtime.addShutdownHook {
+                println "shutting down - please be patient"
+                def stopProcess = "$docker stop $DOCKERCONTAINERNAME".execute()
+                stopProcess.waitFor();
+                println stopProcess.text
+                if (stopProcess.exitValue() == 0) {
+                    println "stopped docker container"
+                }
+            }
+        }
+        p.inputStream.eachLine {println it}
+        p.errorStream.eachLine {println it}
+        p.waitFor();
+    }
+
+    def ProcessBuilder getProcessBuilderForCommand(String cmd, String[] args, String[] dockerArgs, boolean pullFirst = true) {
+        def ProcessBuilder result;
+        def cmdPath = "which $cmd".execute().text.trim()
+        def allArgs
+
+        if (args == null) {
+            args = []
+        }
+        if (cmdPath != null && !cmdPath.empty && !forceDocker) {
+            allArgs = [cmdPath]
+        } else if (docker != null && !docker.empty) {
+            println "No $cmd binary found, but you have docker!"
+            if (pullFirst) {
+                println "Downloading $dockerImageName docker image..."
+                pullDockerImage(dockerImageName);
+            }
+
+            allArgs = [docker, 'run', '--name=' + DOCKERCONTAINERNAME]
+            allArgs.addAll(dockerArgs)
+            allArgs.add(dockerImageName)
+        } else {
+            System.err.println("No $cmd binary or docker found! Install $cmd or docker to continue.")
+        }
+
+        allArgs.addAll(args)
+        result = new ProcessBuilder(allArgs);
+        result.redirectErrorStream(true)
+        result.directory(project.projectDir)
+        return result;
+    }
+
+    def void pullDockerImage() {
+        def builder = new ProcessBuilder(docker, 'pull', dockerImageName)
+        builder.redirectErrorStream(true)
+        def p = builder.start()
+        p.waitFor()
+        if (p.exitValue() != 0) {
+            println p.text
+            System.exit(p.exitValue())
+        }
+    }
+
+}
+
+
+
+

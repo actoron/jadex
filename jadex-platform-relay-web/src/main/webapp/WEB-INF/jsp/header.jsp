@@ -1,6 +1,7 @@
-<%@page session="false"%>
-<%@page import="java.net.InetAddress"%>
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<%@page contentType="text/html; charset=UTF-8"
+%><%@page session="false"
+%><%@page import="java.net.InetAddress"
+%><?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <HTML lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <HEAD>
@@ -38,8 +39,8 @@
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/accordion.js' defer='defer'></script>
  -->
 <%	/*if(request.getParameter("title")!=null && request.getParameter("title").toLowerCase().indexOf("history")!=-1) {*/ %>
-	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
-	<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/resources/markercluster/MarkerCluster.css" />
@@ -62,7 +63,6 @@
 
 </HEAD>
 <BODY id="body"
-	onload="createAccordion({div:'xwikinav', no:0, height:150});"
 	class="wiki-xwiki space-AC_User_Guide viewbody hideright">
 	<DIV id="xwikimaincontainer">
 		<DIV id="xwikimaincontainerinner">
