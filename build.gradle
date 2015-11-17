@@ -70,7 +70,7 @@ subprojects
             androidTestCompile junit
         }
     }
-    else 
+    else
     {
         apply plugin: 'java'
         compileJava.options.encoding = 'UTF-8'
@@ -144,7 +144,7 @@ task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) << {
 task distZips(dependsOn: [subprojects.build, srcZips, exampleZips]) << {
 	
 	gradle.ext.selecteddists.each { selecteddist ->
-		Set<String> arts = gradle.ext.distartmap.get(selecteddist)
+		def arts = gradle.ext.distartmap.get(selecteddist)
 		createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
 	}
 }
