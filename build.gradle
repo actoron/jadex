@@ -1,104 +1,30 @@
 import java.util.regex.Matcher
 
 apply plugin: 'signing'
-apply plugin: 'java-library-distribution'
+//apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
 apply plugin: 'maven' // use gradle install to install in local .m2 
-apply plugin: 'net.researchgate.release'
+//apply plugin: 'net.researchgate.release'
 // gradle install -x test -i    for fast local install without tests (-x test i program args)
 
 def date = new Date()
 def timestamp = date.format('yyyyMMdd.HHmmss')
 
-def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey', 
-	'-launch', '-web', '-distribution-', '-webservice', '-securetransport', '-relay', '-android'] //*:*-relay-standalone
+def maindistsuffix = ''
+gradle.ext.selecteddists.each { dname ->
+	maindistsuffix += '-' + dname
+}
 
-def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup', '-android']
+project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle'
 
-def androidIncl = ['jadex-android-commons',
-                'jadex-android-antlr',
-                'jadex-android-xmlpull',
-                'jadex-android-platformclient',
-                'jadex-android-bluetooth',
-                'jadex-platform-android',
-                'jadex-runtimetools-android',
-                'jadex-platform-extension-webservice-android',
-                'jadex-commons',
-                'jadex-tools-base',
-                'jadex-bridge',
-                'jadex-javaparser',
-                'jadex-xml',
-                'jadex-rules',
-                'jadex-rules-eca',
-                'jadex-kernel-base',
-                'jadex-kernel-micro',
-                'jadex-kernel-component',
-                'jadex-kernel-bdi',
-                'jadex-kernel-bdiv3',
-                'jadex-kernel-bdiv3-android',
-                'jadex-kernel-bpmn',
-                'jadex-model-bpmn',
-                'jadex-kernel-bdibpmn',
-                'jadex-platform',
-                'jadex-platform-extension-webservice',
-                'jadex-android-platformapp',
-                'jadex-applications-android-demos',
-                'jadex-applications-android:jadex-applications-android:chat',
-                'jadex-applications-android:jadex-applications-android:puzzle'
-]
+project.ext.mainres = ['src/main/java', 'src/main/resources']
+project.ext.testres = ['src/test/java', 'src/test/resources']
 
-// collect all aar project names in this list
-def aarProjects = []
+project.ext.subprojectmap  = new HashMap()
+project.subprojects.each { sp ->
+	addSubproject('', sp)
+}
 
-// http://stackoverflow.com/questions/30250923/how-do-i-build-a-war-file-with-gradle-using-a-copyspec-containing-filesmatching
-//def filterSpec = copySpec
-//{
-////	copy
-////	{
-//		filter 
-//		{
-////			println "filterSpec"
-//			if(rootProject.jadex_lastbuild_version!=null)
-//			{
-//				// Replace version in agent/capability xmls, xsds
-//				filesMatching('**/*.agent.xml')
-//				{
-//					println "file"+it
-//					filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-//						'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-//				}
-//				filesMatching('**/*.capability.xml')
-//				{
-//		//			println "file"+it
-//					filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-//						'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-//				}
-//				filesMatching('**/*.xsd')
-//				{
-//		//			println "file"+it
-//					filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-//						'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-//				}
-//				// Replace doc link
-//				filesMatching('**/Platform.component.xml')
-//				{
-//		//			println "file"+it
-//					filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
-//						'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
-//				}
-//			}
-//			// Update version properties
-//			filesMatching('**/version.properties')
-//			{
-//		//		println "file"+it
-//				filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
-//				filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
-//			}
-//		}
-////	}
-//}
-// make filterSpec variable accessible for all projects via putting it into the root project :-(
-//project.ext.filterSpec=filterSpec
 project.ext.jadex_build_version=jadex_build_version
 project.ext.jadex_lastbuild_version=jadex_lastbuild_version
 project.ext.timestamp=timestamp
@@ -106,86 +32,42 @@ project.ext.timestamp=timestamp
 buildscript 
 {
     apply from: 'util.gradle'
+ 
     repositories
     {
-        mavenLocal()
+        //mavenLocal()
         mavenCentral()
-        jcenter()
+        //jcenter()
     }
+    
     dependencies
     {
         classpath 'com.android.tools.build:gradle:1.3.0'
-        classpath 'net.researchgate:gradle-release:2.2.2'
+        //classpath 'net.researchgate:gradle-release:2.2.2'
     }
 }
 
 allprojects
 {
-	apply plugin: 'eclipse-wtp'	// Hack!!! broken eclipse gradle integration: https://issues.gradle.org/browse/GRADLE-1880
-	
     version = jadex_build_version // Set the project version property, otherwise install does not work
     group = 'net.sourceforge.jadex'
-    
-    configurations
-    {
-        deployerJars
-
-        // see http://www.sinking.in/blog/provided-scope-in-gradle/
-        provided {
-            dependencies.all { dep ->
-                // New inheritance: testRuntime -> testCompile -> compile -> provided
-                // This has to be done here to assure the new inheritance before artifacts are excluded from runtime
-                testRuntime.extendsFrom = [testCompile]
-                configurations.runtime.exclude group: dep.group, module: dep.name
-            }
-        }
-        // new inheritance: default -> runtime -> compile -> provided
-        compile.extendsFrom provided
-
-        // configurations which includes artifacts to include in dist
-        androidDistribution
-        desktopDistribution
-        // distributions should contain all runtime artifacts by default
-        androidDistribution.extendsFrom runtime
-        desktopDistribution.extendsFrom runtime
-    }
-
-    dependencies
-    {
-        deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
-    }
 
     repositories
     {
         mavenCentral()
-        //maven
-        //{
-        //    name 'www1'
-        //    url 'http://www1.activecomponents.org/nexus/content/repositories/snapshots/'
-        //    credentials
-        //    {
-        //        username 'deployment'
-        //        password 'laxlax'
-        //    }
-        //}
     }
-
-    buildscript {
-        repositories {
-            mavenLocal()
-            mavenCentral()
-            maven
-            {
-                name 'Active Components Nexus'
-                url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
-            }
-        }
-    }
-}
-
-configurations
-{
-	excludeset
+    
+    buildscript 
+	{
+	    repositories
+	    {
+	    	mavenCentral()
+	        maven
+			{
+				url "http://www2.activecomponents.org/nexus/content/repositories/snapshots/"
+			}
+	    }
+	}
 }
 
 subprojects
@@ -194,240 +76,8 @@ subprojects
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
     def allSource   = ''
-
-    if(isAndroidProject(project))
-    {
-        if (isAndroidLibraryProject(project)) 
-        {
-            apply plugin: 'android-library'
-            aarProjects.add project.name
-        } 
-        else 
-        {
-            apply plugin: 'com.android.application'
-        }
-        // include all resources that are placed inside src dirs
-        android.sourceSets.main.resources.srcDirs mainSrcDir
-        android.sourceSets.test.resources.srcDirs testSrcDir
-        allSource   = android.sourceSets.main.java.srcDirs
-        dependencies
-        {
-            androidTestCompile junit
-        }
-    }
-    else 
-    {
-        apply plugin: 'java'
-        compileJava.options.encoding = 'UTF-8'
-//        apply plugin: 'java-library-distribution' // TODO: needed?
-        allSource   = sourceSets.main.allSource
-        // include all resources that are placed inside src dirs
-        sourceSets.main.resources.srcDirs    mainSrcDir
-        sourceSets.test.resources.srcDirs    testSrcDir
-        dependencies
-        {
-            testCompile junit
-        }
-
-        // Set correct bootclasspath for each project, depending on sourceCompatibility
-        afterEvaluate {
-            def requestedVersion = JavaVersion.toVersion(project.sourceCompatibility)
-            // each JDK should be provided by an environment variable
-            def envHomeVar = "JAVA_${requestedVersion.majorVersion}_HOME"
-            // check if running JDK (which usually is the same Version as in JAVA_HOME) is the requested JDK
-            if (JavaVersion.current() > requestedVersion) {
-                def requestedHome = System.getenv(envHomeVar)
-                if (requestedHome == null || requestedHome.empty || !file(requestedHome).exists()) {
-                    println "Warning: compiling ${project.sourceCompatibility} source with ${JavaVersion.current()} JDK may lead to problems. " +
-                            "Set $envHomeVar to the corresponding JDK to avoid this."
-                } else {
-                    // set bootstrap path to correct JDK version
-                    // println "Setting bootClasspath for $project.name to JDK $requestedVersion"
-                    project.tasks.withType(JavaCompile) {
-                        // provide same libs that are used in the default boot classpath
-                        options.bootClasspath = \
-                            ["resources.jar", "rt.jar", "sunrsasign.jar", "jsse.jar", "jce.jar", "charsets.jar", "jfr.jar"]\
-                            .collect {"$requestedHome"+java.io.File.separator+"jre"+java.io.File.separator+"lib"+java.io.File.separator+"$it"}\
-                            .join(java.io.File.pathSeparator) +
-                            ":$requestedHome"+java.io.File.separator+"jre"+java.io.File.separator+"classes"
-//                        options.fork = true
-//						println "Bootclasspath: " + options.bootClasspath
-                    }
-                }
-            }
-        }
-
-    }
-
-    apply plugin: 'maven'
-    //apply plugin: 'maven-publish'
-   
-
-    sourceCompatibility = 1.6
-
-	task myJavadocs(type: Javadoc) {    
-    	//source = sourceSets.main.allJava
-    	classpath = configurations.compile
-    	destinationDir = file("./doc/")
-	    options.charSet = 'UTF-8'
-	    options.encoding = 'UTF-8'
-	    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-	    if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
-	        options.addStringOption('Xdoclint:none', '-quiet')
-	    } else {
-	        options.addStringOption('-quiet')
-	    }
-  	}
-
-    task sourcesJar(type: Jar, dependsOn: 'classes') {
-        classifier 'sources'
-        from allSource
-    }
-
-    task javadocJar(type: Jar, dependsOn: 'myJavadocs') {
-        classifier = 'javadoc'
-        from new File(projectDir, 'build/docs')
-    }
-	
-	processResources {
-//		println "pR" + it + " " + filterSpec
-//		with filterSpec 
-		
-//		println "filterSpec: "+project
-		if(rootProject.jadex_lastbuild_version!=null)
-		{
-//			println "filterSpec2: "+project
-			// Replace version in agent/capability xmls, xsds
-			filesMatching('**/*.agent.xml')
-			{
-//				println "file"+it
-				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-			}
-			filesMatching('**/*.capability.xml')
-			{
-	//			println "file"+it
-				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-			}
-			filesMatching('**/*.xsd')
-			{
-	//			println "file"+it
-				filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-					'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-			}
-			// Replace doc link
-			filesMatching('**/Platform.component.xml')
-			{
-	//			println "file"+it
-				filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
-					'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
-			}
-		}
-		// Update version properties
-		filesMatching('**/version.properties')
-		{
-	//		println "file"+it
-			filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
-			filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
-		}
-	}
-
-    javadocJar.onlyIf { calledWithTask("uploadArchives") || calledWithTask("install") || calledWithTask("uploadGradlePluginArchives") }
-
-	//sourcesJar.onlyIf { calledWithTask("uploadArchives") }
-	
-    artifacts
-    {
-        archives sourcesJar
-        archives javadocJar
-    }
-
-	signing
-	{
-		if(project.hasProperty("ext.signing.keyId"))
-		{
-	    	sign configurations.archives
-		}
-	}
-
-	// cannot sign with maven-publish :-( http://stackoverflow.com/questions/16560235/how-to-sign-maven-publications-with-gradle
-    // publishing
-    // {
-    //    publications
-    //    {
-    //        mavenJava(MavenPublication)
-    //        {
-    //			from components.java
-    //		
-    //			artifact sourceJar {
-    //            	classifier "sources"
-    //        	}
-    //		}
-    //	}
-   	//}
-
-    //uploadArchives
-    //{
-    //    repositories
-    //    {
-    //        add project.repositories.www1
-    //    }
-    //}
-
-    uploadArchives
-    {
-        repositories.mavenDeployer
-        {
-        	beforeDeployment
-        	{
-        		MavenDeployment deployment -> signing.signPom(deployment)
-        	}
-        	
-            configuration = configurations.deployerJars
-
-			//println("repouser: "+repouser+" pass: "+repopassword)
-
-			if (reposnapshoturl.isEmpty()) {
-                reposnapshoturl = repositories.mavenLocal().getUrl()
-            }
-
-            snapshotRepository(url: reposnapshoturl)
-            {
-                //<id>jadex-public-snapshots</id>
-                authentication(userName: repouser, password: repopassword)
-                //authentication(userName: "deployment", password: "laxlax")
-            }
-            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            {
-            	//<id>sonatype-nexus-staging</id>
-            	authentication(userName: repouser, password: repopassword)
-                //authentication(userName: "deployment", password: "laxlax")
-            }
-
-            // gradle does not add type: aar for android library dependencies automatically:
-            // https://discuss.gradle.org/t/repositories-mavendeployer-dont-add-dependency-type-attribute-to-the-result-pom-xml/1297
-            pom.whenConfigured {pom ->
-                dependencies.findAll {dep ->
-                    if (dep.groupId == project.group
-                        && aarProjects.contains(dep.artifactId)) {
-                        println "configured dependency $dep.artifactId as aar for pom generation"
-                        dep.type = 'aar'
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-
-// additional android config
-subprojects 
-{
-    // library definitions to be used in subprojects
+    
     ext.libraries = [
-//            android_support: "com.google.android:support-v4:r7",
             android_support: "com.android.support:support-v4:23.1.0",
             android_compat: "com.android.support:appcompat-v7:23.1.0",
             android: 'com.google.android:android:2.2.1',
@@ -435,13 +85,21 @@ subprojects
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
             junit: 'junit:junit:4.11',
             robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
-//            robolectric: 'com.pivotallabs:robolectric:1.0'
             robolectric: 'org.robolectric:robolectric:2.2'
     ]
 
     if(isAndroidProject(project))
     {
-        android {
+    	 if (isAndroidLibraryProject(project)) 
+        {
+            apply plugin: 'android-library'
+        } 
+        else 
+        {
+            apply plugin: 'com.android.application'
+        }
+        
+    	android {
             compileSdkVersion android_compileSdkVersion
             buildToolsVersion android_buildToolsVersion
 
@@ -478,493 +136,225 @@ subprojects
                 abortOnError false
             }
         }
-
-        configurations {
-            // exclude transitive deps that are not supported on android
-            all*.exclude group:'org.javassist', module:'javassist'
-            all*.exclude group:'javax.mail', module:'mail'
-            all*.exclude group:'org.antlr', module:'antlr-runtime'
-            all*.exclude group:'org.bouncycastle', module:'bcprov-jdk15on'
-            all*.exclude group:'org.ow2.asm', module:'asm-all'
-            runtime.exclude group: 'junit', module:'junit' // no junit in runtime classpath
-        }
-
-        // general dependencies for all android modules
-        dependencies 
+        
+        // include all resources that are placed inside src dirs
+        android.sourceSets.main.resources.srcDirs mainSrcDir
+        android.sourceSets.test.resources.srcDirs testSrcDir
+        allSource   = android.sourceSets.main.java.srcDirs
+        dependencies
         {
-            compile libraries.android
-        }
-
-        // dummy tasks to allow dependencies on tasks that are missing in android-plugin
-        task jar(type:Jar) {
-
-        }
-        
-        // create configuration -> dependency mappings for maven pom generation
-        project.conf2ScopeMappings.addMapping(10,configurations.compile,Conf2ScopeMappingContainer.COMPILE)
-        project.conf2ScopeMappings.addMapping(11,configurations.androidTestCompile,Conf2ScopeMappingContainer.TEST)
-        project.conf2ScopeMappings.addMapping(12,configurations.provided,Conf2ScopeMappingContainer.PROVIDED)
-
-    	// add custom task to generate javadocs to exclude R and BuildConfig and to include correct links
-    	getVariants(project).all {variant -> 
-	    	task("generate${variant.name}JavaDoc", type:Javadoc) {
-		        source = variant.javaCompile.source
-		        ext.androidJar =
-		                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-		        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-		        options.links("http://docs.oracle.com/javase/7/docs/api/");
-		        options.links("http://d.android.com/reference/");
-		        exclude '**/BuildConfig.java'
-		        exclude '**/R.java'
-		
-		        // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-		        if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
-		            options.addStringOption('Xdoclint:none', '-quiet')
-		        } else {
-		            options.addStringOption('-quiet')
-		        }
-	        }
-    	} 
-        
-        // disable default javadoc task because we created a custom one
-        myJavadocs.enabled = false
-
-        task classes(dependsOn: 'compileDebugSources') {
-
-        }
-
-        if (isAndroidLibraryProject(project)) {
-            afterEvaluate {
-                def variant = getReleaseVariant(project)
-                jar.from(variant.javaCompile.destinationDir)
-                jar.dependsOn variant.javaCompile
-            }
-        }
-
-    } else {
-        // configure "non"-android project transitive excludes
-        if (androidIncl.contains(project.name)) {
-            project.configurations.androidDistribution.exclude group:'org.javassist', module:'javassist'
-            project.configurations.androidDistribution.exclude group:'javax.mail', module:'mail'
-            project.configurations.androidDistribution.exclude group:'org.antlr', module:'antlr-runtime'
-            project.configurations.androidDistribution.exclude group:'bouncycastle', module:'bcprov-jdk15'
-            project.configurations.androidDistribution.exclude group:'org.ow2.asm', module:'asm-all'
-            project.configurations.androidDistribution.exclude module:'junit' // no junit in runtime classpath
+            androidTestCompile junit
         }
     }
-    
-    // debug task to show configuration -> maven dep. scope mappings
-    task mappings << {
-    	println project.conf2ScopeMappings.mappings
-	}
-}
-
-task docs(type: Javadoc) {
-    source subprojects.collect {project -> getOnlyJavaSources(project)}
-    classpath = files(subprojects.collect {project -> project.getCompileClassPath(project)})
-    destinationDir = new File(projectDir, 'build/docs')
-    options.links("http://docs.oracle.com/javase/7/docs/api/")
-    options.charSet = 'UTF-8'
-    options.encoding = 'UTF-8'
-    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-    if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
-        options.addStringOption('Xdoclint:none', '-quiet')
-    } else {
-        options.addStringOption('-quiet')
-    }
-}
-
-//  ---------------------------------
-//      DISTRIBUTION TASKS/CONFIG
-//  ---------------------------------
-
-task srcAndroidZip(type: Zip) {
-    buildDistributionSource(srcAndroidZip, null, androidIncl, "sourcesAndroid.zip", false)
-}
-
-task srcZip(type: Zip) {
-	buildDistributionSource(srcZip, stdexcl, null, null, true)
-}
-
-task srcZipPro(type: Zip) {
-	buildDistributionSource(srcZipPro, proexcl, null, null, false)
-}
-
-task srcZip3d(type: Zip) {
-    buildDistributionSource(srcZip3d, null, ['jadex-kernel-extension-envsupport-jmonkey'], 'sources3d.zip', true)
-}
-
-task srcZipWebservice(type: Zip) {
-    buildDistributionSource(srcZipWebservice, null, ['jadex-applications-webservice', 'jadex-platform-extension-webservice', 'jadex-platform-extension-webservice-desktop'], 'sourcesws.zip', false)
-}
-
-task srcZipRelay(type: Zip) {
-    buildDistributionSource(srcZipRelay, null, ['jadex-platform-extension-relay-standalone'], 'sources-relay.zip', false)
-}
-
-task srcZipSecureTransport(type: Zip) {
-    buildDistributionSource(srcZipSecureTransport, null, ['jadex-platform-extension-securetransport'], 'sources-securetransport.zip', false)
-}
-
-task srcZipManagement(type: Zip) {
-    buildDistributionSource(srcZipSecureTransport, null, ['jadex-platform-extension-management'], 'sources-management.zip', false)
-}
-
-task srcZipMaven(type: Zip) {
-    buildDistributionSource(srcZipSecureTransport, null, ['jadex-platform-extension-maven'], 'sources-maven.zip', false)
-}
-
-task srcZipBpmnEditor(type: Zip) {
-    buildDistributionSource(srcZipBpmnEditor, null, ['jadex-editor-bpmn'], 'sources-bpmneditor.zip', false)
-}
-
-task srcZipGpmnEditor(type: Zip) {
-    buildDistributionSource(srcZipBpmnEditor, null, ['jadex-editor-gpmn'], 'sources-gpmneditor.zip', false)
-}
-
-
-def buildDistributionSource(task, excl, incl, name, opengl) {
-	task.archiveName = name!=null? name: 'sources.zip'
-    task.classifier = 'src'
-    task.destinationDir = new File(project.distsDir, "sources")
-    
-    //from(sourceSets.main.allSource){}
-    //from sourceSets*.allSource.srcDirs*.collect { relativePath(it) }.flatten()
-    
-    task.from('build.gradle'){ into('sources') }
-    task.from('util.gradle'){ into('sources') }
-    task.from('settings.gradle'){ into('sources') }
-    
-    subprojects.each {subproject ->
-        if ((excl != null && !isExcluded(excl, subproject.name))
-                || (incl != null && incl.contains(subproject.name)))
+    else
+    {
+        apply plugin: 'java'
+        compileJava.options.encoding = 'UTF-8'
+        allSource   = sourceSets.main.allSource
+        // include all resources that are placed inside src dirs
+        sourceSets.main.resources.srcDirs    mainSrcDir
+        sourceSets.test.resources.srcDirs    testSrcDir
+        
+        dependencies
         {
-//        	println('including: '+task.name+" "+subproject.projectDir.name+" "+rootProject.filterSpec) //rootProject.filterSpec
-//			def ttt = it 
-//			println ttt + ttt.getClass()
-			task.from(subproject.projectDir.name) {include 'build.gradle' into 'sources/'+subproject.projectDir.name}
-			
-			
-			
-			// todo: replace version etc in source code 
-			task.from(getSourceDir(subproject)) {into 'sources/'+subproject.projectDir.name+'/src/main/java'}// with rootProject.filterSpec}
-			task.from(getResourcesDir(subproject)) {into 'sources/'+subproject.projectDir.name+'/src/main/resources'}// with rootProject.filterSpec}
-		
+            testCompile junit
+        }
+        
+        processResources {
+			filesMatching('**/version.properties')
+			{
+				filter{String line -> line.replace('${jadex_build_version}', rootProject.jadex_build_version)}
+				filter{String line -> line.replace('${timestamp}', rootProject.timestamp)}
+			}
+		}
+    }
 
+    apply plugin: 'maven'
+    sourceCompatibility = 1.6
+}
+
+// Hack, helper to generate dep-tree
+task genDepList << {
+
+	def out = new PrintStream(project.projectDir.getCanonicalPath() + '/dependencies.conf', 'UTF-8')
+	project.ext.subprojectmap.entrySet().each { entry ->
+		def sp = entry.getValue()
+		out. println ('### ' + entry.getKey())
+		def founddeps = new HashSet<String>()
+		sp.configurations.each { conf ->
+			conf.getAllDependencies().withType(org.gradle.api.artifacts.ProjectDependency).each { dep ->
+				if (!founddeps.contains(dep.getName()))
+					out.println dep.getName()
+				founddeps.add(dep.getName())
+			}
 		}
 	}
+	out.close()
+}
 
-    // todo: replace with copySpec in gradle 3.0
-    task.eachFile {
-        if(rootProject.jadex_lastbuild_version!=null)
-        {
-//            println "filterSpec2: "+it.name
-            // Replace version in agent/capability xmls, xsds
-            if(it.name.endsWith('.agent.xml') || it.name.endsWith('.capability.xml') || it.name.endsWith('.xsd'))
-            {
-                //				println "file"+it
-                filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_lastbuild_version+'.xsd',
-                        'http://jadex.sourceforge.net/jadex-bdi-'+rootProject.jadex_build_version+'.xsd')}
-            }
-            // Replace doc link
-            if(it.name=='Platform.component.xml')
-            {
-                //			println "file"+it
-                filter{String line -> line.replaceAll('http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_lastbuild_version+'-javadoc/index.html',
-                        'http://www.activecomponents.org/docs/jadex-'+rootProject.jadex_build_version+'-javadoc/index.html')}
-            }
-        }
-        if(it.name=='version.properties')
-        {
-            filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', rootProject.jadex_build_version)}
-            filter{String line -> line.replaceAll('\\$\\{timestamp\\}', rootProject.timestamp)}
-        }
-    }
-	
-	if(opengl)
-	{
-		task.from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
-		task.from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+task exampleZips << {
+	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
+	def preprocessdir = preprocessdirfile.getCanonicalPath()
+	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
+	gradle.ext.maindistartifacts.each { artname ->
+		Project sp = project.ext.subprojectmap.get(artname)
+		println artname
+		println subprojectmap
+		File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
+		println '' + exdir + ' ' + exdir.exists()
+		if (exdir.exists() && exdir.isDirectory()) {
+			exdir.listFiles().each { ex ->
+				preprocessdirfile.mkdirs()
+				def ant = new groovy.util.AntBuilder()
+				ant.sequential {
+					ant.copy todir: preprocessdir + '/' + ex.getName(),
+					{
+						resources
+						{
+							fileset dir: ex.getCanonicalPath(), includes: project.ext.filterfiles, erroronmissingdir: false
+						}
+						
+						filterset begintoken: '${', endtoken: '}',
+						{
+							filter token: 'jadex_build_version', value: jadex_build_version
+						}
+					}
+					ant.copy todir: preprocessdir + '/' + ex.getName(),
+					{
+						resources
+						{
+							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles, erroronmissingdir: false
+						}
+					}
+					ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
+					ant.delete dir: preprocessdir
+				}
+			}
+		}
 	}
 }
 
-task buildExampleProject(type: Zip) {
-	destinationDir = new File(project.distsDir, "standard-version")
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = 'jadex-example-project.zip'
-	from('docs/jadex-example-project') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
+task srcZip << {
+	createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts)
 }
 
-/**
- * Generates non-maven and gradle example projects
- */
-task buildAndroidExampleProject(type: Zip) {
-    destinationDir = new File(project.distsDir, "standard-version")
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveName = 'jadex-android-example-projects.zip'
-    // eclipse and gradle example project:
-//    from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
-    from('docs/android/jadex-android-example-project-gradle') {into ('jadex-android-example-project-gradle')}
-    from('docs/android/jadex-android-example-project-bdiv3-gradle') {into ('jadex-android-example-project-bdiv3-gradle')}
-    // Copy sources from gradle example project to eclipse example project
-//    from('docs/android/jadex-android-example-project-gradle/src/main/java') {into ('jadex-android-example-project/src')}
-    // Copy resources from gradle example project to eclipse example project
-//    from('docs/android/jadex-android-example-project-gradle/src/main/res') {into ('jadex-android-example-project/res')}
-    // Copy Manifest from gradle example project to eclipse example project
-//    from('docs/android/jadex-android-example-project-gradle/src/main/AndroidManifest.xml') {into ('jadex-android-example-project/')}
+task srcZips << {
+	gradle.ext.selecteddists.each { selecteddist ->
+		def arts = gradle.ext.distartmap.get(selecteddist)
+		createSrcZip(selecteddist, arts)
+	}
 }
 
-def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
-	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) << {
+	def isaddon = true
+	gradle.ext.selecteddists.each { dist ->
+		isaddon &= dist.startsWith('addon')
+	}
+	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isaddon)
+}
 
-	subprojects.each {subproject ->
-		if ((excl != null && !isExcluded(excl, subproject.name))
-            || (incl != null && incl.contains(subproject.name)))
+task distZips(dependsOn: [subprojects.build, srcZips, exampleZips]) << {
+	
+	gradle.ext.selecteddists.each { selecteddist ->
+		def arts = gradle.ext.distartmap.get(selecteddist)
+		createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
+	}
+}
+
+def createDistZip(distname, arts, isaddon)
+{
+	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filtereddistfiles')
+	preprocessdirfile.mkdirs()
+	def preprocessdir = preprocessdirfile.getCanonicalPath()
+	def foldername = 'jadex-'  + jadex_build_version
+	def zipfilename = project.distsDir.getCanonicalPath() + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+	def distdir = project.distsDir.getCanonicalPath()
+	def subprojectmap = project.ext.subprojectmap;
+	def ant = new groovy.util.AntBuilder()
+	
+	ant.sequential {
+		ant.copy todir: preprocessdir,
 		{
-            task.from(subproject.configurations[configuration]) { into('lib') }
+			resources
+			{
+				arts.each { artname ->
+					Project sp = subprojectmap.get(artname)
+					fileset dir: sp.projectDir.getCanonicalPath() + '/dist/files', includes: project.ext.filterfiles, erroronmissingdir: false
+				}
+			}
+			
+			filterset begintoken: '${', endtoken: '}',
+			{
+				filter token: 'jadex_build_version', value: jadex_build_version
+			}
+		}
+		if (isaddon)
+		{
+			ant.copy file: project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname  + '-' + jadex_build_version + '-sources.zip', tofile: preprocessdir + '/sources-' + distname + '.zip'
+		}
+		else
+		{
+			ant.copy file: project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname  + '-' + jadex_build_version + '-sources.zip', tofile: preprocessdir + '/sources.zip'
+		}
+		ant.zip destfile: zipfilename,
+		{
+			arts.each { artname ->
+				def sp = subprojectmap.get(artname)
+				def spbdir = sp.buildDir.getCanonicalPath()
+				
+				zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
 
-            if (isAndroidProject(subproject)) {
-                subproject.afterEvaluate {
-                    def releaseApkVariant = getReleaseVariant(subproject).outputs.find({ o -> o.name.contains('release') })
-                    if (isAndroidLibraryProject(subproject)) {
-                        println "adding " + releaseApkVariant.outputFile
-                        task.from(releaseApkVariant.outputFile) { into('lib').rename('(.*)-release\\.(.*)', '$1-' + subproject.version + '.$2') }
-                    } else {
-                        task.from(releaseApkVariant.outputFile) { into('apk').rename('(.*)-release\\.(.*)', '$1-' + subproject.version + '.$2') }
-                    }
-                }
-            } else {
-                task.from(subproject.jar) { into('lib') }
-            }
+				zipfileset dir: spbdir + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
+
+				
+				def exdir = new File(sp.projectDir.getCanonicalPath() + File.separator + 'dist/exampleprojects')
+				if (exdir.exists() && exdir.isDirectory()) {
+					exdir.listFiles().each { ex ->
+						zipfileset dir: project.distsDir.getCanonicalPath() + '/exampleprojects/', prefix: foldername + '/', includes: ex.getName() + '.zip'
+					}
+				}
+			}
+			
+			zipfileset dir: preprocessdir, prefix: foldername + '/', erroronmissingdir: false
+		}
+		ant.delete dir: preprocessdir
+	}
+}
+
+def createSrcZip(distname, arts)
+{
+	def mainzipdir = 'sources/'
+	String maindir = project.projectDir.getCanonicalPath()
+	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+	def ant = new groovy.util.AntBuilder()
+	ant.sequential {
+		zip destfile: zipfilename,
+		{
+			project.ext.mainres.each { rsdir ->
+				arts.each { artname ->
+					Project sp = subprojectmap.get(artname)
+					zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + rsdir, prefix: mainzipdir + sp.projectDir.getName() +'/' + rsdir,  erroronmissingdir: false
+				}
+			}
+			
+			arts.each { artname ->
+				Project sp = subprojectmap.get(artname)
+				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle',  erroronmissingdir: false
+			}
+			
+			zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle', excludes: '.gradle'
+			zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
+			zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
 		}
 	}
-	 	
-    //from(subprojects.configurations.runtime){ into('lib') }
-    //from('subprojects.jar'){ into('lib') }
-    //from('sourceSets.main.allSource') { into('src') }
-
-    task.from('docs/readme.txt') 
-    task.from('docs/license.txt')
-    task.from('docs/api-changes.txt')
-
-    if(configuration == "desktopDistribution") {
-        task.from('docs/default.settings.xml')
-        task.from('docs/junit-3.8.1.jar'){ into('lib') }
-        task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
-        task.from('build/jadex-example-project.zip')
-        task.from('docs/jcc.settings.xml') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-        task.from('docs/jadex.bat') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-        task.from('docs/jadex_no_awareness.bat') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-        task.from('docs/jadex.sh') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-        task.from('docs/jadex_no_awareness.sh') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-        task.from('docs/bpmn_editor.bat') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-        task.from('docs/bpmn_editor.sh') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-        task.from('docs/howtostart.txt') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-    }
 }
 
-/*task ttt(type: Zip){
-	archiveName = 'ttt-' + jadex_build_version + '.zip'
-	destinationDir = new File(project.distsDir, "testest")
-	from('docs/jadex.sh') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-	from('docs/jadex.bat') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-}*/
-
-task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip, buildAndroidExampleProject]) {
-    archiveName = 'jadex-android-' + jadex_build_version + '.zip'
-    destinationDir = new File(project.distsDir, "standard-version")
-    buildDistribution(buildDistAndroid, null, androidIncl, "androidDistribution")
-    from(srcAndroidZip.archivePath)
-    from(buildAndroidExampleProject.archivePath)
+/* Recursively add subprojects */
+def addSubproject(prefix, proj)
+{
+	def pname = prefix + ':' + proj.name
+	project.ext.subprojectmap.put(pname, proj)
+	proj.subprojects.each { sp ->
+		addSubproject(pname, sp)
+	}
 }
-
-task copyArchives(type: Copy) {
-	destinationDir = project.distsDir
-	// from war { into 'wars'}
-    // from('.') { include '**/*.war' into 'wars' }
-    //from(project(":jadex-platform-relay-web").jar) { into 'build/distributions/wars' }
-    //from(project(":jadex-servletfilter-web").jar) { into 'build/distributions/wars' }
-    //from(project(":jadex-applications-web").jar) { into 'build/distributions/wars' }
-	//from fileTree(".").files include '*.war' into 'wars'
-	
-	from(new File(project(":jadex-platform-relay-web").buildDir, "libs")) { include '*.war' into 'pro-version' }
-	from(new File(project(":jadex-servletfilter-web").buildDir, "libs")) { include '*.war' into 'pro-version' }
-	from(new File(project(":jadex-applications-web").buildDir, "libs")) { include '*.war' into 'standard-version' }
-	
-	//from(new File(project(":jadex-editor-bpmn").buildDir, "libs")) { include '*.jar' into 'standard-version' }
-	//from(new File(project(":jadex-editor-gpmn").buildDir, "libs")) { include '*.jar' into 'standard-version' }
-}
-
-task buildDist(type: Zip, dependsOn: [srcZip, buildExampleProject, copyArchives]) {
-	archiveName = 'jadex-'+jadex_build_version+'.zip' //baseName
-	destinationDir = new File(project.distsDir, "standard-version")
-	buildDistribution(buildDist, stdexcl, null)
-	from(srcZip.archivePath)
-	from(buildExampleProject.archivePath)
-}
-
-task buildDistPro(type: Zip, dependsOn: [srcZipPro, copyArchives]) {
-	archiveName = 'jadex-pro-'+jadex_build_version+'.zip' //baseName
-	destinationDir = new File(project.distsDir, "pro-version")
-	buildDistribution(buildDistPro, proexcl, null)
-	from(srcZipPro.archivePath)
-	from('docs/jadex-relay.bat') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-	from('docs/jadex-relay.sh') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-	from('jadex-platform-extension-management/win') { into('win') }
-}
-
-task buildDist3d(type: Zip, dependsOn: srcZip3d) {
-	archiveName = 'jadex-3d-addon-'+jadex_build_version+'.zip' //baseName
-	destinationDir = new File(project.distsDir, "standard-version")
-	from(project(":jadex-kernel-extension-envsupport-jmonkey").jar) { into('lib') }
-	from(project(":jadex-kernel-extension-envsupport-jmonkey").configurations.runtime) { into('lib') exclude("*jadex*") } // exclude jadex dependencies
-	from(srcZip3d.archivePath)
-	from('docs/readme-3d.txt')
-}
-
-task buildDistWebservice(type: Zip, dependsOn: srcZipWebservice) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = 'jadex-webservice-addon-'+jadex_build_version+'.zip' 
-	destinationDir = new File(project.distsDir, "standard-version")
-	from(project(":jadex-applications-webservice").jar) { into('lib') }
-	from(project(":jadex-applications-webservice").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
-	from(project(":jadex-platform-extension-webservice").jar) { into('lib') }
-	from(project(":jadex-platform-extension-webservice").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
-	from(project(":jadex-platform-extension-webservice-desktop").jar) { into('lib') }
-	from(project(":jadex-platform-extension-webservice-desktop").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
-	from(srcZipWebservice.archivePath)
-}
-
-task buildDistRelay(type: Zip, dependsOn: srcZipRelay) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = 'jadex-relay-standalone-'+jadex_build_version+'.zip' 
-	destinationDir = new File(project.distsDir, "pro-version")
-	from(project(":jadex-platform-extension-relay-standalone").jar) { into('lib') }
-	from(project(":jadex-platform-extension-relay-standalone").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
-	from(srcZipRelay.archivePath)
-	from('docs/jadex-relay.bat') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-	from('docs/jadex-relay.sh') {filter{String line -> line.replaceAll('\\$\\{jadex_build_version\\}', jadex_build_version)}}
-}
-
-task buildDistSecureTransport(type: Zip, dependsOn: srcZipSecureTransport) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = 'jadex-securetransport-addon-'+jadex_build_version+'.zip' 
-	destinationDir = new File(project.distsDir, "pro-version")
-	from(project(":jadex-platform-extension-securetransport").jar) { into('lib') }
-	from(project(":jadex-platform-extension-securetransport").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
-	from(srcZipSecureTransport.archivePath)
-}
-
-task buildDistManagement(type: Zip, dependsOn: srcZipManagement) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = 'jadex-management-addon-'+jadex_build_version+'.zip' 
-	destinationDir = new File(project.distsDir, "pro-version")
-	from(project(":jadex-platform-extension-management").jar) { into('lib') }
-	from(project(":jadex-platform-extension-management").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
-	from(srcZipManagement.archivePath)
-}
-
-task buildDistMaven(type: Zip, dependsOn: srcZipMaven) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = 'jadex-mavendependencies-addon-'+jadex_build_version+'.zip' 
-	destinationDir = new File(project.distsDir, "pro-version")
-	from(project(":jadex-platform-extension-maven").jar) { into('lib') }
-	from(project(":jadex-platform-extension-maven").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
-	from(srcZipMaven.archivePath)
-}
-
-task buildDistBpmnEditor(type: Zip, dependsOn: srcZipBpmnEditor) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = 'jadex-editor-bpmn-'+jadex_build_version+'.zip' 
-	destinationDir = new File(project.distsDir, "standard-version")
-	from(project(":jadex-editor-bpmn").jar) { into('lib') }
-	from(project(":jadex-editor-bpmn").configurations.runtime){ into('lib') exclude("*jadex*") }
-	from(srcZipBpmnEditor.archivePath)
-	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt')
-	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING')
-}
-
-task buildDistGpmnEditor(type: Zip, dependsOn: srcZipGpmnEditor) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = 'jadex-editor-gpmn-'+jadex_build_version+'.zip' 
-	destinationDir = new File(project.distsDir, "standard-version")
-	from(project(":jadex-editor-gpmn").jar) { into('lib') }
-	from(project(":jadex-editor-gpmn").configurations.runtime){ into('lib') exclude("*jadex*") }
-	from(srcZipGpmnEditor.archivePath)
-	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt')
-	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING')
-}
-
-task buildAll(dependsOn: [build, docs, buildDistGpmnEditor, buildDistBpmnEditor,
-	buildDistMaven, buildDistManagement, buildDistSecureTransport, buildDistRelay, buildDistWebservice,
-	buildDist3d, buildDistPro, buildDist, buildDistAndroid, uploadArchives]) << {
-}
-
-
-// Problems with copySpec -> 3.0: https://github.com/gradle/gradle/blob/master/design-docs/gradle-3.0.md
-//def fi = copySpec {
-//	from("docs/readme.txt")
-//	into("ttt")
-//	filesMatching("**/readme.txt") {
-//		String line -> line.replaceAll('a','b')
-//	}
-//}	
-
-//task mycopy (type: Copy) {
-//	into("ttt")
-//	with fi
-//}
-
-
-
-//  ---------------------------------
-//      RELEASE TASKS/CONFIG
-//  ---------------------------------
-
-release {
-    failOnCommitNeeded = true
-    failOnPublishNeeded = false
-    failOnSnapshotDependencies = false // sadly, we have jmonkey snapshot dependencies...
-    failOnUnversionedFiles = false
-    failOnUpdateNeeded = true
-    revertOnFail = true
-//    preCommitText = ''
-//    preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
-//    tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
-//    newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
-//    tagTemplate = '${version}'
-    versionPropertyFile = 'gradle.properties'
-    versionProperties = ['jadex_build_version', 'gradleplugin_build_version']
-    buildTasks = [\
-            'installGradlePluginArchives',
-            'build',
-            'docs',
-            'buildDistGpmnEditor',
-            'buildDistMaven',
-            'buildDistManagement',
-            'buildDistSecureTransport',
-            'buildDistRelay',
-            'buildDistWebservice',
-            'buildDist3d',
-            'buildDistPro',
-            'buildDist',
-            'buildDistAndroid'
-    ]
-    versionPatterns = [
-        /(\d+)([^\d]*$)/: { Matcher m, Project p -> m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") }
-    ]
-    scmAdapters = [
-        net.researchgate.release.GitAdapter
-    ]
-
-    git {
-        requireBranch = 'master'
-//        pushToRemote = 'origin'
-        pushToRemote = false
-//        pushToCurrentBranch = false
-
-    }
-
-}
-
-//afterReleaseBuild.dependsOn uploadArchives

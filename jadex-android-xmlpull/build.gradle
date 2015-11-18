@@ -1,6 +1,6 @@
 dependencies
 {
-    provided libraries.android
+    compile libraries.android
     compile(project(':jadex-xml'))
 //    testCompile(project(':jadex-commons:test-jar'))
     testCompile files(project(':jadex-commons').sourceSets.test.output)
