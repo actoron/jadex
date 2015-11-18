@@ -15,8 +15,8 @@ import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature.GoalsExistCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.LifecycleStateCondition;
-import jadex.bdiv3.features.impl.BDIAgentFeature.PlansExistCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.NotInShutdownCondition;
+import jadex.bdiv3.features.impl.BDIAgentFeature.PlansExistCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
@@ -81,7 +81,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.rules.eca.ChangeInfo;
@@ -261,16 +260,21 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		boolean ret = false;
 		
 		UnparsedExpression uexp = cond.getExpression();
-		if(uexp.getParsed()==null)
-			SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader());
-		Object res = ((IParsedExpression)uexp.getParsed()).getValue(CapabilityWrapper.getFetcher(agent, uexp.getLanguage(), vals));
-		if(res instanceof Boolean)
+		try
 		{
-			ret = ((Boolean)res).booleanValue();
+			Object res = SJavaParser.getParsedValue(uexp, agent.getModel().getAllImports(), CapabilityWrapper.getFetcher(agent, uexp.getLanguage(), vals), agent.getClassLoader());
+			if(res instanceof Boolean)
+			{
+				ret = ((Boolean)res).booleanValue();
+			}
+			else
+			{
+				agent.getLogger().warning("Condition does not evaluate to boolean: "+uexp.getValue());
+			}
 		}
-		else
+		catch(Exception e)
 		{
-			System.out.println("Condition does not evaluate to boolean: "+uexp.getValue());
+			agent.getLogger().warning("Condition evaluation produced exception: "+uexp.getValue()+", "+e);
 		}
 		
 		return ret;
