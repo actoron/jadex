@@ -19,11 +19,11 @@ public interface IPublishService
 	public static final String PUBLISH_RS = "rs";
 	
 	/** The default publish implementations for rest. */
-	public static final String[] DEFAULT_RSPUBLISH_CLASSES = new String[]
+	public static final String[] DEFAULT_RSPUBLISH_COMPONENTS = new String[]
 	{
-		"jadex.extension.rs.publish.JettyRSPublishAgent",
-		"jadex.extension.rs.publish.GrizzlyRSPublishAgent",
-		"jadex.extension.rs.publish.ExternalRSPublishAgent"
+		"/jadex/extension/rs/publish/JettyRSPublishAgent.class",
+		"/jadex/extension/rs/publish/GrizzlyRSPublishAgent.class",
+		"/jadex/extension/rs/publish/ExternalRSPublishAgent.class"
 	};
 	
 	/**

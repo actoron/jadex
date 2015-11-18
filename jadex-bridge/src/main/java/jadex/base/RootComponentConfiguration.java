@@ -125,7 +125,7 @@ public class RootComponentConfiguration
 	public static final String RSPUBLISH = "rspublish"; // class: boolean default: false
 
 	/** Optionally provide alternative rs publish implementation.  **/
-	public static final String RSPUBLISHCLASS = "rspublishclass"; // class: boolean default: false
+	public static final String RSPUBLISHCOMPONENT = "rspublishcomponent"; // class: String default: First component available as defined in IPublishService...
 	
 	/** The name(s) of kernel(s) to load (separated by comma).
 	      Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
@@ -732,12 +732,12 @@ public class RootComponentConfiguration
 
 	public String getRsPublishClass()
 	{
-		return (String)getValue(RSPUBLISHCLASS);
+		return (String)getValue(RSPUBLISHCOMPONENT);
 	}
 
 	public void setRsPublishClass(String value)
 	{
-		setValue(RSPUBLISHCLASS, value);
+		setValue(RSPUBLISHCOMPONENT, value);
 	}
 	
 	public KERNEL[] getKernels()
@@ -952,6 +952,14 @@ public class RootComponentConfiguration
 		for (Map.Entry<String, Object> entry : other.rootargs.entrySet()) {
 			this.setValue(entry.getKey(), entry.getValue());
 		}
+	}
+
+	/**
+	 * Checks this config for consistency.
+	 */
+	public void checkConsistency() {
+		boolean rsPublish = getRsPublish();
+		String rsPublishClass = getRsPublishClass();
 	}
 
 }

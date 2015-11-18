@@ -1064,4 +1064,11 @@ public class PlatformConfiguration
 		}
 		rootconfig.enhanceWith(other.rootconfig);
 	}
+
+	/**
+	 * Checks this configuration for consistency errors.
+	 */
+	public void checkConsistency() {
+		rootconfig.checkConsistency();
+	}
 }

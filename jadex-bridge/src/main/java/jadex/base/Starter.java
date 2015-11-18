@@ -251,6 +251,7 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config)
 	{
+		config.checkConsistency();
 		RootComponentConfiguration rootConfig = config.getRootConfig();
 		
 		// pass configuration parameters to static fields:

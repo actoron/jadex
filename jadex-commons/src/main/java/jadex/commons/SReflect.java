@@ -10,6 +10,8 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -603,31 +605,46 @@ public class SReflect
 		}
 		return packagename;
 	}
-	
+
 	/**
-	 *  Select the first available class name from a choice of potential classes.
+	 *  Select the first available resource from a choice of potential resources.
 	 *  Allows, e.g. swapping alternative implementations in the classpath. 
 	 */
-	public static String	chooseAvailableClassName(String... choices)
+	public static String chooseAvailableResource(String... choices)
 	{
-		return chooseAvailableClassName(SReflect.class.getClassLoader(), choices);
+		return chooseAvailableResource(SReflect.class.getClassLoader(), choices);
 	}
 	
 	/**
-	 *  Select the first available class name from a choice of potential classes.
+	 *  Select the first available resource from a choice of potential resources.
 	 *  Allows, e.g. swapping alternative implementations in the classpath. 
 	 */
-	public static String	chooseAvailableClassName(ClassLoader cl, String... choices)
+	public static String chooseAvailableResource(ClassLoader cl, String... choices)
 	{
 		String	ret	= null;
 		for(String choice: choices)
 		{
-			Class<?>	clazz	= classForName0(choice, cl);
-			if(clazz!=null)
-			{
-				ret	= clazz.getName();
-				break;
+			if (choice.endsWith(".class")) {
+				Class<?>	clazz	= classForName0((choice.startsWith("/") ? choice.substring(1) : choice).substring(0,choice.length()-6).replace("/","."), cl);
+				if(clazz!=null)
+				{
+					ret	= choice;
+					break;
+				}
+			} else {
+				InputStream is = SUtil.getResource0(choice, cl);
+				if(is!=null)
+				{
+					ret	= choice;
+					try {
+						is.close();
+					} catch (IOException e) {
+					}
+					break;
+				}
 			}
+
+
 		}
 		return ret;
 	}

@@ -113,7 +113,7 @@ import static jadex.base.RootComponentConfiguration.*;
 	@Argument(name=WSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 	
 	@Argument(name=RSPUBLISH, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=RSPUBLISHCLASS, clazz=String.class, defaultvalue="jadex.commons.SReflect.chooseAvailableClassName(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_CLASSES)+\".class\""),
+	@Argument(name=RSPUBLISHCOMPONENT, clazz=String.class, defaultvalue="jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)"),
 
 	@Argument(name=KERNELS, clazz=String.class, defaultvalue="\"multi\""),
 	
@@ -158,7 +158,7 @@ import static jadex.base.RootComponentConfiguration.*;
 	@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"),
 	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
-	@ComponentType(name="rspublish", filename="$args.rspublishclass"),
+	@ComponentType(name="rspublish", filename="$args.rspublishcomponent"),
 //	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/ExternalRSPublishAgent.class"),
 //	@ComponentType(name="rspublish_grizzly", filename="jadex/extension/rs/publish/GrizzlyRSPublishAgent.class"),
 //	@ComponentType(name="rspublish_jetty", filename="jadex/extension/rs/publish/JettyRSPublishAgent.class"),
@@ -285,7 +285,7 @@ import static jadex.base.RootComponentConfiguration.*;
 			arguments={
 				@NameValue(name="saveonexit", value="$args.saveonexit"),
 				@NameValue(name="platforms", value="$args.jccplatforms")}),
-//		@Component(name="rspub", type="$args.RSPUBLISHCLASS", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
+//		@Component(name="rspub", type="$args.RSPUBLISHCOMPONENT", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="rspub", type="rspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="wspub", type="wspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
 		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",

@@ -25,7 +25,7 @@
 	    </providedservice>
 	    <providedservice class="jadex.bridge.service.types.library.IDependencyService">
 	        <implementation>
-	        	$args.maven_dependencies ? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.platform.service.library.BasicDependencyService()
+				jadex.commons.SReflect.isAndroid() ? null : $args.maven_dependencies ? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.platform.service.library.BasicDependencyService()
 	        </implementation>
 	    </providedservice>
 	</services>
