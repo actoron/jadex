@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -50,22 +52,38 @@ public class VersionInfo
 			InputStream	is	= VersionInfo.class.getResourceAsStream("version.properties");
 			props.load(is);
 			is.close();
-			version	= props.getProperty("jadex.version");
 			
 //			System.out.println(props);
-			String	timestamp	= props.getProperty("jadex.timestamp");
+			String	timestamp	= props.getProperty("jadex_build_timestamp");
 //			System.out.println("timestamp: "+timestamp);
 			if(timestamp.startsWith("$"))
 			{
-				// non-maven build -> use file date
+				// non build -> use file date
 				URL	url	= VersionInfo.class.getResource("version.properties");
 				URLConnection	con	= url.openConnection();
 				date	= new Date(con.getLastModified());
 				con.getInputStream().close();	// Required to release file handle!
 //				System.out.println("file date: "+date);
+				
+				// non build -> find settings file.
+				File	start	= new File(url.getPath());
+				while(start.exists() && start.getParentFile()!=null)
+				{
+					start	= start.getParentFile();
+					File	settings	= new File(start, "gradle.properties");
+					if(settings.exists())
+					{
+						is	= new FileInputStream(settings);
+						props.load(is);
+						is.close();
+						version	= props.getProperty("jadex_build_version");
+						break;
+					}
+				}
 			}
 			else
 			{
+				version	= props.getProperty("jadex_build_version");
 				// Format is yyyyMMdd.HHmmss
 				int	year	= Integer.parseInt(timestamp.substring(0, 4));
 				int	month	= Integer.parseInt(timestamp.substring(4, 6));
@@ -80,6 +98,8 @@ public class VersionInfo
 		catch(Exception e)
 		{
 //			e.printStackTrace();
+			date	= date!=null ? date : new Date();
+			version	= version!=null ? version : "n/a";
 		}
 	}
 	

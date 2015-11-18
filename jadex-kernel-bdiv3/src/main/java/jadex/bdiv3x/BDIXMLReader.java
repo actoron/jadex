@@ -388,7 +388,20 @@ public class BDIXMLReader extends ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cardinalityone", "cardinalityOne"))}, 
 			new SubobjectInfo[]{new SubobjectInfo(new XMLInfo(new QName(uri, "inhibits")), new AccessInfo("inhibits", "inhibitionExpression"))})));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "inhibits")}), new ObjectInfo(UnparsedExpression.class, null),
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "inhibits")}), new ObjectInfo(UnparsedExpression.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				// internal name for cref
+				((UnparsedExpression)object).setName(MElement.internalName(((UnparsedExpression)object).getName()));
+				return object;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("ref", "name")),
@@ -861,25 +874,22 @@ public class BDIXMLReader extends ComponentXMLReader
 					{
 						ref	= (String)context.getStackElement(context.getStackSize()-2).getRawAttributes().get("cref");
 					}
-					mtrig.addGoalMatchExpression(ref, (UnparsedExpression)object);	// Todo: support match expression on other elements as allowed in schema 
+					mtrig.addGoalMatchExpression(MElement.internalName(ref), (UnparsedExpression)object);	// Todo: support match expression on other elements as allowed in schema 
 				}
 				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factadded")))
 				{
 					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
-					String	name	= ((String)object).replace(".", MElement.CAPABILITY_SEPARATOR);
-					mtrig.addFactAdded(name);
+					mtrig.addFactAdded(MElement.internalName((String)object));
 				}
 				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factremoved")))
 				{
 					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
-					String	name	= ((String)object).replace(".", MElement.CAPABILITY_SEPARATOR);
-					mtrig.addFactRemoved(name);
+					mtrig.addFactRemoved(MElement.internalName((String)object));
 				}
 				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factchanged")))
 				{
 					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-2).getObject();
-					String	name	= ((String)object).replace(".", MElement.CAPABILITY_SEPARATOR);
-					mtrig.addFactChangeds(name);
+					mtrig.addFactChanged(MElement.internalName((String)object));
 				}
 				else
 				{
@@ -905,16 +915,23 @@ public class BDIXMLReader extends ComponentXMLReader
 		{
 			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 			{
-				return rawattributes.get("ref");
+				String	ref	= rawattributes.get("ref");
+				if(ref==null)
+				{
+					return rawattributes.get("cref");
+				}
+				return MElement.internalName(ref);
 			}
 		};
+		AttributeInfo[]	factattrs	= new AttributeInfo[]
+		{
+			new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
+			new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
+		};
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factadded")), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factremoved")), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factchanged")), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factadded")), new ObjectInfo(boc), new MappingInfo(null, null, "value", factattrs), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factremoved")), new ObjectInfo(boc), new MappingInfo(null, null, "value", factattrs), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "factchanged")), new ObjectInfo(boc), new MappingInfo(null, null, "value", factattrs), null));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(boc), new MappingInfo(null, null, "value", 
 //			new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))}), null));
 
@@ -1270,7 +1287,7 @@ public class BDIXMLReader extends ComponentXMLReader
 			{
 				StackElement	se	= context.getStackElement(context.getStackSize()-2);
 				String	name	= se.getRawAttributes().containsKey("ref") ? se.getRawAttributes().get("ref") : se.getRawAttributes().get("cref");
-				((UnparsedExpression)object).setName(name);
+				((UnparsedExpression)object).setName(MElement.internalName(name));
 				((MConfigParameterElement)parent).addParameter((UnparsedExpression)object);
 				// super add would required additional support for parameterset (subobjectinfo on all MConfigParameterElement elems
 //				super.linkObject(object, parent, linkinfo, pathname, context);

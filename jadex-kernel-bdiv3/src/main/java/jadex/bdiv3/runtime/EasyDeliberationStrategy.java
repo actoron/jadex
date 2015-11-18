@@ -51,7 +51,8 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	 */
 	public IFuture<Void> goalIsAdopted(RGoal goal)
 	{
-		for(RGoal other: getCapability().getGoals())
+		Collection<RGoal>	others	= getCapability().getGoals();
+		for(RGoal other: others)
 		{
 //			if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
 //				&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
@@ -83,7 +84,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	 */
 	public IFuture<Void> goalIsActive(RGoal goal)
 	{
-//		if(goal.getId().indexOf("PerformPatrol")!=-1)
+//		if(goal.getId().indexOf("analyse")!=-1)
 //			System.out.println("addinh: "+goal);
 		MDeliberation delib = goal.getMGoal().getDeliberation();
 		if(delib!=null)
@@ -245,7 +246,6 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 			return false;
 		
 		// todo: cardinality
-		
 		boolean ret = false;
 		
 		if(goal.getLifecycleState().equals(GoalLifecycleState.ACTIVE) && goal.getProcessingState().equals(GoalProcessingState.INPROCESS))

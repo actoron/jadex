@@ -91,6 +91,11 @@
 
 			<deliberation>
 				<inhibits cref="move.walk_around"/>
+				<inhibits ref="analyse_target">
+					!$goal.target.equals($ref.target) &amp;&amp;
+					$beliefbase.my_location.getDistance($goal.target.getLocation())
+					&lt; $beliefbase.my_location.getDistance($ref.target.getLocation())
+				</inhibits>
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. -->
 			<targetcondition>
