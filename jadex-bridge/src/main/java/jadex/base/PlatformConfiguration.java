@@ -369,6 +369,7 @@ public class PlatformConfiguration
 	{
 		this.model = model;
 		configurationInfo = getConfigurationInfo(model);
+		this.rootconfig.setModel(model);
 	}
 	
 	/**
@@ -1068,7 +1069,7 @@ public class PlatformConfiguration
 	/**
 	 * Checks this configuration for consistency errors.
 	 */
-	public void checkConsistency() {
+	protected void checkConsistency() {
 		rootconfig.checkConsistency();
 	}
 }

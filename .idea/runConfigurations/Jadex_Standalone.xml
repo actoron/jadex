@@ -3,7 +3,7 @@
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <option name="MAIN_CLASS_NAME" value="jadex.base.Starter" />
     <option name="VM_PARAMETERS" value="-ea" />
-    <option name="PROGRAM_PARAMETERS" value="-xsimulation true -logging true -xdeftimeout -1 -xuniqueids false -relaysecurity false -ssltcptransport false -localtransport false -xsensors true -xawareness true -rspublish true -xpersist false -tcptransport false -xsimulation false -niotcptransport false -xrelaytransport false -xextensions null -xchat false -xcli false -xdeployment false -xdf false -xmonitoring false -xsimul false -xsensors false -relayaddress http://toaster.activecomponents.org/relay" />
+    <option name="PROGRAM_PARAMETERS" value="-xsimulation true -logging true -xdeftimeout -1 -xuniqueids false -xrelaysecurity false -xssltcptransport false -xlocaltransport false -xsensors true -xawareness true -xrspublish true -xpersist false -xtcptransport false -xsimulation false -xniotcptransport false -xrelaytransport false -xextensions null -xchat false -xcli false -xdeployment false -xdf false -xmonitoring false -xsimul false -xsensors false -xrelayaddress http://toaster.activecomponents.org/relay" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" value="" />

@@ -251,7 +251,6 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config)
 	{
-		config.checkConsistency();
 		RootComponentConfiguration rootConfig = config.getRootConfig();
 		
 		// pass configuration parameters to static fields:
@@ -324,6 +323,7 @@ public class Starter
 			else
 			{
 				config.setPlatformModel(model);
+				config.checkConsistency();
 				Class<?> pc = config.getPlatformComponent();
 //				Object	pc = config.getValue(RootComponentConfiguration.PLATFORM_COMPONENT);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_COMPONENT, pc);
