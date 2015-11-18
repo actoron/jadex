@@ -90,7 +90,7 @@ subprojects
 
     if(isAndroidProject(project))
     {
-    	 if (isAndroidLibraryProject(project)) 
+	 	if (isAndroidLibraryProject(project))
         {
             apply plugin: 'android-library'
         } 
@@ -145,6 +145,16 @@ subprojects
         {
             androidTestCompile junit
         }
+
+		configurations {
+			// exclude transitive deps that are not supported on android
+			all*.exclude group:'org.javassist', module:'javassist'
+			all*.exclude group:'javax.mail', module:'mail'
+			all*.exclude group:'org.antlr', module:'antlr-runtime'
+			all*.exclude group:'org.bouncycastle', module:'bcprov-jdk15on'
+			all*.exclude group:'org.ow2.asm', module:'asm-all'
+			runtime.exclude group: 'junit', module:'junit' // no junit in runtime classpath
+		}
     }
     else
     {
