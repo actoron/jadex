@@ -1,7 +1,10 @@
 apply from: 'util.gradle'
 
+def artifactselectionmarker = 'X'
+def buildconfigsfile = 'buildconfigs.csv'
+
 /* Read the buildconfigs.csv and generate data structures */
-BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + 'buildconfigs.csv')))
+BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + buildconfigsfile)))
 def disttargets = new ArrayList<String>()
 def allbuildartifacts = new HashSet<String>()
 //def builddeps = new HashSet<String>()
@@ -24,13 +27,16 @@ br.eachLine { line ->
 		String[] toks = line.split(',');
 		if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || !toks[0].endsWith('-java8'))
 		{
-			allbuildartifacts.add(toks[0])
-			for (int i = 1; i < toks.length; ++i)
+			if (androidSdkExists() || !toks[0].contains('android'))
 			{
-				if ('X'.equals(toks[i].trim().toUpperCase()))
+				allbuildartifacts.add(':' + toks[0])
+				for (int i = 1; i < toks.length; ++i)
 				{
-					Set<String> arts = gradle.ext.distartmap.get(disttargets.get(i - 1))
-					arts.add(toks[0]);
+					if (artifactselectionmarker.equals(toks[i].trim().toUpperCase()))
+					{
+						Set<String> arts = gradle.ext.distartmap.get(disttargets.get(i - 1))
+						arts.add(':' + toks[0]);
+					}
 				}
 			}
 		}
@@ -44,12 +50,12 @@ gradle.ext.selecteddists = new ArrayList<String>()
 String selectedstr = gradle.startParameter.getProjectProperties().get('dist')
 selectedstr = selectedstr != null? selectedstr : 'everything'
 selectedstr.split(',').each {
-	gradle.ext.selecteddists.add(it)
+	gradle.ext.selecteddists.add(it.trim())
 }
 System.out.println('Selected distributions: ' + gradle.ext.selecteddists.toString())
 gradle.ext.maindistartifacts = new HashSet()
 gradle.ext.selecteddists.each {
-	gradle.ext.maindistartifacts.addAll(gradle.ext.distartmap.get(it.trim()))
+	gradle.ext.maindistartifacts.addAll(gradle.ext.distartmap.get(it))
 }
 
 gradle.ext.includeartifacts = new HashSet<String>()
@@ -79,9 +85,18 @@ else
 	}
 	depconfreader.close()
 	
-	gradle.ext.maindistartifacts.each { mainart ->
+	/*gradle.ext.maindistartifacts.each { mainart ->
 		addDependency(mainart, projdeps, gradle.ext.includeartifacts)
+	}*/
+	
+	gradle.ext.selecteddists.each { seldist ->
+		if (seldist.startsWith('addon')) {
+			gradle.ext.distartmap.get(seldist).each { art ->
+				addDependency(art, projdeps, gradle.ext.includeartifacts)
+			}
+		}
 	}
+	gradle.ext.includeartifacts.addAll(gradle.ext.maindistartifacts)
 	
 	include gradle.ext.includeartifacts.toArray(new String[gradle.ext.includeartifacts.size()])
 }
@@ -89,7 +104,7 @@ else
 // the plugins depend on other projects to be deployed, so they have to be standalone
 //'jadex-android-maven-plugin',
 // android-specific modules:
-if (androidSdkExists()) {
+/*if (androidSdkExists()) {
     include\
     'jadex-gradle-plugin',
     'jadex-android-antlr',
@@ -123,7 +138,7 @@ if (androidSdkExists()) {
 } else {
     logger.warn('Cannot compile android projects: No Android SDK found.\n' +
             'To include android projects in build, set ANDROID_HOME to your android sdk root.')
-}
+}*/
 
 //include 'jadex-test'
 
