@@ -958,7 +958,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							{
 								public void customResultAvailable(IResourceIdentifier rid)
 								{
-									if(rid!=null && rid.getGlobalIdentifier()!=null && !ResourceIdentifier.isJadexRid(rid))
+									if(rid!=null && rid.getGlobalIdentifier()!=null && !ResourceIdentifier.isHashGid(rid) && !ResourceIdentifier.isJadexRid(rid))
 									{
 //										System.out.println("rid: "+rid+" "+content.getClass()+" "+msg.get(SFipa.SENDER));
 										msg.put(SFipa.X_RID, rid);

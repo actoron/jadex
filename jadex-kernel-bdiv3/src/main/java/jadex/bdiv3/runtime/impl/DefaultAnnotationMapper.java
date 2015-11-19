@@ -50,7 +50,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 		boolean done = false;
 		
 		MGoal mgoal;
-		// Use plan parameters in xml case because the should exactly match the call in order and type
+		// Use plan parameters in xml case because they should exactly match the call in order and type
 		if(goal instanceof RGoal)
 		{
 			mgoal = (MGoal)((RGoal)goal).getModelElement();

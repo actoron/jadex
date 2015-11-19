@@ -47,7 +47,8 @@ task buildDocsZip (type: Zip, dependsOn: buildDocs) {
     from "${project.buildDir}${File.separator}site${File.separator}"
     baseName = 'jadex-mkdocs'
     version = jadex_build_version
-    into "$baseName-${version.replaceAll('-SNAPSHOT','')}"
+//    into "$baseName-${version.replaceAll('-SNAPSHOT','')}"
+    into "$baseName-$version"
     destinationDir = file("$project.buildDir")
     outputs.upToDateWhen { false }
 }
@@ -70,6 +71,10 @@ task buildDocsPdf (type:PandocTask, dependsOn: 'buildPandocDockerImage') {
 
 task buildPandocDockerImage (type: BuildPandocImageTask) {
     dockerImageName = 'jadexpandoc'
+}
+
+task clean(type:Delete) {
+    delete 'build', 'work'
 }
 
 class PandocTask extends DockerTask {

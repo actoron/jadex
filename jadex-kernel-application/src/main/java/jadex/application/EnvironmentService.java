@@ -56,20 +56,8 @@ public class EnvironmentService	implements IEnvironmentService
 			{
 				public void resultAvailable(final IExtensionInstance instance)
 				{
-					instance.init().addResultListener(
-						component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-							spaces.put(ei.getName(), instance);
-							lis.resultAvailable(null);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							lis.exceptionOccurred(exception);
-						}
-					}));
+					spaces.put(ei.getName(), instance);	// Make space known before init, in case initial avatars are created that create agents that want to get their spaces. (hack?)
+					instance.init().addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(lis));
 				}
 				
 				public void exceptionOccurred(Exception exception)
