@@ -120,7 +120,7 @@
 		
 		<plan name="extinguish_fire_plan">
 			<parameter name="disaster" class="ISpaceObject">
-				<goalmapping ref="extinguish_fire.disaster"/>
+				<goalmapping ref="extinguish_fires.disaster"/>
 			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
 				<goalmapping ref="extinguish_fires.units"/>

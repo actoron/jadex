@@ -62,7 +62,7 @@
 				$beliefbase.environment.getDistance($beliefbase.home, $beliefbase.position).getAsDouble()&gt;0.001
 			</creationcondition>
 			<dropcondition>
-				$goalbase.getGoals("treat_victims").length>1
+				$goalbase.getGoals("treat_victims").length>0
 			</dropcondition>
 		</achievegoal>
 
@@ -70,7 +70,7 @@
 		<achievegoal name="treat_victims">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<dropcondition>
-				$goal.getLifecycleState()==GoalLifecycleState.OPTION
+				$goal.getLifecycleState()==IGoal$GoalLifecycleState.OPTION
 				&amp;&amp; $goalbase.getGoals("treat_victims").length>1
 			</dropcondition>
 			<!-- <deliberation cardinality="1"/> -->

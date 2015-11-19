@@ -137,9 +137,9 @@ public class GoalDelegationHandler  implements InvocationHandler
 				String typename = SReflect.getInnerClassName(type);
 				String methodname = method.getName();
 				
-				for(MParameter mparam: mparams)
+				for(int i=0; i<mparams.size(); i++)
 				{
-					List<String> mappings = mparam.getServiceMappings();
+					List<String> mappings = mparams.get(i).getServiceMappings();
 					if(mappings!=null)
 					{
 						for(String mapping: mappings)
@@ -169,10 +169,14 @@ public class GoalDelegationHandler  implements InvocationHandler
 								if(target.startsWith("argument"))
 									target=target.substring(8);
 								int num = Integer.valueOf(target);
-								vals.put(mparam.getName(), args[num]);
+								vals.put(mparams.get(i).getName(), args[num]);
 								break;
 							}
 						}
+					}
+					else
+					{
+						vals.put(mparams.get(i).getName(), args[i]);
 					}
 				}
 			}
