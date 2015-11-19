@@ -49,6 +49,8 @@ disttargets = null
 gradle.ext.selecteddists = new ArrayList<String>()
 String selectedstr = gradle.startParameter.getProjectProperties().get('dist')
 selectedstr = selectedstr != null? selectedstr : 'everything'
+//selectedstr = gradle.startParameter.getProjectProperties().containsKey(selectedstr)? gradle.startParameter.getProjectProperties().get(selectedstr) : selectedstr 
+
 selectedstr.split(',').each {
 	gradle.ext.selecteddists.add(it.trim())
 }

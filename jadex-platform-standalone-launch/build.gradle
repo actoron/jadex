@@ -1,44 +1,40 @@
 dependencies 
 {
-	// Core api
-	compile project(':jadex-commons')
-	compile project(':jadex-bridge')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-xml')
+	def launcharts = new HashSet<String> ([
+										   // Core API
+										   ':jadex-commons',':jadex-bridge',':jadex-javaparser',':jadex-xml',
+										   
+										   // Kernels
+										   ':jadex-kernel-base',':jadex-kernel-micro',':jadex-kernel-bpmn',
+										   ':jadex-kernel-application',':jadex-kernel-component',':jadex-applib-bdi',
+										   ':jadex-kernel-bdiv3',
+										   
+										   // Platform
+										   ':jadex-platform',
+										   
+										   // Tools
+										   ':jadex-runtimetools-swing',':jadex-tools-bdi',':jadex-tools-bpmn',
+										   ':jadex-tools-comanalyzer',':jadex-rules-tools',
+										   
+										   // Extensions
+										   ':jadex-kernel-extension-agr',':jadex-kernel-extension-envsupport',
+										   ':jadex-kernel-extension-envsupport-opengl',':jadex-platform-extension-maven',
+										   ':jadex-kernel-extension-envsupport-jmonkey',' :jadex-platform-extension-webservice',
+										   ':jadex-platform-extension-securetransport',':jadex-platform-extension-management',
+										   ':jadex-platform-extension-webservice-desktop',
+										   ':jadex-platform-extension-webservice-desktop-jetty',
+										   ':jadex-platform-extension-webservice-desktop-grizzly'
+										   
+										   // Tests
+										   ':jadex-applications-micro',':jadex-applications-bdiv3',
+										   ':jadex-applications-bdi',':jadex-applications-bpmn'
+										   ])
 	
-	// Kernels
-	compile project(':jadex-kernel-base')
-	compile project(':jadex-kernel-micro')
-	compile project(':jadex-kernel-bpmn')
-	compile project(':jadex-kernel-application')
-//	compile project(':jadex-kernel-gpmn')
-	compile project(':jadex-kernel-component')
-//	compile project(':jadex-kernel-bdibpmn')
-	compile project(':jadex-applib-bdi')
-//	compile project(':jadex-kernel-bdi')
-	compile project(':jadex-kernel-bdiv3')
+	launcharts.retainAll(gradle.ext.includeartifacts)
 	
-	// Platform
-	compile project(':jadex-platform')
-	
-	// Tools
-	compile project(':jadex-runtimetools-swing')
-	compile project(':jadex-tools-bdi')
-	compile project(':jadex-tools-bpmn')
-	compile project(':jadex-tools-comanalyzer')
-	compile project(':jadex-rules-tools')
-	
-	// Extensions
-	compile project(':jadex-kernel-extension-agr')
-	compile project(':jadex-kernel-extension-envsupport')
-	compile project(':jadex-kernel-extension-envsupport-opengl')
-	compile project(':jadex-applib-bdi')
-
-	// Tests
-	testCompile project(':jadex-applications-micro')
-	testCompile project(':jadex-applications-bdiv3')
-	testCompile project(':jadex-applications-bdi')
-	testCompile project(':jadex-applications-bpmn')
+	gradle.ext.launcharts.each { art ->
+		compile project(art)
+	}
 }
 
 jar 
