@@ -220,7 +220,7 @@ task genDepList << {
 		sp.configurations.each { conf ->
 			conf.getAllDependencies().withType(org.gradle.api.artifacts.ProjectDependency).each { dep ->
 				if (!founddeps.contains(dep.getName()))
-					out.println dep.getName()
+					out.println dep.getDependencyProject().getPath()
 				founddeps.add(dep.getName())
 			}
 		}
