@@ -1,0 +1,5 @@
+dependencies 
+{
+//	compile project(':jadex-platform')
+//	compile project(':jadex-kernel-micro')
+}

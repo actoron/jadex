@@ -323,6 +323,7 @@ public class Starter
 			else
 			{
 				config.setPlatformModel(model);
+				config.checkConsistency();
 				Class<?> pc = config.getPlatformComponent();
 //				Object	pc = config.getValue(RootComponentConfiguration.PLATFORM_COMPONENT);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_COMPONENT, pc);

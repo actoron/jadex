@@ -17,6 +17,7 @@ jadex-distribution-minimal,X,X,X,,,,,,,,,,,X
 jadex-distribution-pro,,,X,,,,,,,,,,,X
 jadex-distribution-server,,,X,,,,,,,,,,,X
 jadex-distribution-standard,,X,X,,,,,,,,,,,X
+jadex-distribution-android,,,,X,,,,,,,,,,X
 jadex-editor-bpmn,,X,X,,,,,,,,X,,,X
 jadex-editor-gpmn,,,,,,,,,,,,X,,X
 jadex-javaparser,X,X,X,X,,,,,,,,,X,X

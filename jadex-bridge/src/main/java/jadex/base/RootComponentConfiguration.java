@@ -1,7 +1,11 @@
 package jadex.base;
 
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,7 +129,7 @@ public class RootComponentConfiguration
 	public static final String RSPUBLISH = "rspublish"; // class: boolean default: false
 
 	/** Optionally provide alternative rs publish implementation.  **/
-	public static final String RSPUBLISHCLASS = "rspublishclass"; // class: boolean default: false
+	public static final String RSPUBLISHCOMPONENT = "rspublishcomponent"; // class: String default: First component available as defined in IPublishService...
 	
 	/** The name(s) of kernel(s) to load (separated by comma).
 	      Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
@@ -175,6 +179,12 @@ public class RootComponentConfiguration
 	public static final String ADDRESS = "address"; // class: boolean default: true
 	/** Flag if dht storage ring should be provided. **/
 	public static final String DHT_PROVIDE = PlatformConfiguration.DHT_PROVIDE; // class: boolean default: false
+
+	private IModelInfo model;
+
+	void setModel(IModelInfo model) {
+		this.model = model;
+	}
 
 	/**
 	 * Kernel names enum.
@@ -243,7 +253,11 @@ public class RootComponentConfiguration
 	 * @return the value
 	 */
 	public Object getValue(String key) {
-		return rootargs.get(key);
+		Object val = rootargs.get(key);
+		if (val == null && model != null) {
+			val = getValueFromModel(key);
+		}
+		return val;
 	}
 
 	public Map<String, Object> getArgs()
@@ -730,14 +744,14 @@ public class RootComponentConfiguration
 		setValue(RSPUBLISH, value);
 	}
 
-	public String getRsPublishClass()
+	public String getRsPublishComponent()
 	{
-		return (String)getValue(RSPUBLISHCLASS);
+		return (String)getValue(RSPUBLISHCOMPONENT);
 	}
 
-	public void setRsPublishClass(String value)
+	public void setRsPublishComponent(String value)
 	{
-		setValue(RSPUBLISHCLASS, value);
+		setValue(RSPUBLISHCOMPONENT, value);
 	}
 	
 	public KERNEL[] getKernels()
@@ -952,6 +966,38 @@ public class RootComponentConfiguration
 		for (Map.Entry<String, Object> entry : other.rootargs.entrySet()) {
 			this.setValue(entry.getKey(), entry.getValue());
 		}
+	}
+
+	/**
+	 * Checks this config for consistency.
+	 */
+	protected void checkConsistency() {
+		StringBuilder errorText = new StringBuilder();
+		Object publish = getValue(RSPUBLISH);
+		Object publishComponent = getValue(RSPUBLISHCOMPONENT);
+		if (Boolean.TRUE.equals(publish) && publishComponent == null) {
+			errorText.append(RSPUBLISH + " set to true, but no " + RSPUBLISHCOMPONENT +" found.");
+		}
+
+		if (errorText.length() != 0) {
+			throw new RuntimeException("Configuration consistency error: \n" + errorText.toString());
+		}
+	}
+
+	/**
+	 * Returns the value as it is used in the (already loaded) model.
+	 * @param key
+	 * @return Object
+	 */
+	private Object getValueFromModel(String key) {
+		Object val;
+		Argument argument = (Argument) model.getArgument(key);
+		val	= SJavaParser.getParsedValue(argument, model.getAllImports(), null, Starter.class.getClassLoader());
+		if (val == null) {
+			// get default value
+			val = SJavaParser.getParsedValue(argument.getDefaultValue(), model.getAllImports(), null, Starter.class.getClassLoader());
+		}
+		return val;
 	}
 
 }

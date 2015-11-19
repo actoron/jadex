@@ -128,7 +128,7 @@
 		<argument name="rspublish" class="boolean">false</argument>
 		
 		<!-- Rest publish implementation. -->
-		<argument name="rspublishclass" class="String">jadex.commons.SReflect.chooseAvailableClassName(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_CLASSES)+".class"</argument>
+		<argument name="rspublishcomponent" class="String">jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)</argument>
 		
 		<!-- The name(s) of kernel(s) to load (separated by comma).
 		     Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.

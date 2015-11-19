@@ -43,7 +43,7 @@ public class MapWrapper<T, E> extends jadex.commons.collection.wrappers.MapWrapp
 	 */
 	protected void	entryAdded(T key, E value)
 	{
-		publisher.entryAdded(value, value);
+		publisher.entryAdded(key, value);
 	}
 	
 	/**

@@ -387,10 +387,10 @@ public class ComponentManagementService implements IComponentManagementService
 		final IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{			
 		if(modelname==null)
-			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
+			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + name + " : Modelname must not be null."));
 
-		if(name!=null && name.indexOf("rspub")!=-1)
-			System.out.println("create compo: "+modelname+" "+info);
+//		if(name!=null && name.indexOf("rspub")!=-1)
+//			System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();

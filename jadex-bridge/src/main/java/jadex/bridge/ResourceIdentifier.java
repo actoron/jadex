@@ -26,7 +26,9 @@ public class ResourceIdentifier implements IResourceIdentifier
 	protected static final Set<String>	IGNORED	= Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 		"bin",
 		"classes",
-		"target"
+		"target",
+		"build",
+		"main"
 	)));
 	
 	/** The jadex project names. */

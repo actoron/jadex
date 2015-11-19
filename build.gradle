@@ -14,7 +14,7 @@ def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
 }
-
+// ressource files that are filtered for variables
 project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle'
 
 project.ext.mainres = ['src/main/java', 'src/main/resources']
@@ -90,15 +90,21 @@ subprojects
 
     if(isAndroidProject(project))
     {
-    	 if (isAndroidLibraryProject(project)) 
+	 	if (isAndroidLibraryProject(project))
         {
             apply plugin: 'android-library'
-        } 
+        }
         else 
         {
             apply plugin: 'com.android.application'
         }
-        
+
+		// strip "-release" from .aar and .apks
+		onReleaseOutput(project) {output ->
+			def fileName = output.outputFile.getName()
+			output.outputFile = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}")
+		}
+
     	android {
             compileSdkVersion android_compileSdkVersion
             buildToolsVersion android_buildToolsVersion
@@ -136,7 +142,7 @@ subprojects
                 abortOnError false
             }
         }
-        
+
         // include all resources that are placed inside src dirs
         android.sourceSets.main.resources.srcDirs mainSrcDir
         android.sourceSets.test.resources.srcDirs testSrcDir
@@ -145,6 +151,16 @@ subprojects
         {
             androidTestCompile junit
         }
+
+		configurations {
+			// exclude transitive deps that are not supported on android
+			all*.exclude group:'org.javassist', module:'javassist'
+			all*.exclude group:'javax.mail', module:'mail'
+			all*.exclude group:'org.antlr', module:'antlr-runtime'
+			all*.exclude group:'org.bouncycastle', module:'bcprov-jdk15on'
+			all*.exclude group:'org.ow2.asm', module:'asm-all'
+			runtime.exclude group: 'junit', module:'junit' // no junit in runtime classpath
+		}
     }
     else
     {
@@ -216,6 +232,7 @@ task exampleZips << {
 	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
 	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
+    String buildExcludes = 'build/**, classes/**, target/**, bin/**, .gradle/**, .idea/**, *.iml'
 	gradle.ext.maindistartifacts.each { artname ->
 		Project sp = project.ext.subprojectmap.get(artname)
 		File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
@@ -230,7 +247,7 @@ task exampleZips << {
 						{
 							fileset dir: ex.getCanonicalPath(), includes: project.ext.filterfiles, erroronmissingdir: false
 						}
-						
+
 						filterset begintoken: '${', endtoken: '}',
 						{
 							filter token: 'jadex_build_version', value: jadex_build_version
@@ -240,7 +257,7 @@ task exampleZips << {
 					{
 						resources
 						{
-							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles, erroronmissingdir: false
+							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles + ', ' + buildExcludes, erroronmissingdir: false
 						}
 					}
 					ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
@@ -323,8 +340,20 @@ def createDistZip(distname, arts, isaddon)
 			arts.each { artname ->
 				def sp = project.ext.subprojectmap.get(artname)
 				def spbdir = sp.buildDir.getCanonicalPath()
-				
-				zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
+
+				if (isAndroidProject(sp)) {
+					def targetFolder = '/apps/'
+					if (isAndroidLibraryProject(sp)) {
+						targetFolder = '/lib/'
+					}
+					onReleaseOutput(sp) {output ->
+						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
+					}
+				} else {
+//					sp.jar.archivePath?
+//					sp.war.archivePath?
+					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
+				}
 
 				zipfileset dir: spbdir + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
 

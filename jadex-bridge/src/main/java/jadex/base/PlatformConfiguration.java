@@ -369,6 +369,7 @@ public class PlatformConfiguration
 	{
 		this.model = model;
 		configurationInfo = getConfigurationInfo(model);
+		this.rootconfig.setModel(model);
 	}
 	
 	/**
@@ -1063,5 +1064,12 @@ public class PlatformConfiguration
 			this.setValue(entry.getKey(), entry.getValue());
 		}
 		rootconfig.enhanceWith(other.rootconfig);
+	}
+
+	/**
+	 * Checks this configuration for consistency errors.
+	 */
+	protected void checkConsistency() {
+		rootconfig.checkConsistency();
 	}
 }
