@@ -188,7 +188,7 @@ subprojects
     apply plugin: 'maven'
     sourceCompatibility = 1.6
     
-    uploadArchives {
+    /*uploadArchives {
         repositories {
         	if (isCommercial(project))
         	{
@@ -206,7 +206,7 @@ subprojects
 	            }
 	        }
         }
-    }
+    }*/
 }
 
 // Hack, helper to generate dep-tree
