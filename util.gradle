@@ -1,3 +1,5 @@
+import groovy.lang.Closure;
+
 buildscript {
     repositories
     {
@@ -17,15 +19,51 @@ def isAndroidLibraryProject(project) {
     project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
 }
 
+def onReleaseVariant(project, Closure c) {
+    if (isAndroidLibraryProject(project)) {
+        project.android.libraryVariants.all {variant ->
+            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+                c(variant)
+            }
+        }
+    } else {
+        project.android.applicationVariants.all {variant ->
+            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+                c(variant)
+            }
+        }
+    }
+}
+
+/**
+ * Calls given closure with the output object of the given project.
+ * This ensures that the output is already configured when the callback is called.
+ * @param project
+ * @param c callback
+ * @return void
+ */
+def onReleaseOutput(project, Closure c) {
+//    onReleaseVariant(project) {println it}
+    onReleaseVariant(project) { variant ->
+//        variant.outputs.each { output ->
+//            c(output)
+//        }
+        def output = variant.outputs.find({ o -> o.name.contains(com.android.builder.core.BuilderConstants.RELEASE)})
+        c(output)
+    }
+}
+
 def getReleaseVariant(project) {
     if (isAndroidLibraryProject(project)) {
-        project.android.libraryVariants.each {variant ->
+        project.android.libraryVariants.all {variant ->
+//            println variant
             if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
                 return variant
             }
         }
     } else {
-        project.android.applicationVariants.each {variant ->
+        project.android.applicationVariants.all {variant ->
+//            println variant
             if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
                 return variant
             }
@@ -125,4 +163,6 @@ ext {
     isExcluded = this.&isExcluded
     calledWithTask = this.&calledWithTask
     androidSdkExists = this.&androidSdkExists
+    onReleaseVariant = this.&onReleaseVariant
+    onReleaseOutput = this.&onReleaseOutput
 }

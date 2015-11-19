@@ -93,12 +93,18 @@ subprojects
 	 	if (isAndroidLibraryProject(project))
         {
             apply plugin: 'android-library'
-        } 
+        }
         else 
         {
             apply plugin: 'com.android.application'
         }
-        
+
+		// strip "-release" from .aar and .apks
+		onReleaseOutput(project) {output ->
+			def fileName = output.outputFile.getName()
+			output.outputFile = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}")
+		}
+
     	android {
             compileSdkVersion android_compileSdkVersion
             buildToolsVersion android_buildToolsVersion
@@ -136,7 +142,7 @@ subprojects
                 abortOnError false
             }
         }
-        
+
         // include all resources that are placed inside src dirs
         android.sourceSets.main.resources.srcDirs mainSrcDir
         android.sourceSets.test.resources.srcDirs testSrcDir
@@ -208,10 +214,10 @@ task exampleZips << {
 	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
 	gradle.ext.maindistartifacts.each { artname ->
 		Project sp = project.ext.subprojectmap.get(artname)
-		println artname
-		println subprojectmap
+//		println artname
+//		println subprojectmap
 		File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
-		println '' + exdir + ' ' + exdir.exists()
+//		println '' + exdir + ' ' + exdir.exists()
 		if (exdir.exists() && exdir.isDirectory()) {
 			exdir.listFiles().each { ex ->
 				preprocessdirfile.mkdirs()
@@ -309,10 +315,18 @@ def createDistZip(distname, arts, isaddon)
 		ant.zip destfile: zipfilename,
 		{
 			arts.each { artname ->
-				def sp = subprojectmap.get(artname)
+				def Project sp = subprojectmap.get(artname)
 				def spbdir = sp.buildDir.getCanonicalPath()
-				
-				zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
+
+				if (isAndroidProject(sp)) {
+					onReleaseOutput(sp) {output ->
+						zipfileset dir: output.outputFile.getParent(), prefix: foldername + '/lib/', includes:  output.outputFile.getName(), erroronmissingdir: true
+					}
+				} else {
+//					sp.jar.archivePath?
+//					sp.war.archivePath?
+					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
+				}
 
 				zipfileset dir: spbdir + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
 
