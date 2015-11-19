@@ -320,8 +320,12 @@ def createDistZip(distname, arts, isaddon)
 				def spbdir = sp.buildDir.getCanonicalPath()
 
 				if (isAndroidProject(sp)) {
+					def targetFolder = '/apps/'
+					if (isAndroidLibraryProject(sp)) {
+						targetFolder = '/lib/'
+					}
 					onReleaseOutput(sp) {output ->
-						zipfileset dir: output.outputFile.getParent(), prefix: foldername + '/lib/', includes:  output.outputFile.getName(), erroronmissingdir: true
+						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
 					}
 				} else {
 //					sp.jar.archivePath?
