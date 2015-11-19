@@ -171,6 +171,26 @@ subprojects
 
     apply plugin: 'maven'
     sourceCompatibility = 1.6
+    
+    uploadArchives {
+        repositories {
+        	if (isCommercial(project))
+        	{
+	            mavenDeployer {
+	                repository(url: "file:///home/jander/tmp/repotest/")
+	                snapshotRepository(url: "file:///home/jander/tmp/repotest/", uniiqueVersion: true)
+	            }
+	        }
+	        else
+	        {
+	        	mavenDeployer {
+	                repository(url: "file:///home/jander/tmp/repotest2/")
+	                snapshotRepository(url: "file:///home/jander/tmp/repotest2/")
+	                uniiqueVersion(true)
+	            }
+	        }
+        }
+    }
 }
 
 // Hack, helper to generate dep-tree
@@ -198,10 +218,7 @@ task exampleZips << {
 	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
 	gradle.ext.maindistartifacts.each { artname ->
 		Project sp = project.ext.subprojectmap.get(artname)
-		println artname
-		println subprojectmap
 		File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
-		println '' + exdir + ' ' + exdir.exists()
 		if (exdir.exists() && exdir.isDirectory()) {
 			exdir.listFiles().each { ex ->
 				preprocessdirfile.mkdirs()
@@ -263,13 +280,18 @@ task distZips(dependsOn: [subprojects.build, srcZips, exampleZips]) << {
 
 def createDistZip(distname, arts, isaddon)
 {
+	def commercial = false
+	arts.each { artname ->
+		commercial |= isCommercial(project.ext.subprojectmap.get(artname))
+	}
+	println 'Distribution "' + distname + '" is ' + (commercial? 'commercial.' : 'non-commercial.')
+		
 	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filtereddistfiles')
 	preprocessdirfile.mkdirs()
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
 	def foldername = 'jadex-'  + jadex_build_version
-	def zipfilename = project.distsDir.getCanonicalPath() + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+	def zipfilename = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 	def distdir = project.distsDir.getCanonicalPath()
-	def subprojectmap = project.ext.subprojectmap;
 	def ant = new groovy.util.AntBuilder()
 	
 	ant.sequential {
@@ -278,7 +300,7 @@ def createDistZip(distname, arts, isaddon)
 			resources
 			{
 				arts.each { artname ->
-					Project sp = subprojectmap.get(artname)
+					def sp = project.ext.subprojectmap.get(artname)
 					fileset dir: sp.projectDir.getCanonicalPath() + '/dist/files', includes: project.ext.filterfiles, erroronmissingdir: false
 				}
 			}
@@ -299,7 +321,7 @@ def createDistZip(distname, arts, isaddon)
 		ant.zip destfile: zipfilename,
 		{
 			arts.each { artname ->
-				def sp = subprojectmap.get(artname)
+				def sp = project.ext.subprojectmap.get(artname)
 				def spbdir = sp.buildDir.getCanonicalPath()
 				
 				zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
@@ -357,4 +379,9 @@ def addSubproject(prefix, proj)
 	proj.subprojects.each { sp ->
 		addSubproject(pname, sp)
 	}
+}
+
+/* Tests if a project is commercial. */
+def isCommercial(project) {
+	project.hasProperty("commercial") && project.property("commercial").toLowerCase().equals('true')
 }
