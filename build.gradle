@@ -55,6 +55,13 @@ allprojects
     repositories
     {
         mavenCentral()
+        
+        // public sonatype repository for jmonkey artifacts
+		maven
+		{
+			name 'sonatype public'
+			url 'https://oss.sonatype.org/content/groups/public/'
+		}
     }
     
     buildscript 

@@ -1,13 +1,14 @@
 def jmonkeyversion = "3.0.0.20130125-SNAPSHOT"
 
-repositories
-{
-    maven
-    {
-        name 'sonatype public'
-        url 'https://oss.sonatype.org/content/groups/public/'
-    }
-}
+// Moved to root build.gradle
+//repositories
+//{
+//    maven
+//    {
+//        name 'sonatype public'
+//        url 'https://oss.sonatype.org/content/groups/public/'
+//    }
+//}
 
 dependencies 
 {
