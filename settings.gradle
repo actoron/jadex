@@ -2,9 +2,23 @@ apply from: 'util.gradle'
 
 def artifactselectionmarker = 'X'
 def buildconfigsfile = 'buildconfigs.csv'
+gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,editorgpmn,relaystandalone'
+
+gradle.rootProject {
+	def secpropfile = new File(settingsDir.getCanonicalPath() + File.separator + 'secret.properties')
+	if (secpropfile.exists()) {
+		def is = new FileInputStream(secpropfile)
+		def secprops = new Properties();
+		secprops.load(is)
+		is.close()
+		secprops.entrySet().each { entry ->
+			gradle.rootProject.ext[entry.getKey()] = entry.getValue()
+		}
+	}
+}
 
 /* Read the buildconfigs.csv and generate data structures */
-BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + buildconfigsfile)))
+BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getCanonicalPath() + File.separator + buildconfigsfile)))
 def disttargets = new ArrayList<String>()
 def allbuildartifacts = new HashSet<String>()
 //def builddeps = new HashSet<String>()
@@ -49,7 +63,7 @@ disttargets = null
 gradle.ext.selecteddists = new ArrayList<String>()
 String selectedstr = gradle.startParameter.getProjectProperties().get('dist')
 selectedstr = selectedstr != null? selectedstr : 'everything'
-//selectedstr = gradle.startParameter.getProjectProperties().containsKey(selectedstr)? gradle.startParameter.getProjectProperties().get(selectedstr) : selectedstr 
+selectedstr = gradle.ext.properties.containsKey(selectedstr)? gradle.ext.properties.get(selectedstr) : selectedstr 
 
 selectedstr.split(',').each {
 	gradle.ext.selecteddists.add(it.trim())

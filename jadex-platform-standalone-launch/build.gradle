@@ -23,7 +23,7 @@ dependencies
 										   ':jadex-platform-extension-securetransport',':jadex-platform-extension-management',
 										   ':jadex-platform-extension-webservice-desktop',
 										   ':jadex-platform-extension-webservice-desktop-jetty',
-										   ':jadex-platform-extension-webservice-desktop-grizzly'
+										   ':jadex-platform-extension-webservice-desktop-grizzly',
 										   
 										   // Tests
 										   ':jadex-applications-micro',':jadex-applications-bdiv3',
@@ -32,7 +32,7 @@ dependencies
 	
 	launcharts.retainAll(gradle.ext.includeartifacts)
 	
-	gradle.ext.launcharts.each { art ->
+	launcharts.each { art ->
 		compile project(art)
 	}
 }
