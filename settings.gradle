@@ -60,46 +60,40 @@ gradle.ext.selecteddists.each {
 
 gradle.ext.includeartifacts = new HashSet<String>()
 
-if (gradle.startParameter.getTaskNames().contains('genDepList'))
-{
-	include allbuildartifacts.toArray(new String[allbuildartifacts.size()])
-}
-else
-{
-	def depconfreader = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + 'dependencies.conf')))
-	def subproj = ''
-	def projdeps = new HashMap<String, Set<String>>()
-	depconfreader.eachLine { line ->
-		if (line.startsWith('### '))
-			subproj = line.substring(4)
-		else
+def depconfreader = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + 'dependencies.conf')))
+def subproj = ''
+def projdeps = new HashMap<String, Set<String>>()
+depconfreader.eachLine { line ->
+	if (line.startsWith('### '))
+		subproj = line.substring(4)
+	else
+	{
+		def deps = projdeps.get(subproj)
+		if (deps == null)
 		{
-			def deps = projdeps.get(subproj)
-			if (deps == null)
-			{
-				deps = new HashSet<String>()
-				projdeps.put(subproj, deps)
-			}
-			deps.add(line)	
+			deps = new HashSet<String>()
+			projdeps.put(subproj, deps)
 		}
+		deps.add(line)	
 	}
-	depconfreader.close()
-	
-	/*gradle.ext.maindistartifacts.each { mainart ->
-		addDependency(mainart, projdeps, gradle.ext.includeartifacts)
-	}*/
-	
-	gradle.ext.selecteddists.each { seldist ->
-		if (seldist.startsWith('addon')) {
-			gradle.ext.distartmap.get(seldist).each { art ->
-				addDependency(art, projdeps, gradle.ext.includeartifacts)
-			}
-		}
-	}
-	gradle.ext.includeartifacts.addAll(gradle.ext.maindistartifacts)
-	
-	include gradle.ext.includeartifacts.toArray(new String[gradle.ext.includeartifacts.size()])
 }
+depconfreader.close()
+
+/*gradle.ext.maindistartifacts.each { mainart ->
+	addDependency(mainart, projdeps, gradle.ext.includeartifacts)
+}*/
+
+gradle.ext.selecteddists.each { seldist ->
+	if (seldist.startsWith('addon')) {
+		gradle.ext.distartmap.get(seldist).each { art ->
+			addDependency(art, projdeps, gradle.ext.includeartifacts)
+		}
+	}
+}
+gradle.ext.includeartifacts.addAll(gradle.ext.maindistartifacts)
+
+include gradle.ext.includeartifacts.toArray(new String[gradle.ext.includeartifacts.size()])
+
 
 // the plugins depend on other projects to be deployed, so they have to be standalone
 //'jadex-android-maven-plugin',

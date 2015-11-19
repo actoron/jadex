@@ -14,7 +14,7 @@ def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
 }
-
+// ressource files that are filtered for variables
 project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle'
 
 project.ext.mainres = ['src/main/java', 'src/main/resources']
@@ -187,6 +187,26 @@ subprojects
 
     apply plugin: 'maven'
     sourceCompatibility = 1.6
+    
+    /*uploadArchives {
+        repositories {
+        	if (isCommercial(project))
+        	{
+	            mavenDeployer {
+	                repository(url: "file:///home/jander/tmp/repotest/")
+	                snapshotRepository(url: "file:///home/jander/tmp/repotest/", uniiqueVersion: true)
+	            }
+	        }
+	        else
+	        {
+	        	mavenDeployer {
+	                repository(url: "file:///home/jander/tmp/repotest2/")
+	                snapshotRepository(url: "file:///home/jander/tmp/repotest2/")
+	                uniiqueVersion(true)
+	            }
+	        }
+        }
+    }*/
 }
 
 // Hack, helper to generate dep-tree
@@ -200,7 +220,7 @@ task genDepList << {
 		sp.configurations.each { conf ->
 			conf.getAllDependencies().withType(org.gradle.api.artifacts.ProjectDependency).each { dep ->
 				if (!founddeps.contains(dep.getName()))
-					out.println dep.getName()
+					out.println dep.getDependencyProject().getPath()
 				founddeps.add(dep.getName())
 			}
 		}
@@ -212,12 +232,10 @@ task exampleZips << {
 	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
 	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
+    String buildExcludes = 'build/**, classes/**, target/**, bin/**, .gradle/**, .idea/**, *.iml'
 	gradle.ext.maindistartifacts.each { artname ->
 		Project sp = project.ext.subprojectmap.get(artname)
-//		println artname
-//		println subprojectmap
 		File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
-//		println '' + exdir + ' ' + exdir.exists()
 		if (exdir.exists() && exdir.isDirectory()) {
 			exdir.listFiles().each { ex ->
 				preprocessdirfile.mkdirs()
@@ -229,7 +247,7 @@ task exampleZips << {
 						{
 							fileset dir: ex.getCanonicalPath(), includes: project.ext.filterfiles, erroronmissingdir: false
 						}
-						
+
 						filterset begintoken: '${', endtoken: '}',
 						{
 							filter token: 'jadex_build_version', value: jadex_build_version
@@ -239,7 +257,7 @@ task exampleZips << {
 					{
 						resources
 						{
-							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles, erroronmissingdir: false
+							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles + ', ' + buildExcludes, erroronmissingdir: false
 						}
 					}
 					ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
@@ -279,13 +297,18 @@ task distZips(dependsOn: [subprojects.build, srcZips, exampleZips]) << {
 
 def createDistZip(distname, arts, isaddon)
 {
+	def commercial = false
+	arts.each { artname ->
+		commercial |= isCommercial(project.ext.subprojectmap.get(artname))
+	}
+	println 'Distribution "' + distname + '" is ' + (commercial? 'commercial.' : 'non-commercial.')
+		
 	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filtereddistfiles')
 	preprocessdirfile.mkdirs()
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
 	def foldername = 'jadex-'  + jadex_build_version
-	def zipfilename = project.distsDir.getCanonicalPath() + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+	def zipfilename = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 	def distdir = project.distsDir.getCanonicalPath()
-	def subprojectmap = project.ext.subprojectmap;
 	def ant = new groovy.util.AntBuilder()
 	
 	ant.sequential {
@@ -294,7 +317,7 @@ def createDistZip(distname, arts, isaddon)
 			resources
 			{
 				arts.each { artname ->
-					Project sp = subprojectmap.get(artname)
+					def sp = project.ext.subprojectmap.get(artname)
 					fileset dir: sp.projectDir.getCanonicalPath() + '/dist/files', includes: project.ext.filterfiles, erroronmissingdir: false
 				}
 			}
@@ -315,12 +338,16 @@ def createDistZip(distname, arts, isaddon)
 		ant.zip destfile: zipfilename,
 		{
 			arts.each { artname ->
-				def Project sp = subprojectmap.get(artname)
+				def sp = project.ext.subprojectmap.get(artname)
 				def spbdir = sp.buildDir.getCanonicalPath()
 
 				if (isAndroidProject(sp)) {
+					def targetFolder = '/apps/'
+					if (isAndroidLibraryProject(sp)) {
+						targetFolder = '/lib/'
+					}
 					onReleaseOutput(sp) {output ->
-						zipfileset dir: output.outputFile.getParent(), prefix: foldername + '/lib/', includes:  output.outputFile.getName(), erroronmissingdir: true
+						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
 					}
 				} else {
 //					sp.jar.archivePath?
@@ -381,4 +408,9 @@ def addSubproject(prefix, proj)
 	proj.subprojects.each { sp ->
 		addSubproject(pname, sp)
 	}
+}
+
+/* Tests if a project is commercial. */
+def isCommercial(project) {
+	project.hasProperty("commercial") && project.property("commercial").toLowerCase().equals('true')
 }
