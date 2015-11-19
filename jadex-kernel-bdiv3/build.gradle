@@ -16,9 +16,9 @@ assemble << {
 	ant.xslt(
 		basedir: "${projectDir}/src/main/config/",
 		destdir: "${buildDir}/schemadocs/",
-		extension: ".html",
+		extension: "-${project.version}.html",
 		force: "true",
-		style: "${projectDir}/../docs/xs3p.xsl",
+		style: "${projectDir}/../src/main/buildutils/xs3p.xsl",
 		includes: "*.xsd"
 	)
 }
