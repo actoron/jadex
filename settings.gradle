@@ -110,48 +110,6 @@ gradle.ext.includeartifacts.addAll(gradle.ext.maindistartifacts)
 
 include gradle.ext.includeartifacts.toArray(new String[gradle.ext.includeartifacts.size()])
 
-
-// the plugins depend on other projects to be deployed, so they have to be standalone
-//'jadex-android-maven-plugin',
-// android-specific modules:
-/*if (androidSdkExists()) {
-    include\
-    'jadex-gradle-plugin',
-    'jadex-android-antlr',
-    'jadex-android-commons',
-    'jadex-android-xmlpull',
-    'jadex-android-bluetooth',
-//    'jadex-android-integration-test',
-//    'jadex-android-maven-plugin',
-    'jadex-android-platformclient',
-//    'jadex-android-testlauncher',
-
-    'jadex-kernel-bdiv3-android',
-    'jadex-platform-android',
-    'jadex-platform-extension-webservice-android',
-    'jadex-runtimetools-android'
-
-
-    def pluginBootstrap = System.getProperty('gradlePluginBootstrap')
-
-    if (!pluginBootstrap
-            && !calledWithTask('uploadGradlePluginArchives')
-            && !calledWithTask('buildGradlePluginArchives')
-            && !calledWithTask('installGradlePluginArchives')) {
-        include\
-        'jadex-applications-android:jadex-applications-android-chat',
-        'jadex-applications-android:jadex-applications-android-puzzle',
-        'jadex-applications-android-demos',
-        'jadex-android-platformapp'
-    }
-
-} else {
-    logger.warn('Cannot compile android projects: No Android SDK found.\n' +
-            'To include android projects in build, set ANDROID_HOME to your android sdk root.')
-}*/
-
-//include 'jadex-test'
-
 def addDependency(artifact, projdeps, includeartifacts)
 {
 	if (!includeartifacts.contains(artifact))
