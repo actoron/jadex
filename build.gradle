@@ -14,7 +14,7 @@ def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
 }
-
+// ressource files that are filtered for variables
 project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle'
 
 project.ext.mainres = ['src/main/java', 'src/main/resources']
@@ -212,6 +212,7 @@ task exampleZips << {
 	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
 	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
+    String buildExcludes = 'build/**, classes/**, target/**, bin/**, .gradle/**, .idea/**, *.iml'
 	gradle.ext.maindistartifacts.each { artname ->
 		Project sp = project.ext.subprojectmap.get(artname)
 //		println artname
@@ -229,7 +230,7 @@ task exampleZips << {
 						{
 							fileset dir: ex.getCanonicalPath(), includes: project.ext.filterfiles, erroronmissingdir: false
 						}
-						
+
 						filterset begintoken: '${', endtoken: '}',
 						{
 							filter token: 'jadex_build_version', value: jadex_build_version
@@ -239,7 +240,7 @@ task exampleZips << {
 					{
 						resources
 						{
-							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles, erroronmissingdir: false
+							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles + ', ' + buildExcludes, erroronmissingdir: false
 						}
 					}
 					ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
