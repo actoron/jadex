@@ -78,9 +78,11 @@ public class MoveTask extends AbstractTask
 						final ISpaceObject so = (ISpaceObject)it.next();
 						if(so.getType().equals("target"))
 						{
-							if(!capa.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
+							// Todo: remember capability scope in component steps based on scoped external access
+							if(!capa.getBeliefbase().getBeliefSet("move/my_targets").containsFact(so))
 							{
-								capa.getBeliefbase().getBeliefSet("my_targets").addFact(so);
+								// Todo: remember capability scope in component steps based on scoped external access
+								capa.getBeliefbase().getBeliefSet("move/my_targets").addFact(so);
 							}
 //							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
 							

@@ -9,6 +9,7 @@ import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Inform the sentry agent about a new target.
@@ -22,8 +23,7 @@ public class InformNewTargetPlan extends Plan
 	 */
 	public void body()
 	{
-		ChangeEvent	reason	= (ChangeEvent)getReason();
-		ISpaceObject	target	= (ISpaceObject)reason.getValue();
+		ISpaceObject	target	= (ISpaceObject)((ChangeInfo<?>)((ChangeEvent)getReason()).getValue()).getValue();
 		
 		// Todo: multiple spaces by name...
 		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();

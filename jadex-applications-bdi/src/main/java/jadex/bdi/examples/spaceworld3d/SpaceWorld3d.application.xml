@@ -68,6 +68,7 @@
 					<env:property name="ore" class="int">0</env:property>
 					<env:property name="capacity" class="int">0</env:property>
 					<env:property name="state" class="String">"unknown"</env:property>
+					<env:property name="position" class="IVector3"/>
 				</env:objecttype>
 				<env:objecttype name="sentry">
 				<env:property name="tick360" class="double" dynamic="true">((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick()%360

@@ -12,14 +12,14 @@
 
 	<imports>
 		<import>jadex.extension.envsupport.environment.*</import>
-		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.space3d.*</import>
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.commons.future.*</import>
 	</imports>
 
 	<beliefs>
 		<!-- Environment. -->
-		<belief name="environment" class="ContinuousSpace2D">
+		<belief name="environment" class="ContinuousSpace3D">
  			<fact>jadex.application.EnvironmentService.getSpace($component, "my3dspace").get()</fact>
  		</belief>
  		
@@ -54,7 +54,7 @@
 
 		<!-- Move home when missionend. -->
 		<achievegoal name="missionend">
-			<parameter name="destination" class="IVector2">
+			<parameter name="destination" class="IVector3">
 				<value>$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position")</value>
 			</parameter>
 			<unique/>
@@ -69,7 +69,7 @@
 	<plans>
 		<!-- Go to a destination. -->
 		<plan name="go_destination">
-			<parameter name="destination" class="IVector2">
+			<parameter name="destination" class="IVector3">
  				<goalmapping ref="move_dest.destination"/>
   				<goalmapping ref="missionend.destination"/>
 			</parameter>
