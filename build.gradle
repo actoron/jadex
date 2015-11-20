@@ -198,9 +198,9 @@ subprojects
 		}
     }
 
-	// generate schemadocs
+	// process schemas and generate schemadocs
 	if (project.projectDir.toPath().resolve('src/main/schema').toFile().exists()) {
-		project.processResources << {
+		project.tasks.create('schemadocs') << {
 			ant.xslt(
 					basedir: "${project.projectDir}/src/main/schema/",
 					destdir: "${project.buildDir}/schemadocs/",
@@ -210,6 +210,27 @@ subprojects
 					includes: "*.xsd"
 			)
 		}
+		project.assemble.dependsOn += project.schemadocs
+		project.tasks.create('processSchemas') << {
+			ant.copy todir: file("$project.buildDir/tmp/schemas"),
+			{
+				resources
+				{
+					fileset dir: 'src/main/schema', includes: project.rootProject.ext.filterfiles, erroronmissingdir: false
+				}
+
+				filterset begintoken: '${', endtoken: '}',
+				{
+					filter token: 'jadex_build_version', value: jadex_build_version
+				}
+			}
+			copy {
+				from file("$project.buildDir/tmp/schemas")
+				into file("$project.buildDir/schemas")
+				rename '(.+)\\.(.+)', "\$1-$project.version.\$2"
+			}
+		}
+		project.processResources.dependsOn += project.processSchemas
 	}
 
     apply plugin: 'maven'
