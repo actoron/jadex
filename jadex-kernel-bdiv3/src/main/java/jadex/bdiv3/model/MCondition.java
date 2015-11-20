@@ -102,7 +102,7 @@ public class MCondition extends MElement
 	/**
 	 *  Init the event, when loaded from xml.
 	 */
-	public void	initEvents(MElement owner)
+	public void	initEvents(MParameterElement owner)
 	{
 		if(events==null)
 			events = new ArrayList<EventType>();

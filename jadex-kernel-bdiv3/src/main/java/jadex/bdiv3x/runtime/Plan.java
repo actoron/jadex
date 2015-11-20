@@ -21,6 +21,7 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
@@ -1152,7 +1153,7 @@ public abstract class Plan
 		final IParsedExpression exp = SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), 
 			getAgent().getClassLoader());
 		List<EventType> events = new ArrayList<EventType>();
-		BDIAgentFeature.addExpressionEvents(uexp, events, rplan.getModelElement());
+		BDIAgentFeature.addExpressionEvents(uexp, events, (MParameterElement)rplan.getModelElement());
 		
 		final IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		final Future<Void> ret = new Future<Void>();

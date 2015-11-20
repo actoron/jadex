@@ -187,6 +187,8 @@ public class BDIClassReader extends MicroClassReader
 		Class<?> genclass = SReflect.findClass0(cma.getName(), null, classloader);
 		modelinfo.setStartable(!Modifier.isAbstract(genclass.getModifiers()));
 		
+		initBDIModelAfterClassLoading(ret, classloader);
+		
 		return ret;
 	}
 
@@ -1229,4 +1231,17 @@ public class BDIClassReader extends MicroClassReader
 ////		System.out.println("eveve: "+p[0]+" "+p[1]);
 //		return new EventType(p);
 //	}
+	
+	/**
+	 *  Do model initialization that can only be done after class reading. 
+	 */
+	protected void	initBDIModelAfterClassLoading(BDIModel model, ClassLoader cl)
+	{
+		for(MBelief bel: SUtil.safeList(model.getCapability().getBeliefs()))
+		{
+			bel.initEvents(model, cl);
+		}
+		
+		// Todo: parameters?
+	}
 }

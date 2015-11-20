@@ -2,7 +2,6 @@ package jadex.bdiv3.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,16 +63,14 @@ public class SBDIModel
 				// Copy concrete belief.
 				else
 				{
-					Set<String> events = convertEvents(capaname, bel.getBeliefEvents(), bdimodel);
-					
 					MBelief	bel2;
 					if(bel.getGetter()==null)
 					{
-						bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdateRate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+						bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdateRate(), null, null);	// Not necessary to copy raw/belief events, because inited events are copied below
 					}
 					else
 					{
-						bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdateRate(), events, bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
+						bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdateRate(), null, null);	// Not necessary to copy raw/belief events, because inited events are copied below
 						bel2.setSetter(bel.getSetter());
 					}
 					bel2.setName(belname);
@@ -84,6 +81,11 @@ public class SBDIModel
 					bel2.setMulti(bel.isMulti(cl));
 					bel2.setClazz(bel.getClazz()!=null ? new ClassInfo(bel.getClazz().getType(cl)) : null);
 					bel2.setUpdateRate(copyExpression(capaname, bel.getUpdateRate()));
+					if(bel.getEvents()==null)
+					{
+						System.out.println("srhpioyug");
+					}
+					bel2.setEvents(convertEventTypes(capaname, bel.getEvents(), bdimodel));
 					
 					if(addpos==-1)
 					{
@@ -415,8 +417,6 @@ public class SBDIModel
 				for(UnparsedExpression value: param.getValue())
 				{
 					cpel2.addParameter(copyExpression(capaname, value));
-//					// Hack!!! change name after adding.	todo: why?
-//					value2.setName(capaname + MElement.CAPABILITY_SEPARATOR + (value.getName()!=null ? value.getName() : ""));
 				}
 			}			
 		}
@@ -429,7 +429,6 @@ public class SBDIModel
 	protected static MParameter copyParameter(IBDIModel bdimodel, ClassLoader cl, String capaname, MParameter param)
 	{
 		MParameter	param2	= param instanceof MPlanParameter ? new MPlanParameter() : new MParameter(param.getField());
-		param2.setBeliefEvents(convertEvents(capaname, param.getBeliefEvents(), bdimodel));
 		param2.setBindingOptions(copyExpression(capaname, param.getBindingOptions()));
 		param2.setClazz(param.getClazz());
 		param2.setDefaultValue(copyExpression(capaname, param.getDefaultValue()));
@@ -441,10 +440,10 @@ public class SBDIModel
 		param2.setMulti(param.isMulti(cl));
 		param2.setName(param.getName());
 		param2.setOptional(param.isOptional());
-		param2.setRawEvents(param.getRawEvents());
 		param2.setServiceMappings(param.getServiceMappings());
 		param2.setSetter(param.getSetter());
 		param2.setUpdateRate(copyExpression(capaname, param.getUpdateRate()));
+		param2.setEvents(convertEventTypes(capaname, param.getEvents(), bdimodel));
 		
 		if(param instanceof MPlanParameter)
 		{
@@ -492,24 +491,31 @@ public class SBDIModel
 					
 		for(MGoal goal: bdimodel.getCapability().getGoals())
 		{
-			// todo: goal parameters?
+			// Convert parameter events
+			for(MParameter param: SUtil.safeList(goal.getParameters()))
+			{
+				param.setEvents(convertEventTypes(null, param.getEvents(), bdimodel));
+			}
 			
 			// Convert goal condition events
-			if(goal.getConditions()!=null)
+			for(String type: SUtil.safeMap(goal.getConditions()).keySet())
 			{
-				for(String type: goal.getConditions().keySet())
+				List<MCondition> conds = goal.getConditions(type);
+				for(MCondition cond: conds)
 				{
-					List<MCondition> conds = goal.getConditions(type);
-					for(MCondition cond: conds)
-					{
-						cond.setEvents(convertEventTypes(null, cond.getEvents(), bdimodel));
-					}
+					cond.setEvents(convertEventTypes(null, cond.getEvents(), bdimodel));
 				}
 			}
 		}
 			
 		for(MPlan plan: bdimodel.getCapability().getPlans())
 		{
+			// Convert parameter events
+			for(MParameter param: SUtil.safeList(plan.getParameters()))
+			{
+				param.setEvents(convertEventTypes(null, param.getEvents(), bdimodel));
+			}
+			
 			// Triggers need to be converted in place, because they are post processed in pass 2!
 			convertTrigger(bdimodel, null, plan.getTrigger(), false);
 			convertTrigger(bdimodel, null, plan.getWaitqueue(), false);

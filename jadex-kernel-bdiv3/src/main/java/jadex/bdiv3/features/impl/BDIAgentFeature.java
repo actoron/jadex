@@ -2249,7 +2249,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Init the event, when loaded from xml.
 	 */
-	public static void addExpressionEvents(UnparsedExpression expression, List<EventType> events, MElement owner)
+	public static void addExpressionEvents(UnparsedExpression expression, List<EventType> events, MParameterElement owner)
 	{
 		if(expression!=null)// && expression.getParsed() instanceof ExpressionNode)
 		{

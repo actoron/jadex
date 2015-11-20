@@ -705,7 +705,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			for(final MBelief mbel: beliefs)
 			{
-				List<EventType> events = mbel.getAllEvents(component);
+				List<EventType> events = mbel.getEvents();
 				
 //				Object cap = null;
 //				if(component.getComponentFeature0(IPojoComponentFeature.class)!=null)
@@ -744,9 +744,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				// Automatic reevaluation if belief depends on other beliefs
 				if(!events.isEmpty() || mbel.getEvaluationMode().equals(EvaluationMode.PUSH))
 				{
-					// Add the dependencies that come from the expression 
-					BDIAgentFeature.addExpressionEvents(mbel.getDefaultFact(), events, null);
-					
 					Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
 						ICondition.TRUE_CONDITION, new IAction<Void>()
 					{
@@ -875,11 +872,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						if(mparam.getEvaluationMode().equals(EvaluationMode.PUSH))
 						{
-							List<EventType> events = mparam.getAllEvents(component, mgoal).size()==0? new ArrayList<EventType>(): new ArrayList<EventType>(mparam.getAllEvents(component, mgoal));
-//							System.out.println("evs1: "+events+" "+events.hashCode()+" "+component.getComponentIdentifier());
-							
-							BDIAgentFeature.addExpressionEvents(mparam.getDefaultValue(), events, mgoal);
-//							System.out.println("evs2: "+events+" "+events.hashCode()+" "+component.getComponentIdentifier());
+							List<EventType> events = mparam.getEvents();
 						
 							// Automatic reevaluation if belief depends on other beliefs
 							if(!events.isEmpty())

@@ -28,6 +28,7 @@ import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
+import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.model.MProcessableElement;
@@ -681,34 +682,6 @@ public class BDIXMLReader extends ComponentXMLReader
 			new AttributeInfo(new AccessInfo("updaterate", "updateRate"), new AttributeConverter(exconf, rexconf)),
 			new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
 		};
-		IPostProcessor	belproc	= new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
-			{
-				MBelief mbel = (MBelief)object;
-				mbel.setMulti(false);
-				return mbel;
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		};
-		IPostProcessor	belsetproc	= new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
-			{
-				MBelief mbel = (MBelief)object;
-				mbel.setMulti(true);
-				return mbel;
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		};
 		
 		// 'Link' assign to refs by adding reference entries.
 		IObjectLinker	atlinker	= new BeanObjectReaderHandler()
@@ -740,12 +713,12 @@ public class BDIXMLReader extends ComponentXMLReader
 			}
 		};
 
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, belproc),
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, new BeliefMultiProc(false)),
 			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
 			}), new LinkingInfo(atlinker)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(MBelief.class, belsetproc), 
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(MBelief.class, new BeliefMultiProc(true)), 
 			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				// because there is only MBelief the facts expression is stored as default fact
 				// and multiple facts are added to a list
@@ -753,12 +726,12 @@ public class BDIXMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName(uri, "facts"), "defaultFact"))
 			}), new LinkingInfo(atlinker)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MBelief.class, belproc),
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(MBelief.class, new BeliefMultiProc(false)),
 			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
 			}), new LinkingInfo(atlinker)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(MBelief.class, belsetproc), 
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(MBelief.class, new BeliefMultiProc(true)), 
 			new MappingInfo(null, belattrs, new SubobjectInfo[]{
 				// because there is only MBelief the facts expression is stored as default fact
 				// and multiple facts are added to a list
@@ -981,12 +954,12 @@ public class BDIXMLReader extends ComponentXMLReader
 				cond.setName(cond.getExpression().getName());
 				
 				AReadContext ar	= (AReadContext)context;
-				MElement pe	= null;
+				MParameterElement pe	= null;
 				for(StackElement se: ar.getStack())
 				{
-					if(se.getObject() instanceof MGoal || se.getObject() instanceof MPlan)
+					if(se.getObject() instanceof MParameterElement)
 					{
-						pe	= (MElement)se.getObject();
+						pe	= (MParameterElement)se.getObject();
 					}
 				}				
 				cond.initEvents(pe);
@@ -997,7 +970,7 @@ public class BDIXMLReader extends ComponentXMLReader
 					StringTokenizer stok = new StringTokenizer(bels, ",");
 					while(stok.hasMoreElements())
 					{
-						String tok = stok.nextToken();
+						String tok = MElement.internalName(stok.nextToken());
 						cond.addEvent(new EventType(ChangeEvent.BELIEFCHANGED, tok));
 						cond.addEvent(new EventType(ChangeEvent.FACTCHANGED, tok));
 						cond.addEvent(new EventType(ChangeEvent.FACTADDED, tok));
@@ -1010,7 +983,7 @@ public class BDIXMLReader extends ComponentXMLReader
 					StringTokenizer stok = new StringTokenizer(params, ",");
 					while(stok.hasMoreElements())
 					{
-						String tok = stok.nextToken();
+						String tok = MElement.internalName(stok.nextToken());
 						cond.addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, pe.getName(), tok));
 						cond.addEvent(new EventType(ChangeEvent.VALUECHANGED, pe.getName(), tok));
 						cond.addEvent(new EventType(ChangeEvent.VALUEADDED, pe.getName(), tok));
@@ -1023,7 +996,7 @@ public class BDIXMLReader extends ComponentXMLReader
 					StringTokenizer stok = new StringTokenizer(goals, ",");
 					while(stok.hasMoreElements())
 					{
-						String tok = stok.nextToken();
+						String tok = MElement.internalName(stok.nextToken());
 						cond.addEvent(new EventType(ChangeEvent.GOALACTIVE, tok));
 						cond.addEvent(new EventType(ChangeEvent.GOALADOPTED, tok));
 						cond.addEvent(new EventType(ChangeEvent.GOALDROPPED, tok));
@@ -1333,7 +1306,37 @@ public class BDIXMLReader extends ComponentXMLReader
 	}
 	
 	/**
-	 * 
+	 *  Postprocess beliefs and belief sets.
+	 */
+	public static class BeliefMultiProc implements IPostProcessor
+	{
+		boolean multi;
+		
+		BeliefMultiProc(boolean multi)
+		{
+			this.multi = multi;
+		}
+		
+		public Object postProcess(IContext context, Object object)
+		{
+			MBelief mbel = (MBelief)object;
+			mbel.setMulti(multi);
+			
+			// Init events.
+			BDIXModel model = (BDIXModel)context.getRootObject();
+			mbel.initEvents(model, context.getClassLoader());
+			
+			return mbel;
+		}
+		
+		public int getPass()
+		{
+			return 0;
+		}
+	}
+	
+	/**
+	 *  Postprocess parameters and parameter sets.
 	 */
 	public static class ParamMultiProc implements IPostProcessor
 	{
@@ -1348,6 +1351,19 @@ public class BDIXMLReader extends ComponentXMLReader
 		{
 			MParameter mparam = (MParameter)object;
 			mparam.setMulti(multi);
+			
+			// Init events.
+			AReadContext ar	= (AReadContext)context;
+			MParameterElement pe	= null;
+			for(StackElement se: ar.getStack())
+			{
+				if(se.getObject() instanceof MParameterElement)
+				{
+					pe	= (MParameterElement)se.getObject();
+				}
+			}
+			mparam.initEvents(pe);
+			
 			return mparam;
 		}
 		

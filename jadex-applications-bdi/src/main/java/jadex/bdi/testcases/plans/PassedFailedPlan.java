@@ -47,12 +47,14 @@ public class PassedFailedPlan extends Plan
 		if(num==3)
 		{
 			tr.setSucceeded(true);
+			getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		}
-		else
+		else if(num<3)
 		{
 			tr.setReason("Plan should not call passed.");
+			getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
+		// else plan gets called again (why? broken microplansteps?)
 	}
 
 	/**

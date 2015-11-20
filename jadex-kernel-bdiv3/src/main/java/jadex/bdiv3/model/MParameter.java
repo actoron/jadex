@@ -4,8 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,14 +142,15 @@ public class MParameter extends MElement
 	/** The update rate. */
 	protected UnparsedExpression updaterate;
 	
-	/** The events this belief depends on. */
-	protected Set<String> beliefevents;
+	// Currently unused -> todo support in XML / Annotations.
+//	/** The events this belief depends on. */
+//	protected Set<String> beliefevents;
+//	
+//	/** The raw events. */
+//	protected Set<EventType> rawevents;
 	
-	/** The raw events. */
-	protected Set<EventType> rawevents;
-	
-	/** Cached aggregated events. */
-	protected volatile List<EventType> allevents;
+	/** The ECA events that may denote changes in the parameter value(s). */
+	protected List<EventType> events;
 	
 	/** The service mappings. */
 	protected List<String> servicemappings;
@@ -632,73 +631,103 @@ public class MParameter extends MElement
 		return ret;
 	}
 	
-	/**
-	 *  Get the rawevents.
-	 *  @return The rawevents.
-	 */
-	public Set<EventType> getRawEvents()
-	{
-		return rawevents;
-	}
-
-	/**
-	 *  Set the rawevents.
-	 *  @param rawevents The rawevents to set.
-	 */
-	public void setRawEvents(Set<EventType> rawevents)
-	{
-		this.rawevents = rawevents;
-	}
+	// Currently unused -> todo support in XML / Annotations.
+//	/**
+//	 *  Get the rawevents.
+//	 *  @return The rawevents.
+//	 */
+//	public Set<EventType> getRawEvents()
+//	{
+//		return rawevents;
+//	}
+//
+//	/**
+//	 *  Set the rawevents.
+//	 *  @param rawevents The rawevents to set.
+//	 */
+//	public void setRawEvents(Set<EventType> rawevents)
+//	{
+//		this.rawevents = rawevents;
+//	}
+//	
+//	/**
+//	 *  Get the events.
+//	 *  @return The events.
+//	 */
+//	public Set<String> getBeliefEvents()
+//	{
+//		return beliefevents;
+//	}
+//
+//	/**
+//	 *  Set the events.
+//	 *  @param events The events to set.
+//	 */
+//	public void setBeliefEvents(Set<String> events)
+//	{
+//		this.beliefevents	= events;
+//	}
 	
 	/**
 	 *  Get the events.
 	 *  @return The events.
 	 */
-	public Set<String> getBeliefEvents()
+	public List<EventType> getEvents()
 	{
-		return beliefevents;
+		return events;
+	}
+	
+	/**
+	 *  Init the event, when loaded from xml.
+	 */
+	public void	initEvents(MParameterElement owner)
+	{
+		if(events==null)
+			events = new ArrayList<EventType>();
+		
+		// Currently unused -> todo support in XML / Annotations.
+//		Collection<String> evs = getBeliefEvents();
+//		if(evs!=null && !evs.isEmpty())
+//		{
+//			for(String ev: evs)
+//			{
+//				BDIAgentFeature.addBeliefEvents(agent, allevents, ev);
+//			}
+//		}
+		
+		// Currently unused -> todo support in XML / Annotations.
+//		Collection<EventType> rawevents = getRawEvents();
+//		if(rawevents!=null)
+//			allevents.addAll(rawevents);
+		
+		// Hack!!! what about initial values?
+		if(getDefaultValue()!=null)
+		{
+			BDIAgentFeature.addExpressionEvents(getDefaultValue(), events, owner);
+		}
+	}
+	
+	/**
+	 *  The events to set.
+	 *  @param events The events to set
+	 */
+	public void setEvents(List<EventType> events)
+	{
+		this.events = events;
+	}
+	
+	/**
+	 *  Add an event.
+	 *  @param event The event.
+	 */
+	public void addEvent(EventType event)
+	{
+		if(events==null)
+			events = new ArrayList<EventType>();
+		if(!events.contains(event))
+			events.add(event);
 	}
 
-	/**
-	 *  Set the events.
-	 *  @param events The events to set.
-	 */
-	public void setBeliefEvents(Set<String> events)
-	{
-		this.beliefevents	= events;
-	}
-	
-	/**
-	 *  Get all events that this parameter depends on.
-	 */
-	public List<EventType> getAllEvents(IInternalAccess agent, MElement owner)
-	{
-		if(allevents==null)
-		{
-			allevents = new ArrayList<EventType>();
-			
-			Collection<String> evs = getBeliefEvents();
-			if(evs!=null && !evs.isEmpty())
-			{
-				for(String ev: evs)
-				{
-					BDIAgentFeature.addBeliefEvents(agent, allevents, ev);
-				}
-			}
-			
-			Collection<EventType> rawevents = getRawEvents();
-			if(rawevents!=null)
-				allevents.addAll(rawevents);
-			
-			// Hack!!! what about initial values?
-			if(getDefaultValue()!=null)
-			{
-				BDIAgentFeature.addExpressionEvents(getDefaultValue(), allevents, owner);
-			}
-		}
-		return Collections.unmodifiableList(allevents);
-	}
-	
 	/**
 	 *  Get the service mappings.
 	 */

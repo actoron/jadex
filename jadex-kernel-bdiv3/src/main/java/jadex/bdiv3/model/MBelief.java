@@ -26,6 +26,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.EventType;
 
@@ -60,8 +61,8 @@ public class MBelief extends MElement
 	/** The raw events. */
 	protected Collection<EventType> rawevents;
 	
-	/** Cached aggregated events. */
-	protected List<EventType> allevents;
+	/** The aggregated/inited events. */
+	protected List<EventType> events;
 
 	//-------- additional xml properties --------
 	
@@ -820,27 +821,75 @@ public class MBelief extends MElement
 	}
 	
 	/**
-	 *  Get all events that this belief depends on.
+	 *  Get the events.
+	 *  @return The events.
 	 */
-	public List<EventType> getAllEvents(IInternalAccess agent)
+	public List<EventType> getEvents()
 	{
-		if(allevents==null)
+		return SUtil.safeList(events);
+	}
+	
+	/**
+	 *  Init the event, when loaded from xml.
+	 */
+	public void	initEvents(IBDIModel model, ClassLoader cl)
+	{
+		Collection<String> evs = getBeliefEvents();
+		if(evs!=null && !evs.isEmpty())
 		{
-			allevents = new ArrayList<EventType>();
-			
-			Collection<String> evs = getBeliefEvents();
-			if(evs!=null && !evs.isEmpty())
+			if(events==null)
 			{
-				for(String ev: evs)
-				{
-					BDIAgentFeature.addBeliefEvents(agent, allevents, ev);
-				}
+				events = new ArrayList<EventType>();
 			}
-			
-			Collection<EventType> rawevents = getRawEvents();
-			if(rawevents!=null)
-				allevents.addAll(rawevents);
+
+			for(String ev: evs)
+			{
+				BDIAgentFeature.addBeliefEvents(model.getCapability(), events, ev, cl);
+			}
 		}
-		return allevents;
+		
+		Collection<EventType> rawevents = getRawEvents();
+		if(rawevents!=null)
+		{
+			if(events==null)
+			{
+				events = new ArrayList<EventType>();
+			}
+
+			events.addAll(rawevents);
+		}
+		
+		// Hack!!! what about initial values?
+		if(getDefaultFact()!=null)
+		{
+			if(events==null)
+			{
+				events = new ArrayList<EventType>();
+			}
+
+			SJavaParser.parseExpression(getDefaultFact(), model.getModelInfo().getAllImports(), cl);
+			BDIAgentFeature.addExpressionEvents(getDefaultFact(), events, null);
+		}
+	}
+	
+	/**
+	 *  The events to set.
+	 *  @param events The events to set
+	 */
+	public void setEvents(List<EventType> events)
+	{
+		this.events = events;
+	}
+	
+	/**
+	 *  Add an event.
+	 *  @param event The event.
+	 */
+	public void addEvent(EventType event)
+	{
+		if(events==null)
+			events = new ArrayList<EventType>();
+		if(!events.contains(event))
+			events.add(event);
 	}
 }
