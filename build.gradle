@@ -262,10 +262,10 @@ task copyJavaDocSources(type: Copy) {
 	}
 }
 
-task javadocs(type: Javadoc, dependsOn: [copyJavaDocSources]) {
+task distJavadoc(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	def sourcedir = project.distsDir.getCanonicalPath() + '/javadocworkdir'
 	source(sourcedir)
-	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadocs')
+	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadoc')
 	
 	options.encoding 'UTF-8'
 	options.docEncoding 'UTF-8'
