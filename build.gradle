@@ -236,6 +236,25 @@ subprojects
     }*/
 }
 
+// Hack, helper to generate dep-tree
+task genDepList << {
+
+	def out = new PrintStream(project.projectDir.getCanonicalPath() + '/dependencies.conf', 'UTF-8')
+	project.ext.subprojectmap.entrySet().each { entry ->
+		def sp = entry.getValue()
+		out. println ('### ' + entry.getKey())
+		def founddeps = new HashSet<String>()
+		sp.configurations.each { conf ->
+			conf.getAllDependencies().withType(org.gradle.api.artifacts.ProjectDependency).each { dep ->
+				if (!founddeps.contains(dep.getName()))
+					out.println dep.getDependencyProject().getPath()
+				founddeps.add(dep.getName())
+			}
+		}
+	}
+	out.close()
+}
+
 task copyJavaDocSources(type: Copy) {
 	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadocworkdir')
 	gradle.ext.maindistartifacts.each { artname ->
@@ -262,10 +281,10 @@ task copyJavaDocSources(type: Copy) {
 	}
 }
 
-task distJavadoc(type: Javadoc, dependsOn: [copyJavaDocSources]) {
+task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	def sourcedir = project.distsDir.getCanonicalPath() + '/javadocworkdir'
 	source(sourcedir)
-	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadoc')
+	destinationDir = new File(project.distsDir.getCanonicalPath() + '/jadex-' + jadex_build_version + '-javadoc')
 	
 	options.encoding 'UTF-8'
 	options.docEncoding 'UTF-8'
@@ -284,27 +303,14 @@ task distJavadoc(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	
 	doLast {
 		def ant = new groovy.util.AntBuilder()
-		ant.delete dir: sourcedir
-	}
-}
-
-// Hack, helper to generate dep-tree
-task genDepList << {
-
-	def out = new PrintStream(project.projectDir.getCanonicalPath() + '/dependencies.conf', 'UTF-8')
-	project.ext.subprojectmap.entrySet().each { entry ->
-		def sp = entry.getValue()
-		out. println ('### ' + entry.getKey())
-		def founddeps = new HashSet<String>()
-		sp.configurations.each { conf ->
-			conf.getAllDependencies().withType(org.gradle.api.artifacts.ProjectDependency).each { dep ->
-				if (!founddeps.contains(dep.getName()))
-					out.println dep.getDependencyProject().getPath()
-				founddeps.add(dep.getName())
+		ant.sequential {
+			ant.delete dir: sourcedir
+			ant.zip destfile: destinationDir.getCanonicalPath() + '.zip', {
+				zipfileset dir: destinationDir.getCanonicalPath(), prefix: destinationDir.getName() + '/', erroronmissingdir: false
 			}
+			ant.delete dir: destinationDir
 		}
 	}
-	out.close()
 }
 
 task exampleZips << {
