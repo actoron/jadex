@@ -75,6 +75,12 @@ allprojects
 			}
 	    }
 	}
+	
+	if (JavaVersion.current().isJava8Compatible()) {
+		tasks.withType(Javadoc) {
+        	options.addStringOption('Xdoclint:none', '-quiet')
+        }
+	}
 }
 
 subprojects
@@ -228,6 +234,58 @@ subprojects
 	        }
         }
     }*/
+}
+
+task copyJavaDocSources(type: Copy) {
+	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadocworkdir')
+	gradle.ext.maindistartifacts.each { artname ->
+		def sp = project.ext.subprojectmap.get(artname)
+		from(sp.projectDir.getCanonicalPath() + '/src/main/java') {
+			include '**/*.java'
+			exclude '**/org/apache/**'
+			exclude '**/impl/**'
+		}
+	}
+	def comment = false
+	
+	/* Filter to fix some HTML-entity/Javadoc nonsense */
+	filter { line ->
+		if (line.trim().startsWith('/**'))
+			comment = true
+		
+		if (comment) {
+			line = line.replaceAll('(?<!code)>','&gt;')
+			if (line.contains('*/'))
+				comment = false;
+		}
+		return line
+	}
+}
+
+task javadocs(type: Javadoc, dependsOn: [copyJavaDocSources]) {
+	def sourcedir = project.distsDir.getCanonicalPath() + '/javadocworkdir'
+	source(sourcedir)
+	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadocs')
+	
+	options.encoding 'UTF-8'
+	options.docEncoding 'UTF-8'
+	options.charSet 'UTF-8'
+	options.quiet()
+	
+	options.docTitle("Jadex Active Component Platform ${project.version} API")
+	options.windowTitle("Jadex Active Component Platform ${project.version} API")
+	options.group('Core Packages','jadex.commons*:jadex.bridge*')
+	options.group('Micro Agent Packages','jadex.micro*')
+	options.group('BPMN Process Packages','jadex.bpmn*')
+	options.group('BDI Agent Packages','jadex.bdi*')
+	options.group('Web Service Extension Packages','jadex.extension.ws*:jadex.extension.rs*')
+	options.group('2D/3D Environment Extension Packages','')
+	options.group('Agent-Group-Role (AGR) Extension Packages','jadex.extension.agr*')
+	
+	doLast {
+		def ant = new groovy.util.AntBuilder()
+		ant.delete dir: sourcedir
+	}
 }
 
 // Hack, helper to generate dep-tree
