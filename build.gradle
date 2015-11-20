@@ -196,6 +196,33 @@ subprojects
 				filter{String line -> line.replace('${timestamp}', rootProject.timestamp)}
 			}
 		}
+
+        // Set correct bootclasspath for each project, depending on sourceCompatibility
+        afterEvaluate {
+            def requestedVersion = JavaVersion.toVersion(project.sourceCompatibility)
+            // each JDK should be provided by an environment variable
+            def envHomeVar = "JAVA_${requestedVersion.majorVersion}_HOME"
+            // check if running JDK (which usually is the same Version as in JAVA_HOME) is the requested JDK
+            if (JavaVersion.current() > requestedVersion) {
+                def requestedHome = System.getenv(envHomeVar)
+                if (requestedHome == null || requestedHome.empty || !file(requestedHome).exists()) {
+                    println "Warning: compiling ${project.sourceCompatibility} source with ${JavaVersion.current()} JDK may lead to problems. " +
+                            "Set $envHomeVar to the corresponding JDK to avoid this."
+                } else {
+                    // set bootstrap path to correct JDK version
+                    // println "Setting bootClasspath for $project.name to JDK $requestedVersion"
+                    project.tasks.withType(JavaCompile) {
+                        // provide same libs that are used in the default boot classpath
+                        options.bootClasspath = \
+                            ["resources.jar", "rt.jar", "sunrsasign.jar", "jsse.jar", "jce.jar", "charsets.jar", "jfr.jar"]\
+                            .collect {"$requestedHome"+File.separator+"jre"+File.separator+"lib"+File.separator+"$it"}\
+                            .join(File.pathSeparator) +
+                            ":$requestedHome"+File.separator+"jre"+File.separator+"classes"
+//                        options.fork = true
+                    }
+                }
+            }
+        }
     }
 
 	// process schemas and generate schemadocs
