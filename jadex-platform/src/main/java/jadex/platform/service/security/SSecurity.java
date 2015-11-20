@@ -26,7 +26,6 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAKey;
 import java.security.interfaces.RSAKey;
 import java.util.Date;
-import java.util.Enumeration;
 
 import javax.crypto.interfaces.DHKey;
 import javax.security.auth.x500.X500Principal;
@@ -138,12 +137,12 @@ public class SSecurity
 	{
 		try
 		{
-			Enumeration<String> aliases = ks.aliases();
-			for(; aliases.hasMoreElements(); ) 
-			{
-				String alias = (String)aliases.nextElement();
-				System.out.println(alias);
-			}
+//			Enumeration<String> aliases = ks.aliases();
+//			for(; aliases.hasMoreElements(); ) 
+//			{
+//				String alias = (String)aliases.nextElement();
+//				System.out.println("alias: "+alias);
+//			}
 			
 			if(!ks.containsAlias("startcom.ca")) 
 			{
