@@ -41,7 +41,7 @@ br.eachLine { line ->
 	{
 		String[] toks = line.split(',');
 		// Only include artifacts available on disk (e.g. for building a downloaded minimal dist, etc.)
-		if(new File(settingsDir.getCanonicalPath() + File.separator + toks[0]).exists())
+		if(new File(settingsDir.getCanonicalPath() + File.separator + toks[0].replace((char)':', File.separatorChar)).exists())
 		{
 			if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || !toks[0].endsWith('-java8'))
 			{
