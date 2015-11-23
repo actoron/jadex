@@ -2,7 +2,7 @@
 =========================
 
 Jadex Android is a framework for developing software agents running on the Android platform. Agent-oriented Software Engineering (AOSE) is a software development paradigm especially suited for distributed Systems as the main buildings blocks are constituted by software agents, whose outstanding characteristics are - among others - autonomy, message-based and asynchronous communication, re- and proactivity, social abilities and cooperation, etc.\
-![JadexAndroid-Logo.png](https://www0.activecomponents.org/bin/download/Android+User+Guide/01+Introduction/JadexAndroid%2DLogo.png)
+![JadexAndroid-Logo.png](JadexAndroid-Logo.png)
 
 On the one hand, AOSE allows to model active objects, meaning that e.g. the user and her needs can naturally be represented by an agents, taking the responsibilty to autonomously achieve the user's goals. On the other hand AOSE abstracts from lower-level details such as multithreading and communication issues, as in this respect the Jadex framework takes care of all these.
 
