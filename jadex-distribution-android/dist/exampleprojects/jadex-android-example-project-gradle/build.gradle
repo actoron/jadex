@@ -17,12 +17,10 @@ repositories {
         name 'jadexsnapshots'
         url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
     }
-}
-
-allprojects {
-    repositories {
-        jcenter()
-        mavenCentral()
+    maven
+    {
+        name 'jadexreleases'
+        url 'http://www.activecomponents.org/nexus/content/repositories/releases/'
     }
 }
 
@@ -31,7 +29,7 @@ android {
     buildToolsVersion "21.1.1"
 
     defaultConfig {
-        applicationId "com.example.mymodule.app"
+        applicationId "org.activecomponents.jadex.android.example"
         minSdkVersion 8
         targetSdkVersion 16
         versionCode 1
@@ -53,7 +51,7 @@ android {
     }
 }
 
-def jadex_version = '3.0-SNAPSHOT'
+def jadex_version = '${jadex_build_version}'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

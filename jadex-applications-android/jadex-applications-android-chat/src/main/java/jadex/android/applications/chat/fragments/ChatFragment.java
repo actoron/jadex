@@ -1,30 +1,8 @@
 package jadex.android.applications.chat.fragments;
 
-import jadex.android.applications.chat.ChatEventArrayAdapter;
-import jadex.android.applications.chat.ChatUser;
-import jadex.android.applications.chat.R;
-import jadex.android.applications.chat.R.id;
-import jadex.android.applications.chat.R.layout;
-import jadex.android.applications.chat.filetransfer.TransferActivity;
-import jadex.android.applications.chat.model.ITypedObservable;
-import jadex.android.applications.chat.model.ITypedObserver;
-import jadex.android.applications.chat.model.UserModel;
-import jadex.android.applications.chat.service.AndroidChatService;
-import jadex.android.applications.chat.service.IAndroidChatService;
-import jadex.android.applications.chat.service.AndroidChatService.ChatEventListener;
-import jadex.android.standalone.clientapp.ClientAppFragment;
-import jadex.android.standalone.clientapp.ClientAppMainFragment;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.chat.ChatEvent;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.platform.service.chat.ChatService;
-import android.app.Activity;
-import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,15 +11,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import jadex.android.applications.chat.ChatEventArrayAdapter;
+import jadex.android.applications.chat.R;
+import jadex.android.applications.chat.filetransfer.TransferActivity;
+import jadex.android.applications.chat.model.ITypedObservable;
+import jadex.android.applications.chat.model.ITypedObserver;
+import jadex.android.applications.chat.service.AndroidChatService.ChatEventListener;
+import jadex.android.applications.chat.service.IAndroidChatService;
+import jadex.bridge.service.types.chat.ChatEvent;
+import jadex.commons.future.DefaultResultListener;
+import jadex.platform.service.chat.ChatService;
+
 /**
  * Fragment for the jadex android chat app.
  */
-public class ChatFragment extends Fragment implements ClientAppFragment, ChatEventListener, ITypedObserver<Boolean>
+public class ChatFragment extends Fragment implements ChatEventListener, ITypedObserver<Boolean>
 {
 	
 	// -------- attributes --------
@@ -60,10 +48,11 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 	// -------- methods --------
 	
 	@Override
-	public void onAttachMainFragment(ClientAppMainFragment mainFragment) {
-		this.chatServiceProvider = (ChatServiceProvider) mainFragment;
+	public void onAttach(Context ctx) {
+		super.onAttach(ctx);
+		this.chatServiceProvider = (ChatServiceProvider) getActivity();
 		chatServiceProvider.addObserver(this);
-	};
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

@@ -1,15 +1,8 @@
 package jadex.android.applications.chat.fragments;
 
-import jadex.android.applications.chat.ChatUser;
-import jadex.android.applications.chat.ChatUserArrayAdapter;
-import jadex.android.applications.chat.model.ITypedObservable;
-import jadex.android.applications.chat.model.ITypedObserver;
-import jadex.android.applications.chat.model.TypedObserver;
-import jadex.android.applications.chat.model.UserModel;
-import jadex.android.applications.chat.service.IAndroidChatService;
-import jadex.android.standalone.clientapp.ClientAppFragment;
-import jadex.android.standalone.clientapp.ClientAppMainFragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,15 +11,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class UsersFragment extends ListFragment implements ClientAppFragment, ITypedObserver<Boolean> {
+import jadex.android.applications.chat.ChatUser;
+import jadex.android.applications.chat.ChatUserArrayAdapter;
+import jadex.android.applications.chat.model.ITypedObservable;
+import jadex.android.applications.chat.model.ITypedObserver;
+import jadex.android.applications.chat.model.TypedObserver;
+import jadex.android.applications.chat.model.UserModel;
+import jadex.android.applications.chat.service.IAndroidChatService;
+
+public class UsersFragment extends ListFragment implements ITypedObserver<Boolean> {
 
 	private ChatUserArrayAdapter listAdapter;
 	private IAndroidChatService chatService;
 	private ChatServiceProvider chatServiceProvider;
 
 	@Override
-	public void onAttachMainFragment(ClientAppMainFragment mainFragment) {
-		chatServiceProvider = (ChatServiceProvider) mainFragment;
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		chatServiceProvider = (ChatServiceProvider) getActivity();
 		chatServiceProvider.addObserver(this);
 		update(chatServiceProvider, chatServiceProvider.isConnected());
 	}

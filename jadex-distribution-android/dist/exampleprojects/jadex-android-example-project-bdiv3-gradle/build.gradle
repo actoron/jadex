@@ -8,11 +8,16 @@ buildscript {
             name 'jadexsnapshots'
             url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
         }
+        maven
+        {
+            name 'jadexreleases'
+            url 'http://www.activecomponents.org/nexus/content/repositories/releases/'
+        }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:1.3.0'
-        classpath 'net.sourceforge.jadex:jadex-gradle-plugin:3.0-SNAPSHOT'
+        classpath 'net.sourceforge.jadex:jadex-gradle-plugin:' + jadex_version
     }
 }
 apply plugin: 'com.android.application'
@@ -28,6 +33,11 @@ repositories {
         name 'jadexsnapshots'
         url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
     }
+    maven
+    {
+        name 'jadexreleases'
+        url 'http://www.activecomponents.org/nexus/content/repositories/releases/'
+    }
 }
 
 android {
@@ -35,7 +45,7 @@ android {
     buildToolsVersion "21.1.1"
 
     defaultConfig {
-        applicationId "com.example.mymodule.app.bdiv3"
+        applicationId "org.activecomponents.jadex.android.bdiv3example"
         minSdkVersion 8
         targetSdkVersion 16
         versionCode 1
@@ -58,7 +68,7 @@ android {
 }
 
 
-def jadex_version = '3.0-SNAPSHOT'
+def jadex_version = '${jadex_build_version}'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
