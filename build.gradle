@@ -475,6 +475,7 @@ def createSrcZip(distname, arts)
 			}
 			
 			zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle', excludes: '.gradle'
+			zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat, gradle.properties, gradle/wrapper/*'
 			zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
 			zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
 		}
