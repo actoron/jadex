@@ -471,8 +471,9 @@ def createSrcZip(distname, arts, isaddon)
 			}
 			// top-level build script files
 			if (!isaddon) {
-				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle', excludes: '.gradle'
-				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat, gradle.properties, gradle/wrapper/*'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle, gradle.properties, gradle/wrapper/*', excludes: '.gradle'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat', filemode: 755
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
 			}
