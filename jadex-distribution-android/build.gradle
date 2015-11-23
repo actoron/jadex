@@ -1,3 +1,16 @@
 dependencies 
 {
+    // do not use distribution-minimal, because we do not need platform-standalone-launch
+//    compile project(':jadex-bridge')
+    compile project(':jadex-android-commons')
+    compile project(':jadex-android-xmlpull')
+    compile project(':jadex-android-bluetooth')
+//    compile project(':jadex-javaparser')
+    compile project(':jadex-kernel-bdiv3-android')
+    compile project(':jadex-kernel-bpmn')
+    compile project(':jadex-kernel-component')
+    compile project(':jadex-kernel-micro')
+    compile project(':jadex-platform-android')
+    compile project(':jadex-platform-extension-webservice-android')
+    compile project(':jadex-runtimetools-android')
 }

@@ -359,12 +359,15 @@ task srcZips << {
 	}
 }
 
-task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) << {
+task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
+	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
+} << {
 	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 }
 
-task distZips(dependsOn: [subprojects.build, srcZips, exampleZips]) << {
-	
+task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
+	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
+} << {
 	gradle.ext.selecteddists.each { selecteddist ->
 		def arts = gradle.ext.distartmap.get(selecteddist)
 		createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
@@ -474,12 +477,13 @@ def createSrcZip(distname, arts, isaddon)
 				// each project: dist directory
 				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: mainzipdir + sp.projectDir.getName() +'/dist',  erroronmissingdir: false
 				// each project: build script files
-				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle, *.properties',  erroronmissingdir: false
+				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
 			}
 			// top-level build script files
 			if (!isaddon) {
-				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle', excludes: '.gradle'
-				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat, gradle.properties, gradle/wrapper/*'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle, gradle.properties, gradle/wrapper/*', excludes: '.gradle'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat', filemode: 755
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
 			}

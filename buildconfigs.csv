@@ -48,6 +48,7 @@ jadex-platform-extension-webservice-desktop-grizzly,,,X,,,,,,,,,,,,X
 jadex-platform-extension-webservice-desktop-jetty,,,X,,,,,,,,,,,,X
 jadex-platform-relay-web,,,,,,,,,,,,,,,X
 jadex-platform-standalone-launch,X,X,X,,,,,,,,,,,,X
+jadex-integration-test,,X,X,,,,,,,,,,,,X
 jadex-rules,,X,X,X,,,,,,,,,,,X
 jadex-rules-applications,,X,X,,,,,,,,,,,,X
 jadex-rules-eca,X,X,X,X,,,,,,,,,X,,X

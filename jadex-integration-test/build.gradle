@@ -1,0 +1,4 @@
+ 
+dependencies {
+    compile project(':jadex-platform-standalone-launch')
+}
