@@ -210,25 +210,36 @@ subprojects
     apply plugin: 'maven'
     sourceCompatibility = 1.6
     
-    /*uploadArchives {
-        repositories {
-        	if (isCommercial(project))
-        	{
-	            mavenDeployer {
-	                repository(url: "file:///home/jander/tmp/repotest/")
-	                snapshotRepository(url: "file:///home/jander/tmp/repotest/", uniiqueVersion: true)
-	            }
+    uploadArchives {
+    	if (project.hasProperty('repouser')) {
+	        repositories {
+	        	if (isCommercial(project))
+	        	{
+		            mavenDeployer {
+		                repository(url: "https://nexus.actoron.com/nexus/content/repositories/commercial-releases") {
+		                	authentication(userName: repouser, password: repopassword)
+		                }
+		                snapshotRepository(url: "https://nexus.actoron.com/nexus/content/repositories/commercial-snapshots") {
+		                	authentication(userName: repouser, password: repopassword)
+		                }
+		                uniqueVersion=true
+		            }
+		        }
+		        else
+		        {
+		        	mavenDeployer {
+		                repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+		                	authentication(userName: repouser, password: repopassword)
+		                }
+		                snapshotRepository(url: "https://nexus.actoron.com/nexus/content/repositories/noncommercial-snapshots") {
+		                	authentication(userName: repouser, password: repopassword)
+		                }
+		                uniqueVersion=true
+		            }
+		        }
 	        }
-	        else
-	        {
-	        	mavenDeployer {
-	                repository(url: "file:///home/jander/tmp/repotest2/")
-	                snapshotRepository(url: "file:///home/jander/tmp/repotest2/")
-	                uniiqueVersion(true)
-	            }
-	        }
-        }
-    }*/
+	    }
+    }
 }
 
 // Hack, helper to generate dep-tree
