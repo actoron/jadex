@@ -386,6 +386,7 @@ def createDistZip(distname, arts, isaddon)
 	def zipfilename = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 	def distdir = project.distsDir.getCanonicalPath()
 	def ant = new groovy.util.AntBuilder()
+	def extdists = new HashSet()
 	
 	ant.sequential {
 		ant.copy todir: preprocessdir,
@@ -429,8 +430,17 @@ def createDistZip(distname, arts, isaddon)
 //					sp.jar.archivePath?
 //					sp.war.archivePath?
 					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
+					
+					sp.configurations.runtime.fileCollection {
+						it instanceof org.gradle.api.artifacts.ExternalModuleDependency? it : null
+					}.each { file ->
+						if (!extdists.contains(file)) {
+							zipfileset file: file, prefix: foldername + '/lib/'
+							extdists.add(file)
+						}
+					}
 				}
-
+				
 				zipfileset dir: spbdir + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
 
 				
