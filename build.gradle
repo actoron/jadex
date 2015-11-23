@@ -465,6 +465,8 @@ def createSrcZip(distname, arts)
 				Project sp = subprojectmap.get(artname)
 				// each project: sources + resources
 				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: mainzipdir + sp.projectDir.getName() +'/' + srcdir,  erroronmissingdir: false
+				// each project: dist directory
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: mainzipdir + sp.projectDir.getName() +'/dist',  erroronmissingdir: false
 				// each project: build script files
 				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle, *.properties',  erroronmissingdir: false
 			}
