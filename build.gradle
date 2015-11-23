@@ -17,8 +17,7 @@ gradle.ext.selecteddists.each { dname ->
 // ressource files that are filtered for variables
 project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle'
 
-project.ext.mainres = ['src/main/java', 'src/main/resources']
-project.ext.testres = ['src/test/java', 'src/test/resources']
+project.ext.srcdir = 'src'
 
 project.ext.subprojectmap  = new HashMap()
 project.subprojects.each { sp ->
@@ -350,24 +349,20 @@ task exampleZips << {
 }
 
 task srcZip << {
-	createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts)
+	createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 }
 
 task srcZips << {
 	gradle.ext.selecteddists.each { selecteddist ->
 		def arts = gradle.ext.distartmap.get(selecteddist)
-		createSrcZip(selecteddist, arts)
+		createSrcZip(selecteddist, arts, selecteddist.startsWith('addon'))
 	}
 }
 
 task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
 	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
 } << {
-	def isaddon = true
-	gradle.ext.selecteddists.each { dist ->
-		isaddon &= dist.startsWith('addon')
-	}
-	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isaddon)
+	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 }
 
 task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
@@ -385,7 +380,7 @@ def createDistZip(distname, arts, isaddon)
 	arts.each { artname ->
 		commercial |= isCommercial(project.ext.subprojectmap.get(artname))
 	}
-	println 'Distribution "' + distname + '" is ' + (commercial? 'commercial.' : 'non-commercial.')
+	println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
 		
 	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filtereddistfiles')
 	preprocessdirfile.mkdirs()
@@ -456,7 +451,7 @@ def createDistZip(distname, arts, isaddon)
 	}
 }
 
-def createSrcZip(distname, arts)
+def createSrcZip(distname, arts, isaddon)
 {
 	def mainzipdir = 'sources/'
 	String maindir = project.projectDir.getCanonicalPath()
@@ -465,22 +460,22 @@ def createSrcZip(distname, arts)
 	ant.sequential {
 		zip destfile: zipfilename,
 		{
-			project.ext.mainres.each { rsdir ->
-				arts.each { artname ->
-					Project sp = subprojectmap.get(artname)
-					zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + rsdir, prefix: mainzipdir + sp.projectDir.getName() +'/' + rsdir,  erroronmissingdir: false
-				}
-			}
-			
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
-				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle, lib/**',  erroronmissingdir: false
+				// each project: sources + resources
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: mainzipdir + sp.projectDir.getName() +'/' + srcdir,  erroronmissingdir: false
+				// each project: dist directory
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: mainzipdir + sp.projectDir.getName() +'/dist',  erroronmissingdir: false
+				// each project: build script files
+				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
 			}
-			
-			zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle', excludes: '.gradle'
-			zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat, gradle.properties, gradle/wrapper/*'
-			zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
-			zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
+			// top-level build script files
+			if (!isaddon) {
+				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle', excludes: '.gradle'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat, gradle.properties, gradle/wrapper/*'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
+			}
 		}
 	}
 }
@@ -498,4 +493,12 @@ def addSubproject(prefix, proj)
 /* Tests if a project is commercial. */
 def isCommercial(project) {
 	project.hasProperty("commercial") && project.property("commercial").toLowerCase().equals('true')
+}
+
+def isAddon(selecteddists) {
+	def isaddon = true
+	selecteddists.each { dist ->
+		isaddon &= dist.startsWith('addon')
+	}
+	return isaddon
 }
