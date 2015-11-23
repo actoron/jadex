@@ -17,8 +17,7 @@ gradle.ext.selecteddists.each { dname ->
 // ressource files that are filtered for variables
 project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle'
 
-project.ext.mainres = ['src/main/java', 'src/main/resources']
-project.ext.testres = ['src/test/java', 'src/test/resources']
+project.ext.srcdir = 'src'
 
 project.ext.subprojectmap  = new HashMap()
 project.subprojects.each { sp ->
@@ -462,18 +461,14 @@ def createSrcZip(distname, arts)
 	ant.sequential {
 		zip destfile: zipfilename,
 		{
-			project.ext.mainres.each { rsdir ->
-				arts.each { artname ->
-					Project sp = subprojectmap.get(artname)
-					zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + rsdir, prefix: mainzipdir + sp.projectDir.getName() +'/' + rsdir,  erroronmissingdir: false
-				}
-			}
-			
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
-				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle',  erroronmissingdir: false
+				// each project: sources + resources
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: mainzipdir + sp.projectDir.getName() +'/' + srcdir,  erroronmissingdir: false
+				// each project: build script files
+				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle, *.properties',  erroronmissingdir: false
 			}
-			
+			// top-level build script files
 			zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle', excludes: '.gradle'
 			zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat, gradle.properties, gradle/wrapper/*'
 			zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
