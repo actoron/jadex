@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:redefine schemaLocation="http://jadex.sourceforge.net/jadex-component-2.5.xsd">
+	<xs:redefine schemaLocation="http://jadex.sourceforge.net/jadex-component-${jadex_build_version}.xsd">
 	</xs:redefine>
 
 	<xs:element name="applicationtype">
