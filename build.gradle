@@ -360,7 +360,9 @@ task srcZips << {
 	}
 }
 
-task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) << {
+task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
+	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
+} << {
 	def isaddon = true
 	gradle.ext.selecteddists.each { dist ->
 		isaddon &= dist.startsWith('addon')
@@ -368,8 +370,9 @@ task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) << {
 	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isaddon)
 }
 
-task distZips(dependsOn: [subprojects.build, srcZips, exampleZips]) << {
-	
+task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
+	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
+} << {
 	gradle.ext.selecteddists.each { selecteddist ->
 		def arts = gradle.ext.distartmap.get(selecteddist)
 		createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
@@ -471,7 +474,7 @@ def createSrcZip(distname, arts)
 			
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
-				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle',  erroronmissingdir: false
+				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle, lib/**',  erroronmissingdir: false
 			}
 			
 			zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle', excludes: '.gradle'

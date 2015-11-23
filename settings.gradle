@@ -2,7 +2,8 @@ apply from: 'util.gradle'
 
 def artifactselectionmarker = 'X'
 def buildconfigsfile = 'buildconfigs.csv'
-gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,editorgpmn,relaystandalone'
+//gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,editorgpmn,relaystandalone'
+gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,relaystandalone' // no editorgpmn until kernel not available
 
 gradle.rootProject {
 	def secpropfile = new File(settingsDir.getCanonicalPath() + File.separator + 'secret.properties')
@@ -39,17 +40,21 @@ br.eachLine { line ->
 	else
 	{
 		String[] toks = line.split(',');
-		if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || !toks[0].endsWith('-java8'))
+		// Only include artifacts available on disk (e.g. for building a downloaded minimal dist, etc.)
+		if(new File(settingsDir.getCanonicalPath() + File.separator + toks[0]).exists())
 		{
-			if (androidSdkExists() || !toks[0].contains('android'))
+			if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || !toks[0].endsWith('-java8'))
 			{
-				allbuildartifacts.add(':' + toks[0])
-				for (int i = 1; i < toks.length; ++i)
+				if (androidSdkExists() || !toks[0].contains('android'))
 				{
-					if (artifactselectionmarker.equals(toks[i].trim().toUpperCase()))
+					allbuildartifacts.add(':' + toks[0])
+					for (int i = 1; i < toks.length; ++i)
 					{
-						Set<String> arts = gradle.ext.distartmap.get(disttargets.get(i - 1))
-						arts.add(':' + toks[0]);
+						if (artifactselectionmarker.equals(toks[i].trim().toUpperCase()))
+						{
+							Set<String> arts = gradle.ext.distartmap.get(disttargets.get(i - 1))
+							arts.add(':' + toks[0]);
+						}
 					}
 				}
 			}
