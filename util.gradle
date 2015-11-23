@@ -43,11 +43,7 @@ def onReleaseVariant(project, Closure c) {
  * @return void
  */
 def onReleaseOutput(project, Closure c) {
-//    onReleaseVariant(project) {println it}
     onReleaseVariant(project) { variant ->
-//        variant.outputs.each { output ->
-//            c(output)
-//        }
         def output = variant.outputs.find({ o -> o.name.contains(com.android.builder.core.BuilderConstants.RELEASE)})
         c(output)
     }
@@ -56,14 +52,12 @@ def onReleaseOutput(project, Closure c) {
 def getReleaseVariant(project) {
     if (isAndroidLibraryProject(project)) {
         project.android.libraryVariants.all {variant ->
-//            println variant
             if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
                 return variant
             }
         }
     } else {
         project.android.applicationVariants.all {variant ->
-//            println variant
             if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
                 return variant
             }
@@ -71,74 +65,131 @@ def getReleaseVariant(project) {
     }
 }
 
-def getVariants(project) {
-	if (isAndroidLibraryProject(project)) {
-		return project.android.libraryVariants
-	} else {
-		project.android.applicationVariants
-	}
-}
-
-def getSourceDir(project) {
-    if (isAndroidProject(project)) {
-        project.android.sourceSets.main.java.srcDirs
-    } else {
-        project.sourceSets.main.allJava
+/**
+ * Adds schema processing tasks:
+ * 1. Generate schemadocs using XSLT
+ * 2. Copy schemas to build dir and filter schema for version
+ * @param project
+ * @return
+ */
+def addSchemaTasks(Project project) {
+    project.tasks.create('schemadocs') << {
+        ant.xslt(
+                basedir: "${project.projectDir}/src/main/schema/",
+                destdir: "${project.buildDir}/schemadocs/",
+                extension: "-${project.version}.html",
+                force: "true",
+                style: "${project.rootProject.projectDir}/src/main/buildutils/xs3p.xsl",
+                includes: "*.xsd"
+        )
     }
-}
+    project.assemble.dependsOn += project.schemadocs
+    project.tasks.create('processSchemas') << {
+        ant.copy todir: file("$project.buildDir/tmp/schemas"),
+                {
+                    resources
+                            {
+                                fileset dir: 'src/main/schema', includes: project.rootProject.ext.filterfiles, erroronmissingdir: false
+                            }
 
-// only return java sources 
-// (getSourceDir includes xml, bpmn, aidl, ... which is wrong for javadoc generation)
-def getOnlyJavaSources(project) {
-    if (isAndroidProject(project)) {
-    	getReleaseVariant(project).javaCompile.source
-    } else {
-        project.sourceSets.main.allJava
-    }
-}
-
-def getResourcesDir(project) {
-    if (isAndroidProject(project)) {
-        project.android.sourceSets.main.res.srcDirs
-    } else {
-        project.sourceSets.main.resources
-    }
-}
-
-def getCompileClassPath(project) {
-    if (isAndroidProject(project)) {
-        if (isAndroidLibraryProject(project)) {
-            project.android.libraryVariants.javaCompile.classpath
-        } else {
-            project.android.applicationVariants.javaCompile.classpath
+                    filterset begintoken: '${', endtoken: '}',
+                            {
+                                filter token: 'jadex_build_version', value: jadex_build_version
+                            }
+                }
+        copy {
+            from file("$project.buildDir/tmp/schemas")
+            into file("$project.buildDir/schemas")
+            rename '(.+)\\.(.+)', "\$1-$jadex_build_version.\$2"
         }
-    } else {
-        project.sourceSets.main.compileClasspath
+        copy {
+            from file("$project.buildDir/tmp/schemas")
+            into file("$project.buildDir/schemas")
+            rename '(.+)\\.(.+)', '\$1-\\${jadex_build_version}.\$2'
+        }
     }
+    project.processResources.dependsOn += project.processSchemas
 }
 
-def isExcluded(excl, name)
-{
-    boolean ret = false;
-    if(excl!=null)
-    {
-        for(ex in excl)
-        {
-            if(name.indexOf(ex)!=-1)
-            {
-                ret = true;
-                break;
+ext.classPathWarningsShownFor = [:]
+
+/**
+ * Sets the boot classpath according to project.sourceCompatibility.
+ * Needs corresponding JAVA_X_HOME Environment Variable set to the required JDK.
+ * @param project
+ * @return
+ */
+def setBootClassPath(Project project) {
+    def requestedVersion = JavaVersion.toVersion(project.sourceCompatibility)
+    // each JDK should be provided by an environment variable
+    def envHomeVar = "JAVA_${requestedVersion.majorVersion}_HOME"
+    // check if running JDK (which usually is the same Version as in JAVA_HOME) is the requested JDK
+    if (JavaVersion.current() > requestedVersion) {
+        def requestedHome = System.getenv(envHomeVar)
+        if ((requestedHome == null || requestedHome.empty || !file(requestedHome).exists())
+            && !classPathWarningsShownFor[project.sourceCompatibility]) {
+            logger.warn("Warning: compiling ${project.sourceCompatibility} source with ${JavaVersion.current()} JDK may lead to problems. " +
+                    "Set $envHomeVar to the corresponding JDK to avoid this.")
+            classPathWarningsShownFor.put(project.sourceCompatibility, true)
+        } else {
+            // set bootstrap path to correct JDK version
+            // println "Setting bootClasspath for $project.name to JDK $requestedVersion"
+            project.tasks.withType(JavaCompile) {
+                // provide same libs that are used in the default boot classpath
+                options.bootClasspath = \
+                            ["resources.jar", "rt.jar", "sunrsasign.jar", "jsse.jar", "jce.jar", "charsets.jar", "jfr.jar"]\
+                            .collect {"$requestedHome"+File.separator+"jre"+File.separator+"lib"+File.separator+"$it"}\
+                            .join(File.pathSeparator) +
+                        ":$requestedHome"+File.separator+"jre"+File.separator+"classes"
+//                        options.fork = true
             }
         }
     }
-    return ret;
 }
 
-def calledWithTask(fulltaskname)
-{
-    def result = gradle.startParameter.taskNames.any {taskName -> taskName.contains(fulltaskname)}
-    return result
-}
+//def getSourceDir(project) {
+//    if (isAndroidProject(project)) {
+//        project.android.sourceSets.main.java.srcDirs
+//    } else {
+//        project.sourceSets.main.allJava
+//    }
+//}
+//
+//// only return java sources
+//// (getSourceDir includes xml, bpmn, aidl, ... which is wrong for javadoc generation)
+//def getOnlyJavaSources(project) {
+//    if (isAndroidProject(project)) {
+//    	getReleaseVariant(project).javaCompile.source
+//    } else {
+//        project.sourceSets.main.allJava
+//    }
+//}
+//
+//def getResourcesDir(project) {
+//    if (isAndroidProject(project)) {
+//        project.android.sourceSets.main.res.srcDirs
+//    } else {
+//        project.sourceSets.main.resources
+//    }
+//}
+//
+//def getCompileClassPath(project) {
+//    if (isAndroidProject(project)) {
+//        if (isAndroidLibraryProject(project)) {
+//            project.android.libraryVariants.javaCompile.classpath
+//        } else {
+//            project.android.applicationVariants.javaCompile.classpath
+//        }
+//    } else {
+//        project.sourceSets.main.compileClasspath
+//    }
+//}
+
+//def calledWithTask(fulltaskname)
+//{
+//    def result = gradle.startParameter.taskNames.any {taskName -> taskName.contains(fulltaskname)}
+//    return result
+//}
 
 def androidSdkExists() {
     def androidHome = System.env.'ANDROID_HOME'
@@ -154,15 +205,9 @@ def androidSdkExists() {
 ext {
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
-    getReleaseVariant = this.&getReleaseVariant
-    getVariants = this.&getVariants
-    getSourceDir = this.&getSourceDir
-    getOnlyJavaSources = this.&getOnlyJavaSources
-    getResourcesDir = this.&getResourcesDir
-    getCompileClassPath = this.&getCompileClassPath
-    isExcluded = this.&isExcluded
-    calledWithTask = this.&calledWithTask
     androidSdkExists = this.&androidSdkExists
     onReleaseVariant = this.&onReleaseVariant
     onReleaseOutput = this.&onReleaseOutput
+    addSchemaTasks = this.&addSchemaTasks
+    setBootClassPath = this.&setBootClassPath
 }
