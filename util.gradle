@@ -126,11 +126,12 @@ def setBootClassPath(Project project) {
     // check if running JDK (which usually is the same Version as in JAVA_HOME) is the requested JDK
     if (JavaVersion.current() > requestedVersion) {
         def requestedHome = System.getenv(envHomeVar)
-        if ((requestedHome == null || requestedHome.empty || !file(requestedHome).exists())
-            && !classPathWarningsShownFor[project.sourceCompatibility]) {
-            logger.warn("Warning: compiling ${project.sourceCompatibility} source with ${JavaVersion.current()} JDK may lead to problems. " +
-                    "Set $envHomeVar to the corresponding JDK to avoid this.")
-            classPathWarningsShownFor.put(project.sourceCompatibility, true)
+        if (requestedHome == null || requestedHome.empty || !file(requestedHome).exists()) {
+            if (!classPathWarningsShownFor[project.sourceCompatibility]) {
+                logger.warn("Warning: compiling ${project.sourceCompatibility} source with ${JavaVersion.current()} JDK may lead to problems. " +
+                        "Set $envHomeVar to the corresponding JDK to avoid this.")
+                classPathWarningsShownFor.put(project.sourceCompatibility, true)
+            }
         } else {
             // set bootstrap path to correct JDK version
             // println "Setting bootClasspath for $project.name to JDK $requestedVersion"
