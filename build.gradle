@@ -1,3 +1,4 @@
+import java.nio.file.Paths
 import java.util.regex.Matcher
 
 apply plugin: 'signing'
@@ -444,7 +445,7 @@ def createDistZip(distname, arts, isaddon)
 //					sp.jar.archivePath?
 //					sp.war.archivePath?
 					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
-					
+
 					sp.configurations.runtime.fileCollection {
 						it instanceof org.gradle.api.artifacts.ExternalModuleDependency? it : null
 					}.each { file ->
@@ -484,11 +485,12 @@ def createSrcZip(distname, arts, isaddon)
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
 				// each project: sources + resources
-				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: mainzipdir + sp.projectDir.getName() +'/' + srcdir,  erroronmissingdir: false
+				String prefix = Paths.get(maindir).relativize(sp.projectDir.toPath()).toString() // handle nested paths correctly
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: prefix +'/' + srcdir,  erroronmissingdir: false
 				// each project: dist directory
-				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: mainzipdir + sp.projectDir.getName() +'/dist',  erroronmissingdir: false
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: prefix + '/dist',  erroronmissingdir: false
 				// each project: build script files
-				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: mainzipdir + sp.projectDir.getName(), includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
+				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: prefix, includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
 			}
 			// top-level build script files
 			if (!isaddon) {
