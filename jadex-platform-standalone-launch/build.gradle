@@ -35,6 +35,8 @@ dependencies
 	launcharts.each { art ->
 		compile project(art)
 	}
+	
+	compile project(':jadex-platform-extension-webservice-desktop-jetty')
 }
 
 jar 

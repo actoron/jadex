@@ -18,6 +18,8 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -228,6 +230,39 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      */
     public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {
+		final AsyncContext rctx = request.startAsync();
+		final boolean[] complete = new boolean[1];
+		AsyncListener alis = new AsyncListener()
+		{
+			public void onTimeout(AsyncEvent arg0) throws IOException
+			{
+			}
+			
+			public void onStartAsync(AsyncEvent arg0) throws IOException
+			{
+			}
+			
+			public void onError(AsyncEvent arg0) throws IOException
+			{
+			}
+			
+			public void onComplete(AsyncEvent arg0) throws IOException
+			{
+				complete[0] = true;
+			}
+		};
+		rctx.addListener(alis);
+		
+		// Must be async because Jadex runs on other thread
+		// tomcat async bug? http://jira.icesoft.org/browse/PUSH-116
+		request.setAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO, new IAsyncContextInfo()
+		{
+			public boolean isComplete()
+			{
+				return complete[0];
+			}
+		});
+    	
 //    	System.out.println("handler is: "+uri.getPath());
 
         // check if call is an intermediate result fetch

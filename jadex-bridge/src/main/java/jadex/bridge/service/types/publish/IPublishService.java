@@ -23,6 +23,7 @@ public interface IPublishService
 	{
 		"/jadex/extension/rs/publish/JettyRSPublishAgent.class",
 		"/jadex/extension/rs/publish/GrizzlyRSPublishAgent.class",
+		"/jadex/extension/rs/publish/LegacyGrizzlyRSPublishAgent.class",
 		"/jadex/extension/rs/publish/ExternalRSPublishAgent.class"
 	};
 	
