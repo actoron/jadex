@@ -624,27 +624,33 @@ public class SReflect
 		String	ret	= null;
 		for(String choice: choices)
 		{
-			if (choice.endsWith(".class")) {
-				Class<?>	clazz	= classForName0((choice.startsWith("/") ? choice.substring(1) : choice).substring(0,choice.length()-6).replace("/","."), cl);
+			if(choice.endsWith(".class")) 
+			{
+				String clname = choice.startsWith("/") ? choice.substring(1): choice;
+				clname =  clname.substring(0, clname.length()-6).replace("/",".");
+				Class<?> clazz = classForName0(clname, cl);
 				if(clazz!=null)
 				{
 					ret	= choice;
 					break;
 				}
-			} else {
+			} 
+			else 
+			{
 				InputStream is = SUtil.getResource0(choice, cl);
 				if(is!=null)
 				{
 					ret	= choice;
-					try {
+					try 
+					{
 						is.close();
-					} catch (IOException e) {
+					} 
+					catch (IOException e) 
+					{
 					}
 					break;
 				}
 			}
-
-
 		}
 		return ret;
 	}

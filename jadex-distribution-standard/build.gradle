@@ -10,4 +10,8 @@ dependencies
 
 	compile project(':jadex-kernel-extension-agr')
 	compile project(':jadex-kernel-extension-envsupport')
+	
+	// excluded?
+//	compile project(':jadex-platform-extension-webservice')
+//	compile project(':jadex-platform-extension-webservice-desktop')
 }

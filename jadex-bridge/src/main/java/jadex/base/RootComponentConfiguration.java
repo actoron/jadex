@@ -13,223 +13,480 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+
 /**
- * Configuration of the root platform component. 
+ * Configuration of the root platform component.
  */
 public class RootComponentConfiguration
 {
 	/** Tell starter to print welcome message. **/
-	public static final String WELCOME = "welcome"; // class: boolean default: true
-	
+	public static final String	WELCOME				= "welcome";								// class:
+																								// boolean
+																								// default:
+																								// true
+
 	// ----- arguments set by starter for root or platform component -----
 
 	/** The IPlatformComponentAccess instance **/
-	public static final String	PLATFORM_ACCESS	= "platformaccess";
+	public static final String	PLATFORM_ACCESS		= "platformaccess";
+
 	/** The component factory instance. */
 	public static final String	COMPONENT_FACTORY	= PlatformConfiguration.COMPONENT_FACTORY;
+
 	/** The saved program arguments. **/
-	public static final String PROGRAM_ARGUMENTS = "programarguments"; // class: String[] default: emptyvalue
-	
+	public static final String	PROGRAM_ARGUMENTS	= "programarguments";						// class:
+																								// String[]
+																								// default:
+																								// emptyvalue
+
 	/** ======== Arguments used by platform components. ======== **/
-	
+
 	/** Start the JCC agent to open the platform GUI? **/
-	public static final String GUI = "gui"; // class: boolean default: true
-	/** Start the platform with command line interface (cli) activated?  (requires Jadex Pro add-on) **/
-	public static final String CLI = "cli"; // class: boolean default: true
+	public static final String	GUI					= "gui";									// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/**
+	 * Start the platform with command line interface (cli) activated? (requires
+	 * Jadex Pro add-on)
+	 **/
+	public static final String	CLI					= "cli";									// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Start cli with console in or not **/
-	public static final String CLICONSOLE = "cliconsole"; // class: boolean default: true
+	public static final String	CLICONSOLE			= "cliconsole";								// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Save platform settings on shutdown? **/
-	public static final String SAVEONEXIT = "saveonexit"; // class: boolean default: true
+	public static final String	SAVEONEXIT			= "saveonexit";								// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Open JCC for specific remote platforms. **/
-	public static final String JCCPLATFORMS = "jccplatforms"; // class: String default: null
+	public static final String	JCCPLATFORMS		= "jccplatforms";							// class:
+																								// String
+																								// default:
+																								// null
+
 	/** Enable verbose logging (shortcut for setting logging_level to info). **/
-	public static final String LOGGING = "logging"; // class: boolean default: false
+	public static final String	LOGGING				= "logging";								// class:
+																								// boolean
+																								// default:
+																								// false
+
 	/** Logging level for platform. **/
-	public static final String LOGGING_LEVEL = "logging_level"; // class: java.util.logging.Level default: java.util.logging.Level.SEVERE
+	public static final String	LOGGING_LEVEL		= "logging_level";							// class:
+																								// java.util.logging.Level
+																								// default:
+																								// java.util.logging.Level.SEVERE
+
 	/** Use simulation execution mode? **/
-	public static final String SIMULATION = "simulation"; // class: Boolean default: emptyvalue
+	public static final String	SIMULATION			= "simulation";								// class:
+																								// Boolean
+																								// default:
+																								// emptyvalue
+
 	/** Use asynchronous execution mode? **/
-	public static final String ASYNCEXECUTION = "asyncexecution"; // class: Boolean default: emptyvalue
+	public static final String	ASYNCEXECUTION		= "asyncexecution";							// class:
+																								// Boolean
+																								// default:
+																								// emptyvalue
+
 	/** Flag to enable component persistence. **/
-	public static final String PERSIST = "persist"; // class: boolean default: false
+	public static final String	PERSIST				= "persist";								// class:
+																								// boolean
+																								// default:
+																								// false
+
 	/** Flag if CIDs may be reused (true for not). **/
-	public static final String UNIQUEIDS = "uniqueids"; // class: boolean default: true
+	public static final String	UNIQUEIDS			= "uniqueids";								// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Flag for deferring thread creation/deletion in thread pool **/
-	public static final String THREADPOOLDEFER = "threadpooldefer"; // class: boolean default: true
-	
-	
-	/** Additional library paths (classpath entries) for loading agent models and classes. **/
-	public static final String LIBPATH = "libpath"; // class: String default: 
+	public static final String	THREADPOOLDEFER		= "threadpooldefer";						// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/**
+	 * Additional library paths (classpath entries) for loading agent models and
+	 * classes.
+	 **/
+	public static final String	LIBPATH				= "libpath";								// class:
+																								// String
+																								// default:
+
 	/** The base classloader. **/
-	public static final String BASECLASSLOADER = "baseclassloader"; // class: ClassLoader default: 
-			
-	/** Start the chat agent for instant messaging and file transfer with user Jadex users. **/
-	public static final String CHAT = "chat"; // class: boolean default: true
-	
+	public static final String	BASECLASSLOADER		= "baseclassloader";						// class:
+																								// ClassLoader
+																								// default:
+
+	/**
+	 * Start the chat agent for instant messaging and file transfer with user
+	 * Jadex users.
+	 **/
+	public static final String	CHAT				= "chat";									// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Start the awareness agent (awa) for automatic platform discovery. **/
-	public static final String AWARENESS = "awareness"; // class: boolean default: true
+	public static final String	AWARENESS			= "awareness";								// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Specify the awareness agent discovery mechanisms (comma separated). **/
-	public static final String AWAMECHANISMS = "awamechanisms"; // class: String default: "Broadcast, Multicast, Message, Relay, Local"
+	public static final String	AWAMECHANISMS		= "awamechanisms";							// class:
+																								// String
+																								// default:
+																								// "Broadcast,
+																								// Multicast,
+																								// Message,
+																								// Relay,
+																								// Local"
+
 	/** The awareness delay in milliseconds **/
-	public static final String AWADELAY = "awadelay"; // class: long default: 20000
+	public static final String	AWADELAY			= "awadelay";								// class:
+																								// long
+																								// default:
+																								// 20000
+
 	/** Include entries for awareness agent. **/
-	public static final String AWAINCLUDES = "awaincludes"; // class: String default: ""
+	public static final String	AWAINCLUDES			= "awaincludes";							// class:
+																								// String
+																								// default:
+																								// ""
+
 	/** Exclude entries for awareness agent. **/
-	public static final String AWAEXCLUDES = "awaexcludes"; // class: String default: ""
-	
+	public static final String	AWAEXCLUDES			= "awaexcludes";							// class:
+																								// String
+																								// default:
+																								// ""
+
 	/** Use a compact binary message format instead of XML by default. **/
-	public static final String BINARYMESSAGES = "binarymessages"; // class: boolean default: true
-	
+	public static final String	BINARYMESSAGES		= "binarymessages";							// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Fail on recoverable message decoding errors instead of ignoring. **/
-	public static final String STRICTCOM = "strictcom"; // class: boolean default: false
-			
-	/** Flag if the platform should be protected with password.
-	      If a value is provided this value overrides the settings value. **/
-	public static final String USEPASS = "usepass"; // class: Boolean default: emptyvalue
+	public static final String	STRICTCOM			= "strictcom";								// class:
+																								// boolean
+																								// default:
+																								// false
+
+	/**
+	 * Flag if the platform should be protected with password. If a value is
+	 * provided this value overrides the settings value.
+	 **/
+	public static final String	USEPASS				= "usepass";								// class:
+																								// Boolean
+																								// default:
+																								// emptyvalue
+
 	/** Flag if the platform password should be printed to the console. **/
-	public static final String PRINTPASS = "printpass"; // class: boolean default: true
+	public static final String	PRINTPASS			= "printpass";								// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Flag if trusted lan should be used. **/
-	public static final String TRUSTEDLAN = "trustedlan"; // class: Boolean default: emptyvalue
+	public static final String	TRUSTEDLAN			= "trustedlan";								// class:
+																								// Boolean
+																								// default:
+																								// emptyvalue
+
 	/** Network name. **/
-	public static final String NETWORKNAME = "networkname"; // class: String default: emptyvalue
+	public static final String	NETWORKNAME			= "networkname";							// class:
+																								// String
+																								// default:
+																								// emptyvalue
+
 	/** Network pass. **/
-	public static final String NETWORKPASS = "networkpass"; // class: String default: emptyvalue
+	public static final String	NETWORKPASS			= "networkpass";							// class:
+																								// String
+																								// default:
+																								// emptyvalue
+
 	/** Virtual names that are used for authentication **/
-	public static final String VIRTUALNAMES = "virtualnames"; // class: java.util.Map default: emptyvalue
+	public static final String	VIRTUALNAMES		= "virtualnames";							// class:
+																								// java.util.Map
+																								// default:
+																								// emptyvalue
+
 	/** The message validity duration (in minutes) **/
-	public static final String VALIDITYDURATION = "validityduration"; // class: long default: 
-	
+	public static final String	VALIDITYDURATION	= "validityduration";						// class:
+																								// long
+																								// default:
+
 	/** Flag if local transport is enabled. **/
-	public static final String LOCALTRANSPORT = "localtransport"; // class: boolean default: true
+	public static final String	LOCALTRANSPORT		= "localtransport";							// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Flag if tcp transport is enabled. **/
-	public static final String TCPTRANSPORT = "tcptransport"; // class: boolean default: false
+	public static final String	TCPTRANSPORT		= "tcptransport";							// class:
+																								// boolean
+																								// default:
+																								// false
+
 	/** Port for TCP transport. **/
-	public static final String TCPPORT = "tcpport"; // class: int default: 9876
+	public static final String	TCPPORT				= "tcpport";								// class:
+																								// int
+																								// default:
+																								// 9876
+
 	/** Flag if niotcp transport is enabled. **/
-	public static final String NIOTCPTRANSPORT = "niotcptransport"; // class: boolean default: true
+	public static final String	NIOTCPTRANSPORT		= "niotcptransport";						// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Port for NIOTCP transport. **/
-	public static final String NIOTCPPORT = "niotcpport"; // class: int default: 8765
+	public static final String	NIOTCPPORT			= "niotcpport";								// class:
+																								// int
+																								// default:
+																								// 8765
+
 	/** Flag if relay transport is enabled. **/
-	public static final String RELAYTRANSPORT = "relaytransport"; // class: boolean default: true
-	/** Address(es) for relay transport (one or more addresses separated by commas). **/
-	public static final String RELAYADDRESS = "relayaddress"; // class: String default: jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
+	public static final String	RELAYTRANSPORT		= "relaytransport";							// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/**
+	 * Address(es) for relay transport (one or more addresses separated by
+	 * commas).
+	 **/
+	public static final String	RELAYADDRESS		= "relayaddress";							// class:
+																								// String
+																								// default:
+																								// jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
+
 	/** Flag if relay should use HTTPS for receiving messages. **/
-	public static final String RELAYSECURITY = "relaysecurity"; // class: boolean default: $args.relayaddress.indexOf("https://")==-1 ? false : true
+	public static final String	RELAYSECURITY		= "relaysecurity";							// class:
+																								// boolean
+																								// default:
+																								// $args.relayaddress.indexOf("https://")==-1
+																								// ?
+																								// false
+																								// :
+																								// true
+
 	/** Flag if only awareness messages should be sent through relay. **/
-	public static final String RELAYAWAONLY = "relayawaonly"; // class: boolean default: false
+	public static final String	RELAYAWAONLY		= "relayawaonly";							// class:
+																								// boolean
+																								// default:
+																								// false
+
 	/** Flag if ssltcp transport should enabled (requires Jadex Pro add-on). **/
-	public static final String SSLTCPTRANSPORT = "ssltcptransport"; // class: boolean default: false
+	public static final String	SSLTCPTRANSPORT		= "ssltcptransport";						// class:
+																								// boolean
+																								// default:
+																								// false
+
 	/** Port for SSL TCP transport. **/
-	public static final String SSLTCPPORT = "ssltcpport"; // class: int default: 44334
-	
+	public static final String	SSLTCPPORT			= "ssltcpport";								// class:
+																								// int
+																								// default:
+																								// 44334
+
 	/** Flag if web service publishing is enabled. **/
-	public static final String WSPUBLISH = "wspublish"; // class: boolean default: false
-	
+	public static final String	WSPUBLISH			= "wspublish";								// class:
+																								// boolean
+																								// default:
+																								// false
+
 	/** Flag if rest service publishing is enabled. **/
-	public static final String RSPUBLISH = "rspublish"; // class: boolean default: false
+	public static final String	RSPUBLISH			= "rspublish";								// class:
+																								// boolean
+																								// default:
+																								// false
 
-	/** Optionally provide alternative rs publish implementation.  **/
-	public static final String RSPUBLISHCOMPONENT = "rspublishcomponent"; // class: String default: First component available as defined in IPublishService...
-	
-	/** The name(s) of kernel(s) to load (separated by comma).
-	      Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
-	      Alternatively, the 'multi' can be used to start any available kernels on demand.
-	      Specifying 'all' will start all available kernels directly. **/
-	public static final String KERNELS = "kernels"; // class: String default: "multi"
-	
+	/** Optionally provide alternative rs publish implementation. **/
+	public static final String	RSPUBLISHCOMPONENT	= "rspublishcomponent";						// class:
+																								// String
+																								// default:
+																								// First
+																								// component
+																								// available
+																								// as
+																								// defined
+																								// in
+																								// IPublishService...
+
+	/**
+	 * The name(s) of kernel(s) to load (separated by comma). Currently supports
+	 * 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
+	 * Alternatively, the 'multi' can be used to start any available kernels on
+	 * demand. Specifying 'all' will start all available kernels directly.
+	 **/
+	public static final String	KERNELS				= "kernels";								// class:
+																								// String
+																								// default:
+																								// "multi"
+
 	/** <argument name="platform_shutdown_time">1000</argument> **/
-	
-	/** Flag to enable the Maven dependency service (requires Jadex Pro add-on). **/
-	public static final String MAVEN_DEPENDENCIES = "maven_dependencies"; // class: boolean default: false
-	
-	/** Flag if global monitoring is turned on.  **/
-	public static final String MONITORINGCOMP = "monitoringcomp"; // class: boolean default: true
-	
-	/** Flag if sensors are turned on.  **/
-	public static final String SENSORS = "sensors"; // class: boolean default: false
-	
-	/** Optionally provide alternative thread pool implementation.  **/
-	public static final String THREADPOOLCLASS = "threadpoolclass"; // class: String default: null
-	
-	/** Optionally provide alternative context service implementation.  **/
-	public static final String CONTEXTSERVICECLASS = "contextserviceclass"; // class: String default: null
-	
-	
-	/** Flag if df component and service should be started.  **/
-	public static final String DF = "df"; // class: boolean default: true
-	/** Flag if clock component and service should be started.  **/
-	public static final String CLOCK = "clock"; // class: boolean default: true
-	/** Flag if message component and service should be started.  **/
-	public static final String MESSAGE = "message"; // class: boolean default: true
-	/** Flag if simulation component and service should be started.  **/
-	public static final String SIMUL = "simul"; // class: boolean default: true
-	/** Flag if filetransfer component and service should be started.  **/
-	public static final String FILETRANSFER = "filetransfer"; // class: boolean default: true
-	/** Flag if marshal component and service should be started.  **/
-	public static final String MARSHAL = "marshal"; // class: boolean default: true
-	/** Flag if security component and service should be started.  **/
-	public static final String SECURITY = "security"; // class: boolean default: true
-	/** Flag if library component and service should be started.  **/
-	public static final String LIBRARY = "library"; // class: boolean default: true
-	/** Flag if settings component and service should be started.  **/
-	public static final String SETTINGS = "settings"; // class: boolean default: true
-	/** Flag if context component and service should be started.  **/
-	public static final String CONTEXT = "context"; // class: boolean default: true
-	/** Flag if address component and service should be started.  **/
-	public static final String ADDRESS = "address"; // class: boolean default: true
+
+	/**
+	 * Flag to enable the Maven dependency service (requires Jadex Pro add-on).
+	 **/
+	public static final String	MAVEN_DEPENDENCIES	= "maven_dependencies";						// class:
+																								// boolean
+																								// default:
+																								// false
+
+	/** Flag if global monitoring is turned on. **/
+	public static final String	MONITORINGCOMP		= "monitoringcomp";							// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if sensors are turned on. **/
+	public static final String	SENSORS				= "sensors";								// class:
+																								// boolean
+																								// default:
+																								// false
+
+	/** Optionally provide alternative thread pool implementation. **/
+	public static final String	THREADPOOLCLASS		= "threadpoolclass";						// class:
+																								// String
+																								// default:
+																								// null
+
+	/** Optionally provide alternative context service implementation. **/
+	public static final String	CONTEXTSERVICECLASS	= "contextserviceclass";					// class:
+																								// String
+																								// default:
+																								// null
+
+	/** Flag if df component and service should be started. **/
+	public static final String	DF					= "df";										// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if clock component and service should be started. **/
+	public static final String	CLOCK				= "clock";									// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if message component and service should be started. **/
+	public static final String	MESSAGE				= "message";								// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if simulation component and service should be started. **/
+	public static final String	SIMUL				= "simul";									// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if filetransfer component and service should be started. **/
+	public static final String	FILETRANSFER		= "filetransfer";							// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if marshal component and service should be started. **/
+	public static final String	MARSHAL				= "marshal";								// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if security component and service should be started. **/
+	public static final String	SECURITY			= "security";								// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if library component and service should be started. **/
+	public static final String	LIBRARY				= "library";								// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if settings component and service should be started. **/
+	public static final String	SETTINGS			= "settings";								// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if context component and service should be started. **/
+	public static final String	CONTEXT				= "context";								// class:
+																								// boolean
+																								// default:
+																								// true
+
+	/** Flag if address component and service should be started. **/
+	public static final String	ADDRESS				= "address";								// class:
+																								// boolean
+																								// default:
+																								// true
+
 	/** Flag if dht storage ring should be provided. **/
-	public static final String DHT_PROVIDE = PlatformConfiguration.DHT_PROVIDE; // class: boolean default: false
+	public static final String	DHT_PROVIDE			= PlatformConfiguration.DHT_PROVIDE;		// class:
+																								// boolean
+																								// default:
+																								// false
 
-	private IModelInfo model;
+	private IModelInfo			model;
 
-	void setModel(IModelInfo model) {
+	void setModel(IModelInfo model)
+	{
 		this.model = model;
 	}
 
 	/**
 	 * Kernel names enum.
 	 */
-	public enum KERNEL {
-		component,
-		micro,
-		bpmn,
-		v3,
-		bdi,
-		bdibpmn,
-		multi
+	public enum KERNEL
+	{
+		component, micro, bpmn, v3, bdi, bdibpmn, multi
 	}
-	
+
 	/**
 	 * Discovery names enum.
 	 */
-	public enum AWAMECHANISM {
-		broadcast,
-		multicast,
-		message,
-		relay,
-		local,
-//		bluetooth
+	public enum AWAMECHANISM
+	{
+		broadcast, multicast, message, relay, local,
+		// bluetooth
 	}
 
 	/** All configured parameters as map. **/
 	private Map<String, Object>	rootargs;
-	
+
 	/** The activated kernels. **/
-	private KERNEL[]	kernels;
+	private KERNEL[]			kernels;
 
 	/** The activated awareness machanisms. **/
-	private AWAMECHANISM[]	awamechanisms;
-	
+	private AWAMECHANISM[]		awamechanisms;
+
 	/**
 	 * Create a new configuration.
 	 */
 	public RootComponentConfiguration()
 	{
-		rootargs = new HashMap<String, Object>();	// Arguments of root component (platform)
+		rootargs = new HashMap<String, Object>(); // Arguments of root component
+													// (platform)
 	}
-	
+
 	/**
 	 * Copy constructor
+	 * 
 	 * @param source
 	 */
 	public RootComponentConfiguration(RootComponentConfiguration source)
@@ -239,6 +496,7 @@ public class RootComponentConfiguration
 
 	/**
 	 * Set a value in the root component configuration
+	 * 
 	 * @param key a key from the constants in this class.
 	 * @param val the value
 	 */
@@ -246,15 +504,18 @@ public class RootComponentConfiguration
 	{
 		rootargs.put(key, val);
 	}
-	
+
 	/**
 	 * Returns a value of a given configuration parameter.
+	 * 
 	 * @param key the key
 	 * @return the value
 	 */
-	public Object getValue(String key) {
+	public Object getValue(String key)
+	{
 		Object val = rootargs.get(key);
-		if (val == null && model != null) {
+		if(val == null && model != null)
+		{
 			val = getValueFromModel(key);
 		}
 		return val;
@@ -264,54 +525,58 @@ public class RootComponentConfiguration
 	{
 		return rootargs;
 	}
-	
+
 	/**
 	 * Set program arguments to be available at runtime.
+	 * 
 	 * @param args
 	 */
 	protected void setProgramArguments(String[] args)
 	{
 		setValue(PROGRAM_ARGUMENTS, args);
 	}
-	
-//	// internal
-	public  boolean getWelcome()
+
+	// // internal
+	public boolean getWelcome()
 	{
 		return Boolean.TRUE.equals(getValue(WELCOME));
 	}
-	public  void setWelcome(boolean value)
+
+	public void setWelcome(boolean value)
 	{
 		setValue(WELCOME, value);
 	}
 
-	//	// internal
-//	public  IPlatformComponentAccess getPlatformAccess()
-//	{
-//		return (IPlatformComponentAccess)getValue(PLATFORM_ACCESS);
-//	}
+	// // internal
+	// public IPlatformComponentAccess getPlatformAccess()
+	// {
+	// return (IPlatformComponentAccess)getValue(PLATFORM_ACCESS);
+	// }
 	/**
 	 * Set the platform access.
+	 * 
 	 * @param value
 	 */
-	protected  void setPlatformAccess(IPlatformComponentAccess value)
+	protected void setPlatformAccess(IPlatformComponentAccess value)
 	{
 		setValue(PLATFORM_ACCESS, value);
 	}
-//
-//	// internal
-//	public  IComponentFactory getComponentFactory()
-//	{
-//		return (IComponentFactory)getValue(COMPONENT_FACTORY);
-//	}
+
+	//
+	// // internal
+	// public IComponentFactory getComponentFactory()
+	// {
+	// return (IComponentFactory)getValue(COMPONENT_FACTORY);
+	// }
 	/**
 	 * Set the component factory.
+	 * 
 	 * @param value
 	 */
-	protected  void setComponentFactory(IComponentFactory value)
+	protected void setComponentFactory(IComponentFactory value)
 	{
 		setValue(COMPONENT_FACTORY, value);
 	}
-
 
 	// individual getters/setters
 
@@ -753,7 +1018,7 @@ public class RootComponentConfiguration
 	{
 		setValue(RSPUBLISHCOMPONENT, value);
 	}
-	
+
 	public KERNEL[] getKernels()
 	{
 		return kernels;
@@ -762,9 +1027,10 @@ public class RootComponentConfiguration
 	/**
 	 * @param value
 	 */
-	public void setKernels(String... value) {
+	public void setKernels(String... value)
+	{
 		List<KERNEL> kernelList = new ArrayList<KERNEL>();
-		for (String kernel : value)
+		for(String kernel : value)
 		{
 			kernelList.add(KERNEL.valueOf(kernel));
 		}
@@ -956,14 +1222,16 @@ public class RootComponentConfiguration
 		setValue(DHT_PROVIDE, value);
 	}
 
-
 	/**
-	 * Enhance this config with given other config.
-	 * Will overwrite all values that are set in the other config.
+	 * Enhance this config with given other config. Will overwrite all values
+	 * that are set in the other config.
+	 * 
 	 * @param other
 	 */
-	public void enhanceWith(RootComponentConfiguration other) {
-		for (Map.Entry<String, Object> entry : other.rootargs.entrySet()) {
+	public void enhanceWith(RootComponentConfiguration other)
+	{
+		for(Map.Entry<String, Object> entry : other.rootargs.entrySet())
+		{
 			this.setValue(entry.getKey(), entry.getValue());
 		}
 	}
@@ -971,33 +1239,41 @@ public class RootComponentConfiguration
 	/**
 	 * Checks this config for consistency.
 	 */
-	protected void checkConsistency() {
+	protected void checkConsistency()
+	{
 		StringBuilder errorText = new StringBuilder();
 		Object publish = getValue(RSPUBLISH);
 		Object publishComponent = getValue(RSPUBLISHCOMPONENT);
-		if (Boolean.TRUE.equals(publish) && publishComponent == null) {
-			errorText.append(RSPUBLISH + " set to true, but no " + RSPUBLISHCOMPONENT +" found.");
+		
+//		System.out.println("publish: "+RSPUBLISHCOMPONENT+" "+publishComponent);
+		
+		if(Boolean.TRUE.equals(publish) && publishComponent == null)
+		{
+			errorText.append(RSPUBLISH + " set to true, but no " + RSPUBLISHCOMPONENT + " found.");
 		}
 
-		if (errorText.length() != 0) {
+		if(errorText.length() != 0)
+		{
 			throw new RuntimeException("Configuration consistency error: \n" + errorText.toString());
 		}
 	}
 
 	/**
 	 * Returns the value as it is used in the (already loaded) model.
+	 * 
 	 * @param key
 	 * @return Object
 	 */
-	private Object getValueFromModel(String key) {
+	private Object getValueFromModel(String key)
+	{
 		Object val;
-		Argument argument = (Argument) model.getArgument(key);
-		val	= SJavaParser.getParsedValue(argument, model.getAllImports(), null, Starter.class.getClassLoader());
-		if (val == null) {
+		Argument argument = (Argument)model.getArgument(key);
+		val = SJavaParser.getParsedValue(argument, model.getAllImports(), null, Starter.class.getClassLoader());
+		if(val == null)
+		{
 			// get default value
 			val = SJavaParser.getParsedValue(argument.getDefaultValue(), model.getAllImports(), null, Starter.class.getClassLoader());
 		}
 		return val;
 	}
-
 }
