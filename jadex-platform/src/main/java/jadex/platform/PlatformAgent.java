@@ -158,7 +158,7 @@ import static jadex.base.RootComponentConfiguration.*;
 	@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"),
 	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
-	@ComponentType(name="rspublish", filename="$args.rspublishcomponent"),
+	@ComponentType(name="rspublish", filename="%{$args.rspublishcomponent}"),
 //	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/ExternalRSPublishAgent.class"),
 //	@ComponentType(name="rspublish_grizzly", filename="jadex/extension/rs/publish/GrizzlyRSPublishAgent.class"),
 //	@ComponentType(name="rspublish_jetty", filename="jadex/extension/rs/publish/JettyRSPublishAgent.class"),
