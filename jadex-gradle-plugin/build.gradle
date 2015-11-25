@@ -31,27 +31,27 @@ artifacts {
 }
 
 // upload task for gradle plugin and its dependencies
-uploadGradlePluginArchives {
-    repositories {
-        repositories.mavenDeployer {
-            beforeDeployment
-                    {
-                        MavenDeployment deployment -> signing.signPom(deployment)
-                    }
+//uploadGradlePluginArchives {
+//    repositories {
+//        repositories.mavenDeployer {
+//            beforeDeployment
+//                    {
+//                        MavenDeployment deployment -> signing.signPom(deployment)
+//                    }
+//
+//            snapshotRepository(url: reposnapshoturl)
+//                    {
+//                        authentication(userName: repouser, password: repopassword)
+//                    }
+//            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
+//                    {
+//                        authentication(userName: repouser, password: repopassword)
+//                    }
+//        }
+//    }
+//}
 
-            snapshotRepository(url: reposnapshoturl)
-                    {
-                        authentication(userName: repouser, password: repopassword)
-                    }
-            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                    {
-                        authentication(userName: repouser, password: repopassword)
-                    }
-        }
-    }
-}
-
-uploadGradlePluginArchives.dependsOn += uploadArchives
+//uploadGradlePluginArchives.dependsOn += uploadArchives
 
 task installGradlePluginArchives(dependsOn:'install') {
 
