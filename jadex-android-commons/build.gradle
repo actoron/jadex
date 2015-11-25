@@ -1,8 +1,5 @@
 dependencies 
 {
-    compile libraries.android
     compile libraries.android_support
-	compile(project(':jadex-bridge')) {
-        exclude group: 'junit', module: 'junit'
-    }
+	compile(project(':jadex-bridge'))
 }

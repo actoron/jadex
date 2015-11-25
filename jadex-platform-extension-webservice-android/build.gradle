@@ -11,8 +11,6 @@ dependencies
     ext.spring_android_version = '1.0.0.RELEASE'
     ext.jersey_version = '1.11'
 
-    compile libraries.android
-
     testCompile 'org.springframework:spring-web:3.1.2.RELEASE'
     compile project(':jadex-platform-extension-webservice')
     compile 'org.springframework.android:spring-android-rest-template:' + spring_android_version

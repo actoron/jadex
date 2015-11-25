@@ -9,5 +9,5 @@ dependencies
 	compile project(':jadex-rules-eca')
 	compile project(':jadex-xml')
 	
-	compile 'org.ow2.asm:asm-all:5.0.3'
+	compileNoAndroidRuntime 'org.ow2.asm:asm-all:5.0.3'
 }

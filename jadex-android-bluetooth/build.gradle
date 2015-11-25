@@ -7,5 +7,8 @@ dependencies
     androidTestCompile libraries.android_test
     testCompile libraries.robolectric
     compile libraries.android_support
+    androidTestCompile libraries.junit
+    testCompile libraries.junit
+
     //provided libraries.android
 }
