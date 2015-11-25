@@ -501,7 +501,7 @@ def createSrcZip(distname, arts, isaddon)
 				String prefix = mainzipdir + Paths.get(maindir).relativize(sp.projectDir.toPath()).toString() // handle nested paths correctly
 				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: prefix +'/' + srcdir,  erroronmissingdir: false
 				// each project: dist directory
-				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: prefix + '/dist',  erroronmissingdir: false
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: prefix + '/dist',  erroronmissingdir: false, excludes: '**/build/**'
 				// each project: build script files
 				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: prefix, includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
 			}
