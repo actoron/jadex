@@ -228,10 +228,10 @@ subprojects
 	        	if (isCommercial(project))
 	        	{
 		            mavenDeployer {
-		                repository(url: "https://nexus.actoron.com/nexus/content/repositories/commercial-releases") {
+		                repository(url: repo_release_commercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
-		                snapshotRepository(url: "https://nexus.actoron.com/nexus/content/repositories/commercial-snapshots") {
+		                snapshotRepository(url: repo_snapshot_commercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
 		                uniqueVersion=true
@@ -240,10 +240,10 @@ subprojects
 		        else
 		        {
 		        	mavenDeployer {
-		                repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+		                repository(url: repo_release_noncommercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
-		                snapshotRepository(url: "https://nexus.actoron.com/nexus/content/repositories/noncommercial-snapshots") {
+						snapshotRepository(url: repo_snapshot_noncommercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
 		                uniqueVersion=true
