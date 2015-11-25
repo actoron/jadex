@@ -22,9 +22,9 @@ repositories {
     mavenCentral()
 }
 
-configurations {
-    gradlePluginArchives
-}
+//configurations {
+//    gradlePluginArchives
+//}
 
 artifacts {
     archives jar
@@ -53,17 +53,17 @@ artifacts {
 
 //uploadGradlePluginArchives.dependsOn += uploadArchives
 
-task installGradlePluginArchives(dependsOn:'install') {
+//task installGradlePluginArchives(dependsOn:'install') {
+//
+//}
 
-}
-
-afterEvaluate {
-    def deps = getTransitiveJadexDependencies(getConfigurations().getByName('compile'), project.group)
-// add dependencies -> install them when installGradlePluginArchives executes
-    addTaskDependencies(installGradlePluginArchives, deps, "install")
-    // add dependencies -> upload them when uploadgradlePluginArchives executes
-    addTaskDependencies(uploadGradlePluginArchives, deps, "uploadArchives")
-}
+//afterEvaluate {
+//    def deps = getTransitiveJadexDependencies(getConfigurations().getByName('compile'), project.group)
+//// add dependencies -> install them when installGradlePluginArchives executes
+//    addTaskDependencies(installGradlePluginArchives, deps, "install")
+//    // add dependencies -> upload them when uploadgradlePluginArchives executes
+//    addTaskDependencies(uploadGradlePluginArchives, deps, "uploadArchives")
+//}
 
 /**
  * Add depTaskName tasks of given depProjects as dependency to given task.
