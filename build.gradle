@@ -96,7 +96,7 @@ subprojects
             android: 'com.google.android:android:2.2.1',
             android_test: "com.google.android:android-test:2.2.1",
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
-            junit: 'junit:junit:4.11',
+            junit: junit,
             robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
             robolectric: 'org.robolectric:robolectric:2.2'
     ]
@@ -162,17 +162,16 @@ subprojects
         allSource   = android.sourceSets.main.java.srcDirs
         dependencies
         {
-            androidTestCompile junit
+            testCompile junit
         }
 
 		configurations {
 			// exclude transitive deps that are not supported on android
-			all*.exclude group:'org.javassist', module:'javassist'
-			all*.exclude group:'javax.mail', module:'mail'
-			all*.exclude group:'org.antlr', module:'antlr-runtime'
-			all*.exclude group:'org.bouncycastle', module:'bcprov-jdk15on'
-			all*.exclude group:'org.ow2.asm', module:'asm-all'
-			runtime.exclude group: 'junit', module:'junit' // no junit in runtime classpath
+			all {
+				dependencies.all { dep ->
+					excludeNonAndroidRuntime(project, dep)
+				}
+			}
 		}
     }
     else
@@ -201,7 +200,19 @@ subprojects
         afterEvaluate {
             setBootClassPath(project)
         }
+
     }
+
+	configurations {
+		// compileNoAndroidRuntime will exclude the artifact in Android APKs
+		runtimeAndroid.extendsFrom runtime
+		compileNoAndroidRuntime {
+			dependencies.all { dep ->
+				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
+			}
+		}
+		compile.extendsFrom compileNoAndroidRuntime
+	}
 
 	// process schemas and generate schemadocs
 	if (project.projectDir.toPath().resolve('src/main/schema').toFile().exists()) {
@@ -442,11 +453,13 @@ def createDistZip(distname, arts, isaddon)
 						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
 					}
 				} else {
-//					sp.jar.archivePath?
-//					sp.war.archivePath?
 					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
 
-					sp.configurations.runtime.fileCollection {
+					def runtimeConfig = sp.configurations.runtime
+					if (distname.contains('android')) {
+						runtimeConfig = sp.configurations.runtimeAndroid
+					}
+					runtimeConfig.fileCollection {
 						it instanceof org.gradle.api.artifacts.ExternalModuleDependency? it : null
 					}.each { file ->
 						if (!extdists.contains(file)) {
@@ -485,7 +498,7 @@ def createSrcZip(distname, arts, isaddon)
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
 				// each project: sources + resources
-				String prefix = Paths.get(maindir).relativize(sp.projectDir.toPath()).toString() // handle nested paths correctly
+				String prefix = mainzipdir + Paths.get(maindir).relativize(sp.projectDir.toPath()).toString() // handle nested paths correctly
 				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: prefix +'/' + srcdir,  erroronmissingdir: false
 				// each project: dist directory
 				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: prefix + '/dist',  erroronmissingdir: false

@@ -1,11 +1,7 @@
 dependencies
 {
-    compile libraries.android
-    compile(project(':jadex-platform')) {
-        exclude group: 'junit', module: 'junit'
-    }
+    compile(project(':jadex-platform'))
     compile project(':jadex-android-commons')
-    testCompile libraries.junit
     testCompile libraries.robotium
     testCompile libraries.robolectric
 }

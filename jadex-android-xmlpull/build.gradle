@@ -1,7 +1,9 @@
 dependencies
 {
-    compile libraries.android
+    compileNoAndroidRuntime libraries.android
     compile(project(':jadex-xml'))
-//    testCompile(project(':jadex-commons:test-jar'))
-    testCompile files(project(':jadex-commons').sourceSets.test.output)
+//    testCompile project(':jadex-commons').sourceSets.test.output
+    testCompile(project(':jadex-xml'))
+    testCompile project(path: ':jadex-commons', configuration: 'testOutput')
+//    testCompile files(project(':jadex-commons').sourceSets.test.output)
 }

@@ -10,5 +10,5 @@ dependencies
 	compile project(':jadex-tools-base-swing')
 
 	compile 'commons-daemon:commons-daemon:1.0.10'
-	compile 'javassist:javassist:3.12.1.GA'
+	compileNoAndroidRuntime 'javassist:javassist:3.12.1.GA'
 }

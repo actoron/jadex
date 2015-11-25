@@ -1,4 +1,5 @@
-import groovy.lang.Closure;
+import groovy.lang.Closure
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 
 buildscript {
     repositories
@@ -63,6 +64,41 @@ def getReleaseVariant(project) {
             }
         }
     }
+}
+
+/**
+ * Recursivly check for dependencies with compileNoAndroidRuntime scope and exclude them from default configuration.
+ * @param project
+ * @param dep
+ * @param alreadyChecked
+ * @return
+ */
+def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = []) {
+        if (dep instanceof DefaultProjectDependency && !alreadyChecked.contains(dep)) {
+            DefaultProjectDependency pdep = dep
+            alreadyChecked.add(pdep)
+            pdep.dependencyProject.configurations.all {
+                dependencies.all { innerDep ->
+                    if (innerDep instanceof DefaultProjectDependency)
+                    {
+                        excludeNonAndroidRuntime(project, innerDep, alreadyChecked)
+                    }
+                }
+            }
+            pdep.dependencyProject.configurations.compileNoAndroidRuntime {
+                dependencies.all { innerDep ->
+//                    println "excluding $innerDep.group:$innerDep.name, found in $pdep.dependencyProject.name from $project.name"
+                    project.configurations.default.exclude group: innerDep.group, module: innerDep.name
+//                    project.configurations.compile.exclude group: innerDep.group, module: innerDep.name
+//                    project.configurations.all {conf ->
+//                        if (conf.name.toLowerCase().endsWith('apk')) {
+//                            println "conf = $conf.name"
+//                            exclude group: innerDep.group, module: innerDep.name
+//                        }
+//                    }
+                }
+            }
+        }
 }
 
 /**
@@ -211,4 +247,5 @@ ext {
     onReleaseOutput = this.&onReleaseOutput
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
+    excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime
 }
