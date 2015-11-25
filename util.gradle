@@ -1,5 +1,6 @@
 import groovy.lang.Closure
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
+import org.gradle.api.tasks.compile.GroovyCompile;
 
 buildscript {
     repositories
@@ -171,7 +172,8 @@ def setBootClassPath(Project project) {
         } else {
             // set bootstrap path to correct JDK version
             // println "Setting bootClasspath for $project.name to JDK $requestedVersion"
-            project.tasks.withType(JavaCompile) {
+
+            def optionClosure = {
                 // provide same libs that are used in the default boot classpath
                 options.bootClasspath = \
                             ["resources.jar", "rt.jar", "sunrsasign.jar", "jsse.jar", "jce.jar", "charsets.jar", "jfr.jar"]\
@@ -180,6 +182,8 @@ def setBootClassPath(Project project) {
                         ":$requestedHome"+File.separator+"jre"+File.separator+"classes"
 //                        options.fork = true
             }
+            project.tasks.withType(JavaCompile, optionClosure)
+            project.tasks.withType(GroovyCompile, optionClosure)
         }
     }
 }
