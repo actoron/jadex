@@ -103,7 +103,9 @@ public class CliShell extends ACliShell
 					
 					if(name!=null)
 					{
-						ret = name.endsWith(".class") && name.indexOf("Command")!=-1;
+						// Avoid loading e.g. CommanderBDI...
+//						ret = name.endsWith(".class") && name.indexOf("Command")!=-1;
+						ret = name.endsWith("Command.class");
 					}
 					
 					return ret;

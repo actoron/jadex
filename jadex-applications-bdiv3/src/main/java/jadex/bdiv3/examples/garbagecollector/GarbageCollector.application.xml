@@ -43,9 +43,12 @@
 					</env:property>
 					<env:property name="vision_range">0</env:property>
 					<env:property name="position" event="true"/>
+					<env:property name="lastmove" />
+					<env:property name="garbage" />
 				</env:objecttype>
 				<env:objecttype name="burner">
 					<env:property name="vision_range">0</env:property>
+					<env:property name="garbage" />
 				</env:objecttype>
 				<env:objecttype name="garbage">
 					<env:property name="position" event="true"/>
