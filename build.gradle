@@ -466,9 +466,12 @@ def createDistZip(distname, arts, isaddon)
 					if (distname.contains('android')) {
 						runtimeConfig = sp.configurations.runtimeAndroid
 					}
-					runtimeConfig.fileCollection {
+					
+					def deps = runtimeConfig.allDependencies.findAll {
 						it instanceof org.gradle.api.artifacts.ExternalModuleDependency? it : null
-					}.each { file ->
+					}
+					def incconf = sp.configurations.detachedConfiguration(deps.toArray(new Dependency[0]))
+					incconf.each { file ->
 						if (!extdists.contains(file)) {
 							zipfileset file: file, prefix: foldername + '/lib/'
 							extdists.add(file)
