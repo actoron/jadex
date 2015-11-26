@@ -129,74 +129,79 @@ public class JadexGatewayServlet extends HttpServlet
 	{
 //		response.getWriter().append("Served at: ").append(request.getContextPath());
 	
-		handler.handleRequest(request, response, null).addResultListener(new IResultListener<Void>()
-		{
-			public void exceptionOccurred(Exception e)
-			{
-				throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
-			}
-			
-			public void resultAvailable(Void result)
-			{
-			}
-		});
 		
-//		try
+//		handler.handleRequest(request, response, null).addResultListener(new IResultListener<Void>()
 //		{
-//			System.out.println("received request: "+request.getRequestURL().toString());
+//			public void exceptionOccurred(Exception e)
+//			{
+//				throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
+//			}
 //			
-//			final AsyncContext ctx = request.startAsync();
-//			final boolean[] complete = new boolean[1];
-//			AsyncListener alis = new AsyncListener()
+//			public void resultAvailable(Void result)
 //			{
-//				public void onTimeout(AsyncEvent arg0) throws IOException
-//				{
-//				}
-//				
-//				public void onStartAsync(AsyncEvent arg0) throws IOException
-//				{
-//				}
-//				
-//				public void onError(AsyncEvent arg0) throws IOException
-//				{
-//				}
-//				
-//				public void onComplete(AsyncEvent arg0) throws IOException
-//				{
-//					complete[0] = true;
-//				}
-//			};
-//			ctx.addListener(alis);
-//			
-//			// Must be async because Jadex runs on other thread
-//			// tomcat async bug? http://jira.icesoft.org/browse/PUSH-116
-//			request.setAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO, new IAsyncContextInfo()
-//			{
-//				public boolean isComplete()
-//				{
-//					return complete[0];
-//				}
-//			});
-//			handler.handleRequest(request, response, null).addResultListener(new IResultListener<Void>()
-//			{
-//				public void exceptionOccurred(Exception e)
-//				{
-//					if(!complete[0])
-//						ctx.complete();
-//					throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
-//				}
-//				
-//				public void resultAvailable(Void result)
-//				{
-//					// done internally
-//	//				ctx.complete();
-//				}
-//			});
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
+//			}
+//		});
+		
+		// Async must be set here because otherwise the result page is immediately delivered
+		// without waiting for the async processing
+		
+		try
+		{
+			System.out.println("received request: "+request.getRequestURL().toString());
+			
+			final AsyncContext ctx = request.startAsync();
+			final boolean[] complete = new boolean[1];
+			AsyncListener alis = new AsyncListener()
+			{
+				public void onTimeout(AsyncEvent arg0) throws IOException
+				{
+				}
+				
+				public void onStartAsync(AsyncEvent arg0) throws IOException
+				{
+				}
+				
+				public void onError(AsyncEvent arg0) throws IOException
+				{
+				}
+				
+				public void onComplete(AsyncEvent arg0) throws IOException
+				{
+					complete[0] = true;
+				}
+			};
+			ctx.addListener(alis);
+			
+			// Must be async because Jadex runs on other thread
+			// tomcat async bug? http://jira.icesoft.org/browse/PUSH-116
+			request.setAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO, new IAsyncContextInfo()
+			{
+				public boolean isComplete()
+				{
+					return complete[0];
+				}
+			});
+			
+			handler.handleRequest(request, response, null).addResultListener(new IResultListener<Void>()
+			{
+				public void exceptionOccurred(Exception e)
+				{
+					if(!complete[0])
+						ctx.complete();
+					throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
+				}
+				
+				public void resultAvailable(Void result)
+				{
+					// done internally
+	//				ctx.complete();
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		
 //		System.out.println("resp is orig: "+response.hashCode());
 //		response.getWriter().append("Served at: ").append(request.getContextPath());

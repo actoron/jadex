@@ -105,7 +105,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	        {
 		        Writer out = response.getWriter();
 		        out.write("<html><head></head><body>"+err+"</body></html>");
-		        out.flush();
+//		        out.flush();
 		        
 		        complete(request, response);
 //		         hack? todo: where to handle this complete?

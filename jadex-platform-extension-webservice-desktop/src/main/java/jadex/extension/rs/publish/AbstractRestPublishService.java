@@ -230,38 +230,44 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      */
     public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {
-		final AsyncContext rctx = request.startAsync();
-		final boolean[] complete = new boolean[1];
-		AsyncListener alis = new AsyncListener()
-		{
-			public void onTimeout(AsyncEvent arg0) throws IOException
+    	// In case the call comes from an internally started server async is not already set
+    	// In case the call comes from an external web server it has to set the async in oder
+    	// to let the call wait for async processing
+    	if(request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO)==null)
+    	{
+			final AsyncContext rctx = request.startAsync();
+			final boolean[] complete = new boolean[1];
+			AsyncListener alis = new AsyncListener()
 			{
-			}
+				public void onTimeout(AsyncEvent arg0) throws IOException
+				{
+				}
+				
+				public void onStartAsync(AsyncEvent arg0) throws IOException
+				{
+				}
+				
+				public void onError(AsyncEvent arg0) throws IOException
+				{
+				}
+				
+				public void onComplete(AsyncEvent arg0) throws IOException
+				{
+					complete[0] = true;
+				}
+			};
+			rctx.addListener(alis);
 			
-			public void onStartAsync(AsyncEvent arg0) throws IOException
+			// Must be async because Jadex runs on other thread
+			// tomcat async bug? http://jira.icesoft.org/browse/PUSH-116
+			request.setAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO, new IAsyncContextInfo()
 			{
-			}
-			
-			public void onError(AsyncEvent arg0) throws IOException
-			{
-			}
-			
-			public void onComplete(AsyncEvent arg0) throws IOException
-			{
-				complete[0] = true;
-			}
-		};
-		rctx.addListener(alis);
-		
-		// Must be async because Jadex runs on other thread
-		// tomcat async bug? http://jira.icesoft.org/browse/PUSH-116
-		request.setAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO, new IAsyncContextInfo()
-		{
-			public boolean isComplete()
-			{
-				return complete[0];
-			}
-		});
+				public boolean isComplete()
+				{
+					return complete[0];
+				}
+			});
+    	}
     	
 //    	System.out.println("handler is: "+uri.getPath());
 
@@ -1153,8 +1159,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
          url.append(scheme);
          url.append("://");
          url.append(req.getServerName());
-         if ((scheme.equals ("http") && port != 80)
-         || (scheme.equals ("https") && port != 443)) {
+         if(("http".equals(scheme) && port != 80)
+         || ("https".equals(scheme) && port != 443)) 
+         {
              url.append (':');
              url.append (req.getServerPort());
          }
