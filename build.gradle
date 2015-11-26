@@ -1,5 +1,6 @@
 import java.nio.file.Paths
 import java.util.regex.Matcher
+import org.gradle.api.artifacts.ProjectDependency
 
 apply plugin: 'signing'
 //apply plugin: 'java-library-distribution'
@@ -270,7 +271,7 @@ task genDepList << {
 		out. println ('### ' + entry.getKey())
 		def founddeps = new HashSet<String>()
 		sp.configurations.each { conf ->
-			conf.getAllDependencies().withType(org.gradle.api.artifacts.ProjectDependency).each { dep ->
+			conf.getAllDependencies().withType(ProjectDependency).each { dep ->
 				if (!founddeps.contains(dep.getName()))
 					out.println dep.getDependencyProject().getPath()
 				founddeps.add(dep.getName())
@@ -467,11 +468,7 @@ def createDistZip(distname, arts, isaddon)
 						runtimeConfig = sp.configurations.runtimeAndroid
 					}
 					
-					def deps = runtimeConfig.allDependencies.findAll {
-						it instanceof org.gradle.api.artifacts.ExternalModuleDependency? it : null
-					}
-					def incconf = sp.configurations.detachedConfiguration(deps.toArray(new Dependency[0]))
-					incconf.each { file ->
+					sp.configurations.detachedConfiguration(runtimeConfig.allDependencies.findAll { !(it instanceof ProjectDependency) } as Dependency[]).each { file ->
 						if (!extdists.contains(file)) {
 							zipfileset file: file, prefix: foldername + '/lib/'
 							extdists.add(file)
