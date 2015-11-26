@@ -103,6 +103,26 @@ def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [
 }
 
 /**
+ * Add scope mapping for parent configurations of given configuration.
+ * Maven pom generation does not include inherited configurations by default:
+ * http://gradle.1045684.n5.nabble.com/pom-generation-and-inherited-dependencies-td1436197.html
+ * @param task
+ * @param configuration
+ * @return
+ */
+def addParentScopeMappings(Task task, Configuration configuration) {
+    def repos = task.repositories.asList()
+    if (!repos.empty) {
+        def scopeMappings = repos[0].pom.scopeMappings
+        def scope = scopeMappings.getMapping([configuration]).scope
+        configuration.extendsFrom.each {parentConfiguration ->
+//            println "add mapping for $parentConfiguration"
+            scopeMappings.addMapping(300, parentConfiguration, scope)
+        }
+    }
+}
+
+/**
  * Adds schema processing tasks:
  * 1. Generate schemadocs using XSLT
  * 2. Copy schemas to build dir and filter schema for version
@@ -252,4 +272,5 @@ ext {
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
     excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime
+    addParentScopeMappings = this.&addParentScopeMappings
 }

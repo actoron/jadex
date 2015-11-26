@@ -90,6 +90,8 @@ subprojects
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
     def allSource   = ''
+
+	apply plugin: 'maven'
     
     ext.libraries = [
             android_support: "com.android.support:support-v4:23.1.0",
@@ -101,6 +103,17 @@ subprojects
             robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
             robolectric: 'org.robolectric:robolectric:2.2'
     ]
+
+	configurations {
+		// compileNoAndroidRuntime will exclude the artifact in Android APKs
+		runtimeAndroid.extendsFrom runtime
+		compileNoAndroidRuntime {
+			dependencies.all { dep ->
+				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
+			}
+		}
+		compile.extendsFrom compileNoAndroidRuntime
+	}
 
     if(isAndroidProject(project))
     {
@@ -202,25 +215,18 @@ subprojects
             setBootClassPath(project)
         }
 
-    }
-
-	configurations {
-		// compileNoAndroidRuntime will exclude the artifact in Android APKs
-		runtimeAndroid.extendsFrom runtime
-		compileNoAndroidRuntime {
-			dependencies.all { dep ->
-				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
-			}
+		[install, uploadArchives].each { task ->
+			addParentScopeMappings(task, configurations.compile)
 		}
-		compile.extendsFrom compileNoAndroidRuntime
-	}
+
+    }
 
 	// process schemas and generate schemadocs
 	if (project.projectDir.toPath().resolve('src/main/schema').toFile().exists()) {
 		addSchemaTasks(project)
 	}
 
-    apply plugin: 'maven'
+
     sourceCompatibility = 1.6
     
     uploadArchives {
