@@ -19,9 +19,9 @@ jadex-applications-bpmn,,X,X,,,,,,,,,,,,X
 jadex-applications-gpmn,,,,,,,,,,,,,,,
 jadex-applications-java8,,X,X,,,,,,,,,,,,X
 jadex-applications-micro,,X,X,,,,,,,,,,,,X
-jadex-applications-mixed,,,,,,,,,,,,,,,X
-jadex-applications-web,,,,,,,,,,,,,,,X
-jadex-applications-webservice,,,X,,,X,,,,,,,,,X
+jadex-applications-mixed,,X,X,,,,,,,,,,,,X
+jadex-applications-web,,X,X,,,,,,,,,,,,X
+jadex-applications-webservice,,X,X,,,X,,,,,,,,,X
 jadex-applications-wfms,,,,,,,,,,,,,,,X
 jadex-bridge,X,X,X,X,,,,,,,,,X,X,X
 jadex-commons,X,X,X,X,,,,,,,,,X,X,X
@@ -63,7 +63,7 @@ jadex-platform-extension-webservice-android,,,,X,,,,,,,,,,,X
 jadex-platform-extension-webservice-desktop,,,X,,,X,,,,,,,,,X
 jadex-platform-extension-webservice-desktop-grizzly,,,X,,,,,,,,,,,,X
 jadex-platform-extension-webservice-desktop-jetty,,,X,,,,,,,,,,,,X
-jadex-platform-relay-web,,,,,,,,,,,,,,,X
+jadex-platform-relay-web,,,X,,,,,,,,,,X,,X
 jadex-platform-standalone-launch,X,X,X,,,,,,,,,,,,X
 jadex-rules,,X,X,X,,,,,,,,,,,X
 jadex-rules-applications,,X,X,,,,,,,,,,,,X
@@ -71,8 +71,8 @@ jadex-rules-eca,X,X,X,X,,,,,,,,,X,,X
 jadex-rules-tools,,X,X,,,,,,,,,,,,X
 jadex-runtimetools-android,,,,X,,,,,,,,,,,X
 jadex-runtimetools-swing,,X,X,,,,,,,,,,,,X
-jadex-servletfilter,,X,X,,,,,,,,,,,,X
-jadex-servletfilter-web,,,,,,,,,,,,,,,X
+jadex-servletfilter,,,X,,,,,,,,,,,,X
+jadex-servletfilter-web,,,X,,,,,,,,,,,,X
 jadex-tools-base,,X,X,X,,,,,,,,,,,X
 jadex-tools-base-swing,,X,X,,,,,,,,,,,,X
 jadex-tools-bdi,,X,X,,,,,,,,,,,,X
