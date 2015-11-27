@@ -211,14 +211,15 @@ subprojects
 			}
 		}
 
-        // Set correct bootclasspath for each project, depending on sourceCompatibility
         afterEvaluate {
+        	// Set correct bootclasspath for each project, depending on sourceCompatibility
             setBootClassPath(project)
+			// add scope mappings to include parent configurations in deployed pom.xml
+			[install, uploadArchives].each { task ->
+				addParentScopeMappings(task, configurations.compile)
+			}
         }
 
-		[install, uploadArchives].each { task ->
-			addParentScopeMappings(task, configurations.compile)
-		}
 
     }
 
