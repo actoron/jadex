@@ -51,6 +51,23 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		super(component, cinfo);
 	}
 	
+	boolean	body;
+	
+	/**
+	 *  Execute the functional body of the agent.
+	 *  Is only called once.
+	 */
+	public IFuture<Void> body()
+	{
+		if(body)
+		{
+			System.out.println("fidfugaio");
+		}
+		body	= true;
+		
+		return IFuture.DONE;
+	}
+	
 	/**
 	 *  Initialize the feature.
 	 */

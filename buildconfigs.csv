@@ -80,3 +80,4 @@ jadex-applications-android:jadex-applications-android-chat,,,,X,,,,,,,,,,,X
 jadex-applications-android:jadex-applications-android-puzzle,,,,X,,,,,,,,,,,X
 jadex-applications-android-demos,,,,X,,,,,,,,,,,X
 jadex-android-platformapp,,,,,,,,,,,,,,,
+jadex-integration-test,,,,,,,,,,,,,,,X

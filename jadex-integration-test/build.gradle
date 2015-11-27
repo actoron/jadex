@@ -1,4 +1,39 @@
- 
-dependencies {
-    compile project(':jadex-platform-standalone-launch')
+dependencies 
+{
+	def launcharts = new HashSet<String> ([
+										   // Core API
+										   ':jadex-commons',':jadex-bridge',':jadex-javaparser',':jadex-xml',
+										   
+										   // Kernels
+										   ':jadex-kernel-base',':jadex-kernel-micro',':jadex-kernel-bpmn',
+										   ':jadex-kernel-application',':jadex-kernel-component',':jadex-applib-bdi',
+										   ':jadex-kernel-bdiv3',
+										   
+										   // Platform
+										   ':jadex-platform',
+										   
+										   // Tools
+										   ':jadex-runtimetools-swing',':jadex-tools-bdi',':jadex-tools-bpmn',
+										   ':jadex-tools-comanalyzer',':jadex-rules-tools',
+										   
+										   // Extensions
+										   ':jadex-kernel-extension-agr',':jadex-kernel-extension-envsupport',
+										   ':jadex-kernel-extension-envsupport-opengl',':jadex-platform-extension-maven',
+										   ':jadex-kernel-extension-envsupport-jmonkey',' :jadex-platform-extension-webservice',
+										   ':jadex-platform-extension-securetransport',':jadex-platform-extension-management',
+										   ':jadex-platform-extension-webservice-desktop',
+										   ':jadex-platform-extension-webservice-desktop-jetty',
+										   ':jadex-platform-extension-webservice-desktop-grizzly',
+										   
+										   // Tests
+										   ':jadex-applications-micro',':jadex-applications-bdiv3',
+										   ':jadex-applications-bdi',':jadex-applications-bpmn'
+										   ])
+	
+	launcharts.retainAll(gradle.ext.includeartifacts)
+	
+	launcharts.each { art ->
+		compile project(art)
+	}
+	
 }
