@@ -461,7 +461,7 @@ def createDistZip(distname, arts, isaddon)
 						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
 					}
 				} else {
-					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
+					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
 
 					def runtimeConfig = sp.configurations.runtime
 					if (distname.contains('android')) {
