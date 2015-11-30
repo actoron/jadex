@@ -375,16 +375,6 @@ if(cnt>0)
 	<tr>
 		<td style="border: 0; padding: 0">
 			o<SPAN class="wikilink">
-				<A href="http://jadex.informatik.uni-hamburg.de/relay"><SPAN class="wikigeneratedlinkcontent">http://jadex.informatik.uni-hamburg.de/relay</SPAN></A>
-			</SPAN>
-		</td>
-		<td style="border: 0; padding: 0; text-align: center">
-			<img src="resources/uhh-9e763cf9f3e.png"/>
-		</td>
-	</tr>
-	<tr>
-		<td style="border: 0; padding: 0">
-			o<SPAN class="wikilink">
 				<A href="http://www0.activecomponents.org/relay"><SPAN class="wikigeneratedlinkcontent">http://www0.activecomponents.org/relay</SPAN></A>
 			</SPAN>
 		</td>
