@@ -21,7 +21,7 @@ jadex-applications-java8,,X,X,,,,,,,,,,,,X
 jadex-applications-micro,,X,X,,,,,,,,,,,,X
 jadex-applications-mixed,,X,X,,,,,,,,,,,,X
 jadex-applications-web,,X,X,,,,,,,,,,,,X
-jadex-applications-webservice,,X,X,,,X,,,,,,,,,X
+jadex-applications-webservice,,,X,,,X,,,,,,,,,X
 jadex-applications-wfms,,,,,,,,,,,,,,,X
 jadex-bridge,X,X,X,X,,,,,,,,,X,X,X
 jadex-commons,X,X,X,X,,,,,,,,,X,X,X
