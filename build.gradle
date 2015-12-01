@@ -51,7 +51,14 @@ buildscript
 allprojects
 {
     version = jadex_build_version // Set the project version property, otherwise install does not work
-    group = 'net.sourceforge.jadex'
+    if(isCommercial(project))
+    {
+	    group = 'com.actoron.jadex'
+	}
+	else
+	{
+	    group = 'org.activecomponents.jadex'
+	}
 
     repositories
     {
