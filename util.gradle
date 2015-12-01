@@ -68,13 +68,18 @@ def getReleaseVariant(project) {
 }
 
 /**
- * Recursivly check for dependencies with compileNoAndroidRuntime scope and exclude them from default configuration.
+ * Recursively check for dependencies with compileNoAndroidRuntime scope and exclude them from the dependency
  * @param project
  * @param dep
  * @param alreadyChecked
  * @return
  */
-def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = []) {
+def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [], parentDep = null) {
+        if (parentDep == null) {
+            parentDep = project
+        } else if (parentDep == project) {
+            parentDep = dep
+        }
         if (dep instanceof DefaultProjectDependency && !alreadyChecked.contains(dep)) {
             DefaultProjectDependency pdep = dep
             alreadyChecked.add(pdep)
@@ -82,21 +87,20 @@ def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [
                 dependencies.all { innerDep ->
                     if (innerDep instanceof DefaultProjectDependency)
                     {
-                        excludeNonAndroidRuntime(project, innerDep, alreadyChecked)
+                        excludeNonAndroidRuntime(project, innerDep, alreadyChecked, parentDep)
                     }
                 }
             }
             pdep.dependencyProject.configurations.compileNoAndroidRuntime {
                 dependencies.all { innerDep ->
 //                    println "excluding $innerDep.group:$innerDep.name, found in $pdep.dependencyProject.name from $project.name"
-                    project.configurations.default.exclude group: innerDep.group, module: innerDep.name
+//                    project.configurations.default.exclude group: innerDep.group, module: innerDep.name
 //                    project.configurations.compile.exclude group: innerDep.group, module: innerDep.name
-//                    project.configurations.all {conf ->
-//                        if (conf.name.toLowerCase().endsWith('apk')) {
-//                            println "conf = $conf.name"
-//                            exclude group: innerDep.group, module: innerDep.name
-//                        }
-//                    }
+
+                    if (parentDep instanceof DefaultProjectDependency) {
+                        println "excluding transitive dep: $parentDep.name / $innerDep.group:$innerDep.name in $project.name"
+                        ((DefaultProjectDependency)parentDep).exclude(group: innerDep.group, module: innerDep.name)
+                    }
                 }
             }
         }
