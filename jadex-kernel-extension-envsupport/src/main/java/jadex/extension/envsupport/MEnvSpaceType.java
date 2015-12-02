@@ -239,7 +239,7 @@ public class MEnvSpaceType
 			}
 		}, null);
 		
-		String uri =  "http://jadex.sourceforge.net/jadex-envspace"; 
+		String uri =  "http://www.activecomponents.org/jadex-envspace"; 
 		
 		TypeInfo ti_po = new TypeInfo(new XMLInfo("abstract_propertyobject"), new ObjectInfo(MultiCollection.class), 
 			new MappingInfo(null, new SubobjectInfo[]{

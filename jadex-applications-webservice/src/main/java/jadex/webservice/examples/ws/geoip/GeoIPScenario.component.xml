@@ -4,13 +4,13 @@
 	It can be started to launch a geoip scenario
 	with a geoip user and a geoip provider.
 -->
-<componenttype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-	                    http://jadex.sourceforge.net/jadex-component-2.5.xsd
-	                    http://jadex.sourceforge.net/jadex-envspace 
-	                    http://jadex.sourceforge.net/jadex-envspace-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+	                    http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
 	name="GeoIPScenario" package="jadex.webservice.examples.ws.geoip">
 	
 	<componenttypes>

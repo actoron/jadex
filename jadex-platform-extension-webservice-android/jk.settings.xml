@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<p0:properties xmlns:p0="http://jadex.sourceforge.net/jadexconf" __ID="0">
+<p0:properties xmlns:p0="http://www.activecomponents.org/jadex-conf" __ID="0">
 	<p0:properties __ID="1" type="library_service"></p0:properties>
 	<p0:properties __ID="2" type="clockservice">
 		<p0:property __ID="3" type="type">system</p0:property>

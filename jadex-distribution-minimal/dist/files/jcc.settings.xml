@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<p0:properties xmlns:p0="http://www.activecomponents.org/jadex-conf" __ID="0">
+	<p0:properties __ID="1" type="controlcenter">
+		<p0:property __ID="2" type="perspective">Starter</p0:property>
+		<p0:property __ID="3" type="consoleenabled">false</p0:property>
+		<p0:property __ID="4" type="consoleheights"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<p0:HashMap xmlns:p0="typeinfo:java.util" __ID="0">
+	<entries>
+		<entry __ID="1">
+			<key>
+				<p1:String xmlns:p1="typeinfo:java.lang" __ID="2">Starter.console.height</p1:String>
+			</key>
+			<value>
+				<p1:Double xmlns:p1="typeinfo:java.lang" __ID="3" content="1.0"></p1:Double>
+			</value>
+		</entry>
+	</entries>
+</p0:HashMap>
+]]></p0:property>
+	</p0:properties>
+	<p0:properties __ID="6" type="Starter">
+		<p0:property __ID="7" type="leftsplit_location">0.6781609195402298</p0:property>
+		<p0:property __ID="8" type="mainsplit_location">0.37051282051282053</p0:property>
+	</p0:properties>
+	<p0:properties __ID="10" type="window">
+		<p0:property __ID="11" type="width">800</p0:property>
+		<p0:property __ID="12" type="height">650</p0:property>
+		<p0:property __ID="13" type="x">240</p0:property>
+		<p0:property __ID="14" type="y">187</p0:property>
+		<p0:property __ID="15" type="extendedState">0</p0:property>
+		<p0:property __ID="16" type="jccexit">ask</p0:property>
+		<p0:property __ID="17" type="saveonexit">true</p0:property>
+	</p0:properties>
+</p0:properties>

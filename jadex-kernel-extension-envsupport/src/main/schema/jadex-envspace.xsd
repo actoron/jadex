@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jadex.sourceforge.net/jadex-envspace" elementFormDefault="qualified">
+<xs:schema xmlns="http://www.activecomponents.org/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.activecomponents.org/jadex-envspace" elementFormDefault="qualified">
 	<xs:complexType name="actiontype">
 		<xs:annotation>
 			<xs:documentation>An action type defines how a component can act in the environment. </xs:documentation>
@@ -1040,12 +1040,21 @@
 				<xs:attribute name="font" type="xs:string"/>
 				<xs:attribute name="style" type="xs:string"/>
 				<xs:attribute name="text" type="xs:string" use="required"/>
-				<xs:attribute name="align" default="left">
+				<xs:attribute name="halign" default="left">
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
 							<xs:enumeration value="left"/>
 							<xs:enumeration value="right"/>
 							<xs:enumeration value="center"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="valign" default="top">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="top"/>
+							<xs:enumeration value="middle"/>
+							<xs:enumeration value="bottom"/>
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:attribute>

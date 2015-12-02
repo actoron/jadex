@@ -4,13 +4,13 @@
 
 	It can be started to launch a cleaner world scenario.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
-	                    http://jadex.sourceforge.net/jadex-application-2.5.xsd
-	                    http://jadex.sourceforge.net/jadex-envspace 
-	                    http://jadex.sourceforge.net/jadex-envspace-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
 	name="CleanerWorld" package="jadex.bdi.examples.cleanerworld">
 	
 	<imports>
@@ -162,7 +162,7 @@
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*20)</env:property>
 						<env:property name="text" dynamic="true">$object.owner.getName().getLocalName()</env:property>
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld/images/cleaner.png" />
-						<env:text layer="4" align="center" y="-0.6" color="black" text="$text$" size="8"/>
+						<env:text layer="4" halign="center" y="-0.6" color="black" text="$text$" size="8"/>
 						<env:ellipse layer="-1" size="vision_size" color="#ffff007f" />
 						<env:texturedrectangle layer="0" x="0.3" y="0.4" width="0.3" height="0.3" imagepath="jadex/bdi/examples/cleanerworld/images/waste.png">
 							<env:drawcondition>$object.waste!=null</env:drawcondition>
@@ -174,7 +174,7 @@
 					<env:drawable objecttype="truck" width="0.2" height="0.15">
 						<env:property name="text" dynamic="true">$object.owner.getName().getLocalName()</env:property>
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld/images/truck.png" />
-						<env:text layer="4" align="center" y="-0.5" color="black" text="$text$" size="8"/>
+						<env:text layer="4" halign="center" y="-0.5" color="black" text="$text$" size="8"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="waste" width="0.03" height="0.03">

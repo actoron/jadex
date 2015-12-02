@@ -64,13 +64,13 @@ public class BdiModelCodec extends AbstractModelCodec
 				gm.getDescription() == null ? "" : gm.getDescription());
 		printlnIndent(ps, ind, "-->");
 		printlnIndent(ps, ind++,
-				"<agent xmlns=\"http://jadex.sourceforge.net/jadex\"");
+				"<agent xmlns=\"http://www.activecomponents.org/jadex\"");
 		printlnIndent(ps, ind,
 				"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
 		printlnIndent(
 				ps,
 				ind,
-				"xsi:schemaLocation=\"http://jadex.sourceforge.net/jadex http://jadex.sourceforge.net/jadex-bdi-2.0.xsd\"");
+				"xsi:schemaLocation=\"http://www.activecomponents.org/jadex http://www.activecomponents.org/jadex-bdi-2.0.xsd\"");
 		printIndent(ps, ind, "name=\"");
 		String modelname = file.getName();
 		modelname = modelname.substring(0, modelname.lastIndexOf(".agent.xml"));

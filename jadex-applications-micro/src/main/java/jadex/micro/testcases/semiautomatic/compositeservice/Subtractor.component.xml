@@ -4,10 +4,10 @@
 	
 	Very simple component that provides a subtract service.
 -->
-<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-						http://jadex.sourceforge.net/jadex-component-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
 	name="Subtractor" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
 	<services>

@@ -5,10 +5,10 @@
 	Uses a self-contained calculator component that
 	is tested by a user.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
-	                    http://jadex.sourceforge.net/jadex-application-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
 	name="Calculate" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
 	<componenttypes>

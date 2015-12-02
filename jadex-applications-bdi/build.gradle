@@ -21,6 +21,6 @@ dependencies
 //	filesMatching('**/*.agent.xml')
 //	{
 //		println "file"+it
-//		filter{String line -> line.replaceAll('http://jadex.sourceforge.net/jadex-bdi-2.5.xsd', 'xxxxxx')}
+//		filter{String line -> line.replaceAll('http://www.activecomponents.org/jadex-bdi-2.5.xsd', 'xxxxxx')}
 //	}
 //}

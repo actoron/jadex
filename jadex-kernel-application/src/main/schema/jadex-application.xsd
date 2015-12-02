@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:redefine schemaLocation="http://jadex.sourceforge.net/jadex-component-${jadex_build_version}.xsd">
+<xs:schema targetNamespace="http://www.activecomponents.org/jadex-application" xmlns="http://www.activecomponents.org/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:redefine schemaLocation="http://www.activecomponents.org/jadex-component-base-${jadex_build_version}.xsd">
 	</xs:redefine>
 
 	<xs:element name="applicationtype">
@@ -28,44 +28,44 @@
 		<!-- constraints copied from jadex-component.xsd, prefixed names with 'app_' as duplicates are not allowed. -->
 		<!-- keys on type level -->
 		<xs:key name="app_argument_name">
-			<xs:selector xpath="jadex:arguments/jadex:argument"/>
+			<xs:selector xpath="arguments/argument"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="app_component_name">
-			<xs:selector xpath="jadex:componenttypes/jadex:componenttype"/>
+			<xs:selector xpath="componenttypes/componenttype"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="app_providedservice_key">
-			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="services/providedservice"/>
 			<xs:field xpath="@name|@class"/>
 		</xs:key>
 		<xs:unique name="app_providedservice_name">
-			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="services/providedservice"/>
 			<xs:field xpath="@name"/>
 		</xs:unique>
 		<xs:key name="app_requiredservice_name">
-			<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+			<xs:selector xpath="services/requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="app_property_name">
-			<xs:selector xpath="jadex:properties/jadex:property"/>
+			<xs:selector xpath="properties/property"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<!-- key references in configurations -->
 		<xs:keyref name="app_argument_reference" refer="app_argument_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:arguments/jadex:argument"/>
+			<xs:selector xpath="configurations/configuration/arguments/argument"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
 		<xs:keyref name="app_component_reference" refer="app_component_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:components/jadex:component"/>
+			<xs:selector xpath="configurations/configuration/components/component"/>
 			<xs:field xpath="@type"/>
 		</xs:keyref>
 		<xs:keyref name="app_providedservice_reference" refer="app_providedservice_key">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="configurations/configuration/services/providedservice"/>
 			<xs:field xpath="@name|@class"/>
 		</xs:keyref>
 		<xs:keyref name="app_requiredservice_reference" refer="app_requiredservice_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
+			<xs:selector xpath="configurations/configuration/services/requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
 	</xs:element>
@@ -98,20 +98,20 @@ In the configurations section, predefined
 						configuration.
 					</xs:documentation>
 				</xs:annotation>
-				<xs:key name="config_argument_name">
-					<xs:selector xpath="jadex:arguments/jadex:argument"/>
+				<xs:key name="config_argument_name2">
+					<xs:selector xpath="arguments/argument"/>
 					<xs:field xpath="@name"/>
 				</xs:key>
-				<xs:key name="config_providedservice_key">
-					<xs:selector xpath="jadex:services/jadex:providedservice"/>
+				<xs:key name="config_providedservice_key2">
+					<xs:selector xpath="services/providedservice"/>
 					<xs:field xpath="@name|@class"/>
 				</xs:key>
-				<xs:unique name="config_providedservice_name">
-					<xs:selector xpath="jadex:services/jadex:providedservice"/>
+				<xs:unique name="config_providedservice_name2">
+					<xs:selector xpath="services/providedservice"/>
 					<xs:field xpath="@name"/>
 				</xs:unique>
-				<xs:key name="config_requiredservice_name">
-					<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+				<xs:key name="config_requiredservice_name2">
+					<xs:selector xpath="services/requiredservice"/>
 					<xs:field xpath="@name"/>
 				</xs:key>
 				<!-- Configuration unique constraints defined here, because elements need only be unique inside one config. -->

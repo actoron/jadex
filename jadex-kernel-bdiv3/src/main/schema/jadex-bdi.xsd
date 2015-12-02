@@ -1,126 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:include schemaLocation="http://jadex.sourceforge.net/jadex-component-${jadex_build_version}.xsd"/>
+<xs:schema targetNamespace="http://www.activecomponents.org/jadex-bdi" xmlns="http://www.activecomponents.org/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="http://www.activecomponents.org/jadex-component-base-${jadex_build_version}.xsd"/>
 	
 	<xs:element name="agent" type="agenttype">
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
 		</xs:annotation>
 		<xs:key name="agent_capability_name">
-			<xs:selector xpath="jadex:capabilities/jadex:capability"/>
+			<xs:selector xpath="capabilities/capability"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_belief_name">
-			<xs:selector xpath="jadex:beliefs/jadex:belief|jadex:beliefs/jadex:beliefset|jadex:beliefs/jadex:beliefref|jadex:beliefs/jadex:beliefsetref"/>
+			<xs:selector xpath="beliefs/belief|beliefs/beliefset|beliefs/beliefref|beliefs/beliefsetref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_belief_key">
-			<xs:selector xpath="jadex:beliefs/jadex:belief|jadex:beliefs/jadex:beliefref"/>
+			<xs:selector xpath="beliefs/belief|beliefs/beliefref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_beliefset_key">
-			<xs:selector xpath="jadex:beliefs/jadex:beliefset|jadex:beliefs/jadex:beliefsetref"/>
+			<xs:selector xpath="beliefs/beliefset|beliefs/beliefsetref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_goal_name">
-			<xs:selector xpath="jadex:goals/jadex:performgoal|jadex:goals/jadex:achievegoal|jadex:goals/jadex:querygoal|jadex:goals/jadex:maintaingoal|jadex:goals/jadex:metagoal|jadex:goals/jadex:performgoalref|jadex:goals/jadex:achievegoalref|jadex:goals/jadex:querygoalref|jadex:goals/jadex:maintaingoalref|jadex:goals/jadex:metagoalref"/>
+			<xs:selector xpath="goals/performgoal|goals/achievegoal|goals/querygoal|goals/maintaingoal|goals/metagoal|goals/performgoalref|goals/achievegoalref|goals/querygoalref|goals/maintaingoalref|goals/metagoalref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_plan_name">
-			<xs:selector xpath="jadex:plans/jadex:plan"/>
+			<xs:selector xpath="plans/plan"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_internalevent_name">
-			<xs:selector xpath="jadex:events/jadex:internalevent|jadex:events/jadex:internaleventref"/>
+			<xs:selector xpath="events/internalevent|events/internaleventref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_messageevent_name">
-			<xs:selector xpath="jadex:events/jadex:messageevent|jadex:events/jadex:messageeventref"/>
+			<xs:selector xpath="events/messageevent|events/messageeventref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:keyref name="agent_belief_trigger" refer="agent_belief_name">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:factchanged"/>
+			<xs:selector xpath="plans/plan/trigger/factchanged"/>
 			<xs:field xpath="@ref"/>
 			<!-- Both beliefs and belief sets allowed. -->
 		</xs:keyref>
 		<xs:keyref name="agent_beliefset_trigger" refer="agent_beliefset_key">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:factadded|jadex:plans/jadex:plan/jadex:trigger/jadex:factremoved"/>
+			<xs:selector xpath="plans/plan/trigger/factadded|plans/plan/trigger/factremoved"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_goal_trigger" refer="agent_goal_name">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:goalfinished|jadex:plans/jadex:plan/jadex:trigger/jadex:goal|jadex:plans/jadex:plan/jadex:waitqueue/jadex:goalfinished|jadex:goals/jadex:metagoal/jadex:trigger/jadex:goalfinished|jadex:goals/jadex:metagoal/jadex:trigger/jadex:goal"/>
+			<xs:selector xpath="plans/plan/trigger/goalfinished|plans/plan/trigger/goal|plans/plan/waitqueue/goalfinished|goals/metagoal/trigger/goalfinished|goals/metagoal/trigger/goal"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_internalevent_trigger" refer="agent_internalevent_name">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:internalevent|jadex:plans/jadex:plan/jadex:waitqueue/jadex:internalevent|jadex:goals/jadex:metagoal/jadex:trigger/jadex:internalevent"/>
+			<xs:selector xpath="plans/plan/trigger/internalevent|plans/plan/waitqueue/internalevent|goals/metagoal/trigger/internalevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_messageevent_trigger" refer="agent_messageevent_name">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:messageevent|jadex:plans/jadex:plan/jadex:waitqueue/jadex:messageevent|jadex:goals/jadex:metagoal/jadex:trigger/jadex:messageevent"/>
+			<xs:selector xpath="plans/plan/trigger/messageevent|plans/plan/waitqueue/messageevent|goals/metagoal/trigger/messageevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_inhibits_reference" refer="agent_goal_name">
-			<xs:selector xpath="jadex:goals/jadex:performgoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:achievegoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:querygoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:maintaingoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:metagoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:performgoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:achievegoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:querygoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:maintaingoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:metagoalref/jadex:deliberation/jadex:inhibits"/>
+			<xs:selector xpath="goals/performgoal/deliberation/inhibits|goals/achievegoal/deliberation/inhibits|goals/querygoal/deliberation/inhibits|goals/maintaingoal/deliberation/inhibits|goals/metagoal/deliberation/inhibits|goals/performgoalref/deliberation/inhibits|goals/achievegoalref/deliberation/inhibits|goals/querygoalref/deliberation/inhibits|goals/maintaingoalref/deliberation/inhibits|goals/metagoalref/deliberation/inhibits"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_capability_reference" refer="agent_capability_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:capabilities/jadex:initialcapability"/>
+			<xs:selector xpath="configurations/configuration/capabilities/initialcapability"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_belief_reference" refer="agent_belief_key">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:beliefs/jadex:initialbelief"/>
+			<xs:selector xpath="configurations/configuration/beliefs/initialbelief"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_beliefset_reference" refer="agent_beliefset_key">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:beliefs/jadex:initialbeliefset"/>
+			<xs:selector xpath="configurations/configuration/beliefs/initialbeliefset"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_goal_reference" refer="agent_goal_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:goals/jadex:initialgoal|jadex:configurations/jadex:configuration/jadex:goals/jadex:endgoal"/>
+			<xs:selector xpath="configurations/configuration/goals/initialgoal|configurations/configuration/goals/endgoal"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_plan_reference" refer="agent_plan_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:plans/jadex:initialplan|jadex:configurations/jadex:configuration/jadex:plans/jadex:endplan"/>
+			<xs:selector xpath="configurations/configuration/plans/initialplan|configurations/configuration/plans/endplan"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_internalevent_reference" refer="agent_internalevent_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:internalevents/jadex:initialinternalevent|jadex:configurations/jadex:configuration/jadex:internalevents/jadex:endinternalevent"/>
+			<xs:selector xpath="configurations/configuration/internalevents/initialinternalevent|configurations/configuration/internalevents/endinternalevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="agent_messageevent_reference" refer="agent_messageevent_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:messageevents/jadex:initialmessageevent|jadex:configurations/jadex:configuration/jadex:messageevents/jadex:endmessageevent"/>
+			<xs:selector xpath="configurations/configuration/messageevents/initialmessageevent|configurations/configuration/messageevents/endmessageevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:key name="agent_component_name">
-			<xs:selector xpath="jadex:componenttypes/jadex:componenttype"/>
+			<xs:selector xpath="componenttypes/componenttype"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_providedservice_key">
-			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="services/providedservice"/>
 			<xs:field xpath="@name|@class"/>
 		</xs:key>
 		<xs:unique name="agent_providedservice_name">
-			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="services/providedservice"/>
 			<xs:field xpath="@name"/>
 		</xs:unique>
 		<xs:key name="agent_requiredservice_name">
-			<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+			<xs:selector xpath="services/requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="agent_property_name">
-			<xs:selector xpath="jadex:properties/jadex:property"/>
+			<xs:selector xpath="properties/property"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:keyref name="agent_component_reference" refer="agent_component_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:components/jadex:component"/>
+			<xs:selector xpath="configurations/configuration/components/component"/>
 			<xs:field xpath="@type"/>
 		</xs:keyref>
 		<xs:keyref name="agent_providedservice_reference" refer="agent_providedservice_key">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="configurations/configuration/services/providedservice"/>
 			<xs:field xpath="@name|@class"/>
 		</xs:keyref>
 		<xs:keyref name="agent_requiredservice_reference" refer="agent_requiredservice_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
+			<xs:selector xpath="configurations/configuration/services/requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
 		<!-- unique keys on type level -->
@@ -133,120 +133,120 @@
 			<xs:documentation>Defines a new capability type.</xs:documentation>
 		</xs:annotation>
 		<xs:key name="capa_capability_name">
-			<xs:selector xpath="jadex:capabilities/jadex:capability"/>
+			<xs:selector xpath="capabilities/capability"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_belief_name">
-			<xs:selector xpath="jadex:beliefs/jadex:belief|jadex:beliefs/jadex:beliefset|jadex:beliefs/jadex:beliefref|jadex:beliefs/jadex:beliefsetref"/>
+			<xs:selector xpath="beliefs/belief|beliefs/beliefset|beliefs/beliefref|beliefs/beliefsetref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_belief_key">
-			<xs:selector xpath="jadex:beliefs/jadex:belief|jadex:beliefs/jadex:beliefref"/>
+			<xs:selector xpath="beliefs/belief|beliefs/beliefref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_beliefset_key">
-			<xs:selector xpath="jadex:beliefs/jadex:beliefset|jadex:beliefs/jadex:beliefsetref"/>
+			<xs:selector xpath="beliefs/beliefset|beliefs/beliefsetref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_goal_name">
-			<xs:selector xpath="jadex:goals/jadex:performgoal|jadex:goals/jadex:achievegoal|jadex:goals/jadex:querygoal|jadex:goals/jadex:maintaingoal|jadex:goals/jadex:metagoal|jadex:goals/jadex:performgoalref|jadex:goals/jadex:achievegoalref|jadex:goals/jadex:querygoalref|jadex:goals/jadex:maintaingoalref|jadex:goals/jadex:metagoalref"/>
+			<xs:selector xpath="goals/performgoal|goals/achievegoal|goals/querygoal|goals/maintaingoal|goals/metagoal|goals/performgoalref|goals/achievegoalref|goals/querygoalref|goals/maintaingoalref|goals/metagoalref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_plan_name">
-			<xs:selector xpath="jadex:plans/jadex:plan"/>
+			<xs:selector xpath="plans/plan"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_internalevent_name">
-			<xs:selector xpath="jadex:events/jadex:internalevent|jadex:events/jadex:internaleventref"/>
+			<xs:selector xpath="events/internalevent|events/internaleventref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_messageevent_name">
-			<xs:selector xpath="jadex:events/jadex:messageevent|jadex:events/jadex:messageeventref"/>
+			<xs:selector xpath="events/messageevent|events/messageeventref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:keyref name="capa_belief_trigger" refer="capa_belief_name">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:factchanged"/>
+			<xs:selector xpath="plans/plan/trigger/factchanged"/>
 			<xs:field xpath="@ref"/>
 			<!-- Both beliefs and belief sets allowed. -->
 		</xs:keyref>
 		<xs:keyref name="capa_beliefset_trigger" refer="capa_beliefset_key">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:factadded|jadex:plans/jadex:plan/jadex:trigger/jadex:factremoved"/>
+			<xs:selector xpath="plans/plan/trigger/factadded|plans/plan/trigger/factremoved"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_goal_trigger" refer="capa_goal_name">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:goalfinished|jadex:plans/jadex:plan/jadex:trigger/jadex:goal|jadex:plans/jadex:plan/jadex:waitqueue/jadex:goalfinished|jadex:goals/jadex:metagoal/jadex:trigger/jadex:goalfinished|jadex:goals/jadex:metagoal/jadex:trigger/jadex:goal"/>
+			<xs:selector xpath="plans/plan/trigger/goalfinished|plans/plan/trigger/goal|plans/plan/waitqueue/goalfinished|goals/metagoal/trigger/goalfinished|goals/metagoal/trigger/goal"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_internalevent_trigger" refer="capa_internalevent_name">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:internalevent|jadex:plans/jadex:plan/jadex:waitqueue/jadex:internalevent|jadex:goals/jadex:metagoal/jadex:trigger/jadex:internalevent"/>
+			<xs:selector xpath="plans/plan/trigger/internalevent|plans/plan/waitqueue/internalevent|goals/metagoal/trigger/internalevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_messageevent_trigger" refer="capa_messageevent_name">
-			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:messageevent|jadex:plans/jadex:plan/jadex:waitqueue/jadex:messageevent|jadex:goals/jadex:metagoal/jadex:trigger/jadex:messageevent"/>
+			<xs:selector xpath="plans/plan/trigger/messageevent|plans/plan/waitqueue/messageevent|goals/metagoal/trigger/messageevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_inhibits_reference" refer="capa_goal_name">
-			<xs:selector xpath="jadex:goals/jadex:performgoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:achievegoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:querygoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:maintaingoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:metagoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:performgoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:achievegoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:querygoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:maintaingoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:metagoalref/jadex:deliberation/jadex:inhibits"/>
+			<xs:selector xpath="goals/performgoal/deliberation/inhibits|goals/achievegoal/deliberation/inhibits|goals/querygoal/deliberation/inhibits|goals/maintaingoal/deliberation/inhibits|goals/metagoal/deliberation/inhibits|goals/performgoalref/deliberation/inhibits|goals/achievegoalref/deliberation/inhibits|goals/querygoalref/deliberation/inhibits|goals/maintaingoalref/deliberation/inhibits|goals/metagoalref/deliberation/inhibits"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_capability_reference" refer="capa_capability_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:capabilities/jadex:initialcapability"/>
+			<xs:selector xpath="configurations/configuration/capabilities/initialcapability"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_belief_reference" refer="capa_belief_key">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:beliefs/jadex:initialbelief"/>
+			<xs:selector xpath="configurations/configuration/beliefs/initialbelief"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_beliefset_reference" refer="capa_beliefset_key">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:beliefs/jadex:initialbeliefset"/>
+			<xs:selector xpath="configurations/configuration/beliefs/initialbeliefset"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_goal_reference" refer="capa_goal_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:goals/jadex:initialgoal|jadex:configurations/jadex:configuration/jadex:goals/jadex:endgoal"/>
+			<xs:selector xpath="configurations/configuration/goals/initialgoal|configurations/configuration/goals/endgoal"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_plan_reference" refer="capa_plan_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:plans/jadex:initialplan|jadex:configurations/jadex:configuration/jadex:plans/jadex:endplan"/>
+			<xs:selector xpath="configurations/configuration/plans/initialplan|configurations/configuration/plans/endplan"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_internalevent_reference" refer="capa_internalevent_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:internalevents/jadex:initialinternalevent|jadex:configurations/jadex:configuration/jadex:internalevents/jadex:endinternalevent"/>
+			<xs:selector xpath="configurations/configuration/internalevents/initialinternalevent|configurations/configuration/internalevents/endinternalevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:keyref name="capa_messageevent_reference" refer="capa_messageevent_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:messageevents/jadex:initialmessageevent|jadex:configurations/jadex:configuration/jadex:messageevents/jadex:endmessageevent"/>
+			<xs:selector xpath="configurations/configuration/messageevents/initialmessageevent|configurations/configuration/messageevents/endmessageevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
 		<xs:key name="capa_component_name">
-			<xs:selector xpath="jadex:componenttypes/jadex:componenttype"/>
+			<xs:selector xpath="componenttypes/componenttype"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_providedservice_key">
-			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="services/providedservice"/>
 			<xs:field xpath="@name|@class"/>
 		</xs:key>
 		<xs:unique name="capa_providedservice_name">
-			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="services/providedservice"/>
 			<xs:field xpath="@name"/>
 		</xs:unique>
 		<xs:key name="capa_requiredservice_name">
-			<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+			<xs:selector xpath="services/requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:key name="capa_property_name">
-			<xs:selector xpath="jadex:properties/jadex:property"/>
+			<xs:selector xpath="properties/property"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:keyref name="capa_component_reference" refer="capa_component_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:components/jadex:component"/>
+			<xs:selector xpath="configurations/configuration/components/component"/>
 			<xs:field xpath="@type"/>
 		</xs:keyref>
 		<xs:keyref name="capa_providedservice_reference" refer="capa_providedservice_key">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:providedservice"/>
+			<xs:selector xpath="configurations/configuration/services/providedservice"/>
 			<xs:field xpath="@name|@class"/>
 		</xs:keyref>
 		<xs:keyref name="capa_requiredservice_reference" refer="capa_requiredservice_name">
-			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
+			<xs:selector xpath="configurations/configuration/services/requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
 		<!-- unique keys on type level -->
@@ -268,7 +268,6 @@
 					<xs:element name="services" type="services" minOccurs="0"/>
 					<xs:element name="properties" type="properties" minOccurs="0"/>
 					<xs:element name="configurations" type="aconfigurations" minOccurs="0"/>
-					<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
 					<xs:element name="capabilities" type="MCapabilityBase" minOccurs="0"/>
 					<xs:element name="beliefs" type="MBeliefbase" minOccurs="0"/>
 					<xs:element name="goals" type="MGoalbase" minOccurs="0"/>
@@ -299,19 +298,19 @@ In the configurations section, predefined
 					</xs:documentation>
 				</xs:annotation>
 				<xs:key name="aconfig_argument_name">
-					<xs:selector xpath="jadex:arguments/jadex:argument"/>
+					<xs:selector xpath="arguments/argument"/>
 					<xs:field xpath="@name"/>
 				</xs:key>
 				<xs:key name="aconfig_providedservice_key">
-					<xs:selector xpath="jadex:services/jadex:providedservice"/>
+					<xs:selector xpath="services/providedservice"/>
 					<xs:field xpath="@name|@class"/>
 				</xs:key>
 				<xs:unique name="aconfig_providedservice_name">
-					<xs:selector xpath="jadex:services/jadex:providedservice"/>
+					<xs:selector xpath="services/providedservice"/>
 					<xs:field xpath="@name"/>
 				</xs:unique>
 				<xs:key name="aconfig_requiredservice_name">
-					<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+					<xs:selector xpath="services/requiredservice"/>
 					<xs:field xpath="@name"/>
 				</xs:key>
 				<!-- Configuration unique constraints defined here, because elements need only be unique inside one config. -->
@@ -327,20 +326,19 @@ In the configurations section, predefined
 				<xs:all>
 					<xs:element name="components" type="configcomponents" minOccurs="0"/>
 					<xs:element name="services" type="configservices" minOccurs="0"/>
-					<xs:element name="extensions" type="extensions" minOccurs="0"/>
 					<xs:element name="capabilities" type="MConfigCapabilitybase" minOccurs="0">
 						<xs:key name="config_capability_name">
-							<xs:selector xpath="jadex:initialcapability"/>
+							<xs:selector xpath="initialcapability"/>
 							<xs:field xpath="@ref"/>
 						</xs:key>
 					</xs:element>
 					<xs:element name="beliefs" type="MConfigBeliefbase" minOccurs="0">
 						<xs:unique name="config_belief_name">
-							<xs:selector xpath="jadex:initialbelief|jadex:initialbeliefset"/>
+							<xs:selector xpath="initialbelief|initialbeliefset"/>
 							<xs:field xpath="@ref"/>
 						</xs:unique>
 						<xs:unique name="config_belief_cref">
-							<xs:selector xpath="jadex:initialbelief|jadex:initialbeliefset"/>
+							<xs:selector xpath="initialbelief|initialbeliefset"/>
 							<xs:field xpath="@cref"/>
 						</xs:unique>
 					</xs:element>
@@ -380,7 +378,6 @@ In the configurations section, predefined
 			<xs:element name="services" type="services" minOccurs="0"/>
 			<xs:element name="properties" type="properties" minOccurs="0"/>
 			<xs:element name="configurations" type="aconfigurations" minOccurs="0"/>
-			<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
 			<xs:element name="capabilities" type="MCapabilityBase" minOccurs="0"/>
 			<xs:element name="beliefs" type="MBeliefbase" minOccurs="0"/>
 			<xs:element name="goals" type="MGoalbase" minOccurs="0"/>
@@ -751,7 +748,7 @@ In the configurations section, predefined
 							</xs:annotation>
 						</xs:element>
 					</xs:sequence>
-					<xs:sequence>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
 						<xs:element name="parameter" type="MParameter" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>Any number of parameters.</xs:documentation>
@@ -762,7 +759,7 @@ In the configurations section, predefined
 								<xs:documentation>Any number of parameter sets.</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-					</xs:sequence>
+					</xs:choice>
 					<xs:sequence>
 						<xs:element name="contextcondition" type="MInternalCondition" minOccurs="0">
 							<xs:annotation>
@@ -791,32 +788,14 @@ In the configurations section, predefined
 			</xs:restriction>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="MDummyPlan" mixed="true">
-		<xs:annotation>
-			<xs:documentation>Used only internally.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent mixed="true">
-			<xs:restriction base="MParameterElement">
-				<xs:sequence>
-					<xs:sequence>
-						<xs:element name="assignto" type="MAssign" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Assign this element to an abstract element of another capability.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:sequence>
-			</xs:restriction>
-		</xs:complexContent>
-	</xs:complexType>
 	<xs:complexType name="MPlan" mixed="true">
 		<xs:annotation>
-			<xs:documentation>A plan contains procedural knowledge. It consits of a plan head and a plan body.</xs:documentation>
+			<xs:documentation>A plan contains procedural knowledge. It consists of a plan head and a plan body.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MDummyPlan">
+			<xs:extension base="MElement">
 				<xs:sequence>
-					<xs:sequence>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
 						<xs:element name="parameter" type="MPlanParameter" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>An arbitrary number of plan parameters.</xs:documentation>
@@ -827,7 +806,7 @@ In the configurations section, predefined
 								<xs:documentation>An arbitrary number of plan parameter sets.</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-					</xs:sequence>
+					</xs:choice>
 					<xs:element name="body" type="MPlanBody">
 						<xs:annotation>
 							<xs:documentation>The plan body. If it is a normal plan the body is interpreted as an expression that must be evaluable to a plan object. If it is an inline plan the body (passed, failed, aborted) code is directly contained in this body specification.</xs:documentation>
@@ -1262,7 +1241,14 @@ In the configurations section, predefined
 						</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
-
+				<xs:attribute name="rawevents" type="xs:string"
+					use="optional">
+					<xs:annotation>
+						<xs:documentation>
+							Allows specifying raw events (in internal ECA format) on which the condition depends.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1286,6 +1272,14 @@ In the configurations section, predefined
 						<xs:documentation>
 							The parameters (i.e. for goal and plan
 							conditions) on which the condition depends.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="rawevents" type="xs:string"
+					use="optional">
+					<xs:annotation>
+						<xs:documentation>
+							Allows specifying raw events (in internal ECA format) on which the condition depends.
 						</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
@@ -1390,7 +1384,7 @@ In the configurations section, predefined
 		</xs:annotation>
 		<xs:complexContent mixed="true">
 			<xs:extension base="MReferenceableElement">
-				<xs:sequence>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
 					<xs:element name="parameter" type="MParameter" minOccurs="0" maxOccurs="unbounded">
 						<xs:annotation>
 							<xs:documentation>Any number of parameters.</xs:documentation>
@@ -1401,7 +1395,7 @@ In the configurations section, predefined
 							<xs:documentation>Any number of parameter set elements.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-				</xs:sequence>
+				</xs:choice>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -2170,7 +2164,7 @@ In the configurations section, predefined
 						</xs:annotation>
 					</xs:element>
 				</xs:sequence>
-				<xs:attribute name="cardinality" type="xs:int" use="optional" default="-1"/>
+				<xs:attribute name="cardinalityone" type="xs:boolean" use="optional" default="false"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

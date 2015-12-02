@@ -187,7 +187,7 @@ public class BDIXMLReader extends ComponentXMLReader
 	 */
 	public BDIXMLReader(BDIXModelLoader loader)
 	{
-		super(getXMLMapping());
+		super(getXMLMapping("http://www.activecomponents.org/jadex-bdi"));
 		this.loader	= loader;
 	}
 	
@@ -214,12 +214,10 @@ public class BDIXMLReader extends ComponentXMLReader
 	/**
 	 *  Get the XML mapping.
 	 */
-	public static Set<TypeInfo> getXMLMapping()
+	public static Set<TypeInfo> getXMLMapping(final String uri)
 	{
-		Set<TypeInfo> typeinfos = ComponentXMLReader.getXMLMapping(null);
-		
-		final String uri = "http://jadex.sourceforge.net/jadex";
-		
+		Set<TypeInfo> typeinfos = ComponentXMLReader.getXMLMapping(null, uri);
+				
 		// Post processors.
 		final IPostProcessor expost = new ExpressionProcessor();
 
@@ -229,7 +227,7 @@ public class BDIXMLReader extends ComponentXMLReader
 //		
 //		Set typeinfos = new HashSet(ComponentXMLReader.getXMLMapping(null));
 //
-//		final String uri = "http://jadex.sourceforge.net/jadex";
+//		final String uri = "http://www.activecomponents.org/jadex";
 //		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "exclude")),  new ObjectInfo(new IBeanObjectCreator()
 //		{

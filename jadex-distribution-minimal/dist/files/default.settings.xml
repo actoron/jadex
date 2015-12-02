@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<p0:properties xmlns:p0="http://www.activecomponents.org/jadex-conf" __ID="0">
+	<p0:properties __ID="1" type="StarterServicePanel">
+		<p0:properties __ID="2" type="mpanel">
+			<p0:property __ID="3" type="tree"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<p0:TreeProperties xmlns:p0="typeinfo:jadex.base.gui.filetree" __ID="0">
+	<selectedNode>
+		<p0:NodePath __ID="1" entry="3">
+			<path>
+				<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="2" __len="5">
+					<entries>
+						<p1:String __ID="3">jadex</p1:String>
+						<p1:String __ID="4">micro</p1:String>
+						<p1:String __ID="5">examples</p1:String>
+						<p1:String __ID="6">mandelbrot</p1:String>
+						<p1:String __ID="7">Mandelbrot.application.xml</p1:String>
+					</entries>
+				</p1:String__1>
+			</path>
+		</p0:NodePath>
+	</selectedNode>
+	<expandedNodes>
+		<p0:NodePath__1 __ID="8" __len="5">
+			<entries>
+				<p0:NodePath __ID="9" entry="3">
+					<path>
+						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="10" __len="1">
+							<entries>
+								<p1:String __ID="11">jadex</p1:String>
+							</entries>
+						</p1:String__1>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="12" entry="3">
+					<path>
+						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="13" __len="0"></p1:String__1>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="14" entry="3">
+					<path>
+						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="15" __len="4">
+							<entries>
+								<p1:String __ID="16">jadex</p1:String>
+								<p1:String __ID="17">micro</p1:String>
+								<p1:String __ID="18">examples</p1:String>
+								<p1:String __ID="19">mandelbrot</p1:String>
+							</entries>
+						</p1:String__1>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="20" entry="3">
+					<path>
+						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="21" __len="2">
+							<entries>
+								<p1:String __ID="22">jadex</p1:String>
+								<p1:String __ID="23">micro</p1:String>
+							</entries>
+						</p1:String__1>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="24" entry="3">
+					<path>
+						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="25" __len="3">
+							<entries>
+								<p1:String __ID="26">jadex</p1:String>
+								<p1:String __ID="27">micro</p1:String>
+								<p1:String __ID="28">examples</p1:String>
+							</entries>
+						</p1:String__1>
+					</path>
+				</p0:NodePath>
+			</entries>
+		</p0:NodePath__1>
+	</expandedNodes>
+	<rootPathEntries>
+		<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="29" __len="4">
+			<entries>
+				<p1:String __ID="30">lib/jadex-applications-bdi-${jadex_build_version}.jar</p1:String>
+				<p1:String __ID="30">lib/jadex-applications-bdiv3-${jadex_build_version}.jar</p1:String>
+				<!-- <p1:String __ID="31">lib/jadex-applications-bdibpmn-${jadex_build_version}.jar</p1:String>-->
+				<p1:String __ID="32">lib/jadex-applications-bpmn-${jadex_build_version}.jar</p1:String>
+				<p1:String __ID="34">lib/jadex-applications-micro-${jadex_build_version}.jar</p1:String>
+			</entries>
+		</p1:String__1>
+	</rootPathEntries>
+</p0:TreeProperties>
+]]></p0:property>
+			<p0:properties __ID="4" type="mic">
+				<p0:property __ID="5" type="BPMN Process">true</p0:property>
+				<p0:property __ID="6" type="BDI Agent">true</p0:property>
+				<p0:property __ID="7" type="BDI Capability">true</p0:property>
+				<p0:property __ID="8" type="Application">true</p0:property>
+				<p0:property __ID="9" type="Component">true</p0:property>
+				<p0:property __ID="10" type="Micro Agent">true</p0:property>
+			</p0:properties>
+		</p0:properties>
+		<p0:properties __ID="13" type="spanel">
+			<p0:property __ID="14" type="model">/jadex/micro/examples/mandelbrot/Mandelbrot.application.xml</p0:property>
+			<p0:property __ID="15" type="config">All Components</p0:property>
+			<p0:property __ID="16" type="startsuspended">false</p0:property>
+			<p0:property __ID="17" type="autogenerate">false</p0:property>
+			<p0:property __ID="18" type="name">Mandelbrot</p0:property>
+			<p0:property __ID="19" type="argument"></p0:property>
+		</p0:properties>
+	</p0:properties>
+	<p0:properties __ID="22" type="awa">
+		<p0:property __ID="23" type="address">224.0.0.0</p0:property>
+		<p0:property __ID="24" type="port">55667</p0:property>
+		<p0:property __ID="25" type="delay">10000</p0:property>
+		<p0:property __ID="26" type="fast">true</p0:property>
+		<p0:property __ID="27" type="autocreate">true</p0:property>
+		<p0:property __ID="28" type="autodelete">true</p0:property>
+	</p0:properties>
+	<p0:properties __ID="30" type="simulationservice">
+		<p0:property __ID="31" type="executing">true</p0:property>
+	</p0:properties>
+	<p0:properties __ID="33" type="clockservice">
+		<p0:property __ID="34" type="type">system</p0:property>
+		<p0:property __ID="35" type="delta">100</p0:property>
+		<p0:property __ID="36" type="dilation">1.0</p0:property>
+	</p0:properties>
+	<p0:properties __ID="38" type="library_service">
+	</p0:properties>
+</p0:properties>

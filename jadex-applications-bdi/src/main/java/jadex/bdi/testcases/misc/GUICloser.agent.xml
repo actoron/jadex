@@ -7,10 +7,10 @@
 	gui, then the plan terminates. Otherwise, the plan
 	closes the gui after 3 seconds itself.
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex"
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-	                    http://jadex.sourceforge.net/jadex-bdi-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	name="GUICloser"
 	package="jadex.bdi.testcases.misc">
 	

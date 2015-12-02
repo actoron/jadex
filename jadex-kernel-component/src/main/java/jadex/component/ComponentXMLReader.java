@@ -161,7 +161,7 @@ public class ComponentXMLReader
 	 */
 	public ComponentXMLReader(Set[] mappings)
 	{
-		this(getXMLMapping(mappings));
+		this(getXMLMapping(mappings, "http://www.activecomponents.org/jadex-component"));
 	}
 	
 	/**
@@ -305,11 +305,9 @@ public class ComponentXMLReader
 	/**
 	 *  Get the XML mapping.
 	 */
-	public static Set<TypeInfo> getXMLMapping(Set<TypeInfo>[] mappings)
+	public static Set<TypeInfo> getXMLMapping(Set<TypeInfo>[] mappings, String uri)
 	{
 		Set<TypeInfo> types = new HashSet<TypeInfo>();
-		
-		String uri = "http://jadex.sourceforge.net/jadex";
 		
 //		TypeInfo satype = new TypeInfo(null, new ObjectInfo(MStartable.class),
 //			new MappingInfo(null, new AttributeInfo[]{

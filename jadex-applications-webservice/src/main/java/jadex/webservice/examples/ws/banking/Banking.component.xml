@@ -9,10 +9,10 @@
     the id (e.g. a web service url) and the service type, i.e. interface to
     be specified.
 -->
-<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-						http://jadex.sourceforge.net/jadex-component-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
 	name="Banking" package="jadex.webservice.examples.ws.banking">
 	
 	<imports>
