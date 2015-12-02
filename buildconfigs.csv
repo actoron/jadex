@@ -38,7 +38,6 @@ jadex-javaparser,X,X,X,X,,,,,,,,,X,X,X
 jadex-json,,X,X,,,,,,,,,,,,X
 jadex-kernel-application,,X,X,,,,,,,,,,,,X
 jadex-kernel-base,X,X,X,X,,,,,,,,,X,,X
-jadex-kernel-bdi,,,,,,,,,,,,,,,
 jadex-kernel-bdibpmn,,,,,,,,,,,,,,,
 jadex-kernel-bdiv3,,X,X,X,,,,,,,,,,X,X
 jadex-kernel-bdiv3-android,,,,X,,,,,,,,,,,X
