@@ -584,8 +584,20 @@ In the configurations section, predefined
 			<xs:documentation>Base type for all goals.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MParameterElement">
+			<xs:extension base="MReferenceableElement">
 				<xs:sequence>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="parameter" type="MGoalParameter" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Any number of parameters.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="parameterset" type="MGoalParameterSet" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Any number of parameter sets.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
 					<xs:element name="unique" type="MUnique" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>If a goal is declared unique only one instance of this type is allowed being adopted at any one time. To determine if two goals are equal the type and parameters are used. Parameters that should not be considered can explicitly be excluded. </xs:documentation>
@@ -749,12 +761,12 @@ In the configurations section, predefined
 						</xs:element>
 					</xs:sequence>
 					<xs:choice minOccurs="0" maxOccurs="unbounded">
-						<xs:element name="parameter" type="MParameter" minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="parameter" type="MGoalParameter" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>Any number of parameters.</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="parameterset" type="MParameterSet" minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="parameterset" type="MGoalParameterSet" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>Any number of parameter sets.</xs:documentation>
 							</xs:annotation>
@@ -896,95 +908,6 @@ In the configurations section, predefined
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="MTypedElementSet" abstract="true" mixed="true">
-		<xs:annotation>
-			<xs:documentation>Base type for multi-valued elements with a type.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent mixed="true">
-			<xs:extension base="MReferenceableElement">
-				<xs:attribute name="class" type="xs:string" use="required">
-					<xs:annotation>
-						<xs:documentation>The required Java class of the fact. Used for type checking objects that are asserted as facts.</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-				<xs:attribute name="updaterate" type="xs:long" use="optional" default="0">
-					<xs:annotation>
-						<xs:documentation>For dynamic expressions the update rate defines in what intervals the fact will be re-evaluated. The default update rate is set to 0.</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-				<xs:attribute name="transient" type="xs:boolean" use="optional" default="false">
-					<xs:annotation>
-						<xs:documentation>Transient beliefs or prameter values are not retained, when persisting or migrating an agent. This is useful e.g. when a value class is not serializable.</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-				<xs:attribute name="evaluationmode" use="optional" default="static">
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="static"/>
-							<xs:enumeration value="push"/>
-							<xs:enumeration value="pull"/>
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:attribute>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-	<xs:complexType name="MParameter">
-		<xs:annotation>
-			<xs:documentation>A parameter represents a single-valued piece of information belonging to some parameter element.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:restriction base="MPlanParameter">
-				<xs:sequence>
-					<xs:sequence>
-						<xs:element name="assignto" type="MAssign" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Assign this element to an abstract element of another capability.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-					<xs:choice>
-						<xs:element name="value" type="MInternalExpression" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>An expression that represents the default value. Per default it is static, i.e. it is only evalued only once on creation. </xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="bindingoptions" type="MInternalExpression" minOccurs="0"/>
-					</xs:choice>
-				</xs:sequence>
-			</xs:restriction>
-		</xs:complexContent>
-	</xs:complexType>
-	<xs:complexType name="MParameterSet">
-		<xs:annotation>
-			<xs:documentation>A parameter set represents a multi-valued piece of information belonging to some parameter element.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:restriction base="MPlanParameterSet">
-				<xs:sequence>
-					<xs:sequence>
-						<xs:element name="assignto" type="MAssign" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Assign this element to an abstract element of another capability.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-					<xs:choice>
-						<xs:element name="value" type="MInternalExpression" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>An expression that evaluated to a default value. Only static values are allowed, i.e. it is only evaluated once on creation.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="values" type="MInternalExpression" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>An expression that is evaluated to a set of default values. Per default it is static, i.e. it is only evalued only once on creation. </xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:choice>
-				</xs:sequence>
-			</xs:restriction>
-		</xs:complexContent>
-	</xs:complexType>
 	<xs:complexType name="MBelief" mixed="true">
 		<xs:annotation>
 			<xs:documentation>
@@ -1019,7 +942,7 @@ In the configurations section, predefined
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MTypedElementSet">
+			<xs:extension base="MTypedElement">
 				<xs:choice>
 					<xs:element name="fact" type="MInternalExpression" minOccurs="0" maxOccurs="unbounded">
 						<xs:annotation>
@@ -1037,9 +960,9 @@ In the configurations section, predefined
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="MPlanParameter" mixed="true">
+	<xs:complexType name="MParameter" mixed="true">
 		<xs:annotation>
-			<xs:documentation>Parameter for a plan. Additionally allows mappings being defined.</xs:documentation>
+			<xs:documentation>A parameter set represents a single-valued piece of information belonging to some parameter element.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElement">
@@ -1055,42 +978,13 @@ In the configurations section, predefined
 						<xs:annotation>
 							<xs:documentation>
 								From a set of binding option values one
-								concrete is selected per plan instance.
-								If a plan with binding options is
-								created for each possible binding value
-								a new plan instance is created.
+								concrete is selected per parameter element instance (e.g. a goal, plan or event).
+								If an element with binding option parameters is
+								created for each possible binding value combination
+								a new element instance is created.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:choice minOccurs="0" maxOccurs="unbounded">
-						<xs:element name="goalmapping" type="MAssign" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>
-									This parameter is considered as a
-									proxy. It is mapped to another
-									parameter in a goal.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="internaleventmapping" type="MAssign" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>
-									This parameter is considered as a
-									proxy. It is mapped to another
-									parameter in an internal event.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="messageeventmapping" type="MAssign" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>
-									This parameter is considered as a
-									proxy. It is mapped to another
-									parameter in a message event.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:choice>
 				</xs:choice>
 				<xs:attribute name="optional" type="xs:boolean" use="optional" default="false">
 					<xs:annotation>
@@ -1113,20 +1007,84 @@ In the configurations section, predefined
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="MPlanParameterSet" mixed="true">
+	<xs:complexType name="MGoalParameter" mixed="true">
 		<xs:annotation>
-			<xs:documentation>Parameter set for a plan. Additionally allows mappings being defined.</xs:documentation>
+			<xs:documentation>Parameter for a goal. Additionally allows mappings being defined.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MTypedElementSet">
+			<xs:extension base="MParameter">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="servicemapping" type="MAssign" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								This parameter is considered as a
+								proxy. It is mapped to an argument or result of a service.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="MPlanParameter" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Parameter for a plan. Additionally allows mappings being defined.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="MParameter">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="goalmapping" type="MAssign" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								This parameter is considered as a
+								proxy. It is mapped to another
+								parameter in a goal.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="internaleventmapping" type="MAssign" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								This parameter is considered as a
+								proxy. It is mapped to another
+								parameter in an internal event.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="messageeventmapping" type="MAssign" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								This parameter is considered as a
+								proxy. It is mapped to another
+								parameter in a message event.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="MParameterSet" mixed="true">
+		<xs:annotation>
+			<xs:documentation>A parameter set represents a multi-valued piece of information belonging to some parameter element.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="MTypedElement">
 				<xs:choice>
-					<xs:element name="value" type="MInternalExpression" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="values" type="MInternalExpression" minOccurs="0"/>
-					<xs:sequence>
-						<xs:element name="internaleventmapping" type="MAssign" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element name="messageeventmapping" type="MAssign" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element name="goalmapping" type="MAssign" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
+					<xs:element name="value" type="MInternalExpression" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>
+								An expression that is one of the default values.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="values" type="MInternalExpression" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								An expression that represents a collection of default values.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 				</xs:choice>
 				<xs:attribute name="optional" type="xs:boolean" use="optional" default="false">
 					<xs:annotation>
@@ -1149,34 +1107,77 @@ In the configurations section, predefined
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	<xs:complexType name="MGoalParameterSet" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Parameter for a goal. Additionally allows mappings being defined.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="MParameterSet">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="servicemapping" type="MAssign" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								This parameter is considered as a
+								proxy. It is mapped to an argument or result of a service.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="MPlanParameterSet" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Parameter set for a plan. Additionally allows mappings being defined.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="MParameterSet">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="goalmapping" type="MAssign" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								This parameter is considered as a
+								proxy. It is mapped to another
+								parameter in a goal.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="internaleventmapping" type="MAssign" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								This parameter is considered as a
+								proxy. It is mapped to another
+								parameter in an internal event.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="messageeventmapping" type="MAssign" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								This parameter is considered as a
+								proxy. It is mapped to another
+								parameter in a message event.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 	<xs:complexType name="MExpression" mixed="true">
 		<xs:annotation>
 			<xs:documentation>
-													A piece a program
-													code that is
-													evaluated.
-									</xs:documentation>
+				A piece a program code that is evaluated.
+			</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
 			<xs:extension base="MReferenceableElement">
 				<xs:attribute name="class" type="xs:string" use="optional">
 					<xs:annotation>
 						<xs:documentation>
-																									The
-																									required
-																									Java
-																									class
-																									of
-																									the
-																									expression.
-																									Used
-																									for
-																									type
-																									checking
-																									the
-																									evaluation
-																									result.
-																					</xs:documentation>
+							The required Java class of the expression.
+							Used for type checking the evaluation result.
+						</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name="language" type="xs:string" use="optional"/>
