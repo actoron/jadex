@@ -1661,7 +1661,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public <T, E> IFuture<E> adoptPlan(T plan)
 	{
-		return adoptPlan(plan, null);
+		return adoptPlan(plan, (Object[])null);
 	}
 	
 	/**
@@ -1670,7 +1670,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 *  @param args The plan arguments.
 	 *  @return The plan result.
 	 */
-	public <T, E> IFuture<E> adoptPlan(T plan, Object[] args)
+	public <T, E> IFuture<E> adoptPlan(T plan, Object... args)
 	{
 		final Future<E> ret = new Future<E>();
 		MPlan mplan = bdimodel.getCapability().getPlan(plan instanceof String? (String)plan: plan.getClass().getName());
