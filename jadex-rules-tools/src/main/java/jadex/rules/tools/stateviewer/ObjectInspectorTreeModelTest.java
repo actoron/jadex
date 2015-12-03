@@ -1,8 +1,5 @@
 package jadex.rules.tools.stateviewer;
 
-import jadex.commons.gui.TreeExpansionHandler;
-import jadex.rules.state.javaimpl.OAVStateFactory;
-
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -13,6 +10,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+
+import jadex.commons.gui.TreeExpansionHandler;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 public class ObjectInspectorTreeModelTest extends OAVTreeModel
 {

@@ -1,13 +1,13 @@
 package jadex.tools.daemon;
 
+import javax.swing.JTable;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.jtable.ObjectTableModel;
-
-import javax.swing.JTable;
 
 /**
  * 

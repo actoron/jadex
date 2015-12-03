@@ -1,5 +1,11 @@
 package jadex.base;
 
+import java.io.File;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -8,12 +14,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Filter for Jadex component models. 

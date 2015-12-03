@@ -1,10 +1,5 @@
 package jadex.examples.presentationtimer.display.ui;
 
-import jadex.examples.presentationtimer.common.ICountdownController;
-import jadex.examples.presentationtimer.common.ICountdownService.ICountdownListener;
-import jadex.examples.presentationtimer.common.State;
-import jadex.examples.presentationtimer.display.Main;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -23,6 +18,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
+import jadex.examples.presentationtimer.common.ICountdownController;
+import jadex.examples.presentationtimer.common.ICountdownService.ICountdownListener;
+import jadex.examples.presentationtimer.common.State;
+import jadex.examples.presentationtimer.display.Main;
 
 public class CountDownView extends JFrame {
 	

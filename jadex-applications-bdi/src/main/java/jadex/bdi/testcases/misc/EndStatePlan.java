@@ -1,25 +1,20 @@
 package jadex.bdi.testcases.misc;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.df.IDF;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.commons.collection.SCollection;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Check correct operation of end states.

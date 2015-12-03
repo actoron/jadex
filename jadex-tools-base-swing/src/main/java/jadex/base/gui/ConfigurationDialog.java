@@ -1,9 +1,5 @@
 package jadex.base.gui;
 
-import jadex.commons.SReflect;
-import jadex.commons.collection.SCollection;
-import jadex.commons.gui.BrowserPane;
-
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -26,6 +22,10 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.commons.SReflect;
+import jadex.commons.collection.SCollection;
+import jadex.commons.gui.BrowserPane;
 
 /**
  *  Panel for Jadex configuration.

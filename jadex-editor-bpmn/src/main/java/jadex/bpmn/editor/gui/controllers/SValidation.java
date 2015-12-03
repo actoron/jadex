@@ -1,5 +1,11 @@
 package jadex.bpmn.editor.gui.controllers;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.mxgraph.model.mxICell;
+
 import jadex.bpmn.editor.gui.SHelper;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VInParameter;
@@ -12,12 +18,6 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.MTask;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import com.mxgraph.model.mxICell;
 
 /**
  *  Class for validating operations.

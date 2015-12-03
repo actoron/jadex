@@ -1,14 +1,13 @@
 package jadex.bridge.fipa;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
-import jadex.bridge.service.types.df.IProperty;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
 
 
 /**

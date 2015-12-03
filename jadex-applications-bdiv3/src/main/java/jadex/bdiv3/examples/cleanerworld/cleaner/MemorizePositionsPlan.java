@@ -1,14 +1,14 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import java.util.Set;
+
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.MapPoint;
 import jadex.bdiv3.runtime.IPlan;
-
-import java.util.Set;
 
 
 

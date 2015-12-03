@@ -1,8 +1,8 @@
 package jadex.bridge.service.types.df;
 
-import jadex.bridge.IComponentIdentifier;
-
 import java.util.Date;
+
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Interface for df component descriptions.

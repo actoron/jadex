@@ -1,11 +1,11 @@
 package jadex.base.gui.filetree;
 
+import javax.swing.JTree;
+
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IAsyncFilter;
-
-import javax.swing.JTree;
 
 /**
  *  The node factory interface.

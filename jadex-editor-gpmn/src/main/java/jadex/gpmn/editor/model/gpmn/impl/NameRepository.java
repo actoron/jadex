@@ -1,12 +1,12 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.gpmn.editor.model.gpmn.IEdge;
 import jadex.gpmn.editor.model.gpmn.IElement;
 import jadex.gpmn.editor.model.gpmn.IGoal;
 import jadex.gpmn.editor.model.gpmn.IPlan;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Repository for names currently in use.

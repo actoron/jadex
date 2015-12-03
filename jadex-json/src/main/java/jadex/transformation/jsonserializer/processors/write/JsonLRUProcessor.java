@@ -1,18 +1,14 @@
 package jadex.transformation.jsonserializer.processors.write;
 
-import jadex.commons.SReflect;
-import jadex.commons.collection.ILRUEntryCleaner;
-import jadex.commons.collection.LRU;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.lang.reflect.Type;
-import java.net.InetAddress;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.commons.collection.LRU;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  * 

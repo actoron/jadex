@@ -1,32 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.DefaultFileFilter;
-import jadex.base.SRemoteGui;
-import jadex.base.gui.asynctree.AsyncSwingTreeModel;
-import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
-import jadex.base.gui.asynctree.ISwingNodeHandler;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.asynctree.TreePopupListener;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.filetransfer.FileData;
-import jadex.commons.IPropertiesProvider;
-import jadex.commons.IAsyncFilter;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.IMenuItemConstructor;
-import jadex.commons.gui.PopupBuilder;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.TreeExpansionHandler;
-import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.gui.future.SwingIntermediateExceptionDelegationResultListener;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -46,6 +19,33 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.TreePath;
+
+import jadex.base.DefaultFileFilter;
+import jadex.base.SRemoteGui;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.TreePopupListener;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.commons.IAsyncFilter;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.IMenuItemConstructor;
+import jadex.commons.gui.PopupBuilder;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.TreeExpansionHandler;
+import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingIntermediateExceptionDelegationResultListener;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 /**
  *  A panel displaying components on the platform as tree.

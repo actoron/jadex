@@ -1,13 +1,13 @@
 package jadex.webservice.examples.rs.hello;
 
-import jadex.bridge.service.annotation.Value;
-import jadex.commons.future.IFuture;
-import jadex.extension.rs.publish.annotation.ResultMapper;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import jadex.bridge.service.annotation.Value;
+import jadex.commons.future.IFuture;
+import jadex.extension.rs.publish.annotation.ResultMapper;
 
 /**
  * The mapping information for the rest service. Describes how the Java service

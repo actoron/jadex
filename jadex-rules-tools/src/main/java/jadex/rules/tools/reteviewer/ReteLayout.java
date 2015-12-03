@@ -1,10 +1,5 @@
 package jadex.rules.tools.reteviewer;
 
-import jadex.rules.rulesystem.rete.nodes.BetaNode;
-import jadex.rules.rulesystem.rete.nodes.INode;
-import jadex.rules.rulesystem.rete.nodes.ITupleConsumerNode;
-import jadex.rules.rulesystem.rete.nodes.TerminalNode;
-
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -14,6 +9,10 @@ import java.util.List;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
+import jadex.rules.rulesystem.rete.nodes.BetaNode;
+import jadex.rules.rulesystem.rete.nodes.INode;
+import jadex.rules.rulesystem.rete.nodes.ITupleConsumerNode;
+import jadex.rules.rulesystem.rete.nodes.TerminalNode;
 
 /**
  *  Jung layout for a Rete network.

@@ -1,13 +1,13 @@
 package jadex.bridge.service.types.cms;
 
-import jadex.bridge.Cause;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 
 /**

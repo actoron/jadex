@@ -1,19 +1,5 @@
 package jadex.tools.monitoring;
 
-import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.base.gui.idtree.IdTreeCellRenderer;
-import jadex.base.gui.idtree.IdTreeModel;
-import jadex.base.gui.idtree.IdTreeNode;
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService;
-import jadex.commons.Properties;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -30,6 +16,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.TreeSelectionModel;
+
+import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.base.gui.idtree.IdTreeCellRenderer;
+import jadex.base.gui.idtree.IdTreeModel;
+import jadex.base.gui.idtree.IdTreeNode;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.commons.Properties;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 /**
  *  The security settings panel.

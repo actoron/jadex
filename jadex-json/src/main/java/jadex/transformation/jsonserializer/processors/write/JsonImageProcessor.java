@@ -1,6 +1,5 @@
 package jadex.transformation.jsonserializer.processors.write;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.lang.reflect.Type;
 import java.util.List;

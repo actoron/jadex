@@ -1,5 +1,13 @@
 package jadex.bpmn.features.impl;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
@@ -11,14 +19,6 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.commons.IValueFetcher;
 import jadex.commons.collection.MultiCollection;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Overriden to allow for service implementations as BPMN processes using signal events.

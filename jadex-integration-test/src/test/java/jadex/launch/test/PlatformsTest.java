@@ -1,5 +1,13 @@
 package jadex.launch.test;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IArgument;
@@ -16,14 +24,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  *  Test if the platforms can be started and terminate correctly.

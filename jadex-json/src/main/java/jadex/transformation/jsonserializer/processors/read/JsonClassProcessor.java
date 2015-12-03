@@ -10,7 +10,6 @@ import com.eclipsesource.json.JsonValue;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Codec for encoding and decoding class objects.

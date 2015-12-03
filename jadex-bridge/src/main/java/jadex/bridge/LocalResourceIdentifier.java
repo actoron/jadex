@@ -1,11 +1,11 @@
 package jadex.bridge;
 
+import java.net.URI;
+import java.net.URL;
+
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.commons.SUtil;
-
-import java.net.URI;
-import java.net.URL;
 
 /**
  *  Default implementation for resource identification.

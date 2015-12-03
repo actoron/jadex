@@ -1,20 +1,5 @@
 package jadex.tools.debugger;
 
-import jadex.base.gui.asynctree.ISwingNodeHandler;
-import jadex.base.gui.asynctree.INodeListener;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.componenttree.ComponentTreePanel;
-import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.Properties;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.CombiIcon;
-import jadex.commons.gui.ObjectCardLayout;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
@@ -32,6 +17,21 @@ import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
+
+import jadex.base.gui.asynctree.INodeListener;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.componenttree.IActiveComponentTreeNode;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.Properties;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.ObjectCardLayout;
+import jadex.commons.gui.SGUI;
 
 
 /**

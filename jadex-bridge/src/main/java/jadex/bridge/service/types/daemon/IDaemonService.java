@@ -1,10 +1,10 @@
 package jadex.bridge.service.types.daemon;
 
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.IFuture;
-
-import java.util.Set;
 
 /**
  * 

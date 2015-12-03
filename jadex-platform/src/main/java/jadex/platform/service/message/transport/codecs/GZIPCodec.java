@@ -1,15 +1,15 @@
 package jadex.platform.service.message.transport.codecs;
 
-import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.IEncodingContext;
-import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
+import jadex.commons.SUtil;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 /**
  *  Converts byte[] -> byte[] in both directions.

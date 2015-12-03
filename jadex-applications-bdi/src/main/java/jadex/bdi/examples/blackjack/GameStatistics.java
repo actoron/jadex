@@ -1,12 +1,12 @@
 package jadex.bdi.examples.blackjack;
 
+import java.util.Iterator;
+import java.util.List;
+
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.Tuple;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.collection.MultiCollection;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  *  This class holds all necessary information, that might be shown

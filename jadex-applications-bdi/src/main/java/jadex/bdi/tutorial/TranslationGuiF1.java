@@ -1,12 +1,12 @@
 package jadex.bdi.tutorial;
 
-import jadex.commons.gui.SGUI;
-
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+
+import jadex.commons.gui.SGUI;
 
 /**
  *  The gui showing translation actions.

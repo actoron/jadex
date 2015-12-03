@@ -1,9 +1,5 @@
 package jadex.platform.service.library;
 
-import jadex.bridge.IResourceIdentifier;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -14,6 +10,10 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import jadex.bridge.IResourceIdentifier;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 
 /**

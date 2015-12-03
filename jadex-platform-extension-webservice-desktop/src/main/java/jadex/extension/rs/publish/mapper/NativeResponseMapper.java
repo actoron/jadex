@@ -1,7 +1,5 @@
 package jadex.extension.rs.publish.mapper;
 
-import jadex.commons.SUtil;
-
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.Map;
@@ -9,6 +7,8 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+
+import jadex.commons.SUtil;
 
 /**
  *  The native response mapper allows for sending back native response objects.

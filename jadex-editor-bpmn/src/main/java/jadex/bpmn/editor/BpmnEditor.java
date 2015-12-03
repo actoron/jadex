@@ -1,15 +1,5 @@
 package jadex.bpmn.editor;
 
-import jadex.bpmn.editor.gui.BpmnEditorWindow;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColorGradient;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
-import jadex.bpmn.task.info.TaskMetaInfo;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
-
 import java.awt.EventQueue;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,6 +17,16 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.mxgraph.view.mxStylesheet;
+
+import jadex.bpmn.editor.gui.BpmnEditorWindow;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColorGradient;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
+import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
 /**
  *  Class for starting the BPMN editor.

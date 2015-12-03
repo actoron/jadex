@@ -1,12 +1,10 @@
 package jadex.webservice.examples.rs.chart;
 
-import jadex.extension.rs.invoke.RestResponse;
-import jadex.extension.rs.publish.mapper.IValueMapper;
-
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+
+import jadex.extension.rs.invoke.RestResponse;
+import jadex.extension.rs.publish.mapper.IValueMapper;
 
 /**
  * 

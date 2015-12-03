@@ -1,16 +1,16 @@
 package jadex.xml.writer;
 
-import jadex.commons.collection.MultiCollection;
-import jadex.xml.IContext;
-import jadex.xml.IPreProcessor;
-import jadex.xml.Namespace;
-import jadex.xml.StackElement;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.collection.MultiCollection;
+import jadex.xml.IContext;
+import jadex.xml.IPreProcessor;
+import jadex.xml.Namespace;
+import jadex.xml.StackElement;
 
 /**
  *  Context for writing an xml.

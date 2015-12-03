@@ -1,17 +1,5 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
-import jadex.bpmn.editor.gui.stylesheets.EventShape;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MIdElement;
-import jadex.bpmn.model.MLane;
-import jadex.bpmn.model.MParameter;
-import jadex.bpmn.model.MPool;
-import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.model.MTask;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +12,18 @@ import java.util.Set;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.gui.stylesheets.EventShape;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MIdElement;
+import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 
 /**
  *  Visual representation of an activity.

@@ -3,9 +3,9 @@
  */
 package jadex.base.gui.modeltree;
 
-import jadex.bridge.IExternalAccess;
-
 import javax.swing.JTree;
+
+import jadex.bridge.IExternalAccess;
 
 /**
  *  Interface for tree abstraction used in generic add/remove path actions.

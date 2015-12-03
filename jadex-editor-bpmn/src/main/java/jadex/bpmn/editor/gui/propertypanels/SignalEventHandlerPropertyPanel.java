@@ -1,16 +1,16 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MProperty;
 import jadex.bridge.modelinfo.UnparsedExpression;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
 
 public class SignalEventHandlerPropertyPanel extends BasePropertyPanel
 {

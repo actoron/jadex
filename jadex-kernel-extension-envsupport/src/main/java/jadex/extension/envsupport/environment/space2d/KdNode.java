@@ -1,15 +1,15 @@
 package jadex.extension.envsupport.environment.space2d;
 
-import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.commons.IFilter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import jadex.commons.IFilter;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.math.IVector2;
 
 /**
  * Node for the k-dimensional-tree.

@@ -1,5 +1,11 @@
 package jadex.webservice.examples.rs.chart;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.RestServiceAgent;
@@ -8,12 +14,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 /**
  *  Agent that searches and uses the chart service

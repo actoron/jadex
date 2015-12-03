@@ -1,8 +1,8 @@
 package jadex.bridge.fipa;
 
-import jadex.bridge.service.types.df.IProperty;
-
 import java.io.Serializable;
+
+import jadex.bridge.service.types.df.IProperty;
 
 
 /**

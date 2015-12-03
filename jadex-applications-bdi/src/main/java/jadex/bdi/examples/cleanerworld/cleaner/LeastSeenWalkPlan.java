@@ -1,12 +1,12 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
+import java.util.List;
+
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.List;
 
 
 /**

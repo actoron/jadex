@@ -1,13 +1,13 @@
 package jadex.bridge.service.types.awareness;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Local information about discovered platforms.

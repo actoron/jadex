@@ -1,11 +1,11 @@
 package jadex.platform.service.message.transport.niotcpmtp;
 
-import jadex.platform.service.message.transport.niotcpmtp.SelectorThread.Cleaner;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+
+import jadex.platform.service.message.transport.niotcpmtp.SelectorThread.Cleaner;
 
 /**
  *  Struct for holding information about an output connection.

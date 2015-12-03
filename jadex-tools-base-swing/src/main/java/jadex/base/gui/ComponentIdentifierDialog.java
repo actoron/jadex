@@ -1,9 +1,5 @@
 package jadex.base.gui;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -19,6 +15,10 @@ import java.awt.event.WindowAdapter;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.gui.SGUI;
 
 /**
  *  Dialog for component identifier.

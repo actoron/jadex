@@ -1,8 +1,8 @@
 package jadex.bridge.component;
 
-import jadex.bridge.IInternalAccess;
-
 import java.util.Set;
+
+import jadex.bridge.IInternalAccess;
 
 /**
  *  A component feature is a pluggable part of the state and behavior

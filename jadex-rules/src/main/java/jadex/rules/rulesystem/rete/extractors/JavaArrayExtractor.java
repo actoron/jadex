@@ -1,10 +1,10 @@
 package jadex.rules.rulesystem.rete.extractors;
 
+import java.lang.reflect.Array;
+
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-
-import java.lang.reflect.Array;
 
 /**
  *  An extractor for getting elements from arrays.

@@ -1,13 +1,5 @@
 package jadex.base.relay;
 
-import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.message.ICodec;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.transformation.annotations.Exclude;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
@@ -16,6 +8,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
+
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.message.ICodec;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Exclude;
 
 
 /**

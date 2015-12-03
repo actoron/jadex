@@ -1,11 +1,11 @@
 package jadex.bdi.planlib.protocols;
 
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.SUtil;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 
 /**
  *  The negotiation record has the purpose to store all information

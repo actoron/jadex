@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -21,8 +23,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Map;
 
 /**
  *  Test if result back transfer from injected fields works.

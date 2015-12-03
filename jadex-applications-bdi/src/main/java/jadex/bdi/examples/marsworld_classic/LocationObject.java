@@ -1,8 +1,8 @@
 package jadex.bdi.examples.marsworld_classic;
 
-import jadex.commons.SReflect;
-
 import java.io.Serializable;
+
+import jadex.commons.SReflect;
 
 
 /**

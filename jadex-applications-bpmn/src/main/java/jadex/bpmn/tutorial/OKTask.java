@@ -1,12 +1,12 @@
 package jadex.bpmn.tutorial;
 
+import javax.swing.JOptionPane;
+
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.runtime.task.AbstractTask;
 import jadex.bridge.IInternalAccess;
-
-import javax.swing.JOptionPane;
 
 /**
  *  A task that displays a message using a

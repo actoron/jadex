@@ -1,12 +1,5 @@
 package jadex.base.gui.componenttree;
 
-import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.SReflect;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.jtable.ResizeableTableHeader;
-
 import java.awt.BorderLayout;
 import java.lang.reflect.Method;
 
@@ -14,6 +7,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SReflect;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.ResizeableTableHeader;
 
 /**
  *  Panel for showing required service properties.

@@ -1,8 +1,8 @@
 package jadex.javaparser;
 
-import jadex.commons.IValueFetcher;
-
 import java.util.Set;
+
+import jadex.commons.IValueFetcher;
 
 
 /**

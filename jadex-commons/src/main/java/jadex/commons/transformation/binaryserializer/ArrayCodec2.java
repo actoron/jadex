@@ -1,16 +1,13 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Codec for encoding and decoding arrays.

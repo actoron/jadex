@@ -1,5 +1,8 @@
 package jadex.bdiv3.examples.disastermanagement.firebrigade;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
@@ -9,8 +12,6 @@ import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.ClearChemicalsTask;
 import jadex.bdiv3.examples.disastermanagement.DisasterType;
-import jadex.bdiv3.examples.disastermanagement.ExtinguishFireTask;
-import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI;
 import jadex.bdiv3.examples.disastermanagement.firebrigade.FireBrigadeBDI.ClearChemicals;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa.Move;
 import jadex.bdiv3.runtime.IPlan;
@@ -21,9 +22,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Move to chemicals and clear them.

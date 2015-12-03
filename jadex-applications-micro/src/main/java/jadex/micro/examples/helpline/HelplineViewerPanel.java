@@ -1,15 +1,15 @@
 package jadex.micro.examples.helpline;
 
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 /**
  *  Panel for the helpline view.

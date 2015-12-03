@@ -1,5 +1,8 @@
 package jadex.platform.service.threadpool;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
@@ -11,10 +14,6 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  *  Service wrapper for a threadpool.

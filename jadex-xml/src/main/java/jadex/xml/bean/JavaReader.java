@@ -1,5 +1,28 @@
 package jadex.xml.bean;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URL;
+import java.security.cert.CertificateFactory;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
@@ -28,29 +51,6 @@ import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URL;
-import java.security.cert.CertificateFactory;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 
 

@@ -1,13 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry;
 
-import jadex.extension.envsupport.environment.SpaceObject;
-import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpecialAction;
-import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
-
 import java.util.ArrayList;
 
 import com.jme3.material.Material;
@@ -15,6 +7,14 @@ import com.jme3.material.RenderState.BlendMode;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+
+import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpecialAction;
+import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 
 
 public class Object3dJMonkeyRenderer extends AObject3dRenderer

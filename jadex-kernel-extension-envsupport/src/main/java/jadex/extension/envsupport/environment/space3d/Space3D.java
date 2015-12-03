@@ -1,5 +1,12 @@
 package jadex.extension.envsupport.environment.space3d;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import jadex.commons.IFilter;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.IVector1;
@@ -7,13 +14,6 @@ import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.math.Vector3Int;
-import jadex.commons.IFilter;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  *  General 3D space.

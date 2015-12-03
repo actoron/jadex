@@ -1,14 +1,14 @@
 package jadex.commons.gui.autocombo;
 
-import jadex.commons.SUtil;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
-
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
+
+import jadex.commons.SUtil;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
  * 

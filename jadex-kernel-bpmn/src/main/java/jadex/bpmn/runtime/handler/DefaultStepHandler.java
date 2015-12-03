@@ -1,5 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.List;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MNamedIdElement;
@@ -16,8 +18,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
-
-import java.util.List;
 
 /**
  *  Handles the transition of steps.

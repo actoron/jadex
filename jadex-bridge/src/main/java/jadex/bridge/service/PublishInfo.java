@@ -1,15 +1,11 @@
 package jadex.bridge.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Info struct for service publishing details.

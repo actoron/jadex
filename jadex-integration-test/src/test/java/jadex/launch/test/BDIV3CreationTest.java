@@ -1,5 +1,12 @@
 package jadex.launch.test;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+
 import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -13,15 +20,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Test;
 
 /**
  *  Test if the bdi v3 creation test works.

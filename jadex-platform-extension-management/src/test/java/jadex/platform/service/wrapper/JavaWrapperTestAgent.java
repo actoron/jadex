@@ -1,5 +1,8 @@
 package jadex.platform.service.wrapper;
 
+import java.io.File;
+import java.util.Collection;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
@@ -23,9 +26,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.io.File;
-import java.util.Collection;
 
 /**
  *  Agent that tests the rule and timer monitoring of initial events in bpmn processes.

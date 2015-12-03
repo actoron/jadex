@@ -1,5 +1,8 @@
 package jadex.bridge.fipa;
 
+import java.util.Collection;
+import java.util.Set;
+
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -9,9 +12,6 @@ import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-
-import java.util.Collection;
-import java.util.Set;
 
 /**
  *  Helper class for JADE specific issues.

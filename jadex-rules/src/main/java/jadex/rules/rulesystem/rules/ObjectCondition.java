@@ -1,9 +1,9 @@
 package jadex.rules.rulesystem.rules;
 
-import jadex.rules.state.OAVObjectType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.rules.state.OAVObjectType;
 
 /**
  *  A condition that contains constraints belonging to one object.

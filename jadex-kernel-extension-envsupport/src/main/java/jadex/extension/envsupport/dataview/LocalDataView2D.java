@@ -1,13 +1,13 @@
 package jadex.extension.envsupport.dataview;
 
+import java.util.Map;
+
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
-
-import java.util.Map;
 
 /**
  *  A view showing only objects in a local range.

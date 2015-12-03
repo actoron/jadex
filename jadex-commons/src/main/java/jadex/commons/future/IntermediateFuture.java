@@ -1,9 +1,6 @@
 package jadex.commons.future;
 
 
-import jadex.commons.IResultCommand;
-import jadex.commons.functional.Function;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import jadex.commons.functional.Function;
 
 /**
  *  Default implementation of an intermediate future.

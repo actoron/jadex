@@ -1,6 +1,16 @@
 package jadex.base.gui.componenttree;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
@@ -11,7 +21,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -26,16 +35,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.Icon;
-import javax.swing.JTree;
-import javax.swing.UIDefaults;
 
 /**
  *  Node object representing a nf properties container

@@ -1,5 +1,7 @@
 package jadex.platform.service.remote.commands;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -13,8 +15,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteReferenceModule;
-
-import java.util.Map;
 
 /**
  *  Default base class for remote commands.

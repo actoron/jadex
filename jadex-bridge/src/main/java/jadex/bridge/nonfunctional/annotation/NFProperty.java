@@ -1,11 +1,11 @@
 package jadex.bridge.nonfunctional.annotation;
 
-import jadex.bridge.nonfunctional.INFProperty;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import jadex.bridge.nonfunctional.INFProperty;
 
 /**
  *  Non-functional property annotation.

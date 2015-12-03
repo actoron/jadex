@@ -1,16 +1,5 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
-import jadex.gpmn.editor.model.gpmn.IActivationEdge;
-import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IEdge;
-import jadex.gpmn.editor.model.gpmn.IGoal;
-import jadex.gpmn.editor.model.gpmn.INode;
-import jadex.gpmn.editor.model.gpmn.IParameter;
-import jadex.gpmn.editor.model.gpmn.IPlanEdge;
-import jadex.gpmn.editor.model.gpmn.IRefPlan;
-import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
-import jadex.gpmn.editor.model.gpmn.ModelConstants;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -22,6 +11,17 @@ import java.util.Set;
 
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.view.mxGraph;
+
+import jadex.gpmn.editor.model.gpmn.IActivationEdge;
+import jadex.gpmn.editor.model.gpmn.IActivationPlan;
+import jadex.gpmn.editor.model.gpmn.IEdge;
+import jadex.gpmn.editor.model.gpmn.IGoal;
+import jadex.gpmn.editor.model.gpmn.INode;
+import jadex.gpmn.editor.model.gpmn.IParameter;
+import jadex.gpmn.editor.model.gpmn.IPlanEdge;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
+import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
+import jadex.gpmn.editor.model.gpmn.ModelConstants;
 
 /**
  * Codec for generating BDI agent models.

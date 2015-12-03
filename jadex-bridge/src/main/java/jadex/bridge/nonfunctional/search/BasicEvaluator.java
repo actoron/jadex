@@ -1,9 +1,6 @@
 package jadex.bridge.nonfunctional.search;
 
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.INFPropertyComponentFeature;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;

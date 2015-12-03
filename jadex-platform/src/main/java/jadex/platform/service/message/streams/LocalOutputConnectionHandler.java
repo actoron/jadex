@@ -2,7 +2,6 @@ package jadex.platform.service.message.streams;
 
 import java.util.Map;
 
-import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 

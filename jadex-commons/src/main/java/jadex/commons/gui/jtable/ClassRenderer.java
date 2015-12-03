@@ -1,11 +1,11 @@
 package jadex.commons.gui.jtable;
 
-import jadex.commons.SReflect;
-
 import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import jadex.commons.SReflect;
 
 /**
  *  Table renderer for classes that displays full name in tooltip.

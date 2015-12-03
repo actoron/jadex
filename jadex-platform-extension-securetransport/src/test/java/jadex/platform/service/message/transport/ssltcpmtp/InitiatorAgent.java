@@ -1,6 +1,9 @@
 package jadex.platform.service.message.transport.ssltcpmtp;
 
 
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.ComponentIdentifier;
@@ -20,9 +23,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  *  Test if the @SecureTransmission annotation works.

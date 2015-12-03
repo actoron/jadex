@@ -1,5 +1,7 @@
 package jadex.micro.testcases.subresults;
 
+import java.util.Collection;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -22,8 +24,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Collection;
 
 @Agent
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class,

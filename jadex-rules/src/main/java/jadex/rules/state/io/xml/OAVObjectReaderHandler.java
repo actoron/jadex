@@ -1,5 +1,8 @@
 package jadex.rules.state.io.xml;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.commons.SReflect;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IStringObjectConverter;
@@ -14,13 +17,9 @@ import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.bean.IBeanObjectCreator;
+import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
-import jadex.xml.reader.AReadContext;
-
-import java.util.List;
-import java.util.Map;
-
 import jadex.xml.stax.QName;
 
 

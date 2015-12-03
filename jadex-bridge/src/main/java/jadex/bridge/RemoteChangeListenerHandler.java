@@ -1,12 +1,5 @@
 package jadex.bridge;
 
-import jadex.bridge.component.IExecutionFeature;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IRemoteChangeListener;
-import jadex.commons.collection.MultiCollection;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,6 +7,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IRemoteChangeListener;
+import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  A listener to be installed remotely in a component.

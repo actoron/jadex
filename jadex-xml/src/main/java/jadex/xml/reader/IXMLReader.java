@@ -1,7 +1,5 @@
 package jadex.xml.reader;
 
-import java.io.*;
-import java.io.Reader;
 import java.util.LinkedList;
 import java.util.Map;
 

@@ -1,12 +1,12 @@
 package jadex.bridge.service.types.persistence;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
-
-import java.util.Collection;
 
 /**
  *  Service for basic component persistence features.

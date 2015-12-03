@@ -1,8 +1,8 @@
 package jadex.commons.collection;
 
-import jadex.commons.concurrent.TimeoutException;
-
 import java.util.List;
+
+import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  A queue that blocks until an element is available.

@@ -1,11 +1,11 @@
 package jadex.rules.tools.profiler;
 
-import jadex.commons.SUtil;
-import jadex.rules.state.IProfiler;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.commons.SUtil;
+import jadex.rules.state.IProfiler;
 
 /**
  *  Default implementation for profiler.

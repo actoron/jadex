@@ -1,10 +1,10 @@
 package jadex.rules.rulesystem.rete.extractors;
 
+import java.util.Arrays;
+
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.Arrays;
 
 /**
  *  Extractor for chained expressions (e.g. obj1.attr1.attr2)

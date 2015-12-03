@@ -1,5 +1,8 @@
 package jadex.bdi.testcases.misc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
@@ -7,9 +10,6 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.concurrent.TimeoutException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Check if the initial and end elements are correctly named.

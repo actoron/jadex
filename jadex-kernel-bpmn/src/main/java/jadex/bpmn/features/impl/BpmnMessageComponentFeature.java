@@ -1,5 +1,7 @@
 package jadex.bpmn.features.impl;
 
+import java.util.Iterator;
+
 import jadex.bpmn.features.IBpmnComponentFeature;
 import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.runtime.ProcessThread;
@@ -13,8 +15,6 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.commons.IFilter;
-
-import java.util.Iterator;
 
 /**
  *  Extension to allow message injection in agent methods.

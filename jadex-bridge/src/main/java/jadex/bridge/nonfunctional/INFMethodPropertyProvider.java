@@ -3,14 +3,10 @@
  */
 package jadex.bridge.nonfunctional;
 
-import jadex.commons.MethodInfo;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
+
+import jadex.commons.MethodInfo;
+import jadex.commons.future.IFuture;
 
 /**
  *  Interface for method-based non-functional property providers such

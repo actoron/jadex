@@ -1,5 +1,7 @@
 package jadex.bdi.planlib.protocols.dutchauction;
 
+import java.util.List;
+
 import jadex.bdi.planlib.protocols.AbstractReceiverPlan;
 import jadex.bdi.planlib.protocols.AuctionDescription;
 import jadex.bdiv3.runtime.IGoal;
@@ -9,8 +11,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.TimeoutException;
-
-import java.util.List;
 
 /**
  *  This plan implements the receiver of the "FIPA Dutch Auction Interaction

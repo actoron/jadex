@@ -1,13 +1,13 @@
 package jadex.rules.rulesystem.rete.nodes;
 
-import jadex.commons.SReflect;
-import jadex.rules.rulesystem.rete.Tuple;
-import jadex.rules.state.IOAVState;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.state.IOAVState;
 
 
 /**

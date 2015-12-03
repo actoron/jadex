@@ -1,5 +1,72 @@
 package jadex.platform;
 
+import static jadex.base.RootComponentConfiguration.ADDRESS;
+import static jadex.base.RootComponentConfiguration.ASYNCEXECUTION;
+import static jadex.base.RootComponentConfiguration.AWADELAY;
+import static jadex.base.RootComponentConfiguration.AWAEXCLUDES;
+import static jadex.base.RootComponentConfiguration.AWAINCLUDES;
+import static jadex.base.RootComponentConfiguration.AWAMECHANISMS;
+import static jadex.base.RootComponentConfiguration.AWARENESS;
+import static jadex.base.RootComponentConfiguration.BASECLASSLOADER;
+import static jadex.base.RootComponentConfiguration.BINARYMESSAGES;
+import static jadex.base.RootComponentConfiguration.CHAT;
+import static jadex.base.RootComponentConfiguration.CLI;
+import static jadex.base.RootComponentConfiguration.CLICONSOLE;
+import static jadex.base.RootComponentConfiguration.CLOCK;
+import static jadex.base.RootComponentConfiguration.CONTEXT;
+import static jadex.base.RootComponentConfiguration.CONTEXTSERVICECLASS;
+import static jadex.base.RootComponentConfiguration.DF;
+import static jadex.base.RootComponentConfiguration.DHT_PROVIDE;
+import static jadex.base.RootComponentConfiguration.FILETRANSFER;
+import static jadex.base.RootComponentConfiguration.GUI;
+import static jadex.base.RootComponentConfiguration.JCCPLATFORMS;
+import static jadex.base.RootComponentConfiguration.KERNELS;
+import static jadex.base.RootComponentConfiguration.LIBPATH;
+import static jadex.base.RootComponentConfiguration.LIBRARY;
+import static jadex.base.RootComponentConfiguration.LOCALTRANSPORT;
+import static jadex.base.RootComponentConfiguration.LOGGING;
+import static jadex.base.RootComponentConfiguration.LOGGING_LEVEL;
+import static jadex.base.RootComponentConfiguration.MARSHAL;
+import static jadex.base.RootComponentConfiguration.MAVEN_DEPENDENCIES;
+import static jadex.base.RootComponentConfiguration.MESSAGE;
+import static jadex.base.RootComponentConfiguration.MONITORINGCOMP;
+import static jadex.base.RootComponentConfiguration.NETWORKNAME;
+import static jadex.base.RootComponentConfiguration.NETWORKPASS;
+import static jadex.base.RootComponentConfiguration.NIOTCPPORT;
+import static jadex.base.RootComponentConfiguration.NIOTCPTRANSPORT;
+import static jadex.base.RootComponentConfiguration.PERSIST;
+import static jadex.base.RootComponentConfiguration.PRINTPASS;
+import static jadex.base.RootComponentConfiguration.PROGRAM_ARGUMENTS;
+import static jadex.base.RootComponentConfiguration.RELAYADDRESS;
+import static jadex.base.RootComponentConfiguration.RELAYAWAONLY;
+import static jadex.base.RootComponentConfiguration.RELAYSECURITY;
+import static jadex.base.RootComponentConfiguration.RELAYTRANSPORT;
+import static jadex.base.RootComponentConfiguration.RSPUBLISH;
+import static jadex.base.RootComponentConfiguration.RSPUBLISHCOMPONENT;
+import static jadex.base.RootComponentConfiguration.SAVEONEXIT;
+import static jadex.base.RootComponentConfiguration.SECURITY;
+import static jadex.base.RootComponentConfiguration.SENSORS;
+import static jadex.base.RootComponentConfiguration.SETTINGS;
+import static jadex.base.RootComponentConfiguration.SIMUL;
+import static jadex.base.RootComponentConfiguration.SIMULATION;
+import static jadex.base.RootComponentConfiguration.SSLTCPPORT;
+import static jadex.base.RootComponentConfiguration.SSLTCPTRANSPORT;
+import static jadex.base.RootComponentConfiguration.STRICTCOM;
+import static jadex.base.RootComponentConfiguration.TCPPORT;
+import static jadex.base.RootComponentConfiguration.TCPTRANSPORT;
+import static jadex.base.RootComponentConfiguration.THREADPOOLCLASS;
+import static jadex.base.RootComponentConfiguration.THREADPOOLDEFER;
+import static jadex.base.RootComponentConfiguration.TRUSTEDLAN;
+import static jadex.base.RootComponentConfiguration.UNIQUEIDS;
+import static jadex.base.RootComponentConfiguration.USEPASS;
+import static jadex.base.RootComponentConfiguration.VALIDITYDURATION;
+import static jadex.base.RootComponentConfiguration.VIRTUALNAMES;
+import static jadex.base.RootComponentConfiguration.WELCOME;
+import static jadex.base.RootComponentConfiguration.WSPUBLISH;
+
+import java.util.Map;
+import java.util.logging.Level;
+
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -44,11 +111,6 @@ import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.settings.SettingsAgent;
 import jadex.platform.service.simulation.SimulationAgent;
-
-import java.util.Map;
-import java.util.logging.Level;
-
-import static jadex.base.RootComponentConfiguration.*;
 
 /**
  *	Basic standalone platform services provided as a micro agent. 

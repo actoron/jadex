@@ -1,5 +1,15 @@
 package jadex.component;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -50,16 +60,6 @@ import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**

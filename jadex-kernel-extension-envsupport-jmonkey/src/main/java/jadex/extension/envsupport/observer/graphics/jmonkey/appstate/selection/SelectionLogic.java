@@ -1,23 +1,21 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.selection;
 
-import jadex.extension.envsupport.math.IVector3;
-import jadex.extension.envsupport.math.Vector3Double;
-import jadex.extension.envsupport.math.Vector3Int;
-import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.InputManager;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+
+import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.math.Vector3Double;
+import jadex.extension.envsupport.math.Vector3Int;
+import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 
 public class SelectionLogic
 {

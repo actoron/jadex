@@ -1,5 +1,7 @@
 package jadex.xml.stax;
 
+import javax.xml.stream.XMLStreamException;
+
 /**
  * Stax API: XMLReporter
  */

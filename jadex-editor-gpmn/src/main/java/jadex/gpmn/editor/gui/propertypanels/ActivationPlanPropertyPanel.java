@@ -1,13 +1,5 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
-import jadex.gpmn.editor.gui.ModelContainer;
-import jadex.gpmn.editor.gui.SGuiHelper;
-import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IPlanEdge;
-import jadex.gpmn.editor.model.gpmn.ModelConstants;
-import jadex.gpmn.editor.model.visual.VEdge;
-import jadex.gpmn.editor.model.visual.VPlan;
-
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -20,6 +12,14 @@ import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
 import com.mxgraph.model.mxCell;
+
+import jadex.gpmn.editor.gui.ModelContainer;
+import jadex.gpmn.editor.gui.SGuiHelper;
+import jadex.gpmn.editor.model.gpmn.IActivationPlan;
+import jadex.gpmn.editor.model.gpmn.IPlanEdge;
+import jadex.gpmn.editor.model.gpmn.ModelConstants;
+import jadex.gpmn.editor.model.visual.VEdge;
+import jadex.gpmn.editor.model.visual.VPlan;
 
 /**
  *  Panel displaying activation plan properties.

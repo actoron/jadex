@@ -1,9 +1,9 @@
 package jadex.gpmn.editor.model.visual;
 
+import com.mxgraph.model.mxGeometry;
+
 import jadex.gpmn.editor.model.gpmn.IElement;
 import jadex.gpmn.editor.model.gpmn.INode;
-
-import com.mxgraph.model.mxGeometry;
 /**
  *  Visual representation of a node.
  *

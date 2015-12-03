@@ -1,14 +1,14 @@
 package jadex.platform.service.cli;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The abstract command implementation implements the logic for:

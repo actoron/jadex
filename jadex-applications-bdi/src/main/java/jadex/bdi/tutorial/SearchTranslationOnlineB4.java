@@ -1,12 +1,12 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdiv3x.runtime.IMessageEvent;
-import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.fipa.SFipa;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+
+import jadex.bdiv3x.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Seach a translation of a word online.

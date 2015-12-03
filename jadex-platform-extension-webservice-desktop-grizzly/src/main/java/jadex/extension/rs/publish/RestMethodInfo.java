@@ -1,10 +1,6 @@
 package jadex.extension.rs.publish;
 
-import jadex.commons.MethodInfo;
-import jadex.commons.Tuple2;
-
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -13,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+
+import jadex.commons.MethodInfo;
+import jadex.commons.Tuple2;
 
 /**
  *  Info struct for building a rest method. 

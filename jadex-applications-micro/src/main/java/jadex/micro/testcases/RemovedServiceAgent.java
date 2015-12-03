@@ -1,5 +1,9 @@
 package jadex.micro.testcases;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.ComponentTerminatedException;
@@ -30,10 +34,6 @@ import jadex.micro.benchmarks.servicecall.DecoupledServiceAgent;
 import jadex.micro.benchmarks.servicecall.DirectServiceAgent;
 import jadex.micro.benchmarks.servicecall.IServiceCallService;
 import jadex.micro.benchmarks.servicecall.RawServiceAgent;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  *  A test case for testing access to services of already terminated components.

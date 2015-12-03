@@ -1,14 +1,14 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.IModelInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 
 public class ConfigurationModel implements ComboBoxModel
 {

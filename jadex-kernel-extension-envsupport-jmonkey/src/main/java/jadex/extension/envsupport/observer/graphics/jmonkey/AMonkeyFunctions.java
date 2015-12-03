@@ -1,37 +1,20 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
-import jadex.extension.envsupport.environment.ISpaceController;
-import jadex.extension.envsupport.math.IVector3;
-import jadex.extension.envsupport.math.Vector3Int;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
-import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.Triggers;
-
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
-import java.util.List;
 
-import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
-import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseAxisTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
-import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Spatial;
 import com.jme3.system.JmeCanvasContext;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.HillHeightMap;
+
+import jadex.extension.envsupport.environment.ISpaceController;
+import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.math.Vector3Int;
 
 
 /**

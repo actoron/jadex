@@ -1,14 +1,14 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  *  A beta node has the purpose to perform a constraints check

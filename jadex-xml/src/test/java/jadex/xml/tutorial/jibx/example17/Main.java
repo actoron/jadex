@@ -1,5 +1,9 @@
 package jadex.xml.tutorial.jibx.example17;
 
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.MappingInfo;
@@ -10,10 +14,6 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
-
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Main class to execute tutorial lesson.

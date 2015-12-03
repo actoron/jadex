@@ -1,5 +1,10 @@
 package jadex.bridge.service.component.multiinvoke;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import jadex.bridge.service.IService;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
@@ -8,11 +13,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  *  Sequential call distributor.

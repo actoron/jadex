@@ -1,12 +1,12 @@
 package jadex.platform.service.awareness.discovery.ipmulticast;
 
-import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.platform.service.awareness.discovery.DiscoveryAgent;
-import jadex.platform.service.awareness.discovery.SendHandler;
-
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.platform.service.awareness.discovery.DiscoveryAgent;
+import jadex.platform.service.awareness.discovery.SendHandler;
 
 /**
  *  Handle sending.

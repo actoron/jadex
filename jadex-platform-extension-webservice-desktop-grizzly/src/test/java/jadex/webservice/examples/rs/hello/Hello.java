@@ -1,10 +1,5 @@
 package jadex.webservice.examples.rs.hello;
 
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.service.BasicService;
-import jadex.extension.rs.publish.JadexXMLBodyReader;
-import jadex.xml.bean.JavaWriter;
-
 import javax.ws.rs.Path;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -15,6 +10,11 @@ import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.service.BasicService;
+import jadex.extension.rs.publish.JadexXMLBodyReader;
+import jadex.xml.bean.JavaWriter;
 
 @Path("")
 public class Hello extends BasicService

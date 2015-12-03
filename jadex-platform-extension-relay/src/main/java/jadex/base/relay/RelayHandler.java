@@ -1,5 +1,19 @@
 package jadex.base.relay;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
@@ -19,20 +33,6 @@ import jadex.platform.service.message.transport.codecs.CodecFactory;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 import jadex.xml.bean.JavaReader;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 
 /**

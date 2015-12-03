@@ -1,9 +1,11 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.INFPropertyComponentFeature;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
@@ -11,17 +13,11 @@ import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  *  Class defining runtime hard constraints.

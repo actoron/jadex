@@ -1,9 +1,9 @@
 package jadex.bridge.service.types.message;
 
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
 import java.util.Map;
 import java.util.Properties;
+
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 /**
  *  The interface for content codecs. 

@@ -1,21 +1,5 @@
 package jadex.tools.jcc;
 
-import jadex.base.gui.ClassChooserPanel;
-import jadex.base.gui.JadexLogoButton;
-import jadex.base.gui.plugin.IControlCenterPlugin;
-import jadex.commons.IFilter;
-import jadex.commons.IPropertiesProvider;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
@@ -56,6 +40,22 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+
+import jadex.base.gui.ClassChooserPanel;
+import jadex.base.gui.JadexLogoButton;
+import jadex.base.gui.plugin.IControlCenterPlugin;
+import jadex.commons.IFilter;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 /**
  *  Panel for administering one chosen platform.

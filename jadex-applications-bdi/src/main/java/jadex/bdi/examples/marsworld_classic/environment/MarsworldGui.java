@@ -1,25 +1,5 @@
 package jadex.bdi.examples.marsworld_classic.environment;
 
-import jadex.bdi.examples.marsworld_classic.AgentInfo;
-import jadex.bdi.examples.marsworld_classic.Environment;
-import jadex.bdi.examples.marsworld_classic.Homebase;
-import jadex.bdi.examples.marsworld_classic.Location;
-import jadex.bdi.examples.marsworld_classic.Target;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -49,6 +29,26 @@ import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.bdi.examples.marsworld_classic.AgentInfo;
+import jadex.bdi.examples.marsworld_classic.Environment;
+import jadex.bdi.examples.marsworld_classic.Homebase;
+import jadex.bdi.examples.marsworld_classic.Location;
+import jadex.bdi.examples.marsworld_classic.Target;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  This class displays the GUI of the sample application.

@@ -4,7 +4,6 @@ import java.awt.Canvas;
 import java.util.Collection;
 import java.util.List;
 
-
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;

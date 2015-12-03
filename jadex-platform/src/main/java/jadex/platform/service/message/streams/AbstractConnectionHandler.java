@@ -1,11 +1,22 @@
 package jadex.platform.service.message.streams;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimerTask;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.future.DelegationResultListener;
@@ -19,18 +30,6 @@ import jadex.platform.service.message.AbstractSendTask;
 import jadex.platform.service.message.MessageService;
 import jadex.platform.service.message.MessageService.SendManager;
 import jadex.platform.service.message.transport.ITransport;
-
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimerTask;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.Timer;
 
 /**
  *  Abstract base class for connection handlers.

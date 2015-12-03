@@ -1,25 +1,5 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.bdi.examples.hunterprey_classic.Creature;
-import jadex.bdi.examples.hunterprey_classic.CurrentVision;
-import jadex.bdi.examples.hunterprey_classic.Prey;
-import jadex.bdi.examples.hunterprey_classic.Vision;
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -40,6 +20,26 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.bdi.examples.hunterprey_classic.Creature;
+import jadex.bdi.examples.hunterprey_classic.CurrentVision;
+import jadex.bdi.examples.hunterprey_classic.Prey;
+import jadex.bdi.examples.hunterprey_classic.Vision;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 
 /**

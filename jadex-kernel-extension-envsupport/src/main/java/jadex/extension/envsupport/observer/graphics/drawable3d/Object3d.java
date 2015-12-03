@@ -1,13 +1,13 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
+
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.javaparser.IParsedExpression;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
 
 
 /**

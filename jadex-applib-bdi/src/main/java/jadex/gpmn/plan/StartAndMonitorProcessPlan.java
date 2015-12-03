@@ -1,12 +1,5 @@
 package jadex.gpmn.plan;
 
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.runtime.Plan;
-import jadex.commons.SUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *  Create a process and the corresponding parameters.
  */

@@ -1,21 +1,5 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
-import jadex.gpmn.editor.model.gpmn.IActivationEdge;
-import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IRefPlan;
-import jadex.gpmn.editor.model.gpmn.IContext;
-import jadex.gpmn.editor.model.gpmn.IEdge;
-import jadex.gpmn.editor.model.gpmn.IElement;
-import jadex.gpmn.editor.model.gpmn.IGoal;
-import jadex.gpmn.editor.model.gpmn.IGpmnModel;
-import jadex.gpmn.editor.model.gpmn.IModelCodec;
-import jadex.gpmn.editor.model.gpmn.INode;
-import jadex.gpmn.editor.model.gpmn.IPlanEdge;
-import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
-import jadex.gpmn.editor.model.visual.VEdge;
-import jadex.gpmn.editor.model.visual.VGoal;
-import jadex.gpmn.editor.model.visual.VPlan;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +9,22 @@ import java.util.Set;
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
+
+import jadex.gpmn.editor.model.gpmn.IActivationEdge;
+import jadex.gpmn.editor.model.gpmn.IActivationPlan;
+import jadex.gpmn.editor.model.gpmn.IContext;
+import jadex.gpmn.editor.model.gpmn.IEdge;
+import jadex.gpmn.editor.model.gpmn.IElement;
+import jadex.gpmn.editor.model.gpmn.IGoal;
+import jadex.gpmn.editor.model.gpmn.IGpmnModel;
+import jadex.gpmn.editor.model.gpmn.IModelCodec;
+import jadex.gpmn.editor.model.gpmn.INode;
+import jadex.gpmn.editor.model.gpmn.IPlanEdge;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
+import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
+import jadex.gpmn.editor.model.visual.VEdge;
+import jadex.gpmn.editor.model.visual.VGoal;
+import jadex.gpmn.editor.model.visual.VPlan;
 
 /**
  *  The GPMN model.

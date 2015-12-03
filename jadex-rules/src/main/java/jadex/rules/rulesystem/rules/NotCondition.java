@@ -1,9 +1,9 @@
 package jadex.rules.rulesystem.rules;
 
-import jadex.rules.rulesystem.ICondition;
-
 import java.util.Collections;
 import java.util.List;
+
+import jadex.rules.rulesystem.ICondition;
 
 /**
  *  Condition for negating another condition. 

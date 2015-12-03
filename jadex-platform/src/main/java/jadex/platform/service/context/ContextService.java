@@ -1,5 +1,10 @@
 package jadex.platform.service.context;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.List;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.context.IContextService;
@@ -8,11 +13,6 @@ import jadex.bridge.service.types.context.IPreferences;
 import jadex.commons.SNonAndroid;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.List;
 
 /**
  * Java SE Implementation of {@link IContextService}

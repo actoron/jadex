@@ -3,14 +3,12 @@ package jadex.transformation.jsonserializer.processors.read;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import com.eclipsesource.json.JsonObject;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 

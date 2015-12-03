@@ -1,19 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
-import jadex.extension.envsupport.environment.ISpaceController;
-import jadex.extension.envsupport.math.Vector3Int;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpecialAction;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.DefaultCameraState;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.IsoCameraState;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui.DefaultGuiController;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.userinteraction.InteractionState;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.userinteraction.SelectionControl;
-import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.FlyCamera;
-import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.FocusCamera;
-import jadex.extension.envsupport.observer.graphics.jmonkey.util.StringNames;
-
 import java.awt.Dimension;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -35,12 +21,8 @@ import com.jme3.audio.Environment;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.light.Light;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.post.FilterPostProcessor;
-import com.jme3.post.filters.BloomFilter;
-import com.jme3.post.filters.CartoonEdgeFilter;
-import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.BatchNode;
 import com.jme3.scene.Node;
@@ -48,11 +30,20 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainQuad;
-import com.jme3.water.WaterFilter;
 
 import de.lessvoid.nifty.Nifty;
 // import com.jme3.post.*;
 // import com.jme3.post.ssao.SSAOFilter;
+import jadex.extension.envsupport.environment.ISpaceController;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.DefaultCameraState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui.DefaultGuiController;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.userinteraction.InteractionState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.userinteraction.SelectionControl;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.FlyCamera;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.FocusCamera;
+import jadex.extension.envsupport.observer.graphics.jmonkey.util.StringNames;
 
 
 /**

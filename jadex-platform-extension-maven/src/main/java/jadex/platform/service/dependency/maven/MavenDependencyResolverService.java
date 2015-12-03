@@ -1,22 +1,5 @@
 package jadex.platform.service.dependency.maven;
 
-import jadex.bridge.GlobalResourceIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IGlobalResourceIdentifier;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.LocalResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.types.library.IDependencyService;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +46,23 @@ import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+
+import jadex.bridge.GlobalResourceIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IGlobalResourceIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.types.library.IDependencyService;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Handler for retrieving dependency information from maven artifacts.

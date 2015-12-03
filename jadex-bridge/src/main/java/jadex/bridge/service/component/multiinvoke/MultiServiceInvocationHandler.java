@@ -1,5 +1,10 @@
 package jadex.bridge.service.component.multiinvoke;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Iterator;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -18,11 +23,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.javaparser.SJavaParser;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  *  Invocation handler for multiplexing service calls.

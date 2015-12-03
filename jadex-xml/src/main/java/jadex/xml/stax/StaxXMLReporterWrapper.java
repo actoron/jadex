@@ -1,5 +1,7 @@
 package jadex.xml.stax;
 
+import javax.xml.stream.XMLStreamException;
+
 /**
  * Wraps a javax.xml.stream.XMLReporter Object to provide the
  * jadex.xml.stax.XMLReporter API.

@@ -1,5 +1,7 @@
 package jadex.platform.service.processengine;
 
+import java.util.Collection;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
@@ -8,8 +10,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.platform.service.cron.jobs.CreateCommand;
 import jadex.rules.eca.CommandAction.CommandData;
-
-import java.util.Collection;
 
 /**
  *  The create command is used to create a component via the cms.

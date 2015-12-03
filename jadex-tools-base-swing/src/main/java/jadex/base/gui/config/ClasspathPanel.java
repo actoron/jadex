@@ -1,11 +1,5 @@
 package jadex.base.gui.config;
 
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.gui.PropertiesPanel;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -28,6 +22,12 @@ import javax.swing.JTable;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.gui.PropertiesPanel;
 
 /**
  *  Show/edit the class path or the used maven artifacts

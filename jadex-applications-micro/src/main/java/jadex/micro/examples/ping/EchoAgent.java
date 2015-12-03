@@ -1,5 +1,8 @@
 package jadex.micro.examples.ping;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
@@ -10,9 +13,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Sends back the same message it received. 

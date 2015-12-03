@@ -1,5 +1,8 @@
 package jadex.platform.service.awareness.discovery.ipmulticast;
 
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -12,9 +15,6 @@ import jadex.platform.service.awareness.discovery.ConnectionException;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
 import jadex.platform.service.awareness.discovery.SendHandler;
-
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.

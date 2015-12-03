@@ -1,10 +1,10 @@
 package jadex.bdiv3.examples.blocksworld;
 
 
+import javax.swing.DefaultListModel;
+
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
-
-import javax.swing.DefaultListModel;
 
 
 /**

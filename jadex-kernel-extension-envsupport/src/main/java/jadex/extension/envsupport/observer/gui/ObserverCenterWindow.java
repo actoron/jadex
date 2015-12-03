@@ -1,23 +1,15 @@
 package jadex.extension.envsupport.observer.gui;
 
-import jadex.commons.gui.SGUI;
-
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
-import java.awt.Robot;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowListener;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +24,8 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+
+import jadex.commons.gui.SGUI;
 
 
 /**

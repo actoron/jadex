@@ -5,8 +5,6 @@ import jadex.bpmn.model.task.ITaskContext;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
-import java.util.Map;
-
 /**
  * 
  */

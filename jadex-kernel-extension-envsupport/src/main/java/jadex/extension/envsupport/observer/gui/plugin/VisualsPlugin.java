@@ -1,11 +1,5 @@
 package jadex.extension.envsupport.observer.gui.plugin;
 
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
-import jadex.extension.envsupport.observer.perspective.IPerspective;
-import jadex.extension.envsupport.observer.perspective.Perspective2D;
-import jadex.commons.SUtil;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -39,6 +33,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+
+import jadex.commons.SUtil;
+import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.observer.gui.ObserverCenter;
+import jadex.extension.envsupport.observer.perspective.IPerspective;
+import jadex.extension.envsupport.observer.perspective.Perspective2D;
 
 public class VisualsPlugin implements IObserverCenterPlugin
 {

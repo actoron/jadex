@@ -1,10 +1,5 @@
 package jadex.tools.dfbrowser;
 
-import jadex.base.gui.jtable.ComponentIdentifierRenderer;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
-import jadex.bridge.service.types.df.IProperty;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,6 +14,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.types.df.IProperty;
 
 /**
  * ServiceDescriptionPanel

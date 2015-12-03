@@ -16,7 +16,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.dht.IDistributedServiceRegistryService;

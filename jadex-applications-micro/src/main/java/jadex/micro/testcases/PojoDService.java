@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import java.lang.reflect.Proxy;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -17,8 +19,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.lang.reflect.Proxy;
 
 /**
  * 

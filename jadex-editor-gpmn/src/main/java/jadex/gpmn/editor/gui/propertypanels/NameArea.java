@@ -1,9 +1,5 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
-import jadex.gpmn.editor.gui.DocumentAdapter;
-import jadex.gpmn.editor.gui.ModelContainer;
-import jadex.gpmn.editor.model.visual.VElement;
-
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -12,6 +8,10 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
+
+import jadex.gpmn.editor.gui.DocumentAdapter;
+import jadex.gpmn.editor.gui.ModelContainer;
+import jadex.gpmn.editor.model.visual.VElement;
 
 /**
  *  Class representing a text area for name changes on elements.

@@ -1,5 +1,14 @@
 package jadex.bridge.service.component;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
@@ -12,15 +21,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  *  Context for service invocations.

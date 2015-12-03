@@ -1,5 +1,8 @@
 package jadex.bdiv3.benchmarks;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -27,9 +30,6 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.NameValue;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Agent creation benchmark BDI V3.

@@ -1,15 +1,6 @@
 package jadex.webservice.examples.rs.banking;
 
-import jadex.commons.SUtil;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.extension.rs.publish.GrizzlyRestServicePublishService;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -18,7 +9,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -26,6 +16,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import jadex.commons.SUtil;
 
 
 /**

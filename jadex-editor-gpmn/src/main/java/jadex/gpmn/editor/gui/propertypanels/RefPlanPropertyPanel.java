@@ -1,12 +1,5 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
-import jadex.gpmn.editor.gui.DocumentAdapter;
-import jadex.gpmn.editor.gui.ModelContainer;
-import jadex.gpmn.editor.gui.SGuiHelper;
-import jadex.gpmn.editor.model.gpmn.IRefPlan;
-import jadex.gpmn.editor.model.visual.VPlan;
-import jadex.gpmn.editor.model.visual.VPlan.VPlanType;
-
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -19,6 +12,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
+
+import jadex.gpmn.editor.gui.DocumentAdapter;
+import jadex.gpmn.editor.gui.ModelContainer;
+import jadex.gpmn.editor.gui.SGuiHelper;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
+import jadex.gpmn.editor.model.visual.VPlan;
+import jadex.gpmn.editor.model.visual.VPlan.VPlanType;
 
 /**
  *  Panel displaying referred plan properties.

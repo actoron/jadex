@@ -1,9 +1,9 @@
 package jadex.micro.examples.mandelbrot;
 
+import java.awt.Rectangle;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
-
-import java.awt.Rectangle;
 
 /**
  *  Object representing information about an ongoing calculation.

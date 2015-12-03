@@ -1,9 +1,5 @@
 package jadex.tools.comanalyzer;
 
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-import jadex.tools.comanalyzer.table.TablePanel;
-
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +12,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.UIDefaults;
+
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
+import jadex.tools.comanalyzer.table.TablePanel;
 
 
 /**

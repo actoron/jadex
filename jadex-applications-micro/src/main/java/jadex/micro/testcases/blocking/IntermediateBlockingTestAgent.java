@@ -1,5 +1,9 @@
 package jadex.micro.testcases.blocking;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
@@ -18,10 +22,6 @@ import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  *  Calls the step service and waits for the intermediate results twice.

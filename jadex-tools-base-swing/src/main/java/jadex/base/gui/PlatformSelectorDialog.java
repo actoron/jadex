@@ -1,21 +1,5 @@
 package jadex.base.gui;
 
-import jadex.base.gui.componenttree.ComponentIconCache;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
@@ -32,6 +16,22 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 /**
  *  Dialog for selecting among known platforms.

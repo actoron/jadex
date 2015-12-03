@@ -8,7 +8,6 @@ import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import jadex.xml.TypeInfoPathManager;
 import jadex.xml.stax.StaxReaderWrapper;
 import jadex.xml.stax.StaxXMLReporterWrapper;
 

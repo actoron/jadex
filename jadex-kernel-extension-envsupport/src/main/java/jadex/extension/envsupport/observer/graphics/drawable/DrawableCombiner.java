@@ -1,11 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.drawable;
 
-import jadex.extension.envsupport.observer.graphics.IViewport;
-import jadex.extension.envsupport.observer.gui.SObjectInspector;
-import jadex.commons.IPropertyObject;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +9,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.IPropertyObject;
+import jadex.extension.envsupport.observer.graphics.IViewport;
+import jadex.extension.envsupport.observer.gui.SObjectInspector;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 /**
  * This drawable combines multiple drawables into a single drawable object.

@@ -1,17 +1,5 @@
 package jadex.bdiv3.examples.alarmclock;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.gui.jtable.ObjectTableModel;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -33,6 +21,18 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
+
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.gui.jtable.ObjectTableModel;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  The alarm dialog presenting a list of alarms..

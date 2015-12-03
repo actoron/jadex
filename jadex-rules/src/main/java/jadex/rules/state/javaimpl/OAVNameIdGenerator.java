@@ -1,11 +1,11 @@
 package jadex.rules.state.javaimpl;
 
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVObjectType;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVObjectType;
 
 /**
  *  Id generator using easy to read names and numbers.

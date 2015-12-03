@@ -1,9 +1,9 @@
 package jadex.extension.rs.invoke;
 
+import java.lang.reflect.Proxy;
+
 import jadex.bridge.IInternalAccess;
 import jadex.extension.rs.RSFactory;
-
-import java.lang.reflect.Proxy;
 
 /**
  *  Static helper class for rest web service invocation.

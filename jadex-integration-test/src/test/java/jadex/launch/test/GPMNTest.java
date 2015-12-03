@@ -1,12 +1,5 @@
 package jadex.launch.test;
 
-import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SReflect;
-
-import java.io.File;
-
-import junit.framework.Test;
-
 /**
  *  Test suite for GPMN agent tests.
  */

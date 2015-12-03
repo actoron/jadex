@@ -1,7 +1,6 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.annotation.Reference;
 import jadex.commons.Base64;
 
 

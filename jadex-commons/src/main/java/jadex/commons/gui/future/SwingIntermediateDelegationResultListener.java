@@ -1,16 +1,13 @@
 package jadex.commons.gui.future;
 
-import jadex.commons.SReflect;
-import jadex.commons.future.IFunctionalExceptionListener;
-import jadex.commons.future.IFunctionalResultListener;
-import jadex.commons.future.IIntermediateFutureCommandResultListener;
-import jadex.commons.future.IUndoneIntermediateResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.IntermediateFuture;
-
 import java.util.Collection;
 
 import javax.swing.SwingUtilities;
+
+import jadex.commons.SReflect;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
+import jadex.commons.future.IUndoneIntermediateResultListener;
+import jadex.commons.future.IntermediateFuture;
 
 /**
  *  Exception delegation listener for intermediate results called back on swing thread.

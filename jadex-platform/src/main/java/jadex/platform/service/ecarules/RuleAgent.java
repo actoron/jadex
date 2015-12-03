@@ -1,5 +1,8 @@
 package jadex.platform.service.ecarules;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.ecarules.IRuleService;
@@ -17,9 +20,6 @@ import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRulebase;
 import jadex.rules.eca.RuleEvent;
 import jadex.rules.eca.RuleSystem;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Agent that exposes an eca rule engine as service.

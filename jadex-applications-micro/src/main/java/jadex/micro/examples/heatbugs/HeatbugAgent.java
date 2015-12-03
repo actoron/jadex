@@ -1,5 +1,10 @@
 package jadex.micro.examples.heatbugs;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.application.EnvironmentService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -7,7 +12,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -16,11 +20,6 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Int;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  The heatbug agent.

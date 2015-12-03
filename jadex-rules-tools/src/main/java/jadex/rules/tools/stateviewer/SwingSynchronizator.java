@@ -1,10 +1,10 @@
 package jadex.rules.tools.stateviewer;
 
-import jadex.commons.concurrent.ISynchronizator;
-
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
+
+import jadex.commons.concurrent.ISynchronizator;
 
 /**
  *  Synchronize code execution with the swing thread.

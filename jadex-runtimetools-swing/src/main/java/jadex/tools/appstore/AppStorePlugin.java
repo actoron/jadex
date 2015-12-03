@@ -1,15 +1,15 @@
 package jadex.tools.appstore;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.tools.filetransfer.FileTransferPlugin;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.UIDefaults;
 
 /**
  *  The app store plugin.

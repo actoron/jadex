@@ -1,5 +1,9 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITargetResolver;
@@ -18,10 +22,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.logging.Logger;
 
 /**
  *  Interceptor for realizing intelligent proxies. These proxies

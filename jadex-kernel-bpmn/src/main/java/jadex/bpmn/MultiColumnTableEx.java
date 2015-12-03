@@ -4,12 +4,12 @@
 package jadex.bpmn;
 
 
-import jadex.bpmn.model.MAnnotation;
-import jadex.bpmn.model.MAnnotationDetail;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.bpmn.model.MAnnotation;
+import jadex.bpmn.model.MAnnotationDetail;
 
 /**
  * ADAPTED !!! Copy of editor table version

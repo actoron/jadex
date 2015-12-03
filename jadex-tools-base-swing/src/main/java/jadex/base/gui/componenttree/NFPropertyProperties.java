@@ -1,21 +1,5 @@
 package jadex.base.gui.componenttree;
 
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.INFPropertyComponentFeature;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.INFPropertyProvider;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.future.SwingResultListener;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -27,6 +11,19 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.future.SwingResultListener;
 
 /**
  *  Panel for showing service properties.

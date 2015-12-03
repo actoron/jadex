@@ -1,5 +1,7 @@
 package jadex.bdi.examples.blackjack.dealer;
 
+import java.util.List;
+
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdiv3x.runtime.IMessageEvent;
@@ -7,8 +9,6 @@ import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
-
-import java.util.List;
 
 /**
  *  Updates the belief "gamestate" and propage the gamestate.

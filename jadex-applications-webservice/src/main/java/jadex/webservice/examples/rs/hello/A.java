@@ -3,8 +3,6 @@ package jadex.webservice.examples.rs.hello;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * 
  */

@@ -1,8 +1,8 @@
 package jadex.commons.gui.autocombo;
 
-import jadex.commons.SReflect;
-
 import java.util.List;
+
+import jadex.commons.SReflect;
 
 /**
  * 

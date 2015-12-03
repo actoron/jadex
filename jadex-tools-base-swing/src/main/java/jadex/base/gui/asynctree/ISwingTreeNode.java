@@ -1,11 +1,11 @@
 package jadex.base.gui.asynctree;
 
-import jadex.commons.future.IFuture;
-
 import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+
+import jadex.commons.future.IFuture;
 
 /**
  *  Node for the component tree panel.

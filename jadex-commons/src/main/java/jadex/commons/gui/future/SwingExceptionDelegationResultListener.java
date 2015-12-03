@@ -1,12 +1,12 @@
 package jadex.commons.gui.future;
 
 
+import javax.swing.SwingUtilities;
+
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IUndoneResultListener;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  Delegation result listener that calls customResultAvailable and

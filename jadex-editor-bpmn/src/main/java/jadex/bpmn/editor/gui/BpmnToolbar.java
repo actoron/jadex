@@ -1,8 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
-
 import java.awt.Color;
 import java.awt.Shape;
 import java.util.ArrayList;
@@ -14,6 +11,9 @@ import java.util.logging.Logger;
 import javax.swing.Icon;
 
 import com.mxgraph.util.mxUtils;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 
 /**
  *  Toolbar implementing BPMN editing tools.

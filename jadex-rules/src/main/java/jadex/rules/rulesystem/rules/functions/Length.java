@@ -1,12 +1,12 @@
 package jadex.rules.rulesystem.rules.functions;
 
 
+import java.util.Collection;
+
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
-
-import java.util.Collection;
 
 /**
  *  Length of a multislot.

@@ -1,7 +1,5 @@
 package jadex.commons;
 
-import jadex.commons.concurrent.IThreadPool;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +10,8 @@ import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import jadex.commons.concurrent.IThreadPool;
 
 /**
  *  A combined input stream allows for combining two input streams in one.

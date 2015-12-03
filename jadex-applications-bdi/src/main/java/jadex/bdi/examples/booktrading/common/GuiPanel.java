@@ -1,23 +1,5 @@
 package jadex.bdi.examples.booktrading.common;
 
-import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bdiv3x.runtime.IExpression;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.annotation.Binding;
-import jadex.rules.eca.ChangeInfo;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -58,6 +40,24 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import jadex.bdiv3.runtime.IBeliefListener;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bdiv3x.runtime.IExpression;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.micro.annotation.Binding;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  The gui allows to add and delete buy or sell orders and shows open and

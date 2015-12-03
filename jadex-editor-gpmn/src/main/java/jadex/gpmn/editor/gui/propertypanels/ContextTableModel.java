@@ -1,9 +1,9 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
+import javax.swing.table.AbstractTableModel;
+
 import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.model.gpmn.IParameter;
-
-import javax.swing.table.AbstractTableModel;
 
 public class ContextTableModel extends AbstractTableModel
 {

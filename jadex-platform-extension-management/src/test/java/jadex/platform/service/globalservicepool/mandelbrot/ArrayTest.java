@@ -1,11 +1,11 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
+import java.util.Random;
+import java.util.StringTokenizer;
+
 import jadex.commons.Base64;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
-
-import java.util.Random;
-import java.util.StringTokenizer;
 
 /**
  *  Test ways of transferring short[][] arrays.

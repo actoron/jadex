@@ -1,13 +1,13 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 public class TimestampCodec extends AbstractCodec
 {

@@ -1,13 +1,5 @@
 package jadex.tools.comanalyzer.diagram;
 
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-import jadex.tools.comanalyzer.ComanalyzerPlugin;
-import jadex.tools.comanalyzer.PaintMaps;
-import jadex.tools.comanalyzer.ToolCanvas;
-import jadex.tools.comanalyzer.ToolTab;
-import jadex.tools.comanalyzer.table.TablePanel;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -29,6 +21,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
+
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
+import jadex.tools.comanalyzer.ComanalyzerPlugin;
+import jadex.tools.comanalyzer.PaintMaps;
+import jadex.tools.comanalyzer.ToolCanvas;
+import jadex.tools.comanalyzer.ToolTab;
+import jadex.tools.comanalyzer.table.TablePanel;
 
 
 /**

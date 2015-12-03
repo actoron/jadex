@@ -1,5 +1,8 @@
 package jadex.micro.testcases.blocking;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
@@ -14,9 +17,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Test timeouts in threaded component execution.

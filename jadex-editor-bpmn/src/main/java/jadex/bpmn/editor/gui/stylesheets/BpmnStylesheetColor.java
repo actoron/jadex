@@ -1,18 +1,5 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VDataEdge;
-import jadex.bpmn.editor.model.visual.VExternalSubProcess;
-import jadex.bpmn.editor.model.visual.VInParameter;
-import jadex.bpmn.editor.model.visual.VLane;
-import jadex.bpmn.editor.model.visual.VMessagingEdge;
-import jadex.bpmn.editor.model.visual.VOutParameter;
-import jadex.bpmn.editor.model.visual.VPool;
-import jadex.bpmn.editor.model.visual.VSequenceEdge;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MTask;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,6 +30,19 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxStylesheet;
+
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VDataEdge;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
+import jadex.bpmn.editor.model.visual.VOutParameter;
+import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.editor.model.visual.VSequenceEdge;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
 
 /**
  *  Style sheet defining the visual aspects of the BPMN model.

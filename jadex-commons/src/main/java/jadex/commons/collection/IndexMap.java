@@ -1,7 +1,5 @@
 package jadex.commons.collection;
 
-import jadex.commons.SUtil;
-
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -14,6 +12,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SUtil;
 
 
 /**

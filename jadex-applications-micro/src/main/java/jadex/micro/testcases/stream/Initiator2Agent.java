@@ -1,5 +1,8 @@
 package jadex.micro.testcases.stream;
 
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.ComponentIdentifier;
@@ -18,9 +21,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.testcases.TestAgent;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  *  Agent that provides a service with a stream.

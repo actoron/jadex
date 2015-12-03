@@ -1,5 +1,8 @@
 package jadex.micro.testcases.servicevalue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
@@ -8,9 +11,6 @@ import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 

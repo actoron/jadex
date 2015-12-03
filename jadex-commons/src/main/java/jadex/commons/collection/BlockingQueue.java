@@ -1,12 +1,12 @@
 package jadex.commons.collection;
 
-import jadex.commons.concurrent.TimeoutException;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import jadex.commons.concurrent.TimeoutException;
 
 
 /**

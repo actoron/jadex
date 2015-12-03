@@ -1,10 +1,10 @@
 package jadex.bdi.examples.blackjack.player.strategies;
 
-import jadex.bdi.examples.blackjack.Card;
-import jadex.commons.SReflect;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.bdi.examples.blackjack.Card;
+import jadex.commons.SReflect;
 
 /**
  *  Abstract base class for strategies.

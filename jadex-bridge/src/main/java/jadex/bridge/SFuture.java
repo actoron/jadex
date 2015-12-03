@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;

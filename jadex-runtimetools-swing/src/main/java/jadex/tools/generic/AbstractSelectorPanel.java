@@ -1,19 +1,5 @@
 package jadex.tools.generic;
 
-import jadex.base.gui.componentviewer.IAbstractViewerPanel;
-import jadex.commons.IPropertiesProvider;
-import jadex.commons.Properties;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.ObjectCardLayout;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -34,6 +20,20 @@ import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.ObjectCardLayout;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 
 /**

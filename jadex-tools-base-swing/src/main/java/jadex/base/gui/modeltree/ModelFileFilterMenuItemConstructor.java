@@ -1,22 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.AsyncSwingTreeModel;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.commons.IPropertiesProvider;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.IMenuItemConstructor;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -34,6 +17,23 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.tree.TreeModel;
+
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.IMenuItemConstructor;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 /**
  *  Dynamically create a new menu item structure for starting components.

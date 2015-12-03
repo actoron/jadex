@@ -1,17 +1,16 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry;
 
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Dome;
+
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Dome3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
-
-import com.jme3.bounding.BoundingBox;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Dome;
 
 
 

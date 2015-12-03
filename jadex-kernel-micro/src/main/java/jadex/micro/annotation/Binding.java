@@ -1,13 +1,13 @@
 package jadex.micro.annotation;
 
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Value;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Value;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
 /**
  *  The argument annotation.

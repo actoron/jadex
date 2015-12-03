@@ -3,6 +3,12 @@
  */
 package jadex.platform.service.cli.commands;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -22,12 +28,6 @@ import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Map;
 
 /**
  *  List the file contents of a directory.

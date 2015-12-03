@@ -1,5 +1,13 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.ICondition;
@@ -26,14 +34,6 @@ import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 
 /**

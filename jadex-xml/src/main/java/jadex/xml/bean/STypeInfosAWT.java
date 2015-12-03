@@ -1,5 +1,12 @@
 package jadex.xml.bean;
 
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
@@ -14,14 +21,6 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import jadex.xml.stax.QName;
 
 /**

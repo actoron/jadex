@@ -1,16 +1,16 @@
 package jadex.commons.gui.future;
 
+import java.awt.Component;
+import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
+
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.gui.SGUI;
-
-import java.awt.Component;
-import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  Result listener that redirects callbacks on the swing thread.

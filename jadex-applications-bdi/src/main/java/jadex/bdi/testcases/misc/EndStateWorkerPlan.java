@@ -1,17 +1,12 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.base.test.TestReport;
-import jadex.bdiv3.runtime.impl.GoalFailureException;
-import jadex.bdiv3x.runtime.IMessageEvent;
-import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.fipa.SFipa;
-import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.future.IFuture;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.base.test.TestReport;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
+import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  Check correct operation of end states.

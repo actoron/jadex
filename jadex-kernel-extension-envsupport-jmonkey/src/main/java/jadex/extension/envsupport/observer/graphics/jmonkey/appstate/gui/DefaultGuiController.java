@@ -1,7 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui;
 
-import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
@@ -11,6 +9,7 @@ import com.jme3.scene.Node;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
+import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 
 public class DefaultGuiController extends AbstractAppState implements ScreenController {
 

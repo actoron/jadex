@@ -1,14 +1,5 @@
 package jadex.tools.dfbrowser;
 
-import jadex.base.gui.jtable.ComponentIdentifierRenderer;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.jtable.TableSorter;
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -23,6 +14,15 @@ import javax.swing.JTable;
 import javax.swing.UIDefaults;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.TableSorter;
 
 /**
  *  This class serves for displaying component descriptions.

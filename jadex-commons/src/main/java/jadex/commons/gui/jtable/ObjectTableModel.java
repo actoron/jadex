@@ -1,8 +1,5 @@
 package jadex.commons.gui.jtable;
 
-import jadex.commons.SUtil;
-import jadex.commons.Tuple;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +7,9 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
+
+import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 
 /**
  *  The object table model has associated an object with each row.

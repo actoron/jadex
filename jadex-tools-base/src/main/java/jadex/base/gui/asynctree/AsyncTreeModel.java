@@ -1,8 +1,5 @@
 package jadex.base.gui.asynctree;
 
-import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.collection.MultiCollection;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.collection.MultiCollection;
 
 /**
  * Tree model, which dynamically represents running components.

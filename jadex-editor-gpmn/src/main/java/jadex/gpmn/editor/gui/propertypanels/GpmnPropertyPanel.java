@@ -1,11 +1,5 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
-import jadex.gpmn.editor.gui.BetterFileChooser;
-import jadex.gpmn.editor.gui.DocumentAdapter;
-import jadex.gpmn.editor.gui.ImageProvider;
-import jadex.gpmn.editor.gui.ModelContainer;
-import jadex.gpmn.editor.gui.SGuiHelper;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -30,6 +24,12 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
+
+import jadex.gpmn.editor.gui.BetterFileChooser;
+import jadex.gpmn.editor.gui.DocumentAdapter;
+import jadex.gpmn.editor.gui.ImageProvider;
+import jadex.gpmn.editor.gui.ModelContainer;
+import jadex.gpmn.editor.gui.SGuiHelper;
 
 public class GpmnPropertyPanel extends BasePropertyPanel
 {

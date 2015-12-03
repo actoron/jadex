@@ -1,13 +1,5 @@
 package jadex.base.gui.filechooser;
 
-import jadex.base.SRemoteFileChooser;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.filetransfer.FileData;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,6 +8,14 @@ import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
+
+import jadex.base.SRemoteFileChooser;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 
 /**

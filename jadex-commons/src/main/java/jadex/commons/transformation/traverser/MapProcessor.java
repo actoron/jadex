@@ -1,14 +1,14 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-import jadex.commons.collection.ILRUEntryCleaner;
-import jadex.commons.collection.LRU;
-
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.commons.collection.ILRUEntryCleaner;
+import jadex.commons.collection.LRU;
 
 /**
  *  A map processor allows for traversing maps.

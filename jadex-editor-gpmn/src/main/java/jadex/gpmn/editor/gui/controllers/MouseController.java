@@ -1,20 +1,5 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.GuiConstants;
-import jadex.gpmn.editor.gui.ModelContainer;
-import jadex.gpmn.editor.gui.SGuiHelper;
-import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IGoal;
-import jadex.gpmn.editor.model.gpmn.IPlan;
-import jadex.gpmn.editor.model.gpmn.IRefPlan;
-import jadex.gpmn.editor.model.gpmn.ModelConstants;
-import jadex.gpmn.editor.model.visual.VEdge;
-import jadex.gpmn.editor.model.visual.VGoal;
-import jadex.gpmn.editor.model.visual.VNode;
-import jadex.gpmn.editor.model.visual.VPlan;
-import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
-import jadex.gpmn.editor.model.visual.VVirtualActivationEdge.VVEdgeMarker;
-
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -32,6 +17,21 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraphView;
+
+import jadex.gpmn.editor.gui.GuiConstants;
+import jadex.gpmn.editor.gui.ModelContainer;
+import jadex.gpmn.editor.gui.SGuiHelper;
+import jadex.gpmn.editor.model.gpmn.IActivationPlan;
+import jadex.gpmn.editor.model.gpmn.IGoal;
+import jadex.gpmn.editor.model.gpmn.IPlan;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
+import jadex.gpmn.editor.model.gpmn.ModelConstants;
+import jadex.gpmn.editor.model.visual.VEdge;
+import jadex.gpmn.editor.model.visual.VGoal;
+import jadex.gpmn.editor.model.visual.VNode;
+import jadex.gpmn.editor.model.visual.VPlan;
+import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
+import jadex.gpmn.editor.model.visual.VVirtualActivationEdge.VVEdgeMarker;
 
 /**
  *  Controller for handling mouse inputs to the graph.

@@ -1,12 +1,12 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.SUtil;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 
 
 /**

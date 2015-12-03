@@ -1,7 +1,5 @@
 package jadex.tools.comanalyzer.diagram;
 
-import jadex.tools.comanalyzer.Component;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,6 +12,8 @@ import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
 import javax.swing.JPanel;
+
+import jadex.tools.comanalyzer.Component;
 
 /**
  * The panel for component representation.

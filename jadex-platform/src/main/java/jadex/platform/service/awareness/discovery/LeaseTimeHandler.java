@@ -1,13 +1,5 @@
 package jadex.platform.service.awareness.discovery;
 
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.commons.future.IFuture;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -15,6 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  Used to a list of entries that is automatically

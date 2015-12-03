@@ -1,5 +1,7 @@
 package jadex.tools.simcenter;
 
+import javax.swing.JComponent;
+
 import jadex.base.gui.componentviewer.AbstractServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.IService;
@@ -8,8 +10,6 @@ import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-
-import javax.swing.JComponent;
 
 /**
  *  Panel for the daemon view.

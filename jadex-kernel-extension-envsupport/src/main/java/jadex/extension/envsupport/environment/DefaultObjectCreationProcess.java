@@ -1,12 +1,12 @@
 package jadex.extension.envsupport.environment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Process for continuously creating objects in the space.

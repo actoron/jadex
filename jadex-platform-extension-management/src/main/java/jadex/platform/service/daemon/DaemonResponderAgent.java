@@ -1,19 +1,18 @@
 package jadex.platform.service.daemon;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
-import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Simple agent that sends a message on startup.

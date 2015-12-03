@@ -2,22 +2,28 @@
 
 package jadex.rules.parser.conditions.javagrammar;
 
-import jadex.rules.rulesystem.rules.Variable;
-import jadex.rules.rulesystem.rules.IOperator;
-import jadex.rules.rulesystem.rules.functions.IFunction;
-import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.OAVObjectType;
-import jadex.rules.state.OAVJavaType;
-
-import jadex.commons.SReflect;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-
-
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.DFA;
+import org.antlr.runtime.FailedPredicateException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.Parser;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+
+import jadex.commons.SReflect;
+import jadex.rules.rulesystem.rules.IOperator;
+import jadex.rules.rulesystem.rules.Variable;
+import jadex.rules.rulesystem.rules.functions.IFunction;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
 
 @SuppressWarnings("all")
 public class JavaJadexParser extends Parser {

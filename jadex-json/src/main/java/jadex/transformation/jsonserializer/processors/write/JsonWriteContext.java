@@ -1,6 +1,5 @@
 package jadex.transformation.jsonserializer.processors.write;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 
 import jadex.commons.SReflect;

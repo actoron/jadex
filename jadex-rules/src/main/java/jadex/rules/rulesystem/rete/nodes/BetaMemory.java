@@ -1,10 +1,5 @@
 package jadex.rules.rulesystem.rete.nodes;
 
-import jadex.commons.SReflect;
-import jadex.rules.rulesystem.rete.Tuple;
-import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
-import jadex.rules.state.IOAVState;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +8,11 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
+import jadex.rules.state.IOAVState;
 
 /**
  *  Memory for a beta node.

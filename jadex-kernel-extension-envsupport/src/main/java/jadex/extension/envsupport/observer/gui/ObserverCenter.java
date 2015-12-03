@@ -1,26 +1,5 @@
 package jadex.extension.envsupport.observer.gui;
 
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClock;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IChangeListener;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.extension.envsupport.dataview.IDataView;
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.observer.gui.plugin.IObserverCenterPlugin;
-import jadex.extension.envsupport.observer.gui.plugin.IntrospectorPlugin;
-import jadex.extension.envsupport.observer.gui.plugin.VisualsPlugin;
-import jadex.extension.envsupport.observer.perspective.IPerspective;
-import jadex.extension.envsupport.observer.perspective.Perspective2D;
-import jadex.extension.envsupport.observer.perspective.Perspective3D;
-
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,6 +24,27 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.IChangeListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.observer.gui.plugin.IObserverCenterPlugin;
+import jadex.extension.envsupport.observer.gui.plugin.IntrospectorPlugin;
+import jadex.extension.envsupport.observer.gui.plugin.VisualsPlugin;
+import jadex.extension.envsupport.observer.perspective.IPerspective;
+import jadex.extension.envsupport.observer.perspective.Perspective2D;
+import jadex.extension.envsupport.observer.perspective.Perspective3D;
 
 /** 
  *  The default observer center.

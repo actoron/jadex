@@ -1,9 +1,9 @@
 package jadex.platform.service.ecarules;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import jadex.bridge.service.types.ecarules.IRulebaseEvent;
 import jadex.commons.future.IBackwardCommandFuture;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 

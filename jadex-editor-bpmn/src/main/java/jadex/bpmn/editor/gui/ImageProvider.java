@@ -1,12 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.gui.stylesheets.EventShape;
-import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple;
-import jadex.commons.Tuple3;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
-
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -50,6 +43,13 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
+
+import jadex.bpmn.editor.gui.stylesheets.EventShape;
+import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple;
+import jadex.commons.Tuple3;
+import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
 /**
  *  Class for providing images, either stored or generated, with a cache.

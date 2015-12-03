@@ -1,16 +1,6 @@
 package jadex.rules.tools.stateviewer;
 
 
-import jadex.commons.collection.IdentityHashSet;
-import jadex.commons.concurrent.ISynchronizator;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.IOAVStateListener;
-import jadex.rules.state.IProfiler;
-import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.OAVObjectType;
-import jadex.rules.state.OAVTypeModel;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,6 +10,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.collection.IdentityHashSet;
+import jadex.commons.concurrent.ISynchronizator;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.IOAVStateListener;
+import jadex.rules.state.IProfiler;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.OAVTypeModel;
 
 /**
  *  A copy state allows to decouple a state

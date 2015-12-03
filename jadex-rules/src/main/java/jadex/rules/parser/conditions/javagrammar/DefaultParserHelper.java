@@ -1,11 +1,11 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import java.util.List;
+
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-
-import java.util.List;
 
 /**
  *  Basic handler for context specific parsing issues.

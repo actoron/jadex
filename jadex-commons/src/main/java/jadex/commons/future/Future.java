@@ -1,6 +1,16 @@
 package jadex.commons.future;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
@@ -11,16 +21,6 @@ import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.functional.BiFunction;
 import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *  Future that includes mechanisms for callback notification.

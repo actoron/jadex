@@ -1,9 +1,9 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import java.util.HashMap;
+
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
-
-import java.util.HashMap;
 
 /**
  *  Abstract super class for all kinds of nodes.

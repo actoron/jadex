@@ -1,16 +1,16 @@
 package jadex.tools.generic;
 
+import java.util.Collection;
+import java.util.Iterator;
+
+import javax.swing.JComboBox;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
-
-import java.util.Collection;
-import java.util.Iterator;
-
-import javax.swing.JComboBox;
 
 /**
  *  The abstract base class for service selector panels.

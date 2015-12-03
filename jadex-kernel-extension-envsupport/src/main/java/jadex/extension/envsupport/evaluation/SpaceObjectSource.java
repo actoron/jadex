@@ -1,12 +1,12 @@
 package jadex.extension.envsupport.evaluation;
 
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.commons.SUtil;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.commons.SUtil;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 /**
  *  A space object source can provide space objects of a specific object type.

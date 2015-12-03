@@ -1,13 +1,5 @@
 package jadex.xml.writer;
 
-import jadex.commons.collection.Tree;
-import jadex.commons.collection.TreeNode;
-import jadex.xml.IPreProcessor;
-import jadex.xml.SXML;
-import jadex.xml.StackElement;
-import jadex.xml.TypeInfo;
-import jadex.xml.stax.QName;
-
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +8,14 @@ import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
+
+import jadex.commons.collection.Tree;
+import jadex.commons.collection.TreeNode;
+import jadex.xml.IPreProcessor;
+import jadex.xml.SXML;
+import jadex.xml.StackElement;
+import jadex.xml.TypeInfo;
+import jadex.xml.stax.QName;
 
 /**
  *  XML writer for conversion of objects to XML.

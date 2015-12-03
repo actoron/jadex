@@ -1,14 +1,12 @@
 package jadex.bpmn.editor;
 
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.jar.JarEntry;
+
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
+import jadex.commons.future.IIntermediateResultListener;
 
 /**
  *  Test to find perm gen space error.

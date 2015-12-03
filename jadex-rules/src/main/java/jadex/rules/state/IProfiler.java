@@ -1,9 +1,9 @@
 package jadex.rules.state;
 
-import jadex.commons.SUtil;
-
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+
+import jadex.commons.SUtil;
 
 /**
  *  A profiler stores execution information, such as

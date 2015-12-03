@@ -1,5 +1,8 @@
 package jadex.bdi.examples.cleanerworld;
 
+import java.util.HashSet;
+import java.util.Map;
+
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -9,9 +12,6 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
-
-import java.util.HashSet;
-import java.util.Map;
 
 /**
  *  Action for dropping a waste.

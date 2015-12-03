@@ -1,5 +1,8 @@
 package jadex.application;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -15,9 +18,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  *  Environment service implementation.

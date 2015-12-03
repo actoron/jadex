@@ -1,22 +1,5 @@
 package jadex.rules.tools.reteviewer;
 
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-import jadex.rules.rulesystem.rete.Tuple;
-import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
-import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
-import jadex.rules.rulesystem.rete.nodes.AbstractBetaNode;
-import jadex.rules.rulesystem.rete.nodes.AlphaNode;
-import jadex.rules.rulesystem.rete.nodes.CollectNode;
-import jadex.rules.rulesystem.rete.nodes.INode;
-import jadex.rules.rulesystem.rete.nodes.ReteMemory;
-import jadex.rules.rulesystem.rete.nodes.SplitNode;
-import jadex.rules.rulesystem.rete.nodes.TerminalNode;
-import jadex.rules.rulesystem.rete.nodes.TestNode;
-import jadex.rules.rulesystem.rete.nodes.TypeNode;
-import jadex.rules.state.IOAVState;
-
 import java.awt.BorderLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -37,6 +20,23 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
+import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
+import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
+import jadex.rules.rulesystem.rete.nodes.AbstractBetaNode;
+import jadex.rules.rulesystem.rete.nodes.AlphaNode;
+import jadex.rules.rulesystem.rete.nodes.CollectNode;
+import jadex.rules.rulesystem.rete.nodes.INode;
+import jadex.rules.rulesystem.rete.nodes.ReteMemory;
+import jadex.rules.rulesystem.rete.nodes.SplitNode;
+import jadex.rules.rulesystem.rete.nodes.TerminalNode;
+import jadex.rules.rulesystem.rete.nodes.TestNode;
+import jadex.rules.rulesystem.rete.nodes.TypeNode;
+import jadex.rules.state.IOAVState;
 
 /**
  *  Display information about a single node.

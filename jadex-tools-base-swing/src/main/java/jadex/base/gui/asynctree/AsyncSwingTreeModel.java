@@ -1,13 +1,13 @@
 package jadex.base.gui.asynctree;
 
-import jadex.base.gui.asynctree.adapter.TreeModelListenerWrapper;
-
 import java.util.List;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+
+import jadex.base.gui.asynctree.adapter.TreeModelListenerWrapper;
 
 /**
  *  Tree model, which dynamically represents running components.

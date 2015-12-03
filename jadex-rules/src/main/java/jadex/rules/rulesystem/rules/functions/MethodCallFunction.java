@@ -1,10 +1,10 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import java.lang.reflect.Method;
+
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
-
-import java.lang.reflect.Method;
 
 /**
  *  Invoke a method on an object.

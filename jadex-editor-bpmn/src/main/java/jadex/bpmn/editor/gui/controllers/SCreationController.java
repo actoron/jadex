@@ -1,5 +1,20 @@
 package jadex.bpmn.editor.gui.controllers;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
+
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.SHelper;
@@ -33,21 +48,6 @@ import jadex.bpmn.model.MTask;
 import jadex.bpmn.model.io.IdGenerator;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxICell;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
 
 /**
  *  Methods for creating model objects.

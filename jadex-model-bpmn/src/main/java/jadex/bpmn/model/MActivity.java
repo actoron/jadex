@@ -1,5 +1,16 @@
 package jadex.bpmn.model;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bpmn.model.task.annotation.TaskArgument;
 import jadex.bpmn.model.task.annotation.TaskBody;
 import jadex.bpmn.model.task.annotation.TaskComponent;
@@ -14,17 +25,6 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Base class for all kinds of activities.

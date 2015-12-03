@@ -1,9 +1,9 @@
 package jadex.commons.future;
 
 
-import jadex.commons.DebugException;
-
 import java.util.logging.Logger;
+
+import jadex.commons.DebugException;
 
 /**
  *  The default listener for just printing out result information.

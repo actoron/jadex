@@ -1,10 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.userinteraction;
 
-import jadex.extension.envsupport.math.IVector3;
-import jadex.extension.envsupport.math.Vector3Double;
-import jadex.extension.envsupport.math.Vector3Int;
-import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-
 import java.util.Iterator;
 
 import com.jme3.app.Application;
@@ -19,6 +14,11 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+
+import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.math.Vector3Double;
+import jadex.extension.envsupport.math.Vector3Int;
+import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 
 
 public class SelectionLogic

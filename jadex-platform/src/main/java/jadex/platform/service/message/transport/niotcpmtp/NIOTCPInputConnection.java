@@ -1,14 +1,12 @@
 package jadex.platform.service.message.transport.niotcpmtp;
 
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
-import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 
 /**

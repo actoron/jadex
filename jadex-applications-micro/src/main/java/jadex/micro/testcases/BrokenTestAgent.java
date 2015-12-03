@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import java.util.Collection;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -24,8 +26,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Collection;
 
 /**
  *  Testing broken components.

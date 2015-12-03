@@ -1,8 +1,8 @@
 package jadex.bridge;
 
-import jadex.commons.SUtil;
-
 import java.io.Serializable;
+
+import jadex.commons.SUtil;
 
 
 /**

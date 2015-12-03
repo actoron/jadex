@@ -1,14 +1,13 @@
 package jadex.platform.service.message.transport.codecs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.nio.charset.Charset;
 
 //import nuggets.Nuggets;
 

@@ -1,8 +1,8 @@
 package jadex.bridge.nonfunctional.search;
 
-import jadex.commons.future.IFuture;
-
 import java.util.Collection;
+
+import jadex.commons.future.IFuture;
 
 /**
  * Decides when to start ranking results.

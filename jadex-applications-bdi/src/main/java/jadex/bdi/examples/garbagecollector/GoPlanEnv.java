@@ -1,5 +1,8 @@
 package jadex.bdi.examples.garbagecollector;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -9,9 +12,6 @@ import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Go to a specified position.

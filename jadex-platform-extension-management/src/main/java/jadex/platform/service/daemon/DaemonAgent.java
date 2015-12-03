@@ -1,5 +1,7 @@
 package jadex.platform.service.daemon;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -18,8 +20,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Map;
 
 
 /**

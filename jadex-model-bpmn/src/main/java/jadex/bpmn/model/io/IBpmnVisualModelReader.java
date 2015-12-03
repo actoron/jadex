@@ -1,14 +1,12 @@
 package jadex.bpmn.model.io;
 
-import jadex.bpmn.model.MIdElement;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
+import jadex.bpmn.model.MIdElement;
 
 /**
  *  Interface for writer of the visual part of BPMN models.

@@ -17,15 +17,6 @@
 
 package org.apache.harmony.beans;
 
-import jadex.commons.beans.BeanInfo;
-import jadex.commons.beans.Expression;
-import jadex.commons.beans.IndexedPropertyDescriptor;
-import jadex.commons.beans.IntrospectionException;
-import jadex.commons.beans.Introspector;
-import jadex.commons.beans.PropertyDescriptor;
-import jadex.commons.beans.Statement;
-import jadex.commons.beans.XMLDecoder;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -35,6 +26,15 @@ import java.util.Vector;
 
 import org.apache.harmony.beans.internal.nls.Messages;
 import org.xml.sax.Attributes;
+
+import jadex.commons.beans.BeanInfo;
+import jadex.commons.beans.Expression;
+import jadex.commons.beans.IndexedPropertyDescriptor;
+import jadex.commons.beans.IntrospectionException;
+import jadex.commons.beans.Introspector;
+import jadex.commons.beans.PropertyDescriptor;
+import jadex.commons.beans.Statement;
+import jadex.commons.beans.XMLDecoder;
 
 public class Command {
 

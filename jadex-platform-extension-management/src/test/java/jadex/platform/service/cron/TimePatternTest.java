@@ -1,8 +1,5 @@
 package jadex.platform.service.cron;
 
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -10,6 +7,9 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 
 /**
  *  Test time patterns via simple simulation.

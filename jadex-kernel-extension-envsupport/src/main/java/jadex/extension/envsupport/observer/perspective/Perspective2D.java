@@ -1,27 +1,5 @@
 package jadex.extension.envsupport.observer.perspective;
 
-import jadex.extension.envsupport.dataview.IDataView;
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector1;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.IVector3;
-import jadex.extension.envsupport.math.Vector1Double;
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.math.Vector3Double;
-import jadex.extension.envsupport.observer.graphics.IViewport;
-import jadex.extension.envsupport.observer.graphics.IViewportListener;
-import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
-import jadex.extension.envsupport.observer.graphics.drawable.TexturedRectangle;
-import jadex.extension.envsupport.observer.graphics.java2d.ViewportJ2D;
-import jadex.extension.envsupport.observer.graphics.layer.Layer;
-import jadex.extension.envsupport.observer.gui.IObserverCenter;
-import jadex.extension.envsupport.observer.gui.SObjectInspector;
-import jadex.commons.meta.TypedPropertyObject;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -40,6 +18,26 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+
+import jadex.commons.meta.TypedPropertyObject;
+import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector1;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector1Double;
+import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.observer.graphics.IViewport;
+import jadex.extension.envsupport.observer.graphics.IViewportListener;
+import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
+import jadex.extension.envsupport.observer.graphics.drawable.TexturedRectangle;
+import jadex.extension.envsupport.observer.graphics.java2d.ViewportJ2D;
+import jadex.extension.envsupport.observer.graphics.layer.Layer;
+import jadex.extension.envsupport.observer.gui.IObserverCenter;
+import jadex.extension.envsupport.observer.gui.SObjectInspector;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 /**
  *  Perspective for viewing in 2D.

@@ -1,10 +1,10 @@
 package jadex.bridge.service.types.dht;
 
+import java.util.List;
+
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
-
-import java.util.List;
 
 /**
  * Service that provides functionality for a ring-structured overlay network. 

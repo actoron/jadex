@@ -1,5 +1,11 @@
 package jadex.platform.service.clock;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TimerTask;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -19,12 +25,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TimerTask;
 
 /**
  *  A clock service abstracts away from clock implementations.

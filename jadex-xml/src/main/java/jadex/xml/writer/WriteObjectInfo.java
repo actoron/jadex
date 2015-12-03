@@ -1,12 +1,11 @@
 package jadex.xml.writer;
 
-import jadex.commons.collection.Tree;
-import jadex.commons.collection.TreeNode;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import jadex.commons.collection.Tree;
+import jadex.commons.collection.TreeNode;
 import jadex.xml.stax.QName;
 
 /**

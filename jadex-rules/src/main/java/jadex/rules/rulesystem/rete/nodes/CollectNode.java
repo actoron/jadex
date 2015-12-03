@@ -1,5 +1,10 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
@@ -7,11 +12,6 @@ import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  *  The purpose of a collect node is to compress a number of tuples to a

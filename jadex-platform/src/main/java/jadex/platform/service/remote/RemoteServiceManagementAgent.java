@@ -1,5 +1,9 @@
 package jadex.platform.service.remote;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
@@ -54,10 +58,6 @@ import jadex.platform.service.remote.commands.RemoteSearchCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
 import jadex.platform.service.remote.replacements.DefaultHashcodeMethodReplacement;
 import jadex.platform.service.remote.replacements.GetComponentFeatureMethodReplacement;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  *  Remote service management service that hosts the corresponding

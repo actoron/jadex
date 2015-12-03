@@ -1,10 +1,10 @@
 package jadex.platform.service.clock;
 
+import java.io.Serializable;
+
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
-
-import java.io.Serializable;
 
 /**
  *  A timer for being notified at a specified timepoint.

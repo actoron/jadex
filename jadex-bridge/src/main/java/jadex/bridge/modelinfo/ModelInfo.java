@@ -1,5 +1,11 @@
 package jadex.bridge.modelinfo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -9,12 +15,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.commons.SUtil;
 import jadex.commons.transformation.annotations.Exclude;
 import jadex.javaparser.SJavaParser;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**

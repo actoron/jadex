@@ -1,7 +1,5 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
 
 /**
  *  A collection processor allows for traversing collections.

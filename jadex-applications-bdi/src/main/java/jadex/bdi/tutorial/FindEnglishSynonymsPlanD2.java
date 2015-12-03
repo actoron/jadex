@@ -1,12 +1,12 @@
 package jadex.bdi.tutorial;
 
+import java.util.List;
+import java.util.StringTokenizer;
+
 import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
-
-import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  *  Find english synonyms for a word.

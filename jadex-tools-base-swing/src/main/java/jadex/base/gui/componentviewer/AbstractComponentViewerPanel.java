@@ -1,12 +1,12 @@
 package jadex.base.gui.componentviewer;
 
+import javax.swing.JComponent;
+
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import javax.swing.JComponent;
 
 /**
  *  Simple default viewer panel.

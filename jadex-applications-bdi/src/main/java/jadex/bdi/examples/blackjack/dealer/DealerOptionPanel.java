@@ -1,17 +1,5 @@
 package jadex.bdi.examples.blackjack.dealer;
 
-import jadex.bdi.examples.blackjack.GameStatistics;
-import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
-import jadex.bdi.examples.blackjack.gui.StatisticGraph;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bdiv3x.runtime.IInternalEvent;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -29,6 +17,18 @@ import javax.swing.JSpinner;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import jadex.bdi.examples.blackjack.GameStatistics;
+import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
+import jadex.bdi.examples.blackjack.gui.StatisticGraph;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bdiv3x.runtime.IInternalEvent;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
 	This class is used for managing the progressBar in the upper right 

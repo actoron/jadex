@@ -1,5 +1,10 @@
 package jadex.bdi.examples.booktrading.serviceimpl.buyer;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
+
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
 import jadex.bdi.examples.booktrading.serviceimpl.IBuyBookService;
@@ -10,11 +15,6 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
 
 /**
  * The plan tries to purchase a book.

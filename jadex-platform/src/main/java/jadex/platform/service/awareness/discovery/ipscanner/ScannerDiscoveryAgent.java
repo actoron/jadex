@@ -1,5 +1,11 @@
 package jadex.platform.service.awareness.discovery.ipscanner;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
@@ -17,12 +23,6 @@ import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
 import jadex.platform.service.awareness.discovery.SendHandler;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.nio.channels.DatagramChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.

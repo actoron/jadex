@@ -1,15 +1,15 @@
 package jadex.extension.envsupport.observer.graphics.drawable;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.font.TextLayout;
+
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.AbstractViewport;
 import jadex.extension.envsupport.observer.graphics.IViewport;
 import jadex.javaparser.IParsedExpression;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.font.TextLayout;
 
 /**
  * Drawable component for displaying text.

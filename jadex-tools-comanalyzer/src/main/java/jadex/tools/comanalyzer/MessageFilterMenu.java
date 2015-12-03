@@ -1,7 +1,5 @@
 package jadex.tools.comanalyzer;
 
-import jadex.commons.SUtil;
-
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +10,8 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
+
+import jadex.commons.SUtil;
 
 
 /**

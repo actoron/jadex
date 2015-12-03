@@ -1,9 +1,9 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.bdiv3x.runtime.Plan;
-
 import java.util.Calendar;
 import java.util.Date;
+
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Plan to wake up at every full minute.

@@ -1,5 +1,8 @@
 package jadex.micro.testcases.semiautomatic.nfpropvis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
@@ -9,9 +12,6 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Waits for a fixed random time before a service completes. 

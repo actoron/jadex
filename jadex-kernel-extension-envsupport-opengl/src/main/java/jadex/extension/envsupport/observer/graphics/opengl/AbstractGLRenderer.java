@@ -1,5 +1,7 @@
 package jadex.extension.envsupport.observer.graphics.opengl;
 
+import javax.media.opengl.GL;
+
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
@@ -9,8 +11,6 @@ import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import javax.media.opengl.GL;
 
 public abstract class AbstractGLRenderer implements IGLRenderer
 {

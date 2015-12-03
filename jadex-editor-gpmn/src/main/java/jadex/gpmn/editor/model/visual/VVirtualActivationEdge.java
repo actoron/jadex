@@ -1,15 +1,15 @@
 package jadex.gpmn.editor.model.visual;
 
-import jadex.gpmn.editor.gui.GuiConstants;
-import jadex.gpmn.editor.model.gpmn.IActivationEdge;
-import jadex.gpmn.editor.model.gpmn.IEdge;
-import jadex.gpmn.editor.model.gpmn.IElement;
-
 import java.util.List;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
+
+import jadex.gpmn.editor.gui.GuiConstants;
+import jadex.gpmn.editor.model.gpmn.IActivationEdge;
+import jadex.gpmn.editor.model.gpmn.IEdge;
+import jadex.gpmn.editor.model.gpmn.IElement;
 
 /**
  *  A virtual activation edge not directly represent as business model edge.

@@ -1,10 +1,5 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +8,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Codec for encoding and decoding collections.

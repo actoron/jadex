@@ -1,13 +1,5 @@
 package jadex.tools.comanalyzer.chart;
 
-import jadex.tools.comanalyzer.Component;
-import jadex.tools.comanalyzer.Message;
-import jadex.tools.comanalyzer.MessageFilterMenu;
-import jadex.tools.comanalyzer.PaintMaps;
-import jadex.tools.comanalyzer.ToolCanvas;
-import jadex.tools.comanalyzer.ToolTab;
-import jadex.tools.comanalyzer.chart.ChartLabelGenerator.KeyRenderer;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
@@ -36,6 +28,14 @@ import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.TextAnchor;
 import org.jfree.util.TableOrder;
+
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.Message;
+import jadex.tools.comanalyzer.MessageFilterMenu;
+import jadex.tools.comanalyzer.PaintMaps;
+import jadex.tools.comanalyzer.ToolCanvas;
+import jadex.tools.comanalyzer.ToolTab;
+import jadex.tools.comanalyzer.chart.ChartLabelGenerator.KeyRenderer;
 
 
 /**

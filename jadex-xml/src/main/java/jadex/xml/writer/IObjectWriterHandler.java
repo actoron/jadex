@@ -3,7 +3,6 @@ package jadex.xml.writer;
 import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
 import jadex.xml.TypeInfo;
-
 import jadex.xml.stax.QName;
 
 /**

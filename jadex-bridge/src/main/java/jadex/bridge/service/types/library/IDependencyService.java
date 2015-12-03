@@ -1,13 +1,13 @@
 package jadex.bridge.service.types.library;
 
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
-
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Service for resolving deployment artifact dependencies.

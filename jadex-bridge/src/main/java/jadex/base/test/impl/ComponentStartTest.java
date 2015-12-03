@@ -1,6 +1,12 @@
 package jadex.base.test.impl;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
 import jadex.bridge.ComponentTerminatedException;
@@ -21,13 +27,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import junit.framework.TestResult;
 
 /**

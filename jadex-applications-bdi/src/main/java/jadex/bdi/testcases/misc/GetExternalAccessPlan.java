@@ -1,5 +1,8 @@
 package jadex.bdi.testcases.misc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.Plan;
@@ -18,9 +21,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  This plan performs an illegal action. 

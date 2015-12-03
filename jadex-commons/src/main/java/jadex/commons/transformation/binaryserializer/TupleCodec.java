@@ -1,15 +1,15 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Codec for encoding and decoding URL objects.

@@ -1,14 +1,14 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdiv3x.runtime.Plan;
-import jadex.commons.SUtil;
-import jadex.commons.gui.GuiCreator;
-
 import java.awt.Component;
 import java.awt.Toolkit;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+
+import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.SUtil;
+import jadex.commons.gui.GuiCreator;
 
 /**
  *  Play a beep.

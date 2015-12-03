@@ -1,5 +1,9 @@
 package jadex.platform.service.awareness.discovery.registry;
 
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -12,10 +16,6 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.DiscoveryEntry;
 import jadex.platform.service.awareness.discovery.MasterSlaveSendHandler;
-
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
 /**
  *  Handle sending.

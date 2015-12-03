@@ -1,7 +1,6 @@
 package jadex.bdiv3.examples.helloworld;
 
 import jadex.bdiv3.annotation.Goal;
-import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;

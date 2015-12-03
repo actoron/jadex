@@ -1,10 +1,10 @@
 package jadex.commons;
 
-import jadex.commons.collection.SCollection;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
+
+import jadex.commons.collection.SCollection;
 
 /**
  *  Dispatch the write calls to a number of

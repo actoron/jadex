@@ -1,14 +1,14 @@
 package jadex.bdiv3.examples.puzzle;
 
-import jadex.commons.SimplePropertyChangeSupport;
-import jadex.commons.beans.PropertyChangeListener;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  The board containing places, pieces and played moves.

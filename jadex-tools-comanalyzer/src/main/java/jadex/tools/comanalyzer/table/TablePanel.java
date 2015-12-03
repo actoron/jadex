@@ -1,12 +1,5 @@
 package jadex.tools.comanalyzer.table;
 
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.jtable.ResizeableTableHeader;
-import jadex.tools.comanalyzer.ComanalyzerPlugin;
-import jadex.tools.comanalyzer.ToolCanvas;
-import jadex.tools.comanalyzer.ToolTab;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -14,6 +7,13 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.UIDefaults;
+
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.ResizeableTableHeader;
+import jadex.tools.comanalyzer.ComanalyzerPlugin;
+import jadex.tools.comanalyzer.ToolCanvas;
+import jadex.tools.comanalyzer.ToolTab;
 
 
 /**

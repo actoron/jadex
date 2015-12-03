@@ -1,13 +1,13 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
-import jadex.gpmn.editor.model.gpmn.IContext;
-import jadex.gpmn.editor.model.gpmn.IParameter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.gpmn.editor.model.gpmn.IContext;
+import jadex.gpmn.editor.model.gpmn.IParameter;
 
 public class Context implements IContext
 {

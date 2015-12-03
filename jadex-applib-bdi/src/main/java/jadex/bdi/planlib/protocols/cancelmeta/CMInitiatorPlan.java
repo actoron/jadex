@@ -1,5 +1,7 @@
 package jadex.bdi.planlib.protocols.cancelmeta;
 
+import java.util.List;
+
 import jadex.bdi.planlib.protocols.InteractionState;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
@@ -8,8 +10,6 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
-
-import java.util.List;
 
 /**
  *  Plan to handle protocol abortion according to FIPA cancel meta protocol

@@ -1,15 +1,15 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.commons.SReflect;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class LRUCodec extends AbstractCodec
 {

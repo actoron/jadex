@@ -1,9 +1,9 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import java.util.List;
+
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.OAVObjectType;
-
-import java.util.List;
 
 /**
  *  Provides an extension point to introduce

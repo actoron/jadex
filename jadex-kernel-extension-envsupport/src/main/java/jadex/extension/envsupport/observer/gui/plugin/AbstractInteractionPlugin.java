@@ -1,15 +1,5 @@
 package jadex.extension.envsupport.observer.gui.plugin;
 
-import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.observer.graphics.IViewport;
-import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
-import jadex.extension.envsupport.observer.perspective.Perspective2D;
-import jadex.extension.envsupport.observer.perspective.Perspective3D;
-import jadex.commons.SimplePropertyObject;
-
 import java.awt.Canvas;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -20,6 +10,16 @@ import java.util.List;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.observer.graphics.IViewport;
+import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
+import jadex.extension.envsupport.observer.gui.ObserverCenter;
+import jadex.extension.envsupport.observer.perspective.Perspective2D;
+import jadex.extension.envsupport.observer.perspective.Perspective3D;
 
 /**
  * 

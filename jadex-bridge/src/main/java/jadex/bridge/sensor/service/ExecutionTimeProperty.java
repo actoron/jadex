@@ -1,5 +1,10 @@
 package jadex.bridge.sensor.service;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.sensor.time.TimedProperty;
 import jadex.bridge.service.IService;
@@ -11,12 +16,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Property for the overall execution time of a method or a service.

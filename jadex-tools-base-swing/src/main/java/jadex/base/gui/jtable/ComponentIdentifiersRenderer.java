@@ -1,14 +1,14 @@
 package jadex.base.gui.jtable;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
-import jadex.commons.SReflect;
-
 import java.awt.Component;
 import java.util.Iterator;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
+import jadex.commons.SReflect;
 
 
 /**

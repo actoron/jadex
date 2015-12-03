@@ -1,12 +1,12 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.bridge.service.types.message.IContentCodec;
-import jadex.bridge.service.types.message.IEncodingContext;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
+
+import jadex.bridge.service.types.message.IContentCodec;
+import jadex.bridge.service.types.message.IEncodingContext;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 /**
  *  Simple test codec.

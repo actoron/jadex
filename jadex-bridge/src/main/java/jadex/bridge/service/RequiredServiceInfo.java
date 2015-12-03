@@ -1,12 +1,12 @@
 package jadex.bridge.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Struct for information about a required service.

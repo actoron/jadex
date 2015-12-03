@@ -1,7 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ImageProvider;
-
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -11,6 +9,8 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import jadex.bpmn.editor.gui.ImageProvider;
 
 /**
  *  Generic class representing a button panel for adding and removing items.

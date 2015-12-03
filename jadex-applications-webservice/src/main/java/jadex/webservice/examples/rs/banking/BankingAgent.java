@@ -1,6 +1,5 @@
 package jadex.webservice.examples.rs.banking;
 
-import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;

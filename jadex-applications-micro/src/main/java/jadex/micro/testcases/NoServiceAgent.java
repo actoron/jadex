@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import java.util.Collection;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
@@ -14,8 +16,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Collection;
 
 /**
  *  Test searching for services that don't exist. 

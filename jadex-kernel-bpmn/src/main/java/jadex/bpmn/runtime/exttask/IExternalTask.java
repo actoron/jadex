@@ -1,8 +1,8 @@
 package jadex.bpmn.runtime.exttask;
 
-import jadex.commons.future.IFuture;
-
 import java.util.Map;
+
+import jadex.commons.future.IFuture;
 
 /**
  * 

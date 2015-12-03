@@ -1,12 +1,12 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.List;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
-
-import java.util.List;
 
 /**
  * 

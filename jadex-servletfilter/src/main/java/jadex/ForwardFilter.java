@@ -1,8 +1,5 @@
 package jadex;
 
-import jadex.commons.SUtil;
-import jadex.commons.collection.LRU;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -40,6 +36,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import jadex.commons.SUtil;
+import jadex.commons.collection.LRU;
 
 /**
  *  The forward filter is a kind of web proxy that offers rest methods to adjust its mappings.

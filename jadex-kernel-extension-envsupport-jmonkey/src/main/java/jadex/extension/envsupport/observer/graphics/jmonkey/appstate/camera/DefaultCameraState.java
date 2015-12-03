@@ -1,20 +1,15 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera;
 
-import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.IsoCamera;
-
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
-import com.jme3.input.InputManager;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Node;
+
+import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 
 
 public class DefaultCameraState extends AbstractAppState

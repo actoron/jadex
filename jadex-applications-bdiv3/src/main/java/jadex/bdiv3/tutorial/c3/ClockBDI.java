@@ -1,13 +1,13 @@
 package jadex.bdiv3.tutorial.c3;
 
+import java.text.SimpleDateFormat;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
-
-import java.text.SimpleDateFormat;
 
 /**
  *  Getter/setter belief.

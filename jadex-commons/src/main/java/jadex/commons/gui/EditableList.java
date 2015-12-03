@@ -1,7 +1,5 @@
 package jadex.commons.gui;
 
-import jadex.commons.SUtil;
-
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
@@ -15,6 +13,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+
+import jadex.commons.SUtil;
 
 /**
  *  A editable list with x / + symbols at each row.

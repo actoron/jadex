@@ -1,16 +1,15 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry;
 
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Cylinder;
+
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Cylinder3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
-
-import com.jme3.bounding.BoundingBox;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Cylinder;
 
 
 public class CylinderJMonkeyRenderer extends AbstractJMonkeyRenderer

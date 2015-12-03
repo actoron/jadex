@@ -1,5 +1,8 @@
 package jadex.bdiv3.testcases.goals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.annotation.Belief;
@@ -24,9 +27,6 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.rules.eca.annotations.Event;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Agent that has a goal for buying an amount of items.

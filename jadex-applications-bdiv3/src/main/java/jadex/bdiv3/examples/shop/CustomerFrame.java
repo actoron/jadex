@@ -1,5 +1,10 @@
 package jadex.bdiv3.examples.shop;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -13,11 +18,6 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.JFrame;
 
 /**
  *  Frame for displaying of the customer gui.

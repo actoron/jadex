@@ -1,15 +1,15 @@
 package jadex.micro.examples.mandelbrot;
 
+import java.awt.BorderLayout;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.appstore.IAppGui;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-
-import java.awt.BorderLayout;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 /**
  * 

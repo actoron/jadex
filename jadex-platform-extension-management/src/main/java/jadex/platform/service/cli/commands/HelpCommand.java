@@ -1,5 +1,11 @@
 package jadex.platform.service.cli.commands;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.transformation.IObjectStringConverter;
@@ -8,12 +14,6 @@ import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ICliCommand;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  The help command can be used to display all available or

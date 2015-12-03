@@ -1,29 +1,5 @@
 package jadex.tools.convcenter;
 
-import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.componenttree.ComponentIconCache;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
-import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -54,6 +30,30 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.IMessageAdapter;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 /**
  * A panel for sending and receiving messages.

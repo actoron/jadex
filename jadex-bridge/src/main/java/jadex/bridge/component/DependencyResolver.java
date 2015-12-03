@@ -1,7 +1,5 @@
 package jadex.bridge.component;
 
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -9,6 +7,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  The dependency resolver can be used to find a valid

@@ -1,6 +1,8 @@
 package jadex.bdi.tutorial;
 
 
+import java.util.StringTokenizer;
+
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.IMessageEvent;
@@ -13,8 +15,6 @@ import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.commons.SUtil;
-
-import java.util.StringTokenizer;
 
 /**
  *  Tries to translate a sentence word by word

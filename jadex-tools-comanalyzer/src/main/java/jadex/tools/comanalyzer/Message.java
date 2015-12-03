@@ -1,18 +1,17 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IMessageAdapter;
-import jadex.bridge.fipa.SFipa;
-import jadex.commons.ComposedFilter;
-import jadex.commons.IFilter;
-import jadex.commons.collection.SCollection;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import edu.uci.ics.jung.graph.util.Pair;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IMessageAdapter;
+import jadex.bridge.fipa.SFipa;
+import jadex.commons.ComposedFilter;
+import jadex.commons.IFilter;
+import jadex.commons.collection.SCollection;
 
 
 /**

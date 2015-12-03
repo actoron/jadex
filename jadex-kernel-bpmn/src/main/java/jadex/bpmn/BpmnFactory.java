@@ -1,5 +1,11 @@
 package jadex.bpmn;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
 import jadex.bpmn.features.impl.BpmnComponentFeature;
 import jadex.bpmn.features.impl.BpmnExecutionFeature;
 import jadex.bpmn.features.impl.BpmnMessageComponentFeature;
@@ -29,12 +35,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 
 
 /**

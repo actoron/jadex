@@ -1,5 +1,12 @@
 package jadex.micro.examples.mandelbrot;
 
+import java.awt.Rectangle;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.SwingUtilities;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -23,13 +30,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-
-import java.awt.Rectangle;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  Generate service implementation. 

@@ -1,9 +1,9 @@
 package jadex.bdi.testcases.plans;
 
+import java.util.Arrays;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
-
-import java.util.Arrays;
 
 /**
  *  Wait endlessly for belief changes.

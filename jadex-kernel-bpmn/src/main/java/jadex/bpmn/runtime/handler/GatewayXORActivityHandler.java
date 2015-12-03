@@ -1,5 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.List;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.IActivityHandler;
@@ -12,8 +14,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
-
-import java.util.List;
 
 
 /**

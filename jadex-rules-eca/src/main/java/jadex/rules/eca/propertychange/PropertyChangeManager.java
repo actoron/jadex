@@ -1,5 +1,9 @@
 package jadex.rules.eca.propertychange;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.beans.PropertyChangeEvent;
@@ -8,10 +12,6 @@ import jadex.commons.future.IResultListener;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.IEvent;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract class to provide a Factory Method and common methods for

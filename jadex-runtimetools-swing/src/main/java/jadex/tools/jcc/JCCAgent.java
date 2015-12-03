@@ -28,7 +28,6 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
-import jadex.tools.awareness.AwarenessComponentPlugin;
 import jadex.tools.awareness.AwarenessServicePlugin;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;

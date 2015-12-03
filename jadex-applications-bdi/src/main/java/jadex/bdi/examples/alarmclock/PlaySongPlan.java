@@ -1,15 +1,14 @@
 package jadex.bdi.examples.alarmclock;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.URL;
+
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.net.URL;
-
 import javazoom.jl.player.AudioDevice;
 import javazoom.jl.player.FactoryRegistry;
 import javazoom.jl.player.Player;

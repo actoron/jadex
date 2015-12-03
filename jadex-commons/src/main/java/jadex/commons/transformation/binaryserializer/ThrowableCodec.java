@@ -1,13 +1,13 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.Map;
+
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Codec for encoding and decoding exception objects.

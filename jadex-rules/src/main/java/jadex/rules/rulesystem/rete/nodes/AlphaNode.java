@@ -1,5 +1,10 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;
@@ -7,11 +12,6 @@ import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  *  An alpha node is a 1-input -> 1-output node which

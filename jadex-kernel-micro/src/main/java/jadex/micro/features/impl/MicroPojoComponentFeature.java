@@ -1,5 +1,7 @@
 package jadex.micro.features.impl;
 
+import java.util.Collections;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -10,8 +12,6 @@ import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.micro.MicroModel;
-
-import java.util.Collections;
 
 /**
  *  Feature that makes pojo accessible.

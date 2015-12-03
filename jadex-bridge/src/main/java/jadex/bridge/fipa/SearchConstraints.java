@@ -1,8 +1,8 @@
 package jadex.bridge.fipa;
 
-import jadex.bridge.ISearchConstraints;
-
 import java.io.Serializable;
+
+import jadex.bridge.ISearchConstraints;
 
 /**
  *  Java class for concept SearchConstraints of beanynizer_beans_fipa_default ontology.

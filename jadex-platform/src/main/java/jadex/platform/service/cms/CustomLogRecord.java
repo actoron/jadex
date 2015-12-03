@@ -1,9 +1,9 @@
 package jadex.platform.service.cms;
 
-import jadex.bridge.IComponentIdentifier;
-
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
+import jadex.bridge.IComponentIdentifier;
 
 
 /**

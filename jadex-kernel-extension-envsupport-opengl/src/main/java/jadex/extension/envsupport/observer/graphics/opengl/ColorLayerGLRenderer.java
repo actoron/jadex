@@ -1,13 +1,13 @@
 package jadex.extension.envsupport.observer.graphics.opengl;
 
+import java.awt.Color;
+
+import javax.media.opengl.GL;
+
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
-
-import java.awt.Color;
-
-import javax.media.opengl.GL;
 
 public class ColorLayerGLRenderer implements ILayerGLRenderer
 {

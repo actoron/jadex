@@ -1,7 +1,5 @@
 package jadex.tools.comanalyzer.chart;
 
-import jadex.tools.comanalyzer.PaintMaps;
-
 import java.awt.Color;
 import java.awt.Paint;
 import java.util.HashMap;
@@ -11,6 +9,8 @@ import org.jfree.chart.plot.DefaultDrawingSupplier;
 import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.PieDataset;
+
+import jadex.tools.comanalyzer.PaintMaps;
 
 
 /**

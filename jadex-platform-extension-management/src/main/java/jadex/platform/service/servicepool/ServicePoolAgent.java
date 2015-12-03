@@ -1,5 +1,9 @@
 package jadex.platform.service.servicepool;
 
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
@@ -19,10 +23,6 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The service pool agent can be used to handle services in a pooled manner.

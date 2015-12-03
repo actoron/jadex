@@ -1,23 +1,5 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.bdiv3.examples.shop.CustomerCapability.BuyItem;
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.runtime.ICapability;
-import jadex.bdiv3.runtime.impl.BeliefAdapter;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.rules.eca.ChangeInfo;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -54,6 +36,24 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bdiv3.examples.shop.CustomerCapability.BuyItem;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.ICapability;
+import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Customer gui that allows buying items at different shops.

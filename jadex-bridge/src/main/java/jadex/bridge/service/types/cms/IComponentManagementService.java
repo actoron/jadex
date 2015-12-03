@@ -1,5 +1,9 @@
 package jadex.bridge.service.types.cms;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -12,10 +16,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  General interface for components that the container can execute.

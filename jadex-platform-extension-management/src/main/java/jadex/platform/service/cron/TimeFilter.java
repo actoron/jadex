@@ -1,9 +1,9 @@
 package jadex.platform.service.cron;
 
-import jadex.commons.IFilter;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import jadex.commons.IFilter;
 
 /**
  *  Filter for testing if a time point matches one specific pattern.

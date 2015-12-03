@@ -1,13 +1,13 @@
 package jadex.tools.comanalyzer;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.SCollection;
-
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  *  A filter checks if an object matches

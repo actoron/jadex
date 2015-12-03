@@ -17,13 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.Beans;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.beans.PropertyVetoException;
-import jadex.commons.beans.VetoableChangeListener;
-import jadex.commons.beans.Visibility;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -37,6 +30,13 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.harmony.beans.internal.nls.Messages;
+
+import jadex.commons.beans.Beans;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyVetoException;
+import jadex.commons.beans.VetoableChangeListener;
+import jadex.commons.beans.Visibility;
 
 /**
  * This support class implements <code>BeanContext</code> interface. 

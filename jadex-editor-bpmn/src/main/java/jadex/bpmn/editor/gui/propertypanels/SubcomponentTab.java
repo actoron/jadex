@@ -1,13 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bridge.modelinfo.ComponentInstanceInfo;
-import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.commons.IFilter;
-import jadex.commons.SUtil;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -21,6 +13,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 
 public class SubcomponentTab extends JPanel
 {

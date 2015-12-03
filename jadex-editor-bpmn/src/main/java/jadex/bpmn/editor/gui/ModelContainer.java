@@ -1,15 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.Settings.BpmnClassFilter;
-import jadex.bpmn.editor.gui.Settings.FileFilter;
-import jadex.bpmn.model.IModelContainer;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MTask;
-import jadex.bpmn.model.io.IdGenerator;
-import jadex.bpmn.task.info.TaskMetaInfo;
-import jadex.bridge.ClassInfo;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
@@ -35,6 +25,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.mxgraph.swing.mxGraphComponent;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.Settings.BpmnClassFilter;
+import jadex.bpmn.editor.gui.Settings.FileFilter;
+import jadex.bpmn.model.IModelContainer;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
+import jadex.bpmn.model.io.IdGenerator;
+import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.ClassInfo;
 
 /**
  * Container for the current model.

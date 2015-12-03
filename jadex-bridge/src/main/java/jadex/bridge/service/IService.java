@@ -1,10 +1,9 @@
 package jadex.bridge.service;
 
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import java.util.Map;
+
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
 
 
 /**

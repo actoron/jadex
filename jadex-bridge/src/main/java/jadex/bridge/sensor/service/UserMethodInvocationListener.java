@@ -1,9 +1,9 @@
 package jadex.bridge.sensor.service;
 
+import java.lang.reflect.Method;
+
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
-
-import java.lang.reflect.Method;
 
 /**
  *  Listener that only observes user methods. It ignores calls to

@@ -1,11 +1,5 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.base.test.TestReport;
-import jadex.bdi.planlib.messaging.EmailAccount;
-import jadex.bdi.planlib.messaging.IMAccount;
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.runtime.Plan;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,6 +7,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import jadex.base.test.TestReport;
+import jadex.bdi.planlib.messaging.EmailAccount;
+import jadex.bdi.planlib.messaging.IMAccount;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Test the messaging capability.

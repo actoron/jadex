@@ -1,13 +1,13 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.awt.Image;
+import java.util.List;
+import java.util.Map;
+
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-
-import java.awt.Image;
-import java.util.List;
-import java.util.Map;
 
 
 /**

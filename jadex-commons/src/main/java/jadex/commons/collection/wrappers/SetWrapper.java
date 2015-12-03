@@ -1,6 +1,5 @@
 package jadex.commons.collection.wrappers;
 
-import java.util.List;
 import java.util.Set;
 
 /**

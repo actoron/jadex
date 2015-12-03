@@ -1,9 +1,9 @@
 package jadex.javaparser.javaccimpl;
 
-import jadex.commons.IValueFetcher;
-
 import java.util.Collection;
 import java.util.Map;
+
+import jadex.commons.IValueFetcher;
 
 
 /**

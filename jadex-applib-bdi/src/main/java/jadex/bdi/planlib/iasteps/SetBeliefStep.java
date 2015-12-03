@@ -1,14 +1,14 @@
 package jadex.bdi.planlib.iasteps;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IBeliefbase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public class SetBeliefStep implements IComponentStep<Void>
 {

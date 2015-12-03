@@ -1,5 +1,7 @@
 package jadex.platform.service.cli.commands;
 
+import java.util.Map;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -13,8 +15,6 @@ import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.util.Map;
 
 /**
  *

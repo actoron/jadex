@@ -1,11 +1,11 @@
 package jadex.base.relay;
 
-import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 /**
  *  The peer list actively manages the list of

@@ -1,5 +1,8 @@
 package jadex.micro.testcases;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -18,9 +21,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Simple test agent with one service.

@@ -1,12 +1,12 @@
 package jadex.webservice.examples.rs.hello;
 
-import jadex.extension.rs.invoke.RestResponse;
-import jadex.extension.rs.publish.mapper.IValueMapper;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import javax.ws.rs.core.Response;
+
+import jadex.extension.rs.invoke.RestResponse;
+import jadex.extension.rs.publish.mapper.IValueMapper;
 
 public class XMLResultMapper implements IValueMapper
 {

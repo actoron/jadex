@@ -1,39 +1,10 @@
 package jadex.tools.testcenter;
 
-import jadex.base.SRemoteGui;
-import jadex.base.gui.asynctree.INodeListener;
-import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filetree.IFileNode;
-import jadex.base.gui.modeltree.AddPathAction;
-import jadex.base.gui.modeltree.ModelTreePanel;
-import jadex.base.gui.modeltree.RemovePathAction;
-import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
-import jadex.commons.collection.SCollection;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ToolTipAction;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
-
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,6 +19,30 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
 import javax.swing.tree.TreePath;
+
+import jadex.base.SRemoteGui;
+import jadex.base.gui.asynctree.INodeListener;
+import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.filetree.IFileNode;
+import jadex.base.gui.modeltree.AddPathAction;
+import jadex.base.gui.modeltree.ModelTreePanel;
+import jadex.base.gui.modeltree.RemovePathAction;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.collection.SCollection;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 
 /**
  *  Plugin for the test center.

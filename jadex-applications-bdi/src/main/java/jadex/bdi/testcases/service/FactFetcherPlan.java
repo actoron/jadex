@@ -1,12 +1,12 @@
 package jadex.bdi.testcases.service;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  *  Test fetching a fact via a service.

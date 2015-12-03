@@ -1,10 +1,10 @@
 package jadex.bdi.examples.booktrading.serviceimpl.seller;
 
+import java.util.Date;
+
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
 import jadex.bdiv3x.runtime.Plan;
-
-import java.util.Date;
 
 /**
  * Execute the order by setting execution price and date.

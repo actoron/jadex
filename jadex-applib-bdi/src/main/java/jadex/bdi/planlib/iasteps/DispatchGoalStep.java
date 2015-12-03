@@ -1,5 +1,9 @@
 package jadex.bdi.planlib.iasteps;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IParameter;
@@ -9,10 +13,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 {

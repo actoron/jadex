@@ -1,10 +1,10 @@
 package jadex.commons.collection;
 
-import jadex.commons.SUtil;
-import jadex.commons.concurrent.TimeoutException;
-
 import java.util.Arrays;
 import java.util.List;
+
+import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
 
 
 

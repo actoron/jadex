@@ -1,21 +1,5 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bdiv3x.runtime.IInternalEvent;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -50,6 +34,22 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bdiv3x.runtime.IInternalEvent;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 
 /**

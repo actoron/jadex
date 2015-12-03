@@ -1,17 +1,5 @@
 package jadex.bpmn.editor.gui.controllers;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VEdge;
-import jadex.bpmn.editor.model.visual.VElement;
-import jadex.bpmn.editor.model.visual.VLane;
-import jadex.bpmn.editor.model.visual.VSubProcess;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MNamedIdElement;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
@@ -33,6 +21,15 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.model.MBpmnModel;
 
 /**
  *  This controller handles certain operations concerning the graph such as object movement.

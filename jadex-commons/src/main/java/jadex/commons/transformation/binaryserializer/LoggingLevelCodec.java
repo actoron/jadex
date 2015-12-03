@@ -1,13 +1,13 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Codec for encoding and decoding Logging Level objects.

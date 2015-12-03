@@ -7,7 +7,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 
 /**
  *  Main class for starting the chat

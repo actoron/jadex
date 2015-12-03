@@ -4,14 +4,14 @@
 package jadex.bdi.examples.hunterprey.ldahunter.potentialfield;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Int;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  *

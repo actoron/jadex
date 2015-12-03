@@ -1,17 +1,9 @@
 package jadex.commons.gui.autocombo;
 
-import jadex.commons.SUtil;
-import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.ThreadPool;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -28,6 +20,12 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
+
+import jadex.commons.SUtil;
+import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.concurrent.ThreadPool;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 
 /**

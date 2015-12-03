@@ -1,5 +1,9 @@
 package jadex.bdiv3.examples.marsworld.movement;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.application.EnvironmentService;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
@@ -21,11 +25,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * 

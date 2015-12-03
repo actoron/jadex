@@ -1,9 +1,5 @@
 package jadex.commons.gui;
 
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +12,10 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
+
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 
 /**

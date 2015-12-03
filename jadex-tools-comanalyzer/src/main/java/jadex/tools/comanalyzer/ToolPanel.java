@@ -1,7 +1,5 @@
 package jadex.tools.comanalyzer;
 
-import jadex.commons.gui.BrowserPane;
-
 import java.awt.BorderLayout;
 import java.util.Map;
 
@@ -11,6 +9,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import jadex.commons.gui.BrowserPane;
 
 
 /**

@@ -1,5 +1,7 @@
 package jadex.bdiv3.testcases.beliefs;
 
+import java.util.Arrays;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.IBDIAgent;
@@ -16,8 +18,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Arrays;
 
 /**
  *  Agent that tests if waiting for a specific index change in a collection works.

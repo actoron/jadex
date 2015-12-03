@@ -1,5 +1,13 @@
 package jadex.micro.features.impl;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -30,14 +38,6 @@ import jadex.micro.MicroModel;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 

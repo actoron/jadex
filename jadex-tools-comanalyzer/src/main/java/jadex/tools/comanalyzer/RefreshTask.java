@@ -1,17 +1,13 @@
 package jadex.tools.comanalyzer;
 
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.ThreadSuspendable;
-
-import java.awt.EventQueue;
-import java.awt.Toolkit;
-import java.awt.event.InvocationEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
 import javax.swing.SwingUtilities;
+
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 
 
 /**

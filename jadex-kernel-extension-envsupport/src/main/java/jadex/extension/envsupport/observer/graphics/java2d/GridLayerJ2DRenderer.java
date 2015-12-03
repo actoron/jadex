@@ -1,14 +1,14 @@
 package jadex.extension.envsupport.observer.graphics.java2d;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
-
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
 
 public class GridLayerJ2DRenderer implements ILayerJ2DRenderer
 {

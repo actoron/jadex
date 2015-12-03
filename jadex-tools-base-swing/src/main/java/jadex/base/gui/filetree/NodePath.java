@@ -1,12 +1,12 @@
 package jadex.base.gui.filetree;
 
 
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.commons.SUtil;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.commons.SUtil;
 
 /**
  *  Store a path in the project for selected or expanded nodes.

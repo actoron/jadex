@@ -1,38 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VElement;
-import jadex.bpmn.editor.model.visual.VLane;
-import jadex.bpmn.editor.model.visual.VPool;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MContextVariable;
-import jadex.bpmn.model.MLane;
-import jadex.bpmn.model.MNamedIdElement;
-import jadex.bpmn.model.MPool;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.ProvidedServiceImplementation;
-import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IFilter;
-import jadex.commons.SUtil;
-import jadex.commons.collection.IndexMap;
-import jadex.commons.gui.autocombo.AutoComboTableCellEditor;
-import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
-import jadex.commons.gui.autocombo.AutoCompleteCombo;
-import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
-import jadex.commons.gui.autocombo.ComboBoxEditor;
-import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -75,6 +42,39 @@ import javax.swing.table.TableColumn;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
+
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MContextVariable;
+import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MNamedIdElement;
+import jadex.bpmn.model.MPool;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.IFilter;
+import jadex.commons.SUtil;
+import jadex.commons.collection.IndexMap;
+import jadex.commons.gui.autocombo.AutoComboTableCellEditor;
+import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
+import jadex.commons.gui.autocombo.ComboBoxEditor;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
 /**
  *  BPMN process property panel.

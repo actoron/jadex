@@ -5,7 +5,7 @@
 <agent xmlns="http://www.activecomponents.org/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
-	                    http://www.activecomponents.org/jadex-bdi-2.0.xsd"
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	   name="SimulationClientApplication"
 	   package="jadex.wfms.simulation">
 

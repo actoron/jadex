@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.Map;
+
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -9,8 +11,6 @@ import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.Map;
 
 /**
  *  The interface for accessing components from the outside.

@@ -1,12 +1,11 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-
 import java.awt.BorderLayout;
 
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
 
 /**
  * 

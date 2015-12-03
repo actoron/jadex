@@ -1,10 +1,10 @@
 package jadex.commons.future;
 
-import jadex.commons.ICommand;
-import jadex.commons.IFilter;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import jadex.commons.ICommand;
+import jadex.commons.IFilter;
 
 
 /**

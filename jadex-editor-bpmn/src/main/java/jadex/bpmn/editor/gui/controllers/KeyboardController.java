@@ -1,8 +1,5 @@
 package jadex.bpmn.editor.gui.controllers;
 
-import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.ModelContainer;
-
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -12,6 +9,9 @@ import javax.swing.KeyStroke;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxKeyboardHandler;
+
+import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.editor.gui.ModelContainer;
 
 public class KeyboardController extends mxKeyboardHandler
 {

@@ -1,13 +1,13 @@
 package jadex.extension.envsupport.observer.gui.plugin;
 
-import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
-
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
+
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.observer.gui.ObserverCenter;
 
 /**
  * 

@@ -1,8 +1,5 @@
 package jadex.base.gui;
 
-import jadex.base.gui.ObjectTreeModel.ObjectTreeCellRenderer;
-import jadex.commons.gui.TreeExpansionHandler;
-
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
@@ -12,6 +9,9 @@ import javax.swing.JTree;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
+
+import jadex.base.gui.ObjectTreeModel.ObjectTreeCellRenderer;
+import jadex.commons.gui.TreeExpansionHandler;
 
 /**
  *  Panel for inspecting Java objects.

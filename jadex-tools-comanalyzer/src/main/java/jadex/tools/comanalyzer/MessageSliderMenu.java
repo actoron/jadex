@@ -1,7 +1,5 @@
 package jadex.tools.comanalyzer;
 
-import jadex.commons.SUtil;
-
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.List;
@@ -13,6 +11,8 @@ import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import jadex.commons.SUtil;
 
 
 /**

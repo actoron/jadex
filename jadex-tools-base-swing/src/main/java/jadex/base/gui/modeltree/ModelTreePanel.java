@@ -1,5 +1,21 @@
 package jadex.base.gui.modeltree;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
+
 import jadex.base.ModelFileFilter;
 import jadex.base.SRemoteGui;
 import jadex.base.gui.RememberOptionMessage;
@@ -32,22 +48,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JOptionPane;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 
 /**
  *  Tree for component models.

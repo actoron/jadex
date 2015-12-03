@@ -1,5 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
@@ -10,24 +13,21 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.PullIntermediateDelegationFuture;
 import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.Tuple2Future;
-import jadex.commons.future.TupleResult;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
-
-import java.util.Collection;
-import java.util.logging.Logger;
+import jadex.commons.future.Tuple2Future;
+import jadex.commons.future.TupleResult;
 
 /**
  *  Default future functionality.

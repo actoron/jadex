@@ -1,12 +1,12 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 public class MethodCodec
 {

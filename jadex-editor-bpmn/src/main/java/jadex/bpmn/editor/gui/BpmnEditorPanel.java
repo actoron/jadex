@@ -1,8 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.gui.controllers.SelectionController;
-import jadex.commons.gui.JSplitPanel;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 
@@ -10,6 +7,9 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import com.mxgraph.util.mxEvent;
+
+import jadex.bpmn.editor.gui.controllers.SelectionController;
+import jadex.commons.gui.JSplitPanel;
 
 /**
  * 

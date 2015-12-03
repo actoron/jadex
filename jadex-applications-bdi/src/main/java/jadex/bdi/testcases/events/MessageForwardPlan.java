@@ -1,13 +1,13 @@
 package jadex.bdi.testcases.events;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Receive a message sent to itself and forward it to another agent

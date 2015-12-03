@@ -1,11 +1,5 @@
 package jadex.platform.service.message.transport.niotcpmtp;
 
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,6 +18,12 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
+
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 
 /**

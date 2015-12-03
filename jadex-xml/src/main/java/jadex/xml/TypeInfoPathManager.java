@@ -1,12 +1,12 @@
 package jadex.xml;
 
-import jadex.xml.stax.QName;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import jadex.xml.stax.QName;
 
 /**
  *  Type path info manager. This manager organizes type infos via their paths.

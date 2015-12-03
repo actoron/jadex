@@ -1,11 +1,5 @@
 package jadex.bdi.examples.blackjack.gui;
 
-import jadex.bdi.examples.blackjack.GameState;
-import jadex.bdi.examples.blackjack.Player;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.collection.SCollection;
-
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -15,6 +9,12 @@ import java.awt.Insets;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import jadex.bdi.examples.blackjack.GameState;
+import jadex.bdi.examples.blackjack.Player;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.collection.SCollection;
 
 /**
  *	This class represents the JPanel of one player as it is shown in the GUI.

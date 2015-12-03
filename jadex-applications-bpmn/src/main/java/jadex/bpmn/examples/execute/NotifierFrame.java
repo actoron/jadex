@@ -1,9 +1,5 @@
 package jadex.bpmn.examples.execute;
 
-import jadex.bpmn.runtime.handler.IExternalNotifier;
-import jadex.bpmn.runtime.handler.Notifier;
-import jadex.commons.gui.SGUI;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +8,10 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+
+import jadex.bpmn.runtime.handler.IExternalNotifier;
+import jadex.bpmn.runtime.handler.Notifier;
+import jadex.commons.gui.SGUI;
 
 /**
  *  Notifier frame is an example for a very simple external system that

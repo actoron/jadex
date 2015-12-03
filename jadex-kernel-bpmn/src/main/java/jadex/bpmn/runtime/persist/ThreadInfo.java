@@ -1,11 +1,11 @@
 package jadex.bpmn.runtime.persist;
 
-import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.handler.SplitInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.handler.SplitInfo;
 
 /**
  *  Thread info object.

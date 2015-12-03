@@ -1,9 +1,5 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -12,6 +8,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Object serializer for encoding to and decoding from a compact binary format.

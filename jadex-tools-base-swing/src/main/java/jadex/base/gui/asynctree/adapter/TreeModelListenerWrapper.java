@@ -2,11 +2,6 @@ package jadex.base.gui.asynctree.adapter;
 
 import jadex.base.gui.asynctree.AsyncTreeModelEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.event.TreeModelListener;
-
 /**
  * Wraps a java.swing.event.TreeModelListener to implement jadex.base.gui.asynctree.TreeModelListener
  */

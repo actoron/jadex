@@ -1,5 +1,11 @@
 package jadex.platform.service.cli.commands;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.DecimalFormat;
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -24,12 +30,6 @@ import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  *  Command to upload a file.

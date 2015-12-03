@@ -1,10 +1,10 @@
 package jadex.bridge;
 
-import jadex.bridge.service.annotation.Timeout;
-import jadex.commons.future.ThreadLocalTransferHelper;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.future.ThreadLocalTransferHelper;
 
 
 /**

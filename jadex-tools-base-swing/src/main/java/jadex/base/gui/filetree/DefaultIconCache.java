@@ -1,11 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.base.gui.filechooser.RemoteFile;
-import jadex.bridge.service.types.filetransfer.FileData;
-import jadex.commons.SUtil;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +7,12 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
+
+import jadex.base.JarAsDirectory;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.base.gui.filechooser.RemoteFile;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.commons.SUtil;
 
 /**
  *  Cache for component icons.

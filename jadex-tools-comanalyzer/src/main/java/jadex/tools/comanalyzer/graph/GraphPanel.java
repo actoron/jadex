@@ -1,15 +1,5 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-import jadex.tools.comanalyzer.ComanalyzerPlugin;
-import jadex.tools.comanalyzer.PaintMaps;
-import jadex.tools.comanalyzer.ToolCanvas;
-import jadex.tools.comanalyzer.ToolTab;
-import jadex.tools.comanalyzer.graph.EdgeTransformer.WeightStroke;
-import jadex.tools.comanalyzer.graph.VertexTransformer.IconSize;
-import jadex.tools.comanalyzer.table.TablePanel;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -50,6 +40,15 @@ import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout2;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
+import jadex.tools.comanalyzer.ComanalyzerPlugin;
+import jadex.tools.comanalyzer.PaintMaps;
+import jadex.tools.comanalyzer.ToolCanvas;
+import jadex.tools.comanalyzer.ToolTab;
+import jadex.tools.comanalyzer.graph.EdgeTransformer.WeightStroke;
+import jadex.tools.comanalyzer.graph.VertexTransformer.IconSize;
+import jadex.tools.comanalyzer.table.TablePanel;
 
 
 /**

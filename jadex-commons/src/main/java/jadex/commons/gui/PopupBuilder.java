@@ -1,13 +1,13 @@
 package jadex.commons.gui;
 
-import jadex.commons.SUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
+import jadex.commons.SUtil;
 
 /**
  *  The popup builder. Constructs a (non-nested) popup menu from actions.

@@ -1,12 +1,12 @@
 package jadex.tools.dfbrowser;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
-
 import java.util.Date;
 
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
 
 /**
  *  The table model for component descriptions.

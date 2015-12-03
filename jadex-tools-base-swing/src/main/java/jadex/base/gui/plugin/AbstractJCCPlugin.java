@@ -1,6 +1,16 @@
 package jadex.base.gui.plugin;
 
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -19,16 +29,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 
 /**
  *  Template class for control center plugins.

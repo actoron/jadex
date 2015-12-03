@@ -1,5 +1,13 @@
 package jadex.tools.filetransfer;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.FileTreePanel;
@@ -11,14 +19,6 @@ import jadex.commons.future.Future;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.UIDefaults;
 
 /**
  *  The refresh all action.

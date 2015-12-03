@@ -1,5 +1,9 @@
 package jadex.micro.testcases.multiinvoke;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
@@ -24,10 +28,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  *  Agent that uses a multiplexed service.

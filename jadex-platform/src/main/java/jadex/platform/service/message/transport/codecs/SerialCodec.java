@@ -1,14 +1,14 @@
 package jadex.platform.service.message.transport.codecs;
 
-import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.IEncodingContext;
-import jadex.commons.CLObjectInputStream;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+
+import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
+import jadex.commons.CLObjectInputStream;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 /**
  *  The serial codec allows for encoding and decoding

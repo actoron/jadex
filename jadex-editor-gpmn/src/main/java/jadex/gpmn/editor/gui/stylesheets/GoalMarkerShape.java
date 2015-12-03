@@ -1,9 +1,5 @@
 package jadex.gpmn.editor.gui.stylesheets;
 
-import jadex.gpmn.editor.model.gpmn.ModelConstants;
-import jadex.gpmn.editor.model.visual.VGoal;
-import jadex.gpmn.editor.model.visual.VGoal.VGoalType;
-
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -12,6 +8,10 @@ import java.util.Map;
 
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.view.mxCellState;
+
+import jadex.gpmn.editor.model.gpmn.ModelConstants;
+import jadex.gpmn.editor.model.visual.VGoal;
+import jadex.gpmn.editor.model.visual.VGoal.VGoalType;
 
 public class GoalMarkerShape extends AbstractTextMarkerShape
 {

@@ -2,7 +2,6 @@ package jadex.bridge.sensor.service;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.search.BasicEvaluator;
-import jadex.bridge.sensor.service.WaitqueueProperty;
 import jadex.commons.MethodInfo;
 
 /**

@@ -13,7 +13,6 @@ import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MTask;
 
 /**

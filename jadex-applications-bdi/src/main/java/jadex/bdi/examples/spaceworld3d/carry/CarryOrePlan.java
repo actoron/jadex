@@ -1,5 +1,8 @@
 package jadex.bdi.examples.spaceworld3d.carry;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdi.examples.spaceworld3d.producer.ProduceOreTask;
 import jadex.bdi.examples.spaceworld3d.sentry.AnalyzeTargetTask;
 import jadex.bdiv3.runtime.IGoal;
@@ -11,9 +14,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space3d.Space3D;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

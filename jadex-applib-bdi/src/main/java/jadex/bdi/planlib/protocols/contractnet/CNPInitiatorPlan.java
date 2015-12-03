@@ -1,5 +1,11 @@
 package jadex.bdi.planlib.protocols.contractnet;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bdi.planlib.protocols.AbstractInitiatorPlan;
 import jadex.bdi.planlib.protocols.NegotiationRecord;
 import jadex.bdi.planlib.protocols.ParticipantProposal;
@@ -11,12 +17,6 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Handles the initiator side of a contract-net protocol.

@@ -1,37 +1,5 @@
 package jadex.tools.awareness;
 
-import jadex.base.gui.componentviewer.IComponentViewerPanel;
-import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.base.gui.jtable.ComponentIdentifierRenderer;
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.awareness.DiscoveryInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.EditableList;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.platform.service.awareness.management.AwarenessManagementAgent;
-import jadex.platform.service.awareness.management.AwarenessManagementAgentHelper;
-import jadex.platform.service.awareness.management.AwarenessSettingsData;
-import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
-
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -78,6 +46,38 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.base.gui.componentviewer.IComponentViewerPanel;
+import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.awareness.DiscoveryInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.EditableList;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.gui.jtable.DateTimeRenderer;
+import jadex.platform.service.awareness.management.AwarenessManagementAgent;
+import jadex.platform.service.awareness.management.AwarenessManagementAgentHelper;
+import jadex.platform.service.awareness.management.AwarenessSettingsData;
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 /**
  *  Panel for the awareness infos.

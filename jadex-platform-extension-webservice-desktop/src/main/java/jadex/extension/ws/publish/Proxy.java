@@ -1,9 +1,9 @@
 package jadex.extension.ws.publish;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+
+import jadex.commons.SReflect;
 
 /**
  *  Base class for generated web service proxies.

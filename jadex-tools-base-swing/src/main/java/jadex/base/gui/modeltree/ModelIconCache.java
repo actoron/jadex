@@ -1,5 +1,14 @@
 package jadex.base.gui.modeltree;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JTree;
+import javax.swing.UIDefaults;
+import javax.swing.tree.TreeModel;
+
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.filetree.DirNode;
@@ -17,15 +26,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JTree;
-import javax.swing.UIDefaults;
-import javax.swing.tree.TreeModel;
 
 /**
  *  Cache for component icons.

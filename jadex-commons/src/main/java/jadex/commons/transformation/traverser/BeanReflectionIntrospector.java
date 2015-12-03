@@ -1,11 +1,5 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.Tuple3;
-import jadex.commons.collection.LRU;
-import jadex.commons.transformation.annotations.Exclude;
-import jadex.commons.transformation.annotations.Include;
-import jadex.commons.transformation.annotations.IncludeFields;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -14,6 +8,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.Tuple3;
+import jadex.commons.collection.LRU;
+import jadex.commons.transformation.annotations.Exclude;
+import jadex.commons.transformation.annotations.Include;
+import jadex.commons.transformation.annotations.IncludeFields;
 
 
 /**

@@ -1,5 +1,9 @@
 package jadex.bdiv3.testcases.beliefs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
@@ -10,10 +14,6 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Agent
 public class ArrayListBDI 

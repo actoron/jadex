@@ -1,5 +1,12 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.commons.IPropertyObject;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector3Double;
@@ -7,13 +14,6 @@ import jadex.extension.envsupport.observer.graphics.IViewport3d;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 

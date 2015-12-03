@@ -1,5 +1,7 @@
 package jadex.tools.awareness;
 
+import javax.swing.Icon;
+
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
@@ -7,8 +9,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.tools.generic.AbstractComponentPlugin;
-
-import javax.swing.Icon;
 
 /**
  *  The awareness component plugin is used to wrap the awareness agent panel as JCC plugin.

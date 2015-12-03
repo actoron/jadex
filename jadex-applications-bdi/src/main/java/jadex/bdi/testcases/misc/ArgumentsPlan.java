@@ -1,5 +1,7 @@
 package jadex.bdi.testcases.misc;
 
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
@@ -9,8 +11,6 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.TimeoutException;
-
-import java.util.Map;
 
 /**
  *  Test if arguments can be accessed.

@@ -3,8 +3,6 @@ package jadex.platform.service.dependency.maven;
 import java.util.ArrayList;
 import java.util.List;
 
-import maventest.MavenModelResolver;
-
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
@@ -18,6 +16,8 @@ import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+
+import maventest.MavenModelResolver;
 
 
 /**

@@ -17,8 +17,6 @@
 
 package org.apache.harmony.beans;
 
-import jadex.commons.beans.XMLDecoder;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -28,6 +26,8 @@ import org.apache.harmony.beans.internal.nls.Messages;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import jadex.commons.beans.XMLDecoder;
 
 public class Handler extends DefaultHandler {
 

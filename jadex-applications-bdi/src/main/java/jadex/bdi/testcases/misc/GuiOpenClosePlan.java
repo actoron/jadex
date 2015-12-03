@@ -1,5 +1,12 @@
 package jadex.bdi.testcases.misc;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IInternalEvent;
@@ -10,13 +17,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 /**
  *  Tests to open and close a gui.

@@ -1,16 +1,16 @@
 package jadex.launch.test;
 
-import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.junit.Test;
+
+import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 
 /**
  *  Test if the platform terminates itself.

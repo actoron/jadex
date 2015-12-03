@@ -1,5 +1,7 @@
 package jadex.platform.service.remote;
 
+import java.util.Map;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
@@ -28,8 +30,6 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.util.Map;
 
 
 

@@ -1,5 +1,10 @@
 package jadex.micro.examples.fireflies;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.application.EnvironmentService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -17,11 +22,6 @@ import jadex.extension.envsupport.math.Vector1Int;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  The firefly agent.

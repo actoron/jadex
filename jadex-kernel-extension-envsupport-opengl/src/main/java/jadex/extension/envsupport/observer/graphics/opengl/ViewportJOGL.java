@@ -1,14 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.opengl;
 
-import jadex.commons.SUtil;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.observer.graphics.AbstractViewport;
-import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
-import jadex.extension.envsupport.observer.graphics.layer.Layer;
-import jadex.extension.envsupport.observer.perspective.IPerspective;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,8 +8,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.color.ColorSpace;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
@@ -49,6 +38,15 @@ import javax.media.opengl.glu.GLU;
 
 import com.sun.opengl.impl.GLDrawableHelper;
 import com.sun.opengl.util.j2d.TextRenderer;
+
+import jadex.commons.SUtil;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.observer.graphics.AbstractViewport;
+import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
+import jadex.extension.envsupport.observer.graphics.layer.Layer;
+import jadex.extension.envsupport.observer.perspective.IPerspective;
 
 
 /**

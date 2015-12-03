@@ -1,8 +1,8 @@
 package jadex.bridge.nonfunctional.search;
 
-import jadex.commons.future.IFuture;
-
 import java.util.Collection;
+
+import jadex.commons.future.IFuture;
 
 /**
  *  Service search ranking decider based on a simple service count threshold.

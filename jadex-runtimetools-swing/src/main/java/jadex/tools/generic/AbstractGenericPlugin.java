@@ -1,11 +1,11 @@
 package jadex.tools.generic;
 
+import javax.swing.JComponent;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
-
-import javax.swing.JComponent;
-import javax.swing.UIDefaults;
 
 
 /**

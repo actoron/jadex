@@ -1,12 +1,5 @@
 package jadex.commons;
 
-import jadex.commons.collection.LRU;
-import jadex.commons.collection.SCollection;
-import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
-import jadex.commons.transformation.traverser.BeanProperty;
-import jadex.commons.transformation.traverser.IBeanIntrospector;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,8 +30,6 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.MappedByteBuffer;
-import java.nio.channels.Channel;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -76,6 +67,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import jadex.commons.collection.LRU;
+import jadex.commons.collection.SCollection;
+import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 
 /**

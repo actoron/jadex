@@ -1,5 +1,8 @@
 package jadex.bdiv3.testcases.beliefs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.annotation.Belief;
@@ -17,9 +20,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Test plan is activated when a belief list is modified.

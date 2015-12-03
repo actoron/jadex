@@ -1,5 +1,7 @@
 package jadex.platform.service.email;
 
+import java.util.List;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -9,8 +11,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
-
-import java.util.List;
 
 /**
  *  Agent that is responsible for fetching mails for one subscription.

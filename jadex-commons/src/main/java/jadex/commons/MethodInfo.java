@@ -1,12 +1,12 @@
 package jadex.commons;
 
 
-import jadex.bridge.ClassInfo;
-import jadex.commons.transformation.annotations.Exclude;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+
+import jadex.bridge.ClassInfo;
+import jadex.commons.transformation.annotations.Exclude;
 
 /**
  *  All info for identifying a method.

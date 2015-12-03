@@ -1,16 +1,16 @@
 package jadex.extension.envsupport.observer.graphics;
 
+import java.awt.Canvas;
+import java.awt.EventQueue;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
-
-import java.awt.Canvas;
-import java.awt.EventQueue;
-import java.util.HashSet;
-import java.util.Set;
 
 
 public abstract class AbstractViewport3d implements IViewport3d

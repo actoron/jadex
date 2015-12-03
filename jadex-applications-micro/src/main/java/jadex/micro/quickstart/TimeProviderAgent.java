@@ -1,5 +1,12 @@
 package jadex.micro.quickstart;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Scanner;
+import java.util.Set;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -13,13 +20,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Scanner;
-import java.util.Set;
 
 /**
  *  The time provider periodically sends out time values to all subscribers.

@@ -2,7 +2,6 @@ package jadex.extension.envsupport.observer.graphics.jmonkey.util;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Stack;
 
 import com.jme3.scene.Node;
 

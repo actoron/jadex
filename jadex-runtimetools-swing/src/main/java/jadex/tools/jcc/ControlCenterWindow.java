@@ -1,16 +1,5 @@
 package jadex.tools.jcc;
 
-import jadex.base.gui.AboutDialog;
-import jadex.base.gui.StatusBar;
-import jadex.bridge.VersionInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.commons.BrowserLauncher;
-import jadex.commons.SUtil;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.SGUI;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -42,6 +31,17 @@ import javax.swing.UIDefaults;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
+
+import jadex.base.gui.AboutDialog;
+import jadex.base.gui.StatusBar;
+import jadex.bridge.VersionInfo;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.BrowserLauncher;
+import jadex.commons.SUtil;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
 
 /**
  *  The main window of the control center.

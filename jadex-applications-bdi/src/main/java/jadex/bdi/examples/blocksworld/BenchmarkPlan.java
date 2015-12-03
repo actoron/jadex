@@ -1,11 +1,11 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.runtime.Plan;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.Plan;
 
 
 /**

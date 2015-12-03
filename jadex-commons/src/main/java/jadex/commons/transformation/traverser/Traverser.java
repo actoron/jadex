@@ -1,13 +1,13 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
 
 /**
  *  The traverser allows to traverse an object graph deeply.

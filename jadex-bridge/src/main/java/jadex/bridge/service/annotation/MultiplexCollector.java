@@ -1,12 +1,12 @@
 package jadex.bridge.service.annotation;
 
-import jadex.bridge.service.component.multiinvoke.FlattenMultiplexCollector;
-import jadex.bridge.service.component.multiinvoke.IMultiplexCollector;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import jadex.bridge.service.component.multiinvoke.FlattenMultiplexCollector;
+import jadex.bridge.service.component.multiinvoke.IMultiplexCollector;
 
 /**
  *  

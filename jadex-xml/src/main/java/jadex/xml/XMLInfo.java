@@ -1,9 +1,9 @@
 package jadex.xml;
 
+import java.util.StringTokenizer;
+
 import jadex.commons.IFilter;
 import jadex.xml.stax.QName;
-
-import java.util.StringTokenizer;
 
 /**
  *  Info for an xml element, i.e. identifying tag(path), filter etc. 

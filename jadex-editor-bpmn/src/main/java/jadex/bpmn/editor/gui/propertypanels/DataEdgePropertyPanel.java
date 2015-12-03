@@ -4,6 +4,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
@@ -11,12 +17,6 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bridge.modelinfo.UnparsedExpression;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
 
 /**
  *  Panel for data edges.

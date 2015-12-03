@@ -1,5 +1,12 @@
 package jadex.xml.writer;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import jadex.commons.SReflect;
 import jadex.commons.transformation.annotations.IncludeFields;
 import jadex.xml.AccessInfo;
@@ -12,13 +19,6 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
 import jadex.xml.stax.QName;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  *  Abstract base class for an object writer handler. Is object type agnostic and

@@ -1,16 +1,6 @@
 package jadex.micro.testcases.serviceinheritance;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.ServiceCall;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;

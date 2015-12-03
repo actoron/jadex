@@ -1,12 +1,12 @@
 package jadex.bridge.nonfunctional.search;
 
-import jadex.commons.Tuple2;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import jadex.commons.Tuple2;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Listener that ranks results.

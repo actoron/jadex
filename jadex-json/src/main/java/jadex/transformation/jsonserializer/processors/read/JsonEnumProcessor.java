@@ -1,14 +1,12 @@
 package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Type;
-import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 

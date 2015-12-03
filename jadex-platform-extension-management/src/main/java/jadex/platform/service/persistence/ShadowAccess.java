@@ -1,7 +1,5 @@
 package jadex.platform.service.persistence;
 
-import jadex.bridge.IExternalAccess;
-
 /**
  *  A shadow access holds a reference to the external access of
  *  a component, but is also able to resurrect the component

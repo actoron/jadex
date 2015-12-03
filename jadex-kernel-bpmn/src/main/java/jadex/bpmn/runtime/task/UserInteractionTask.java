@@ -1,30 +1,5 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MIdElement;
-import jadex.bpmn.model.MParameter;
-import jadex.bpmn.model.task.ITask;
-import jadex.bpmn.model.task.ITaskContext;
-import jadex.bpmn.model.task.annotation.Task;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.collection.IndexMap;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -49,6 +24,31 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MIdElement;
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.collection.IndexMap;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 /**
  *  Opens a dialog for the task and lets the user enter

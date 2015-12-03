@@ -1,7 +1,6 @@
 package jadex.micro.testcases.nfproperties;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.SimpleValueNFProperty;
 

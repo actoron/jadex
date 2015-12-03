@@ -1,12 +1,12 @@
 package jadex.bdi.tutorial;
 
+import java.util.StringTokenizer;
+
 import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
-
-import java.util.StringTokenizer;
 
 /**
  *  An english german translation plan can translate

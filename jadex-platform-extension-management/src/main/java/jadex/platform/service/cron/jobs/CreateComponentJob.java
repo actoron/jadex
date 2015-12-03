@@ -5,8 +5,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.platform.service.cron.TimePatternFilter;
 
-import java.util.Collection;
-
 /**
  *  This job can be used to create a component.
  *  In order to create it at a remote platform the parent

@@ -1,7 +1,5 @@
 package jadex.base.gui.asynctree;
 
-import jadex.base.gui.asynctree.ITreeNode;
-
 /**
  * Notified when nodes are added or removed from the component tree.
  */

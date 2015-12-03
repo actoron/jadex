@@ -1,12 +1,12 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
+import java.util.List;
+import java.util.Random;
+
 import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.MapPoint;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
-
-import java.util.List;
-import java.util.Random;
 
 
 /**

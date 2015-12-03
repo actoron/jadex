@@ -1,7 +1,10 @@
 package jadex.bridge.component.impl;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.BulkMonitoringEvent;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
@@ -13,9 +16,9 @@ import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
-import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -25,10 +28,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 

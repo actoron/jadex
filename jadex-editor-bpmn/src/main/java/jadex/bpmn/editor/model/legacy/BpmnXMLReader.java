@@ -1,5 +1,21 @@
 package jadex.bpmn.editor.model.legacy;
 
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.xml.stream.XMLStreamException;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MAnnotation;
 import jadex.bpmn.model.MAnnotationDetail;
@@ -68,22 +84,6 @@ import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
-
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import javax.xml.stream.XMLStreamException;
 
 /**
  *  Reader for loading Bpmn XML models into a Java representation states.

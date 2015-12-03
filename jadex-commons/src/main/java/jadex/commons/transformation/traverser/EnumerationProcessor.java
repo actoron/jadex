@@ -1,12 +1,12 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Type;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
+import jadex.commons.SReflect;
 
 /**
  *  An enumeration processor allows for traversing enumerations.

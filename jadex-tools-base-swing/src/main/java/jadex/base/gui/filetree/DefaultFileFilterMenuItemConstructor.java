@@ -1,14 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.AsyncSwingTreeModel;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.commons.IPropertiesProvider;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.IMenuItemConstructor;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -29,6 +20,15 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.TreeModel;
+
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.IMenuItemConstructor;
 
 /**
  *  Dynamically create a new menu item structure for starting components.

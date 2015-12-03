@@ -1,11 +1,11 @@
 package jadex.rules.rulesystem.rete.extractors;
 
-import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 
 /**
  * 

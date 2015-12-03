@@ -1,15 +1,5 @@
 package jadex.webservice.examples.rs.chart;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.EditableList;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,6 +19,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.EditableList;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  * 

@@ -1,5 +1,7 @@
 package jadex.platform.service.remote.commands;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -14,8 +16,6 @@ import jadex.commons.transformation.annotations.Alias;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
-
-import java.util.Map;
 
 /**
  *  Command that represents the result(s) of a remote command.

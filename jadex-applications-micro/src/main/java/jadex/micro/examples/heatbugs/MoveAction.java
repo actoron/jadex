@@ -1,5 +1,7 @@
 package jadex.micro.examples.heatbugs;
 
+import java.util.Map;
+
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
@@ -7,8 +9,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.Map;
 
 /**
  *  Action for moving a bug to one of its neighbor fields.

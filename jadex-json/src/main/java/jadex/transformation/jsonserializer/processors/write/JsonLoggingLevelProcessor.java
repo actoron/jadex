@@ -1,15 +1,11 @@
 package jadex.transformation.jsonserializer.processors.write;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.binaryserializer.IDecodingContext;
-import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 

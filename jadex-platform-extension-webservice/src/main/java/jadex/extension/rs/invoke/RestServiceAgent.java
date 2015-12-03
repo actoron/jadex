@@ -1,5 +1,7 @@
 package jadex.extension.rs.invoke;
 
+import java.lang.reflect.Proxy;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -10,8 +12,6 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.lang.reflect.Proxy;
 
 /**
  *  Convenience agent that wraps a normal rest web service as Jadex service.

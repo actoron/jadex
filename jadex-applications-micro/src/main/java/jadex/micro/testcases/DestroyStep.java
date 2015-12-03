@@ -2,7 +2,6 @@ package jadex.micro.testcases;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 
 /**

@@ -1,11 +1,11 @@
 package jadex.bdi.examples.puzzle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Meta-level reasoning plan for choosing between applicable plans.

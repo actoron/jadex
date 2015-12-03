@@ -1,11 +1,5 @@
 package jadex.javaparser.javaccimpl;
 
-import jadex.commons.IPropertyObject;
-import jadex.commons.IValueFetcher;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.javaparser.IMapAccess;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -16,6 +10,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.IPropertyObject;
+import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.javaparser.IMapAccess;
 
 
 /**

@@ -1,5 +1,14 @@
 package jadex.platform.service.daemon;
 
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -24,15 +33,6 @@ import jadex.commons.future.IResultListener;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.XMLWriterFactory;
-
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  *  The daemon service.

@@ -1,16 +1,16 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special;
 
+import com.jme3.scene.Spatial;
+import com.jme3.scene.Spatial.CullHint;
+import com.jme3.texture.Texture;
+import com.jme3.util.SkyFactory;
+
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
-
-import com.jme3.scene.Spatial;
-import com.jme3.scene.Spatial.CullHint;
-import com.jme3.texture.Texture;
-import com.jme3.util.SkyFactory;
 
 
 public class SkyJMonkeyRenderer extends AbstractJMonkeyRenderer

@@ -1,13 +1,13 @@
 package jadex.gpmn.editor.gui;
 
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxStylesheet;
+
 import jadex.gpmn.editor.gui.controllers.EdgeReconnectController;
 import jadex.gpmn.editor.gui.controllers.SelectionController;
 import jadex.gpmn.editor.gui.controllers.ValueChangeController;
 import jadex.gpmn.editor.model.visual.VElement;
-
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxStylesheet;
 
 /**
  *  Graph for GPMN models.

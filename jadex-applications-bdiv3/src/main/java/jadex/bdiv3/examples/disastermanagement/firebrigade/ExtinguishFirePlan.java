@@ -1,5 +1,8 @@
 package jadex.bdiv3.examples.disastermanagement.firebrigade;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
@@ -17,9 +20,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Move to fire and extinguish it.

@@ -1,13 +1,13 @@
 package jadex.bridge;
 
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *  Common interface for all component types.

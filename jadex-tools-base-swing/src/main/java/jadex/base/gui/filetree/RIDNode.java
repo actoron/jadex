@@ -1,5 +1,14 @@
 package jadex.base.gui.filetree;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.JTree;
+
 import jadex.base.JarAsDirectory;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
@@ -15,15 +24,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.Icon;
-import javax.swing.JTree;
 
 /**
  *  Node for rid based jar or local artifact directory.

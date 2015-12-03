@@ -1,12 +1,12 @@
 package jadex.bdi.examples.cleanerworld_classic;
 
-import jadex.commons.SimplePropertyChangeSupport;
-import jadex.commons.beans.PropertyChangeListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  The environment object for non distributed applications.

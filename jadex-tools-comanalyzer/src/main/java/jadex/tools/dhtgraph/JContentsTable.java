@@ -1,23 +1,21 @@
 package jadex.tools.dhtgraph;
 
-import jadex.bridge.service.types.dht.IFinger;
-import jadex.bridge.service.types.dht.IID;
-import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
-
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bridge.service.types.dht.IID;
+import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 
 public class JContentsTable extends JTable {
 

@@ -1,14 +1,14 @@
 package jadex.webservice.examples.rs.banking;
 
-import jadex.bridge.service.annotation.Value;
-import jadex.extension.rs.publish.annotation.MethodMapper;
-import jadex.extension.rs.publish.annotation.ParametersMapper;
-import jadex.extension.rs.publish.annotation.ResultMapper;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import jadex.bridge.service.annotation.Value;
+import jadex.extension.rs.publish.annotation.MethodMapper;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
+import jadex.extension.rs.publish.annotation.ResultMapper;
 
 /**
  * 

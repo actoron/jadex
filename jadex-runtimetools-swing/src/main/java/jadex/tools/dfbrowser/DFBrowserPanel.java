@@ -1,19 +1,5 @@
 package jadex.tools.dfbrowser;
 
-import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.fipa.DFComponentDescription;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.types.df.IDF;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -36,6 +22,20 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.types.df.IDF;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  *  DFBrowserPlugin

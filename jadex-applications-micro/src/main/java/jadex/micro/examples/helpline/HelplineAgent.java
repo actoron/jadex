@@ -1,5 +1,11 @@
 package jadex.micro.examples.helpline;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+
+import javax.swing.SwingUtilities;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -20,12 +26,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  Helpline micro agent. 

@@ -1,9 +1,9 @@
 package jadex.base;
 
-import jadex.commons.BrowserLauncher2;
-
 import java.applet.Applet;
 import java.util.StringTokenizer;
+
+import jadex.commons.BrowserLauncher2;
 
 /**
  *  An applet used to start the Jadex platform.

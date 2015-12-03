@@ -1,5 +1,11 @@
 package jadex.platform.service.message.contentcodecs;
 
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import jadex.bridge.service.types.message.IContentCodec;
 import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
@@ -7,13 +13,6 @@ import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.platform.service.message.transport.codecs.JadexBinaryCodec;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  *  Content codec using the Jadex binary framework.

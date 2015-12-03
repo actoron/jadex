@@ -1,11 +1,11 @@
 package jadex.bridge.fipa;
 
 
-import jadex.bridge.ISearchConstraints;
-import jadex.bridge.service.types.cms.IComponentDescription;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.types.cms.IComponentDescription;
 
 
 /**

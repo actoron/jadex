@@ -1,5 +1,8 @@
 package jadex.extension.ws.invoke;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -14,9 +17,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 
 /**
  *  Create a new web service wrapper invocation handler.

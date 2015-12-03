@@ -1,5 +1,11 @@
 package jadex.xml.tutorial.example07;
 
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.IContext;
@@ -15,12 +21,6 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
-
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Main class to execute tutorial lesson.

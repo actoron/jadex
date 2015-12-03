@@ -1,9 +1,9 @@
 package jadex.bridge;
 
+import java.util.Map;
+
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
-
-import java.util.Map;
 
 /**
  *  The adapter for messages on the standalone platform.

@@ -1,13 +1,5 @@
 package jadex.rules.tools.stateviewer;
 
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.IOAVStateListener;
-import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.OAVObjectType;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -36,6 +28,14 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.IOAVStateListener;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
 
 
 /**

@@ -1,5 +1,12 @@
 package jadex.bdiv3.examples.alarmclock;
 
+import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.swing.SwingUtilities;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
@@ -23,13 +30,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.net.URL;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  Alarm clock that notifies on alarm.

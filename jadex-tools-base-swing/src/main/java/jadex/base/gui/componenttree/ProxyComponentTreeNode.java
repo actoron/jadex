@@ -1,5 +1,13 @@
 package jadex.base.gui.componenttree;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -20,14 +28,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.swing.Icon;
-import javax.swing.JTree;
-import javax.swing.UIDefaults;
 
 /**
  *  Node that represents a remote component and blends in the

@@ -1,5 +1,9 @@
 package jadex.bdiv3.examples.alarmclock;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.URL;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -12,11 +16,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.net.URL;
-
 import javazoom.jl.player.AudioDevice;
 import javazoom.jl.player.FactoryRegistry;
 import javazoom.jl.player.Player;

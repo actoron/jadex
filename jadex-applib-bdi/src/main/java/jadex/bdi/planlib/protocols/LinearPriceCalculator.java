@@ -1,9 +1,9 @@
 package jadex.bdi.planlib.protocols;
 
 
-import jadex.commons.collection.SCollection;
-
 import java.util.List;
+
+import jadex.commons.collection.SCollection;
 
 /**
  *  A sample implementation of the IPriceCalculator. Calculates 

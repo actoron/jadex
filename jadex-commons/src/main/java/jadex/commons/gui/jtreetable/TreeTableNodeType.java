@@ -1,13 +1,13 @@
 package jadex.commons.gui.jtreetable;
 
-import jadex.commons.SUtil;
-import jadex.commons.collection.SCollection;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.Icon;
+
+import jadex.commons.SUtil;
+import jadex.commons.collection.SCollection;
 
 
 /**

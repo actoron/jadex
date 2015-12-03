@@ -1,5 +1,7 @@
 package jadex.bdiv3.examples.shop;
 
+import java.util.List;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
@@ -9,8 +11,6 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.util.List;
 
 /**
  * 

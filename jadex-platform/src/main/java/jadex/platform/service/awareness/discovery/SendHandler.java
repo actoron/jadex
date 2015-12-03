@@ -1,5 +1,7 @@
 package jadex.platform.service.awareness.discovery;
 
+import java.util.Timer;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -9,8 +11,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-
-import java.util.Timer;
 
 /**
  *  Automatically reinvokes send method in intervals

@@ -1,5 +1,7 @@
 package jadex.webservice.examples.ws.geoip;
 
+import java.net.InetAddress;
+
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -9,8 +11,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.webservice.examples.ws.geoip.gen.GeoIP;
-
-import java.net.InetAddress;
 
 
 /**

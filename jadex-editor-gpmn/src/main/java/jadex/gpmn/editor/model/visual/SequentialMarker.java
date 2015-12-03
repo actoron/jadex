@@ -1,11 +1,11 @@
 package jadex.gpmn.editor.model.visual;
 
-import jadex.gpmn.editor.gui.GuiConstants;
-import jadex.gpmn.editor.model.gpmn.ModelConstants;
-
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
+
+import jadex.gpmn.editor.gui.GuiConstants;
+import jadex.gpmn.editor.model.gpmn.ModelConstants;
 
 /**
  * 

@@ -1,7 +1,5 @@
 package jadex.extension.rs.publish;
 
-import jadex.xml.bean.JavaWriter;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -12,6 +10,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+
+import jadex.xml.bean.JavaWriter;
 
 /**
  *  Body writer for Jersey. Allows to use the Jadex XML Codec

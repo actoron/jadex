@@ -1,12 +1,12 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.AsyncSwingTreeModel;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-
 import java.io.File;
 
 import javax.swing.JTree;
+
+import jadex.base.JarAsDirectory;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 
 /**
  *  Node for jar file.

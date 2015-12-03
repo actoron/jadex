@@ -1,7 +1,5 @@
 package jadex.extension.envsupport.evaluation;
 
-import jadex.commons.ResourceInfo;
-
 import java.awt.Image;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +13,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.VectorSeries;
 import org.jfree.data.xy.VectorSeriesCollection;
 import org.jfree.data.xy.XYDataset;
+
+import jadex.commons.ResourceInfo;
 
 /**
  *  Create a X/Y chart consumer, x an y must be double values.

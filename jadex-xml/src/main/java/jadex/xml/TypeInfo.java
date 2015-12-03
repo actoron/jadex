@@ -1,9 +1,5 @@
 package jadex.xml;
 
-import jadex.commons.Tuple;
-import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.stax.QName;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import jadex.commons.Tuple;
+import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.stax.QName;
 /**
  *  Mapping from tag (or path fragment) to object.
  */

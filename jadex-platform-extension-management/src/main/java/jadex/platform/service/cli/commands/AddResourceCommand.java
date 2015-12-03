@@ -1,5 +1,8 @@
 package jadex.platform.service.cli.commands;
 
+import java.net.URL;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -15,9 +18,6 @@ import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.net.URL;
-import java.util.Map;
 
 /**
  *  Add a new resource to the library service.

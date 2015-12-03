@@ -1,12 +1,5 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.tools.comanalyzer.Component;
-import jadex.tools.comanalyzer.ComponentFilterMenu;
-import jadex.tools.comanalyzer.Message;
-import jadex.tools.comanalyzer.MessageFilterMenu;
-import jadex.tools.comanalyzer.graph.GraphCanvas.AgentGroup;
-import jadex.tools.comanalyzer.graph.GraphCanvas.MessageGroup;
-
 import java.awt.Cursor;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -21,6 +14,12 @@ import java.util.Set;
 import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.AbstractPopupGraphMousePlugin;
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.ComponentFilterMenu;
+import jadex.tools.comanalyzer.Message;
+import jadex.tools.comanalyzer.MessageFilterMenu;
+import jadex.tools.comanalyzer.graph.GraphCanvas.AgentGroup;
+import jadex.tools.comanalyzer.graph.GraphCanvas.MessageGroup;
 
 
 /**

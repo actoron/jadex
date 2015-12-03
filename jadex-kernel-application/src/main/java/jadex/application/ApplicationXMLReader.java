@@ -1,5 +1,8 @@
 package jadex.application;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -15,9 +18,6 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.stax.QName;
-
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  *  Reader for loading component XML models into a Java representation states.

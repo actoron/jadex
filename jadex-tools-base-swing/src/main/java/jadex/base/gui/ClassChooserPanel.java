@@ -1,25 +1,17 @@
 package jadex.base.gui;
 
-import jadex.commons.IFilter;
-import jadex.commons.IResultCommand;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
 import java.awt.BorderLayout;
 import java.io.File;
-import java.io.FileFilter;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 
 /**
  *  

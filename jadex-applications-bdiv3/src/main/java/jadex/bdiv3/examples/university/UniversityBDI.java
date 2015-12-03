@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.university;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
@@ -14,7 +15,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  *  Go to university example taken from  

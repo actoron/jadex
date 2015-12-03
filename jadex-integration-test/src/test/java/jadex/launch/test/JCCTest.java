@@ -1,5 +1,9 @@
 package jadex.launch.test;
 
+import javax.swing.SwingUtilities;
+
+import org.junit.Test;
+
 import jadex.base.Starter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.BasicComponentIdentifier;
@@ -8,7 +12,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -20,10 +23,6 @@ import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.tools.jcc.ControlCenter;
 import jadex.tools.jcc.JCCAgent;
 import jadex.tools.jcc.PlatformControlCenter;
-
-import javax.swing.SwingUtilities;
-
-import org.junit.Test;
 
 /**
  *  Test if all JCC plugins can be activated.

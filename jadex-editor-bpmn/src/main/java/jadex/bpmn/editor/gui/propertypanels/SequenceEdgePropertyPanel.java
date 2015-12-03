@@ -1,14 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VSequenceEdge;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MSequenceEdge;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.Tuple2;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -27,6 +18,15 @@ import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VSequenceEdge;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MSequenceEdge;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.Tuple2;
 
 public class SequenceEdgePropertyPanel extends BasePropertyPanel
 {

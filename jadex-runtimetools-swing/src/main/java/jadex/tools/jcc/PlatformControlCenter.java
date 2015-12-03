@@ -1,5 +1,14 @@
 package jadex.tools.jcc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
@@ -21,18 +30,9 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
+import jadex.commons.gui.future.SwingResultListener;
 
 /**
  *  A control center for a single platform.

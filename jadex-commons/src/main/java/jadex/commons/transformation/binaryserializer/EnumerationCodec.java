@@ -1,13 +1,13 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  An enumeration processor allows for traversing enumerations.

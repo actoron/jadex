@@ -1,16 +1,16 @@
 package jadex.bpmn.tools.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.mxgraph.util.mxConstants;
+
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColorGradient;
 import jadex.bpmn.editor.gui.stylesheets.EventShape;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MTask;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import com.mxgraph.util.mxConstants;
 
 /**
  * 

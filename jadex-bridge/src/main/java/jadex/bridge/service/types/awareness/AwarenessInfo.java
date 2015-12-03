@@ -1,12 +1,11 @@
 package jadex.bridge.service.types.awareness;
 
-import jadex.bridge.IComponentIdentifier;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.VersionInfo;
 import jadex.commons.SUtil;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Simple info object that is sent between awareness agents.

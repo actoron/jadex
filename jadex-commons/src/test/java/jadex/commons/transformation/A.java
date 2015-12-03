@@ -1,10 +1,10 @@
 package jadex.commons.transformation;
 
-import jadex.commons.transformation.annotations.Exclude;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import jadex.commons.transformation.annotations.Exclude;
 
 public class A
 {

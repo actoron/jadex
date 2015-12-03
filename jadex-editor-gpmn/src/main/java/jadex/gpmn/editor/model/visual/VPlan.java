@@ -1,14 +1,14 @@
 package jadex.gpmn.editor.model.visual;
 
-import jadex.gpmn.editor.gui.GuiConstants;
-import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IRefPlan;
-import jadex.gpmn.editor.model.gpmn.INode;
-import jadex.gpmn.editor.model.gpmn.IPlan;
-
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
+
+import jadex.gpmn.editor.gui.GuiConstants;
+import jadex.gpmn.editor.model.gpmn.IActivationPlan;
+import jadex.gpmn.editor.model.gpmn.INode;
+import jadex.gpmn.editor.model.gpmn.IPlan;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
 
 /**
  *  Visual plan node.

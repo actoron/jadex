@@ -1,9 +1,9 @@
 package jadex.base.gui.componentviewer;
 
+import javax.swing.JComponent;
+
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.future.IFuture;
-
-import javax.swing.JComponent;
 
 /**
  *  Abstract viewer panel for components and services.

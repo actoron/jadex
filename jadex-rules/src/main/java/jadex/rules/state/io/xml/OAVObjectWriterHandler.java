@@ -1,5 +1,9 @@
 package jadex.rules.state.io.xml;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jadex.commons.SReflect;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.rules.state.IOAVState;
@@ -11,14 +15,9 @@ import jadex.xml.IContext;
 import jadex.xml.Namespace;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
-import jadex.xml.writer.AbstractObjectWriterHandler;
-import jadex.xml.writer.AWriteContext;
-
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import jadex.xml.stax.QName;
+import jadex.xml.writer.AWriteContext;
+import jadex.xml.writer.AbstractObjectWriterHandler;
 
 
 /**

@@ -1,12 +1,12 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.Tuple;
-import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
-
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 
 /**
  *  Tuple is itself immutable, but acts as a container

@@ -1,13 +1,5 @@
 package jadex.bpmn.editor.gui.contextmenus;
 
-import jadex.bpmn.editor.gui.BpmnToolbar;
-import jadex.bpmn.editor.gui.BpmnToolbar.IconGenerationTask;
-import jadex.bpmn.editor.gui.ImageProvider;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.model.MActivity;
-import jadex.commons.Tuple3;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -21,6 +13,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
+import jadex.bpmn.editor.gui.BpmnToolbar;
+import jadex.bpmn.editor.gui.BpmnToolbar.IconGenerationTask;
+import jadex.bpmn.editor.gui.ImageProvider;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.MActivity;
+import jadex.commons.Tuple3;
 
 public class EventContextMenu extends JPopupMenu
 {

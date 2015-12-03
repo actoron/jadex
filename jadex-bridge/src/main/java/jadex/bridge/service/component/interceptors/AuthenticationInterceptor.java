@@ -1,5 +1,9 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
@@ -14,10 +18,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Set;
 
 /**
  *  Interceptor that can be used to realize authenticated end-to-end communication.

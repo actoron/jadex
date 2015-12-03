@@ -1,12 +1,12 @@
 package jadex.extension.envsupport.evaluation;
 
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.commons.SimplePropertyObject;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.List;
+
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 /**
  *  Simple file consumer that writes data into a text file.

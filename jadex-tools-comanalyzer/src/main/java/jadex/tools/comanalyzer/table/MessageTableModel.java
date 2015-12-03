@@ -1,14 +1,14 @@
 package jadex.tools.comanalyzer.table;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.SUtil;
-import jadex.commons.collection.SortedList;
-import jadex.tools.comanalyzer.Message;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
+import jadex.commons.collection.SortedList;
+import jadex.tools.comanalyzer.Message;
 
 
 /**

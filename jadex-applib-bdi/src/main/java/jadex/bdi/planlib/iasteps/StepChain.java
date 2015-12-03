@@ -1,11 +1,11 @@
 package jadex.bdi.planlib.iasteps;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Collection;
 
 public class StepChain implements IComponentStep<Object[]>
 {

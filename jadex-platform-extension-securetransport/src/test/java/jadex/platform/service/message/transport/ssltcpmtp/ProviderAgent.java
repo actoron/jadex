@@ -1,6 +1,8 @@
 package jadex.platform.service.message.transport.ssltcpmtp;
 
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
@@ -17,8 +19,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.util.Collection;
 
 
 /**

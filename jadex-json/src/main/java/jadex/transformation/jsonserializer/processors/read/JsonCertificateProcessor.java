@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.lang.reflect.Type;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +11,6 @@ import com.eclipsesource.json.JsonObject;
 
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 

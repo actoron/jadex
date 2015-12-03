@@ -1,16 +1,16 @@
 package jadex.javaparser.javaccimpl;
 
-import jadex.commons.IValueFetcher;
-import jadex.commons.SReflect;
-import jadex.commons.collection.SCollection;
-import jadex.commons.collection.SortedList;
-
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+
+import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
+import jadex.commons.collection.SCollection;
+import jadex.commons.collection.SortedList;
 
 
 /**

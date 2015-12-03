@@ -1,9 +1,5 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
-import jadex.gpmn.editor.gui.GpmnGraph;
-import jadex.gpmn.editor.gui.ModelContainer;
-import jadex.gpmn.editor.model.gpmn.IGpmnModel;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,6 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
+
+import jadex.gpmn.editor.gui.GpmnGraph;
+import jadex.gpmn.editor.gui.ModelContainer;
+import jadex.gpmn.editor.model.gpmn.IGpmnModel;
 
 /**
  *  Class for property panels.

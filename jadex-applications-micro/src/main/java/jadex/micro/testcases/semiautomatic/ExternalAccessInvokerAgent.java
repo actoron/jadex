@@ -1,5 +1,7 @@
 package jadex.micro.testcases.semiautomatic;
 
+import javax.swing.SwingUtilities;
+
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.componenttree.ComponentIconCache;
@@ -16,8 +18,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  Agent that opens a component selector dialog and then executes a 

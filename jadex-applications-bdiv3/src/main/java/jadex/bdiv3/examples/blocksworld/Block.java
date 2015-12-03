@@ -1,9 +1,9 @@
 package jadex.bdiv3.examples.blocksworld;
 
+import java.awt.Color;
+
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.beans.PropertyChangeListener;
-
-import java.awt.Color;
 
 
 /**

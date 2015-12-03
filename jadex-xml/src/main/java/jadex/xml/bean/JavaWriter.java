@@ -1,6 +1,22 @@
 package jadex.xml.bean;
 
 
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URL;
+import java.security.cert.Certificate;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+
 import jadex.commons.Base64;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -23,22 +39,6 @@ import jadex.xml.stax.QName;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.XMLWriterFactory;
-
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URL;
-import java.security.cert.Certificate;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 
 /**

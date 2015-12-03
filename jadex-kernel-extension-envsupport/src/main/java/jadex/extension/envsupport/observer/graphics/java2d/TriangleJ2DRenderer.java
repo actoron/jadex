@@ -1,12 +1,12 @@
 package jadex.extension.envsupport.observer.graphics.java2d;
 
-import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+
+import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 
 /**
  * 

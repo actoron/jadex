@@ -1,15 +1,14 @@
 package jadex.platform.service.message.transport.codecs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 
 /**
  *  The Jadex XML codec. Codec supports parallel

@@ -1,5 +1,7 @@
 package jadex.platform.service.parallelizer;
 
+import java.util.Collection;
+
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -17,8 +19,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Collection;
 
 /**
  * 

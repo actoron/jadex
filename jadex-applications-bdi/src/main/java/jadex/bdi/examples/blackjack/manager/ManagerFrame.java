@@ -1,35 +1,5 @@
 package jadex.bdi.examples.blackjack.manager;
 
-import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.ComponentSelectorDialog;
-import jadex.base.gui.componenttree.ComponentIconCache;
-import jadex.bdi.examples.blackjack.Player;
-import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
-import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.future.DefaultTuple2ResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -59,6 +29,36 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.table.TableModel;
+
+import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.ComponentSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.bdi.examples.blackjack.Player;
+import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
+import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.future.DefaultTuple2ResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  The manager frame.

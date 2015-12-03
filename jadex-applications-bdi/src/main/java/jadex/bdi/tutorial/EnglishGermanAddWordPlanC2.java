@@ -1,12 +1,12 @@
 package jadex.bdi.tutorial;
 
+import java.util.StringTokenizer;
+
 import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.Tuple;
-
-import java.util.StringTokenizer;
 
 /**
  *  Add a english - german word pair to the wordtable.

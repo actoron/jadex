@@ -1,10 +1,10 @@
 package jadex.bdi.planlib.protocols;
 
 
+import java.util.List;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
-
-import java.util.List;
 
 /**
  *  Interface used by default plans of the protocols capability

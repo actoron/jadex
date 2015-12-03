@@ -1,7 +1,5 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.commons.collection.SortedList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +14,7 @@ import org.apache.commons.collections15.Factory;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
+import jadex.commons.collection.SortedList;
 
 /**
  * A generic Graph with edges and vertices consisting of groups of elements. The

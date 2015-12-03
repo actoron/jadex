@@ -1,14 +1,13 @@
 package jadex.bdiv3.examples.marsworld.movement;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
-import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanFailed;
-import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.commons.future.DelegationResultListener;
@@ -17,10 +16,6 @@ import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.math.IVector2;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The move to a location plan.

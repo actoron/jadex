@@ -1,9 +1,9 @@
 package jadex.platform.service.message.streams;
 
+import java.util.Map;
+
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.transformation.annotations.Alias;
-
-import java.util.Map;
 
 /**
  *  Info sent as content of the init message.

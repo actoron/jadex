@@ -1,16 +1,16 @@
 package jadex.bridge;
 
-import jadex.bridge.service.annotation.Reference;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
-
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import jadex.bridge.service.annotation.Reference;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SUtil;
 
 /**
  *  Default implementation for resource identification.

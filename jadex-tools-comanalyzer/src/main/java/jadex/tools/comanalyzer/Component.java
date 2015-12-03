@@ -1,12 +1,12 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.ComposedFilter;
-import jadex.commons.IFilter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.ComposedFilter;
+import jadex.commons.IFilter;
 
 
 /**

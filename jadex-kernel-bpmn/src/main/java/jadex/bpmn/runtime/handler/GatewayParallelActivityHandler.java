@@ -1,14 +1,14 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IInternalAccess;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 
 /**

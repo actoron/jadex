@@ -1,8 +1,8 @@
 package jadex.bdiv3.examples.disastermanagement.commander;
 
-import jadex.extension.envsupport.environment.ISpaceObject;
-
 import java.util.Collection;
+
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  * 

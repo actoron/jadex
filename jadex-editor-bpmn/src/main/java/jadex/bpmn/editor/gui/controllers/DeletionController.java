@@ -1,5 +1,12 @@
 package jadex.bpmn.editor.gui.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
@@ -13,13 +20,6 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 public class DeletionController implements mxIEventListener
 {

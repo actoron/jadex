@@ -1,23 +1,5 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.AWTException;
 import java.awt.MenuItem;
 import java.awt.Point;
@@ -44,6 +26,24 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
+
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  The clock frame.

@@ -1,11 +1,11 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
 
 /**
  *  An array processor allows for traversing arrays.

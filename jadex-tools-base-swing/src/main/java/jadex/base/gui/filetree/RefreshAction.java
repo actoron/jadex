@@ -1,8 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.commons.gui.SGUI;
-
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -10,6 +7,9 @@ import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.tree.TreePath;
+
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.commons.gui.SGUI;
 
 /**
  *  The refresh action.

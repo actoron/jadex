@@ -1,10 +1,10 @@
 package jadex.bridge.nonfunctional;
 
-import jadex.bridge.IComponentStep;
+import java.util.Map;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -17,8 +17,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-
-import java.util.Map;
 
 /**
  *  Static helper class for accessing nf properties also remotely.

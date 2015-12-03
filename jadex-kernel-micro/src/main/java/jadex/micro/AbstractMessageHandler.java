@@ -1,11 +1,11 @@
 package jadex.micro;
 
+import java.util.Map;
+
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IFilter;
-
-import java.util.Map;
 
 /**
  *  Abstract message handler.

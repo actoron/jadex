@@ -1,12 +1,12 @@
 package jadex.bridge;
 
+import java.util.Collection;
+
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
-
-import java.util.Collection;
 
 /**
  *  Intermediate listener that invokes listeners on component thread.

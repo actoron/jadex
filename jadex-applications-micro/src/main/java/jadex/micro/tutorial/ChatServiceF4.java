@@ -1,5 +1,8 @@
 package jadex.micro.tutorial;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
@@ -7,9 +10,6 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  *  Chat service implementation.

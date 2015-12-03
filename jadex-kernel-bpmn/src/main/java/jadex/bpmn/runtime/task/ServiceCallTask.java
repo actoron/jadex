@@ -1,5 +1,28 @@
 package jadex.bpmn.runtime.task;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.management.ServiceNotFoundException;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
@@ -36,29 +59,6 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 import jadex.javaparser.SJavaParser;
-
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.management.ServiceNotFoundException;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
  *  Call a service.

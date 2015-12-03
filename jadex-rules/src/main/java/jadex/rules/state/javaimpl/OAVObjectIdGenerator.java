@@ -1,10 +1,10 @@
 package jadex.rules.state.javaimpl;
 
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVObjectType;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVObjectType;
 
 /**
  *  Simplest possible id generatorusing plain objects.

@@ -1,17 +1,17 @@
 package jadex.extension.envsupport.observer.graphics.java2d;
 
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.observer.graphics.ModulateComposite;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
-
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 
 public class TiledLayerJ2DRenderer implements ILayerJ2DRenderer
 {

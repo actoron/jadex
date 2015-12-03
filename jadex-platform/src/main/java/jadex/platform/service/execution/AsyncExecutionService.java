@@ -1,5 +1,7 @@
 package jadex.platform.service.execution;
 
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.BasicService;
@@ -15,8 +17,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.Map;
 
 /**
  *  The asynchronous executor service that executes all tasks in separate executors.

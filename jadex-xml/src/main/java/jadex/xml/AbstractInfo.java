@@ -1,10 +1,10 @@
 package jadex.xml;
 
+import java.util.Comparator;
+
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.xml.stax.QName;
-
-import java.util.Comparator;
 
 /**
  *  Superclass for XML object type/link infos.

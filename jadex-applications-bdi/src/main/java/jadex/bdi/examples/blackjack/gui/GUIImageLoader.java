@@ -1,9 +1,9 @@
 package jadex.bdi.examples.blackjack.gui;
 
-import jadex.commons.gui.SGUI;
-
 import javax.swing.ImageIcon;
 import javax.swing.UIDefaults;
+
+import jadex.commons.gui.SGUI;
 
 /**
  *  This class serves as an image-loader and image-cache.

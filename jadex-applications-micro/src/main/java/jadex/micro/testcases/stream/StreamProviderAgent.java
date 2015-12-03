@@ -1,5 +1,9 @@
 package jadex.micro.testcases.stream;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
@@ -18,10 +22,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Agent that provides a service with a stream.

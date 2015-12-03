@@ -1,10 +1,10 @@
 package jadex.bridge.nonfunctional.search;
 
+import java.util.List;
+
 import jadex.commons.Tuple2;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
-
-import java.util.List;
 
 /**
  *  Listener that ranks results.

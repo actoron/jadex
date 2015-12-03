@@ -1,11 +1,11 @@
 package jadex.rules.state.javaimpl;
 
-import jadex.rules.state.OAVTypeModel;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+
+import jadex.rules.state.OAVTypeModel;
 
 /**
  *  An object holding the state as

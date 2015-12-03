@@ -1,5 +1,8 @@
 package jadex.bdiv3.testcases.plans;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.IBDIAgent;
@@ -16,9 +19,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Agent that tests if injection of change event works for plan method.

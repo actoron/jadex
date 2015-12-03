@@ -2,7 +2,6 @@ package jadex.bdi.examples.blackjack.player;
 
 import java.util.Random;
 
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;

@@ -1,9 +1,9 @@
 package jadex.rules.rulesystem.rete.builder;
 
-import jadex.rules.rulesystem.IRule;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.rules.rulesystem.IRule;
 
 /**
  *  The report for storing time information about building rules.

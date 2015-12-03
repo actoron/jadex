@@ -1,10 +1,10 @@
 package jadex.bridge.component;
 
+import java.util.Map;
+
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IFilter;
-
-import java.util.Map;
 
 /**
  *  Interface for message handlers.

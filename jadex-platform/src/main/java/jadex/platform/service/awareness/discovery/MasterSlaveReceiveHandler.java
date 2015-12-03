@@ -1,10 +1,10 @@
 package jadex.platform.service.awareness.discovery;
 
-import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.commons.SUtil;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.SUtil;
 
 /**
  *  Master slave receiving handler.

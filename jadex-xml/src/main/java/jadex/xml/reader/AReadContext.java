@@ -1,5 +1,10 @@
 package jadex.xml.reader;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
 import jadex.xml.StackElement;
@@ -7,11 +12,6 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Context for reader that stores all relevant information of the read process.

@@ -1,5 +1,11 @@
 package jadex.platform.service.cli;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -33,12 +39,6 @@ import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  *  The agent listens on a specified email account for command line emails

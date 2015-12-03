@@ -1,18 +1,17 @@
 package jadex.bridge.service.types.security;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.annotation.GuiClassName;
-import jadex.bridge.service.annotation.GuiClassNames;
-import jadex.bridge.service.annotation.SecureTransmission;
-import jadex.bridge.service.annotation.Timeout;
-import jadex.commons.ChangeEvent;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.SecureTransmission;
+import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  The security service is responsible for

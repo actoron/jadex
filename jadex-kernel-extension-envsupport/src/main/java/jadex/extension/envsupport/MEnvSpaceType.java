@@ -1,5 +1,15 @@
 package jadex.extension.envsupport;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.application.ApplicationModelInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.IPropertyObject;
@@ -67,16 +77,6 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.reader.AReadContext;
 import jadex.xml.stax.QName;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Java representation of environment space type for xml description.

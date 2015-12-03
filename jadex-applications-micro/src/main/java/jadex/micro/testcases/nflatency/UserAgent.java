@@ -1,10 +1,9 @@
 package jadex.micro.testcases.nflatency;
 
+import java.util.Collection;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.INFPropertyComponentFeature;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.nonfunctional.INFRPropertyProvider;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
@@ -18,8 +17,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Collection;
 
 @Agent
 @Service

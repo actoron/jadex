@@ -1,11 +1,11 @@
 package jadex.bdi.examples.disastermanagement.commander2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Handle a disaster by assigning units.

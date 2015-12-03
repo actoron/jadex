@@ -1,10 +1,10 @@
 package jadex.bridge.modelinfo;
 
-import jadex.bridge.service.RequiredServiceBinding;
-import jadex.commons.SUtil;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.commons.SUtil;
 
 /**
  *  Component instance information.

@@ -1,13 +1,13 @@
 package jadex.javaparser.javaccimpl;
 
-import jadex.commons.IValueFetcher;
-import jadex.commons.SUtil;
-import jadex.javaparser.IParsedExpression;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import jadex.commons.IValueFetcher;
+import jadex.commons.SUtil;
+import jadex.javaparser.IParsedExpression;
 
 
 /**

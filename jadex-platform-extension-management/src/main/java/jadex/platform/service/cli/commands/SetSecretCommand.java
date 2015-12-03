@@ -3,6 +3,8 @@
  */
 package jadex.platform.service.cli.commands;
 
+import java.util.Map;
+
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -17,8 +19,6 @@ import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.util.Map;
 
 /**
  *  Command to set a password or network secret.

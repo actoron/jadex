@@ -1,5 +1,10 @@
 package jadex.examples.presentationtimer.display;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
+import java.util.Map;
+
 import jadex.base.PlatformConfiguration;
 import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
@@ -10,11 +15,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
-
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.KeyEvent;
-import java.util.Map;
 
 public class Main {
 	

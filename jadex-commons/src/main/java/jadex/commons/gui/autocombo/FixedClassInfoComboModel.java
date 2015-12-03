@@ -1,11 +1,11 @@
 package jadex.commons.gui.autocombo;
 
-import jadex.bridge.ClassInfo;
-import jadex.commons.SReflect;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import jadex.bridge.ClassInfo;
+import jadex.commons.SReflect;
 
 /**
  * 

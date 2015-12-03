@@ -1,6 +1,11 @@
 package jadex.platform.service.cli;
 
-import jadex.bridge.service.types.remote.RemoteException;
+import java.io.File;
+import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.jar.JarEntry;
+
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -9,13 +14,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.io.File;
-import java.lang.reflect.Modifier;
-import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.jar.JarEntry;
 
 
 /**

@@ -1,23 +1,5 @@
 package jadex.launch.test;
 
-import jadex.base.Starter;
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple;
-import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,6 +10,21 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Test;
+
+import jadex.base.Starter;
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 
 /**
  *  Test if the platform terminates itself.

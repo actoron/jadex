@@ -1,5 +1,10 @@
 package jadex.bdiv3.examples.disastermanagement.commander;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
@@ -13,11 +18,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceObject;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  *  Handle forces by sending an appropriate number to the disaster site..

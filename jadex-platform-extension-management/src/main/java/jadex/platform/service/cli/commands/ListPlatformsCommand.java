@@ -1,5 +1,9 @@
 package jadex.platform.service.cli.commands;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -17,10 +21,6 @@ import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  *  List all currently known platforms.

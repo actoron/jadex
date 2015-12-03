@@ -1,9 +1,9 @@
 package jadex.commons.future;
 
-import jadex.commons.Tuple2;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import jadex.commons.Tuple2;
 
 /**
  *  Helper class to access future notification stack

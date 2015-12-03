@@ -1,5 +1,10 @@
 package jadex.bdi.examples.blackjack.manager;
 
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
@@ -12,11 +17,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
-
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 /**
  *  Update the Gui when manager informs about changes.

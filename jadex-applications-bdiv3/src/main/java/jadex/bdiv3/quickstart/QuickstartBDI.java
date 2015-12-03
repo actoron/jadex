@@ -1,5 +1,9 @@
 package jadex.bdiv3.quickstart;
 
+import java.awt.MouseInfo;
+
+import javax.swing.JOptionPane;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
@@ -9,10 +13,6 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-
-import java.awt.MouseInfo;
-
-import javax.swing.JOptionPane;
 
 /**
  *  A simple BDI agent that likes to have the mouse in the upper left corner.

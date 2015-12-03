@@ -1,5 +1,12 @@
 package jadex.extension.envsupport.observer.graphics.opengl;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+
+import com.sun.opengl.util.j2d.TextRenderer;
+
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
@@ -7,13 +14,6 @@ import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.extension.envsupport.observer.graphics.drawable.Text;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-
-import com.sun.opengl.util.j2d.TextRenderer;
 
 public class TextGLRenderer implements IGLRenderer
 {

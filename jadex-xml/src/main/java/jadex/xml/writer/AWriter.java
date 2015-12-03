@@ -1,10 +1,10 @@
 package jadex.xml.writer;
 
-import jadex.xml.SXML;
-
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+
+import jadex.xml.SXML;
 
 /**
  * 

@@ -1,14 +1,14 @@
 package jadex.micro.testcases.multiinvoke;
 
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bridge.service.annotation.MultiplexCollector;
 import jadex.bridge.service.annotation.MultiplexDistributor;
 import jadex.bridge.service.annotation.TargetMethod;
 import jadex.bridge.service.component.multiinvoke.SequentialMultiplexDistributor;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  *  Multiplex Interface for IExampleService.

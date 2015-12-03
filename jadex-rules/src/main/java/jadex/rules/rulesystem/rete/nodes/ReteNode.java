@@ -1,16 +1,5 @@
 package jadex.rules.rulesystem.rete.nodes;
 
-import jadex.rules.rulesystem.AbstractAgenda;
-import jadex.rules.rulesystem.IRule;
-import jadex.rules.rulesystem.rete.builder.ReteBuilder;
-import jadex.rules.rulesystem.rete.extractors.AttributeSet;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.IProfiler;
-import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.OAVObjectType;
-import jadex.rules.state.OAVTypeModel;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +10,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.rules.rulesystem.AbstractAgenda;
+import jadex.rules.rulesystem.IRule;
+import jadex.rules.rulesystem.rete.builder.ReteBuilder;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.IProfiler;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.OAVTypeModel;
 
 /**
  *  ReteNode implementation of the IConditionSystem.

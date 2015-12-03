@@ -1,5 +1,12 @@
 package jadex.extension.envsupport.environment.space2d;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.IFilter;
 import jadex.commons.SimplePropertyObject;
@@ -14,13 +21,6 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 
 /**

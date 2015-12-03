@@ -1,12 +1,12 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdiv3x.runtime.IMessageEvent;
-import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.fipa.SFipa;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import jadex.bdiv3x.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 
 
 /**

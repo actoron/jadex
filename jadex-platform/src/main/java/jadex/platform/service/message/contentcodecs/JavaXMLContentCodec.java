@@ -1,19 +1,18 @@
 package jadex.platform.service.message.contentcodecs;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+import java.util.Properties;
+
 import jadex.bridge.service.types.message.IContentCodec;
 import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.beans.ExceptionListener;
 import jadex.commons.beans.XMLDecoder;
 import jadex.commons.beans.XMLEncoder;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  *  The XML codec based on the standard Java 1.4 XMLCodec.

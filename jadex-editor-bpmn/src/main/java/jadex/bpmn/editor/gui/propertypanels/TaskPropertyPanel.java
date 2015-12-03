@@ -1,31 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.ImageProvider;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VExternalSubProcess;
-import jadex.bpmn.editor.model.visual.VSubProcess;
-import jadex.bpmn.model.IModelContainer;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MParameter;
-import jadex.bpmn.model.MProperty;
-import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.model.task.ITaskPropertyGui;
-import jadex.bpmn.task.info.ParameterMetaInfo;
-import jadex.bpmn.task.info.PropertyMetaInfo;
-import jadex.bpmn.task.info.STaskMetaInfoExtractor;
-import jadex.bpmn.task.info.TaskMetaInfo;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.collection.IndexMap;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.autocombo.AutoCompleteCombo;
-import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
-import jadex.javaparser.SJavaParser;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -63,6 +37,32 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.plaf.metal.MetalComboBoxEditor;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.ImageProvider;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.model.IModelContainer;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MProperty;
+import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.task.ITaskPropertyGui;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.PropertyMetaInfo;
+import jadex.bpmn.task.info.STaskMetaInfoExtractor;
+import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.collection.IndexMap;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Property panel for task activities.

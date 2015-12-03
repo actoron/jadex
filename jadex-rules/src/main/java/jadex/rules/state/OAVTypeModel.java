@@ -1,13 +1,13 @@
 package jadex.rules.state;
 
-import jadex.commons.SReflect;
-
-import jadex.commons.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  A type model contains all known types. Type models must be associated

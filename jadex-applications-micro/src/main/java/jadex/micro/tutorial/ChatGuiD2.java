@@ -1,13 +1,5 @@
 package jadex.micro.tutorial;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,6 +15,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 
 /**
  *  Basic chat user interface.

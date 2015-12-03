@@ -1,9 +1,5 @@
 package jadex.rules.tools.reteviewer;
 
-import jadex.rules.rulesystem.Activation;
-import jadex.rules.rulesystem.IAgenda;
-import jadex.rules.rulesystem.IAgendaListener;
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -22,6 +18,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import jadex.rules.rulesystem.Activation;
+import jadex.rules.rulesystem.IAgenda;
+import jadex.rules.rulesystem.IAgendaListener;
 
 /**
  *  Panel for showing / manipulating the Rete agenda.

@@ -1,9 +1,9 @@
 package jadex.bridge.component;
 
+import java.util.Map;
+
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
 
 /**
  *  Feature for sending messages and handling incoming messages via handlers.

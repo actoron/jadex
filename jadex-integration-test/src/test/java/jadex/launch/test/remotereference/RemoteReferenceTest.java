@@ -1,14 +1,12 @@
 package jadex.launch.test.remotereference;
 
-import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.concurrent.TimeoutException;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.

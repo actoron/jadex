@@ -1,17 +1,11 @@
 package jadex.transformation.jsonserializer.processors.write;
 
 import java.lang.reflect.Type;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
-
-import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Codec for encoding and decoding class objects.

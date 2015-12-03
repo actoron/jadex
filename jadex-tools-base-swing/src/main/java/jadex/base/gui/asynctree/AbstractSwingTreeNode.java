@@ -1,20 +1,16 @@
 package jadex.base.gui.asynctree;
 
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.TreeExpansionHandler;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
+
+import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.TreeExpansionHandler;
 
 
 /**

@@ -1,5 +1,8 @@
 package jadex.platform.service.message.streams;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
@@ -10,9 +13,6 @@ import jadex.commons.Tuple;
 import jadex.platform.service.message.AbstractSendTask;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Task to send data via streams.

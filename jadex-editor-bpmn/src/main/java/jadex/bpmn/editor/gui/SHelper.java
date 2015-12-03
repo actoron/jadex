@@ -1,24 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VEdge;
-import jadex.bpmn.editor.model.visual.VElement;
-import jadex.bpmn.editor.model.visual.VExternalSubProcess;
-import jadex.bpmn.editor.model.visual.VLane;
-import jadex.bpmn.editor.model.visual.VPool;
-import jadex.bpmn.editor.model.visual.VSequenceEdge;
-import jadex.bpmn.editor.model.visual.VSubProcess;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MEdge;
-import jadex.bpmn.model.MIdElement;
-import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.model.MSubProcess;
-import jadex.bridge.service.annotation.ParameterInfo;
-import jadex.commons.Tuple2;
-import jadex.commons.collection.BiHashMap;
-
-import java.awt.geom.Point2D;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -36,8 +17,25 @@ import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.mxgraph.model.mxGeometry;
-import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
+
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.editor.model.visual.VSequenceEdge;
+import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MEdge;
+import jadex.bpmn.model.MIdElement;
+import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.service.annotation.ParameterInfo;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.BiHashMap;
 
 
 /**

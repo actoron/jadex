@@ -1,13 +1,13 @@
 package jadex.base.gui.config;
 
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.types.factory.SBootstrapLoader;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.factory.SBootstrapLoader;
 
 public class ArgumentTableModel extends AbstractTableModel
 {

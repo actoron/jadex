@@ -1,12 +1,5 @@
 package jadex.extension.envsupport.evaluation;
 
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.commons.ResourceInfo;
-import jadex.commons.SUtil;
-import jadex.commons.SimplePropertyObject;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -15,6 +8,13 @@ import javax.swing.SwingUtilities;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+
+import jadex.commons.ResourceInfo;
+import jadex.commons.SUtil;
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 /**
  *  Abstract base class for chart consumers.

@@ -1,12 +1,5 @@
 package jadex.extension.envsupport.observer.graphics;
 
-import jadex.extension.envsupport.environment.ISpaceController;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.math.Vector2Int;
-import jadex.extension.envsupport.observer.graphics.layer.Layer;
-import jadex.extension.envsupport.observer.perspective.IPerspective;
-
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -24,6 +17,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.event.MouseInputAdapter;
+
+import jadex.extension.envsupport.environment.ISpaceController;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.math.Vector2Int;
+import jadex.extension.envsupport.observer.graphics.layer.Layer;
+import jadex.extension.envsupport.observer.perspective.IPerspective;
 
 
 public abstract class AbstractViewport implements IViewport

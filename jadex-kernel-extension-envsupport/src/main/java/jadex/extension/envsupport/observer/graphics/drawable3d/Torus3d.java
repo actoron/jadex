@@ -1,9 +1,9 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import java.util.ArrayList;
+
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.javaparser.IParsedExpression;
-
-import java.util.ArrayList;
 
 
 public class Torus3d extends Primitive3d

@@ -1,5 +1,9 @@
 package jadex.tools.debugger.bpmn;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bpmn.tools.ui.VisualProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;
@@ -7,10 +11,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
 import jadex.tools.debugger.IDebuggerPanel;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.UIDefaults;
 
 /**
  *  A bpmndebugger panel that can display bpmn processes.

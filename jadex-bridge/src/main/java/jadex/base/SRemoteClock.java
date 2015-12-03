@@ -1,5 +1,8 @@
 package jadex.base;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -23,9 +26,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.annotations.IncludeFields;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  *  Helper class for remote access to clock service.

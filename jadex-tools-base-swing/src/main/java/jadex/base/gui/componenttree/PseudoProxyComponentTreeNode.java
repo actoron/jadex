@@ -1,15 +1,15 @@
 package jadex.base.gui.componenttree;
 
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.gui.SGUI;
-
-import javax.swing.Icon;
-import javax.swing.JTree;
-import javax.swing.UIDefaults;
 
 /**
  * 

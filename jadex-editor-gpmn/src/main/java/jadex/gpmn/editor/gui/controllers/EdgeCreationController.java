@@ -1,5 +1,13 @@
 package jadex.gpmn.editor.gui.controllers;
 
+import java.awt.Point;
+import java.util.List;
+
+import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxICell;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+
 import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
@@ -14,14 +22,6 @@ import jadex.gpmn.editor.model.visual.VElement;
 import jadex.gpmn.editor.model.visual.VGoal;
 import jadex.gpmn.editor.model.visual.VPlan;
 import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
-
-import java.awt.Point;
-import java.util.List;
-
-import com.mxgraph.model.mxCell;
-import com.mxgraph.model.mxICell;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 public class EdgeCreationController implements mxIEventListener
 {

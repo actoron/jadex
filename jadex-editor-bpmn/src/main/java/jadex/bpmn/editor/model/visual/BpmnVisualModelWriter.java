@@ -1,10 +1,5 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.io.IBpmnVisualModelWriter;
-import jadex.bpmn.model.io.SVisualWriterHelper;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.PrintStream;
@@ -16,6 +11,11 @@ import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
+
+import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.io.IBpmnVisualModelWriter;
+import jadex.bpmn.model.io.SVisualWriterHelper;
 
 /**
  *  A writer for the visual part of BPMN models.

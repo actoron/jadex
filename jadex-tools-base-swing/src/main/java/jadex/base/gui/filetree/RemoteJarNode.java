@@ -1,17 +1,14 @@
 package jadex.base.gui.filetree;
 
+import javax.swing.JTree;
+
 import jadex.base.RemoteJarFile;
 import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.filetransfer.FileData;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.Collection;
-
-import javax.swing.JTree;
 
 /**
  *  Node for remote jar file.

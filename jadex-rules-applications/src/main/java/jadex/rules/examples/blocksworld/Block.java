@@ -1,8 +1,8 @@
 package jadex.rules.examples.blocksworld;
 
-import jadex.commons.SimplePropertyChangeSupport;
-
 import java.awt.Color;
+
+import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.beans.PropertyChangeListener;
 
 /**

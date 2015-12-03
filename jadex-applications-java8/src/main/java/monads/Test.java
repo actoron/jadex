@@ -1,5 +1,9 @@
 package monads;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Function;
+
 import jadex.commons.IResultCommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -9,12 +13,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.function.Function;
 
 /**
  *  Monadic futures for Java.

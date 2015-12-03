@@ -1,5 +1,8 @@
 package jadex.micro.features.impl;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -27,9 +30,6 @@ import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.MicroModel;
 import jadex.micro.features.IMicroInjectionFeature;
-
-import java.lang.reflect.Field;
-import java.util.Map;
 
 /**
  *  Inject agent arguments into annotated field values.

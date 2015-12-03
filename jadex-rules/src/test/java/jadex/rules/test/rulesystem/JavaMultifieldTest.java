@@ -1,9 +1,8 @@
 package jadex.rules.test.rulesystem;
 
-import jadex.rules.rulesystem.RuleSystem;
-
 import java.util.List;
 
+import jadex.rules.rulesystem.RuleSystem;
 import junit.framework.TestCase;
 
 /**

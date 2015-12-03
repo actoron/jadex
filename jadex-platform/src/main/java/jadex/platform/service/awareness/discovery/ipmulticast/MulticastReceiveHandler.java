@@ -1,10 +1,9 @@
 package jadex.platform.service.awareness.discovery.ipmulticast;
 
+import java.net.DatagramPacket;
+
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
 
 /**
  * 

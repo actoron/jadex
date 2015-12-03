@@ -1,9 +1,9 @@
 package jadex.rules.rulesystem.rules;
 
-import jadex.rules.rulesystem.ICondition;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.rules.rulesystem.ICondition;
 
 /**
  *  A condition that contains constraints belonging to some object or value.

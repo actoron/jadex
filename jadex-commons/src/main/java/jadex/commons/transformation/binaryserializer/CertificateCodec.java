@@ -1,15 +1,14 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-
 import java.io.ByteArrayInputStream;
-import java.lang.reflect.Type;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 
 /**

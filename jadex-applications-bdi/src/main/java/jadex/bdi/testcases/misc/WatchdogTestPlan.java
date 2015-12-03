@@ -1,5 +1,8 @@
 package jadex.bdi.testcases.misc;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bdi.planlib.watchdog.ContactData;
 import jadex.bdi.planlib.watchdog.ObservationDescription;
@@ -8,9 +11,6 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.TimeoutException;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Test the watchdog capability.

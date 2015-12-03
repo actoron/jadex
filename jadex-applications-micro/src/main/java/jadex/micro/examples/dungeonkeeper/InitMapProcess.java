@@ -1,5 +1,12 @@
 package jadex.micro.examples.dungeonkeeper;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
@@ -8,13 +15,6 @@ import jadex.extension.envsupport.environment.ISpaceProcess;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  *  Environment process for creating wastes.

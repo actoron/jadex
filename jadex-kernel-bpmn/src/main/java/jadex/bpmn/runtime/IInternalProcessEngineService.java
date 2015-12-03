@@ -1,11 +1,11 @@
 package jadex.bpmn.runtime;
 
+import java.util.Map;
+
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
 
 /**
  *  Services to be called from BPMN process instances

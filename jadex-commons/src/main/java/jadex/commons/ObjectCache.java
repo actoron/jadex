@@ -1,7 +1,5 @@
 package jadex.commons;
 
-import jadex.commons.collection.SCollection;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Map;
+
+import jadex.commons.collection.SCollection;
 
 /**
  *  A cache for CachedObjects that reflect files.

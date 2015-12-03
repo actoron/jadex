@@ -1,12 +1,12 @@
 package jadex.extension.envsupport.observer.gui;
 
+import java.util.List;
+
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
-
-import java.util.List;
 
 public interface IObserverCenter
 {

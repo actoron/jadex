@@ -1,5 +1,11 @@
 package jadex.bdiv3.examples.puzzle;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.SwingUtilities;
+
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -21,12 +27,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  Puzzle agent tries to solve a solitair board game

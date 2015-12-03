@@ -1,5 +1,8 @@
 package jadex.micro.tutorial;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
@@ -14,9 +17,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  *  Chat micro agent provides a basic chat service. 

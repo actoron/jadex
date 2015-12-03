@@ -1,5 +1,7 @@
 package jadex.bdiv3.tutorial.e2;
 
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
@@ -7,9 +9,6 @@ import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The translation capability.

@@ -1,6 +1,14 @@
 package jadex.launch.test.servicecall;
 
 import static org.junit.Assert.assertNotEquals;
+
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
+
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -17,13 +25,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
 
 /**
  *  Test if non functional properties are being reset after service call.

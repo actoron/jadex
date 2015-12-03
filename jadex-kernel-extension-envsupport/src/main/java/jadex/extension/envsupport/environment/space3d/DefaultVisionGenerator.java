@@ -1,5 +1,14 @@
 package jadex.extension.envsupport.environment.space3d;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.SimplePropertyObject;
+import jadex.commons.collection.MultiCollection;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.EnvironmentEvent;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -9,15 +18,6 @@ import jadex.extension.envsupport.environment.PerceptType;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.SimplePropertyObject;
-import jadex.commons.collection.MultiCollection;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Percept generator for moving components.

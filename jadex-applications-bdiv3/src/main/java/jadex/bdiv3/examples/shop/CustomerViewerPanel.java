@@ -1,9 +1,9 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
-
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 
 /**
  *  Panel for the customer view.

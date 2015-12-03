@@ -1,11 +1,11 @@
 package jadex.commons.future;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.ClassInfo;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The CallMultiplexer unifies multiple executions of "similar" commands to a single execution.

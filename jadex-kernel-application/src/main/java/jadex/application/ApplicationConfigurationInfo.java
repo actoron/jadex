@@ -1,10 +1,10 @@
 package jadex.application;
 
-import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.commons.SUtil;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.commons.SUtil;
 
 /**
  *  Configuration with extensions.

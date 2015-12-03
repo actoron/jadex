@@ -1,5 +1,14 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.Collection;
+import java.util.Iterator;
+
+import javax.swing.JPanel;
+
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.examples.cleanerworld.world.Cleaner;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
@@ -15,15 +24,6 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.util.Collection;
-import java.util.Iterator;
-
-import javax.swing.JPanel;
 
 /**
  *  Panel for showing the cleaner world view.

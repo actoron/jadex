@@ -1,13 +1,13 @@
 package jadex.bdiv3.examples.garbagecollector;
 
+import java.util.Map;
+
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
-
-import java.util.Map;
 
 /**
  *  Action for burning waste.

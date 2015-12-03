@@ -1,9 +1,5 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
-import jadex.bpmn.editor.gui.GuiConstants;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.model.MActivity;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -21,6 +17,10 @@ import com.mxgraph.shape.mxEllipseShape;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
+
+import jadex.bpmn.editor.gui.GuiConstants;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.MActivity;
 
 public class EventShape extends mxEllipseShape
 {

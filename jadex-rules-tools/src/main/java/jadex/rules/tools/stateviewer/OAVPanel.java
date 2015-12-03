@@ -1,12 +1,5 @@
 package jadex.rules.tools.stateviewer;
 
-import jadex.commons.gui.TreeExpansionHandler;
-import jadex.rules.state.IOAVState;
-import jadex.rules.tools.stateviewer.OAVTreeModel.OAVTreeCellRenderer;
-import jadex.rules.tools.stateviewer.OAVTreeModel.ObjectInspectorNode;
-import jadex.rules.tools.stateviewer.OAVTreeModel.ObjectNode;
-import jadex.rules.tools.stateviewer.OAVTreeModel.RootNode;
-
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
@@ -16,6 +9,13 @@ import javax.swing.JTree;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
+
+import jadex.commons.gui.TreeExpansionHandler;
+import jadex.rules.state.IOAVState;
+import jadex.rules.tools.stateviewer.OAVTreeModel.OAVTreeCellRenderer;
+import jadex.rules.tools.stateviewer.OAVTreeModel.ObjectInspectorNode;
+import jadex.rules.tools.stateviewer.OAVTreeModel.ObjectNode;
+import jadex.rules.tools.stateviewer.OAVTreeModel.RootNode;
 
 /**
  *  A panel displaying an OAV state.

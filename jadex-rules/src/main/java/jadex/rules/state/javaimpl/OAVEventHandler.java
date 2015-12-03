@@ -1,17 +1,17 @@
 package jadex.rules.state.javaimpl;
 
-import jadex.commons.collection.IdentityHashSet;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.IOAVStateListener;
-import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVObjectType;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import jadex.commons.collection.IdentityHashSet;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.IOAVStateListener;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVObjectType;
 
 
 /**

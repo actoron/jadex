@@ -1,5 +1,7 @@
 package jadex.micro.testcases.authenticate;
 
+import java.util.Collection;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -14,8 +16,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Collection;
 
 /**
  * 

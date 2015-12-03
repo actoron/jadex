@@ -1,13 +1,13 @@
 package jadex.bdi.examples.hunterprey;
 
+import java.util.Comparator;
+
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.extension.envsupport.environment.ComponentActionList;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
-
-import java.util.Comparator;
 
 /**
  *  Sort creature actions to execute hunters before preys.

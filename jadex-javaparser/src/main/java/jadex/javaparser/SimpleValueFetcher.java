@@ -1,9 +1,9 @@
 package jadex.javaparser;
 
-import jadex.commons.IValueFetcher;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import jadex.commons.IValueFetcher;
 
 /**
  *  Simple default implementation of a value fetcher useful for

@@ -1,12 +1,5 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.ModelContainer;
-import jadex.gpmn.editor.gui.SGuiHelper;
-import jadex.gpmn.editor.model.gpmn.IActivationEdge;
-import jadex.gpmn.editor.model.visual.VEdge;
-import jadex.gpmn.editor.model.visual.VPlan;
-import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +8,13 @@ import java.util.List;
 import com.mxgraph.model.mxGraphModel.mxValueChange;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
+
+import jadex.gpmn.editor.gui.ModelContainer;
+import jadex.gpmn.editor.gui.SGuiHelper;
+import jadex.gpmn.editor.model.gpmn.IActivationEdge;
+import jadex.gpmn.editor.model.visual.VEdge;
+import jadex.gpmn.editor.model.visual.VPlan;
+import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
 
 public class ValueChangeController implements mxIEventListener
 {

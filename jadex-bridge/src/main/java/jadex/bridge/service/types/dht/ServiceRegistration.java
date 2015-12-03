@@ -1,8 +1,8 @@
 package jadex.bridge.service.types.dht;
 
-import jadex.bridge.service.IServiceIdentifier;
-
 import java.util.Calendar;
+
+import jadex.bridge.service.IServiceIdentifier;
 
 /**
  * This class represents a registration of a Service. 

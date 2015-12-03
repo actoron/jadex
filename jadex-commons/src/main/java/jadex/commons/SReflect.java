@@ -1,13 +1,5 @@
 package jadex.commons;
 
-import jadex.commons.collection.SCollection;
-import jadex.commons.collection.WeakValueMap;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -38,6 +30,14 @@ import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import jadex.commons.collection.SCollection;
+import jadex.commons.collection.WeakValueMap;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
  *  This class provides several useful static reflection methods.

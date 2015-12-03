@@ -1,26 +1,5 @@
 package jadex.tools.security;
 
-import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.PlatformSelectorDialog;
-import jadex.base.gui.componenttree.ComponentIconCache;
-import jadex.base.gui.idtree.IdTreeCellRenderer;
-import jadex.base.gui.idtree.IdTreeModel;
-import jadex.base.gui.idtree.IdTreeNode;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.CombiIcon;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.TreeExpansionHandler;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -50,6 +29,27 @@ import javax.swing.UIDefaults;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
+
+import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.PlatformSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.base.gui.idtree.IdTreeCellRenderer;
+import jadex.base.gui.idtree.IdTreeModel;
+import jadex.base.gui.idtree.IdTreeNode;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.TreeExpansionHandler;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 /**
  * 

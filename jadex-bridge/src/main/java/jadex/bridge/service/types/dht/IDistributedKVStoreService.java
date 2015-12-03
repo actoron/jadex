@@ -1,12 +1,12 @@
 package jadex.bridge.service.types.dht;
 
+import java.util.Collection;
+import java.util.Set;
+
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Exclude;
-
-import java.util.Collection;
-import java.util.Set;
 
 /**
  * This Service provides Distributed Key-Value storage using the DHT-based Chord protocol. 

@@ -1,25 +1,5 @@
 package jadex.tools.debugger.bdiv3;
 
-import jadex.bdiv3.runtime.impl.AbstractBDIInfo;
-import jadex.bdiv3.runtime.impl.BeliefInfo;
-import jadex.bdiv3.runtime.impl.GoalInfo;
-import jadex.bdiv3.runtime.impl.PlanInfo;
-import jadex.bridge.BulkMonitoringEvent;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IFilter;
-import jadex.commons.SUtil;
-import jadex.commons.collection.SortedList;
-import jadex.commons.future.FutureTerminatedException;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.tools.debugger.micro.MicroAgentViewPanel;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -51,6 +31,26 @@ import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import jadex.bdiv3.runtime.impl.AbstractBDIInfo;
+import jadex.bdiv3.runtime.impl.BeliefInfo;
+import jadex.bdiv3.runtime.impl.GoalInfo;
+import jadex.bdiv3.runtime.impl.PlanInfo;
+import jadex.bridge.BulkMonitoringEvent;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.IFilter;
+import jadex.commons.SUtil;
+import jadex.commons.collection.SortedList;
+import jadex.commons.future.FutureTerminatedException;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.tools.debugger.micro.MicroAgentViewPanel;
 
 /**
  *  A panel showing the internals of a BDI agent.

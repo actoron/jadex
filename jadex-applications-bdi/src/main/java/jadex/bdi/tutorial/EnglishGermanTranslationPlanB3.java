@@ -1,9 +1,9 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdiv3x.runtime.Plan;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  An english german translation plan can translate

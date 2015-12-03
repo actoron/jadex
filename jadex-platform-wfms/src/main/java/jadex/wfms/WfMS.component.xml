@@ -7,7 +7,7 @@
 <componenttype xmlns="http://www.activecomponents.org/jadex-component"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
-						http://www.activecomponents.org/jadex-component-2.0.xsd"
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
 	name="WfMS" package="jadex.wfms">
 	
 	<imports>

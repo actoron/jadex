@@ -1,13 +1,5 @@
 package jadex.micro.tutorial;
 
-import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IPojoComponentFeature;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -19,6 +11,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
+
+import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  *  The gui for the chat bot allows

@@ -1,8 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.commons.collection.OrderedProperties;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -35,6 +32,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.commons.collection.OrderedProperties;
 
 public class SettingsPanel extends JPanel
 {

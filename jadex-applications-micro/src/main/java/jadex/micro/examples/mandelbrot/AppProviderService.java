@@ -5,7 +5,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.appstore.AppMetaInfo;
-import jadex.bridge.service.types.appstore.IAppGui;
 import jadex.bridge.service.types.appstore.IAppProviderService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

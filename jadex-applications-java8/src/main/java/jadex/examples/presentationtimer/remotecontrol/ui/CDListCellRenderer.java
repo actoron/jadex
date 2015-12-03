@@ -1,10 +1,5 @@
 package jadex.examples.presentationtimer.remotecontrol.ui;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.examples.presentationtimer.common.State;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -21,6 +16,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.examples.presentationtimer.common.State;
 
 public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDListItem>
 {

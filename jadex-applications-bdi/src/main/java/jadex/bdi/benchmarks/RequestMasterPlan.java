@@ -1,12 +1,12 @@
 package jadex.bdi.benchmarks;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *	Start the partner agent.

@@ -1,5 +1,8 @@
 package jadex.micro.testcases.search;
 
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -11,15 +14,11 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Collection;
-import java.util.Map;
 
 @Agent
 @RequiredServices({@RequiredService(name = "testService", type = ITestService.class, multiple = true, 

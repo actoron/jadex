@@ -1,7 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.BpmnEditor;
-
 import java.awt.BorderLayout;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -10,6 +8,8 @@ import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import jadex.bpmn.editor.BpmnEditor;
 
 /**
  *  Area for status messages.

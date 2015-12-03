@@ -1,5 +1,7 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
+import java.util.Map;
+
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -9,8 +11,6 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
-
-import java.util.Map;
 
 
 /**

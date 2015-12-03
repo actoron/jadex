@@ -1,8 +1,8 @@
 package jadex.bridge.service.types.filetransfer;
 
-import jadex.commons.SUtil;
-
 import java.io.File;
+
+import jadex.commons.SUtil;
 
 
 /**

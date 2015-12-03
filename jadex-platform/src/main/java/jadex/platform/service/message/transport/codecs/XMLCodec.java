@@ -1,17 +1,16 @@
 package jadex.platform.service.message.transport.codecs;
 
-import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.IEncodingContext;
-
-import jadex.commons.beans.ExceptionListener;
-import jadex.commons.beans.XMLDecoder;
-import jadex.commons.beans.XMLEncoder;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
+import jadex.commons.beans.ExceptionListener;
+import jadex.commons.beans.XMLDecoder;
+import jadex.commons.beans.XMLEncoder;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 /**
  *  The XML codec.

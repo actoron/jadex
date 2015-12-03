@@ -7,8 +7,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.email.Email;
 import jadex.bridge.service.types.email.IEmailService;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
 
 public class EmailTest
 {

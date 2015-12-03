@@ -1,12 +1,12 @@
 package jadex.extension.envsupport.environment.space2d;
 
-import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.commons.IFilter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import jadex.commons.IFilter;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.math.IVector2;
 
 /**
  * Implementation of a 2D variant of a k-dimensional-tree for spatial separation and searches.

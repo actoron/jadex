@@ -1,5 +1,5 @@
 package jadex.micro.examples.eliza;
-import java.util.*;
+import java.util.Vector;
 
 /**
 Eliza in Java.

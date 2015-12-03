@@ -1,13 +1,13 @@
 package jadex.commons.gui.future;
 
-import jadex.commons.SReflect;
-import jadex.commons.future.IIntermediateResultListener;
-
 import java.awt.Component;
 import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+
+import jadex.commons.SReflect;
+import jadex.commons.future.IIntermediateResultListener;
 
 /**
  *  Default implementation of intermediate result listener

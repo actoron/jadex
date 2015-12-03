@@ -1,5 +1,10 @@
 package jadex.base.gui;
 
+import java.util.Collection;
+import java.util.Iterator;
+
+import javax.swing.SwingUtilities;
+
 import jadex.base.RemoteCMSListener;
 import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
@@ -18,11 +23,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-
-import java.util.Collection;
-import java.util.Iterator;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  A change handler which receives remote CMS events and delegates to the registered listeners.
