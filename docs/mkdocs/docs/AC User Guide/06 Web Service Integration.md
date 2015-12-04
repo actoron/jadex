@@ -9,7 +9,7 @@ The integration of Jadex components with web services includes two directions. T
 
 #### <span>Integrating Existing Web Services</span> 
 
-![06 Web Service Integration@wscall.png](wscall.png)\
+![06 Web Service Integration@wscall.png](wscall.png)  
 *Web Service Invocation Architecture*
 
 <div class="wikimodel-emptyline">
@@ -24,7 +24,7 @@ The objective of the web service call integration consists in integrating an ext
 
 #### <span>Publishing Jadex Services as Web Services</span> 
 
-![06 Web Service Integration@wspublish.png](wspublish.png)\
+![06 Web Service Integration@wspublish.png](wspublish.png)  
 *Web Service Publish Architecture*
 
 <div class="wikimodel-emptyline">

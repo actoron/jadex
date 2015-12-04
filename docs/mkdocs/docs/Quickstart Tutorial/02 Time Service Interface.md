@@ -64,7 +64,7 @@ Normally, all service methods are potentially remote calls. Therefore it is alwa
 
 The subscribe() method signature captures the interaction between time provider and time user. It uses the <span class="wikiexternallink">[subscription intermediate future](../AC%20User%20Guide/03%20Asynchronous%20Programming)</span> as a return type, which denotes a subscription semantics for the interaction as shown in the diagram below.
 
-![02 Time Service Interface@subscription.png](subscription.png)\
+![02 Time Service Interface@subscription.png](subscription.png)  
 *Figure 2: Interaction diagram of a subscription future*
 
 The interactions starts by the user calling the subscribe() method on the service of the provider. While the interaction is active, the time provider may post time values in arbitrary intervals. These time values are transmitted as intermediate results of the future and immediately become available to the time user. At any point in time, either of both sides may decide to end the interaction. The time provider may do this by setting the future to finished to indicate that no more results will be published. The time user on the other hand may decide that it no longer wants to receive time values from the time provider and thus may call the cancel() method on the future.

@@ -1,12 +1,12 @@
 <span>Chapter 13 - Cli Email Signer</span> 
 ==========================================
 
-![13 Cli Email Signer@emcli\_ov.png](emcli_ov.png)\
+![13 Cli Email Signer@emcli\_ov.png](emcli_ov.png)  
 *Screenshot of the Cli Email Singer*
 
 The Cli (command line interface) Email signer allows for signing command scripts that can be executed by the Jadex Cli platform processor. The idea is that one can use emails to send command scripts to specific Jadex platforms, which then verfify that the script comes from a trusted origin and then execute the script and send a reply email with the result of the execution. The singer tool helps to sign scripts making them acceptable for other Jadex platforms. Please note that only platforms will execute a script that share a secret with the sender (cf. <span class="wikiexternallink">[platform security mechanisms](../AC%20User%20Guide/08%20Security)</span>).
 
-![13 Cli Email Signer@emcli\_arch.png](emcli_arch.png)\
+![13 Cli Email Signer@emcli\_arch.png](emcli_arch.png)  
 * Using the signer tool*
 
 The general architecture and workflow is depicted in the architecture view shown above. The steps that need to be manually performed are marked with a red circle and comrise the following:

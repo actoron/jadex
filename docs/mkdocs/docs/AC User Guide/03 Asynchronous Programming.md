@@ -1,7 +1,7 @@
 <span>Chapter 3 - Asynchronous Programming</span> 
 =================================================
 
-![03 Asynchronous Programming@synccall.png](synccall.png)\
+![03 Asynchronous Programming@synccall.png](synccall.png)  
 *Synchronous call*
 
 <div class="wikimodel-emptyline">
@@ -17,7 +17,7 @@ Understanding the difference between the synchronous and the asynchrnonous progr
 <span>Asynchronous Call Concepts</span> 
 ---------------------------------------
 
-![03 Asynchronous Programming@asynccall.png](asynccall.png)\
+![03 Asynchronous Programming@asynccall.png](asynccall.png)  
 *a) Asynchronous call with wait by necessity                        b) Asynchronous call with listener notification*
 
 <div class="wikimodel-emptyline">
@@ -33,7 +33,7 @@ An asynchronous call is simply a call that does not block the caller while the c
 <span>Programming Futures and Listeners</span> 
 ----------------------------------------------
 
-![03 Asynchronous Programming@futures\_new.png](futures_new.png)\
+![03 Asynchronous Programming@futures\_new.png](futures_new.png)  
 *Future types*
 
 <div class="wikimodel-emptyline">
@@ -166,7 +166,7 @@ public interface IIntermediateResultListener<E> extends IResultListener<Collecti
 <span>Library Support for Listeners</span> 
 ------------------------------------------
 
-![03 Asynchronous Programming@listeners.png](listeners.png)\
+![03 Asynchronous Programming@listeners.png](listeners.png)  
 *Result listeners*
 
 <div class="wikimodel-emptyline">
