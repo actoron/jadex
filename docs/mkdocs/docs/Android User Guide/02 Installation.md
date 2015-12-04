@@ -22,7 +22,7 @@ To develop Android applications with jadex-android you need to:
 
 -   Install the Android SDK (from <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://developer.android.com/sdk/index.html</span>](http://developer.android.com/sdk/index.html)</span>)
 -   Download the SDK Platform API for Android 2.2 or higher using the *Android SDK Manager*
--   Download and extract *jadex-android* (<span class="wikiexternallink">[Download Section](/Download/Overview)</span>)
+-   Download and extract *jadex-android* (<span class="wikiexternallink">[Download Section](https://www.activecomponents.org/bin/view/Download/Overview)</span>)
 
 Proceed to the next step if you want to use Eclipse OR start using jadex-android by adding the libraries in the extracted folder *lib* to your projects build path
 

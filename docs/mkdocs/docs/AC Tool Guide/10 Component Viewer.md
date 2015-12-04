@@ -7,4 +7,4 @@ The component and service viewer is a tool that displays custom component or ser
 
 ![10 Component Viewer@cvalter.png](cvalter.png)
 
-Please refer to the AC tutorial <span class="wikiexternallink">[Exercise F2 - Component Viewer](/AC%20Tutorial/07%20External%20Access)</span> in order to learn about how a user interface for a component can be created. 
+Please refer to the AC tutorial <span class="wikiexternallink">[Exercise F2 - Component Viewer](../AC%20Tutorial/07%20External%20Access)</span> in order to learn about how a user interface for a component can be created. 

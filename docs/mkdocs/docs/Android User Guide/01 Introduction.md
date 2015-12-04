@@ -13,7 +13,7 @@ On the one hand, AOSE allows to model active objects, meaning that e.g. the user
 ------------------------------------
 
 Except for the UI, multiple Jadex modules were ported to android, replacing incompatible libraries and calls with ones that are compatible with android. Although we try to keep up with new jadex features, some things are still missing on android.\
-You can follow the release notes below to get an impression of the ongoing developmen, the latest implementation can be found in the <span class="wikiexternallink">[download](/Download/Overview)</span> section.
+You can follow the release notes below to get an impression of the ongoing development, the latest implementation can be found in the <span class="wikiexternallink">[download](https://www.activecomponents.org/bin/view/Download/Overview)</span> section.
 
 <div class="wikimodel-emptyline">
 

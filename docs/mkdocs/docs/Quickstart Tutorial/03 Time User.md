@@ -83,7 +83,7 @@ jadex.base.Starter
 
 In case there are any time services online, you should see their time printed to the console in periodic updates. If no time service is found after 30 seconds, a  jadex.bridge.service.search.ServiceNotFoundException is printed.
 
-See <span class="wikiexternallink">[AC Tutorial.Chapter 02: Installation](AC%20Tutorial/02%20Installation)</span> for details on setting up a launch configuration and starting agents in the JCC.
+See <span class="wikiexternallink">[AC Tutorial.Chapter 02: Installation](../AC%20Tutorial/02%20Installation)</span> for details on setting up a launch configuration and starting agents in the JCC.
 
 The details of the agent are explained in the following subsections.
 
