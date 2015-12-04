@@ -16,8 +16,11 @@ def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
 }
-// ressource files that are filtered for variables
+// resource files that are filtered for variables
 project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle'
+
+// resource files that are executable and should be flagged as such in the zip, must be subset of filterfiles
+project.ext.execfiles = '*.bat,*.sh'
 
 project.ext.srcdir = 'src'
 
@@ -497,7 +500,8 @@ def createDistZip(distname, arts, isaddon)
 				}
 			}
 			
-			zipfileset dir: preprocessdir, prefix: foldername + '/', erroronmissingdir: false
+			zipfileset dir: preprocessdir, prefix: foldername + '/', excludes: project.ext.execfiles, erroronmissingdir: false
+			zipfileset dir: preprocessdir, prefix: foldername + '/', includes: project.ext.execfiles, filemode: 755, erroronmissingdir: false
 		}
 		ant.delete dir: preprocessdir
 	}
