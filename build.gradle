@@ -476,10 +476,12 @@ def createDistZip(distname, arts, isaddon)
 						runtimeConfig = sp.configurations.runtimeAndroid
 					}
 					
-					sp.configurations.detachedConfiguration(runtimeConfig.allDependencies.findAll { !(it instanceof ProjectDependency) } as Dependency[]).each { file ->
-						if (!extdists.contains(file)) {
-							zipfileset file: file, prefix: foldername + '/lib/'
-							extdists.add(file)
+					if (!isaddon) {
+						sp.configurations.detachedConfiguration(runtimeConfig.allDependencies.findAll { !(it instanceof ProjectDependency) } as Dependency[]).each { file ->
+							if (!extdists.contains(file)) {
+								zipfileset file: file, prefix: foldername + '/lib/'
+								extdists.add(file)
+							}
 						}
 					}
 				}
