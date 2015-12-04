@@ -60,7 +60,7 @@ To understand the code it is necessary to explain the underlying concepts of the
 
 </div>
 
-![04 Required Services@Image2.png](Image2.png)\
+![04 Required Services@Image2.png](Image2.png)  
 *Component tree in Starter*
 
 <span>Exercise C2 - Invoking a Predefined Service</span> 
@@ -122,7 +122,7 @@ In this execise we will use another service of the platform and invoke a method 
 
 Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the IComponentManagementService interface to learn more about theses functionalities.\
 \
-![04 Required Services@console1.png](console1.png)\
+![04 Required Services@console1.png](console1.png)  
 * Console snaphsot*
 
 <div class="wikimodel-emptyline">
@@ -131,7 +131,7 @@ Start the platform and the agent and check if the component descriptions are pri
 
 Please note that, besides the interface type itself, the most important factor of searches and required service specifications is the search scope. It defines the area of the search and is per default set to *application*. This means that only components within the started application are considered within the search. Knowing this it becomes clear why we had to change the scope to *platform* in all lectures so far. Otherwise the search would have stopped at the application component and the platform services would not have been found. In the figure below a visual representation of search scopes is given.
 
-![04 Required Services@scopes.png](scopes.png)\
+![04 Required Services@scopes.png](scopes.png)  
 * Component search scopes*
 
 <span>Exercise C4 - Searching services</span> 

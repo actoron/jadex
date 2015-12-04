@@ -7,7 +7,7 @@ The Jadex ADF Checker is an eclipse plugin that allows checking Jadex *agent def
 
 </div>
 
-![15 ADF Checker@adfchecker.png](adfchecker.png)\
+![15 ADF Checker@adfchecker.png](adfchecker.png)  
 *Figure 1: The ADF Checker in action*
 
 <div class="wikimodel-emptyline">
@@ -48,7 +48,7 @@ The plugin can be obtained from the eclipse update site <span class="wikiexterna
 
 </div>
 
-![15 ADF Checker@install.png](install.png)\
+![15 ADF Checker@install.png](install.png)  
 *Figure 2: Installing the ADF Checker*
 
 <div class="wikimodel-emptyline">
@@ -64,7 +64,7 @@ The ADF Checker can be activated and deactivated individually for each Eclipse p
 
 </div>
 
-![15 ADF Checker@activate.png](activate.png)\
+![15 ADF Checker@activate.png](activate.png)  
 *Figure 3: Activating the ADF Checker*
 
 <div class="wikimodel-emptyline">
@@ -88,7 +88,7 @@ All found problems are reported in the corresponding files editor views as well 
 
 </div>
 
-![15 ADF Checker@info.png](info.png)\
+![15 ADF Checker@info.png](info.png)  
 *Figure 4: Info Note on Successfully Validated ADF*
 
 <div class="wikimodel-emptyline">
@@ -111,5 +111,5 @@ The following is a list of issues that we are already aware of:
 -   **Custom extensions are not yet supported.** Currently, only EnvSupport and AGR are supported. A configuration option for adding custom extensiontypes will be added in the future.
 -   **Overlapping source/resource folders when using Maven and M2Eclipse.** M2Eclipse has a bug to set source includes to *\*\*/\*.java* when source and resource folders overlap. Unfortunately, this is a common setting for Jadex projects, because we consider it useful placing e.g. *.component.xml* files in the same folder as corresponding *.java* files. As a result, ADFs are ignored during the build and the ADF Checker is not invoked. To fix this issue, you currently have to manually remove the inclusion pattern from the project setup. Right-click on the project, choose *Build Path-&gt;Configure Build Path* and open the *Source* tab. Select the *Included: \*\*/\*.java* entry and click *Remove*.
 
-![15 ADF Checker@includes.png](includes.png)\
+![15 ADF Checker@includes.png](includes.png)  
 *Figure 5: Fixing Maven Project Setup*

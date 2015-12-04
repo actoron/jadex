@@ -1,7 +1,7 @@
 <span>Chapter 5 - Security Settings</span> 
 ==========================================
 
-![05 Security Settings @sec.png](sec.png)\
+![05 Security Settings @sec.png](sec.png)  
 *Security settings panel*
 
 Platform security in Jadex is based on platform passwords and networks. Please refer to the <span class="wikiexternallink">[security chapter](../AC%20User%20Guide/08%20Security)</span> in the user guide to read about these concepts. The security settings panel consists of four different areas that are explained in the following sections.

@@ -4,7 +4,7 @@
 In Jadex all component types (e.g. micro agents, BDI agents, BPMN workflows) share the same active component characteristics. Depending on the type of the component the definition is based on Java annotations or XML elements. The following explanations make extensive use of XML-based structure diagrams, but they are valid for annotations as well.  \
 As can be seen in the figure below an active component specification is composed of *imports*, *arguments*, *componenttypes*, *services*, *properties*, *configurations* and *extensiontypes*. These elements will be explained in detail in the next subsections.
 
-![04 Component Specification@componenttype.png](componenttype.png)\
+![04 Component Specification@componenttype.png](componenttype.png)  
 *Component type*
 
 <div class="wikimodel-emptyline">
@@ -27,7 +27,7 @@ The imports can be used in the same way as in Java to specify the classes and pa
 
 </div>
 
-![04 Component Specification@imports.png](imports.png)\
+![04 Component Specification@imports.png](imports.png)  
 *Imports*
 
 <div class="wikimodel-emptyline">
@@ -71,7 +71,7 @@ Active components can have arguments and results. The arguments are supplied at 
 -   *class*: The Java type of the argument or result. 
 -   *defaultvalue*: (Optional) expression for the argument or result value if nothing else is supplied. The default value is defined as Java expression that is evaluated once.
 
-![04 Component Specification@arguments.png](arguments.png)\
+![04 Component Specification@arguments.png](arguments.png)  
 *Arguments*
 
 <div class="wikimodel-emptyline">
@@ -117,7 +117,7 @@ The declaration of a subcomponent type is done using the following parameters:
 -   *name*: The local name of the component type. This name can be used at other places to refer to the component type. Especially in the components section to create component instances of a given type.
 -   *filename*: The filename of the referenced active component type. The filename can either include the package structure or contain only the name itself if the package is imported.  
 
-![04 Component Specification@componenttypes.png](componenttypes.png)\
+![04 Component Specification@componenttypes.png](componenttypes.png)  
 *Component types*
 
 <div class="wikimodel-emptyline">
@@ -162,7 +162,7 @@ Active components realize component orientation in the same way as traditional c
 
 #### <span>Required Services</span> 
 
-![04 Component Specification@requiredservicetype.png](requiredservicetype.png)\
+![04 Component Specification@requiredservicetype.png](requiredservicetype.png)  
 *Required service type*
 
 A required service represents a needed functionality of another component. The specfication of a required service is composed of two aspects. First the service definition describes what kind of service is needed and secondly the binding describes how a service can be found. 
@@ -175,7 +175,7 @@ A required service is defined using the following properties:
 
 The optional service *binding* has the following options:
 
-![05 Services@scopes.png](scopes.png)\
+![05 Services@scopes.png](scopes.png)  
 *Search scopes*
 
 -   *scope*: The scope of the search (cf. also the figure above). Static constants for search scopes are available via the class RequiredServiceInfo. Currently several predefined scopes are available (*application* being the default):
@@ -196,7 +196,7 @@ The optional service *binding* has the following options:
 
 #### <span>Provided Services</span> 
 
-![04 Component Specification@providedservicetype.png](providedservicetype.png)\
+![04 Component Specification@providedservicetype.png](providedservicetype.png)  
 *Provided service type*
 
 <div class="wikimodel-emptyline">
@@ -222,7 +222,7 @@ In most cases a service definition should include an implementation because othe
 
 ### <span>Properties</span> 
 
-![04 Component Specification@properties.png](properties.png)\
+![04 Component Specification@properties.png](properties.png)  
 *Properties*
 
 <div class="wikimodel-emptyline">
@@ -243,7 +243,7 @@ A property has the following attributes:
 
 ### <span>Configurations</span> 
 
-![04 Component Specification@configurations.png](configurations.png)\
+![04 Component Specification@configurations.png](configurations.png)  
 *Configurations*
 
 <div class="wikimodel-emptyline">
@@ -270,7 +270,7 @@ The properties of a configuration are as follows:
 
 #### <span>Components</span> 
 
-![04 Component Specification@configcomponents.png](configcomponents.png)\
+![04 Component Specification@configcomponents.png](configcomponents.png)  
 *Configuration components*
 
 -   *components*: The components section allows for creating component instances of specified subcomponent types. These component instances can be customized by the follow properties:
@@ -287,7 +287,7 @@ The properties of a configuration are as follows:
 
 #### <span>Services</span> 
 
-![04 Component Specification@configservices.png](configservices.png)\
+![04 Component Specification@configservices.png](configservices.png)  
 *Configuration Services*
 
 <div class="wikimodel-emptyline">
@@ -302,7 +302,7 @@ In the configuration of a component also the service details can be changed. Wit
 
 #### <span>Extensions</span> 
 
-![04 Component Specification@configextensions.png](configextensions.png)\
+![04 Component Specification@configextensions.png](configextensions.png)  
 *Extensions*
 
 <div class="wikimodel-emptyline">
@@ -323,7 +323,7 @@ Extensions can be used to add extension instance elements to an active component
 
 #### <span>Steps</span> 
 
-![04 Component Specification@configsteps.png](configsteps.png)\
+![04 Component Specification@configsteps.png](configsteps.png)  
 *Steps*
 
 <div class="wikimodel-emptyline">
@@ -355,7 +355,7 @@ public interface IComponentStep<T>
 
 ### <span>Extension Types</span> 
 
-![04 Component Specification@extensiontypes.png](extensiontypes.png)\
+![04 Component Specification@extensiontypes.png](extensiontypes.png)  
 *Extension types*
 
 <div class="wikimodel-emptyline">

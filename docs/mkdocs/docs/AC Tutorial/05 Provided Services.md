@@ -13,7 +13,7 @@ Learning how to build provided services allows building an initial version of th
 
 </div>
 
-![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)\
+![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)  
 *Conceptual design of the chat application*
 
 <div class="wikimodel-emptyline">
@@ -233,7 +233,7 @@ The figure below shows the interplay between the implemented Java classes when e
 
 </div>
 
-![AC Tutorial.05 Provided Services@chatimpl.png](chatimpl.png)\
+![AC Tutorial.05 Provided Services@chatimpl.png](chatimpl.png)  
 *Interplay between implemented Java classes inside a chat component*
 
 <span>Exercise D3 - Service Interfaces</span> 
