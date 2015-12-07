@@ -71,9 +71,9 @@ public class TranslationBDI
 	 */
 	@Plan
 //	protected List<String> findSynonyms(String eword)
-	protected List<String> findSynonyms(ChangeEvent ev)
+	protected List<String> findSynonyms(ChangeEvent<Object[]> ev)
 	{
-		String eword = (String)((Object[])ev.getValue())[0];
+		String eword = (String)ev.getValue()[0];
 		List<String> ret = new ArrayList<String>();
 		String gword = wordtable.get(eword);
 		for(String key: wordtable.keySet())

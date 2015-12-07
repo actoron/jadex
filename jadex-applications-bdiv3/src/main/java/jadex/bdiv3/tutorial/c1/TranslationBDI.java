@@ -62,9 +62,9 @@ public class TranslationBDI
 	 *  Add a new word pair to the dictionary.
 	 */
 	@Plan(trigger=@Trigger(factaddeds="wordtable"))
-	public void checkWordPairPlan(ChangeEvent event)
+	public void checkWordPairPlan(ChangeEvent<ChangeInfo<String>> event)
 	{
-		ChangeInfo<String>	change	= ((ChangeInfo<String>)event.getValue());
+		ChangeInfo<String>	change	= event.getValue();
 		
 		if(change.getInfo().equals("bugger"))
 			System.out.println("Warning, a colloquial word pair has been added: "+change.getInfo()+" "+change.getValue());
