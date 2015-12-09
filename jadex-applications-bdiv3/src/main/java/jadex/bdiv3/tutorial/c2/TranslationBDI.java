@@ -46,9 +46,9 @@ public class TranslationBDI
 	 *  Initiate an alarm.
 	 */
 	@Plan(trigger=@Trigger(factchangeds="alarm"))
-	public void checkWordPairPlan(ChangeEvent event)
+	public void checkWordPairPlan(ChangeEvent<ChangeInfo<Boolean>> event)
 	{
-		ChangeInfo<Boolean>	change	= (ChangeInfo<Boolean>)event.getValue();
+		ChangeInfo<Boolean>	change	= event.getValue();
 		// Print warning when value changes from false to true.
 		if(Boolean.FALSE.equals(change.getOldValue()) && Boolean.TRUE.equals(change.getValue()))
 		{
