@@ -206,7 +206,9 @@ subprojects
         allSource   = sourceSets.main.allSource
         // include all resources that are placed inside src dirs
         sourceSets.main.resources.srcDirs    mainSrcDir
+        sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
         sourceSets.test.resources.srcDirs    testSrcDir
+        sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
         
         dependencies
         {
