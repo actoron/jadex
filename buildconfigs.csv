@@ -54,15 +54,15 @@ jadex-platform,X,X,X,X,,,,,,,,,X,,X
 jadex-platform-android,,,,X,,,,,,,,,,,X
 jadex-platform-extension-management,,,X,,,,,,X,,,,,,X
 jadex-platform-extension-maven,,,X,,,,,X,,,,,,,X
-jadex-platform-extension-relay,,,X,,,,,,,,,,X,,X
+jadex-platform-extension-relay,,,,,,,,,,,,,,,X
 jadex-platform-extension-relay-standalone,,,X,,,,,,,,,,X,,X
+jadex-platform-extension-relay-web,,,X,,,,,,,,,,X,,X
 jadex-platform-extension-securetransport,,,X,,,,X,,,,,,,,X
 jadex-platform-extension-webservice,,,X,X,,X,,,,,,,,X,X
 jadex-platform-extension-webservice-android,,,,X,,,,,,,,,,,X
 jadex-platform-extension-webservice-desktop,,,X,,,X,,,,,,,,,X
 jadex-platform-extension-webservice-desktop-grizzly,,,X,,,,,,,,,,,,X
 jadex-platform-extension-webservice-desktop-jetty,,,X,,,,,,,,,,,,X
-jadex-platform-relay-web,,,X,,,,,,,,,,X,,X
 jadex-platform-standalone-launch,X,X,X,,,,,,,,,,,,X
 jadex-rules,,X,X,X,,,,,,,,,,,X
 jadex-rules-applications,,X,X,,,,,,,,,,,,X

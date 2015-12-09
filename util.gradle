@@ -13,6 +13,24 @@ buildscript {
     }
 }
 
+
+def isApp(project) {
+	project.hasProperty('distasapp') && project.property('distasapp').toLowerCase().equals('true')
+}
+
+/* Tests if a project is commercial. */
+def isCommercial(project) {
+	project.hasProperty("commercial") && project.property("commercial").toLowerCase().equals('true')
+}
+
+def isAddon(selecteddists) {
+	def isaddon = true
+	selecteddists.each { dist ->
+		isaddon &= dist.startsWith('addon')
+	}
+	return isaddon
+}
+
 def isAndroidProject(project) {
     project.hasProperty("androidProject") && project.property("androidProject") == 'true'
 }
@@ -270,6 +288,9 @@ def androidSdkExists() {
 // make functions externally visible
 
 ext {
+	isApp = this.&isApp
+	isCommercial = this.&isCommercial
+	isAddon = this.&isAddon
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     androidSdkExists = this.&androidSdkExists

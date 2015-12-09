@@ -472,18 +472,23 @@ def createDistZip(distname, arts, isaddon)
 						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
 					}
 				} else {
-					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
-
-					def runtimeConfig = sp.configurations.runtime
-					if (distname.contains('android')) {
-						runtimeConfig = sp.configurations.runtimeAndroid
+					if (isApp(sp)) {
+						zipfileset dir: spbdir + '/libs', prefix: foldername + '/apps/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
 					}
-					
-					if (!isaddon) {
-						sp.configurations.detachedConfiguration(runtimeConfig.allDependencies.findAll { !(it instanceof ProjectDependency) } as Dependency[]).each { file ->
-							if (!extdists.contains(file)) {
-								zipfileset file: file, prefix: foldername + '/lib/'
-								extdists.add(file)
+					else {
+						zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
+						
+						def runtimeConfig = sp.configurations.runtime
+						if (distname.contains('android')) {
+							runtimeConfig = sp.configurations.runtimeAndroid
+						}
+						
+						if (!isaddon) {
+							sp.configurations.detachedConfiguration(runtimeConfig.allDependencies.findAll { !(it instanceof ProjectDependency) } as Dependency[]).each { file ->
+								if (!extdists.contains(file)) {
+									zipfileset file: file, prefix: foldername + '/lib/'
+									extdists.add(file)
+								}
 							}
 						}
 					}
@@ -546,17 +551,4 @@ def addSubproject(prefix, proj)
 	proj.subprojects.each { sp ->
 		addSubproject(pname, sp)
 	}
-}
-
-/* Tests if a project is commercial. */
-def isCommercial(project) {
-	project.hasProperty("commercial") && project.property("commercial").toLowerCase().equals('true')
-}
-
-def isAddon(selecteddists) {
-	def isaddon = true
-	selecteddists.each { dist ->
-		isaddon &= dist.startsWith('addon')
-	}
-	return isaddon
 }

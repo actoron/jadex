@@ -104,6 +104,7 @@ depconfreader.close()
 	addDependency(mainart, projdeps, gradle.ext.includeartifacts)
 }*/
 
+// Add Dependencies for Addons
 gradle.ext.selecteddists.each { seldist ->
 	if (seldist.startsWith('addon')) {
 		gradle.ext.distartmap.get(seldist).each { art ->
@@ -111,6 +112,26 @@ gradle.ext.selecteddists.each { seldist ->
 		}
 	}
 }
+
+// Add Dependencies for Apps
+gradle.ext.maindistartifacts.each { art ->
+	// Subprojects unavailable during initialization, manually loading properties.
+	def propfilepath = settingsDir.getCanonicalPath() + art.replace(':','/') + '/gradle.properties'
+	def propfile = new File(propfilepath)
+	println propfile.getCanonicalPath() + ' ' + propfile.exists()
+	if (propfile.exists()) {
+		def prop = new java.util.Properties()
+  		def propin = new FileInputStream(propfile)
+  		prop.load(propin)
+  		propin.close()
+  		println art + ' ' + prop.getProperty('distasapp')
+  		if (prop.getProperty('distasapp') != null && prop.getProperty('distasapp').toLowerCase().equals('true'))
+  		{
+  			addDependency(art, projdeps, gradle.ext.includeartifacts)
+  		}
+	}
+}
+println gradle.ext.includeartifacts
 gradle.ext.includeartifacts.addAll(gradle.ext.maindistartifacts)
 
 include gradle.ext.includeartifacts.toArray(new String[gradle.ext.includeartifacts.size()])
