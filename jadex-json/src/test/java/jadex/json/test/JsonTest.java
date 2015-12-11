@@ -22,7 +22,7 @@ public class JsonTest extends jadex.commons.transformation.Test
 	 */
 	public Object doRead(Object ro)
 	{
-		return JsonTraverser.objectFromByteArray((byte[])ro, null, null, /*StandardCharsets.UTF_8.name()*/"UTF-8");
+		return JsonTraverser.objectFromByteArray((byte[])ro, null, null, /*StandardCharsets.UTF_8.name()*/"UTF-8", null);
 	}
 
 	/**

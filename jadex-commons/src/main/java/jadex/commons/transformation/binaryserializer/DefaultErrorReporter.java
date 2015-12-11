@@ -5,6 +5,9 @@ package jadex.commons.transformation.binaryserializer;
  */
 public class DefaultErrorReporter implements IErrorReporter
 {
+	/** Error reporter constant. */
+	public static final IErrorReporter DEFAULT_ERROR_REPORTER = new DefaultErrorReporter();
+	
 	/**
 	 *  Method called when a decoding error occurs.
 	 *  

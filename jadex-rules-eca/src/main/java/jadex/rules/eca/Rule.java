@@ -30,7 +30,7 @@ public class Rule<T> implements IRule<T>
 	//-------- constructors --------
 
 	/**
-	 * 
+	 *  Create a new rule.
 	 */
 	public Rule(String name)
 	{
@@ -38,7 +38,7 @@ public class Rule<T> implements IRule<T>
 	}
 	
 	/**
-	 * 
+	 *  Create a new rule.
 	 */
 	public Rule(String name, ICondition condition)
 	{
@@ -46,7 +46,7 @@ public class Rule<T> implements IRule<T>
 	}
 	
 	/**
-	 * 
+	 *  Create a new rule.
 	 */
 	public Rule(String name, ICondition condition, IAction<T> action)
 	{
@@ -54,7 +54,7 @@ public class Rule<T> implements IRule<T>
 	}
 	
 	/**
-	 * 
+	 *  Create a new rule.
 	 */
 	public Rule(String name, ICondition condition, IAction<T> action, EventType[] events)
 	{

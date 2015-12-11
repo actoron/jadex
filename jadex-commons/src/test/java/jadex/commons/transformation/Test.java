@@ -1,5 +1,6 @@
 package jadex.commons.transformation;
 
+import jadex.bridge.ClassInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -143,6 +144,7 @@ public abstract class Test extends TestCase
 				testByteArrayAttribute();
 	
 				testClass();
+				testClassInfo();
 				testDate();
 				testUUID();
 				testInnerClass();
@@ -784,6 +786,16 @@ public abstract class Test extends TestCase
 	}
 	
 	public static class InnerTestClass{}
+	
+	
+	/**
+	 *  Test if class info transfer works.
+	 */
+	public void testClassInfo() throws Exception
+	{
+		doWriteAndRead(new ClassInfo("boolean"));
+		doWriteAndRead(new ClassInfo(InnerTestClass.class.getName()));
+	}
 	
 	/**
 	 *  Test if date transfer works.

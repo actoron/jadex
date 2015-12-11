@@ -65,6 +65,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -683,7 +684,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         {
         	try
         	{
-        		ret = JsonTraverser.objectFromByteArray(val.getBytes(), component.getClassLoader(), null);
+        		ret = JsonTraverser.objectFromByteArray(val.getBytes(), component.getClassLoader(), (IErrorReporter)null);
         		done = true;
         	}
         	catch(Exception e)

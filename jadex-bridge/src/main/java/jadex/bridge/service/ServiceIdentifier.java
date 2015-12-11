@@ -29,7 +29,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	protected String scope;
 	
 	/** The string representation (cached for reducing memory consumption). */
-	protected String	tostring;
+	protected String tostring;
 	
 	//-------- constructors --------
 	

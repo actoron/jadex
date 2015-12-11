@@ -1,6 +1,7 @@
 package jadex.transformation.jsonserializer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.binaryserializer.DefaultErrorReporter;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -44,6 +46,7 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLoggingLevelProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonUUIDProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonClassProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonClassInfoProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMultiCollectionProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonEnumProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCertificateProcessor());
@@ -78,6 +81,7 @@ public class JsonTraverser extends Traverser
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURIProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURLProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassInfoProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveObjectProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLRUProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMapProcessor());
@@ -160,23 +164,20 @@ public class JsonTraverser extends Traverser
 	}
 	
 	/**
-	 *  Convert a byte array (of an xml) to an object.
-	 *  @param val The byte array.
-	 *  @param classloader The class loader.
-	 *  @return The decoded object.
+	 *  Convert to a byte array.
 	 */
-	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep)
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc)
 	{
-		return objectFromByteArray(val, classloader, rep, null);
+		return objectToByteArray(val, classloader, enc, true);
 	}
 	
 	/**
 	 *  Convert to a byte array.
 	 */
-	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc)
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass)
 	{
 		Traverser traverser = getWriteTraverser();
-		JsonWriteContext wr = new JsonWriteContext(true);
+		JsonWriteContext wr = new JsonWriteContext(writeclass);
 		
 		try
 		{
@@ -204,16 +205,80 @@ public class JsonTraverser extends Traverser
 	 *  @param classloader The class loader.
 	 *  @return The decoded object.
 	 */
-	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep, String enc)
+	public static Object objectFromByteArray(byte[] val, ClassLoader classloader)
+	{
+		return objectFromByteArray(val, classloader, (IErrorReporter)null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, String enc)
+	{
+		return objectFromByteArray(val, classloader, null, enc, null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep)
+	{
+		return objectFromByteArray(val, classloader, rep, null, null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static <T> T objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep, String enc, Class<T> clazz)
 	{
 		try
 		{
-			JsonValue value = Json.parse(enc==null? new String(val): new String(val, enc));
+			return objectFromString(enc==null? new String(val): new String(val, enc), classloader, rep, clazz);
+		}
+		catch(UnsupportedEncodingException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static <T> T objectFromString(String val, ClassLoader classloader, Class<T> clazz)
+	{
+		return objectFromString(val, classloader, null, clazz);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz)
+	{
+		rep = rep==null? DefaultErrorReporter.DEFAULT_ERROR_REPORTER: rep;
+		
+		try
+		{
+			JsonValue value = Json.parse(val);
 			JsonTraverser traverser = getReadTraverser();
 			JsonReadContext rc = new JsonReadContext();
-			Object ret = traverser.traverse(value, null, readprocs, null, rc);
+			Object ret = traverser.traverse(value, clazz, readprocs, null, rc);
 	//		System.out.println("rc: "+rc.knownobjects);
-			return ret;
+			return (T)ret;
 		}
 		catch(RuntimeException e)
 		{

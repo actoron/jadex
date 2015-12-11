@@ -121,7 +121,7 @@ public class ExceptionDelegationResultListener<E, T> implements IResultListener<
 	 */
 	public void customResultAvailable(E result)	throws Exception
 	{
-		if (customResultListener != null)
+		if(customResultListener != null)
 		{
 			customResultListener.resultAvailable(result);
 		}
