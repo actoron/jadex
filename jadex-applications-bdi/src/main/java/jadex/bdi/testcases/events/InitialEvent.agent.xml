@@ -12,10 +12,10 @@
 	The agent should dispatch 2 internal events as there are 2 possible bindings
 	(the 'param' parameter has an initial value)
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex"
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-	                    http://jadex.sourceforge.net/jadex-bdi-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	name="InitialEvent"
 	package="jadex.bdi.testcases.events">
 

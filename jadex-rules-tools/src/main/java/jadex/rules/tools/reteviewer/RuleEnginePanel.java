@@ -1,11 +1,5 @@
 package jadex.rules.tools.reteviewer;
 
-import jadex.commons.ISteppable;
-import jadex.commons.gui.SGUI;
-import jadex.rules.rulesystem.RuleSystem;
-import jadex.rules.rulesystem.RuleSystemExecutor;
-import jadex.rules.tools.stateviewer.OAVPanel;
-
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -15,6 +9,12 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIDefaults;
+
+import jadex.commons.ISteppable;
+import jadex.commons.gui.SGUI;
+import jadex.rules.rulesystem.RuleSystem;
+import jadex.rules.rulesystem.RuleSystemExecutor;
+import jadex.rules.tools.stateviewer.OAVPanel;
 
 /**
  *  Panel containing state and Rete viewer.

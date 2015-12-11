@@ -1,27 +1,5 @@
 package jadex.bdi.examples.cleanerworld_classic.environment;
 
-import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
-import jadex.bdi.examples.cleanerworld_classic.Cleaner;
-import jadex.bdi.examples.cleanerworld_classic.Environment;
-import jadex.bdi.examples.cleanerworld_classic.Location;
-import jadex.bdi.examples.cleanerworld_classic.Waste;
-import jadex.bdi.examples.cleanerworld_classic.Wastebin;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -58,6 +36,28 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
+import jadex.bdi.examples.cleanerworld_classic.Cleaner;
+import jadex.bdi.examples.cleanerworld_classic.Environment;
+import jadex.bdi.examples.cleanerworld_classic.Location;
+import jadex.bdi.examples.cleanerworld_classic.Waste;
+import jadex.bdi.examples.cleanerworld_classic.Wastebin;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 
 /**

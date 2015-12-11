@@ -1,9 +1,5 @@
 package jadex.javaparser.javaccimpl;
 
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
-
 import java.awt.HeadlessException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +15,10 @@ import java.util.StringTokenizer;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 /**
  * 

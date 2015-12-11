@@ -1,9 +1,6 @@
 package jadex.commons.gui;
 
 
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -13,7 +10,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -74,6 +70,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
 
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import sun.awt.image.ImageRepresentation;
 import sun.awt.image.ToolkitImage;
 

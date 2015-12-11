@@ -1,16 +1,13 @@
 package jadex.bpmn.task.info;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.model.task.annotation.TaskProperty;
 import jadex.bpmn.model.task.annotation.TaskPropertyGui;
 import jadex.bridge.ClassInfo;
-import jadex.commons.SReflect;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Static helper for extracting task meta infos.

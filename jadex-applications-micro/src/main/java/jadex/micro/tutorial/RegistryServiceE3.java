@@ -1,12 +1,12 @@
 package jadex.micro.tutorial;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Service for registering a nickname with component identifier.

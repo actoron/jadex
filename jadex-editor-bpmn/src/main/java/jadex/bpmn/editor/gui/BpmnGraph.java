@@ -1,5 +1,21 @@
 package jadex.bpmn.editor.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.SwingUtilities;
+
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.layout.mxStackLayout;
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxLayoutManager;
+import com.mxgraph.view.mxStylesheet;
+
 import jadex.bpmn.editor.gui.controllers.SValidation;
 import jadex.bpmn.editor.gui.layouts.EventHandlerLayout;
 import jadex.bpmn.editor.gui.layouts.LaneLayout;
@@ -19,22 +35,6 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MTask;
 import jadex.commons.collection.LRU;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.SwingUtilities;
-
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.layout.mxStackLayout;
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxICell;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxLayoutManager;
-import com.mxgraph.view.mxStylesheet;
 
 /**
  *  Graph for BPMN models.

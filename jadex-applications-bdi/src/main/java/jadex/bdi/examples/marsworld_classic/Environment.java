@@ -1,8 +1,8 @@
 package jadex.bdi.examples.marsworld_classic;
 
-import jadex.bridge.service.types.clock.IClockService;
-
 import java.util.ArrayList;
+
+import jadex.bridge.service.types.clock.IClockService;
 
 /**
  *  The environment as singleton.

@@ -1,5 +1,13 @@
 package jadex.platform.service.processengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.base.Starter;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MActivity;
@@ -12,7 +20,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -62,14 +69,6 @@ import jadex.platform.service.cron.CronAgent;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
 import jadex.platform.service.processengine.EventMapper.ModelDetails;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Agent that implements the bpmn monitoring starter interface.

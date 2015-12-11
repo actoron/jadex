@@ -1,15 +1,14 @@
 package jadex.platform.service.message.contentcodecs;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Properties;
+
 import jadex.bridge.service.types.message.IContentCodec;
 import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Properties;
 
 //import nuggets.Nuggets;
 

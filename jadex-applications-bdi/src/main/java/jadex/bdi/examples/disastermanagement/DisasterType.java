@@ -1,13 +1,13 @@
 package jadex.bdi.examples.disastermanagement;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 /**
  *  Helper class for random disaster generation.

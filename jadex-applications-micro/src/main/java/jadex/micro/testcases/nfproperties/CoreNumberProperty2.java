@@ -5,8 +5,6 @@ import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.util.Properties;
-
 /**
  *  Non-functional property reporting the CPU core count with a different name.
  *

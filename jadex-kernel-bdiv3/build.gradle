@@ -10,4 +10,21 @@ dependencies
 	compile project(':jadex-xml')
 	
 	compileNoAndroidRuntime 'org.ow2.asm:asm-all:5.0.3'
+//	compile 'org.ow2.asm:asm-all:5.0.3'
 }
+
+task mappings << {
+	conf2ScopeMappings.mappings.each {
+		Conf2ScopeMapping mapping = it.getValue()
+		println "${it.getKey()} -> $mapping.scope"
+		mapping.configuration.allDependencies.each {
+			println it
+		}
+	}
+}
+
+
+//configurations {
+//	compile.extendsFrom compileNoAndroidRuntime
+//	runtime.extendsFrom compileNoAndroidRuntime
+//}

@@ -1,7 +1,8 @@
 package jadex.bridge.service.component;
 
+import java.util.Map;
+
 import jadex.base.Starter;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
@@ -11,8 +12,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadLocalTransferHelper;
-
-import java.util.Map;
 
 /**
  *  Allow waiting for futures by blocking a component.

@@ -1,20 +1,5 @@
 package jadex.bpmn.editor.gui.controllers;
 
-import jadex.bpmn.editor.gui.BpmnGraphComponent;
-import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
-import jadex.bpmn.editor.gui.GuiConstants;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.gui.contextmenus.EventContextMenu;
-import jadex.bpmn.editor.gui.contextmenus.GatewayContextMenu;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VEdge;
-import jadex.bpmn.editor.model.visual.VInParameter;
-import jadex.bpmn.editor.model.visual.VLane;
-import jadex.bpmn.editor.model.visual.VOutParameter;
-import jadex.bpmn.editor.model.visual.VPool;
-import jadex.bpmn.model.MActivity;
-
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -31,6 +16,21 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraphView;
+
+import jadex.bpmn.editor.gui.BpmnGraphComponent;
+import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
+import jadex.bpmn.editor.gui.GuiConstants;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.contextmenus.EventContextMenu;
+import jadex.bpmn.editor.gui.contextmenus.GatewayContextMenu;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VOutParameter;
+import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.model.MActivity;
 
 /**
  *  Controller for handling mouse inputs to the graph.

@@ -1,9 +1,9 @@
 package jadex.bdiv3.testcases.misc;
 
-import jadex.micro.annotation.Agent;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.micro.annotation.Agent;
 
 /**
  *  Test if constructors are called in correct order.

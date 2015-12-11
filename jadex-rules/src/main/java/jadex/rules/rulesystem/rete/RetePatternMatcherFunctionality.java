@@ -1,5 +1,7 @@
 package jadex.rules.rulesystem.rete;
 
+import java.util.Iterator;
+
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
 import jadex.rules.rulesystem.IPatternMatcherState;
@@ -9,8 +11,6 @@ import jadex.rules.rulesystem.IRulebaseListener;
 import jadex.rules.rulesystem.rete.nodes.ReteMemory;
 import jadex.rules.rulesystem.rete.nodes.ReteNode;
 import jadex.rules.state.IOAVState;
-
-import java.util.Iterator;
 
 /**
  *  The static (reusable) part of a Rete matcher (i.e. the Rete network).

@@ -1,34 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
-import jadex.extension.envsupport.environment.ISpaceController;
-import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.SpaceObject;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.IVector3;
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.math.Vector3Double;
-import jadex.extension.envsupport.observer.graphics.AbstractViewport3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.IJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.ArrowJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.BoxJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.CylinderJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.DomeJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Object3dJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.QuadJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.SphereJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Text3dJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.TorusJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.EffectRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.PointLightRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.SkyJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.SoundJMonkeyPlayer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.TerrainJMonkeyRenderer;
-import jadex.extension.envsupport.observer.gui.SObjectInspector;
-import jadex.extension.envsupport.observer.perspective.IPerspective;
-import jadex.extension.envsupport.observer.perspective.Perspective3D;
-
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,6 +29,35 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import com.jme3.water.SimpleWaterProcessor;
+
+import jadex.extension.envsupport.environment.ISpaceController;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.math.Vector3Double;
+import jadex.extension.envsupport.observer.graphics.AbstractViewport3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.IJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.ArrowJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.BoxJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.CylinderJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.DomeJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Object3dJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.QuadJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.SphereJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Text3dJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.TorusJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.EffectRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.PointLightRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.SkyJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.SoundJMonkeyPlayer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.TerrainJMonkeyRenderer;
+import jadex.extension.envsupport.observer.gui.SObjectInspector;
+import jadex.extension.envsupport.observer.perspective.IPerspective;
+import jadex.extension.envsupport.observer.perspective.Perspective3D;
 
 
 /**

@@ -13,6 +13,24 @@ buildscript {
     }
 }
 
+
+def isApp(project) {
+	project.hasProperty('distasapp') && project.property('distasapp').toLowerCase().equals('true')
+}
+
+/* Tests if a project is commercial. */
+def isCommercial(project) {
+	project.hasProperty("commercial") && project.property("commercial").toLowerCase().equals('true')
+}
+
+def isAddon(selecteddists) {
+	def isaddon = true
+	selecteddists.each { dist ->
+		isaddon &= dist.startsWith('addon')
+	}
+	return isaddon
+}
+
 def isAndroidProject(project) {
     project.hasProperty("androidProject") && project.property("androidProject") == 'true'
 }
@@ -68,13 +86,18 @@ def getReleaseVariant(project) {
 }
 
 /**
- * Recursivly check for dependencies with compileNoAndroidRuntime scope and exclude them from default configuration.
+ * Recursively check for dependencies with compileNoAndroidRuntime scope and exclude them from the dependency
  * @param project
  * @param dep
  * @param alreadyChecked
  * @return
  */
-def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = []) {
+def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [], parentDep = null) {
+        if (parentDep == null) {
+            parentDep = project
+        } else if (parentDep == project) {
+            parentDep = dep
+        }
         if (dep instanceof DefaultProjectDependency && !alreadyChecked.contains(dep)) {
             DefaultProjectDependency pdep = dep
             alreadyChecked.add(pdep)
@@ -82,24 +105,43 @@ def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [
                 dependencies.all { innerDep ->
                     if (innerDep instanceof DefaultProjectDependency)
                     {
-                        excludeNonAndroidRuntime(project, innerDep, alreadyChecked)
+                        excludeNonAndroidRuntime(project, innerDep, alreadyChecked, parentDep)
                     }
                 }
             }
             pdep.dependencyProject.configurations.compileNoAndroidRuntime {
                 dependencies.all { innerDep ->
 //                    println "excluding $innerDep.group:$innerDep.name, found in $pdep.dependencyProject.name from $project.name"
-                    project.configurations.default.exclude group: innerDep.group, module: innerDep.name
+//                    project.configurations.default.exclude group: innerDep.group, module: innerDep.name
 //                    project.configurations.compile.exclude group: innerDep.group, module: innerDep.name
-//                    project.configurations.all {conf ->
-//                        if (conf.name.toLowerCase().endsWith('apk')) {
-//                            println "conf = $conf.name"
-//                            exclude group: innerDep.group, module: innerDep.name
-//                        }
-//                    }
+
+                    if (parentDep instanceof DefaultProjectDependency) {
+                        println "excluding transitive dep: $parentDep.name / $innerDep.group:$innerDep.name in $project.name"
+                        ((DefaultProjectDependency)parentDep).exclude(group: innerDep.group, module: innerDep.name)
+                    }
                 }
             }
         }
+}
+
+/**
+ * Add scope mapping for parent configurations of given configuration.
+ * Maven pom generation does not include inherited configurations by default:
+ * http://gradle.1045684.n5.nabble.com/pom-generation-and-inherited-dependencies-td1436197.html
+ * @param task
+ * @param configuration
+ * @return
+ */
+def addParentScopeMappings(Task task, Configuration configuration) {
+    def repos = task.repositories.asList()
+    if (!repos.empty) {
+        def scopeMappings = repos[0].pom.scopeMappings
+        def scope = scopeMappings.getMapping([configuration]).scope
+        configuration.extendsFrom.each {parentConfiguration ->
+//            println "add mapping for $parentConfiguration"
+            scopeMappings.addMapping(300, parentConfiguration, scope)
+        }
+    }
 }
 
 /**
@@ -135,12 +177,14 @@ def addSchemaTasks(Project project) {
                             }
                 }
         copy {
+            // rename filtered file to x-3.0-SNAPSHOT
             from file("$project.buildDir/tmp/schemas")
             into file("$project.buildDir/schemas")
             rename '(.+)\\.(.+)', "\$1-$jadex_build_version.\$2"
         }
         copy {
-            from file("$project.buildDir/tmp/schemas")
+            // copy original unfiltered file and rename to -${jadex_build_version}
+            from file("$project.projectDir/src/main/schema/")
             into file("$project.buildDir/schemas")
             rename '(.+)\\.(.+)', '\$1-\\${jadex_build_version}.\$2'
         }
@@ -244,6 +288,9 @@ def androidSdkExists() {
 // make functions externally visible
 
 ext {
+	isApp = this.&isApp
+	isCommercial = this.&isCommercial
+	isAddon = this.&isAddon
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     androidSdkExists = this.&androidSdkExists
@@ -252,4 +299,5 @@ ext {
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
     excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime
+    addParentScopeMappings = this.&addParentScopeMappings
 }

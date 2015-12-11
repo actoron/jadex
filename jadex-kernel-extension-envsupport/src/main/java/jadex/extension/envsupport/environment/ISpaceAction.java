@@ -1,8 +1,8 @@
 package jadex.extension.envsupport.environment;
 
-import jadex.commons.IPropertyObject;
-
 import java.util.Map;
+
+import jadex.commons.IPropertyObject;
 
 /**
  *  Interface for space actions. These actions can be executed

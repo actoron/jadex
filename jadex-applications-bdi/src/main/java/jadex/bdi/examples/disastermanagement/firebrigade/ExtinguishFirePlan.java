@@ -1,5 +1,8 @@
 package jadex.bdi.examples.disastermanagement.firebrigade;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdi.examples.disastermanagement.DisasterType;
 import jadex.bdi.examples.disastermanagement.ExtinguishFireTask;
 import jadex.bdiv3.runtime.IGoal;
@@ -11,9 +14,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Move to fire and extinguish it.

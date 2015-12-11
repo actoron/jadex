@@ -1,12 +1,11 @@
 package jadex.xml.reader;
 
 
-import jadex.xml.IPostProcessor;
-import jadex.xml.TypeInfo;
-
 import java.util.List;
 import java.util.Map;
 
+import jadex.xml.IPostProcessor;
+import jadex.xml.TypeInfo;
 import jadex.xml.stax.QName;
 
 /**

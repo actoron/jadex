@@ -1,5 +1,8 @@
 package jadex.extension.envsupport.observer.graphics.java2d;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
@@ -9,9 +12,6 @@ import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 
 /**
  * 

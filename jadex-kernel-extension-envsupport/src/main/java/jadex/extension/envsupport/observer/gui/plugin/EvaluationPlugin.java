@@ -1,8 +1,5 @@
 package jadex.extension.envsupport.observer.gui.plugin;
 
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
-import jadex.commons.SimplePropertyObject;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -11,6 +8,9 @@ import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.observer.gui.ObserverCenter;
 
 /**
  *  Th evaluation plugin.

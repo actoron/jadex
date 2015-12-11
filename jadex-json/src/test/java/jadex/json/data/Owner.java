@@ -1,16 +1,16 @@
 package jadex.json.data;
 
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonMapProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor;
+import jadex.transformation.jsonserializer.processors.write.JsonMapProcessor;
+import jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor;
 
 public class Owner
 {

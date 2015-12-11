@@ -1,10 +1,5 @@
 package jadex.tools.comanalyzer.diagram;
 
-import jadex.commons.SUtil;
-import jadex.tools.comanalyzer.Component;
-import jadex.tools.comanalyzer.Message;
-import jadex.tools.comanalyzer.PaintMaps;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,6 +18,10 @@ import java.util.Iterator;
 import javax.swing.JPanel;
 
 import edu.uci.ics.jung.graph.util.Pair;
+import jadex.commons.SUtil;
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.Message;
+import jadex.tools.comanalyzer.PaintMaps;
 
 
 /**

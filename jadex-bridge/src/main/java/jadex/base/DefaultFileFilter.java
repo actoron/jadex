@@ -1,11 +1,11 @@
 package jadex.base;
 
+import java.io.File;
+import java.util.List;
+
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.io.File;
-import java.util.List;
 
 /**
  *  The default file filter allows using different file extensions.

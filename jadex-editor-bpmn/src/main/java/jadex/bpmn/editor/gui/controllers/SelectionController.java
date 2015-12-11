@@ -1,10 +1,10 @@
 package jadex.bpmn.editor.gui.controllers;
 
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
-
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
+
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
 
 /**
  *  Controller for selections.

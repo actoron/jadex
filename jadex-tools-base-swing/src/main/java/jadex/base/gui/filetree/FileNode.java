@@ -1,12 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.AbstractSwingTreeNode;
-import jadex.base.gui.asynctree.AsyncSwingTreeModel;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.bridge.service.types.filetransfer.FileData;
-import jadex.commons.SUtil;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +8,13 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+
+import jadex.base.JarAsDirectory;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.commons.SUtil;
 
 /**
  *  Node object representing a service container.

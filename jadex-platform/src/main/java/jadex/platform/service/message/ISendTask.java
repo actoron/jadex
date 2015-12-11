@@ -1,11 +1,10 @@
 package jadex.platform.service.message;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
 
 
 /**

@@ -1,11 +1,11 @@
 package jadex.commons.transformation;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.annotations.Alias;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.annotations.Alias;
 
 /**
  *  Static helper class for transformation issues.

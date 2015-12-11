@@ -1,10 +1,10 @@
 package jadex.rules.rulesystem.rete;
 
-import jadex.commons.SReflect;
-import jadex.rules.state.IOAVState;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import jadex.commons.SReflect;
+import jadex.rules.state.IOAVState;
 
 /**
  *  A tuple stores a variable binding and optionally has

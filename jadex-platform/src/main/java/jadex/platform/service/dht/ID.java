@@ -1,11 +1,11 @@
 package jadex.platform.service.dht;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.dht.IID;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.dht.IID;
 
 /**
  * This class is an identifier. It is used to represent hash values that are too

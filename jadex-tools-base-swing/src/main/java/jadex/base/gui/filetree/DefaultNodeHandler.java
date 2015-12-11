@@ -1,11 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.ISwingNodeHandler;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.gui.CombiIcon;
-import jadex.commons.gui.SGUI;
-
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +9,12 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
+
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.base.gui.asynctree.ITreeNode;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.SGUI;
 
 /**
  *  The default node handler offers two refresh actions.

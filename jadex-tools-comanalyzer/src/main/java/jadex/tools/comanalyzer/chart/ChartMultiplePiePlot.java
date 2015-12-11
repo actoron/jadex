@@ -1,7 +1,5 @@
 package jadex.tools.comanalyzer.chart;
 
-import jadex.tools.comanalyzer.PaintMaps;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -34,6 +32,8 @@ import org.jfree.data.general.DatasetUtilities;
 import org.jfree.data.general.PieDataset;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.util.TableOrder;
+
+import jadex.tools.comanalyzer.PaintMaps;
 
 
 /**

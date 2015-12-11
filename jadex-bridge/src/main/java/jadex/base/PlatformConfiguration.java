@@ -1,5 +1,13 @@
 package jadex.base;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
 import jadex.base.RootComponentConfiguration.AWAMECHANISM;
 import jadex.base.RootComponentConfiguration.KERNEL;
 import jadex.bridge.IComponentIdentifier;
@@ -10,14 +18,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.javaparser.SJavaParser;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
 
 /**
  * Configuration of the platform setup. 

@@ -1,8 +1,8 @@
 package jadex.extension.envsupport.observer.graphics;
 
-import jadex.extension.envsupport.math.IVector2;
-
 import java.util.Comparator;
+
+import jadex.extension.envsupport.math.IVector2;
 
 
 /**

@@ -1,13 +1,5 @@
 package jadex.rules.rulesystem.rete.nodes;
 
-import jadex.commons.SReflect;
-import jadex.rules.rulesystem.AbstractAgenda;
-import jadex.rules.rulesystem.rete.extractors.AttributeSet;
-import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.IProfiler;
-import jadex.rules.state.OAVAttributeType;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +7,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.rules.rulesystem.AbstractAgenda;
+import jadex.rules.rulesystem.rete.extractors.AttributeSet;
+import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.IProfiler;
+import jadex.rules.state.OAVAttributeType;
 
 /**
  *  A split node has the purpose of generating virtual facts

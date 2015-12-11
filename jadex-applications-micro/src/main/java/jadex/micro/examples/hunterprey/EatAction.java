@@ -1,5 +1,7 @@
 package jadex.micro.examples.hunterprey;
 
+import java.util.Map;
+
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -11,8 +13,6 @@ import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-
-import java.util.Map;
 
 /**
  *  Action for eating food or another creature.

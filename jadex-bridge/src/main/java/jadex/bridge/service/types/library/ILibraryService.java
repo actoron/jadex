@@ -1,5 +1,10 @@
 package jadex.bridge.service.types.library;
 
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
@@ -8,11 +13,6 @@ import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
-
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /** 
  *  Interface for the Library Service. It provides a platform service

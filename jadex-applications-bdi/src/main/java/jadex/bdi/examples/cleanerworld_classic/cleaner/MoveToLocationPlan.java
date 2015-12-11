@@ -1,5 +1,7 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
+import java.util.List;
+
 import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Location;
@@ -10,8 +12,6 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IBeliefSet;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
-
-import java.util.List;
 
 /**
  *  Move to a point.

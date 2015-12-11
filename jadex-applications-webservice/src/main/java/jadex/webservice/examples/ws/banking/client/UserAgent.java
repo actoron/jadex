@@ -1,5 +1,10 @@
 package jadex.webservice.examples.ws.banking.client;
 
+import java.util.GregorianCalendar;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
@@ -13,11 +18,6 @@ import jadex.webservice.examples.ws.banking.client.gen.AccountStatement;
 import jadex.webservice.examples.ws.banking.client.gen.ProxyIWSBankingService;
 import jadex.webservice.examples.ws.banking.client.gen.ProxyIWSBankingServiceService;
 import jadex.webservice.examples.ws.banking.client.gen.Request;
-
-import java.util.GregorianCalendar;
-
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 @Agent
 @RequiredServices(@RequiredService(name="qs", type=IBankingService.class, 

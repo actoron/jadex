@@ -1,5 +1,8 @@
 package jadex.bridge;
 
+import java.util.TimerTask;
+import java.util.logging.Logger;
+
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -13,9 +16,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
-
-import java.util.TimerTask;
-import java.util.logging.Logger;
 
 
 /**

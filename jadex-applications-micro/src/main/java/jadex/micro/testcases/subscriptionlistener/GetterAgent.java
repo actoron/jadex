@@ -1,5 +1,8 @@
 package jadex.micro.testcases.subscriptionlistener;
 
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -11,9 +14,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.testcases.TestAgent;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  *  Test getting values of a subscription future.

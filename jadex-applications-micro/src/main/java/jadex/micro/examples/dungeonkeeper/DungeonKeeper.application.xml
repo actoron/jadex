@@ -3,13 +3,13 @@
 
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
-	                    http://jadex.sourceforge.net/jadex-application-2.5.xsd
-	                    http://jadex.sourceforge.net/jadex-envspace 
-	                    http://jadex.sourceforge.net/jadex-envspace-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
 	name="DungeonKeeper" package="jadex.micro.examples.dungeonkeeper">
 	
 	<imports>

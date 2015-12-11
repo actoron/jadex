@@ -1,5 +1,7 @@
 package jadex.micro.tutorial;
 
+import java.util.Date;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
@@ -11,8 +13,6 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Date;
 
 
 /**

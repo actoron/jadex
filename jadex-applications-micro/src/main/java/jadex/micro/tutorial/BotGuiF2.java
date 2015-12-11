@@ -1,7 +1,5 @@
 package jadex.micro.tutorial;
 
-import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -11,6 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
+
+import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 
 /**
  *  The gui for the chat bot allows

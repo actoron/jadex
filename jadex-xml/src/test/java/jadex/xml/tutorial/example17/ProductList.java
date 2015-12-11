@@ -1,9 +1,9 @@
 package jadex.xml.tutorial.example17;
 
-import jadex.commons.SUtil;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.commons.SUtil;
 
 /**
  *  Simple list of products.

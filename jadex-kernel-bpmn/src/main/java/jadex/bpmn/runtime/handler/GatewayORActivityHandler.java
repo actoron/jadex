@@ -1,5 +1,9 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.IActivityHandler;
@@ -8,10 +12,6 @@ import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 
 /**

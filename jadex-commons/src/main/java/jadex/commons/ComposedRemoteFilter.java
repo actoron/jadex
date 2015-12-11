@@ -1,11 +1,11 @@
 package jadex.commons;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  *  A filter checks if an object matches

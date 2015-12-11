@@ -1,13 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VExternalSubProcess;
-import jadex.bpmn.model.MParameter;
-import jadex.bpmn.model.MProperty;
-import jadex.bpmn.model.MSubProcess;
-import jadex.bridge.modelinfo.UnparsedExpression;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -20,6 +12,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
+
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.model.MProperty;
+import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 
 /**
  * 

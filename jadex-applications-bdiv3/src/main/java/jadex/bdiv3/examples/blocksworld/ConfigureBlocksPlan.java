@@ -1,5 +1,10 @@
 package jadex.bdiv3.examples.blocksworld;
 
+import java.awt.Color;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
@@ -8,11 +13,6 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ConfigureGoal;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.StackGoal;
 import jadex.bdiv3.runtime.IPlan;
-
-import java.awt.Color;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  *  Stack blocks according to the target configuration.

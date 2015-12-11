@@ -1,12 +1,5 @@
 package jadex.gpmn.editor.gui;
 
-import jadex.commons.gui.JSplitPanel;
-import jadex.gpmn.editor.gui.controllers.EdgeCreationController;
-import jadex.gpmn.editor.gui.controllers.MouseController;
-import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetColor;
-import jadex.gpmn.editor.model.gpmn.IGpmnModel;
-import jadex.gpmn.editor.model.visual.VNode;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -37,6 +30,13 @@ import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxStylesheet;
+
+import jadex.commons.gui.JSplitPanel;
+import jadex.gpmn.editor.gui.controllers.EdgeCreationController;
+import jadex.gpmn.editor.gui.controllers.MouseController;
+import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetColor;
+import jadex.gpmn.editor.model.gpmn.IGpmnModel;
+import jadex.gpmn.editor.model.visual.VNode;
 
 public class GpmnEditorWindow extends JFrame
 {

@@ -1,8 +1,8 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.ISwingTreeNode;
-
 import javax.swing.Icon;
+
+import jadex.base.gui.asynctree.ISwingTreeNode;
 
 /**
  *  Interface for the icon cache.

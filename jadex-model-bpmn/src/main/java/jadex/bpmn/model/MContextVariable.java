@@ -1,10 +1,10 @@
 package jadex.bpmn.model;
 
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.UnparsedExpression;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.UnparsedExpression;
 
 /**
  * 

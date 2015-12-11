@@ -1,12 +1,5 @@
 package jadex.micro.tutorial;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +8,13 @@ import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 
 /**
  *  The chat gui with profile button.

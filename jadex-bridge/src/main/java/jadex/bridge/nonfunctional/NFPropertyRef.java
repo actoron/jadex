@@ -3,7 +3,6 @@ package jadex.bridge.nonfunctional;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

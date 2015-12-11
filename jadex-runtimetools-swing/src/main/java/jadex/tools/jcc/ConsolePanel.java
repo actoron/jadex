@@ -1,16 +1,5 @@
 package jadex.tools.jcc;
 
-import jadex.base.SRemoteGui;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.RemoteChangeListenerHandler;
-import jadex.bridge.service.annotation.Security;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IRemoteChangeListener;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -41,6 +30,17 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+
+import jadex.base.SRemoteGui;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.RemoteChangeListenerHandler;
+import jadex.bridge.service.annotation.Security;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IRemoteChangeListener;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
 
 /**
  *  A console panel for displaying the console out

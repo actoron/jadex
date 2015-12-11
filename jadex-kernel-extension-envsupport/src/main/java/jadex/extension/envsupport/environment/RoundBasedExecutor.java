@@ -1,5 +1,8 @@
 package jadex.extension.envsupport.environment;
 
+import java.util.Comparator;
+import java.util.Iterator;
+
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -21,9 +24,6 @@ import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.evaluation.ITableDataConsumer;
-
-import java.util.Comparator;
-import java.util.Iterator;
 
 /**
  *  Synchronized execution of all actions in rounds based on clock ticks.

@@ -1,5 +1,7 @@
 package jadex.rules.rulesystem.rete.constraints;
 
+import java.util.Set;
+
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
@@ -9,8 +11,6 @@ import jadex.rules.rulesystem.rete.extractors.TupleExtractor;
 import jadex.rules.rulesystem.rete.nodes.BetaMemory;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.Set;
 
 /**
  *  The constraint indexer has the purpose to index equal constraints

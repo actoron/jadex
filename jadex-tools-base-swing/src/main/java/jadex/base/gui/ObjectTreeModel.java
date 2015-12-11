@@ -1,8 +1,5 @@
 package jadex.base.gui;
 
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -29,6 +26,9 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 
 
 /**

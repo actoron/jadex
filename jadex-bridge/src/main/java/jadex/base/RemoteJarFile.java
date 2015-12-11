@@ -1,10 +1,10 @@
 package jadex.base;
 
-import jadex.bridge.service.types.filetransfer.FileData;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+
+import jadex.bridge.service.types.filetransfer.FileData;
 
 /**
  *  The remote jar file.

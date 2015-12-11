@@ -1,13 +1,13 @@
 package jadex.xml;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import jadex.commons.SUtil;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  A struct to represent an element on the stack while parsing.

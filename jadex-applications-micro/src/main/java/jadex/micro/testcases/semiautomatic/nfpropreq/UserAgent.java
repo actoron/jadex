@@ -1,5 +1,7 @@
 package jadex.micro.testcases.semiautomatic.nfpropreq;
 
+import java.util.Collection;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
@@ -17,8 +19,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Collection;
 
 @Agent
 @Service

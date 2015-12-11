@@ -1,9 +1,5 @@
 package jadex.platform.service.persistence;
 
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.types.cms.IComponentDescription;
-
 /**
  *  Adapter with special functionality for persistence.
  *  E.g. managing time of last activity.

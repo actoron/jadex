@@ -1,5 +1,9 @@
 package jadex.bdiv3.examples.blocksworld;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Set;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
@@ -10,10 +14,6 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
-
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Set;
 
 
 /**

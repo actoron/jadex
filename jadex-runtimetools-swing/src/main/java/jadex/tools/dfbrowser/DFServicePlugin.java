@@ -1,5 +1,7 @@
 package jadex.tools.dfbrowser;
 
+import javax.swing.Icon;
+
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.commons.future.DelegationResultListener;
@@ -7,8 +9,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.tools.generic.AbstractServicePlugin;
-
-import javax.swing.Icon;
 
 
 /**

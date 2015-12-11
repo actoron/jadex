@@ -1,5 +1,13 @@
 package jadex.extension.ws.publish;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jws.WebService;
+import javax.xml.ws.Endpoint;
+
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
@@ -8,12 +16,6 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.SJavassist;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -23,9 +25,6 @@ import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
-
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
 
 /**
  *  The default web service publish service.

@@ -1,11 +1,10 @@
 package jadex.commons.future;
 
 
-import jadex.commons.IResultCommand;
-import jadex.commons.functional.Function;
-
 import java.util.Collection;
 import java.util.NoSuchElementException;
+
+import jadex.commons.functional.Function;
 
 /**
  *  Future that support intermediate results.

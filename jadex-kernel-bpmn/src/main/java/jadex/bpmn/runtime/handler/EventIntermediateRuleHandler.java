@@ -1,5 +1,9 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.IInternalProcessEngineService;
@@ -18,10 +22,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  *  Wait for an external notification (could be a signal or a fired rule).

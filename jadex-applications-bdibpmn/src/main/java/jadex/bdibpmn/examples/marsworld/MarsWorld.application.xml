@@ -12,16 +12,16 @@
 	Objective is to carry as much ore as possible to the<br>
 	home base in a predefined mission time.<br>
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:agr="http://jadex.sourceforge.net/jadex-agrspace"
-	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:agr="http://www.activecomponents.org/jadex-agrspace"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-						http://jadex.sourceforge.net/jadex-application-2.5.xsd
-						http://jadex.sourceforge.net/jadex-agrspace
-						http://jadex.sourceforge.net/jadex-agrspace-2.5.xsd
-						http://jadex.sourceforge.net/jadex-envspace
-						http://jadex.sourceforge.net/jadex-envspace-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application
+						http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+						http://www.activecomponents.org/jadex-agrspace
+						http://www.activecomponents.org/jadex-agrspace-${jadex_build_version}.xsd
+						http://www.activecomponents.org/jadex-envspace
+						http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
 	name="MarsWorld" package="jadex.bdibpmn.examples.marsworld">
 		
 	<imports>
@@ -124,7 +124,7 @@
 								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
 							</env:drawcondition>
 						</env:texturedrectangle>
-						<env:text layer="2" x="0.02" y="-0.01" size="8" font="Arial" abssize="true" text="ore: $ore$\ncapacity: $capacity$" align="left" color="black">
+						<env:text layer="2" x="0.02" y="-0.01" size="8" font="Arial" abssize="true" text="ore: $ore$\ncapacity: $capacity$" halign="left" color="black">
 							<env:drawcondition>
 								$object.getProperty("state").equals("analyzed")
 							</env:drawcondition>
@@ -139,7 +139,7 @@
 						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
 						<env:property name="oreposition" dynamic="true">new Vector2Double(0, 0.3-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
 						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
-						<env:text layer="2" x="-0.07" y="0.09" size="8" font="Arial" abssize="true" text="$text$" align="left" color="black"/>
+						<env:text layer="2" x="-0.07" y="0.09" size="8" font="Arial" abssize="true" text="$text$" halign="left" color="black"/>
 						<env:texturedrectangle layer="1" size="oresize" position="oreposition" imagepath="jadex/bdibpmn/examples/marsworld/images/ore.png">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
 						</env:texturedrectangle>

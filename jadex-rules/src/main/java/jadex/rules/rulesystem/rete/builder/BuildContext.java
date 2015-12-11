@@ -1,12 +1,12 @@
 package jadex.rules.rulesystem.rete.builder;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.rete.nodes.INode;
 import jadex.rules.rulesystem.rete.nodes.ReteNode;
 import jadex.rules.rulesystem.rules.Variable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The build context contains all relevant data about

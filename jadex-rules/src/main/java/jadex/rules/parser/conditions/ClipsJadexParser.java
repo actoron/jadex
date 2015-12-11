@@ -2,22 +2,47 @@
 
 package jadex.rules.parser.conditions;
 
-import jadex.rules.rulesystem.rules.*;
-import jadex.rules.rulesystem.rules.functions.*;
-import jadex.rules.rulesystem.*;
-import jadex.rules.state.*;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.FailedPredicateException;
+import org.antlr.runtime.MismatchedSetException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.Parser;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
 
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.rules.rulesystem.ICondition;
+import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.AndConstraint;
+import jadex.rules.rulesystem.rules.BoundConstraint;
+import jadex.rules.rulesystem.rules.CollectCondition;
+import jadex.rules.rulesystem.rules.Constant;
+import jadex.rules.rulesystem.rules.FunctionCall;
+import jadex.rules.rulesystem.rules.IConstraint;
+import jadex.rules.rulesystem.rules.IOperator;
+import jadex.rules.rulesystem.rules.LiteralConstraint;
+import jadex.rules.rulesystem.rules.NotCondition;
+import jadex.rules.rulesystem.rules.ObjectCondition;
+import jadex.rules.rulesystem.rules.OrConstraint;
+import jadex.rules.rulesystem.rules.PredicateConstraint;
+import jadex.rules.rulesystem.rules.TestCondition;
+import jadex.rules.rulesystem.rules.ValueSourceReturnValueConstraint;
+import jadex.rules.rulesystem.rules.Variable;
+import jadex.rules.rulesystem.rules.functions.IFunction;
+import jadex.rules.rulesystem.rules.functions.MethodCallFunction;
+import jadex.rules.rulesystem.rules.functions.OperatorFunction;
+import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.OAVTypeModel;
 
 @SuppressWarnings("all")
 public class ClipsJadexParser extends Parser {

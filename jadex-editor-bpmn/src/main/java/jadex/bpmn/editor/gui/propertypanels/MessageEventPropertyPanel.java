@@ -1,13 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ImageProvider;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MProperty;
-import jadex.commons.collection.BiHashMap;
-import jadex.commons.collection.IndexMap;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -34,6 +26,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bpmn.editor.gui.ImageProvider;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MProperty;
+import jadex.commons.collection.BiHashMap;
+import jadex.commons.collection.IndexMap;
 
 /**
  *  Property for message events.

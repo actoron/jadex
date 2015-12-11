@@ -1,12 +1,12 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
 
 /**
  *  Processor for handling iterators.

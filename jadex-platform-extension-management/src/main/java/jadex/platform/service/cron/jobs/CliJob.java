@@ -1,5 +1,9 @@
 package jadex.platform.service.cron.jobs;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -19,10 +23,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.platform.service.cron.TimePatternFilter;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  *  Job that allows executing cli command and scripts.

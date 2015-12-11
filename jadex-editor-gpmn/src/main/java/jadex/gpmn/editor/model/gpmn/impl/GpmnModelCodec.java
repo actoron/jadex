@@ -1,22 +1,5 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
-import jadex.gpmn.editor.model.gpmn.IActivationEdge;
-import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IEdge;
-import jadex.gpmn.editor.model.gpmn.IElement;
-import jadex.gpmn.editor.model.gpmn.IGoal;
-import jadex.gpmn.editor.model.gpmn.INode;
-import jadex.gpmn.editor.model.gpmn.IParameter;
-import jadex.gpmn.editor.model.gpmn.IPlanEdge;
-import jadex.gpmn.editor.model.gpmn.IRefPlan;
-import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
-import jadex.gpmn.editor.model.gpmn.ModelConstants;
-import jadex.gpmn.editor.model.visual.VEdge;
-import jadex.gpmn.editor.model.visual.VElement;
-import jadex.gpmn.editor.model.visual.VGoal;
-import jadex.gpmn.editor.model.visual.VPlan;
-import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,6 +19,23 @@ import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxGraph;
+
+import jadex.gpmn.editor.model.gpmn.IActivationEdge;
+import jadex.gpmn.editor.model.gpmn.IActivationPlan;
+import jadex.gpmn.editor.model.gpmn.IEdge;
+import jadex.gpmn.editor.model.gpmn.IElement;
+import jadex.gpmn.editor.model.gpmn.IGoal;
+import jadex.gpmn.editor.model.gpmn.INode;
+import jadex.gpmn.editor.model.gpmn.IParameter;
+import jadex.gpmn.editor.model.gpmn.IPlanEdge;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
+import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
+import jadex.gpmn.editor.model.gpmn.ModelConstants;
+import jadex.gpmn.editor.model.visual.VEdge;
+import jadex.gpmn.editor.model.visual.VElement;
+import jadex.gpmn.editor.model.visual.VGoal;
+import jadex.gpmn.editor.model.visual.VPlan;
+import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
 
 public class GpmnModelCodec extends AbstractModelCodec
 {

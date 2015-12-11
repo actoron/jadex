@@ -1,11 +1,11 @@
 package jadex.extension.envsupport;
 
-import jadex.commons.meta.IPropertyMetaData;
-import jadex.commons.meta.IPropertyMetaDataSet;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import jadex.commons.meta.IPropertyMetaData;
+import jadex.commons.meta.IPropertyMetaDataSet;
 
 
 /**

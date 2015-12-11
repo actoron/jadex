@@ -1,9 +1,9 @@
 package jadex.platform.service.awareness.discovery.ipscanner;
 
-import jadex.platform.service.awareness.discovery.MasterSlaveReceiveHandler;
-
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+
+import jadex.platform.service.awareness.discovery.MasterSlaveReceiveHandler;
 
 /**
  *  Receiver handler for scanner.

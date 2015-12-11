@@ -1,9 +1,9 @@
 package jadex.rules.rulesystem.rules;
 
-import jadex.rules.rulesystem.ICondition;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.rules.rulesystem.ICondition;
 
 /**
  *  A condition consists of 1..n base conditions that are logically combined.

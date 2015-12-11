@@ -1,5 +1,8 @@
 package jadex.micro.benchmarks;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -13,9 +16,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Creates a complex tree structure of sub components.

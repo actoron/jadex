@@ -1,9 +1,9 @@
 package jadex.platform.service.globalservicepool;
 
-import jadex.bridge.IComponentIdentifier;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Simple strategy that demands a constant number of

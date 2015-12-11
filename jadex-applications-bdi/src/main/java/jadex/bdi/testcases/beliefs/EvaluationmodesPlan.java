@@ -1,9 +1,9 @@
 package jadex.bdi.testcases.beliefs;
 
+import java.util.Date;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
-
-import java.util.Date;
 
 /**
  *  Test the expression evaluation modes.

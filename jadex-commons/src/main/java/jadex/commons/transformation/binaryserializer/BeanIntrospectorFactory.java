@@ -1,10 +1,10 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.lang.reflect.Constructor;
+
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
-
-import java.lang.reflect.Constructor;
 
 /**
  *  Factory for generating bean introspectors.

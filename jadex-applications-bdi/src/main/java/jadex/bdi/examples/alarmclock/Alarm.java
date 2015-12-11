@@ -1,15 +1,15 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.commons.ResourceInfo;
-import jadex.commons.SUtil;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.beans.PropertyChangeSupport;
-
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import jadex.commons.ResourceInfo;
+import jadex.commons.SUtil;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeSupport;
 
 /**
  *  This class encapsulates the functionality of an alarm.

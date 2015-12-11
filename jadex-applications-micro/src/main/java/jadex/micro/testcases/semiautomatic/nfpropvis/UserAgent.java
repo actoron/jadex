@@ -1,30 +1,5 @@
 package jadex.micro.testcases.semiautomatic.nfpropvis;
 
-import jadex.bridge.ComponentResultListener;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.nonfunctional.search.ComposedEvaluator;
-import jadex.bridge.sensor.service.AverageEvaluator;
-import jadex.bridge.sensor.service.WaitqueueEvaluator;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.MethodInfo;
-import jadex.commons.Tuple2;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.Configuration;
-import jadex.micro.annotation.Configurations;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
-
 import java.awt.BorderLayout;
 import java.util.Collection;
 import java.util.Date;
@@ -50,6 +25,31 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.Week;
 import org.jfree.data.time.Year;
 import org.jfree.data.xy.XYDataset;
+
+import jadex.bridge.ComponentResultListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.search.ComposedEvaluator;
+import jadex.bridge.sensor.service.AverageEvaluator;
+import jadex.bridge.sensor.service.WaitqueueEvaluator;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.MethodInfo;
+import jadex.commons.Tuple2;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 /**
  *  Ranking of a requires services via an waitqueue ranker.

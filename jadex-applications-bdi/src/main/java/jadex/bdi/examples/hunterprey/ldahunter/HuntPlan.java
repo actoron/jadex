@@ -1,5 +1,8 @@
 package jadex.bdi.examples.hunterprey.ldahunter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bdi.examples.hunterprey.ldahunter.potentialfield.JointField;
 import jadex.bdi.examples.hunterprey.ldahunter.potentialfield.PotentialFrame;
@@ -12,9 +15,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

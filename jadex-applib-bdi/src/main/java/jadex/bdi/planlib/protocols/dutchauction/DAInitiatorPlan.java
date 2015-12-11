@@ -1,5 +1,7 @@
 package jadex.bdi.planlib.protocols.dutchauction;
 
+import java.util.List;
+
 import jadex.bdi.planlib.protocols.AbstractInitiatorPlan;
 import jadex.bdi.planlib.protocols.AuctionDescription;
 import jadex.bdiv3.runtime.BDIFailureException;
@@ -10,8 +12,6 @@ import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.TimeoutException;
-
-import java.util.List;
 
 
 /**

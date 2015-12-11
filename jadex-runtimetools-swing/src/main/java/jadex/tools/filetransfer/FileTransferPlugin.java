@@ -1,13 +1,13 @@
 package jadex.tools.filetransfer;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.UIDefaults;
 
 /**
  *  The library plugin.

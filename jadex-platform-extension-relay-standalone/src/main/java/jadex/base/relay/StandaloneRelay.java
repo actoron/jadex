@@ -1,8 +1,5 @@
 package jadex.base.relay;
 
-import jadex.bridge.VersionInfo;
-import jadex.platform.service.security.SSecurity;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -26,6 +23,9 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.X509KeyManager;
+
+import jadex.bridge.VersionInfo;
+import jadex.platform.service.security.SSecurity;
 
 /**
  *  Relay as a simple java application.

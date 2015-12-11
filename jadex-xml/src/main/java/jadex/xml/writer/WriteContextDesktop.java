@@ -1,13 +1,13 @@
 package jadex.xml.writer;
 
-import jadex.commons.collection.MultiCollection;
-import jadex.xml.IPreProcessor;
-import jadex.xml.StackElement;
-
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.collection.MultiCollection;
+import jadex.xml.IPreProcessor;
+import jadex.xml.StackElement;
 
 /**
  * Java SE Implementation of {@link AWriteContext}.

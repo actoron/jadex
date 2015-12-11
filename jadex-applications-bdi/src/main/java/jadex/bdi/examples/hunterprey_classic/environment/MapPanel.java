@@ -1,16 +1,5 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.bdi.examples.hunterprey_classic.Creature;
-import jadex.bdi.examples.hunterprey_classic.CurrentVision;
-import jadex.bdi.examples.hunterprey_classic.Food;
-import jadex.bdi.examples.hunterprey_classic.Hunter;
-import jadex.bdi.examples.hunterprey_classic.Location;
-import jadex.bdi.examples.hunterprey_classic.Observer;
-import jadex.bdi.examples.hunterprey_classic.Obstacle;
-import jadex.bdi.examples.hunterprey_classic.Prey;
-import jadex.bdi.examples.hunterprey_classic.WorldObject;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -27,6 +16,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
+
+import jadex.bdi.examples.hunterprey_classic.Creature;
+import jadex.bdi.examples.hunterprey_classic.CurrentVision;
+import jadex.bdi.examples.hunterprey_classic.Food;
+import jadex.bdi.examples.hunterprey_classic.Hunter;
+import jadex.bdi.examples.hunterprey_classic.Location;
+import jadex.bdi.examples.hunterprey_classic.Observer;
+import jadex.bdi.examples.hunterprey_classic.Obstacle;
+import jadex.bdi.examples.hunterprey_classic.Prey;
+import jadex.bdi.examples.hunterprey_classic.WorldObject;
+import jadex.commons.gui.SGUI;
 
 
 /**

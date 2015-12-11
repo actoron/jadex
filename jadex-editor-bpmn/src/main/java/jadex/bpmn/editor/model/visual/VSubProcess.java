@@ -1,8 +1,8 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.model.MSubProcess;
-
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.model.MSubProcess;
 
 /**
  *  Visual representation of a subprocess.

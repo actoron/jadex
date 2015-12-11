@@ -1,16 +1,16 @@
 package jadex.extension.envsupport.observer.graphics;
 
 
+import java.awt.Canvas;
+import java.awt.Color;
+import java.util.List;
+
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
-
-import java.awt.Canvas;
-import java.awt.Color;
-import java.util.List;
 
 
 /**

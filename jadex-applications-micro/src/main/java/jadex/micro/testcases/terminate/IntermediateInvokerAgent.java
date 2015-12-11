@@ -1,6 +1,8 @@
 package jadex.micro.testcases.terminate;
 
 
+import java.util.Collection;
+
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -14,8 +16,6 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
-
-import java.util.Collection;
 
 /**
  *  The intermediate invoker agent tests if intermediate futures can be terminated

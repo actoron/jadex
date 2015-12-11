@@ -1,5 +1,13 @@
 package jadex.micro;
 
+import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -26,15 +34,6 @@ import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroMessageComponentFeature;
 import jadex.micro.features.impl.MicroPojoComponentFeature;
 import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
-
-import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.logging.Logger;
 
 
 /**

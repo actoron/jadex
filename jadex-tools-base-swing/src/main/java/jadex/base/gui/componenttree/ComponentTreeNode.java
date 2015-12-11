@@ -1,5 +1,18 @@
 package jadex.base.gui.componenttree;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
+
 import jadex.base.SRemoteGui;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
@@ -24,19 +37,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 
 /**
  *  Node object representing a service container.

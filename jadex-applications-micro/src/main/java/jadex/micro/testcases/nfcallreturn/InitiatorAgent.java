@@ -1,5 +1,7 @@
 package jadex.micro.testcases.nfcallreturn;
 
+import java.util.Collection;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.ComponentIdentifier;
@@ -22,8 +24,6 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
-
-import java.util.Collection;
 
 /**
  *  Tests if non-functional properties can be changed and passed back

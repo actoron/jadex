@@ -1,13 +1,13 @@
 package jadex.extension.envsupport.environment;
 
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.IFilter;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
+
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.IFilter;
 
 /**
  *  The list of scheduled component percepts and convenience methods for

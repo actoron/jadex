@@ -1,9 +1,5 @@
 package jadex.base.gui;
 
-import jadex.bridge.VersionInfo;
-import jadex.commons.gui.BrowserPane;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Frame;
@@ -20,6 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.UIDefaults;
 import javax.swing.border.Border;
+
+import jadex.bridge.VersionInfo;
+import jadex.commons.gui.BrowserPane;
+import jadex.commons.gui.SGUI;
 
 
 /**

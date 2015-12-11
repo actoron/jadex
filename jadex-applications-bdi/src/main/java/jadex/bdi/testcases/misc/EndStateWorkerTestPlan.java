@@ -1,14 +1,7 @@
 package jadex.bdi.testcases.misc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import jadex.base.test.TestReport;
-import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.fipa.SFipa;
-import jadex.commons.future.IFuture;
 
 /**
  *  Plan to react to various end elements.

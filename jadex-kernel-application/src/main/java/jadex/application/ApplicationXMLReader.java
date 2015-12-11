@@ -1,5 +1,8 @@
 package jadex.application;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -16,9 +19,6 @@ import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.stax.QName;
 
-import java.util.Iterator;
-import java.util.Set;
-
 /**
  *  Reader for loading component XML models into a Java representation states.
  */
@@ -31,7 +31,7 @@ public class ApplicationXMLReader extends ComponentXMLReader
 	 */
 	public ApplicationXMLReader(Set<TypeInfo>[] mappings)
 	{
-		super(getXMLMapping(mappings));
+		super(getXMLMapping(mappings, "http://www.activecomponents.org/jadex-application"));
 	}
 	
 	//-------- methods --------
@@ -47,10 +47,9 @@ public class ApplicationXMLReader extends ComponentXMLReader
 	/**
 	 *  Get the XML mapping.
 	 */
-	public static Set<TypeInfo> getXMLMapping(Set<TypeInfo>[] mappings)
+	public static Set<TypeInfo> getXMLMapping(Set<TypeInfo>[] mappings, String uri)
 	{
-		String uri = "http://jadex.sourceforge.net/jadex";
-		Set<TypeInfo> types = ComponentXMLReader.getXMLMapping(mappings);
+		Set<TypeInfo> types = ComponentXMLReader.getXMLMapping(mappings, uri);
 		
 		// Find type infos.
 		TypeInfo	comptype	= null;

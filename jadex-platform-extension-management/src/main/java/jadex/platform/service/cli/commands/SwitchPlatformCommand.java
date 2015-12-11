@@ -1,33 +1,28 @@
 package jadex.platform.service.cli.commands;
 
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
-import jadex.platform.service.cli.CliShell;
 import jadex.platform.service.cli.CloseShellException;
 import jadex.platform.service.cli.IInternalCliService;
 import jadex.platform.service.cli.RemoteCliShell;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * 

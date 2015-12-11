@@ -1,5 +1,8 @@
 package jadex.bdiv3.examples.garbagecollector;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
@@ -10,9 +13,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Burn a piece of garbage.

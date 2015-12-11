@@ -1,5 +1,11 @@
 package jadex.rules.parser.conditions;
 
+import java.util.List;
+
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+
 import jadex.rules.parser.conditions.javagrammar.ConstraintBuilder;
 import jadex.rules.parser.conditions.javagrammar.DefaultParserHelper;
 import jadex.rules.parser.conditions.javagrammar.Expression;
@@ -15,12 +21,6 @@ import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.OAVTypeModel;
-
-import java.util.List;
-
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
 
 /**
  *  The parser helper class for parsing conditions.

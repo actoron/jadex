@@ -1,13 +1,13 @@
 package jadex.platform.service.globalservicepool;
 
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  The global pool management service is exposed by the global pool

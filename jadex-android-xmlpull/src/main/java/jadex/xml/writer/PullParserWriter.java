@@ -1,13 +1,5 @@
 package jadex.xml.writer;
 
-import jadex.commons.collection.Tree;
-import jadex.commons.collection.TreeNode;
-import jadex.xml.IPreProcessor;
-import jadex.xml.SXML;
-import jadex.xml.StackElement;
-import jadex.xml.TypeInfo;
-import jadex.xml.stax.QName;
-
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +10,14 @@ import javax.xml.XMLConstants;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
+
+import jadex.commons.collection.Tree;
+import jadex.commons.collection.TreeNode;
+import jadex.xml.IPreProcessor;
+import jadex.xml.SXML;
+import jadex.xml.StackElement;
+import jadex.xml.TypeInfo;
+import jadex.xml.stax.QName;
 
 public class PullParserWriter extends AWriter
 {

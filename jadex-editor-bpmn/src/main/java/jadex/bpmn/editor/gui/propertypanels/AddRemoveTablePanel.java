@@ -1,15 +1,9 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ImageProvider;
-import jadex.bpmn.editor.gui.SHelper;
-import jadex.bpmn.editor.gui.propertypanels.BpmnPropertyPanel.ImportTableModel;
-import jadex.commons.SUtil;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,8 +13,9 @@ import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bpmn.editor.gui.ImageProvider;
 
 /**
  * 

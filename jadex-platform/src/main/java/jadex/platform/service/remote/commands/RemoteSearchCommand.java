@@ -1,11 +1,16 @@
 package jadex.platform.service.remote.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Security;
@@ -25,12 +30,6 @@ import jadex.commons.transformation.annotations.Alias;
 import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.platform.service.remote.RemoteServiceManagementService;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  *  Command for performing a remote service search.

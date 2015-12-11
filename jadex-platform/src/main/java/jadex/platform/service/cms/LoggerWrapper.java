@@ -1,9 +1,5 @@
 package jadex.platform.service.cms;
 
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.commons.SNonAndroid;
-import jadex.commons.SReflect;
-
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -12,6 +8,10 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.SNonAndroid;
+import jadex.commons.SReflect;
 
 
 /**

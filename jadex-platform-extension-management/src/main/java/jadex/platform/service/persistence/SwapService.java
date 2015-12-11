@@ -1,30 +1,6 @@
 package jadex.platform.service.persistence;
 
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.IPersistInfo;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.persistence.IIdleHook;
-import jadex.bridge.service.types.persistence.IPersistenceService;
-import jadex.bridge.service.types.persistence.ISwapService;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Automatic swapping of idle components to save memory.

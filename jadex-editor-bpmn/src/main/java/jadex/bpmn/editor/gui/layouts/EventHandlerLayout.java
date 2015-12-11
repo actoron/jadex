@@ -1,11 +1,5 @@
 package jadex.bpmn.editor.gui.layouts;
 
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
-import jadex.bpmn.editor.gui.stylesheets.EventShape;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VElement;
-import jadex.bpmn.model.MActivity;
-
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +8,12 @@ import com.mxgraph.layout.mxGraphLayout;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.gui.stylesheets.EventShape;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.model.MActivity;
 
 /**
  *  Layout for ordering event handlers.

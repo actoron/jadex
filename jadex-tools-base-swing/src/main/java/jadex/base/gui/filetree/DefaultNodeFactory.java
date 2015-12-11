@@ -1,5 +1,9 @@
 package jadex.base.gui.filetree;
 
+import java.io.File;
+
+import javax.swing.JTree;
+
 import jadex.base.RemoteJarFile;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
@@ -7,10 +11,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.commons.SUtil;
-
-import java.io.File;
-
-import javax.swing.JTree;
 
 /** 
  *  Default factory for creating nodes.

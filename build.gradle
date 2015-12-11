@@ -1,5 +1,6 @@
 import java.nio.file.Paths
 import java.util.regex.Matcher
+import org.gradle.api.artifacts.ProjectDependency
 
 apply plugin: 'signing'
 //apply plugin: 'java-library-distribution'
@@ -15,8 +16,11 @@ def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
 }
-// ressource files that are filtered for variables
+// resource files that are filtered for variables
 project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle'
+
+// resource files that are executable and should be flagged as such in the zip, must be subset of filterfiles
+project.ext.execfiles = '*.bat,*.sh'
 
 project.ext.srcdir = 'src'
 
@@ -50,7 +54,14 @@ buildscript
 allprojects
 {
     version = jadex_build_version // Set the project version property, otherwise install does not work
-    group = 'net.sourceforge.jadex'
+    if(isCommercial(project))
+    {
+	    group = 'com.actoron.jadex'
+	}
+	else
+	{
+	    group = 'org.activecomponents.jadex'
+	}
 
     repositories
     {
@@ -90,6 +101,8 @@ subprojects
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
     def allSource   = ''
+
+	apply plugin: 'maven'
     
     ext.libraries = [
             android_support: "com.android.support:support-v4:23.1.0",
@@ -101,6 +114,17 @@ subprojects
             robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
             robolectric: 'org.robolectric:robolectric:2.2'
     ]
+
+	configurations {
+		// compileNoAndroidRuntime will exclude the artifact in Android APKs
+		runtimeAndroid.extendsFrom runtime
+		compileNoAndroidRuntime {
+			dependencies.all { dep ->
+				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
+			}
+		}
+		compile.extendsFrom compileNoAndroidRuntime
+	}
 
     if(isAndroidProject(project))
     {
@@ -182,7 +206,9 @@ subprojects
         allSource   = sourceSets.main.allSource
         // include all resources that are placed inside src dirs
         sourceSets.main.resources.srcDirs    mainSrcDir
+        sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
         sourceSets.test.resources.srcDirs    testSrcDir
+        sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
         
         dependencies
         {
@@ -197,30 +223,24 @@ subprojects
 			}
 		}
 
-        // Set correct bootclasspath for each project, depending on sourceCompatibility
         afterEvaluate {
+        	// Set correct bootclasspath for each project, depending on sourceCompatibility
             setBootClassPath(project)
+			// add scope mappings to include parent configurations in deployed pom.xml
+			[install, uploadArchives].each { task ->
+				addParentScopeMappings(task, configurations.compile)
+			}
         }
 
-    }
 
-	configurations {
-		// compileNoAndroidRuntime will exclude the artifact in Android APKs
-		runtimeAndroid.extendsFrom runtime
-		compileNoAndroidRuntime {
-			dependencies.all { dep ->
-				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
-			}
-		}
-		compile.extendsFrom compileNoAndroidRuntime
-	}
+    }
 
 	// process schemas and generate schemadocs
 	if (project.projectDir.toPath().resolve('src/main/schema').toFile().exists()) {
 		addSchemaTasks(project)
 	}
 
-    apply plugin: 'maven'
+
     sourceCompatibility = 1.6
     
     uploadArchives {
@@ -264,7 +284,7 @@ task genDepList << {
 		out. println ('### ' + entry.getKey())
 		def founddeps = new HashSet<String>()
 		sp.configurations.each { conf ->
-			conf.getAllDependencies().withType(org.gradle.api.artifacts.ProjectDependency).each { dep ->
+			conf.getAllDependencies().withType(ProjectDependency).each { dep ->
 				if (!founddeps.contains(dep.getName()))
 					out.println dep.getDependencyProject().getPath()
 				founddeps.add(dep.getName())
@@ -454,18 +474,24 @@ def createDistZip(distname, arts, isaddon)
 						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
 					}
 				} else {
-					zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar', erroronmissingdir: false
-
-					def runtimeConfig = sp.configurations.runtime
-					if (distname.contains('android')) {
-						runtimeConfig = sp.configurations.runtimeAndroid
+					if (isApp(sp)) {
+						zipfileset dir: spbdir + '/libs', prefix: foldername + '/apps/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
 					}
-					runtimeConfig.fileCollection {
-						it instanceof org.gradle.api.artifacts.ExternalModuleDependency? it : null
-					}.each { file ->
-						if (!extdists.contains(file)) {
-							zipfileset file: file, prefix: foldername + '/lib/'
-							extdists.add(file)
+					else {
+						zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
+						
+						def runtimeConfig = sp.configurations.runtime
+						if (distname.contains('android')) {
+							runtimeConfig = sp.configurations.runtimeAndroid
+						}
+						
+						if (!isaddon) {
+							sp.configurations.detachedConfiguration(runtimeConfig.allDependencies.findAll { !(it instanceof ProjectDependency) } as Dependency[]).each { file ->
+								if (!extdists.contains(file)) {
+									zipfileset file: file, prefix: foldername + '/lib/'
+									extdists.add(file)
+								}
+							}
 						}
 					}
 				}
@@ -481,7 +507,8 @@ def createDistZip(distname, arts, isaddon)
 				}
 			}
 			
-			zipfileset dir: preprocessdir, prefix: foldername + '/', erroronmissingdir: false
+			zipfileset dir: preprocessdir, prefix: foldername + '/', excludes: project.ext.execfiles, erroronmissingdir: false
+			zipfileset dir: preprocessdir, prefix: foldername + '/', includes: project.ext.execfiles, filemode: 755, erroronmissingdir: false
 		}
 		ant.delete dir: preprocessdir
 	}
@@ -526,17 +553,4 @@ def addSubproject(prefix, proj)
 	proj.subprojects.each { sp ->
 		addSubproject(pname, sp)
 	}
-}
-
-/* Tests if a project is commercial. */
-def isCommercial(project) {
-	project.hasProperty("commercial") && project.property("commercial").toLowerCase().equals('true')
-}
-
-def isAddon(selecteddists) {
-	def isaddon = true
-	selecteddists.each { dist ->
-		isaddon &= dist.startsWith('addon')
-	}
-	return isaddon
 }

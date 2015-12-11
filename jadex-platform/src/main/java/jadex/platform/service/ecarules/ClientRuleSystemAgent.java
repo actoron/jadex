@@ -1,5 +1,8 @@
 package jadex.platform.service.ecarules;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.types.ecarules.IRuleEngineService;
@@ -21,9 +24,6 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.RuleEvent;
 import jadex.rules.eca.RuleSystem;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Agent that registers with an IRulebaseService and

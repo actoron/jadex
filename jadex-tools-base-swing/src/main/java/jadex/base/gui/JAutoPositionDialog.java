@@ -1,7 +1,5 @@
 package jadex.base.gui;
 
-import jadex.commons.gui.SGUI;
-
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
@@ -9,6 +7,8 @@ import java.awt.HeadlessException;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+
+import jadex.commons.gui.SGUI;
 
 /**
  *  Dialog that positions itself in the middle of the screen.

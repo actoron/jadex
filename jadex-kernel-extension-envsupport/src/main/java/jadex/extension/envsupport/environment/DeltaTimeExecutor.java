@@ -1,5 +1,7 @@
 package jadex.extension.envsupport.environment;
 
+import java.util.Iterator;
+
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -17,8 +19,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.evaluation.ITableDataConsumer;
-
-import java.util.Iterator;
 
 /**
  * Space executor that connects to a clock service and reacts on time deltas.

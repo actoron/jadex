@@ -1,8 +1,8 @@
 package jadex.platform.service.awareness.management;
 
-import jadex.commons.transformation.annotations.IncludeFields;
-
 import java.net.InetAddress;
+
+import jadex.commons.transformation.annotations.IncludeFields;
 
 /**
  * The awareness settings transferred between GUI and agent.

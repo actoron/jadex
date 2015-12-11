@@ -1,5 +1,11 @@
 package jadex.platform.service.awareness.discovery.local;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -30,12 +36,6 @@ import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 
 /**
  *  Agent providing local discovery using the file system.

@@ -1,7 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.util.logging.Logger;
+
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
@@ -12,8 +13,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
-
-import java.util.logging.Logger;
 
 /**
  *  The decoupling return interceptor ensures that the result

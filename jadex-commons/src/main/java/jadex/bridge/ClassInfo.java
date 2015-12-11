@@ -1,9 +1,9 @@
 package jadex.bridge;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+
+import jadex.commons.SReflect;
 
 
 /**

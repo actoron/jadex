@@ -1,5 +1,8 @@
 package jadex.xml.tutorial.example18;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.MappingInfo;
@@ -9,9 +12,6 @@ import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.writer.Writer;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Main class to execute tutorial lesson.

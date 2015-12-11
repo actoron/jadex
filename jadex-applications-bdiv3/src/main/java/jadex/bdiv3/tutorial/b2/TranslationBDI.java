@@ -1,5 +1,8 @@
 package jadex.bdiv3.tutorial.b2;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
@@ -9,9 +12,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The translation agent B2.

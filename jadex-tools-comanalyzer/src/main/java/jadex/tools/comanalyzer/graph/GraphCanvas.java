@@ -1,12 +1,5 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.commons.gui.SGUI;
-import jadex.tools.comanalyzer.Component;
-import jadex.tools.comanalyzer.Message;
-import jadex.tools.comanalyzer.PaintMaps;
-import jadex.tools.comanalyzer.ToolCanvas;
-import jadex.tools.comanalyzer.graph.EdgeTransformer.GradientPaint;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -41,6 +34,12 @@ import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
 import edu.uci.ics.jung.visualization.util.Animator;
+import jadex.commons.gui.SGUI;
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.Message;
+import jadex.tools.comanalyzer.PaintMaps;
+import jadex.tools.comanalyzer.ToolCanvas;
+import jadex.tools.comanalyzer.graph.EdgeTransformer.GradientPaint;
 
 
 /**

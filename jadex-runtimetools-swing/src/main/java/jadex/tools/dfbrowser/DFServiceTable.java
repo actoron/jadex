@@ -1,5 +1,10 @@
 package jadex.tools.dfbrowser;
 
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.df.IDFComponentDescription;
@@ -7,11 +12,6 @@ import jadex.bridge.service.types.df.IProperty;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.gui.jtable.TableSorter;
-
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 /**
  *  Table showing the df component services.

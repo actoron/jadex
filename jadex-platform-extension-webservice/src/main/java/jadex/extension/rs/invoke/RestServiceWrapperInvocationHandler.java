@@ -1,28 +1,5 @@
 package jadex.extension.rs.invoke;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.Value;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.extension.rs.invoke.annotation.ParameterMapper;
-import jadex.extension.rs.invoke.annotation.ParameterMappers;
-import jadex.extension.rs.invoke.annotation.ParametersInURL;
-import jadex.extension.rs.publish.annotation.ParametersMapper;
-import jadex.extension.rs.publish.annotation.ResultMapper;
-import jadex.extension.rs.publish.mapper.IValueMapper;
-
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -47,6 +24,29 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Value;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.extension.rs.invoke.annotation.ParameterMapper;
+import jadex.extension.rs.invoke.annotation.ParameterMappers;
+import jadex.extension.rs.invoke.annotation.ParametersInURL;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
+import jadex.extension.rs.publish.annotation.ResultMapper;
+import jadex.extension.rs.publish.mapper.IValueMapper;
 
 //import org.glassfish.jersey.client.ClientConfig;
 

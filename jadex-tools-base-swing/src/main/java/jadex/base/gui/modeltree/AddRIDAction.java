@@ -1,5 +1,13 @@
 package jadex.base.gui.modeltree;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.lang.reflect.Method;
+import java.net.URI;
+
+import javax.swing.Icon;
+import javax.swing.UIDefaults;
+
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -14,14 +22,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.lang.reflect.Method;
-import java.net.URI;
-
-import javax.swing.Icon;
-import javax.swing.UIDefaults;
 
 /**
  *  Action for adding a local path.

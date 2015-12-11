@@ -1,8 +1,8 @@
 package jadex.platform.service.cron;
 
-import jadex.commons.IFilter;
-
 import java.util.Set;
+
+import jadex.commons.IFilter;
 
 /**
  *  Simple set based filter that checks

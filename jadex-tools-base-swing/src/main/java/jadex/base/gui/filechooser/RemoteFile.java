@@ -1,11 +1,11 @@
 package jadex.base.gui.filechooser;
 
-import jadex.bridge.service.types.filetransfer.FileData;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+
+import jadex.bridge.service.types.filetransfer.FileData;
 
 
 /**

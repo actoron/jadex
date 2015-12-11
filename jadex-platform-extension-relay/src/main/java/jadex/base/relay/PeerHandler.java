@@ -1,10 +1,5 @@
 package jadex.base.relay;
 
-import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.platform.service.message.MapSendTask;
-import jadex.platform.service.message.transport.codecs.CodecFactory;
-import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -13,6 +8,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.platform.service.message.MapSendTask;
+import jadex.platform.service.message.transport.codecs.CodecFactory;
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 /**
  *  Handler to periodically ping remote peer and synchronize history db.

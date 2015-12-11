@@ -1,5 +1,8 @@
  package jadex.rules.test.rulesystem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -19,10 +22,6 @@ import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.javaimpl.OAVStateFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.TestCase;
 
 /**

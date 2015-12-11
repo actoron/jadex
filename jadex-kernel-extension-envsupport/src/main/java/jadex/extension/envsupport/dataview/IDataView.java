@@ -1,8 +1,8 @@
 package jadex.extension.envsupport.dataview;
 
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
-
 import java.util.Map;
+
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 
 /**
  * View used by an observer to display part of the environment

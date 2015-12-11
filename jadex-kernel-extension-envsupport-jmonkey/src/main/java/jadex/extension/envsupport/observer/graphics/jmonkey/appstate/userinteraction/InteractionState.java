@@ -1,7 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.userinteraction;
 
-import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
@@ -15,6 +13,8 @@ import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
+
+import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 
 
 public class InteractionState extends AbstractAppState

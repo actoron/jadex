@@ -1,12 +1,12 @@
 package jadex.tools.comanalyzer;
 
-import jadex.commons.SUtil;
-import jadex.commons.collection.SortedList;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import jadex.commons.SUtil;
+import jadex.commons.collection.SortedList;
 
 
 /**

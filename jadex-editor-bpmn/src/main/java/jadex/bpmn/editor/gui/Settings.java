@@ -1,18 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.propertypanels.PropertyPanelFactory;
-import jadex.bpmn.model.task.ITask;
-import jadex.bpmn.model.task.annotation.Task;
-import jadex.bridge.ClassInfo;
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,6 +32,19 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
 import com.mxgraph.view.mxStylesheet;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.propertypanels.PropertyPanelFactory;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bridge.ClassInfo;
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  The editor settings.

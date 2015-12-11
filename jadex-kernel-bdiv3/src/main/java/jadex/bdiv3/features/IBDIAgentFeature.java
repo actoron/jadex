@@ -57,7 +57,7 @@ public interface IBDIAgentFeature
 	 *  @param args The plan arguments.
 	 *  @return The plan result.
 	 */
-	public <T, E> IFuture<E> adoptPlan(T plan, Object[] args);
+	public <T, E> IFuture<E> adoptPlan(T plan, Object... args);
 	
 	/**
 	 *  Add a belief listener.

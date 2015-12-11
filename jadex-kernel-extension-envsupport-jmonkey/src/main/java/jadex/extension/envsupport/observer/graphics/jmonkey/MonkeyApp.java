@@ -1,27 +1,19 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
-import jadex.extension.envsupport.environment.ISpaceController;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.EffectSaver;
-import jadex.extension.envsupport.observer.graphics.jmonkey.util.NodeQueue;
-import jme3tools.optimize.GeometryBatchFactory;
 
 import com.jme3.effect.ParticleEmitter;
-import com.jme3.material.Material;
 import com.jme3.math.Vector2f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.scene.BatchNode;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
+
+import jadex.extension.envsupport.environment.ISpaceController;
+import jadex.extension.envsupport.observer.graphics.jmonkey.util.NodeQueue;
+import jme3tools.optimize.GeometryBatchFactory;
 
 
 /**

@@ -1,5 +1,8 @@
 package jadex.bdiv3.tutorial.f1;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
@@ -9,9 +12,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The translation agent F1.

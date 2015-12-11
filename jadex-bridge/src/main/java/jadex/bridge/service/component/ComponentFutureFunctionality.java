@@ -1,5 +1,7 @@
 package jadex.bridge.service.component;
 
+import java.util.logging.Logger;
+
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -7,8 +9,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.logging.Logger;
 
 /**
  *  Schedule future executions on component thread. 

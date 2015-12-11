@@ -1,10 +1,10 @@
 package jadex.platform.service.remote;
 
 
-import jadex.commons.transformation.annotations.Alias;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import jadex.commons.transformation.annotations.Alias;
 
 /**
  *  A proxy reference is the transfer format of a remote reference which should

@@ -1,10 +1,10 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import org.antlr.runtime.TokenStream;
+
 import jadex.commons.SReflect;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-
-import org.antlr.runtime.TokenStream;
 
 /**
  *  Static helper methods for Java condition parser.

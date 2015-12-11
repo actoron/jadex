@@ -1,13 +1,5 @@
 package jadex.tools.simcenter;
 
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.service.types.simulation.ISimulationService;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.TimeFormat;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
 import java.awt.BorderLayout;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,6 +8,14 @@ import java.util.Date;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.UIDefaults;
+
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.TimeFormat;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  The simulation center panel.

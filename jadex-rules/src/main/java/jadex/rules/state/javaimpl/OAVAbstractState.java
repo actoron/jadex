@@ -1,20 +1,5 @@
 package jadex.rules.state.javaimpl;
 
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple;
-import jadex.commons.collection.IdentityHashSet;
-import jadex.commons.concurrent.ISynchronizator;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.IOAVStateListener;
-import jadex.rules.state.IProfiler;
-import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.OAVObjectType;
-import jadex.rules.state.OAVTypeModel;
-
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,6 +15,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.collection.IdentityHashSet;
+import jadex.commons.concurrent.ISynchronizator;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.IOAVStateListener;
+import jadex.rules.state.IProfiler;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
+import jadex.rules.state.OAVTypeModel;
 
 /**
  *  An object holding the state as

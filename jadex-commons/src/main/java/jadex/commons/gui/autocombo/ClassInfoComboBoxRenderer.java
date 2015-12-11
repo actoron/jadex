@@ -1,12 +1,12 @@
 package jadex.commons.gui.autocombo;
 
-import jadex.bridge.ClassInfo;
-import jadex.commons.SReflect;
-
 import java.awt.Component;
 
 import javax.swing.JList;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+
+import jadex.bridge.ClassInfo;
+import jadex.commons.SReflect;
 
 /**
  * 

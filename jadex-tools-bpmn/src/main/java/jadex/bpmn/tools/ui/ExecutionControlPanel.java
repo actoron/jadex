@@ -1,10 +1,5 @@
 package jadex.bpmn.tools.ui;
 
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
-import jadex.commons.ISteppable;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,6 +13,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
+
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.ICommand;
+import jadex.commons.ISteppable;
 
 /**
  * 

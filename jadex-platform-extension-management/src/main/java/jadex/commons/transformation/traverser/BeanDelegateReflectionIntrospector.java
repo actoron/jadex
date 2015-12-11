@@ -1,16 +1,10 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.BeanProperty;
-import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
-import jadex.commons.transformation.traverser.IBeanAccessorDelegate;
-import jadex.commons.transformation.traverser.IBeanDelegateProvider;
-
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import jadex.commons.SReflect;
 import javassist.CannotCompileException;
 import javassist.ClassClassPath;
 import javassist.ClassPool;

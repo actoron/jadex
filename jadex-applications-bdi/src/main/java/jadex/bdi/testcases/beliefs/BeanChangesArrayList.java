@@ -1,10 +1,10 @@
 package jadex.bdi.testcases.beliefs;
 
-import jadex.commons.SimplePropertyChangeSupport;
-import jadex.commons.beans.PropertyChangeListener;
-
 import java.util.ArrayList;
 import java.util.Collection;
+
+import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  An array list with property change support.

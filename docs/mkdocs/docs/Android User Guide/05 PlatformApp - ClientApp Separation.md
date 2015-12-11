@@ -11,7 +11,7 @@ Nevertheless, the mentioned separation is desirable, because if user application
 
 Since version 2.4 (which is currently only available as night build) of jadex-android, this separation is supported.
 
-The Platform and all it's libraries are now packaged into a <span class="wikiexternallink">[standalone Android APK](/Download/Overview)</span>.
+The Platform and all it's libraries are now packaged into a <span class="wikiexternallink">[standalone Android APK](https://www.activecomponents.org/bin/view/Download/Overview)</span>.
 
 This document describes how to develop applications using the *ClientApp* model.
 

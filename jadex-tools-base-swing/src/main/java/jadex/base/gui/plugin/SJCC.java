@@ -1,5 +1,7 @@
 package jadex.base.gui.plugin;
 
+import java.awt.Component;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -10,8 +12,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-
-import java.awt.Component;
 
 /**
  *  Static helper methods for JCC plugins.

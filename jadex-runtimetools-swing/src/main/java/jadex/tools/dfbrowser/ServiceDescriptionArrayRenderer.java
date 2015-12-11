@@ -1,11 +1,11 @@
 package jadex.tools.dfbrowser;
 
-import jadex.bridge.service.types.df.IDFServiceDescription;
-
 import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import jadex.bridge.service.types.df.IDFServiceDescription;
 
 class ServiceDescriptionArrayRenderer extends DefaultTableCellRenderer
 {

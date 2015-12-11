@@ -1,5 +1,7 @@
 package jadex.platform.service.servicepool;
 
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -14,8 +16,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.util.Map;
 
 /**
  *  Functionality agent that provides service A.

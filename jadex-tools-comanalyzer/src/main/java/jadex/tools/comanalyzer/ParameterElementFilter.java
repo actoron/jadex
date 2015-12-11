@@ -1,12 +1,12 @@
 package jadex.tools.comanalyzer;
 
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
-import jadex.commons.collection.MultiCollection;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
+
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
+import jadex.commons.collection.MultiCollection;
 
 
 /**

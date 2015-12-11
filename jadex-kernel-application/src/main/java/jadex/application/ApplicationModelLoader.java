@@ -1,5 +1,7 @@
 package jadex.application;
 
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.AbstractModelLoader;
@@ -7,8 +9,6 @@ import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.xml.TypeInfo;
-
-import java.util.Set;
 
 /**
  *  Loader for application files.

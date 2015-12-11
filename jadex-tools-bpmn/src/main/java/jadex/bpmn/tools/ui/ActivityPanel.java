@@ -1,10 +1,5 @@
 package jadex.bpmn.tools.ui;
 
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.commons.ISteppable;
-import jadex.commons.gui.jtable.TableSorter;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -30,6 +25,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.commons.ISteppable;
+import jadex.commons.gui.jtable.TableSorter;
 
 /**
  *  A panel for viewing the content of a bpmn process model.

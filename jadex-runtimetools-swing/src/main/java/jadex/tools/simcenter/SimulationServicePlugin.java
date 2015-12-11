@@ -1,5 +1,14 @@
 package jadex.tools.simcenter;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.UIDefaults;
+
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.Properties;
@@ -9,15 +18,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.tools.generic.AbstractServicePlugin;
-
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.UIDefaults;
 
 /**
  *  Plugin for starting components.

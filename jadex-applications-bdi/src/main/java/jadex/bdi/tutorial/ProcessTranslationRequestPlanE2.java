@@ -1,12 +1,12 @@
 package jadex.bdi.tutorial;
 
+import java.util.StringTokenizer;
+
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
-
-import java.util.StringTokenizer;
 
 /**
  *  Handles all incoming translation requests with

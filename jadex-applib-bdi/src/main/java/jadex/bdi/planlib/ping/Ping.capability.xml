@@ -2,10 +2,10 @@
 <!--
 	The ping capability helps integrating ping behaviour for agents.
 -->
-<capability xmlns="http://jadex.sourceforge.net/jadex"
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-	                    http://jadex.sourceforge.net/jadex-bdi-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	name="Ping">
 
 	<imports>

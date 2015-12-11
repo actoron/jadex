@@ -1,5 +1,9 @@
 package jadex.rules.test.rulesystem;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -10,11 +14,6 @@ import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.javaimpl.OAVStateFactory;
-
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.TestCase;
 
 /**

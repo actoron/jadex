@@ -1,8 +1,5 @@
 package jadex.webservice.examples.rs.banking;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 

@@ -1,15 +1,15 @@
 package jadex.rules.rulesystem;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import jadex.commons.ICommand;
 import jadex.commons.ISteppable;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  *  A rule system executor can execute rule systems on a separate thread.

@@ -1,19 +1,5 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.bdi.examples.hunterprey_classic.Creature;
-import jadex.bdi.examples.hunterprey_classic.CurrentVision;
-import jadex.bdi.examples.hunterprey_classic.Vision;
-import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.impl.BeliefAdapter;
-import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.xml.bean.JavaReader;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -28,6 +14,20 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.bdi.examples.hunterprey_classic.Creature;
+import jadex.bdi.examples.hunterprey_classic.CurrentVision;
+import jadex.bdi.examples.hunterprey_classic.Vision;
+import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.xml.bean.JavaReader;
 
 
 /**

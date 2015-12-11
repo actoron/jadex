@@ -1,5 +1,8 @@
 package jadex.extension.envsupport;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.application.IExtensionInfo;
 import jadex.application.IExtensionInstance;
 import jadex.bridge.IComponentStep;
@@ -11,9 +14,6 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 	Configuration of an Env space.

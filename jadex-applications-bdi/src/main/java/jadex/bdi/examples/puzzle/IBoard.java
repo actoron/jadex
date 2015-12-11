@@ -1,8 +1,8 @@
 package jadex.bdi.examples.puzzle;
 
-import jadex.commons.beans.PropertyChangeListener;
-
 import java.util.List;
+
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  The interface for the playing board.

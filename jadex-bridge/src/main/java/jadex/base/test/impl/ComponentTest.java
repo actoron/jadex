@@ -1,6 +1,13 @@
 package jadex.base.test.impl;
 
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
 import jadex.base.test.TestReport;
@@ -17,14 +24,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.TupleResult;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 

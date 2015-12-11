@@ -3,7 +3,6 @@ package jadex.micro.tutorial;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 
 /**
  *  Main class for starting the chat

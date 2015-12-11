@@ -1,20 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.controllers.DeletionController;
-import jadex.bpmn.editor.gui.controllers.SCreationController;
-import jadex.bpmn.editor.gui.propertypanels.PropertyPanelFactory;
-import jadex.bpmn.editor.model.legacy.BpmnXMLReader;
-import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
-import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.io.SBpmnModelReader;
-import jadex.bridge.ResourceIdentifier;
-import jadex.commons.ResourceInfo;
-import jadex.commons.collection.OrderedProperties;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -56,6 +41,21 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.mxgraph.view.mxStylesheet;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.controllers.DeletionController;
+import jadex.bpmn.editor.gui.controllers.SCreationController;
+import jadex.bpmn.editor.gui.propertypanels.PropertyPanelFactory;
+import jadex.bpmn.editor.model.legacy.BpmnXMLReader;
+import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
+import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.io.SBpmnModelReader;
+import jadex.bridge.ResourceIdentifier;
+import jadex.commons.ResourceInfo;
+import jadex.commons.collection.OrderedProperties;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 /**
  * 

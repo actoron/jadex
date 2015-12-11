@@ -1,5 +1,7 @@
 package jadex.micro.benchmarks.servicecall;
 
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -21,8 +23,6 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
-
-import java.util.Map;
 
 /**
  *  Agent providing a direct service.

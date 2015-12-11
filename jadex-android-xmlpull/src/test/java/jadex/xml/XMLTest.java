@@ -1,21 +1,4 @@
 package jadex.xml;
-import jadex.commons.SReflect;
-import jadex.commons.Tuple;
-import jadex.commons.Tuple2;
-import jadex.commons.collection.MultiCollection;
-import jadex.commons.transformation.A;
-import jadex.commons.transformation.ArrayHolder;
-import jadex.commons.transformation.B;
-import jadex.commons.transformation.ByteArrayHolder;
-import jadex.commons.transformation.C;
-import jadex.commons.transformation.D;
-import jadex.commons.transformation.E;
-import jadex.commons.transformation.TestEnum;
-import jadex.commons.transformation.VectorModel;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
@@ -33,6 +16,22 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import jadex.commons.SReflect;
+import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.A;
+import jadex.commons.transformation.ArrayHolder;
+import jadex.commons.transformation.B;
+import jadex.commons.transformation.ByteArrayHolder;
+import jadex.commons.transformation.C;
+import jadex.commons.transformation.D;
+import jadex.commons.transformation.E;
+import jadex.commons.transformation.TestEnum;
+import jadex.commons.transformation.VectorModel;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 import junit.framework.TestCase;
 
 /**

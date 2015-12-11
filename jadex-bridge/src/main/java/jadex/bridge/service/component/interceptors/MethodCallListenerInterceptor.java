@@ -1,5 +1,7 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.util.Collection;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -12,8 +14,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.Collection;
 
 /**
  *  Calls a method on an object and returns the result.

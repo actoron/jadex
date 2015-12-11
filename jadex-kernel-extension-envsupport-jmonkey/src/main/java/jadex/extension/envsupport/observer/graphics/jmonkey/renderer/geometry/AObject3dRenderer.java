@@ -1,12 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry;
 
-import jadex.extension.envsupport.environment.SpaceObject;
-import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
-
 import java.util.HashMap;
 import java.util.TreeSet;
 
@@ -20,6 +13,13 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.SkeletonDebugger;
+
+import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
 
 
 public abstract class AObject3dRenderer extends AbstractJMonkeyRenderer

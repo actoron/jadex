@@ -1,14 +1,5 @@
 package jadex.bpmn.editor.gui.contextmenus;
 
-import jadex.bpmn.editor.gui.BpmnToolbar;
-import jadex.bpmn.editor.gui.ImageProvider;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.gui.BpmnToolbar.IconGenerationTask;
-import jadex.bpmn.editor.gui.controllers.SCreationController;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.model.MActivity;
-import jadex.commons.Tuple3;
-
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -27,6 +18,15 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import com.mxgraph.model.mxICell;
+
+import jadex.bpmn.editor.gui.BpmnToolbar;
+import jadex.bpmn.editor.gui.BpmnToolbar.IconGenerationTask;
+import jadex.bpmn.editor.gui.ImageProvider;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.controllers.SCreationController;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.MActivity;
+import jadex.commons.Tuple3;
 
 public class EdgeDragContextMenu extends JPopupMenu
 {

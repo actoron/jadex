@@ -14,7 +14,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
+			<groupId>org.activecomponents.jadex</groupId>
 			<artifactId>jadex-distribution-standard</artifactId>
 			<version> 3.0-SNAPSHOT </version>
 		</dependency>

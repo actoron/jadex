@@ -1,11 +1,11 @@
 package jadex.bridge.fipa;
 
+import java.util.Date;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.message.MessageType;
-
-import java.util.Date;
-import java.util.Map;
 
 /**
  *  The FIPA message type.

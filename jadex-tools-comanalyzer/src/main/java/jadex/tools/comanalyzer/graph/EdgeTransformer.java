@@ -1,9 +1,5 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.tools.comanalyzer.Message;
-import jadex.tools.comanalyzer.PaintMaps;
-import jadex.tools.comanalyzer.graph.GraphCanvas.MessageGroup;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -13,13 +9,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.commons.collections15.Predicate;
 import org.apache.commons.collections15.Transformer;
 
-import edu.uci.ics.jung.algorithms.util.SelfLoopEdgePredicate;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.decorators.GradientEdgePaintTransformer;
+import jadex.tools.comanalyzer.Message;
+import jadex.tools.comanalyzer.PaintMaps;
+import jadex.tools.comanalyzer.graph.GraphCanvas.MessageGroup;
 
 
 /**

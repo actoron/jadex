@@ -1,11 +1,11 @@
 package jadex.javaparser.javaccimpl;
 
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
-
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Map;
+
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
 
 /**
  *  The jadex parser parses all types of expressions in ADF and queries.

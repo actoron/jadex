@@ -1,9 +1,9 @@
 package jadex.commons.gui.autocombo;
 
+import javax.swing.plaf.metal.MetalComboBoxEditor;
+
 import jadex.bridge.ClassInfo;
 import jadex.commons.SUtil;
-
-import javax.swing.plaf.metal.MetalComboBoxEditor;
 
 /**
  * 

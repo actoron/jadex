@@ -1,13 +1,5 @@
 package jadex.extension.rs.publish;
 
-import jadex.bridge.service.IService;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
-import jadex.extension.rs.invoke.RSJAXAnnotationHelper;
-import jadex.extension.rs.publish.annotation.MethodMapper;
-import jadex.extension.rs.publish.annotation.ParametersMapper;
-import jadex.extension.rs.publish.annotation.ResultMapper;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -24,6 +16,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import jadex.bridge.service.IService;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.extension.rs.invoke.RSJAXAnnotationHelper;
+import jadex.extension.rs.publish.annotation.MethodMapper;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
+import jadex.extension.rs.publish.annotation.ResultMapper;
 
 /**
  *  The default rest method generator. Analyses

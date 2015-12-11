@@ -1,9 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ToolTipAction;
-
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -12,6 +8,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
+
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
 
 /**
  *  Action for adding a local path.

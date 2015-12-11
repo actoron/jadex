@@ -1,10 +1,5 @@
 package jadex.tools.security;
 
-import jadex.commons.SUtil;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.platform.service.security.SSecurity;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -21,6 +16,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+
+import jadex.commons.SUtil;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.platform.service.security.SSecurity;
 
 /**
  *  Panel for displaying a certificate.

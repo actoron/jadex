@@ -1,5 +1,13 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
@@ -12,14 +20,6 @@ import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.ExpressionNode;
 import jadex.javaparser.javaccimpl.ParameterNode;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *  Interceptor that checks annotated pre- and postconditions.

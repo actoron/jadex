@@ -17,13 +17,13 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.DesignMode;
-import jadex.commons.beans.Visibility;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
+
+import jadex.commons.beans.DesignMode;
+import jadex.commons.beans.Visibility;
 
 
 @SuppressWarnings("unchecked")

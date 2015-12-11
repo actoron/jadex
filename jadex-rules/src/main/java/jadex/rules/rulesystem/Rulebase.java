@@ -1,13 +1,13 @@
 package jadex.rules.rulesystem;
 
-import jadex.rules.rulesystem.rules.Rule;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import jadex.rules.rulesystem.rules.Rule;
 
 /**
  *  The rule base of the system containing all rules.

@@ -1,5 +1,12 @@
 package jadex.micro.features.impl;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -25,13 +32,6 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.features.IMicroServiceInjectionFeature;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  *  Inject required services into annotated field values.

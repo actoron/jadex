@@ -1,5 +1,7 @@
 package jadex.platform.service.message.streams;
 
+import java.io.InputStream;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -15,8 +17,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-
-import java.io.InputStream;
 
 /**
  *  Output connection for writing data.

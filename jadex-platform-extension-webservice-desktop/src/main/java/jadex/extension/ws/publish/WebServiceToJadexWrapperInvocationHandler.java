@@ -1,11 +1,10 @@
 package jadex.extension.ws.publish;
 
-import jadex.bridge.service.IService;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+
+import jadex.bridge.service.IService;
+import jadex.commons.future.IFuture;
 
 /**
  *  Proxy invocation handler that maps a web service call to

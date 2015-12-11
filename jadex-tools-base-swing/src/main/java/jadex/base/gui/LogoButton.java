@@ -1,9 +1,5 @@
 package jadex.base.gui;
 
-import jadex.commons.BrowserLauncher2;
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -14,6 +10,10 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
+
+import jadex.commons.BrowserLauncher2;
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 
 /**
  * Button to start a web browser showing the a home page.

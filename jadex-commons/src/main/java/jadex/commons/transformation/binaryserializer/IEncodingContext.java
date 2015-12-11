@@ -1,9 +1,9 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-
 import java.util.List;
 import java.util.Set;
+
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
  *  Encoding context interface.

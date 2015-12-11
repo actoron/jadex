@@ -23,7 +23,7 @@ public class InformNewTargetPlan extends Plan
 	 */
 	public void body()
 	{
-		ISpaceObject	target	= (ISpaceObject)((ChangeInfo<?>)((ChangeEvent)getReason()).getValue()).getValue();
+		ISpaceObject	target	= ((ChangeEvent<ChangeInfo<ISpaceObject>>)getReason()).getValue().getValue();
 		
 		// Todo: multiple spaces by name...
 		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();

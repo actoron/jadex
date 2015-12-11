@@ -1,5 +1,17 @@
 package jadex.tools.jcc;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.RememberOptionMessage;
@@ -19,18 +31,6 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.xml.PropertiesXMLHelper;
-
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 /**
  *  The global control center.

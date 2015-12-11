@@ -1,22 +1,5 @@
 package jadex.base.gui.config;
 
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
-import jadex.base.Starter;
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.types.factory.SBootstrapLoader;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.xml.PropertiesXMLHelper;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -42,6 +25,22 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.factory.SBootstrapLoader;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.xml.PropertiesXMLHelper;
 
 
 /**

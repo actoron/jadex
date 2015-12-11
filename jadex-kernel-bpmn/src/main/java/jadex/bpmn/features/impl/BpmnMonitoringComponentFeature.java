@@ -1,5 +1,9 @@
 package jadex.bpmn.features.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import jadex.bpmn.features.IBpmnComponentFeature;
 import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.runtime.ProcessThread;
@@ -7,10 +11,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.MonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  *  Overrides the monitoring feature to add the logic for current state.

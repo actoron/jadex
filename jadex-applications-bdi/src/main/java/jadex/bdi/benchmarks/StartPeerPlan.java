@@ -1,6 +1,7 @@
 package jadex.bdi.benchmarks;
 
-import jadex.bdiv3.runtime.IGoal;
+import java.util.Map;
+
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -9,8 +10,6 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
 
 /**
  *  Start another peer agent.

@@ -1,8 +1,8 @@
 package jadex.xml.bean;
 
-import jadex.xml.IContext;
-
 import java.util.Map;
+
+import jadex.xml.IContext;
 
 /**
  *  Interface for creator objects that can create different 

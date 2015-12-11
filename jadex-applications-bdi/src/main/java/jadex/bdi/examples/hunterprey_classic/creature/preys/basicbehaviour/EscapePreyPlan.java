@@ -1,5 +1,10 @@
 package jadex.bdi.examples.hunterprey_classic.creature.preys.basicbehaviour;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.Hunter;
 import jadex.bdi.examples.hunterprey_classic.Obstacle;
@@ -8,11 +13,6 @@ import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.examples.hunterprey_classic.WorldObject;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Try to run away from a hunter.

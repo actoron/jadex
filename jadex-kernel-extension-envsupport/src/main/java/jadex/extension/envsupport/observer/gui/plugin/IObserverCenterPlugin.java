@@ -1,8 +1,8 @@
 package jadex.extension.envsupport.observer.gui.plugin;
 
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
-
 import java.awt.Component;
+
+import jadex.extension.envsupport.observer.gui.ObserverCenter;
 
 /**
  *  Interface for observer plugins.

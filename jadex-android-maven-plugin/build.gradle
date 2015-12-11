@@ -5,9 +5,9 @@ dependencies
 {
     ext.maven_api = "3.1.1"
 
-	compile 'net.sourceforge.jadex:jadex-bridge:' + props.jadex_build_version
-    compile 'net.sourceforge.jadex:jadex-platform:' + props.jadex_build_version
-    compile 'net.sourceforge.jadex:jadex-kernel-bdiv3:' + props.jadex_build_version
+	compile 'org.activecomponents.jadex:jadex-bridge:' + props.jadex_build_version
+    compile 'org.activecomponents.jadex:jadex-platform:' + props.jadex_build_version
+    compile 'org.activecomponents.jadex:jadex-kernel-bdiv3:' + props.jadex_build_version
 
     compile 'org.apache.maven:maven-artifact:' + maven_api
     compile 'org.apache.maven:maven-model:' + maven_api

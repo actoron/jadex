@@ -1,14 +1,5 @@
 package jadex.tools.email;
 
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.security.DefaultAuthorizable;
-import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.Base64;
-import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -29,6 +20,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.security.DefaultAuthorizable;
+import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.Base64;
+import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
 
 /**
  * 

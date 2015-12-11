@@ -1,17 +1,16 @@
 package jadex.base;
 
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
-import jadex.javaparser.SJavaParser;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.javaparser.SJavaParser;
 
 
 /**

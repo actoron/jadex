@@ -1,9 +1,9 @@
 package jadex.bridge.component;
 
+import java.util.Map;
+
 import jadex.commons.Tuple2;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.Map;
 
 /**
  *  This features provides arguments.

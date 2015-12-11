@@ -1,13 +1,13 @@
 package jadex.bridge.service.types.context;
 
-import jadex.bridge.service.annotation.Excluded;
-import jadex.bridge.service.annotation.Reference;
-import jadex.commons.future.IFuture;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
+
+import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Reference;
+import jadex.commons.future.IFuture;
 
 /**
  *  Provides access to the application Context specific objects and Android

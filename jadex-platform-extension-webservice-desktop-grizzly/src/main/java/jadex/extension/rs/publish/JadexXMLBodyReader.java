@@ -1,7 +1,5 @@
 package jadex.extension.rs.publish;
 
-import jadex.xml.bean.JavaReader;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -12,6 +10,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
+
+import jadex.xml.bean.JavaReader;
 
 /**
  *  Body reader for Jersey. Allows to use the Jadex XML Codec

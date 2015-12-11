@@ -15,7 +15,6 @@ import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.APL.MGoalInfo;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.IInternalPlan;
-import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;

@@ -1,28 +1,6 @@
 package jadex.base.gui.componenttree;
 
 
-import jadex.base.gui.asynctree.AbstractSwingTreeNode;
-import jadex.base.gui.asynctree.AsyncSwingTreeModel;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.NFRPropertyInfo;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingResultListener;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +13,18 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
+
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.NFRPropertyInfo;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.commons.gui.SGUI;
 
 /**
  *  Node object representing a service container.

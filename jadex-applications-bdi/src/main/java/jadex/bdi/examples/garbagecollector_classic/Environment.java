@@ -1,9 +1,5 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
-import jadex.commons.SimplePropertyChangeSupport;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.collection.MultiCollection;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.collection.MultiCollection;
 
 /**
  *  The environment.

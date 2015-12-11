@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.cli;
 
 import jadex.bridge.service.annotation.CheckNotNull;
-import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 

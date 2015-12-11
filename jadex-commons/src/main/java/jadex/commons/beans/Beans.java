@@ -17,8 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.beancontext.BeanContext;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -26,6 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.harmony.beans.internal.nls.Messages;
+
+import jadex.commons.beans.beancontext.BeanContext;
 
 /**
  * This class <code>Beans</code> provides some methods for manipulting bean

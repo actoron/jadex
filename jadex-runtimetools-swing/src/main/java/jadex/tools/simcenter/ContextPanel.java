@@ -1,13 +1,5 @@
 package jadex.tools.simcenter;
 
-import jadex.base.SRemoteClock;
-import jadex.base.SRemoteClock.SimulationState;
-import jadex.bridge.service.types.clock.IClock;
-import jadex.bridge.service.types.simulation.ISimulationService;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ToolTipAction;
-import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
-
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
@@ -17,6 +9,14 @@ import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.base.SRemoteClock;
+import jadex.base.SRemoteClock.SimulationState;
+import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 
 /**
  *	The context panel shows the settings for an execution context.

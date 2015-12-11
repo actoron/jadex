@@ -1,8 +1,5 @@
 package jadex.commons.gui;
 
-import jadex.commons.BrowserLauncher2;
-import jadex.commons.SUtil;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
@@ -30,6 +27,9 @@ import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.ImageView;
+
+import jadex.commons.BrowserLauncher2;
+import jadex.commons.SUtil;
 
 
 /**

@@ -1,5 +1,10 @@
 package jadex.bdiv3.tutorial.e2;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
@@ -10,11 +15,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  The translation agent e1.
@@ -71,9 +71,9 @@ public class TranslationBDI
 	 */
 	@Plan
 //	protected List<String> findSynonyms(String eword)
-	protected List<String> findSynonyms(ChangeEvent ev)
+	protected List<String> findSynonyms(ChangeEvent<Object[]> ev)
 	{
-		String eword = (String)((Object[])ev.getValue())[0];
+		String eword = (String)ev.getValue()[0];
 		List<String> ret = new ArrayList<String>();
 		String gword = wordtable.get(eword);
 		for(String key: wordtable.keySet())

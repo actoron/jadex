@@ -1,9 +1,9 @@
 package jadex.extension.envsupport.observer.graphics.layer;
 
+import java.awt.Color;
+
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
-
-import java.awt.Color;
 
 
 /**

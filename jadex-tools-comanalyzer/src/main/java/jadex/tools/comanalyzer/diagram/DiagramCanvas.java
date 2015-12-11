@@ -1,13 +1,5 @@
 package jadex.tools.comanalyzer.diagram;
 
-import jadex.commons.collection.SortedList;
-import jadex.tools.comanalyzer.Component;
-import jadex.tools.comanalyzer.ComponentFilterMenu;
-import jadex.tools.comanalyzer.Message;
-import jadex.tools.comanalyzer.MessageFilterMenu;
-import jadex.tools.comanalyzer.ToolCanvas;
-import jadex.tools.comanalyzer.ToolTab;
-
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -21,6 +13,13 @@ import java.util.TreeMap;
 import javax.swing.JScrollPane;
 
 import edu.uci.ics.jung.graph.util.Pair;
+import jadex.commons.collection.SortedList;
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.ComponentFilterMenu;
+import jadex.tools.comanalyzer.Message;
+import jadex.tools.comanalyzer.MessageFilterMenu;
+import jadex.tools.comanalyzer.ToolCanvas;
+import jadex.tools.comanalyzer.ToolTab;
 
 
 /**

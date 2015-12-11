@@ -1,7 +1,21 @@
 package jadex.tools.starter;
 
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JSeparator;
+import javax.swing.JToolBar;
+import javax.swing.UIDefaults;
+
 import jadex.base.gui.ComponentIdentifierDialog;
-import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.AddRIDAction;
 import jadex.base.gui.modeltree.CollapseAllAction;
@@ -18,21 +32,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JSeparator;
-import javax.swing.JToolBar;
-import javax.swing.UIDefaults;
 
 /**
  *  Plugin for starting components.

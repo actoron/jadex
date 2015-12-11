@@ -1,7 +1,5 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
-import jadex.bpmn.editor.gui.GuiConstants;
-
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -13,6 +11,8 @@ import java.awt.geom.GeneralPath;
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.shape.mxRhombusShape;
 import com.mxgraph.view.mxCellState;
+
+import jadex.bpmn.editor.gui.GuiConstants;
 
 public class GatewayShape extends mxRhombusShape
 {

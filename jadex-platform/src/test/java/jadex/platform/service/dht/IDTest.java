@@ -1,10 +1,9 @@
 package jadex.platform.service.dht;
 
-import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.service.types.dht.IID;
-
 import org.junit.Test;
 
+import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.service.types.dht.IID;
 import junit.framework.TestCase;
 
 public class IDTest extends TestCase

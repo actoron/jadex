@@ -1,11 +1,11 @@
 package jadex.bdiv3.examples.booktrading;
 
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bdiv3.examples.booktrading.common.NegotiationReport;
 import jadex.bdiv3.examples.booktrading.common.Order;
 import jadex.bridge.IInternalAccess;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 

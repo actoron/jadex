@@ -7,10 +7,10 @@
 	If dynamic value is accessed on init an exception will
 	occur as belief length cannot be evaluted without a value in belief string.
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex"
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-	                    http://jadex.sourceforge.net/jadex-bdi-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	name="DynamicBelief"
 	package="jadex.bdi.testcases.beliefs">
 

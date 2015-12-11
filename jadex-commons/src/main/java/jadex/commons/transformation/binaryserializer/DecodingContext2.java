@@ -1,13 +1,13 @@
 package jadex.commons.transformation.binaryserializer;
 
 
-import jadex.commons.transformation.STransformation;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.commons.transformation.STransformation;
 
 /**
  * Context for decoding a binary-encoded object.

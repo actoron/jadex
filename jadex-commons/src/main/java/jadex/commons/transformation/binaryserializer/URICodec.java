@@ -1,13 +1,12 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Codec for encoding and decoding URI objects.

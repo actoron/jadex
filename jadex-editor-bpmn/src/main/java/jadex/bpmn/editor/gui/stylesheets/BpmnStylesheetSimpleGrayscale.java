@@ -1,5 +1,7 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
+import com.mxgraph.util.mxConstants;
+
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
@@ -8,8 +10,6 @@ import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MTask;
-
-import com.mxgraph.util.mxConstants;
 
 /**
  *  Simple grayscale style.

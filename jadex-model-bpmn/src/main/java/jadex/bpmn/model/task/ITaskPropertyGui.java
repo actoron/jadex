@@ -1,9 +1,9 @@
 package jadex.bpmn.model.task;
 
+import javax.swing.JComponent;
+
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
-
-import javax.swing.JComponent;
 
 /**
  * 

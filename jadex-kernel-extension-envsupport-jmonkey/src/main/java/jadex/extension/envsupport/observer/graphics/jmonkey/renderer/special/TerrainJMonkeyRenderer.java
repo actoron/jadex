@@ -1,16 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-
-import jadex.extension.envsupport.environment.SpaceObject;
-import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Terrain3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.TerrainTexture;
-import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
 
 import com.jme3.material.Material;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
@@ -21,7 +11,14 @@ import com.jme3.terrain.heightmap.HillHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
-import com.jme3.util.SkyFactory;
+
+import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Terrain3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.TerrainTexture;
+import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
 
 
 public class TerrainJMonkeyRenderer extends AbstractJMonkeyRenderer

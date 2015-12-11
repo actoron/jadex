@@ -1,15 +1,15 @@
 package jadex.base.gui.componenttree;
 
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
-
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *  Panel for showing component properties.

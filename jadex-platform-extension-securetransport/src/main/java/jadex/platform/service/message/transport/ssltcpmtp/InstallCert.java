@@ -1,5 +1,18 @@
 package jadex.platform.service.message.transport.ssltcpmtp;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
 // package com.aw.ad.util;
 /*
  * Copyright 2006 Sun Microsystems, Inc. All Rights Reserved. Redistribution and
@@ -27,14 +40,13 @@ package jadex.platform.service.message.transport.ssltcpmtp;
  * http://blogs.sun.com/andreas/resource/InstallCert.java Use: java InstallCert
  * hostname Example: % java InstallCert ecc.fedora.redhat.com
  */
-
-import javax.net.ssl.*;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.security.KeyStore;
-import java.security.MessageDigest;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 
 /**

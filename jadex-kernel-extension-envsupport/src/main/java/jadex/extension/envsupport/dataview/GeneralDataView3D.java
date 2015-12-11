@@ -1,9 +1,9 @@
 package jadex.extension.envsupport.dataview;
 
+import java.util.Map;
+
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.space3d.Space3D;
-
-import java.util.Map;
 
 /**
  * A general 2D view that presents all Objects in a Space2D to the observer.

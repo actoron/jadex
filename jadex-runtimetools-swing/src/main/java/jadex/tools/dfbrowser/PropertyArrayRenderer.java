@@ -1,11 +1,11 @@
 package jadex.tools.dfbrowser;
 
-import jadex.bridge.service.types.df.IProperty;
-
 import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import jadex.bridge.service.types.df.IProperty;
 
 class PropertyArrayRenderer extends DefaultTableCellRenderer
 {

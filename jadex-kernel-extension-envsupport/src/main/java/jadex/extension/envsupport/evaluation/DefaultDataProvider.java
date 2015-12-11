@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.commons.SUtil;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 

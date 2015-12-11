@@ -1,7 +1,5 @@
 package jadex.gpmn.editor.gui;
 
-import jadex.gpmn.editor.GpmnEditor;
-
 import java.awt.Color;
 import java.awt.Shape;
 import java.util.ArrayList;
@@ -13,6 +11,8 @@ import java.util.logging.Logger;
 import javax.swing.Icon;
 
 import com.mxgraph.util.mxUtils;
+
+import jadex.gpmn.editor.GpmnEditor;
 
 /**
  *  Toolbar implementing BPMN editing tools.

@@ -1,5 +1,8 @@
 package jadex.micro.benchmarks;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -33,9 +36,6 @@ import jadex.micro.features.IMicroInjectionFeature;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroPojoComponentFeature;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Agent creation benchmark. 

@@ -1,17 +1,15 @@
 package jadex.bridge.service.types.message;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
 
 /**
  *  The interface for the message service. It is responsible for

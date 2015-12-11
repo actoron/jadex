@@ -1,13 +1,13 @@
 package jadex.bdi.testcases.semiautomatic;
 
+import java.net.URL;
+
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
-
-import java.net.URL;
 
 /**
  *  Plan that creates and searches services. 

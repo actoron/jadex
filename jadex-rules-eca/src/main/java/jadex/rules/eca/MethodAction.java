@@ -1,9 +1,9 @@
 package jadex.rules.eca;
 
+import java.lang.reflect.Method;
+
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.lang.reflect.Method;
 
 /**
  * 

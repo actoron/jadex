@@ -1,8 +1,5 @@
 package jadex.gpmn.editor.gui;
 
-import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
@@ -35,6 +32,9 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 
 /**
  *  Class for providing images, either stored or generated, with a cache.

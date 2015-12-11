@@ -1,5 +1,9 @@
 package jadex.platform.service.cli.commands;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -13,10 +17,6 @@ import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  *  Execute a file.

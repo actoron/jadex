@@ -1,13 +1,13 @@
 package jadex.xml.writer;
 
-import jadex.commons.collection.MultiCollection;
-
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.xmlpull.v1.XmlSerializer;
+
+import jadex.commons.collection.MultiCollection;
 
 /**
  * Android Implementation of {@link AWriteContext}.

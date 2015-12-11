@@ -1,5 +1,8 @@
 package jadex.micro.testcases.nfproperties;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -22,9 +25,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 @Agent
 

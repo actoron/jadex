@@ -35,7 +35,7 @@ This section illustrates several example applications that are part of the Jadex
 
 ### <span>Chat</span> 
 
-The chat is a peer-to-peer application that allows users exchanging simple text messages. In the distributed scenario, each user will host a Jadex platform and start a chat component on her local computer. The Jadex platforms will discover each other automatically without configuration efforts using the built-in awareness mechanisms (<span class="wikiexternallink">[Platform Awareness](AC%20User%20Guide/07%20Platform%20Awareness)</span>) therefore allowing the chat components to interact with each others services. In the peer-to-peer design, each component acts as a service provider (for receiving chat messages for its user) and a service consumer (for sending chat messages to other users). The application desgin is shown in the following figure.
+The chat is a peer-to-peer application that allows users exchanging simple text messages. In the distributed scenario, each user will host a Jadex platform and start a chat component on her local computer. The Jadex platforms will discover each other automatically without configuration efforts using the built-in awareness mechanisms (<span class="wikiexternallink">[Platform Awareness](../AC%20User%20Guide/07%20Platform%20Awareness)</span>) therefore allowing the chat components to interact with each others services. In the peer-to-peer design, each component acts as a service provider (for receiving chat messages for its user) and a service consumer (for sending chat messages to other users). The application desgin is shown in the following figure.
 
 ![02 Active Components@chatdesign.png](chatdesign.png)
 
@@ -49,7 +49,7 @@ The chat is a peer-to-peer application that allows users exchanging simple text 
 
 </div>
 
-The figure shows the interaction between three chat components. The interaction is specified by the Java service interface *IChatService*, which declares the *message(sender, text)* method. For sending a chat message Chat1 acts as a service consumer, i.e. it searches for chat services that are provided by the other chat components (Chat2, Chat3) and invokes their *message()* methods.  The implementation of the chat components is described in depth as a running example in the <span class="wikiexternallink">[Jadex Active Components Tutorial](AC%20Tutorial/01%20Introduction)</span>.
+The figure shows the interaction between three chat components. The interaction is specified by the Java service interface *IChatService*, which declares the *message(sender, text)* method. For sending a chat message Chat1 acts as a service consumer, i.e. it searches for chat services that are provided by the other chat components (Chat2, Chat3) and invokes their *message()* methods.  The implementation of the chat components is described in depth as a running example in the <span class="wikiexternallink">[Jadex Active Components Tutorial](../AC%20Tutorial/01%20Introduction)</span>.
 
 <div class="wikimodel-emptyline">
 

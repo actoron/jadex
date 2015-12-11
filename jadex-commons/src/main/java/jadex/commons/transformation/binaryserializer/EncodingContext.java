@@ -1,14 +1,14 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.transformation.STransformation;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import jadex.commons.transformation.STransformation;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
  *  Context for encoding (serializing) an object in a binary format.

@@ -1,16 +1,15 @@
 package jadex.bridge.service.types.factory;
 
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
-
-import java.util.Collection;
-import java.util.Map;
 
 
 /**

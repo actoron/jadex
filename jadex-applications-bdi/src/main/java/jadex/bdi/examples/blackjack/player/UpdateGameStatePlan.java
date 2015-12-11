@@ -1,11 +1,11 @@
 package jadex.bdi.examples.blackjack.player;
 
+import java.util.List;
+
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
-
-import java.util.List;
 
 /**
  *  Update the game state.

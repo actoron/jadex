@@ -1,5 +1,17 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.swing.JComponent;
+
+import com.mxgraph.model.mxICell;
+
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
@@ -17,18 +29,6 @@ import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.MTask;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import javax.swing.JComponent;
-
-import com.mxgraph.model.mxICell;
 
 /**
  *  Factory for generating appropriate property panels.

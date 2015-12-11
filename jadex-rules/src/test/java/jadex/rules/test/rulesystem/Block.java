@@ -1,9 +1,9 @@
 package jadex.rules.test.rulesystem;
 
+import java.awt.Color;
+
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.beans.PropertyChangeListener;
-
-import java.awt.Color;
 
 /**
  *  A block in the blocks-world.

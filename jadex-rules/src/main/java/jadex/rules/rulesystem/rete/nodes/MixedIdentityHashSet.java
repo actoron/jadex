@@ -1,17 +1,17 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jadex.commons.SUtil;
 import jadex.commons.collection.IdentityHashSet;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
-
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  *  A mixed identity hash set allows to store java objects

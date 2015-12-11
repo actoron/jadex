@@ -1,5 +1,9 @@
 package jadex.bdiv3.testcases.beliefs;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.base.test.TestReport;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
@@ -12,11 +16,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @Capability
 public class AbstractBeliefsCapability

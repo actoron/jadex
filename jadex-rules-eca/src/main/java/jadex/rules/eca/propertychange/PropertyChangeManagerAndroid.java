@@ -1,14 +1,14 @@
 package jadex.rules.eca.propertychange;
 
-import jadex.commons.IResultCommand;
-import jadex.commons.SReflect;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.IFuture;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
+import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.future.IFuture;
 
 
 /**

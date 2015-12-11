@@ -1,6 +1,11 @@
 package jadex.platform.service.message.transport.ssltcpmtp;
 
-import jadex.base.PlatformConfiguration;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -36,12 +41,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
 
 @Agent
 @RequiredServices(

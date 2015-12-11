@@ -1,5 +1,10 @@
 package jadex.platform.service.message.contentcodecs;
 
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+import java.util.Properties;
+
 import jadex.bridge.service.types.message.IContentCodec;
 import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.Tuple2;
@@ -9,12 +14,6 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.writer.IObjectWriterHandler;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  *  Content condec using the Jadex-XML framework.

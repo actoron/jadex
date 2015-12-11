@@ -1,19 +1,5 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.SHelper;
-import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MDataEdge;
-import jadex.bpmn.model.MIdElement;
-import jadex.bpmn.model.MLane;
-import jadex.bpmn.model.MMessagingEdge;
-import jadex.bpmn.model.MPool;
-import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.model.io.IPostProcessingVisualModelReader;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -29,6 +15,20 @@ import javax.xml.namespace.QName;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.editor.gui.SHelper;
+import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MDataEdge;
+import jadex.bpmn.model.MIdElement;
+import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MMessagingEdge;
+import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.io.IPostProcessingVisualModelReader;
 
 /**
  *  Reader for the visual BPMN model.

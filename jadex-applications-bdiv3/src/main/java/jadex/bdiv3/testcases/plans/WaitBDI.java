@@ -1,5 +1,8 @@
 package jadex.bdiv3.testcases.plans;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.annotation.BDIConfiguration;
@@ -23,9 +26,6 @@ import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.rules.eca.ChangeInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Agent that tests plan waiting for fact added and removed.

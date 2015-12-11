@@ -1,12 +1,12 @@
 package jadex.base.test.gzip;
 
-import jadex.bridge.service.types.message.ICodec;
-import jadex.platform.service.message.transport.codecs.GZIPCodec;
-
 import java.nio.charset.Charset;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import jadex.bridge.service.types.message.ICodec;
+import jadex.platform.service.message.transport.codecs.GZIPCodec;
 
 /**
  *  Test gzip.

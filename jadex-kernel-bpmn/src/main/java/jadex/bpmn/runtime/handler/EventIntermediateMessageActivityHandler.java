@@ -1,29 +1,26 @@
 package jadex.bpmn.runtime.handler;
 
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IResultListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.IMessageAdapter;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Handler for message events.

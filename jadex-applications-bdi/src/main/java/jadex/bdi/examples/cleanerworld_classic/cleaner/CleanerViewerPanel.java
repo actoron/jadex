@@ -1,17 +1,17 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
-import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+
+import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  The cleaner panel allows including the cleaner GUI in the JCC.

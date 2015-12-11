@@ -1,9 +1,5 @@
 package jadex.extension.envsupport.environment;
 
-import jadex.commons.ICommand;
-import jadex.commons.IFilter;
-import jadex.commons.future.IResultListener;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -12,6 +8,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import jadex.commons.ICommand;
+import jadex.commons.IFilter;
+import jadex.commons.future.IResultListener;
 
 /**
  *  The list of scheduled component actions and convenience methods for

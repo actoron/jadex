@@ -1,11 +1,5 @@
 package jadex.tools.simcenter;
 
-import jadex.base.SRemoteClock;
-import jadex.base.SRemoteClock.ClockState;
-import jadex.bridge.service.types.clock.IClock;
-import jadex.bridge.service.types.simulation.ISimulationService;
-import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -29,6 +23,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
+
+import jadex.base.SRemoteClock;
+import jadex.base.SRemoteClock.ClockState;
+import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 
 /**
  *	The clock panel shows the settings for a clock object.

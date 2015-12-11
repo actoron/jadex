@@ -1,6 +1,5 @@
 package jadex.extension.envsupport.environment;
 
-import jadex.extension.envsupport.math.IVector1;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.IBooleanCondition;
 import jadex.commons.SimplePropertyObject;

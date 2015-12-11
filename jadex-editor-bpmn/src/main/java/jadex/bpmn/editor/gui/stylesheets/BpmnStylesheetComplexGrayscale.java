@@ -1,5 +1,9 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
+import java.awt.Color;
+
+import com.mxgraph.util.mxConstants;
+
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
@@ -9,11 +13,6 @@ import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MTask;
 import jadex.commons.gui.SGUI;
-
-import java.awt.Color;
-import java.util.HashMap;
-
-import com.mxgraph.util.mxConstants;
 
 /**
  *  Complex grayscale style.

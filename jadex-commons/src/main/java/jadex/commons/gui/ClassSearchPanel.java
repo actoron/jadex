@@ -1,16 +1,5 @@
 package jadex.commons.gui;
 
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.ThreadPool;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminationCommand;
-import jadex.commons.future.TerminableFuture;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -48,6 +37,17 @@ import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.concurrent.ThreadPool;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.TerminableFuture;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 /**
  *  Panel that allows for searching artifacts from maven repositories.

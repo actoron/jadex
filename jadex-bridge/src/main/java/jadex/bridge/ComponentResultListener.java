@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.logging.Logger;
+
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFunctionalExceptionListener;
@@ -9,8 +11,6 @@ import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
 import jadex.commons.future.SResultListener;
-
-import java.util.logging.Logger;
 
 /**
  *  The result listener for executing listener invocations as a component step.

@@ -1,12 +1,12 @@
 package jadex.rules.rulesystem.rete.constraints;
 
+import java.util.Arrays;
+
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.Arrays;
 
 /**
  *  A constraint evaluator for or-connected constraints.

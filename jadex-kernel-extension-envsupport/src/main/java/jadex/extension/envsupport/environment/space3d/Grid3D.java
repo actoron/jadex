@@ -1,18 +1,20 @@
 package jadex.extension.envsupport.environment.space3d;
 
-import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.math.IVector1;
-import jadex.extension.envsupport.math.IVector3;
-import jadex.extension.envsupport.math.Vector1Double;
-import jadex.extension.envsupport.math.Vector1Int;
-import jadex.extension.envsupport.math.Vector3Int;
-import jadex.commons.collection.MultiCollection;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import jadex.commons.collection.MultiCollection;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
+import jadex.extension.envsupport.math.IVector1;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.math.Vector1Double;
+import jadex.extension.envsupport.math.Vector1Int;
+import jadex.extension.envsupport.math.Vector3Int;
 
 /**
  *  2D grid environment.

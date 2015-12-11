@@ -1,10 +1,10 @@
 package jadex.bridge.service;
 
+import java.util.Collection;
+
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
-
-import java.util.Collection;
 
 /**
  *  Interface for fetching required services.

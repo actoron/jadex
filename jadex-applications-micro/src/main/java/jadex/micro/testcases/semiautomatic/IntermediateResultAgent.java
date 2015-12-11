@@ -1,12 +1,12 @@
 package jadex.micro.testcases.semiautomatic;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.micro.annotation.Agent;
-
-import java.util.Collection;
 
 /**
  *  This agent provides a choosable number of intermediate results.

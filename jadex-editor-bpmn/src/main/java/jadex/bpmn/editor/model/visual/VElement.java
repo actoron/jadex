@@ -1,11 +1,11 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.model.MIdElement;
-
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.model.MIdElement;
 
 /**
  *  Generic Visual BPMN Element.

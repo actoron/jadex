@@ -1,9 +1,9 @@
 package jadex.bridge.service.search;
 
+import java.lang.reflect.Proxy;
+
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
-
-import java.lang.reflect.Proxy;
 
 /**
  *  Test if a class is a proxy.

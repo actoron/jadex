@@ -1,10 +1,10 @@
 package jadex.commons;
 
-import jadex.commons.collection.LRU;
-
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import jadex.commons.collection.LRU;
 
 /**
  *  Loader for managing models, loaded from disc and kept in cache.

@@ -3,17 +3,6 @@ package jadex.platform;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
-import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.commons.SReflect;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SJavaParser;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +14,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
+import jadex.base.Starter;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.commons.SReflect;
 
 public class PlatformConfigurationTest
 {

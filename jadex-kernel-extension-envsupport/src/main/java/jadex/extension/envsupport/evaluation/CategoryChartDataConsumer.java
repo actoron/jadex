@@ -1,7 +1,5 @@
 package jadex.extension.envsupport.evaluation;
 
-import jadex.commons.ResourceInfo;
-
 import java.awt.Image;
 
 import javax.imageio.ImageIO;
@@ -11,6 +9,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
+
+import jadex.commons.ResourceInfo;
 
 /**
  *  Create a category chart consumer, x must be a comparable and y must be double value.

@@ -1,7 +1,5 @@
 package jadex.bridge.service.annotation;
 
-import jadex.bridge.service.annotation.PreCondition.Type;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

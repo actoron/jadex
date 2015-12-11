@@ -1,5 +1,8 @@
 package jadex.bdi.examples.spaceworld3d.producer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bdiv3x.runtime.Plan;
@@ -9,9 +12,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space3d.Space3D;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

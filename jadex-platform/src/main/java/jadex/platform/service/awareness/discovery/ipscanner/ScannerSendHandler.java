@@ -1,15 +1,15 @@
 package jadex.platform.service.awareness.discovery.ipscanner;
 
-import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.commons.SUtil;
-import jadex.platform.service.awareness.discovery.DiscoveryAgent;
-import jadex.platform.service.awareness.discovery.MasterSlaveSendHandler;
-
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.SUtil;
+import jadex.platform.service.awareness.discovery.DiscoveryAgent;
+import jadex.platform.service.awareness.discovery.MasterSlaveSendHandler;
 
 /**
  *  Handle sending.

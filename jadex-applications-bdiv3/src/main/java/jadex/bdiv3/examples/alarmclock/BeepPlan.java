@@ -1,5 +1,11 @@
 package jadex.bdiv3.examples.alarmclock;
 
+import java.awt.Component;
+import java.awt.Toolkit;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
@@ -8,12 +14,6 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.NotifyGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.SUtil;
-
-import java.awt.Component;
-import java.awt.Toolkit;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 /**
  *  Play a beep.

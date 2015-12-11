@@ -1,16 +1,15 @@
 package jadex.tools.awareness;
 
+import javax.swing.Icon;
+
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.tools.generic.AbstractServicePlugin;
-
-import javax.swing.Icon;
 
 /**
  *  The security service plugin is used to wrap the security panel as JCC plugin.

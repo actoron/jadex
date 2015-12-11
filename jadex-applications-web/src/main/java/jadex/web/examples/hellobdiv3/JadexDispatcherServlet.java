@@ -1,12 +1,5 @@
 package jadex.web.examples.hellobdiv3;
 
-import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.ThreadSuspendable;
-
 import java.awt.Toolkit;
 import java.io.IOException;
 
@@ -16,6 +9,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.ThreadSuspendable;
 
 /**
  *  Servlet implementation class JadexDispatcherServlet

@@ -1,9 +1,9 @@
 package jadex.platform.service.remote.replacements;
 
+import java.lang.reflect.Proxy;
+
 import jadex.commons.transformation.annotations.Alias;
 import jadex.platform.service.remote.IMethodReplacement;
-
-import java.lang.reflect.Proxy;
 
 /**
  *  Default replacement code for hashCode() method. 

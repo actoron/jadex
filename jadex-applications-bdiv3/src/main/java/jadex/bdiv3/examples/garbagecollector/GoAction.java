@@ -1,5 +1,7 @@
 package jadex.bdiv3.examples.garbagecollector;
 
+import java.util.Map;
+
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
@@ -7,8 +9,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Int;
-
-import java.util.Map;
 
 /**
  *  The go action for moving one field in one of four directions.

@@ -1,5 +1,9 @@
 package jadex.micro.testcases.stream;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Collection;
+
 import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
@@ -19,10 +23,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Collection;
 
 @Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"copy.copy\""))
 @Results(@Result(name="filesize", clazz=long.class))

@@ -1,12 +1,12 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import java.util.Iterator;
+
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
-
-import java.util.Iterator;
 
 /**
  *  Multiply two or more values.

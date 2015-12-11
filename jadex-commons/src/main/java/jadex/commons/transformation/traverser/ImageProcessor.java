@@ -1,12 +1,12 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Image;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.commons.gui.SGUI;
 
 /**
  * 

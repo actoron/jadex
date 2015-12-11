@@ -1,10 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.TreeExpansionHandler;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +8,11 @@ import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.TreeExpansionHandler;
 
 /**
  *  Handles all aspects (e.g. expansion, selection) of the tree

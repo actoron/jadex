@@ -1,7 +1,5 @@
 package jadex.bdiv3;
 
-import jadex.bdiv3.IBDIClassGenerator;
-
 public class MavenBDIModelLoader extends jadex.bdiv3.BDIModelLoader
 {
 	private MavenBDIClassReader mavenReader;

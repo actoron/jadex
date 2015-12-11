@@ -1,14 +1,14 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
-import jadex.gpmn.editor.model.gpmn.IGpmnModel;
-import jadex.gpmn.editor.model.gpmn.IModelCodec;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.view.mxGraph;
+
+import jadex.gpmn.editor.model.gpmn.IGpmnModel;
+import jadex.gpmn.editor.model.gpmn.IModelCodec;
 
 public abstract class AbstractModelCodec implements IModelCodec
 {

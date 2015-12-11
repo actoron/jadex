@@ -1,5 +1,12 @@
 package jadex.platform.service.ecarules;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
@@ -19,13 +26,6 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.IRulebase;
 import jadex.rules.eca.Rulebase;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  Agent that encapsulates a rulebase and allows for tracking

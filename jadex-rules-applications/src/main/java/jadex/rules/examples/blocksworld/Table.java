@@ -1,11 +1,11 @@
 package jadex.rules.examples.blocksworld;
 
-import jadex.commons.SUtil;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import jadex.commons.SUtil;
 
 /**
  *  A table in the blocks-world.

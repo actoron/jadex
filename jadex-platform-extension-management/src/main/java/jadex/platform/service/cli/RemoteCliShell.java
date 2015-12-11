@@ -6,8 +6,6 @@ package jadex.platform.service.cli;
 import java.util.Map;
 
 import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**

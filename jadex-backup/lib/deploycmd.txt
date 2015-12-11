@@ -1,9 +1,0 @@
-mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadex/jadex-backup/lib -DrepositoryId=project -Dfile=dropbox-java-sdk-1.5.1.jar -Dversion=1.5.1 -DgroupId=com.dropbox.client2 -DartifactId=dropbox-client -Dpackaging=jar -DpomFile=dropbox.pom.xml
-
-	<repositories>
-		<repository>
-			<id>project</id>
-			<name>Maven Project Repository</name>
-			<url>file:///${basedir}/lib</url>
-		</repository>
-	</repositories>

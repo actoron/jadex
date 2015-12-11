@@ -1,10 +1,5 @@
 package jadex.rules.rulesystem.rete.nodes;
 
-import jadex.rules.rulesystem.rete.Tuple;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.OAVObjectType;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,6 +9,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.rules.rulesystem.rete.Tuple;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
 
 /**
  *  A mixed identity hash map allows to store java objects

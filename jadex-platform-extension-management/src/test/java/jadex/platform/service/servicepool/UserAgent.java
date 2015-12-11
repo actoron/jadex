@@ -1,5 +1,7 @@
 package jadex.platform.service.servicepool;
 
+import java.util.Collection;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
@@ -28,8 +30,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Collection;
 
 /**
  *  User agent that first registers services A, B at the service pool (which is created if not present).

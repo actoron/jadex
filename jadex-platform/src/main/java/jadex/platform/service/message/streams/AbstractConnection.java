@@ -1,10 +1,10 @@
 package jadex.platform.service.message.streams;
 
+import java.util.Map;
+
 import jadex.bridge.IConnection;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.future.IResultListener;
-
-import java.util.Map;
 
 /**
  *  Abstract base class for connections.

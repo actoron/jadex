@@ -1,8 +1,8 @@
 package jadex.platform.service.awareness.discovery.registry;
 
-import jadex.platform.service.awareness.discovery.MasterSlaveReceiveHandler;
-
 import java.net.DatagramPacket;
+
+import jadex.platform.service.awareness.discovery.MasterSlaveReceiveHandler;
 
 /**
  * 

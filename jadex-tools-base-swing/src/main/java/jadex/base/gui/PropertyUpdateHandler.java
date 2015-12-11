@@ -1,5 +1,11 @@
 package jadex.base.gui;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.swing.SwingUtilities;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -10,12 +16,6 @@ import jadex.commons.IFilter;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.swing.SwingUtilities;
 
 /**
  * 

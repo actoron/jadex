@@ -1,5 +1,12 @@
 package jadex.micro;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -10,13 +17,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.kernelbase.CacheableKernelModel;
-
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  The micro agent model. 

@@ -1,13 +1,11 @@
 package jadex.bpmn.runtime.task;
 
+import java.util.logging.Level;
+
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bpmn.task.info.ParameterMetaInfo;
-import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IInternalAccess;
-
-import java.util.logging.Level;
 
 /**
  *  Log some text stored in variable text.

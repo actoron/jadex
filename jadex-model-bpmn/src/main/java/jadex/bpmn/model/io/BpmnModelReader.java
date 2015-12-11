@@ -1,5 +1,15 @@
 package jadex.bpmn.model.io;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MIdElement;
@@ -25,16 +35,6 @@ import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.AReader;
 import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.stax.QName;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class BpmnModelReader
 {

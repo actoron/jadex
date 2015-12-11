@@ -1,7 +1,5 @@
 package jadex.base.relay;
 
-import jadex.bridge.BasicComponentIdentifier;
-
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -21,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import jadex.bridge.BasicComponentIdentifier;
 
 /**
  *  Database connector for reading and writing statistics via JavaDB.

@@ -1,24 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.gui.propertypanels.ActivityParameterTable.ParameterTableModel;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VInParameter;
-import jadex.bpmn.editor.model.visual.VOutParameter;
-import jadex.bpmn.model.IModelContainer;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MParameter;
-import jadex.bpmn.model.MProperty;
-import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.task.info.ParameterMetaInfo;
-import jadex.bpmn.task.info.STaskMetaInfoExtractor;
-import jadex.bpmn.task.info.TaskMetaInfo;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.SReflect;
-import jadex.commons.gui.PropertiesPanel;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,6 +29,25 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import com.mxgraph.model.mxICell;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.propertypanels.ActivityParameterTable.ParameterTableModel;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VOutParameter;
+import jadex.bpmn.model.IModelContainer;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MProperty;
+import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.STaskMetaInfoExtractor;
+import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SReflect;
+import jadex.commons.gui.PropertiesPanel;
 
 /**
  *  Property panel for task activities.

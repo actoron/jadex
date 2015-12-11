@@ -1,17 +1,5 @@
 package jadex.bpmn.editor.gui.controllers;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.gui.contextmenus.EdgeDragContextMenu;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VDataEdge;
-import jadex.bpmn.editor.model.visual.VEdge;
-import jadex.bpmn.editor.model.visual.VInParameter;
-import jadex.bpmn.editor.model.visual.VMessagingEdge;
-import jadex.bpmn.editor.model.visual.VOutParameter;
-import jadex.bpmn.model.MActivity;
-
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +18,18 @@ import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.contextmenus.EdgeDragContextMenu;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VDataEdge;
+import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
+import jadex.bpmn.editor.model.visual.VOutParameter;
+import jadex.bpmn.model.MActivity;
 
 /**
  *  Edge controller for creating and managing edges.

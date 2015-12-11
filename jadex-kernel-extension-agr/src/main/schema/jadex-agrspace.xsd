@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-agrspace" xmlns="http://jadex.sourceforge.net/jadex-agrspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema targetNamespace="http://www.activecomponents.org/jadex-agrspace" xmlns="http://www.activecomponents.org/jadex-agrspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- 	
-	<xs:import namespace="http://jadex.sourceforge.net/jadex" schemaLocation="http://jadex.sourceforge.net/jadex-application-${jadex_build_version}.xsd"/>
+	<xs:import namespace="http://www.activecomponents.org/jadex" schemaLocation="http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"/>
 	
 	<xs:complexType name="spacetype">
 		<xs:complexContent>

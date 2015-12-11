@@ -1,12 +1,11 @@
 package jadex.platform;
 
-import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.future.ThreadSuspendable;
-
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
+
+import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
 
 
 /**

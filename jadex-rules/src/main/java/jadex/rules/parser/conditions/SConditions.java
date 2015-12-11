@@ -1,5 +1,12 @@
 package jadex.rules.parser.conditions;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import org.antlr.runtime.TokenStream;
+
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.MethodCall;
@@ -8,13 +15,6 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import org.antlr.runtime.TokenStream;
 
 /**
  *  Static helper methods for conditions parser.

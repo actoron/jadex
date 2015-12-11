@@ -1,7 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.gui.controllers.MouseController;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -14,6 +12,8 @@ import javax.swing.event.ChangeListener;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
+
+import jadex.bpmn.editor.gui.controllers.MouseController;
 
 /**
  *  Box for zoom setting.

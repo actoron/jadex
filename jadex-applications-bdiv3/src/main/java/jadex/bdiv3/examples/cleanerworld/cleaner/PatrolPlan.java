@@ -1,5 +1,8 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import java.util.Iterator;
+import java.util.List;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
@@ -11,9 +14,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Iterator;
-import java.util.List;
 
 
 

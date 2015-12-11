@@ -1,16 +1,16 @@
 package jadex.bdi.examples.cleanerworld;
 
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
-import jadex.extension.envsupport.observer.gui.plugin.AbstractInteractionPlugin;
-
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
+
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.observer.gui.ObserverCenter;
+import jadex.extension.envsupport.observer.gui.plugin.AbstractInteractionPlugin;
 
 /**
  *  Plugin that allows for adding waste via mouse clicks.

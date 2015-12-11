@@ -1,13 +1,13 @@
 package jadex.rules.rulesystem.rete.nodes;
 
-import jadex.commons.SReflect;
-import jadex.rules.rulesystem.rete.Tuple;
-
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.rules.rulesystem.rete.Tuple;
 
 /**
  *  Memory for the collect node.

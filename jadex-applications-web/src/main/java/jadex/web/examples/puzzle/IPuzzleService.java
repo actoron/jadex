@@ -1,8 +1,8 @@
 package jadex.web.examples.puzzle;
 
-import jadex.commons.future.IFuture;
-
 import java.util.SortedSet;
+
+import jadex.commons.future.IFuture;
 
 /**
  *  Operations provided by the puzzle agent.

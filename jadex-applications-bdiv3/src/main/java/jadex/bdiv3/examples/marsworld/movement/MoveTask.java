@@ -1,5 +1,8 @@
 package jadex.bdiv3.examples.marsworld.movement;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import jadex.bdiv3.examples.marsworld.BaseBDI;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -14,9 +17,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
-
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  *  Move an object towards a destination.

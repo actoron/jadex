@@ -1,12 +1,11 @@
 package jadex.rules.test.state;
 
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.javaimpl.OAVStateFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 import junit.framework.TestCase;
 
 /**

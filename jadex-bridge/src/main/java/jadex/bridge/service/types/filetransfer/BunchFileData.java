@@ -1,10 +1,10 @@
 package jadex.bridge.service.types.filetransfer;
 
-import jadex.base.RemoteJarFile;
-import jadex.commons.Tuple2;
-
 import java.util.ArrayList;
 import java.util.Collection;
+
+import jadex.base.RemoteJarFile;
+import jadex.commons.Tuple2;
 
 /**
  *  Collection of filedata for bulk transfer.

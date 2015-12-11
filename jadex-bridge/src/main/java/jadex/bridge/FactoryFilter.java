@@ -1,13 +1,13 @@
 package jadex.bridge;
 
+import java.util.Arrays;
+
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Arrays;
 
 /**
  *  Filtering specific component factories.

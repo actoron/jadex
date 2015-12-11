@@ -1,9 +1,9 @@
 package jadex.rules.rulesystem.rules;
 
-import jadex.rules.rulesystem.rules.functions.IFunction;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.rules.rulesystem.rules.functions.IFunction;
 
 /**
  *  Represents a function call.

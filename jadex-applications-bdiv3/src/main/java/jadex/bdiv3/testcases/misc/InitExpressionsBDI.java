@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.misc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
@@ -9,7 +10,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  *  Test using injected values in init expressions or constructors.

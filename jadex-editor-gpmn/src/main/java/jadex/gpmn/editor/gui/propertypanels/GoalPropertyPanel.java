@@ -1,15 +1,5 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
-import jadex.gpmn.editor.gui.DocumentAdapter;
-import jadex.gpmn.editor.gui.ModelContainer;
-import jadex.gpmn.editor.gui.SGuiHelper;
-import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IPlanEdge;
-import jadex.gpmn.editor.model.gpmn.ModelConstants;
-import jadex.gpmn.editor.model.visual.VEdge;
-import jadex.gpmn.editor.model.visual.VGoal;
-import jadex.gpmn.editor.model.visual.VPlan;
-
 import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -29,6 +19,16 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 
 import com.mxgraph.model.mxCell;
+
+import jadex.gpmn.editor.gui.DocumentAdapter;
+import jadex.gpmn.editor.gui.ModelContainer;
+import jadex.gpmn.editor.gui.SGuiHelper;
+import jadex.gpmn.editor.model.gpmn.IActivationPlan;
+import jadex.gpmn.editor.model.gpmn.IPlanEdge;
+import jadex.gpmn.editor.model.gpmn.ModelConstants;
+import jadex.gpmn.editor.model.visual.VEdge;
+import jadex.gpmn.editor.model.visual.VGoal;
+import jadex.gpmn.editor.model.visual.VPlan;
 
 /**
  *  Panel displaying goal properties.

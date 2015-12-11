@@ -1,9 +1,14 @@
 package jadex.platform.service.awareness.discovery.relay;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.TimeoutResultListener;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
@@ -28,11 +33,6 @@ import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
 import jadex.platform.service.awareness.discovery.SendHandler;
 import jadex.platform.service.message.transport.httprelaymtp.SRelay;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**

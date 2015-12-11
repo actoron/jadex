@@ -1,11 +1,11 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.refresh;
 
-import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.scene.Node;
+
+import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 
 public class UpdateSpaceObjectsState extends AbstractAppState
 {

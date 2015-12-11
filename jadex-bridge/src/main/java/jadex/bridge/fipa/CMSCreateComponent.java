@@ -2,7 +2,6 @@ package jadex.bridge.fipa;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
-import jadex.commons.future.IRemoteResultListener;
 
 
 /**

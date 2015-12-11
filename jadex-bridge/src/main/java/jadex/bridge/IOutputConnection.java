@@ -1,9 +1,9 @@
 package jadex.bridge;
 
+import java.io.InputStream;
+
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.io.InputStream;
 
 /**
  *  Interface for output connection.

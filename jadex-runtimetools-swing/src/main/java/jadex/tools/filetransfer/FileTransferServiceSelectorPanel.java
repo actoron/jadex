@@ -1,5 +1,8 @@
 package jadex.tools.filetransfer;
 
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+
 import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
@@ -15,9 +18,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.tools.generic.AbstractServiceSelectorPanel;
-
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
 
 /**
  *  Panel for deployment service selection.

@@ -1,13 +1,13 @@
 package jadex.bdi.planlib.protocols.contractnet;
 
+import java.util.List;
+
 import jadex.bdi.planlib.protocols.AbstractReceiverPlan;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.collection.SCollection;
-
-import java.util.List;
 
 /**
  *  Receive a contract net protocol (cnp) and answer it.

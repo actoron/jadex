@@ -1,5 +1,9 @@
 package jadex.xml.tutorial.jibx.example18;
 
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
@@ -12,10 +16,6 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 import jadex.xml.stax.QName;
-
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**

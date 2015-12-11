@@ -1,5 +1,9 @@
 package jadex.rules.eca;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.commons.IMethodParameterGuesser;
 import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.SimpleParameterGuesser;
@@ -7,10 +11,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Condition implementation that invokes a predefined method.

@@ -1,8 +1,5 @@
 package jadex.bdiv3.examples.puzzle;
 
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -21,6 +18,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIDefaults;
+
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.gui.SGUI;
 
 /**
  *  Display the board.

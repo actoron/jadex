@@ -1,11 +1,11 @@
 package jadex.bridge.service.types.publish;
 
+import java.net.URI;
+
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
-
-import java.net.URI;
 
 /**
  * 

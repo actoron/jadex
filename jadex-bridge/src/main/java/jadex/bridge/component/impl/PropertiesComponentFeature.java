@@ -1,5 +1,8 @@
 package jadex.bridge.component.impl;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -8,9 +11,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  *  This feature provides arguments.

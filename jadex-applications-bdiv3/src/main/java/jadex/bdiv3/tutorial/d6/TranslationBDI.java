@@ -1,5 +1,8 @@
 package jadex.bdiv3.tutorial.d6;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
@@ -14,9 +17,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The translation agent E3. 

@@ -1,10 +1,10 @@
 package jadex.bridge.service.types.marshal;
 
+import java.util.List;
+
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
-
-import java.util.List;
 
 /**
  *  Interface for marshalling functionalities.

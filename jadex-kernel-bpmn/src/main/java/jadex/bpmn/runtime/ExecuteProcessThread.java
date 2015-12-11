@@ -1,19 +1,15 @@
 package jadex.bpmn.runtime;
 
+import java.util.List;
+
 import jadex.bpmn.features.IBpmnComponentFeature;
 import jadex.bpmn.features.impl.BpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
-
-import java.util.List;
 
 /**
  *  Execute the next step of a process thread.

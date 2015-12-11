@@ -1,9 +1,9 @@
 package jadex.extension.rs.invoke;
 
+import java.lang.reflect.InvocationHandler;
+
 import jadex.bridge.IInternalAccess;
 import jadex.extension.rs.RSFactory;
-
-import java.lang.reflect.InvocationHandler;
 
 /**
  * Factory for instantiating the Java SE RestServiceWrapperInvocationHandler.

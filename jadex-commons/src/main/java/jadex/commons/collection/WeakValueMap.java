@@ -1,8 +1,5 @@
 package jadex.commons.collection;
 
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
 import java.lang.ref.ReferenceQueue;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
@@ -12,6 +9,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 /**
  *  A map with weak values.

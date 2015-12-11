@@ -1,10 +1,10 @@
 package jadex.kernelbase;
 
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-
-import java.util.Map;
 
 /**
  *  Interpreter state information used to persist components.

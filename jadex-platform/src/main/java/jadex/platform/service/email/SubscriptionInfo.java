@@ -1,10 +1,5 @@
 package jadex.platform.service.email;
 
-import jadex.bridge.service.types.email.Email;
-import jadex.bridge.service.types.email.EmailAccount;
-import jadex.commons.IFilter;
-import jadex.commons.SUtil;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +16,11 @@ import javax.mail.Store;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage.RecipientType;
 import javax.mail.search.FlagTerm;
+
+import jadex.bridge.service.types.email.Email;
+import jadex.bridge.service.types.email.EmailAccount;
+import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 
 /**
  *  Info struct for email subscriptions.  

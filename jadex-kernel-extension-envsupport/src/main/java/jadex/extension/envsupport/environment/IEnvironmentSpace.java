@@ -1,6 +1,9 @@
 
 package jadex.extension.envsupport.environment;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.application.IExtensionInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -9,9 +12,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.extension.envsupport.dataview.IDataView;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Main interface for an environment space.

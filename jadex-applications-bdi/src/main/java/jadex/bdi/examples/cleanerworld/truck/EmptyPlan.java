@@ -1,5 +1,8 @@
 package jadex.bdi.examples.cleanerworld.truck;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.future.DelegationResultListener;
@@ -10,9 +13,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

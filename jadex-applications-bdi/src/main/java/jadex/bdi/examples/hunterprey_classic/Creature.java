@@ -1,12 +1,12 @@
 package jadex.bdi.examples.hunterprey_classic;
 
-import jadex.bridge.IComponentIdentifier;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+
+import jadex.bridge.IComponentIdentifier;
 
 
 /**

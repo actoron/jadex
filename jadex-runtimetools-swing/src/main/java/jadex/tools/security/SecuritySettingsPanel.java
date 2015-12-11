@@ -1,35 +1,5 @@
 package jadex.tools.security;
 
-import jadex.base.gui.PlatformSelectorDialog;
-import jadex.base.gui.componenttree.ComponentIconCache;
-import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.base.gui.idtree.IdTableModel;
-import jadex.base.gui.jtable.ComponentIdentifierRenderer;
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.security.ISecurityService;
-import jadex.bridge.service.types.security.KeyStoreEntry;
-import jadex.bridge.service.types.security.MechanismInfo;
-import jadex.commons.ICommand;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.platform.service.security.SSecurity;
-import jadex.tools.jcc.JCCResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -75,6 +45,36 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+
+import jadex.base.gui.PlatformSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.base.gui.idtree.IdTableModel;
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.security.ISecurityService;
+import jadex.bridge.service.types.security.KeyStoreEntry;
+import jadex.bridge.service.types.security.MechanismInfo;
+import jadex.commons.ICommand;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+import jadex.platform.service.security.SSecurity;
+import jadex.tools.jcc.JCCResultListener;
 
 /**
  *  The security settings panel.

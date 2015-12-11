@@ -1,13 +1,12 @@
 package jadex.base.gui.asynctree;
 
-import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  * Basic node object.

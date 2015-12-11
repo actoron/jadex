@@ -1,5 +1,8 @@
 package jadex.bdiv3.tutorial.c1;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -8,9 +11,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.rules.eca.ChangeInfo;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The translation agent C1. (Belief that triggers plan)
@@ -62,9 +62,9 @@ public class TranslationBDI
 	 *  Add a new word pair to the dictionary.
 	 */
 	@Plan(trigger=@Trigger(factaddeds="wordtable"))
-	public void checkWordPairPlan(ChangeEvent event)
+	public void checkWordPairPlan(ChangeEvent<ChangeInfo<String>> event)
 	{
-		ChangeInfo<String>	change	= ((ChangeInfo<String>)event.getValue());
+		ChangeInfo<String>	change	= event.getValue();
 		
 		if(change.getInfo().equals("bugger"))
 			System.out.println("Warning, a colloquial word pair has been added: "+change.getInfo()+" "+change.getValue());

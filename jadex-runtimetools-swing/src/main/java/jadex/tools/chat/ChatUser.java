@@ -1,10 +1,6 @@
 package jadex.tools.chat;
 
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.gui.CombiIcon;
-import jadex.commons.gui.SGUI;
-
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,6 +11,10 @@ import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.UIDefaults;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.SGUI;
 
 /**
  *  Struct to hold the user state in the chat GUI.

@@ -1,12 +1,14 @@
 package jadex.platform.service.awareness.discovery.message;
 
-import jadex.bridge.BasicComponentIdentifier;
+import java.util.HashMap;
+import java.util.Map;
+
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
@@ -36,9 +38,6 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
 import jadex.platform.service.awareness.discovery.SendHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

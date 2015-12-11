@@ -1,20 +1,5 @@
 package jadex.base.gui.reposearch;
 
-import jadex.base.gui.idtree.IdTreeCellRenderer;
-import jadex.base.gui.idtree.IdTreeModel;
-import jadex.base.gui.idtree.IdTreeNode;
-import jadex.commons.SUtil;
-import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.ThreadPool;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -33,10 +18,8 @@ import java.util.Map;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -50,7 +33,6 @@ import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -82,6 +64,21 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
+
+import jadex.base.gui.idtree.IdTreeCellRenderer;
+import jadex.base.gui.idtree.IdTreeModel;
+import jadex.base.gui.idtree.IdTreeNode;
+import jadex.commons.SUtil;
+import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.concurrent.ThreadPool;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 /**
  *  Panel that allows for searching artifacts from maven repositories.

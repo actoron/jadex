@@ -1,15 +1,5 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
-import jadex.base.gui.StatusBar;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +12,16 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import jadex.base.gui.StatusBar;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
 
 /**
  *  The panel for controlling the generator.

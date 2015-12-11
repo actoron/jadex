@@ -1,5 +1,8 @@
 package jadex.micro.testcases.servicevalue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.micro.annotation.Agent;
@@ -12,9 +15,6 @@ import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 

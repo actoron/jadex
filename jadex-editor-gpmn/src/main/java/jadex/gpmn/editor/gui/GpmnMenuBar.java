@@ -1,10 +1,5 @@
 package jadex.gpmn.editor.gui;
 
-import jadex.gpmn.editor.GpmnEditor;
-import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetGrayscale;
-import jadex.gpmn.editor.model.gpmn.IGpmnModel;
-import jadex.gpmn.editor.model.gpmn.IModelCodec;
-
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,6 +28,11 @@ import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxStylesheet;
+
+import jadex.gpmn.editor.GpmnEditor;
+import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetGrayscale;
+import jadex.gpmn.editor.model.gpmn.IGpmnModel;
+import jadex.gpmn.editor.model.gpmn.IModelCodec;
 
 /**
  *  The menu bar of the editor.

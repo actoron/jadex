@@ -1,23 +1,10 @@
 package jadex.tools.debugger.micro;
 
-import jadex.bridge.BulkMonitoringEvent;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IBreakpointPanel;
-import jadex.commons.IFilter;
-import jadex.commons.future.FutureTerminatedException;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +23,18 @@ import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import jadex.bridge.BulkMonitoringEvent;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.IBreakpointPanel;
+import jadex.commons.IFilter;
+import jadex.commons.future.FutureTerminatedException;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 /**
  *  Panel for showing / manipulating the Rete agenda.

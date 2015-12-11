@@ -1,11 +1,11 @@
 package jadex.bridge.modelinfo;
 
-import jadex.commons.Tuple2;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import jadex.commons.Tuple2;
 
 /**
  *  Simple default implementation for an argument.

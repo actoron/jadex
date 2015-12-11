@@ -1,8 +1,5 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.tools.comanalyzer.Component;
-import jadex.tools.comanalyzer.graph.GraphCanvas.AgentGroup;
-
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Shape;
@@ -17,6 +14,8 @@ import org.apache.commons.collections15.Transformer;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.FourPassImageShaper;
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.graph.GraphCanvas.AgentGroup;
 
 /**
  * This is a collection of vertex transformer that transforms agent group

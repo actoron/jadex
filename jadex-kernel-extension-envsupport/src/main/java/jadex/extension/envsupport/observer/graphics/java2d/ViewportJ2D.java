@@ -1,13 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.java2d;
 
-import jadex.extension.envsupport.environment.ISpaceController;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.observer.graphics.AbstractViewport;
-import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
-import jadex.extension.envsupport.observer.graphics.layer.Layer;
-import jadex.extension.envsupport.observer.perspective.IPerspective;
-
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -25,6 +17,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.observer.graphics.AbstractViewport;
+import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
+import jadex.extension.envsupport.observer.graphics.layer.Layer;
+import jadex.extension.envsupport.observer.perspective.IPerspective;
 
 
 /**

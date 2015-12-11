@@ -1,17 +1,17 @@
 package jadex.gpmn.editor.gui.controllers;
 
+import java.util.List;
+
+import com.mxgraph.model.mxICell;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+
 import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SPropertyPanelFactory;
 import jadex.gpmn.editor.model.visual.SequentialMarker;
 import jadex.gpmn.editor.model.visual.VGoal;
 import jadex.gpmn.editor.model.visual.VNode;
 import jadex.gpmn.editor.model.visual.VPlan;
-
-import java.util.List;
-
-import com.mxgraph.model.mxICell;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 public class SelectionController implements mxIEventListener
 {

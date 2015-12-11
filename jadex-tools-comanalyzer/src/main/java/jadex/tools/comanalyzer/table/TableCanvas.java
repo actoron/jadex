@@ -1,19 +1,5 @@
 package jadex.tools.comanalyzer.table;
 
-import jadex.base.gui.jtable.ComponentIdentifierRenderer;
-import jadex.base.gui.jtable.ComponentIdentifiersRenderer;
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.SUtil;
-import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.commons.gui.jtable.ResizeableTableHeader;
-import jadex.commons.gui.jtable.TableSorter;
-import jadex.commons.gui.jtable.VisibilityTableColumnModel;
-import jadex.tools.comanalyzer.Component;
-import jadex.tools.comanalyzer.Message;
-import jadex.tools.comanalyzer.MessageFilterMenu;
-import jadex.tools.comanalyzer.ToolCanvas;
-import jadex.tools.comanalyzer.ToolTab;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -29,6 +15,20 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
+import jadex.base.gui.jtable.ComponentIdentifiersRenderer;
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
+import jadex.commons.gui.jtable.DateTimeRenderer;
+import jadex.commons.gui.jtable.ResizeableTableHeader;
+import jadex.commons.gui.jtable.TableSorter;
+import jadex.commons.gui.jtable.VisibilityTableColumnModel;
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.Message;
+import jadex.tools.comanalyzer.MessageFilterMenu;
+import jadex.tools.comanalyzer.ToolCanvas;
+import jadex.tools.comanalyzer.ToolTab;
 
 
 /**

@@ -1,13 +1,13 @@
 package jadex.base.gui.plugin;
 
+import javax.swing.JComponent;
+
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.future.IFuture;
-
-import javax.swing.JComponent;
 
 /**
  *  Control center interface providing useful methods

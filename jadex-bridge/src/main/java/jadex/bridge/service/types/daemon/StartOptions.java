@@ -1,9 +1,9 @@
 package jadex.bridge.service.types.daemon;
 
-import jadex.commons.StreamCopy;
-
 import java.io.File;
 import java.util.logging.Logger;
+
+import jadex.commons.StreamCopy;
 
 
 /**

@@ -1,21 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.RemoteJarFile;
-import jadex.base.SRemoteGui;
-import jadex.base.gui.asynctree.AsyncSwingTreeModel;
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.filetransfer.BunchFileData;
-import jadex.bridge.service.types.filetransfer.FileData;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.collection.SortedList;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +9,21 @@ import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+
+import jadex.base.RemoteJarFile;
+import jadex.base.SRemoteGui;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.filetransfer.BunchFileData;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.SortedList;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 /**
  *  The remote dir node.

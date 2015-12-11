@@ -1,12 +1,12 @@
 package jadex.extension.envsupport.observer.graphics.opengl;
 
-import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
-import jadex.extension.envsupport.observer.graphics.drawable.RegularPolygon;
-
 import java.awt.Color;
 
 import javax.media.opengl.GL;
+
+import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
+import jadex.extension.envsupport.observer.graphics.drawable.RegularPolygon;
 
 public class RegularPolygonGLRenderer extends AbstractGLRenderer
 {

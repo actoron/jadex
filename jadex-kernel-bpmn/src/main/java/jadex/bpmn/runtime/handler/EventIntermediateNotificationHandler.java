@@ -1,14 +1,14 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.IFuture;
-
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  *  Wait for an external notification (could be a signal or a fired rule).

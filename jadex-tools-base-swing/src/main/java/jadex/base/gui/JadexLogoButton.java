@@ -1,8 +1,8 @@
 package jadex.base.gui;
 
-import jadex.commons.gui.SGUI;
-
 import javax.swing.UIDefaults;
+
+import jadex.commons.gui.SGUI;
 
 /**
  * Button to start a web browser showing the Jadex Home page.

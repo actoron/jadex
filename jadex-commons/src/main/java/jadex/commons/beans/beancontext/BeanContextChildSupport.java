@@ -17,19 +17,19 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.beans.PropertyChangeSupport;
-import jadex.commons.beans.PropertyVetoException;
-import jadex.commons.beans.VetoableChangeListener;
-import jadex.commons.beans.VetoableChangeSupport;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.apache.harmony.beans.internal.nls.Messages;
+
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeSupport;
+import jadex.commons.beans.PropertyVetoException;
+import jadex.commons.beans.VetoableChangeListener;
+import jadex.commons.beans.VetoableChangeSupport;
 
 public class BeanContextChildSupport implements BeanContextChild,
         BeanContextServicesListener, Serializable {

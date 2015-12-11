@@ -1,5 +1,7 @@
 package jadex.base;
 
+import java.io.File;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -8,8 +10,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-
-import java.io.File;
 
 /**
  *  Helper methods for remote file system view.

@@ -1,23 +1,5 @@
 package jadex.tools.security;
 
-import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.PlatformSelectorDialog;
-import jadex.base.gui.componenttree.ComponentIconCache;
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.security.ISecurityService;
-import jadex.bridge.service.types.security.MechanismInfo;
-import jadex.bridge.service.types.security.ParameterInfo;
-import jadex.commons.ICommand;
-import jadex.commons.SReflect;
-import jadex.commons.gui.ObjectCardLayout;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.transformation.BasicTypeConverter;
-import jadex.commons.transformation.IObjectStringConverter;
-import jadex.commons.transformation.IStringObjectConverter;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -39,6 +21,24 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+
+import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.PlatformSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.security.ISecurityService;
+import jadex.bridge.service.types.security.MechanismInfo;
+import jadex.bridge.service.types.security.ParameterInfo;
+import jadex.commons.ICommand;
+import jadex.commons.SReflect;
+import jadex.commons.gui.ObjectCardLayout;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 
 /**
  *  Panel that displays the available mechanisms and

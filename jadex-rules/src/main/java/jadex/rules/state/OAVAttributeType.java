@@ -1,10 +1,10 @@
 package jadex.rules.state;
 
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 
 /**

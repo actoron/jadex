@@ -1,5 +1,15 @@
 package jadex.platform.service.cms;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -75,17 +85,6 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  *  Abstract default implementation of component management service.
@@ -682,6 +681,11 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 																	initinfos.put(cid, new InitInfo(component, cinfo, resfut));
 																	
+																	// Start regular execution of inited component
+																	// when this component is the outermost component, i.e. with no parent
+																	// or the parent is already running
+																	final boolean	doinit	= cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null;
+																	
 																	logger.info("Starting component: "+cid.getName());
 							//										System.err.println("Pre-Init: "+cid);
 																	
@@ -766,10 +770,7 @@ public class ComponentManagementService implements IComponentManagementService
 																					}
 																					else
 																					{
-																						// Start regular execution of inited component
-																						// when this component is the outermost component, i.e. with no parent
-																						// or the parent is already running
-																						if(cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null)
+																						if(doinit)
 																						{
 //																							System.out.println("start: "+cid);
 																							resumeComponent(cid, true);//.addResultListener(listener)

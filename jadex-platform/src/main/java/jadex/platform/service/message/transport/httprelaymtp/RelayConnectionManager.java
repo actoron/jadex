@@ -1,9 +1,5 @@
 package jadex.platform.service.message.transport.httprelaymtp;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.HttpConnectionManager;
-import jadex.commons.SUtil;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +7,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.Scanner;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.HttpConnectionManager;
+import jadex.commons.SUtil;
 
 /**
  *  The connection manager performs http requests and further

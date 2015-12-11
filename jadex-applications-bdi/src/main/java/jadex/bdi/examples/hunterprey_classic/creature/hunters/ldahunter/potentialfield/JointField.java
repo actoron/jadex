@@ -3,6 +3,10 @@
  */
 package jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potentialfield;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.Food;
 import jadex.bdi.examples.hunterprey_classic.Hunter;
@@ -10,10 +14,6 @@ import jadex.bdi.examples.hunterprey_classic.Location;
 import jadex.bdi.examples.hunterprey_classic.Obstacle;
 import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.WorldObject;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  *

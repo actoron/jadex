@@ -13,14 +13,14 @@
 	Objective is to carry as much ore as possible to the<br>
 	home base in a predefined mission time.<br>
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:agr="http://jadex.sourceforge.net/jadex-agrspace"
-	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:agr="http://www.activecomponents.org/jadex-agrspace"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
-	                    http://jadex.sourceforge.net/jadex-application-2.5.xsd
-	                    http://jadex.sourceforge.net/jadex-envspace 
-	                    http://jadex.sourceforge.net/jadex-envspace-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
 	name="SpaceWorld3d" package="jadex.bdiv3.examples.marsworld">
 	
 	<imports>

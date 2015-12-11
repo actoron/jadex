@@ -18,10 +18,10 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 
 	</pre>
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex"
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-	                    http://jadex.sourceforge.net/jadex-bdi-2.5.xsd"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	name="BeliefSetChanges"
 	package="jadex.bdi.testcases.beliefs">
 

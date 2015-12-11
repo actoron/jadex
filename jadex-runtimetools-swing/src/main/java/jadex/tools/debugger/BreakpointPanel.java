@@ -1,21 +1,5 @@
 package jadex.tools.debugger;
 
-import jadex.base.gui.CMSUpdateHandler;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IBreakpointPanel;
-import jadex.commons.IChangeListener;
-import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.jtable.TableSorter;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -42,6 +26,22 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+
+import jadex.base.gui.CMSUpdateHandler;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IBreakpointPanel;
+import jadex.commons.IChangeListener;
+import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.jtable.TableSorter;
 
 /**
  *  A panel for viewing the breakpoints.

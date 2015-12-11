@@ -1,5 +1,9 @@
 package jadex.micro.testcases.semiautomatic;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -10,10 +14,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  An agent that is counting to infinity.

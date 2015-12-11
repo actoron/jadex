@@ -1,13 +1,13 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  *  Dummy fact node for not conditions, which are no joins.

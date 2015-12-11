@@ -1,10 +1,10 @@
 package jadex.bdi.tutorial;
 
+import javax.swing.SwingUtilities;
+
 import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.future.Future;
-
-import javax.swing.SwingUtilities;
 
 /**
  *  The plan for updating the gui.

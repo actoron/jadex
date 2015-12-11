@@ -1,8 +1,8 @@
 package jadex.bridge.service.types.security;
 
-import jadex.bridge.service.annotation.Reference;
-
 import java.util.List;
+
+import jadex.bridge.service.annotation.Reference;
 
 
 /**

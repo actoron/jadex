@@ -1,10 +1,10 @@
 package jadex.platform.service.security;
 
+import java.security.cert.Certificate;
+
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
-
-import java.security.cert.Certificate;
 
 /**
  *  Abstract super class for certificate acquisition mechanisms.

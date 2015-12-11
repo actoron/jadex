@@ -1,5 +1,7 @@
 package jadex.bdi.testcases.misc;
 
+import java.util.Arrays;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IMessageEvent;
@@ -8,8 +10,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
-
-import java.util.Arrays;
 
 /**
  *  Test various waitFor methods first from plan, then from external access.

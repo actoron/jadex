@@ -1,12 +1,5 @@
 package jadex.extension.envsupport.observer.gui.plugin;
 
-import jadex.extension.envsupport.environment.IObjectTask;
-import jadex.extension.envsupport.environment.ISpaceProcess;
-import jadex.extension.envsupport.environment.SpaceObject;
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
-import jadex.extension.envsupport.observer.gui.SObjectInspector;
-import jadex.extension.envsupport.observer.perspective.IPerspective;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -31,6 +24,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+
+import jadex.extension.envsupport.environment.IObjectTask;
+import jadex.extension.envsupport.environment.ISpaceProcess;
+import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.observer.gui.ObserverCenter;
+import jadex.extension.envsupport.observer.gui.SObjectInspector;
+import jadex.extension.envsupport.observer.perspective.IPerspective;
 
 /** The Introspector
  */

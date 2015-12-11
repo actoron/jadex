@@ -1,5 +1,9 @@
 package jadex.bdi.examples.hunterprey_classic.creature.preys.basicbehaviour;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.Location;
 import jadex.bdi.examples.hunterprey_classic.Obstacle;
@@ -7,10 +11,6 @@ import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.examples.hunterprey_classic.WorldObject;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  *  Plan to wander around in the environment and avoid obstacles.

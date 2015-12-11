@@ -1,14 +1,14 @@
 package jadex.platform.service.watchdog;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  *  An agent used to provoke out-of-memory-errors fur testing

@@ -1,7 +1,5 @@
 package jadex.extension.envsupport.evaluation;
 
-import jadex.commons.ResourceInfo;
-
 import java.awt.Image;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +22,8 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.Week;
 import org.jfree.data.time.Year;
 import org.jfree.data.xy.XYDataset;
+
+import jadex.commons.ResourceInfo;
 
 /**
  *  Time chart data consumer. Y is interpreted as time point.

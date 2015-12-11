@@ -1,8 +1,5 @@
 package jadex.bpmn.model;
 
-import jadex.bpmn.task.info.TaskMetaInfo;
-import jadex.bridge.ClassInfo;
-
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -10,6 +7,9 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
+
+import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.ClassInfo;
 
 
 /**

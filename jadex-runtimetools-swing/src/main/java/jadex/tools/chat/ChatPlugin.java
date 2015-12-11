@@ -1,5 +1,7 @@
 package jadex.tools.chat;
 
+import javax.swing.Icon;
+
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.IChatGuiService;
@@ -8,8 +10,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.tools.generic.AbstractServicePlugin;
-
-import javax.swing.Icon;
 
 /**
  *  The chat plugin is used to wrap the chat panel as JCC plugin.

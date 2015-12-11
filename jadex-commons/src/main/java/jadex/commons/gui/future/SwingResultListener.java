@@ -1,5 +1,9 @@
 package jadex.commons.gui.future;
 
+import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
+
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFunctionalExceptionListener;
@@ -8,11 +12,6 @@ import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
-
-import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 
 /**

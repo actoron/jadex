@@ -1,5 +1,10 @@
 package jadex.bridge.component.impl;
 
+import java.lang.reflect.Constructor;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
@@ -7,11 +12,6 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-
-import java.lang.reflect.Constructor;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Feature factory allowing the creation of component features.

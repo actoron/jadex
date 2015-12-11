@@ -1,5 +1,7 @@
 package jadex.rules.rulesystem.rete;
 
+import java.util.Iterator;
+
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.IAgenda;
 import jadex.rules.rulesystem.IPatternMatcherState;
@@ -10,8 +12,6 @@ import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
-
-import java.util.Iterator;
 
 /**
  *  The state specific part of a Rete pattern matcher.

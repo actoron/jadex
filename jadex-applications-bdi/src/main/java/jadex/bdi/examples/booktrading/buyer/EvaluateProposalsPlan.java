@@ -1,12 +1,12 @@
 package jadex.bdi.examples.booktrading.buyer;
 
-import jadex.bdi.planlib.protocols.ParticipantProposal;
-import jadex.bdiv3x.runtime.Plan;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import jadex.bdi.planlib.protocols.ParticipantProposal;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Evaluate the received proposals.

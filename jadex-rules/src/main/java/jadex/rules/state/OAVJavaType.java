@@ -1,16 +1,16 @@
 package jadex.rules.state;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
-
 import jadex.commons.beans.BeanInfo;
 import jadex.commons.beans.IndexedPropertyDescriptor;
 import jadex.commons.beans.IntrospectionException;
 import jadex.commons.beans.Introspector;
 import jadex.commons.beans.PropertyDescriptor;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  A java type that

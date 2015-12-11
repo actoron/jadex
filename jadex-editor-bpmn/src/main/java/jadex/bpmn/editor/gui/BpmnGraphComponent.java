@@ -1,15 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.gui.controllers.DeletionController;
-import jadex.bpmn.editor.gui.controllers.EdgeController;
-import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
-import jadex.bpmn.editor.gui.controllers.KeyboardController;
-import jadex.bpmn.editor.gui.controllers.MouseController;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VPool;
-import jadex.bpmn.editor.model.visual.VSubProcess;
-import jadex.bpmn.model.MActivity;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -41,6 +31,16 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
+
+import jadex.bpmn.editor.gui.controllers.DeletionController;
+import jadex.bpmn.editor.gui.controllers.EdgeController;
+import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
+import jadex.bpmn.editor.gui.controllers.KeyboardController;
+import jadex.bpmn.editor.gui.controllers.MouseController;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.model.MActivity;
 
 /**
  *  Graph component for editing GPMN models.

@@ -1,13 +1,13 @@
 package jadex.bridge.service.component;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
-
-import java.util.Collection;
 
 /**
  *  Adapter for the required services feature.

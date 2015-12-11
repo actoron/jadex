@@ -1,13 +1,25 @@
 package jadex.extension.envsupport.observer.perspective;
 
-import jadex.commons.gui.SGUI;
+import java.awt.Color;
+import java.awt.Component;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.SwingUtilities;
+
 import jadex.commons.meta.TypedPropertyObject;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceController;
-import jadex.extension.envsupport.environment.space2d.*;
-import jadex.extension.envsupport.environment.space3d.*;
 import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.environment.space2d.GridController;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
@@ -16,27 +28,11 @@ import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.IViewport3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.gui.IObserverCenter;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.SwingUtilities;
 
 
 /**

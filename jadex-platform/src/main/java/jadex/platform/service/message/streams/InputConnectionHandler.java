@@ -1,15 +1,5 @@
 package jadex.platform.service.message.streams;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.annotation.Timeout;
-import jadex.commons.Tuple2;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.platform.service.message.MessageService;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +10,16 @@ import java.util.TimerTask;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.Tuple2;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.platform.service.message.MessageService;
 
 /**
  *  Handler that sits between connection and message service.

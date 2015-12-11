@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.environment.space3d;
 
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector3;
 
 /**

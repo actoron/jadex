@@ -1,17 +1,5 @@
 package jadex.base.gui;
 
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.gui.EditableList;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -28,6 +16,16 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+
+import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.gui.EditableList;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  *  A panel for displaying/editing a component identifier.

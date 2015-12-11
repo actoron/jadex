@@ -1,26 +1,14 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.filetree.FileTreePanel;
-import jadex.base.gui.filetree.IFileNode;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ToolTipAction;
-import jadex.commons.transformation.annotations.Classname;
-
 import java.awt.event.ActionEvent;
 
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 import javax.swing.tree.TreePath;
+
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
 
 /**
  *  Action for removing a path. 

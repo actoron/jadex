@@ -1,5 +1,8 @@
 package jadex.micro.benchmarks;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -18,9 +21,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Agent creation benchmark using threaded components

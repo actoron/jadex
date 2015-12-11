@@ -1,5 +1,8 @@
 package jadex.bdiv3.examples.garbagecollector;
 
+import java.util.Collection;
+import java.util.Map;
+
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -7,9 +10,6 @@ import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  *  Action for picking up waste.

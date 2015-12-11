@@ -1,12 +1,5 @@
 package jadex.examples.presentationtimer.remotecontrol.ui;
 
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.SResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.examples.presentationtimer.common.ICountdownService;
-import jadex.examples.presentationtimer.common.State;
-import jadex.examples.presentationtimer.remotecontrol.ClientMain;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -22,6 +15,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
+
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.SResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.examples.presentationtimer.common.ICountdownService;
+import jadex.examples.presentationtimer.common.State;
+import jadex.examples.presentationtimer.remotecontrol.ClientMain;
 
 public class ClientFrame extends JFrame
 {

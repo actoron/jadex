@@ -1,5 +1,8 @@
 package jadex.gpmn.editor.model.visual;
 
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
+
 import jadex.gpmn.editor.gui.GuiConstants;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
@@ -7,9 +10,6 @@ import jadex.gpmn.editor.model.gpmn.IEdge;
 import jadex.gpmn.editor.model.gpmn.IElement;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
 import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
-
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxICell;
 
 /**
  *  Visual edge.

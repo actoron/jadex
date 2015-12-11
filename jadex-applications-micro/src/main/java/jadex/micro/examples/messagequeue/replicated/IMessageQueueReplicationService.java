@@ -1,6 +1,5 @@
 package jadex.micro.examples.messagequeue.replicated;
 
-import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.examples.messagequeue.Event;
 

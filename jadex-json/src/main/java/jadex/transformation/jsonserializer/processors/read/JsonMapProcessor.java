@@ -2,7 +2,6 @@ package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

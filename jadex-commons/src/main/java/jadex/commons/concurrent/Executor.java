@@ -1,13 +1,13 @@
 package jadex.commons.concurrent;
 
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 
 /**

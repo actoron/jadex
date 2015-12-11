@@ -1,18 +1,11 @@
 package jadex.commons.collection;
 
-import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
-import jadex.commons.transformation.binaryserializer.VarInt;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,6 +13,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SUtil;
+import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.VarInt;
 
 /**
  *  A map implementation supporting automatic serialization its data

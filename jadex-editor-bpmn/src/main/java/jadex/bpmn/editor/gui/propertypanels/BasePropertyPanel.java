@@ -1,18 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VElement;
-import jadex.bpmn.editor.model.visual.VInParameter;
-import jadex.bpmn.editor.model.visual.VOutParameter;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MParameter;
-import jadex.commons.IFilter;
-import jadex.commons.Tuple2;
-import jadex.commons.collection.IndexMap;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -32,6 +19,17 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+
+import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VOutParameter;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MParameter;
+import jadex.commons.IFilter;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.IndexMap;
 
 /**
  *  Class for property panels.

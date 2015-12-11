@@ -1,9 +1,5 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.tools.comanalyzer.Message;
-import jadex.tools.comanalyzer.graph.GraphCanvas.AgentGroup;
-import jadex.tools.comanalyzer.graph.GraphCanvas.MessageGroup;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +13,9 @@ import java.util.Map;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.EdgeIndexFunction;
 import edu.uci.ics.jung.graph.util.Pair;
+import jadex.tools.comanalyzer.Message;
+import jadex.tools.comanalyzer.graph.GraphCanvas.AgentGroup;
+import jadex.tools.comanalyzer.graph.GraphCanvas.MessageGroup;
 
 
 /**

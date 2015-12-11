@@ -1,15 +1,15 @@
 package jadex.rules.state.javaimpl;
 
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
+
 // #ifndef MIDP
 
 import jadex.commons.collection.WeakEntry;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
-
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Id generator using easy to read names and numbers.

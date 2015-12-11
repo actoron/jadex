@@ -1,16 +1,16 @@
 package maventest;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.Tuple2;
 import jadex.platform.service.dependency.maven.MavenDependencyResolverService;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class MavenTest2
 {

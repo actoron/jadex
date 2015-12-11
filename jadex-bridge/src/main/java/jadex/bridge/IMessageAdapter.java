@@ -1,8 +1,8 @@
 package jadex.bridge;
 
-import jadex.bridge.service.types.message.MessageType;
-
 import java.util.Map;
+
+import jadex.bridge.service.types.message.MessageType;
 
 
 /**

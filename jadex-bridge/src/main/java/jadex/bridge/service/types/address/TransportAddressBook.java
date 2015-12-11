@@ -1,15 +1,14 @@
 package jadex.bridge.service.types.address;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.base.PlatformConfiguration;
-import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Management of transport addresses of platform.

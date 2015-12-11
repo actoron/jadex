@@ -1,16 +1,16 @@
 package jadex.platform.service.awareness.discovery.ipbroadcast;
 
-import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
-import jadex.platform.service.awareness.discovery.DiscoveryAgent;
-import jadex.platform.service.awareness.discovery.MasterSlaveSendHandler;
-
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
+import jadex.platform.service.awareness.discovery.DiscoveryAgent;
+import jadex.platform.service.awareness.discovery.MasterSlaveSendHandler;
 
 /**
  *  Handle sending.

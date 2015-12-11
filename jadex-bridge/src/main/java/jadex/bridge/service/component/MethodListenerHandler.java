@@ -1,14 +1,14 @@
 package jadex.bridge.service.component;
 
-import jadex.bridge.sensor.service.IMethodInvocationListener;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.commons.MethodInfo;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jadex.bridge.sensor.service.IMethodInvocationListener;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.commons.MethodInfo;
 
 /**
  * 

@@ -1,20 +1,19 @@
 package jadex.webservice.examples.rs.banking;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * The Jadex implementation of the banking service.

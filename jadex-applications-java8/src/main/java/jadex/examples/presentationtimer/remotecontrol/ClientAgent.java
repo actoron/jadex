@@ -1,15 +1,15 @@
 package jadex.examples.presentationtimer.remotecontrol;
 
+import javax.swing.SwingUtilities;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.examples.presentationtimer.common.ICountdownService;
 import jadex.examples.presentationtimer.common.ICountdownService.ICountdownListener;
@@ -20,12 +20,9 @@ import jadex.examples.presentationtimer.remotecontrol.ui.ClientFrame;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import javax.swing.SwingUtilities;
 
 
 @Agent

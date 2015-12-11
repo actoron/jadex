@@ -1,11 +1,11 @@
 package jadex.base.gui.plugin;
 
-import jadex.commons.IPropertiesProvider;
-import jadex.commons.future.IFuture;
-
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
+
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.future.IFuture;
 
 
 /**

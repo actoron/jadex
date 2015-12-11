@@ -1,8 +1,8 @@
 package jadex.commons.future;
 
-import jadex.commons.IResultCommand;
-
 import java.util.LinkedList;
+
+import jadex.commons.IResultCommand;
 
 /**
  *  Locking class implementing RX-style operation:

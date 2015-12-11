@@ -1,38 +1,32 @@
 package jadex.platform.service.dht;
 
-import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.dht.IRingNodeDebugService;
-import jadex.bridge.service.types.dht.IFinger;
-import jadex.bridge.service.types.dht.IID;
-import jadex.bridge.service.types.dht.IRingNodeService;
-import jadex.commons.SUtil;
-import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DefaultTuple2ResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+
+import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.dht.IFinger;
+import jadex.bridge.service.types.dht.IID;
+import jadex.bridge.service.types.dht.IRingNodeDebugService;
+import jadex.bridge.service.types.dht.IRingNodeService;
+import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultTuple2ResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import junit.framework.TestCase;
 
 public class RingNodePlatformTest extends TestCase
 {

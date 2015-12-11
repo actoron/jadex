@@ -1,14 +1,14 @@
 package jadex.bdi.examples.hunterprey.cleverprey;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  A plan to explore the map.

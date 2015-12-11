@@ -1,7 +1,5 @@
 package jadex.base.relay;
 
-import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -14,6 +12,8 @@ import java.util.zip.GZIPInputStream;
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
 import com.maxmind.geoip.regionName;
+
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 /**
  *  Helper object to resolve IP addresses to Geo locations.

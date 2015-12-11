@@ -1,17 +1,17 @@
 package jadex.tools.security;
 
+import java.awt.BorderLayout;
+
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.tree.DefaultTreeModel;
+
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.gui.JSplitPanel;
-
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.tree.DefaultTreeModel;
 
 /**
  * 

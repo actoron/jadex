@@ -1,5 +1,8 @@
 package jadex.bdi.examples.spaceworld3d.movement;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -13,9 +16,6 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
-
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  *  Move an object towards a destination.

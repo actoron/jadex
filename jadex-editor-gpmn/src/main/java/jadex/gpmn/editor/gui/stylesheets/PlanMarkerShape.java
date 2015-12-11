@@ -1,13 +1,13 @@
 package jadex.gpmn.editor.gui.stylesheets;
 
-import jadex.gpmn.editor.model.visual.VPlan.VPlanType;
-
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.view.mxCellState;
+
+import jadex.gpmn.editor.model.visual.VPlan.VPlanType;
 
 public class PlanMarkerShape extends AbstractTextMarkerShape
 {

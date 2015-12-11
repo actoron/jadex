@@ -1,16 +1,15 @@
 package jadex.platform.service.remote.commands;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
-
-import java.util.Map;
 
 /**
  * 

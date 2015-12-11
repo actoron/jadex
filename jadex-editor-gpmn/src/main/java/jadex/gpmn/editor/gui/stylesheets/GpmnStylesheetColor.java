@@ -1,8 +1,5 @@
 package jadex.gpmn.editor.gui.stylesheets;
 
-import jadex.gpmn.editor.gui.GuiConstants;
-import jadex.gpmn.editor.model.gpmn.ModelConstants;
-
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.io.InputStream;
@@ -12,6 +9,9 @@ import java.util.Map;
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.view.mxStylesheet;
+
+import jadex.gpmn.editor.gui.GuiConstants;
+import jadex.gpmn.editor.model.gpmn.ModelConstants;
 
 /**
  *  Style sheet defining the visual aspects of the GPMN model.

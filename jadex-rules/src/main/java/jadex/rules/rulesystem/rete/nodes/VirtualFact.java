@@ -1,9 +1,9 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import java.util.List;
+
 import jadex.commons.SReflect;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.List;
 
 
 /**

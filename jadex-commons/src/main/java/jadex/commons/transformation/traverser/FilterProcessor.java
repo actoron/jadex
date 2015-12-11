@@ -1,10 +1,10 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.IFilter;
-
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.IFilter;
 
 /**
  *  Filter processor for directly returning specific objects as is.

@@ -1,11 +1,10 @@
 package jadex.platform.service.awareness.discovery;
 
-import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.future.IFuture;
 
 /**
  *  Handle sending.

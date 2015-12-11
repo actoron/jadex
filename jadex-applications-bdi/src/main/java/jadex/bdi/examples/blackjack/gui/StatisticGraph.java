@@ -1,11 +1,5 @@
 package jadex.bdi.examples.blackjack.gui;
 
-import jadex.bdi.examples.blackjack.Dealer;
-import jadex.bdi.examples.blackjack.GameStatistics;
-import jadex.bdi.examples.blackjack.Player;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -14,6 +8,12 @@ import java.util.Iterator;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+
+import jadex.bdi.examples.blackjack.Dealer;
+import jadex.bdi.examples.blackjack.GameStatistics;
+import jadex.bdi.examples.blackjack.Player;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  This class represents a JPanel on which a graph is drawn.

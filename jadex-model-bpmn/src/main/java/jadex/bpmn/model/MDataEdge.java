@@ -1,7 +1,6 @@
 package jadex.bpmn.model;
 
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.Tuple2;
 
 /**
  *  A data edge is a data flow edge between activity parameters.

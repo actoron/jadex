@@ -1,11 +1,10 @@
 package jadex.xml;
 
-import jadex.commons.SUtil;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.xml.stax.QName;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import jadex.commons.transformation.annotations.Classname;
+import jadex.xml.stax.QName;
 
 /**
  *  Constants for xml handling.

@@ -1,5 +1,14 @@
 package jadex.bpmn.editor.model.visual;
 
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
+
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.model.MActivity;
@@ -9,15 +18,6 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.commons.Tuple3;
-
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxICell;
 
 /**
  *  Generator for auto-generating the visual model of a BPMN.

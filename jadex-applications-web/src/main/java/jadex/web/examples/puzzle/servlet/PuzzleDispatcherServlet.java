@@ -1,16 +1,5 @@
 package jadex.web.examples.puzzle.servlet;
 
-import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.web.examples.puzzle.Board;
-import jadex.web.examples.puzzle.HighscoreEntry;
-import jadex.web.examples.puzzle.IPuzzleService;
-import jadex.web.examples.puzzle.Move;
-import jadex.web.examples.puzzle.Position;
-
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.List;
@@ -22,6 +11,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.web.examples.puzzle.Board;
+import jadex.web.examples.puzzle.HighscoreEntry;
+import jadex.web.examples.puzzle.IPuzzleService;
+import jadex.web.examples.puzzle.Move;
+import jadex.web.examples.puzzle.Position;
 
 /**
  *  Front controller servlet for puzzle application.

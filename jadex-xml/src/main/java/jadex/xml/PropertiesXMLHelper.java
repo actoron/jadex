@@ -1,5 +1,10 @@
 package jadex.xml;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.xml.bean.BeanObjectReaderHandler;
@@ -10,14 +15,9 @@ import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.stax.QName;
-import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.AWriter;
+import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.XMLWriterFactory;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  A simple static helper class for reading and writing jadex.commons.Properties.
@@ -51,7 +51,7 @@ public class PropertiesXMLHelper
 	{
 		typeinfos = new HashSet();
 		
-		String uri = "http://jadex.sourceforge.net/jadexconf";
+		String uri = "http://www.activecomponents.org/jadex-conf";
 		
 		TypeInfo	propstype	= new TypeInfo(new XMLInfo(new QName(uri, "properties")), new ObjectInfo(Properties.class), 
 			new MappingInfo(null, 
@@ -68,7 +68,7 @@ public class PropertiesXMLHelper
 		propstype.setReaderHandler(new BeanObjectReaderHandler());
 		typeinfos.add(propstype);
 		
-//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
+//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://www.activecomponents.org/jadex-conf", "property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), 
 			new ObjectInfo(Property.class), new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, "value")),
 				new AttributeInfo[]{new AttributeInfo(new AccessInfo("name")), new AttributeInfo(new AccessInfo("type"))})));

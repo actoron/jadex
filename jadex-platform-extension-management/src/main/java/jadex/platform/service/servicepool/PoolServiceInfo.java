@@ -1,13 +1,13 @@
 package jadex.platform.service.servicepool;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IPoolStrategy;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

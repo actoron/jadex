@@ -26,7 +26,7 @@ buildscript {
                 }
     }
     dependencies {
-        classpath 'net.sourceforge.jadex:jadex-commons:3.0-SNAPSHOT'
+        classpath 'org.activecomponents.jadex:jadex-commons:3.0-SNAPSHOT'
         classpath 'commons-io:commons-io:2.4'
     }
 }

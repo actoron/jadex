@@ -1,9 +1,9 @@
 package jadex.gpmn.editor.model.visual;
 
-import jadex.gpmn.editor.model.gpmn.IElement;
-
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
+
+import jadex.gpmn.editor.model.gpmn.IElement;
 
 public abstract class VElement extends mxCell
 {

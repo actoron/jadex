@@ -1,10 +1,10 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.model.MNamedIdElement;
-
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.model.MNamedIdElement;
 
 /**
  *  Visual representation of a BPMN edge.

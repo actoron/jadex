@@ -1,12 +1,12 @@
 package jadex.rules.state;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+
 import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-
 import jadex.commons.beans.PropertyDescriptor;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
  
 /**
  *  Attribute type for Java object types.

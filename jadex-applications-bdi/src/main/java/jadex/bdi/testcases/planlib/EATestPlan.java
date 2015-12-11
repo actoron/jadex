@@ -1,5 +1,8 @@
 package jadex.bdi.testcases.planlib;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bdi.planlib.protocols.AuctionDescription;
 import jadex.bdi.planlib.protocols.ExponentialPriceCalculator;
@@ -9,9 +12,6 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-
-import java.util.List;
-import java.util.Map;
 
 
 /**

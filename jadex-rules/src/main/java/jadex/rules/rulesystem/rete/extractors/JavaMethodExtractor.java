@@ -1,12 +1,12 @@
 package jadex.rules.rulesystem.rete.extractors;
 
+import java.lang.reflect.InvocationTargetException;
+
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  *  Call a method on an object.

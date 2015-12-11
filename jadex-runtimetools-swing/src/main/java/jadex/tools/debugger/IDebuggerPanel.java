@@ -1,12 +1,12 @@
 package jadex.tools.debugger;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
+
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
 
 /**
  *  An inner panel of the debugger.

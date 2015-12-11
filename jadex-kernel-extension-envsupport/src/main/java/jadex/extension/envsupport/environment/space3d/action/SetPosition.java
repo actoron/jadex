@@ -2,11 +2,11 @@ package jadex.extension.envsupport.environment.space3d.action;
 
 import java.util.Map;
 
+import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.math.IVector3;
-import jadex.commons.SimplePropertyObject;
 
 /**
  *  Set the position action.

@@ -1,10 +1,5 @@
 package jadex.gpmn.editor.gui;
 
-import jadex.gpmn.editor.GpmnEditor;
-import jadex.gpmn.editor.gui.controllers.DeletionController;
-import jadex.gpmn.editor.gui.controllers.FoldController;
-import jadex.gpmn.editor.model.gpmn.IGpmnModel;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
@@ -22,6 +17,11 @@ import javax.swing.JPanel;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxEvent;
+
+import jadex.gpmn.editor.GpmnEditor;
+import jadex.gpmn.editor.gui.controllers.DeletionController;
+import jadex.gpmn.editor.gui.controllers.FoldController;
+import jadex.gpmn.editor.model.gpmn.IGpmnModel;
 
 public class ModelContainer
 {

@@ -1,9 +1,9 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
-
-import java.util.Map;
 
 /**
  *  Helper class to deal with service calls

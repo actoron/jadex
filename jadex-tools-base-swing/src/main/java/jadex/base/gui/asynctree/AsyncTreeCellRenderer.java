@@ -1,7 +1,5 @@
 package jadex.base.gui.asynctree;
 
-import jadex.commons.gui.CombiIcon;
-
 import java.awt.Component;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -12,6 +10,8 @@ import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeCellRenderer;
+
+import jadex.commons.gui.CombiIcon;
 
 
 /**

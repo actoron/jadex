@@ -1,5 +1,10 @@
 package jadex.kernelbase;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import jadex.base.Starter;
 import jadex.bridge.ComponentPersistedException;
 import jadex.bridge.ComponentTerminatedException;
@@ -34,11 +39,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
-
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *  External access for applications.

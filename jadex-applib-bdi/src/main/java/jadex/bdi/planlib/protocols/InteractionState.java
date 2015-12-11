@@ -1,13 +1,13 @@
 package jadex.bdi.planlib.protocols;
 
 
-import jadex.bridge.IComponentIdentifier;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  The state of the execution of an interaction.

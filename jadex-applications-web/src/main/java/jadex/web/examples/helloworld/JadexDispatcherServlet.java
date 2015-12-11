@@ -1,9 +1,5 @@
 package jadex.web.examples.helloworld;
 
-import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.future.ThreadSuspendable;
-
 import java.awt.Toolkit;
 import java.io.IOException;
 
@@ -13,6 +9,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
 
 /**
  *  Servlet implementation class JadexDispatcherServlet

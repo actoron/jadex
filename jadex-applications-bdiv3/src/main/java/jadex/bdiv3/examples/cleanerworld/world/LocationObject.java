@@ -1,7 +1,6 @@
 package jadex.bdiv3.examples.cleanerworld.world;
 
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
 
 

@@ -1,5 +1,8 @@
 package jadex.bdi.examples.hunterprey_classic.creature.hunters.dumbhunter;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.Vision;
@@ -8,9 +11,6 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
-
-import java.util.ArrayList;
-import java.util.Random;
 
 
 /**

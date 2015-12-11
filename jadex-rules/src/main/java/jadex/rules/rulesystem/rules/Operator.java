@@ -1,12 +1,12 @@
 package jadex.rules.rulesystem.rules;
 
-import jadex.commons.SUtil;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVObjectType;
-
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
+
+import jadex.commons.SUtil;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVObjectType;
 
 /**
  *  The operator class contains the implementation of all 

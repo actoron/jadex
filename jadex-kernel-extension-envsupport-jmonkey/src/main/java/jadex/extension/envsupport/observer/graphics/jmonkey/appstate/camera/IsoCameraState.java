@@ -1,10 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera;
 
-import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.IsoCamera;
-import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.Triggers;
-import jadex.extension.envsupport.observer.graphics.jmonkey.util.MonkeyHelper;
-
 import java.awt.Dimension;
 
 import com.jme3.app.Application;
@@ -21,6 +16,11 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+
+import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.IsoCamera;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.Triggers;
+import jadex.extension.envsupport.observer.graphics.jmonkey.util.MonkeyHelper;
 
 
 public class IsoCameraState extends AbstractAppState

@@ -1,12 +1,11 @@
 package jadex.extension.envsupport.environment.space2d;
 
+import java.util.Collection;
+
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.IVector2;
-
-import java.util.Collection;
 
 
 public class GridController implements ISpaceController

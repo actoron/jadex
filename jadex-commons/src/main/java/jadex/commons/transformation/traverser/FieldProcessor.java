@@ -1,12 +1,12 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
 
 /**
  *  Processor that traverses all fields of an object.

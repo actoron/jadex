@@ -1,5 +1,10 @@
 package jadex.platform.service.remote;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -37,11 +42,6 @@ import jadex.platform.service.remote.commands.RemoteFutureBackwardCommand;
 import jadex.platform.service.remote.commands.RemoteFuturePullCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteMethodInvocationCommand;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Class that implements the Java proxy InvocationHandler, which

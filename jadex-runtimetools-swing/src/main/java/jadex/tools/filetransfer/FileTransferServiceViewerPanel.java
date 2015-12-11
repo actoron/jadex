@@ -1,5 +1,23 @@
 package jadex.tools.filetransfer;
 
+import java.awt.BorderLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.InputEvent;
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.DropMode;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.TransferHandler;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
 import jadex.base.DefaultFileFilter;
 import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.ISwingNodeHandler;
@@ -19,24 +37,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
-
-import java.awt.BorderLayout;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.InputEvent;
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.DropMode;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.TransferHandler;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
 /**
  *  The deployment service viewer panel displays 

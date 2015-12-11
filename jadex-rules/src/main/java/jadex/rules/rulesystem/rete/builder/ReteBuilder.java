@@ -1,5 +1,14 @@
 package jadex.rules.rulesystem.rete.builder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.rete.constraints.AndConstraintEvaluator;
@@ -66,15 +75,6 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**

@@ -1,9 +1,5 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -16,6 +12,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIDefaults;
+
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.gui.SGUI;
 
 /**
  *  The map panel for displaying the environment.

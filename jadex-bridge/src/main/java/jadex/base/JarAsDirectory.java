@@ -1,7 +1,5 @@
 package jadex.base;
 
-import jadex.commons.collection.MultiCollection;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
@@ -21,6 +19,8 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+
+import jadex.commons.collection.MultiCollection;
 
 
 /**

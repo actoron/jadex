@@ -1,9 +1,10 @@
 package jadex.platform.service.message.transport.ssltcpmtp.stream;
 
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
@@ -25,8 +26,6 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.message.transport.ssltcpmtp.TestAgent;
-
-import java.util.Map;
 
 /**
  *  Agent that provides a service with a stream.

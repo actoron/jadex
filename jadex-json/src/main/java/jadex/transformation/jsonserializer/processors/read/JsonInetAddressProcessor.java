@@ -3,7 +3,6 @@ package jadex.transformation.jsonserializer.processors.read;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 

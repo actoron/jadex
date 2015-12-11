@@ -1,20 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MIdElement;
-import jadex.bpmn.model.MParameter;
-import jadex.bpmn.model.MProperty;
-import jadex.bridge.ClassInfo;
-import jadex.commons.SReflect;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.autocombo.AutoCompleteCombo;
-import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
-import jadex.commons.gui.autocombo.ComboBoxEditor;
-import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
-import jadex.javaparser.SJavaParser;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -34,6 +19,21 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+
+import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MIdElement;
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MProperty;
+import jadex.bridge.ClassInfo;
+import jadex.commons.SReflect;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
+import jadex.commons.gui.autocombo.ComboBoxEditor;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
+import jadex.javaparser.SJavaParser;
 
 /**
  * 

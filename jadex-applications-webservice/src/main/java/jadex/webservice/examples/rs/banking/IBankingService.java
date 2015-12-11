@@ -1,9 +1,9 @@
 package jadex.webservice.examples.rs.banking;
 
+import java.util.Date;
+
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-
-import java.util.Date;
 
 
 /**

@@ -1,5 +1,8 @@
 package jadex.bdiv3.tutorial.c2;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -9,9 +12,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.rules.eca.ChangeInfo;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Dynamic belief.
@@ -46,9 +46,9 @@ public class TranslationBDI
 	 *  Initiate an alarm.
 	 */
 	@Plan(trigger=@Trigger(factchangeds="alarm"))
-	public void checkWordPairPlan(ChangeEvent event)
+	public void checkWordPairPlan(ChangeEvent<ChangeInfo<Boolean>> event)
 	{
-		ChangeInfo<Boolean>	change	= (ChangeInfo<Boolean>)event.getValue();
+		ChangeInfo<Boolean>	change	= event.getValue();
 		// Print warning when value changes from false to true.
 		if(Boolean.FALSE.equals(change.getOldValue()) && Boolean.TRUE.equals(change.getValue()))
 		{

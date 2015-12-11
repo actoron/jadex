@@ -1,10 +1,10 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MSequenceEdge;
-
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MSequenceEdge;
 
 /**
  *  Visual representation of a sequence edge.

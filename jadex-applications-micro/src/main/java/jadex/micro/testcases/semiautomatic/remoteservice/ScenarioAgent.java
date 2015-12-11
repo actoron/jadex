@@ -1,5 +1,7 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
+import java.util.List;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -11,8 +13,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.List;
 
 /**
  *  Just for starting the scenario.

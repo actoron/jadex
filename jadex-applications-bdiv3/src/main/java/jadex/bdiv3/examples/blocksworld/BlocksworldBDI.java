@@ -1,5 +1,11 @@
 package jadex.bdiv3.examples.blocksworld;
 
+import java.awt.Color;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.SwingUtilities;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
@@ -19,12 +25,6 @@ import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.awt.Color;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.swing.SwingUtilities;
 
 /**
  * 

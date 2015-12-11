@@ -1,8 +1,8 @@
 package jadex.base.relay;
 
-import jadex.commons.future.Future;
-
 import java.io.InputStream;
+
+import jadex.commons.future.Future;
 
 /**
  *  Struct for a message to be delivered to a platform.

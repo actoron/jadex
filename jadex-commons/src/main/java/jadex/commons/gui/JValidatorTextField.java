@@ -1,7 +1,5 @@
 package jadex.commons.gui;
 
-import jadex.commons.IValidator;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -10,6 +8,8 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JTextField;
 import javax.swing.text.Document;
+
+import jadex.commons.IValidator;
 
 /**
  *  The validator text field allows to check the input and automatically

@@ -1,5 +1,8 @@
 package jadex.bdiv3.tutorial.c4;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
@@ -8,9 +11,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Translation agent C4.

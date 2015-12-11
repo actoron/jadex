@@ -1,15 +1,15 @@
 package jadex.rules.eca.propertychange;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.future.IFuture;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.IdentityHashMap;
-import java.util.Map;
 
 /**
  * Supports Usage of java.beans and jadex.commons.beans types in watched objects.  

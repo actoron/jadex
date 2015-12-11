@@ -1,5 +1,7 @@
 package jadex.bdiv3.examples.marsworld.carry;
 
+import java.util.Collection;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
@@ -10,8 +12,6 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
-
-import java.util.Collection;
 
 /**
  *  Inform the sentry agent about a new target.

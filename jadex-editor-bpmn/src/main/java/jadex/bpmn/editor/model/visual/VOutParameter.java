@@ -1,9 +1,9 @@
 package jadex.bpmn.editor.model.visual;
 
+import com.mxgraph.view.mxGraph;
+
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.model.MParameter;
-
-import com.mxgraph.view.mxGraph;
 
 public class VOutParameter extends VNamedNode
 {

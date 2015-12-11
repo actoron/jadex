@@ -1,5 +1,8 @@
 package jadex.micro.examples.hunterprey;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.application.EnvironmentService;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
@@ -16,9 +19,6 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Simple agent participating in hunter prey.

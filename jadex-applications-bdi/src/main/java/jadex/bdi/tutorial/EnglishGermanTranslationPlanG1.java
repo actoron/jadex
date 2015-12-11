@@ -1,13 +1,13 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdiv3x.runtime.IExpression;
-import jadex.bdiv3x.runtime.Plan;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+
+import jadex.bdiv3x.runtime.IExpression;
+import jadex.bdiv3x.runtime.Plan;
 
 
 /**

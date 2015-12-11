@@ -1,15 +1,15 @@
 package jadex.micro.examples.mandelbrot;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  *  The service allows displaying results in the frame

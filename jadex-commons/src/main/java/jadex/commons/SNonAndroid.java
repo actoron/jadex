@@ -1,7 +1,5 @@
 package jadex.commons;
 
-import jadex.commons.future.Future;
-
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.GraphicsEnvironment;
@@ -27,6 +25,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
+
+import jadex.commons.future.Future;
 
 /**
  *  Helper class for methods used from non-android code.

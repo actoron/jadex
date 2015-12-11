@@ -1,15 +1,5 @@
 package jadex.base.gui;
 
-import jadex.base.SRemoteGui;
-import jadex.base.gui.filechooser.RemoteFileSystemView;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.filetransfer.FileData;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -23,6 +13,16 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+
+import jadex.base.SRemoteGui;
+import jadex.base.gui.filechooser.RemoteFileSystemView;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 /**
  *  Helper class that uses a JFileChooser for 

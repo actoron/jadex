@@ -1,5 +1,14 @@
 package jadex.base.gui.componenttree;
 
+import java.awt.BorderLayout;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -11,15 +20,6 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
-
-import java.awt.BorderLayout;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *  Panel for showing service properties.

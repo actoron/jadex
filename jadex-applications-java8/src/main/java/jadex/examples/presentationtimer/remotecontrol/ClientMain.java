@@ -1,5 +1,7 @@
 package jadex.examples.presentationtimer.remotecontrol;
 
+import java.util.Map;
+
 import jadex.base.PlatformConfiguration;
 import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
@@ -12,8 +14,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SResultListener;
-
-import java.util.Map;
 
 
 public class ClientMain  {

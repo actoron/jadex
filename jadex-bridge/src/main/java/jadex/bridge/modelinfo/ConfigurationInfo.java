@@ -1,12 +1,12 @@
 package jadex.bridge.modelinfo;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Information contained in a component configuration.

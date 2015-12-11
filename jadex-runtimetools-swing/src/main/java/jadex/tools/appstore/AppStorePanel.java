@@ -1,22 +1,5 @@
 package jadex.tools.appstore;
 
-import jadex.base.gui.componentviewer.IAbstractViewerPanel;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.appstore.AppMetaInfo;
-import jadex.bridge.service.types.appstore.IAppGui;
-import jadex.bridge.service.types.appstore.IAppProviderService;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingIntermediateExceptionDelegationResultListener;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -40,6 +23,23 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.appstore.AppMetaInfo;
+import jadex.bridge.service.types.appstore.IAppGui;
+import jadex.bridge.service.types.appstore.IAppProviderService;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 /**
  * 

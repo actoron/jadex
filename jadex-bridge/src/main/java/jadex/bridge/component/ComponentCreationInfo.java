@@ -1,11 +1,11 @@
 package jadex.bridge.component;
 
+import java.util.Map;
+
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
-
-import java.util.Map;
 
 /**
  *  Internal parameter object for data required during component initialization.

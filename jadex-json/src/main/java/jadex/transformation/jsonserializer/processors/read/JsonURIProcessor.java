@@ -2,7 +2,6 @@ package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 

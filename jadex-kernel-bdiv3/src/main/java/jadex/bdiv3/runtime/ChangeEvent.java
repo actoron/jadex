@@ -5,7 +5,7 @@ import jadex.rules.eca.IEvent;
 /**
  *  Event that is thrown in case of a bdi element change (belief, goal, etc.).
  */
-public class ChangeEvent
+public class ChangeEvent<T>
 {
 	/** Event type that a fact has been added. */
 	public static final String FACTADDED = "factadded";
@@ -80,7 +80,7 @@ public class ChangeEvent
 	protected Object source;
 	
 	/** The event value. */
-	protected Object value;
+	protected T value;
 	
 	/** The change identifier, e.g. index or key. */
 	protected Object info;
@@ -98,7 +98,7 @@ public class ChangeEvent
 	 *  @param source
 	 *  @param value
 	 */
-	public ChangeEvent(String type, Object source, Object value, Object info)
+	public ChangeEvent(String type, Object source, T value, Object info)
 	{
 		this.type = type;
 		this.source = source;
@@ -113,7 +113,7 @@ public class ChangeEvent
 	{
 		this.type = event.getType().getType(0);
 		this.source = event.getType().getType(1);
-		this.value = event.getContent();
+		this.value = (T) event.getContent();
 	}
 	
 //	/**
@@ -166,7 +166,7 @@ public class ChangeEvent
 	 *  Get the value.
 	 *  @return The value.
 	 */
-	public Object getValue()
+	public T getValue()
 	{
 		return value;
 	}
@@ -175,7 +175,7 @@ public class ChangeEvent
 	 *  Set the value.
 	 *  @param value The value to set.
 	 */
-	public void setValue(Object value)
+	public void setValue(T value)
 	{
 		this.value = value;
 	}

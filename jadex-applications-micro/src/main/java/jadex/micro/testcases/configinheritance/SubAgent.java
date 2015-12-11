@@ -1,5 +1,7 @@
 package jadex.micro.testcases.configinheritance;
 
+import java.util.Arrays;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
@@ -21,8 +23,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Arrays;
 
 /**
  *  Agent that tests if a configuration can be inherited and

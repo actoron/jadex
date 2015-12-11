@@ -1,10 +1,10 @@
 package jadex.bdiv3.tutorial.b1;
 
-import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.annotation.PlanBody;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanBody;
 
 /**
  *  Translation plan that translates one word.

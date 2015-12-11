@@ -1,10 +1,10 @@
 package jadex.rules.state;
 
-import jadex.commons.concurrent.ISynchronizator;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import jadex.commons.concurrent.ISynchronizator;
 
 /**
  *  An object holding the state as

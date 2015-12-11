@@ -1,5 +1,8 @@
 package jadex.bdi.testcases;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
@@ -11,9 +14,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Base class for test plans that create other agents.

@@ -1,5 +1,14 @@
 package jadex.rules.rulesystem.rete.nodes;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.rules.rulesystem.AbstractAgenda;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
@@ -10,15 +19,6 @@ import jadex.rules.rulesystem.rete.extractors.IValueExtractor;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  A terminal node stores the full matches and notifies

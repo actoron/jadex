@@ -1,8 +1,5 @@
 package jadex.webservice.examples.rs.hello;
 
-import jadex.extension.rs.publish.JadexXMLBodyReader;
-import jadex.xml.bean.JavaWriter;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -20,6 +17,9 @@ import javax.ws.rs.core.UriInfo;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import jadex.extension.rs.publish.JadexXMLBodyReader;
+import jadex.xml.bean.JavaWriter;
 
 @Path("")
 public class Hello

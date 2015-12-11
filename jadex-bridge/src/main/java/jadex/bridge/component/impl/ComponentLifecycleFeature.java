@@ -1,5 +1,8 @@
 package jadex.bridge.component.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -15,9 +18,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 

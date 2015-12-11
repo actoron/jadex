@@ -1,11 +1,11 @@
 package jadex.bridge.service.types.remote;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
-
-import java.util.Collection;
 
 
 /**

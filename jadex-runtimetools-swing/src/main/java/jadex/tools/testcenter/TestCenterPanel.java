@@ -1,36 +1,5 @@
 package jadex.tools.testcenter;
 
-import jadex.base.SRemoteGui;
-import jadex.base.test.TestReport;
-import jadex.base.test.Testcase;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IRemoteResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.BrowserPane;
-import jadex.commons.gui.EditableList;
-import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ScrollablePanel;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.xml.PropertiesXMLHelper;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -73,6 +42,37 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+
+import jadex.base.SRemoteGui;
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IRemoteResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.BrowserPane;
+import jadex.commons.gui.EditableList;
+import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ScrollablePanel;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.xml.PropertiesXMLHelper;
 
 /**
  *  The test center panel for running tests and viewing the results.

@@ -1,5 +1,8 @@
 package jadex.bdi.examples.marsworld.sentry;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.application.EnvironmentService;
 import jadex.bdi.examples.marsworld.RequestProduction;
 import jadex.bdiv3.runtime.IGoal;
@@ -16,9 +19,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

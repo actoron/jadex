@@ -33,7 +33,7 @@ public class AGRExtensionService //implements IComponentFactoryExtensionService
 	public static Set<Object> getXMLMapping()
 	{
 		Set types = new HashSet();
-		String uri = "http://jadex.sourceforge.net/jadex-agrspace";
+		String uri = "http://www.activecomponents.org/jadex-agrspace";
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agrspacetype")}), new ObjectInfo(MAGRSpaceType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "grouptype")}), new ObjectInfo(MGroupType.class)));

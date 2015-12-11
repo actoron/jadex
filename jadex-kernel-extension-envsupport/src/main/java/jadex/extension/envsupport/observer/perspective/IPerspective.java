@@ -1,9 +1,9 @@
 package jadex.extension.envsupport.observer.perspective;
 
+import java.awt.Component;
+
 import jadex.commons.meta.ITypedPropertyObject;
 import jadex.extension.envsupport.observer.gui.IObserverCenter;
-
-import java.awt.Component;
 
 /**
  * A perspective responsible for displaying information gathered using a view.

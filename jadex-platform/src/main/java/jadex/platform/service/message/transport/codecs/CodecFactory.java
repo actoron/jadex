@@ -1,14 +1,14 @@
 package jadex.platform.service.message.transport.codecs;
 
-import jadex.bridge.service.types.message.ICodec;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.collection.SCollection;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import jadex.bridge.service.types.message.ICodec;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.collection.SCollection;
 
 /**
  *  The factory for codecs.

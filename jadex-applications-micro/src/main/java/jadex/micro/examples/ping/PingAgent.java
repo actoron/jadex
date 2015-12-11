@@ -1,13 +1,13 @@
 package jadex.micro.examples.ping;
 
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentMessageArrived;
-
-import java.util.Map;
 
 /**
  *  Answer ping requests. 

@@ -1,8 +1,8 @@
 package jadex.commons.transformation;
 
-import jadex.commons.SUtil;
-
 import java.util.Arrays;
+
+import jadex.commons.SUtil;
 
 
 /**

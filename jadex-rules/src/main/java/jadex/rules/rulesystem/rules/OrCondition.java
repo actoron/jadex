@@ -1,8 +1,8 @@
 package jadex.rules.rulesystem.rules;
 
-import jadex.rules.rulesystem.ICondition;
-
 import java.util.List;
+
+import jadex.rules.rulesystem.ICondition;
 
 /**
  *  Condition for or-ing contained conditions.

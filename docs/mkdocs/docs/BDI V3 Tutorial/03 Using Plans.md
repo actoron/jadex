@@ -147,7 +147,7 @@ public void translateEnglishGerman()
 
 In this exercise we will explore other plan methods. Besides the already known body method three other plan lifecycle methods exist, which are called respectively when the plan passes successfully (@PlanPassed), fails with exception (@PlanFailed) or is aborted (@PlanAborted) e.g. when the context of plan becomes invalid. This time, we need a translation agent with an inner plan class to be able to add the aforementioned method. Hence, it is most convenient to take the class from exercise B2 as starting point and copy its content to the new file. Afterwards we need to apply the following changes:
 
--   Add a try-catch-block to the adoptPlan() call and wait for the plan to be finished using get() at the end of the invocation. The get() turns the future based asynchronous call into a synchronous one. For more information about asynchronous programming with futures in Jadex please refer to the <span class="wikiexternallink">[AC User Guide](AC%20User%20Guide/03%20Asynchronous%20Programming)</span>. The agent body method should look like this:
+-   Add a try-catch-block to the adoptPlan() call and wait for the plan to be finished using get() at the end of the invocation. The get() turns the future based asynchronous call into a synchronous one. For more information about asynchronous programming with futures in Jadex please refer to the <span class="wikiexternallink">[AC User Guide](../AC%20User%20Guide/03%20Asynchronous%20Programming)</span>. The agent body method should look like this:
 
 
 ```java

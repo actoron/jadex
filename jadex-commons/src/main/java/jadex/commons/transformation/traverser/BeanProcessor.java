@@ -1,13 +1,13 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 
 /**
  *  Processor that traverses Java beans.

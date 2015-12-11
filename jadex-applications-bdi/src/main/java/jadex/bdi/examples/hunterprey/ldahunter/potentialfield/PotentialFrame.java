@@ -1,5 +1,14 @@
 package jadex.bdi.examples.hunterprey.ldahunter.potentialfield;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.HeadlessException;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -14,15 +23,6 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Int;
 import jadex.extension.envsupport.math.Vector2Int;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.HeadlessException;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 
 /**
  *  A gui for the LA hunter.

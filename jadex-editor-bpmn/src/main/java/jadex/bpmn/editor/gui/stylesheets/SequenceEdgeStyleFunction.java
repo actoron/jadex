@@ -1,12 +1,5 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
-import jadex.bpmn.editor.gui.GuiConstants;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VEdge;
-import jadex.bpmn.editor.model.visual.VInParameter;
-import jadex.bpmn.editor.model.visual.VOutParameter;
-import jadex.bpmn.model.MActivity;
-
 import java.util.List;
 
 import com.mxgraph.model.mxGeometry;
@@ -14,6 +7,13 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxEdgeStyle.mxEdgeStyleFunction;
 import com.mxgraph.view.mxGraph;
+
+import jadex.bpmn.editor.gui.GuiConstants;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VOutParameter;
+import jadex.bpmn.model.MActivity;
 
 /**
  *  Style function for sequence edges.

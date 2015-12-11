@@ -1,12 +1,5 @@
 package jadex.tools.simcenter;
 
-import jadex.base.SRemoteClock;
-import jadex.base.SRemoteClock.TimerEntries;
-import jadex.bridge.service.types.simulation.ISimulationService;
-import jadex.commons.collection.SCollection;
-import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
-import jadex.commons.gui.jtable.ObjectTableModel;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -22,6 +15,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import jadex.base.SRemoteClock;
+import jadex.base.SRemoteClock.TimerEntries;
+import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.commons.collection.SCollection;
+import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
+import jadex.commons.gui.jtable.ObjectTableModel;
 
 /**
  *  The timer panel.

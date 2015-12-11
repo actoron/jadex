@@ -1,5 +1,10 @@
 package jadex.bridge.sensor.service;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.sensor.time.TimedProperty;
 import jadex.bridge.service.IService;
@@ -8,11 +13,6 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Property for the overall latency a service call.

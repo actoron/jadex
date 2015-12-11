@@ -1,5 +1,9 @@
 package jadex.micro.examples.dungeonkeeper;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
@@ -8,10 +12,6 @@ import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.action.GetPosition;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Int;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *  The move action.

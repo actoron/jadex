@@ -1,5 +1,8 @@
 package jadex.bridge.modelinfo;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -7,9 +10,6 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-
-import java.util.List;
-import java.util.Map;
 
 
 /**

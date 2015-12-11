@@ -29,7 +29,7 @@ In this tutorial a simple chat application will be implemented. The chat applica
 
 </div>
 
-![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)\
+![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)  
 *Conceptual design of the Chat application*
 
 <div class="wikimodel-emptyline">

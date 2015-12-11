@@ -1,11 +1,11 @@
 package jadex.bpmn.editor.model.visual;
 
+import com.mxgraph.model.mxICell;
+import com.mxgraph.view.mxGraph;
+
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
-
-import com.mxgraph.model.mxICell;
-import com.mxgraph.view.mxGraph;
 
 /**
  *  Visual representation of a data edge.

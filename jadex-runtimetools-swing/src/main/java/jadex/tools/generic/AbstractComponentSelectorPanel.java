@@ -1,5 +1,10 @@
 package jadex.tools.generic;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.JComboBox;
+
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -8,17 +13,11 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.swing.JComboBox;
 
 /**
  *  Abstract base class for selector panels.

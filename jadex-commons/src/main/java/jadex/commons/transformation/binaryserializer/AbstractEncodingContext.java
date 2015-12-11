@@ -1,10 +1,10 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
  *  Abstract encoding context that provides base functionality.

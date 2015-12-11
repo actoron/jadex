@@ -1,19 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.controllers.SCreationController;
-import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
-import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
-import jadex.bpmn.editor.model.visual.VEdge;
-import jadex.bpmn.editor.model.visual.VElement;
-import jadex.bpmn.editor.model.visual.VMessagingEdge;
-import jadex.bpmn.model.MPool;
-import jadex.bpmn.model.io.SBpmnModelWriter;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.Graphics2D;
@@ -61,6 +47,20 @@ import org.w3c.dom.Document;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxStylesheet;
+
+import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.controllers.SCreationController;
+import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
+import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
+import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
+import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.io.SBpmnModelWriter;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 public class BpmnMenuBar extends JMenuBar
 {

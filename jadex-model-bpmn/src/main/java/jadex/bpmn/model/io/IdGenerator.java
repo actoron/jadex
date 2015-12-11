@@ -1,12 +1,12 @@
 package jadex.bpmn.model.io;
 
-import jadex.commons.Base64;
-import jadex.commons.IResultCommand;
-import jadex.commons.SUtil;
-
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+
+import jadex.commons.Base64;
+import jadex.commons.IResultCommand;
+import jadex.commons.SUtil;
 
 /**
  *  A configurable Id generator.

@@ -1,5 +1,9 @@
 package jadex.bdiv3.examples.garbagecollector;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.application.EnvironmentService;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bridge.IInternalAccess;
@@ -8,11 +12,6 @@ import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * 

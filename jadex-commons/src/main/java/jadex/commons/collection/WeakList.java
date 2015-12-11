@@ -1,7 +1,5 @@
 package jadex.commons.collection;
 
-import jadex.commons.SUtil;
-
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.lang.ref.Reference;
@@ -14,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+
+import jadex.commons.SUtil;
 
 /**
  *  A list with weak entries.

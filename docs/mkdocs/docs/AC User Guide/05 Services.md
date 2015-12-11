@@ -1,7 +1,7 @@
 <span>Chapter 5 - Services</span> 
 =================================
 
-![05 Services@servicecontainer.png](servicecontainer.png)\
+![05 Services@servicecontainer.png](servicecontainer.png)  
 *Service container*
 
 <div class="wikimodel-emptyline">
@@ -60,7 +60,7 @@ The third block contains methods that can be used to dynamically locate methods 
 
 The search scope defines the area of the search and is per default set to application. This means that only components within the started application are considered within the search. In the figure below a visual representation of the most relevant search scopes is given. Static constants for search scopes are available via the class *RequiredServiceInfo*.
 
-![05 Services@scopes.png](scopes.png)\
+![05 Services@scopes.png](scopes.png)  
 *Search scopes*
 
 <span>Interceptor Handling</span> 
@@ -71,7 +71,7 @@ The fourth block is meant for runtime interceptor management of service. These m
 <span>Parameter Passing</span> 
 ------------------------------
 
-![05 Services@parameterpassing.png](parameterpassing.png)\
+![05 Services@parameterpassing.png](parameterpassing.png)  
 *Parameter passing semantics*
 
 <div class="wikimodel-emptyline">
@@ -120,7 +120,7 @@ Whenever a (non-raw) service is called from another component thread switching i
 
 </div>
 
-![05 Services@invocation.png](invocation.png)\
+![05 Services@invocation.png](invocation.png)  
 *Invocation scheme*
 
 <div class="wikimodel-emptyline">

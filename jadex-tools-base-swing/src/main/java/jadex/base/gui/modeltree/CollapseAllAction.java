@@ -1,17 +1,17 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.base.gui.filetree.FileTreePanel;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ToolTipAction;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-
 import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 import javax.swing.tree.TreePath;
+
+import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.base.gui.filetree.FileTreePanel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  *  Collapse all paths.

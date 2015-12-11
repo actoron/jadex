@@ -1,5 +1,12 @@
 package jadex.extension.envsupport.environment;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
@@ -8,13 +15,6 @@ import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.MObjectType;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Default implementation of a space object. 

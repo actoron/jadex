@@ -1,5 +1,7 @@
 package jadex.micro.testcases.servicescope;
 
+import java.util.Map;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -18,8 +20,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-
-import java.util.Map;
 
 @Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(

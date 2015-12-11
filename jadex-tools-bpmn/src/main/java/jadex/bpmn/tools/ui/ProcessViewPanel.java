@@ -1,20 +1,5 @@
 package jadex.bpmn.tools.ui;
 
-import jadex.bpmn.features.IInternalBpmnComponentFeature;
-import jadex.bpmn.tools.ProcessThreadInfo;
-import jadex.bridge.BulkMonitoringEvent;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IBreakpointPanel;
-import jadex.commons.IFilter;
-import jadex.commons.future.FutureTerminatedException;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.gui.jtable.ResizeableTableHeader;
-import jadex.commons.gui.jtable.TableSorter;
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -34,6 +19,21 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
+
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
+import jadex.bpmn.tools.ProcessThreadInfo;
+import jadex.bridge.BulkMonitoringEvent;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.IBreakpointPanel;
+import jadex.commons.IFilter;
+import jadex.commons.future.FutureTerminatedException;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.jtable.ResizeableTableHeader;
+import jadex.commons.gui.jtable.TableSorter;
 
 /**
  *  Panel for showing details about a running BPMN process.

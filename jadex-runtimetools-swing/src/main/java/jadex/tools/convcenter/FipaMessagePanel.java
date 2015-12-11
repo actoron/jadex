@@ -1,14 +1,5 @@
 package jadex.tools.convcenter;
 
-import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.ComponentSelectorDialog;
-import jadex.base.gui.componenttree.ComponentIconCache;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.fipa.SFipa;
-import jadex.commons.SUtil;
-import jadex.commons.gui.SGUI;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -33,6 +24,15 @@ import javax.swing.JTextField;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.ComponentSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.fipa.SFipa;
+import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 
 /**
  *  A panel for displaying and editing a fipa message.

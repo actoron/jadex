@@ -1,13 +1,5 @@
 package jadex.platform.service.remote;
 
-import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITargetResolver;
-import jadex.bridge.service.BasicService;
-import jadex.commons.MethodInfo;
-import jadex.commons.SUtil;
-import jadex.commons.transformation.annotations.Alias;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +7,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITargetResolver;
+import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Alias;
 
 /**
  *  Info struct that holds all necessary model information to generate

@@ -1,15 +1,5 @@
 package jadex.rules.tools.reteviewer;
 
-import jadex.commons.ChangeEvent;
-import jadex.commons.IBreakpointPanel;
-import jadex.commons.IChangeListener;
-import jadex.commons.ISteppable;
-import jadex.commons.gui.SGUI;
-import jadex.rules.rulesystem.IRule;
-import jadex.rules.rulesystem.IRulebase;
-import jadex.rules.rulesystem.IRulebaseListener;
-import jadex.rules.tools.common.TableSorter;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -34,6 +24,16 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+
+import jadex.commons.ChangeEvent;
+import jadex.commons.IBreakpointPanel;
+import jadex.commons.IChangeListener;
+import jadex.commons.ISteppable;
+import jadex.commons.gui.SGUI;
+import jadex.rules.rulesystem.IRule;
+import jadex.rules.rulesystem.IRulebase;
+import jadex.rules.rulesystem.IRulebaseListener;
+import jadex.rules.tools.common.TableSorter;
 
 /**
  *  A panel for viewing the content of the rulebase.

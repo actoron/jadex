@@ -1,5 +1,7 @@
 package jadex.bdi.examples.hunterprey_classic.creature.actsense;
 
+import java.util.List;
+
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Food;
@@ -12,8 +14,6 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
-
-import java.util.List;
 
 /**
  *  Update the agent's belief according to the new vision.

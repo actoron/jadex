@@ -1,11 +1,11 @@
 package jadex.platform.service.message.transport.tcpmtp;
 
-import jadex.commons.SUtil;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+
+import jadex.commons.SUtil;
 
 /**
  *  Represents the input connection for a tcp stream.  

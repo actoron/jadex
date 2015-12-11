@@ -1,5 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
+
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
@@ -7,9 +10,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Proxy;
 
 /**
  *  Calls a methods on an object and returns the result.

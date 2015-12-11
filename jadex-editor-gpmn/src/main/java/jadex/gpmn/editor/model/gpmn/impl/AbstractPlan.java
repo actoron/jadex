@@ -1,12 +1,12 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.gpmn.editor.model.gpmn.IEdge;
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
 import jadex.gpmn.editor.model.gpmn.IPlan;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 

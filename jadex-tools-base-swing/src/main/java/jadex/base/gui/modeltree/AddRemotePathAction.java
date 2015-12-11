@@ -1,12 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.RemoteFileChooser;
-import jadex.bridge.service.types.filetransfer.FileData;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ToolTipAction;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -14,6 +7,13 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
+
+import jadex.base.gui.RemoteFileChooser;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  *  Action for adding a remote path. 

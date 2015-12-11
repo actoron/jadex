@@ -1,11 +1,11 @@
 package jadex.tools.generic;
 
+import javax.swing.Icon;
+
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-
-import javax.swing.Icon;
 
 /**
  *  Abstract plugin for wrapping service views to plugin view.

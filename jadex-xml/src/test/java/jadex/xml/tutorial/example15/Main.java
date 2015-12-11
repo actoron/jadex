@@ -1,5 +1,9 @@
 package jadex.xml.tutorial.example15;
 
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
@@ -14,10 +18,6 @@ import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
 import jadex.xml.stax.QName;
 import jadex.xml.writer.Writer;
-
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**

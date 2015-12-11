@@ -1,5 +1,7 @@
 package jadex.platform.service.awareness.discovery;
 
+import java.net.InetAddress;
+
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -13,8 +15,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.net.InetAddress;
 
 /**
  *  Abstract receive handler base class.

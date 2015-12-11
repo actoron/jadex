@@ -1,5 +1,8 @@
 package jadex.micro.testcases.autoterminate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -7,7 +10,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -20,9 +22,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.testcases.TestAgent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Test automatic termination of subscriptions, when subscriber dies.
