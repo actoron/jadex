@@ -4897,6 +4897,33 @@ public class SUtil
 		candidates.add(new File(new File(new File(projectroot, "build"), "classes"), test ? "test" : "main"));
 		candidates.add(new File(new File(projectroot, "target"), test ? "test-classes" : "classes"));
 		
+		return findOutputDir(projectroot, candidates);
+	}
+	
+	/**
+	 *  Try to find a resource directory for current build tool chain.
+	 *  Tries bin (e.g. eclipse), build/resources/main (gradle), target/resources (maven)
+	 *  and uses the directory with the newest file.
+	 *  @param test	Find test directory instead of main.
+	 */
+	public static File	findResourceDir(File projectroot, boolean test)
+	{
+		List<File>	candidates	= new ArrayList<File>();
+		candidates.add(new File(new File(new File(projectroot, "build"), "resources"), test ? "test" : "main"));
+		candidates.add(new File(new File(projectroot, "target"), test ? "test-resources" : "resources"));
+		
+		return findOutputDir(projectroot, candidates);
+	}
+	
+	/** 
+	 *  Try to find the correct classpath root directory for current build tool chain
+	 *  from a list of candidates.
+	 *  
+	 * 	@param projectroot The project root.
+	 * 	@param candidates The candidates.
+	 */
+	public static File findOutputDir(File projectroot, List<File> candidates)
+	{
 		File	ret	= null;
 		long	retmod	= -1;
 		for(File cand: candidates)
