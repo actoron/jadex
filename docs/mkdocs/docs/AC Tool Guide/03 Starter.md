@@ -49,7 +49,7 @@ Having selected a component model from the model tree, Jadex will attempt to loa
 
 **Configuration: **The configuration in which the component should be started. Configurations are named property settings declared within a component. A configuration e.g. describes with which subscomponents a component should be started.
 
-**Component name: **The component instance name. This name has to be unique, i.e. there must not exist any component with the same** **name within the platform. This means, if you start a component two times without changing the instance name, you will encounter an error message stating that the component could not be created because it already exists. If you don't care about the instance name or intend starting multiple components you can select the auto generate option and set the number of components�to create.
+**Component name: **The component instance name. This name has to be unique, i.e. there must not exist any component with the same** **name within the platform. This means, if you start a component two times without changing the instance name, you will encounter an error message stating that the component could not be created because it already exists. If you don't care about the instance name or intend starting multiple components you can select the auto generate option and set the number of components to create.
 
 **Parent: **The optional parent component. Using the '...' button a component selector can be brought up and a parent component can be chosen by clicking the corresponding component.** **Using the 'x' button a previous selection can be deleted.
 
