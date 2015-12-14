@@ -21,11 +21,13 @@ public class BPMNStartElementsTest //extends TestCase
 	public void testStartActivities() throws MalformedURLException
 	{
 //		System.err.println("starting platform");
+		File projectroot = new File("../jadex-applications-bpmn");
+		File resdir = SUtil.findResourceDir(projectroot, false);
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 //				"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 				"-simulation", "true",
 				"-asyncexecution", "true",
-				"-libpath", "new String[]{\""+SUtil.findBuildDir(new File("../jadex-applications-bpmn")).toURI().toURL().toString()+"\"}",
+				"-libpath", "new String[]{\""+SUtil.findBuildDir(projectroot).toURI().toURL().toString()+(resdir!=null? ("\",\""+resdir.toURI().toURL().toString()):"") + "\"}",
 //				"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
 				"-logging_level", "java.util.logging.Level.WARNING",
 //				"-debugfutures", "true",
