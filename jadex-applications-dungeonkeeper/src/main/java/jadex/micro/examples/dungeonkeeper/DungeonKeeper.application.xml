@@ -1,0 +1,136 @@
+<!--
+	<H3>The dungeon keeper scenario</H3>
+
+-->
+
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="DungeonKeeper" package="jadex.micro.examples.dungeonkeeper">
+	
+	<imports>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+	</imports>
+	
+	<extensiontypes>
+		<env:envspacetype name="gc2dspace" width="32" height="32" class="Grid2D">
+			<!-- <env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property> -->
+
+			<env:objecttypes>
+				<env:objecttype name="field">
+					<env:property name="position" class="IVector2"/>
+					<env:property name="type" class="String"/>
+				</env:objecttype>
+				<env:objecttype name="imp">
+					<env:property name="position" class="IVector2"/>
+					<env:property name="direction" class="double">0.0</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+						
+			<env:processtypes>
+				<env:processtype name="init" class="InitMapProcess" />
+			</env:processtypes>
+			
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+			</env:dataviews>
+						
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Imp" objecttype="imp" createcomponent="true"/>
+			</env:avatarmappings>
+		
+			<env:actiontypes>
+				<env:actiontype name="move" class="MoveAction" >
+					<env:property name="object_id" class="Object"/>
+					<env:property name="direction" class="double"/>
+				</env:actiontype>
+			</env:actiontypes>
+		
+			<env:perspectives>
+				<env:perspective name="main" class="Perspective2D" objectplacement="center">
+					<env:drawable objecttype="field" width="1.0" height="1.0">
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/solidrock.png">
+							<env:drawcondition>InitMapProcess.IMPENETRABLE_ROCK.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/rock.png">
+							<env:drawcondition>InitMapProcess.ROCK.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/reinforcedwall.png">
+							<env:drawcondition>InitMapProcess.REINFORCED_WALL.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/gold.png">
+							<env:drawcondition>InitMapProcess.GOLD.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/gems.png">
+							<env:drawcondition>InitMapProcess.GEMS.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/dirtpath.png">
+							<env:drawcondition>InitMapProcess.DIRT_PATH.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/claimedpath.png">
+							<env:drawcondition>InitMapProcess.CLAIMED_PATH.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/water.png">
+							<env:drawcondition>InitMapProcess.WATER.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/lava.png">
+							<env:drawcondition>InitMapProcess.LAVA.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/dungeonheart.png">
+							<env:drawcondition>InitMapProcess.DUNGEONHEART.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/treasury.png">
+							<env:drawcondition>InitMapProcess.TREASURY.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/hatchery.png">
+							<env:drawcondition>InitMapProcess.HATCHERY.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/lair.png">
+							<env:drawcondition>InitMapProcess.LAIR.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+					</env:drawable>
+					<env:drawable objecttype="imp" width="1.0" height="1.0">
+						<env:ellipse color="yellow" width="0.5" height="0.5" x="-0.5" y="-0.5"></env:ellipse>
+					</env:drawable>
+				</env:perspective>
+			</env:perspectives>
+			
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<env:property name="space">$space</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+	
+	<componenttypes>
+		<componenttype name="Imp" filename="jadex/micro/examples/dungeonkeeper/ImpAgent.class"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Test map">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="10" height="10">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="mapfile">"jadex/micro/examples/dungeonkeeper/test.map"</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="main"/>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+	</configurations>
+
+</applicationtype>

@@ -1,0 +1,8 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-bridge')
+	compile project(':jadex-kernel-micro')
+	compile project(':jadex-kernel-application')
+	compile project(':jadex-kernel-extension-envsupport')
+}
