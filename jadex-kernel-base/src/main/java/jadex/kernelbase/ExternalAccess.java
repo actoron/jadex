@@ -182,7 +182,9 @@ public class ExternalAccess implements IExternalAccess
 //
 //		return (IServiceProvider)ia.getServiceContainer();
 //	}
-
+	
+	protected volatile Future<Map<String, Object>> killfut;
+	
 	/**
 	 *  Kill the component.
 	 */
@@ -190,7 +192,16 @@ public class ExternalAccess implements IExternalAccess
 	{
 //		System.out.println("exta killComp: "+getComponentIdentifier());
 		
-		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
+		boolean	kill	= false;
+		synchronized(this)
+		{
+			if(killfut==null)
+			{
+				kill	= true;
+				killfut	= new Future<Map<String, Object>>();
+			}
+		}
+		
 //		ret.addResultListener(new IResultListener<Map<String,Object>>()
 //		{
 //			public void resultAvailable(Map<String, Object> result)
@@ -203,77 +214,79 @@ public class ExternalAccess implements IExternalAccess
 //				System.out.println("exOcc "+exception);
 //			}
 //		});
-		
-		if(!valid)
+		if(kill)
 		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(!ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
-		{
-			try
+			if(!valid)
 			{
-//				if(cid.getParent()==null)
-//				{
-//					System.out.println("platform e: "+cid.getName());
-//					Thread.dumpStack();
-//				}
-//				System.out.println("ext kill: "+cid);
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				killfut.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+			}
+			else if(!ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
+			{
+				try
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
+	//				if(cid.getParent()==null)
+	//				{
+	//					System.out.println("platform e: "+cid.getName());
+	//					Thread.dumpStack();
+	//				}
+	//				System.out.println("ext kill: "+cid);
+					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 					{
-//						System.out.println("int kill");
-						if(!valid)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							// Todo: consistency between external access and invokeLater()
-							ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-						}
-						else
-						{
-							ia.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret)
+	//						System.out.println("int kill");
+							if(!valid)
 							{
-								public void customResultAvailable(Map<String, Object> result)
+								// Todo: consistency between external access and invokeLater()
+								killfut.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+							}
+							else
+							{
+								ia.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(killfut)
 								{
-									super.customResultAvailable(result);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									super.exceptionOccurred(exception);
-								}
-							});
+									public void customResultAvailable(Map<String, Object> result)
+									{
+										super.customResultAvailable(result);
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										super.exceptionOccurred(exception);
+									}
+								});
+							}
+							
+							return IFuture.DONE;
 						}
 						
-						return IFuture.DONE;
-					}
-					
-//					public String toString()
-//					{
-//						return "JOOOOOOOOOOOOOOOOOOOOO";
-//					}
-				}); 
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
+	//					public String toString()
+	//					{
+	//						return "JOOOOOOOOOOOOOOOOOOOOO";
+	//					}
+					}); 
+				}
+				catch(final Exception e)
 				{
-					public void run()
+					Starter.scheduleRescueStep(cid, new Runnable()
 					{
-						ret.setException(e);
-					}
-				});
+						public void run()
+						{
+							killfut.setException(e);
+						}
+					});
+				}
 			}
-		}
-		else
-		{
-//			if(cid.getParent()==null)
-//			{
-//				System.err.println("platform i: "+cid.getName());
-//				Thread.dumpStack();
-//			}
-			ia.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+			else
+			{
+	//			if(cid.getParent()==null)
+	//			{
+	//				System.err.println("platform i: "+cid.getName());
+	//				Thread.dumpStack();
+	//			}
+				ia.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(killfut));
+			}
 		}
 		
-		return ret;
+		return killfut;
 	}
 	
 	
