@@ -3,7 +3,6 @@ package jadex.platform.service;
 import java.io.File;
 
 import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SUtil;
 import junit.framework.Test;
 
 /**
@@ -16,23 +15,32 @@ public class ManagementExtensionTest extends ComponentTestSuite
 	 */
 	public ManagementExtensionTest()	throws Exception
 	{
-		this(SUtil.findBuildDir(new File("."), true));
-	}
-	
-	/**
-	 *  Constructor called by JadexInstrumentor for Android tests.
-	 */
-	public ManagementExtensionTest(File cproot)	throws Exception
-	{
-		super(cproot, cproot,
+		super(new File("."),
 			// Exclude failing tests to allow maven build.
 			new String[]
-		{
-			"ManualUser",	// extends user to allow manual testing with gui.
-			"TestSubprocessStartEvent",	// part of test and sometimes produces exception when started alone.
-			"TestIntermediateEvent"	// part of test and sometimes produces exception when started alone.
-		});
+			{
+//				"parallelizer\\User",	// Broken test? todo: fix! (lars?)
+//				"parallelizer/User",	// Broken test? todo: fix! (lars?)
+				"ManualUser",	// extends user to allow manual testing with gui.
+				"TestSubprocessStartEvent",	// part of test and sometimes produces exception when started alone.
+				"TestIntermediateEvent"	// part of test and sometimes produces exception when started alone.
+			});
 	}
+	
+//	/**
+//	 *  Constructor called by JadexInstrumentor for Android tests.
+//	 */
+//	public ManagementExtensionTest(File cproot)	throws Exception
+//	{
+//		super(cproot, cproot,
+//			// Exclude failing tests to allow maven build.
+//			new String[]
+//		{
+//			"ManualUser",	// extends user to allow manual testing with gui.
+//			"TestSubprocessStartEvent",	// part of test and sometimes produces exception when started alone.
+//			"TestIntermediateEvent"	// part of test and sometimes produces exception when started alone.
+//		});
+//	}
 	
 	/**
 	 *  Static method called by eclipse JUnit runner.

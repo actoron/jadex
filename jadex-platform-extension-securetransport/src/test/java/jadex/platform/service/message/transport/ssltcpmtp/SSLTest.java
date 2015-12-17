@@ -3,7 +3,6 @@ package jadex.platform.service.message.transport.ssltcpmtp;
 import java.io.File;
 
 import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SUtil;
 import junit.framework.Test;
 
 /**
@@ -16,7 +15,7 @@ public class SSLTest	extends ComponentTestSuite
 	 */
 	public SSLTest()	throws Exception
 	{
-		this(SUtil.findBuildDir(new File("."), true));
+		this(new File("."));
 	}
 	
 	/**
@@ -24,7 +23,7 @@ public class SSLTest	extends ComponentTestSuite
 	 */
 	public SSLTest(File cproot)	throws Exception
 	{
-		super(cproot, cproot,
+		super(cproot, 
 			// Exclude failing tests to allow maven build.
 			new String[]
 		{

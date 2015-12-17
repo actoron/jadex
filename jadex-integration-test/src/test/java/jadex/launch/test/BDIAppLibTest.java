@@ -2,7 +2,6 @@ package jadex.launch.test;
 import java.io.File;
 
 import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SUtil;
 import junit.framework.Test;
 
 
@@ -17,18 +16,18 @@ public class BDIAppLibTest	extends	ComponentTestSuite
 	public BDIAppLibTest()	throws Exception
 	{
 		// Use BDI classes directory as classpath root,
-		this(SUtil.findBuildDir(new File("../jadex-applib-bdi")));
+		super(new File("../jadex-applib-bdi"), null);
 	}
 	
-	/**
-	 *  Constructor called by JadexInstrumentor for Android tests.
-	 */
-	public BDIAppLibTest(File cproot) throws Exception
-	{
-		super(cproot, cproot,
-			// Exclude failing tests to allow maven build.
-			new String[]{});
-	}
+//	/**
+//	 *  Constructor called by JadexInstrumentor for Android tests.
+//	 */
+//	public BDIAppLibTest(File cproot) throws Exception
+//	{
+//		super(cproot, cproot,
+//			// Exclude failing tests to allow maven build.
+//			new String[]{});
+//	}
 	
 	/**
 	 *  Static method called by eclipse JUnit runner.

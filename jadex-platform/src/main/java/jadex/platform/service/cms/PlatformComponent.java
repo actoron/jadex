@@ -516,7 +516,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			this.exception	= e;
 		}
 		IComponentManagementService cms = SServiceProvider.getLocalService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IFuture<Map<String, Object>> ret = cms.destroyComponent(getComponentIdentifier());		
+		IFuture<Map<String, Object>> ret = cms.destroyComponent(getComponentIdentifier());
+		return ret;
 //		if(getComponentIdentifier().getParent()==null)
 //		{
 //			ret.addResultListener(new IResultListener<Map<String,Object>>()
@@ -532,7 +533,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //				}
 //			});
 //		}
-		return ret;
 	}
 	
 	/**

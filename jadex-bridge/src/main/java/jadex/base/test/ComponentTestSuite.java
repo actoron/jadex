@@ -17,6 +17,9 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
 import jadex.base.Starter;
 import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
@@ -42,6 +45,7 @@ import junit.framework.TestSuite;
 /**
  * Execute multiple component tests in a test suite.
  */
+@RunWith(AllTests.class)
 public class ComponentTestSuite extends TestSuite
 {
 	//-------- constants --------
@@ -98,11 +102,31 @@ public class ComponentTestSuite extends TestSuite
 
 	/**
 	 * Create a component test suite for components contained in a given path.
+	 * @param dir	The project directory.
+	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
+	 */
+	public ComponentTestSuite(File dir, String[] excludes) throws Exception
+	{
+		this(SUtil.findOutputDirs(dir), excludes);
+	}
+	
+	/**
+	 * Create a component test suite for components contained in a given path.
+	 * @param root	The class path root corresponding to the path.
+	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
+	 */
+	public ComponentTestSuite(File[] root, String[] excludes) throws Exception
+	{
+		this(root, root, excludes);
+	}
+	
+	/**
+	 * Create a component test suite for components contained in a given path.
 	 * @param path	The path to look for test cases in.
 	 * @param root	The classpath root corresponding to the path.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
+	public ComponentTestSuite(File[] path, File[] root, String[] excludes) throws Exception
 	{
 		this(path, root, excludes, true, true, true);
 //		this(path, root, excludes, false, true, false);
@@ -117,7 +141,7 @@ public class ComponentTestSuite extends TestSuite
 	 * @param load	Include broken components (will cause test failure if any). Also shows loadable, but not startable components as succeeded tests.
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes, boolean test, boolean load, boolean start) throws Exception
+	public ComponentTestSuite(File[] path, File[] root, String[] excludes, boolean test, boolean load, boolean start) throws Exception
 	{
 		this(DEFARGS, path, root, excludes, test, load, start);
 	}
@@ -131,9 +155,9 @@ public class ComponentTestSuite extends TestSuite
 	 * @param broken	Include broken components (will cause test failure if any).
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final boolean runtests, final boolean load, final boolean start) throws Exception
+	public ComponentTestSuite(String[] args, File[] paths, File roots[], String[] excludes, final boolean runtests, final boolean load, final boolean start) throws Exception
 	{
-		super(path.toString());
+		super(paths[0].toString());
 		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
 		startTimer();
 		
@@ -149,146 +173,157 @@ public class ComponentTestSuite extends TestSuite
 		
 		// Only works with x-rid hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
 //		final IResourceIdentifier	rid	= null;
-		final IResourceIdentifier	rid;
-		try
+		long ctimeout = Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());	// Start with normal timeout for platform startup/shutdown.
+		IResourceIdentifier	rid	= null;
+		for(int root=0; root<roots.length; root++)
 		{
-			URL url = root.toURI().toURL();
-			rid	= libsrv.addURL(null, url).get();
+			try
+			{
+				URL url = roots[root].toURI().toURL();
+				if(rid==null)
+				{
+					rid	= libsrv.addURL(null, url).get();
+				}
+				else
+				{
+					libsrv.addURL(rid, url).get();
+				}
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-		
 		this.classloader	= libsrv.getClassLoader(null).get();
 		stopTimer();
-
-		
-		// Scan for test cases.
-		List<String> scanForTestCases = scanForTestCases(root, path);
-		this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getComponentIdentifier(), 0.05*scanForTestCases.size());	// Timeout for loading models.
-		startTimer();
-		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path+" (scan timeout: "+timeout+")");
-		long ctimeout = Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());	// Start with normal timeout for platform startup/shutdown.
-		for (String abspath : scanForTestCases)
-		{	
-			boolean	exclude	= false;
-						
-			for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
-			{
-				exclude	= abspath.indexOf(excludes[i])!=-1;
-			}
-			
-			if(!exclude)
-			{
-				try
+	
+		for(int root=0; root<roots.length; root++)
+		{			
+			// Scan for test cases.
+			List<String> scanForTestCases = scanForTestCases(roots[root], paths[root]);
+			this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getComponentIdentifier(), 0.05*scanForTestCases.size());	// Timeout for loading models.
+			startTimer();
+			Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + paths[root]+" (scan timeout: "+timeout+")");
+			for (String abspath : scanForTestCases)
+			{	
+				boolean	exclude	= false;
+							
+				for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
 				{
-//					System.out.println("Check: "+abspath);
-					if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
+					exclude	= abspath.indexOf(excludes[i])!=-1;
+				}
+				
+				if(!exclude)
+				{
+					try
 					{
-//						System.out.println("Loadable: "+abspath);
-//						if(abspath.indexOf("INeg")!=-1)
-//							System.out.println("test");
-						boolean	startable	= ((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get()).booleanValue();
-						
-//						System.out.println("Startable: "+abspath+", "+startable);
-						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get();
-						boolean istest = false;
-						if(model!=null && model.getReport()==null && startable)
+	//					System.out.println("Check: "+abspath);
+						if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
 						{
-							IArgument[]	results	= model.getResults();
-							for(int i=0; !istest && i<results.length; i++)
+	//						System.out.println("Loadable: "+abspath);
+	//						if(abspath.indexOf("INeg")!=-1)
+	//							System.out.println("test");
+							boolean	startable	= ((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get()).booleanValue();
+							
+	//						System.out.println("Startable: "+abspath+", "+startable);
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get();
+							boolean istest = false;
+							if(model!=null && model.getReport()==null && startable)
 							{
-								if(results[i].getName().equals("testresults") && Testcase.class.equals(
-									results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports())))
+								IArgument[]	results	= model.getResults();
+								for(int i=0; !istest && i<results.length; i++)
 								{
-									istest	= true;
+									if(results[i].getName().equals("testresults") && Testcase.class.equals(
+										results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports())))
+									{
+										istest	= true;
+									}
 								}
 							}
-						}
-						
-						if(istest)
-						{
-							System.out.print(".");
-//								System.out.println("Test: "+abspath);
-							if(runtests)
+							
+							if(istest)
 							{
-								ComponentTest test = new ComponentTest(cms, model, this);
+								System.out.print(".");
+	//								System.out.println("Test: "+abspath);
+								if(runtests)
+								{
+									ComponentTest test = new ComponentTest(cms, model, this);
+									test.setName(abspath);
+									addTest(test);
+									if(ctimeout==Timeout.NONE || test.getTimeout()==Timeout.NONE)
+									{
+										ctimeout	= Timeout.NONE;
+									}
+									else
+									{
+										ctimeout	+= test.getTimeout();
+									}
+								}
+							}
+							else if(startable && model.getReport()!=null)
+							{
+								System.out.print(".");
+	//								System.out.println("Start: "+abspath);
+								if(start)
+								{
+									ComponentStartTest test = new ComponentStartTest(cms, model, this);
+									test.setName(abspath);
+									addTest(test);
+									if(ctimeout==Timeout.NONE)
+									{
+										ctimeout	= Timeout.NONE;
+									}
+									else
+									{
+										// Delay instead of timeout as start test should be finished after that.
+										ctimeout	+= test.getTimeout();
+									}
+								}
+							}
+							else if(load)
+							{
+								System.out.print(".");
+	//							System.out.println("Load: "+abspath);
+								ComponentLoadTest test = new ComponentLoadTest(model, model.getReport());
 								test.setName(abspath);
 								addTest(test);
-								if(ctimeout==Timeout.NONE || test.getTimeout()==Timeout.NONE)
-								{
-									ctimeout	= Timeout.NONE;
-								}
-								else
-								{
-									ctimeout	+= test.getTimeout();
-								}
 							}
 						}
-						else if(startable && model.getReport()!=null)
+					}
+					catch(final RuntimeException e)
+					{
+						if(load)
 						{
-							System.out.print(".");
-//								System.out.println("Start: "+abspath);
-							if(start)
+							ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
 							{
-								ComponentStartTest test = new ComponentStartTest(cms, model, this);
-								test.setName(abspath);
-								addTest(test);
-								if(ctimeout==Timeout.NONE)
+								public String getErrorText()
 								{
-									ctimeout	= Timeout.NONE;
+									StringWriter	sw	= new StringWriter();
+									e.printStackTrace(new PrintWriter(sw));
+									return "Error loading model: "+sw.toString();
 								}
-								else
+								
+								public String getErrorHTML()
 								{
-									// Delay instead of timeout as start test should be finished after that.
-									ctimeout	+= test.getTimeout();
+									return getErrorText();
 								}
-							}
-						}
-						else if(load)
-						{
-							System.out.print(".");
-//							System.out.println("Load: "+abspath);
-							ComponentLoadTest test = new ComponentLoadTest(model, model.getReport());
+								
+								public Map<String, String> getDocuments()
+								{
+									return null;
+								}
+							});
 							test.setName(abspath);
 							addTest(test);
 						}
 					}
 				}
-				catch(final RuntimeException e)
-				{
-					if(load)
-					{
-						ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
-						{
-							public String getErrorText()
-							{
-								StringWriter	sw	= new StringWriter();
-								e.printStackTrace(new PrintWriter(sw));
-								return "Error loading model: "+sw.toString();
-							}
-							
-							public String getErrorHTML()
-							{
-								return getErrorText();
-							}
-							
-							public Map<String, String> getDocuments()
-							{
-								return null;
-							}
-						});
-						test.setName(abspath);
-						addTest(test);
-					}
-				}
 			}
+			
+			stopTimer();
+			
+			Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + paths[root]+", cumulated execution timeout is: "+ctimeout);
 		}
-		
-		stopTimer();
-		
-		Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + path+", cumulated execution timeout is: "+ctimeout);
 		this.timeout	= ctimeout;
 	}
 

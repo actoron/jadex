@@ -4875,6 +4875,41 @@ public class SUtil
 	}
 
 	/**
+	 *  Try to find the correct classpath root directories for current build tool chain.
+	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
+	 *  and uses the directory with the newest file.
+	 */
+	public static File[]	findOutputDirs(File projectroot)
+	{
+		Set<File>	ret	= new LinkedHashSet<File>();
+		File	build	= findBuildDir(projectroot, false);
+		if(build!=null)
+		{
+			ret.add(build);
+		}
+		File	res	= findResourceDir(projectroot, false);
+		if(res!=null)
+		{
+			ret.add(res);
+		}
+		File	test	= findBuildDir(projectroot, true);
+		// Hack!!! Do not add bin for test, when build already found (would cause adding eclipse-generated bin folder in gradle build when no test dir present)
+		if(test!=null && (build==null || !test.equals(new File(projectroot, "bin"))))
+		{
+			ret.add(test);
+		}
+		File	testres	= findResourceDir(projectroot, true);
+		if(testres!=null)
+		{
+			ret.add(testres);
+		}
+		
+//		System.out.println("findOutputDirs("+projectroot+"): "+ret);
+		return ret.toArray(new File[ret.size()]);
+	}
+	
+
+	/**
 	 *  Try to find the correct classpath root directory for current build tool chain.
 	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
 	 *  and uses the directory with the newest file.
@@ -4928,11 +4963,14 @@ public class SUtil
 		long	retmod	= -1;
 		for(File cand: candidates)
 		{
-			long	mod	= SUtil.getLastModified(cand);
-			if(mod>retmod)
+			if(cand.exists())
 			{
-				ret	= cand;
-				retmod	= mod;
+				long	mod	= SUtil.getLastModified(cand);
+				if(mod>retmod)
+				{
+					ret	= cand;
+					retmod	= mod;
+				}
 			}
 		}
 		
