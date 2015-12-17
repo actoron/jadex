@@ -93,7 +93,7 @@ public class BasicTypeConverter //implements ITypeConverter
 	 *  @param clazz The clazz.
 	 *  @return True, if built-in type.
 	 */
-	public static boolean isBuiltInType(Class clazz)
+	public static boolean isBuiltInType(Class<?> clazz)
 	{
 		return basicconverters.get(clazz)!=null;
 	}
@@ -103,7 +103,7 @@ public class BasicTypeConverter //implements ITypeConverter
 	 *  @param clazz The clazz.
 	 *  @return True, if built-in type.
 	 */
-	public static boolean isExtendedBuiltInType(Class clazz)
+	public static boolean isExtendedBuiltInType(Class<?> clazz)
 	{
 		return extconverters.get(clazz)!=null;
 	}
