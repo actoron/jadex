@@ -21,6 +21,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -39,6 +41,7 @@ import jadex.micro.annotation.RequiredServices;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
 public class InitiatorAgent extends TestAgent
 {
 	/**
@@ -46,18 +49,23 @@ public class InitiatorAgent extends TestAgent
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
+		System.out.println("Initiator starting: "+agent.getComponentIdentifier()+" "+System.currentTimeMillis());
+		
 		final Future<Void> ret = new Future<Void>();
 		
 		testWithSec(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
+				System.out.println("Initiator test1 finished: "+agent.getComponentIdentifier()+" "+System.currentTimeMillis());
+				
 				tc.addReport(result);
 				testWithoutSec(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
 						tc.addReport(result);
+						System.out.println("Initiator finished: "+agent.getComponentIdentifier()+" "+System.currentTimeMillis());
 						ret.setResult(null);
 					}
 				}));
@@ -88,14 +96,15 @@ public class InitiatorAgent extends TestAgent
 						{
 							public void customResultAvailable(final TestReport result)
 							{
-//								System.out.println("killing: "+platform.getComponentIdentifier());
+								System.out.println("killing"+testno+": "+platform.getComponentIdentifier()+" "+System.currentTimeMillis());
 								platform.killComponent()
 									.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
 								{
 									public void customResultAvailable(Map<String, Object> v)
 									{
-//										System.out.println("killed: "+platform.getComponentIdentifier());
+										System.out.println("killed"+testno+": "+platform.getComponentIdentifier()+" "+System.currentTimeMillis());
 										platforms.remove(platform);
+										System.out.println("killedII"+testno+": "+platform.getComponentIdentifier()+" "+System.currentTimeMillis());
 										ret.setResult(result);
 									}
 								});
@@ -131,11 +140,13 @@ public class InitiatorAgent extends TestAgent
 						{
 							public void customResultAvailable(final TestReport result)
 							{
+								System.out.println("killing"+testno+": "+platform.getComponentIdentifier()+" "+System.currentTimeMillis());
 								platform.killComponent()
 									.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
 								{
 									public void customResultAvailable(Map<String, Object> v)
 									{
+										System.out.println("killed"+testno+": "+platform.getComponentIdentifier()+" "+System.currentTimeMillis());
 										if(platforms!=null)	// Todo: Race condition during cleanup!?
 										{
 											platforms.remove(platform);
