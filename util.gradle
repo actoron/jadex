@@ -39,16 +39,16 @@ def isAndroidLibraryProject(project) {
     project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
 }
 
-def onReleaseVariant(project, Closure c) {
+def onVariant(project, String variantName, Closure c) {
     if (isAndroidLibraryProject(project)) {
         project.android.libraryVariants.all {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+            if (variant.buildType.name.equals(variantName)) {
                 c(variant)
             }
         }
     } else {
         project.android.applicationVariants.all {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+            if (variant.buildType.name.equals(variantName)) {
                 c(variant)
             }
         }
@@ -62,9 +62,9 @@ def onReleaseVariant(project, Closure c) {
  * @param c callback
  * @return void
  */
-def onReleaseOutput(project, Closure c) {
-    onReleaseVariant(project) { variant ->
-        def output = variant.outputs.find({ o -> o.name.contains(com.android.builder.core.BuilderConstants.RELEASE)})
+def onVariantOutput(project, String variantName, Closure c) {
+    onVariant(project, variantName) { variant ->
+        def output = variant.outputs.find({ o -> o.name.contains(variantName)})
         c(output)
     }
 }
@@ -294,8 +294,8 @@ ext {
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     androidSdkExists = this.&androidSdkExists
-    onReleaseVariant = this.&onReleaseVariant
-    onReleaseOutput = this.&onReleaseOutput
+    onVariant = this.&onVariant
+    onVariantOutput = this.&onVariantOutput
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
     excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime

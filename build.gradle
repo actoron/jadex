@@ -137,8 +137,8 @@ subprojects
             apply plugin: 'com.android.application'
         }
 
-		// strip "-release" from .aar and .apks
-		onReleaseOutput(project) {output ->
+		// strip "-debug" from .aar and .apks to include them in dist
+		onVariantOutput(project, com.android.builder.core.BuilderConstants.DEBUG) {output ->
 			def fileName = output.outputFile.getName()
 			output.outputFile = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}")
 		}
@@ -470,7 +470,7 @@ def createDistZip(distname, arts, isaddon)
 					if (isAndroidLibraryProject(sp)) {
 						targetFolder = '/lib/'
 					}
-					onReleaseOutput(sp) {output ->
+					onVariantOutput(sp, com.android.builder.core.BuilderConstants.RELEASE) {output ->
 						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
 					}
 				} else {
