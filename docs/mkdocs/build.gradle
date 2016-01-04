@@ -7,12 +7,12 @@ import java.util.regex.Pattern
 
 def rootDir = "..${File.separator}.."
 
-Properties props = new Properties()
-props.load(new FileInputStream("${rootDir}${File.separator}gradle.properties"))
-
-props.entrySet().each { entry ->
-    project.ext[entry.getKey()] = entry.getValue()
-}
+//Properties props = new Properties()
+//props.load(new FileInputStream("${rootDir}${File.separator}gradle.properties"))
+//
+//props.entrySet().each { entry ->
+//    project.ext[entry.getKey()] = entry.getValue()
+//}
 
 apply from: "${rootDir}/src/main/buildutils/versioning.gradle"
 

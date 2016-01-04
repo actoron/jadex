@@ -1,42 +1,55 @@
 //ext.buildTimestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
 
+// Version numbers
+def major = 3
+def minor = 0
 
-if (project.hasProperty('jadex_major_build_version')
-    && project.hasProperty('jadex_minor_build_version')) {
-    version = new ProjectVersion(jadex_major_build_version, jadex_minor_build_version, System.env.BUILD_VERSION_SUFFIX)
-} else {
-    version = new ProjectVersion(ext.jadex_major_build_version, ext.jadex_minor_build_version, System.env.BUILD_VERSION_SUFFIX)
+def patch = '@SRCDIST_PATCH_LEVEL@' // this is injected during build process
+
+//if (project.hasProperty('jadex_major_build_version')
+//    && project.hasProperty('jadex_minor_build_version')) {
+//    major = jadex_major_build_version
+//    minor = jadex_minor_build_version
+//} else {
+//    major = ext.jadex_major_build_version
+//    minor = ext.jadex_minor_build_version
+//}
+
+if (patch.contains('@') || patch.isEmpty()) {
+    patch = System.env.BUILD_VERSION_SUFFIX
 }
+
+version = new ProjectVersion(major, minor, patch)
 
 project.ext.jadex_build_version = version.toString()
 
 
 class ProjectVersion {
-    Integer major
-    Integer minor
-    String build
+    public final Integer major
+    public final Integer minor
+    public final String patch
 
 
-    ProjectVersion(String major, String minor, String build) {
+    ProjectVersion(String major, String minor, String patch) {
         this.major = Integer.parseInt(major)
         this.minor = Integer.parseInt(minor)
-        this.build = build
+        this.patch = patch
     }
 
-    ProjectVersion(Integer major, Integer minor, String build) {
+    ProjectVersion(Integer major, Integer minor, String patch) {
         this.major = major
         this.minor = minor
-        this.build = build
+        this.patch = patch
     }
 
     @Override
     String toString() {
         String fullVersion = "$major.$minor"
 
-        if (build) {
-            fullVersion += ".$build"
+        if (patch) {
+            fullVersion += ".$patch"
         } else {
-            fullVersion +=".local"
+            fullVersion +=".unknown"
         }
 
         fullVersion

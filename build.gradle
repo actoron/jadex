@@ -519,8 +519,22 @@ def createSrcZip(distname, arts, isaddon)
 	def mainzipdir = 'sources/'
 	String maindir = project.projectDir.getCanonicalPath()
 	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+	String filterDir = project.distsDir.getCanonicalPath() + '/sources/filtered/'
 	def ant = new groovy.util.AntBuilder()
 	ant.sequential {
+		copy todir: filterDir,
+		{
+			resources
+			{
+				// hardcode jenkins-generated patch level in versioning.gradle
+				fileset dir: maindir , includes: 'src/main/buildutils/versioning.gradle', erroronmissingdir: true
+			}
+
+			filterset begintoken: '@', endtoken: '@',
+			{
+				filter token: 'SRCDIST_PATCH_LEVEL', value: '' + (project.version.patch ?: '')
+			}
+		}
 		zip destfile: zipfilename,
 		{
 			arts.each { artname ->
@@ -537,10 +551,12 @@ def createSrcZip(distname, arts, isaddon)
 			if (!isaddon) {
 				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle, gradle.properties, gradle/wrapper/*', excludes: '.gradle'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat', filemode: 755
-				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*', excludes: 'src/main/buildutils/versioning.gradle'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
+				zipfileset dir: filterDir, prefix: mainzipdir, includes: '**/*' // filtered files, such as versioning.gradle
 			}
 		}
+		ant.delete dir: filterDir
 	}
 }
 
