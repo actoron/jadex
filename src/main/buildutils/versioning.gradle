@@ -1,0 +1,44 @@
+//ext.buildTimestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
+
+
+if (project.hasProperty('jadex_major_build_version')
+    && project.hasProperty('jadex_minor_build_version')) {
+    version = new ProjectVersion(jadex_major_build_version, jadex_minor_build_version, System.env.BUILD_VERSION_SUFFIX)
+} else {
+    version = new ProjectVersion(ext.jadex_major_build_version, ext.jadex_minor_build_version, System.env.BUILD_VERSION_SUFFIX)
+}
+
+project.ext.jadex_build_version = version.toString()
+
+
+class ProjectVersion {
+    Integer major
+    Integer minor
+    String build
+
+
+    ProjectVersion(String major, String minor, String build) {
+        this.major = Integer.parseInt(major)
+        this.minor = Integer.parseInt(minor)
+        this.build = build
+    }
+
+    ProjectVersion(Integer major, Integer minor, String build) {
+        this.major = major
+        this.minor = minor
+        this.build = build
+    }
+
+    @Override
+    String toString() {
+        String fullVersion = "$major.$minor"
+
+        if (build) {
+            fullVersion += ".$build"
+        } else {
+            fullVersion +=".local"
+        }
+
+        fullVersion
+    }
+}

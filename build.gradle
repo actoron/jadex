@@ -29,14 +29,13 @@ project.subprojects.each { sp ->
 	addSubproject('', sp)
 }
 
-project.ext.jadex_build_version=jadex_build_version
 project.ext.jadex_lastbuild_version=jadex_lastbuild_version
 project.ext.timestamp=timestamp
 
 buildscript 
 {
-    apply from: 'util.gradle'
- 
+    apply from: "$rootDir/src/main/buildutils/util.gradle"
+
     repositories
     {
         //mavenLocal()
@@ -53,7 +52,8 @@ buildscript
 
 allprojects
 {
-    version = jadex_build_version // Set the project version property, otherwise install does not work
+	apply from: "$rootDir/src/main/buildutils/versioning.gradle"
+
     if(isCommercial(project))
     {
 	    group = 'com.actoron.jadex'
@@ -83,7 +83,7 @@ allprojects
 	    	mavenCentral()
 	        maven
 			{
-				url "http://www2.activecomponents.org/nexus/content/repositories/snapshots/"
+				url "http://nexus.actoron.com/content/repositories/oss-snapshots/"
 			}
 	    }
 	}
@@ -218,7 +218,7 @@ subprojects
         processResources {
 			filesMatching('**/version.properties')
 			{
-				filter{String line -> line.replace('${jadex_build_version}', rootProject.jadex_build_version)}
+				filter{String line -> line.replace('${jadex_build_version}', project.version.toString())}
 				filter{String line -> line.replace('${timestamp}', rootProject.timestamp)}
 			}
 		}
@@ -404,13 +404,13 @@ task srcZips << {
 }
 
 task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
-	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
+	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 } << {
 	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 }
 
 task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
-	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
+	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 } << {
 	gradle.ext.selecteddists.each { selecteddist ->
 		def arts = gradle.ext.distartmap.get(selecteddist)
@@ -538,7 +538,6 @@ def createSrcZip(distname, arts, isaddon)
 				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle, gradle.properties, gradle/wrapper/*', excludes: '.gradle'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat', filemode: 755
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*'
-				zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
 			}
 		}

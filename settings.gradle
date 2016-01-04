@@ -1,7 +1,7 @@
-apply from: 'util.gradle'
+apply from: "$rootDir/src/main/buildutils/util.gradle"
 
 def artifactselectionmarker = 'X'
-def buildconfigsfile = 'buildconfigs.csv'
+def buildconfigsfile = 'src/main/buildutils/buildconfigs.csv'
 //gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,editorgpmn,relaystandalone'
 gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,relaystandalone' // no editorgpmn until kernel not available
 
