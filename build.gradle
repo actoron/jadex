@@ -151,7 +151,7 @@ subprojects
                 minSdkVersion android_minSdkVersion
                 targetSdkVersion android_targetSdkVersion
                 versionCode 1
-                versionName project.version
+				versionName jadex_build_version
             }
 
             sourceSets {
