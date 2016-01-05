@@ -13,7 +13,7 @@ dependencies {
 }
 
 //group = 'net.sourceforge.jadex'
-version = gradleplugin_build_version
+//version = gradleplugin_build_version
 
 test.testLogging.showStandardStreams = true
 
