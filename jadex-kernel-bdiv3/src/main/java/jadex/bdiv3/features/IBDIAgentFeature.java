@@ -47,7 +47,7 @@ public interface IBDIAgentFeature
 	/**
 	 *  Dispatch a pojo plan and wait for its result.
 	 *  @param plan The pojo plan or plan name.
-	 *  @return The plan result.
+	 *  @return The plan result, i.e. the return value of the plan body method, if any.
 	 */
 	public <T, E> IFuture<E> adoptPlan(T plan);
 	
@@ -55,7 +55,7 @@ public interface IBDIAgentFeature
 	 *  Dispatch a goal wait for its result.
 	 *  @param plan The pojo plan or plan name.
 	 *  @param args The plan arguments.
-	 *  @return The plan result.
+	 *  @return The plan result, i.e. the return value of the plan body method, if any.
 	 */
 	public <T, E> IFuture<E> adoptPlan(T plan, Object... args);
 	
