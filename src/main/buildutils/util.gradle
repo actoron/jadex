@@ -116,7 +116,7 @@ def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [
 //                    project.configurations.compile.exclude group: innerDep.group, module: innerDep.name
 
                     if (parentDep instanceof DefaultProjectDependency) {
-                        println "excluding transitive dep: $parentDep.name / $innerDep.group:$innerDep.name in $project.name"
+//                        println "excluding transitive dep: $parentDep.name / $innerDep.group:$innerDep.name in $project.name"
                         ((DefaultProjectDependency)parentDep).exclude(group: innerDep.group, module: innerDep.name)
                     }
                 }
@@ -232,6 +232,21 @@ def setBootClassPath(Project project) {
     }
 }
 
+def getDetachedConfiguration(Project p, Configuration c) {
+    def excludes = []
+    c.allDependencies.findAll {it instanceof ModuleDependency}.each {dep ->
+        dep.getExcludeRules().each {rule ->
+            excludes.add("$rule.group:$rule.module")
+        }
+    }
+    c.getExcludeRules().each {rule ->
+        excludes.add("$rule.group:$rule.module")
+    }
+
+    def detached = p.configurations.detachedConfiguration(c.allDependencies.findAll { !(it instanceof ProjectDependency) && !excludes.contains("$it.group:$it.name") } as Dependency[])
+
+}
+
 //def getSourceDir(project) {
 //    if (isAndroidProject(project)) {
 //        project.android.sourceSets.main.java.srcDirs
@@ -300,4 +315,5 @@ ext {
     setBootClassPath = this.&setBootClassPath
     excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime
     addParentScopeMappings = this.&addParentScopeMappings
+    getDetachedConfiguration = this.&getDetachedConfiguration
 }

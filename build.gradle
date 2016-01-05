@@ -138,7 +138,7 @@ subprojects
         }
 
 		// strip "-debug" from .aar and .apks to include them in dist
-		onVariantOutput(project, com.android.builder.core.BuilderConstants.DEBUG) {output ->
+		onVariantOutput(project, com.android.builder.core.BuilderConstants.RELEASE) {output ->
 			def fileName = output.outputFile.getName()
 			output.outputFile = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}")
 		}
@@ -469,10 +469,16 @@ def createDistZip(distname, arts, isaddon)
 					def targetFolder = '/apps/'
 					if (isAndroidLibraryProject(sp)) {
 						targetFolder = '/lib/'
+						onVariantOutput(sp, com.android.builder.core.BuilderConstants.RELEASE) {output ->
+							zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
+						}
+					} else {
+						// apps as debug version, because unsigned releases to not run on android
+						onVariantOutput(sp, com.android.builder.core.BuilderConstants.DEBUG) {output ->
+							zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
+						}
 					}
-					onVariantOutput(sp, com.android.builder.core.BuilderConstants.RELEASE) {output ->
-						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
-					}
+
 				} else {
 					if (isApp(sp)) {
 						zipfileset dir: spbdir + '/libs', prefix: foldername + '/apps/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
@@ -486,7 +492,8 @@ def createDistZip(distname, arts, isaddon)
 						}
 						
 						if (!isaddon) {
-							sp.configurations.detachedConfiguration(runtimeConfig.allDependencies.findAll { !(it instanceof ProjectDependency) } as Dependency[]).each { file ->
+							def detached = getDetachedConfiguration(sp, runtimeConfig)
+							detached.each { file ->
 								if (!extdists.contains(file)) {
 									zipfileset file: file, prefix: foldername + '/lib/'
 									extdists.add(file)
