@@ -252,7 +252,7 @@ subprojects
 		                repository(url: repo_snapshot_commercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
-		                uniqueVersion=true
+		                uniqueVersion=false
 		            }
 		        }
 		        else
@@ -261,7 +261,7 @@ subprojects
 						repository(url: repo_snapshot_noncommercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
-		                uniqueVersion=true
+		                uniqueVersion=false
 		            }
 		        }
 	        }
