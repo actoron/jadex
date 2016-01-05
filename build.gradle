@@ -249,10 +249,7 @@ subprojects
 	        	if (isCommercial(project))
 	        	{
 		            mavenDeployer {
-		                repository(url: repo_release_commercial) {
-		                	authentication(userName: repouser, password: repopassword)
-		                }
-		                snapshotRepository(url: repo_snapshot_commercial) {
+		                repository(url: repo_snapshot_commercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
 		                uniqueVersion=true
@@ -261,10 +258,7 @@ subprojects
 		        else
 		        {
 		        	mavenDeployer {
-		                repository(url: repo_release_noncommercial) {
-		                	authentication(userName: repouser, password: repopassword)
-		                }
-						snapshotRepository(url: repo_snapshot_noncommercial) {
+						repository(url: repo_snapshot_noncommercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
 		                uniqueVersion=true
