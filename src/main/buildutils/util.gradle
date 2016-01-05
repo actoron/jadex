@@ -39,16 +39,16 @@ def isAndroidLibraryProject(project) {
     project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
 }
 
-def onReleaseVariant(project, Closure c) {
+def onVariant(project, String variantName, Closure c) {
     if (isAndroidLibraryProject(project)) {
         project.android.libraryVariants.all {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+            if (variant.buildType.name.equals(variantName)) {
                 c(variant)
             }
         }
     } else {
         project.android.applicationVariants.all {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+            if (variant.buildType.name.equals(variantName)) {
                 c(variant)
             }
         }
@@ -62,9 +62,9 @@ def onReleaseVariant(project, Closure c) {
  * @param c callback
  * @return void
  */
-def onReleaseOutput(project, Closure c) {
-    onReleaseVariant(project) { variant ->
-        def output = variant.outputs.find({ o -> o.name.contains(com.android.builder.core.BuilderConstants.RELEASE)})
+def onVariantOutput(project, String variantName, Closure c) {
+    onVariant(project, variantName) { variant ->
+        def output = variant.outputs.find({ o -> o.name.contains(variantName)})
         c(output)
     }
 }
@@ -116,7 +116,7 @@ def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [
 //                    project.configurations.compile.exclude group: innerDep.group, module: innerDep.name
 
                     if (parentDep instanceof DefaultProjectDependency) {
-                        println "excluding transitive dep: $parentDep.name / $innerDep.group:$innerDep.name in $project.name"
+//                        println "excluding transitive dep: $parentDep.name / $innerDep.group:$innerDep.name in $project.name"
                         ((DefaultProjectDependency)parentDep).exclude(group: innerDep.group, module: innerDep.name)
                     }
                 }
@@ -232,6 +232,21 @@ def setBootClassPath(Project project) {
     }
 }
 
+def getDetachedConfiguration(Project p, Configuration c) {
+    def excludes = []
+    c.allDependencies.findAll {it instanceof ModuleDependency}.each {dep ->
+        dep.getExcludeRules().each {rule ->
+            excludes.add("$rule.group:$rule.module")
+        }
+    }
+    c.getExcludeRules().each {rule ->
+        excludes.add("$rule.group:$rule.module")
+    }
+
+    def detached = p.configurations.detachedConfiguration(c.allDependencies.findAll { !(it instanceof ProjectDependency) && !excludes.contains("$it.group:$it.name") } as Dependency[])
+
+}
+
 //def getSourceDir(project) {
 //    if (isAndroidProject(project)) {
 //        project.android.sourceSets.main.java.srcDirs
@@ -294,10 +309,11 @@ ext {
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     androidSdkExists = this.&androidSdkExists
-    onReleaseVariant = this.&onReleaseVariant
-    onReleaseOutput = this.&onReleaseOutput
+    onVariant = this.&onVariant
+    onVariantOutput = this.&onVariantOutput
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
     excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime
     addParentScopeMappings = this.&addParentScopeMappings
+    getDetachedConfiguration = this.&getDetachedConfiguration
 }

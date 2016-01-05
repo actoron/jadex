@@ -29,14 +29,13 @@ project.subprojects.each { sp ->
 	addSubproject('', sp)
 }
 
-project.ext.jadex_build_version=jadex_build_version
 project.ext.jadex_lastbuild_version=jadex_lastbuild_version
 project.ext.timestamp=timestamp
 
 buildscript 
 {
-    apply from: 'util.gradle'
- 
+    apply from: "$rootDir/src/main/buildutils/util.gradle"
+
     repositories
     {
         //mavenLocal()
@@ -53,7 +52,8 @@ buildscript
 
 allprojects
 {
-    version = jadex_build_version // Set the project version property, otherwise install does not work
+	apply from: "$rootDir/src/main/buildutils/versioning.gradle"
+
     if(isCommercial(project))
     {
 	    group = 'com.actoron.jadex'
@@ -83,7 +83,7 @@ allprojects
 	    	mavenCentral()
 	        maven
 			{
-				url "http://www2.activecomponents.org/nexus/content/repositories/snapshots/"
+				url "http://nexus.actoron.com/content/repositories/oss-snapshots/"
 			}
 	    }
 	}
@@ -137,8 +137,8 @@ subprojects
             apply plugin: 'com.android.application'
         }
 
-		// strip "-release" from .aar and .apks
-		onReleaseOutput(project) {output ->
+		// strip "-debug" from .aar and .apks to include them in dist
+		onVariantOutput(project, com.android.builder.core.BuilderConstants.RELEASE) {output ->
 			def fileName = output.outputFile.getName()
 			output.outputFile = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}")
 		}
@@ -151,7 +151,7 @@ subprojects
                 minSdkVersion android_minSdkVersion
                 targetSdkVersion android_targetSdkVersion
                 versionCode 1
-                versionName project.version
+				versionName jadex_build_version
             }
 
             sourceSets {
@@ -218,7 +218,7 @@ subprojects
         processResources {
 			filesMatching('**/version.properties')
 			{
-				filter{String line -> line.replace('${jadex_build_version}', rootProject.jadex_build_version)}
+				filter{String line -> line.replace('${jadex_build_version}', project.version.toString())}
 				filter{String line -> line.replace('${timestamp}', rootProject.timestamp)}
 			}
 		}
@@ -249,25 +249,19 @@ subprojects
 	        	if (isCommercial(project))
 	        	{
 		            mavenDeployer {
-		                repository(url: repo_release_commercial) {
+		                repository(url: repo_snapshot_commercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
-		                snapshotRepository(url: repo_snapshot_commercial) {
-		                	authentication(userName: repouser, password: repopassword)
-		                }
-		                uniqueVersion=true
+		                uniqueVersion=false
 		            }
 		        }
 		        else
 		        {
 		        	mavenDeployer {
-		                repository(url: repo_release_noncommercial) {
+						repository(url: repo_snapshot_noncommercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
-						snapshotRepository(url: repo_snapshot_noncommercial) {
-		                	authentication(userName: repouser, password: repopassword)
-		                }
-		                uniqueVersion=true
+		                uniqueVersion=false
 		            }
 		        }
 	        }
@@ -404,13 +398,13 @@ task srcZips << {
 }
 
 task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
-	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
+	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 } << {
 	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 }
 
 task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
-	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of buildconfigs.csv."
+	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 } << {
 	gradle.ext.selecteddists.each { selecteddist ->
 		def arts = gradle.ext.distartmap.get(selecteddist)
@@ -469,10 +463,16 @@ def createDistZip(distname, arts, isaddon)
 					def targetFolder = '/apps/'
 					if (isAndroidLibraryProject(sp)) {
 						targetFolder = '/lib/'
+						onVariantOutput(sp, com.android.builder.core.BuilderConstants.RELEASE) {output ->
+							zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
+						}
+					} else {
+						// apps as debug version, because unsigned releases to not run on android
+						onVariantOutput(sp, com.android.builder.core.BuilderConstants.DEBUG) {output ->
+							zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
+						}
 					}
-					onReleaseOutput(sp) {output ->
-						zipfileset dir: output.outputFile.getParent(), prefix: foldername + targetFolder, includes:  output.outputFile.getName(), erroronmissingdir: true
-					}
+
 				} else {
 					if (isApp(sp)) {
 						zipfileset dir: spbdir + '/libs', prefix: foldername + '/apps/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
@@ -486,7 +486,8 @@ def createDistZip(distname, arts, isaddon)
 						}
 						
 						if (!isaddon) {
-							sp.configurations.detachedConfiguration(runtimeConfig.allDependencies.findAll { !(it instanceof ProjectDependency) } as Dependency[]).each { file ->
+							def detached = getDetachedConfiguration(sp, runtimeConfig)
+							detached.each { file ->
 								if (!extdists.contains(file)) {
 									zipfileset file: file, prefix: foldername + '/lib/'
 									extdists.add(file)
@@ -519,8 +520,22 @@ def createSrcZip(distname, arts, isaddon)
 	def mainzipdir = 'sources/'
 	String maindir = project.projectDir.getCanonicalPath()
 	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+	String filterDir = project.distsDir.getCanonicalPath() + '/sources/filtered/'
 	def ant = new groovy.util.AntBuilder()
 	ant.sequential {
+		copy todir: filterDir,
+		{
+			resources
+			{
+				// hardcode jenkins-generated patch level in versioning.gradle
+				fileset dir: maindir , includes: 'src/main/buildutils/versioning.gradle', erroronmissingdir: true
+			}
+
+			filterset begintoken: '@', endtoken: '@',
+			{
+				filter token: 'SRCDIST_PATCH_LEVEL', value: '' + (project.version.patch ?: '')
+			}
+		}
 		zip destfile: zipfilename,
 		{
 			arts.each { artname ->
@@ -537,11 +552,12 @@ def createSrcZip(distname, arts, isaddon)
 			if (!isaddon) {
 				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle, gradle.properties, gradle/wrapper/*', excludes: '.gradle'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat', filemode: 755
-				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*'
-				zipfileset dir: maindir, prefix: mainzipdir, includes: 'buildconfigs.csv'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*', excludes: 'src/main/buildutils/versioning.gradle'
 				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
+				zipfileset dir: filterDir, prefix: mainzipdir, includes: '**/*' // filtered files, such as versioning.gradle
 			}
 		}
+		ant.delete dir: filterDir
 	}
 }
 

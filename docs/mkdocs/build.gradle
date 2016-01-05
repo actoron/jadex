@@ -1,17 +1,21 @@
-import java.nio.file.CopyOption
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+def rootDir = "..${File.separator}.."
 
-Properties props = new Properties()
-props.load(new FileInputStream("${project.projectDir}${File.separator}..${File.separator}..${File.separator}gradle.properties"))
+//Properties props = new Properties()
+//props.load(new FileInputStream("${rootDir}${File.separator}gradle.properties"))
+//
+//props.entrySet().each { entry ->
+//    project.ext[entry.getKey()] = entry.getValue()
+//}
 
-def jadex_build_version = props.getProperty('jadex_build_version')
+apply from: "${rootDir}/src/main/buildutils/versioning.gradle"
+
 
 buildscript {
     repositories
@@ -22,7 +26,7 @@ buildscript {
         maven
                 {
                     name 'Active Components Nexus'
-                    url 'http://www.activecomponents.org/nexus/content/repositories/snapshots/'
+                    url 'http://nexus.actoron.com/content/repositories/oss-snapshots/'
                 }
     }
     dependencies {
@@ -46,7 +50,7 @@ task buildDocs (type: MkDocsTask) {
 task buildDocsZip (type: Zip, dependsOn: buildDocs) {
     from "${project.buildDir}${File.separator}site${File.separator}"
     baseName = 'jadex-mkdocs'
-    version = jadex_build_version
+    version = project.version
 //    into "$baseName-${version.replaceAll('-SNAPSHOT','')}"
     into "$baseName-$version"
     destinationDir = file("$project.buildDir")

@@ -1,0 +1,57 @@
+//ext.buildTimestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
+
+// Version numbers
+def major = 3
+def minor = 0
+
+def patch = '@SRCDIST_PATCH_LEVEL@' // this is injected during build process
+
+//if (project.hasProperty('jadex_major_build_version')
+//    && project.hasProperty('jadex_minor_build_version')) {
+//    major = jadex_major_build_version
+//    minor = jadex_minor_build_version
+//} else {
+//    major = ext.jadex_major_build_version
+//    minor = ext.jadex_minor_build_version
+//}
+
+if (patch.contains('@') || patch.isEmpty()) {
+    patch = System.env.BUILD_VERSION_SUFFIX
+}
+
+version = new ProjectVersion(major, minor, patch)
+
+project.ext.jadex_build_version = version.toString()
+
+
+class ProjectVersion {
+    public final Integer major
+    public final Integer minor
+    public final String patch
+
+
+    ProjectVersion(String major, String minor, String patch) {
+        this.major = Integer.parseInt(major)
+        this.minor = Integer.parseInt(minor)
+        this.patch = patch
+    }
+
+    ProjectVersion(Integer major, Integer minor, String patch) {
+        this.major = major
+        this.minor = minor
+        this.patch = patch
+    }
+
+    @Override
+    String toString() {
+        String fullVersion = "$major.$minor"
+
+        if (patch) {
+            fullVersion += ".$patch"
+        } else {
+            fullVersion +=".unknown"
+        }
+
+        fullVersion
+    }
+}
