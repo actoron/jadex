@@ -83,7 +83,7 @@ allprojects
 	    	mavenCentral()
 	        maven
 			{
-				url "http://nexus.actoron.com/content/repositories/oss-snapshots/"
+				url "http://nexus.actoron.com/content/repositories/oss-nightlies/"
 			}
 	    }
 	}
@@ -249,7 +249,7 @@ subprojects
 	        	if (isCommercial(project))
 	        	{
 		            mavenDeployer {
-		                repository(url: repo_snapshot_commercial) {
+		                repository(url: repo_commercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
 		                uniqueVersion=false
@@ -258,7 +258,7 @@ subprojects
 		        else
 		        {
 		        	mavenDeployer {
-						repository(url: repo_snapshot_noncommercial) {
+						repository(url: repo_noncommercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
 		                uniqueVersion=false
