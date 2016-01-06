@@ -43,7 +43,7 @@ public class MicroCreationTest //extends TestCase
 //			"-kernels", "\"micro\"",
 //			"-logging_level", "java.util.logging.Level.INFO",
 			//"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
-			"-libpath", "new String[]{\""+SUtil.findBuildDir(new File("../jadex-applications-micro")).toURI().toURL().toString()+"\"}", // only works maven 
+			"-libpath", "new String[]{\""+SUtil.findBuildDir("jadex-applications-micro").toURI().toURL().toString()+"\"}", // only works maven
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false",
 			"-saveonexit", "false",

@@ -172,7 +172,7 @@ public class InvokerAgent
 		// Start platform
 		try
 		{
-			String url	= "new String[]{\""+SUtil.findBuildDir(new File("../jadex-applications-micro")).toURI().toURL().toString()+"\"}";	// Todo: support RID for all loaded models.
+			String url	= "new String[]{\""+SUtil.findBuildDir("../jadex-applications-micro").toURI().toURL().toString()+"\"}";	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",

@@ -15,13 +15,13 @@ public class SSLTest	extends ComponentTestSuite
 	 */
 	public SSLTest()	throws Exception
 	{
-		this(new File("."));
+		this(".");
 	}
 	
 	/**
 	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
-	public SSLTest(File cproot)	throws Exception
+	public SSLTest(String cproot)	throws Exception
 	{
 		super(cproot, 
 			// Exclude failing tests to allow maven build.

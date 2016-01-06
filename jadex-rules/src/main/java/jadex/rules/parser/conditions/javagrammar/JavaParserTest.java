@@ -49,7 +49,7 @@ public class JavaParserTest
 			JavaJadexParser parser = new JavaJadexParser(tokens);
 		
 			ClassLoader	cl	= new URLClassLoader(new URL[]{
-				SUtil.findBuildDir(new File("../jadex-applications-bdi")).toURI().toURL()});
+				SUtil.findBuildDir("jadex-applications-bdi").toURI().toURL()});
 			OAVTypeModel	tmodel	= new OAVTypeModel("cleanertypes", cl);
 
 			OAVObjectType	locatype	= tmodel.getObjectType("jadex.bdi.examples.cleanerworld.Location");

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
+import jadex.base.test.IAbortableTestSuite;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -50,7 +51,7 @@ public class ComponentStartTest extends	ComponentTest
 	/**
 	 *  Create a component test.
 	 */
-	public ComponentStartTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
+	public ComponentStartTest(IComponentManagementService cms, IModelInfo comp, IAbortableTestSuite suite)
 	{
 		super(cms, comp, suite);
 		// Hack??? 

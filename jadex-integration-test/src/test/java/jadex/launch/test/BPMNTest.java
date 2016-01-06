@@ -38,7 +38,7 @@ public class BPMNTest	extends ComponentTestSuite
 	 */
 	public BPMNTest()	throws Exception
 	{
-		super(new File("../jadex-applications-bpmn"), EXCLUDES);
+		super("jadex-applications-bpmn", EXCLUDES);
 	}
 	
 //	/**

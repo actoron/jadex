@@ -46,7 +46,7 @@ import junit.framework.TestSuite;
  * Execute multiple component tests in a test suite.
  */
 @RunWith(AllTests.class)
-public class ComponentTestSuite extends TestSuite
+public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 {
 	//-------- constants --------
 	
@@ -102,12 +102,12 @@ public class ComponentTestSuite extends TestSuite
 
 	/**
 	 * Create a component test suite for components contained in a given path.
-	 * @param dir	The project directory.
+	 * @param projectDir	The project directory.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 */
-	public ComponentTestSuite(File dir, String[] excludes) throws Exception
+	public ComponentTestSuite(String projectDir, String[] excludes) throws Exception
 	{
-		this(SUtil.findOutputDirs(dir), excludes);
+		this(SUtil.findOutputDirs(projectDir), excludes);
 	}
 	
 	/**
@@ -348,7 +348,7 @@ public class ComponentTestSuite extends TestSuite
 						}
 						catch(UnsupportedOperationException e)
 						{
-							System.err.println("Unable to abort test suite.");
+							runner.stop();
 						}
 					} 
 					else 
@@ -476,7 +476,7 @@ public class ComponentTestSuite extends TestSuite
 		}, 0, 30000);
 
 		super.run(result);
-		
+
 		cleanup(result);
 	}
 	

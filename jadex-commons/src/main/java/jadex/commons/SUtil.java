@@ -3857,7 +3857,7 @@ public class SUtil
 	 *  Reads an input stream into memory (byte array).
 	 *  Note: This only works for files smaller than 2GiB.
 	 *  
-	 * 	@param file The file.
+	 * 	@param is The InputStream.
 	 * 	@return Contents of the file.
 	 * 	@throws IOException Exception on IO errors.
 	 */
@@ -4283,7 +4283,7 @@ public class SUtil
 		/**
 		 * Looks up the ClassLoader Hierarchy and tries to find a JadexDexClassLoader in it.
 		 * @param cl
-		 * @return {@link JadexDexClassLoader} or <code>null</code>, if none found.
+		 * @return {@link ClassLoader} or <code>null</code>, if none found.
 		 */
 		ClassLoader findJadexDexClassLoader(ClassLoader cl);
 
@@ -4879,7 +4879,7 @@ public class SUtil
 	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
 	 *  and uses the directory with the newest file.
 	 */
-	public static File[]	findOutputDirs(File projectroot)
+	public static File[]	findOutputDirs(String projectroot)
 	{
 		Set<File>	ret	= new LinkedHashSet<File>();
 		File	build	= findBuildDir(projectroot, false);
@@ -4914,7 +4914,7 @@ public class SUtil
 	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
 	 *  and uses the directory with the newest file.
 	 */
-	public static File	findBuildDir(File projectroot)
+	public static File	findBuildDir(String projectroot)
 	{
 		return findBuildDir(projectroot, false);
 	}
@@ -4925,32 +4925,34 @@ public class SUtil
 	 *  and uses the directory with the newest file.
 	 *  @param test	Find test directory instead of main.
 	 */
-	public static File	findBuildDir(File projectroot, boolean test)
+	public static File	findBuildDir(String projectroot, boolean test)
 	{
+		File projectDir = findDirForProject(projectroot);
 		List<File>	candidates	= new ArrayList<File>();
-		candidates.add(new File(projectroot, "bin"));
-		candidates.add(new File(new File(new File(projectroot, "build"), "classes"), test ? "test" : "main"));
-		candidates.add(new File(new File(projectroot, "target"), test ? "test-classes" : "classes"));
+		candidates.add(new File(projectDir, "bin"));
+		candidates.add(new File(new File(new File(projectDir, "build"), "classes"), test ? "test" : "main"));
+		candidates.add(new File(new File(projectDir, "target"), test ? "test-classes" : "classes"));
 		
-		return findOutputDir(projectroot, candidates);
+		return findOutputDir(projectDir, candidates);
 	}
-	
+
 	/**
 	 *  Try to find a resource directory for current build tool chain.
 	 *  Tries bin (e.g. eclipse), build/resources/main (gradle), target/resources (maven)
 	 *  and uses the directory with the newest file.
 	 *  @param test	Find test directory instead of main.
 	 */
-	public static File	findResourceDir(File projectroot, boolean test)
+	public static File	findResourceDir(String projectroot, boolean test)
 	{
+		File projectDir = findDirForProject(projectroot);
 		List<File>	candidates	= new ArrayList<File>();
-		candidates.add(new File(new File(new File(projectroot, "build"), "resources"), test ? "test" : "main"));
-		candidates.add(new File(new File(projectroot, "target"), test ? "test-resources" : "resources"));
-		
-		return findOutputDir(projectroot, candidates);
+		candidates.add(new File(new File(new File(projectDir, "build"), "resources"), test ? "test" : "main"));
+		candidates.add(new File(new File(projectDir, "target"), test ? "test-resources" : "resources"));
+
+		return findOutputDir(projectDir, candidates);
 	}
-	
-	/** 
+
+	/**
 	 *  Try to find the correct classpath root directory for current build tool chain
 	 *  from a list of candidates.
 	 *  
@@ -4975,5 +4977,20 @@ public class SUtil
 		}
 		
 		return ret;
+	}
+
+	/**
+	 * Find dir for given project.
+	 * This allows to run under different environments with different working paths
+	 * (e.g. intellij by default uses WP jadex/ while gradle uses WP jadex/jadex-integration-test
+	 * @param project
+	 * @return File
+	 */
+	private static File findDirForProject(String project) {
+		File result = new File(project);
+		if (!result.exists()) {
+			result = new File("../" + project);
+		}
+		return result;
 	}
 }

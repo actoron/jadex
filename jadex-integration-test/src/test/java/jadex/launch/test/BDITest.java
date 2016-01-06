@@ -56,7 +56,7 @@ public class BDITest	extends	ComponentTestSuite
 	 */
 	public BDITest() throws Exception 
 	{
-		super(new File("../jadex-applications-bdi"), EXCLUDES);
+		super("jadex-applications-bdi", EXCLUDES);
 	}
 
 //	/**

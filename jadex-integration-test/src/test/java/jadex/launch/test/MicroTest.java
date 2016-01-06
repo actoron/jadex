@@ -76,7 +76,7 @@ public class MicroTest	extends ComponentTestSuite
 	 */
 	public MicroTest() 	throws Exception
 	{
-		super(new File("../jadex-applications-micro"), EXCLUDES);
+		super("jadex-applications-micro", EXCLUDES);
 	}
 	
 	/**

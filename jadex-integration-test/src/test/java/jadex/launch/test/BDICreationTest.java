@@ -33,7 +33,7 @@ public class BDICreationTest //extends TestCase
 	public void	testBDICreation() throws Exception
 	{
 		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
-		File projectroot = new File("../jadex-applications-bdi");
+		String projectroot = new String("jadex-applications-bdi");
 		File resdir = SUtil.findResourceDir(projectroot, false);
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",

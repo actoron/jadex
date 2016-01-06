@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
-import jadex.base.test.ComponentTestSuite;
+import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -53,7 +53,7 @@ public class ComponentTest extends TestCase
 	protected long	timeout;
 	
 	/** The test suite. */
-	protected ComponentTestSuite	suite;
+	protected IAbortableTestSuite suite;
 	
 	//-------- constructors --------
 	
@@ -64,7 +64,7 @@ public class ComponentTest extends TestCase
 	/**
 	 *  Create a component test.
 	 */
-	public ComponentTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
+	public ComponentTest(IComponentManagementService cms, IModelInfo comp, IAbortableTestSuite suite)
 	{
 		this.cms	= cms;
 		this.filename	= comp.getFilename();

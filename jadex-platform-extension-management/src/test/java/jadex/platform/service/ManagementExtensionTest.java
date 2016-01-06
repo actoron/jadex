@@ -15,7 +15,7 @@ public class ManagementExtensionTest extends ComponentTestSuite
 	 */
 	public ManagementExtensionTest()	throws Exception
 	{
-		super(new File("."),
+		super(".",
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{

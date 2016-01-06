@@ -77,6 +77,7 @@ public class UserAgent
 		final Testcase tc = new Testcase();
 		if(SReflect.isAndroid()) 
 		{
+			System.out.println("Running on android, setting test nr to 1");
 			tc.setTestCount(1);
 		} 
 		else 
@@ -127,6 +128,7 @@ public class UserAgent
 				tc.addReport(result);
 				if(SReflect.isAndroid()) 
 				{
+					System.out.println("Running on android, so skipping remote tests.");
 					ret.setResult(null);
 				}
 				else
@@ -205,7 +207,7 @@ public class UserAgent
 		// Start platform
 		try
 		{
-			String url	= "new String[]{\""+SUtil.findBuildDir(new File("../jadex-applications-micro")).toURI().toURL().toString()+"\"}";	// Todo: support RID for all loaded models.
+			String url	= "new String[]{\""+SUtil.findBuildDir("jadex-applications-micro").toURI().toURL().toString()+"\"}";	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
