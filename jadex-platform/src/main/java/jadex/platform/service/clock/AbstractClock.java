@@ -178,6 +178,16 @@ public abstract class AbstractClock implements IClock
 	}
 	
 	/**
+	 *  Set the clocks start time.
+	 * @return 
+	 *  @return The start time.
+	 */
+	public void setStarttime(long starttime)
+	{
+		this.starttime = starttime;
+	}
+	
+	/**
 	 *  Get the clocks name.
 	 *  @return The name.
 	 */

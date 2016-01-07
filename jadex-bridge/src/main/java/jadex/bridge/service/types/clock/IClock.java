@@ -80,6 +80,12 @@ public interface IClock
 	public long getStarttime();
 	
 	/**
+	 *  Set the clocks start time.
+	 * @param starttime The start time.
+	 */
+	public void setStarttime(long starttime);
+	
+	/**
 	 *  Get the clock delta.
 	 *  @return The clock delta.
 	 */

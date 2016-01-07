@@ -88,6 +88,16 @@ public class ClockService extends BasicService implements IClockService, IProper
 	}
 	
 	/**
+	 *  Set the current time.
+	 *  @param time The current time.
+	 */
+	public void setTime(long time)
+	{
+		clock.setStarttime(time);
+		clock.reset();
+	}
+	
+	/**
 	 *  Get the current tick.
 	 *  @return The current tick.
 	 */
