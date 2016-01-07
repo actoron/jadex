@@ -22,9 +22,8 @@ class VersionLoader {
             version = new ProjectVersion(major, minor, patch)
 
             println "Loaded Version from properties: $version"
-
-            return version;
         }
+        return version;
     }
 }
 
