@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test request protocol perfomance.</H3>
+	
+	Starts a partner agent and performs a number of simple
+	request-reply conversations using the request capability. 
+	Prints out the time it takes.
+
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="RequestPerformance"
+	package="jadex.bdi.benchmarks">
+
+	<imports>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.types.cms.*</import>
+		<import>jadex.commons.IFilter</import>
+	</imports>
+
+	<capabilities>
+		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- The master is responsible for starting the second agent. -->
+		<belief name="master" class="boolean" exported="true">
+			<fact>true</fact>
+		</belief>
+	
+		<!-- If the receiver is non-null, this agent is the sender. -->
+		<belief name="receiver" class="IComponentIdentifier" exported="true" />
+
+		<!-- The number of conversations to perform. -->
+		<belief name="max" class="int" exported="true">
+			<fact>500</fact>
+		</belief>
+	</beliefs>
+	
+	<plans>
+		<!-- The master plan starts the slave agent. -->
+		<plan name="master_plan">
+			<body class="RequestMasterPlan" />
+			<trigger>
+				<condition>
+					$beliefbase.master
+				</condition>
+			</trigger>
+		</plan>
+
+		<!-- The request sender plan starts request protocols. -->
+		<plan name="sender_plan">
+			<body class="RequestSenderPlan" />
+			<trigger>
+				<condition>
+					$beliefbase.receiver!=null
+				</condition>
+			</trigger>
+		</plan>
+
+		<!-- Receiver plan for answering a single request. -->
+		<plan name="receiver_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="procap.rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out" optional="true">
+				<goalmapping ref="procap.rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestReceiverPlan"/>
+			<trigger>
+				<goal cref="procap.rp_execute_request"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<services>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>
+
+	<properties>
+        <!-- <property name="debugging">true</property> -->
+        <property name="logging.level">Level.SEVERE</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="procap.rp_filter">
+					<fact>IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</agent>
+

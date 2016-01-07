@@ -554,6 +554,14 @@ def createSrcZip(distname, arts, isaddon)
 	}
 }
 
+task performanceTest() {
+	description="Execute performance tests. Be sure to call this with a dist that includes some performance tests, such as 'everything'."
+
+	subprojects.findAll { it.getTasksByName('performanceTest', false) }.each {
+		performanceTest.dependsOn += it.performanceTest
+	}
+}
+
 /* Recursively add subprojects */
 def addSubproject(prefix, proj)
 {

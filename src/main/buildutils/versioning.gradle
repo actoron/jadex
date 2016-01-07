@@ -4,10 +4,19 @@ class VersionLoader {
 
     private static ProjectVersion version
 
+    static String workspaceRootDir
+
     static ProjectVersion getVersion(Project rootProject) {
         if (version == null) {
+            def propFile = new File("$rootProject.rootDir/src/main/buildutils/jadexversion.properties")
+            if (!propFile.exists()) {
+                propFile = new File("$workspaceRootDir/src/main/buildutils/jadexversion.properties")
+            }
+            if (!propFile.exists()) {
+                propFile = new File("src/main/buildutils/jadexversion.properties")
+            }
             def props = new Properties()
-            props.load(new FileReader("$rootProject.rootDir/src/main/buildutils/jadexversion.properties"))
+            props.load(new FileReader(propFile))
 
             // Version numbers
             def major = props.getProperty('jadexversion_major')
@@ -15,17 +24,21 @@ class VersionLoader {
 
             def patch = props.getProperty('jadexversion_patch')
 
+            String patchInfo =''
             if (patch.contains('$') || patch.isEmpty()) {
                 patch = System.env.BUILD_VERSION_SUFFIX
+                patchInfo = '(using patch level from environment)'
             }
 
             version = new ProjectVersion(major, minor, patch)
-
-            println "Loaded Version from properties: $version"
-
-            return version;
+            println "Version $patchInfo: $version"
         }
+        return version;
     }
+}
+
+if (project.hasProperty('workspaceRootDir')) {
+    VersionLoader.workspaceRootDir = ext.workspaceRootDir
 }
 
 version = VersionLoader.getVersion(project.rootProject)

@@ -1,0 +1,7 @@
+dependencies 
+{
+	compile project(':jadex-integration-test')
+	compile project(':jadex-applications-micro')
+}
+
+task performanceTest(dependsOn:test)

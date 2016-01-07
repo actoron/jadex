@@ -30,10 +30,10 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.micro.benchmarks.servicecall.DecoupledServiceAgent;
-import jadex.micro.benchmarks.servicecall.DirectServiceAgent;
-import jadex.micro.benchmarks.servicecall.IServiceCallService;
-import jadex.micro.benchmarks.servicecall.RawServiceAgent;
+import jadex.micro.servicecall.DecoupledServiceAgent;
+import jadex.micro.servicecall.DirectServiceAgent;
+import jadex.micro.servicecall.IServiceCallService;
+import jadex.micro.servicecall.RawServiceAgent;
 
 /**
  *  A test case for testing access to services of already terminated components.
