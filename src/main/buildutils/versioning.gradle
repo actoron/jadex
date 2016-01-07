@@ -1,26 +1,34 @@
 //ext.buildTimestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
 
-// Version numbers
-def major = 3
-def minor = 0
+class VersionLoader {
 
-def patch = '@SRCDIST_PATCH_LEVEL@' // this is injected during build process
+    private static ProjectVersion version
 
-//if (project.hasProperty('jadex_major_build_version')
-//    && project.hasProperty('jadex_minor_build_version')) {
-//    major = jadex_major_build_version
-//    minor = jadex_minor_build_version
-//} else {
-//    major = ext.jadex_major_build_version
-//    minor = ext.jadex_minor_build_version
-//}
+    static ProjectVersion getVersion(Project rootProject) {
+        if (version == null) {
+            def props = new Properties()
+            props.load(new FileReader("$rootProject.rootDir/src/main/buildutils/jadexversion.properties"))
 
-if (patch.contains('@') || patch.isEmpty()) {
-    patch = System.env.BUILD_VERSION_SUFFIX
+            // Version numbers
+            def major = props.getProperty('jadexversion_major')
+            def minor = props.getProperty('jadexversion_minor')
+
+            def patch = props.getProperty('jadexversion_patch')
+
+            if (patch.contains('$') || patch.isEmpty()) {
+                patch = System.env.BUILD_VERSION_SUFFIX
+            }
+
+            version = new ProjectVersion(major, minor, patch)
+
+            println "Loaded Version from properties: $version"
+
+            return version;
+        }
+    }
 }
 
-version = new ProjectVersion(major, minor, patch)
-
+version = VersionLoader.getVersion(project.rootProject)
 project.ext.jadex_build_version = version.toString()
 
 
