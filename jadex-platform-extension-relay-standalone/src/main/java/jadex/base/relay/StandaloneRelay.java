@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -184,6 +185,8 @@ public class StandaloneRelay
 				{
 					try
 					{
+						String	hostip	= ((InetSocketAddress)client.getRemoteSocketAddress()).getAddress().getHostAddress();
+						String	hostname	= ((InetSocketAddress)client.getRemoteSocketAddress()).getHostName();
 						BufferedInputStream	bin	= new BufferedInputStream(client.getInputStream());
 						String	line	= readLine(bin);
 						boolean	get	= line.startsWith("GET");
@@ -204,6 +207,16 @@ public class StandaloneRelay
 								contentlength	= Integer.parseInt(line.substring(line.indexOf(' ')+1));
 //								System.out.println("Content-Length: "+contentlength+"");
 							}
+							if(line.toLowerCase().startsWith("x-forwarded-for:"))
+							{
+								hostip = line.substring(17).trim();
+								if (host.contains(","))
+								{
+									host = host.substring(0, host.indexOf(','));
+								}
+								// Reverse DNS done automatically if needed.
+								hostname = null;
+							}
 //							System.out.println("'"+line+"'");
 						}
 						
@@ -215,7 +228,7 @@ public class StandaloneRelay
 							PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
 							pw.print("HTTP/1.0 200 OK\r\n");
 							pw.print("Content-type: text/plain\r\n");
-							pw.println("\r\n");
+							pw.print("\r\n");
 							pw.println(serverurls);
 							pw.flush();
 							client.close();
@@ -231,10 +244,7 @@ public class StandaloneRelay
 						else if(get && path.startsWith("/?id="))
 						{
 //							client.setTcpNoDelay(true);
-							
 							String	id	= URLDecoder.decode(path.substring(path.indexOf('=')+1), "UTF-8");
-							String	hostip	= ((InetSocketAddress)client.getRemoteSocketAddress()).getAddress().getHostAddress();
-							String	hostname	= ((InetSocketAddress)client.getRemoteSocketAddress()).getHostName();
 							handler.initConnection(id, hostip, hostname, "http");	// Hack!!! https?
 //							System.out.println("id: '"+id+"'");
 //							System.out.println("hostip: '"+hostip+"'");
@@ -253,7 +263,6 @@ public class StandaloneRelay
 								}
 								else if(path.startsWith("/offline"))
 								{
-									String	hostip	= ((InetSocketAddress)client.getRemoteSocketAddress()).getAddress().getHostAddress();
 									handler.handleOffline(hostip, new CounterInputStream(bin, contentlength));
 								}
 								else if(path.startsWith("/platforminfos"))
