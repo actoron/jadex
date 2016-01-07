@@ -12,6 +12,9 @@ class VersionLoader {
             if (!propFile.exists()) {
                 propFile = new File("$workspaceRootDir/src/main/buildutils/jadexversion.properties")
             }
+            if (!propFile.exists()) {
+                propFile = new File("src/main/buildutils/jadexversion.properties")
+            }
             def props = new Properties()
             props.load(new FileReader(propFile))
 
