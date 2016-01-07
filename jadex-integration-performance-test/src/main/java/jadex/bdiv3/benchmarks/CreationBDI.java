@@ -155,7 +155,7 @@ public class CreationBDI
 			{
 				public void resultAvailable(IComponentManagementService result)
 				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getComponentIdentifier()), "CreationBDI.class",
+					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getComponentIdentifier()), "jadex.bdiv3.benchmarks.CreationBDI.class",
 						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getComponentDescription().getResourceIdentifier()), null);
 				}
 			});

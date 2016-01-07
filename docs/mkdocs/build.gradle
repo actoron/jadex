@@ -5,16 +5,10 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.regex.Pattern
 
-def rootDir = "..${File.separator}.."
+def workspaceRootDir = "..${File.separator}.."
+ext.workspaceRootDir = workspaceRootDir
 
-//Properties props = new Properties()
-//props.load(new FileInputStream("${rootDir}${File.separator}gradle.properties"))
-//
-//props.entrySet().each { entry ->
-//    project.ext[entry.getKey()] = entry.getValue()
-//}
-
-apply from: "${rootDir}/src/main/buildutils/versioning.gradle"
+apply from: "${workspaceRootDir}/src/main/buildutils/versioning.gradle"
 
 
 buildscript {
@@ -26,11 +20,11 @@ buildscript {
         maven
                 {
                     name 'Active Components Nexus'
-                    url 'http://nexus.actoron.com/content/repositories/oss-snapshots/'
+                    url 'http://nexus.actoron.com/content/repositories/oss-nightlies/'
                 }
     }
     dependencies {
-        classpath 'org.activecomponents.jadex:jadex-commons:3.0-SNAPSHOT'
+        classpath 'org.activecomponents.jadex:jadex-commons:3.0.+'
         classpath 'commons-io:commons-io:2.4'
     }
 }
