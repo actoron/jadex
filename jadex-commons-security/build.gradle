@@ -1,0 +1,6 @@
+dependencies 
+{
+	compile 'com.madgag.spongycastle:core:1.54.0.0'
+	compile 'net.java.dev.jna:jna:4.2.1'
+	compile 'net.java.dev.jna:jna-platform:4.2.1'
+}

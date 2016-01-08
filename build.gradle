@@ -272,7 +272,7 @@ subprojects
 // Hack, helper to generate dep-tree
 task genDepList << {
 
-	def out = new PrintStream(project.projectDir.getCanonicalPath() + '/dependencies.conf', 'UTF-8')
+	def out = new PrintStream(project.projectDir.getCanonicalPath() + '/src/main/buildutils/dependencies.conf', 'UTF-8')
 	project.ext.subprojectmap.entrySet().each { entry ->
 		def sp = entry.getValue()
 		out. println ('### ' + entry.getKey())

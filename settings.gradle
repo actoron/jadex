@@ -2,6 +2,7 @@ apply from: "$rootDir/src/main/buildutils/util.gradle"
 
 def artifactselectionmarker = 'X'
 def buildconfigsfile = 'src/main/buildutils/buildconfigs.csv'
+def depconfigfile = 'src/main/buildutils/dependencies.conf'
 //gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,editorgpmn,relaystandalone'
 gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,relaystandalone' // no editorgpmn until kernel not available
 
@@ -81,24 +82,27 @@ gradle.ext.selecteddists.each {
 
 gradle.ext.includeartifacts = new HashSet<String>()
 
-def depconfreader = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + 'dependencies.conf')))
-def subproj = ''
 def projdeps = new HashMap<String, Set<String>>()
-depconfreader.eachLine { line ->
-	if (line.startsWith('### '))
-		subproj = line.substring(4)
-	else
-	{
-		def deps = projdeps.get(subproj)
-		if (deps == null)
+def subproj = ''
+if ((new File(settingsDir.getAbsolutePath() + File.separator + depconfigfile)).exists())
+{
+	def depconfreader = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + depconfigfile)))
+	depconfreader.eachLine { line ->
+		if (line.startsWith('### '))
+			subproj = line.substring(4)
+		else
 		{
-			deps = new HashSet<String>()
-			projdeps.put(subproj, deps)
+			def deps = projdeps.get(subproj)
+			if (deps == null)
+			{
+				deps = new HashSet<String>()
+				projdeps.put(subproj, deps)
+			}
+			deps.add(line)	
 		}
-		deps.add(line)	
 	}
+	depconfreader.close()
 }
-depconfreader.close()
 
 /*gradle.ext.maindistartifacts.each { mainart ->
 	addDependency(mainart, projdeps, gradle.ext.includeartifacts)
