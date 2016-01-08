@@ -63,7 +63,7 @@ public class SSecUtils
 				File urandom = new File("/dev/urandom");
 				if (urandom.exists())
 				{
-					// Beefing things up even further if urandom is available.
+					// Using /dev/urandom as seed source
 					byte[] urseed = new byte[numbytes];
 					int offset = 0;
 					FileInputStream urandomin = null;
@@ -92,6 +92,7 @@ public class SSecUtils
 					}
 				}
 				
+				// For Windows, use Windows API to gather seed data
 				String osname = System.getProperty("os.name");
 				String osversion = System.getProperty("os.version");
 				int minmajwinversion = 6;
@@ -113,9 +114,11 @@ public class SSecUtils
 				
 				if (seed == null)
 				{
+					// Fallback to Java mechanism
 					seed = seedrandom.generateSeed(numbytes);
 				}
 				
+				/** Beef it up with some Java PRNG data to avoid single failure point */
 				final byte[] fseed = seed;
 				seed = new byte[fseed.length];
 				seedrandom.nextBytes(seed);
@@ -145,6 +148,7 @@ public class SSecUtils
 			}
 		};
 		
+		// Combine AES-CTR-DRBG, AES-HMAC-DRBG and Java SecureRandom
 		List<SecureRandom> prngs = new ArrayList<SecureRandom>();
 		SP800SecureRandomBuilder builder = new SP800SecureRandomBuilder(esp);
 		AESFastEngine eng = new AESFastEngine();
