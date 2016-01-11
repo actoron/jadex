@@ -316,6 +316,7 @@ task copyJavaDocSources(type: Copy) {
 
 task createVersionInfo(type: Copy) {
 	into project.buildDir.getCanonicalPath()
+	outputs.upToDateWhen {false}
 	from('src/main/buildutils') {
 		include 'jadexversion.properties'
 		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '')
