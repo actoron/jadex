@@ -50,7 +50,7 @@ import java.util.logging.LogRecord;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.x509.X509V1CertificateGenerator;
+import org.spongycastle.x509.X509V1CertificateGenerator;
 
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;

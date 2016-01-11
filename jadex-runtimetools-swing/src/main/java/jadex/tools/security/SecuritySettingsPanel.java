@@ -73,7 +73,7 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
-import jadex.platform.service.security.SSecurity;
+import jadex.commons.security.SSecurity;
 import jadex.tools.jcc.JCCResultListener;
 
 /**

@@ -34,6 +34,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.security.SSecurity;
 import jadex.micro.annotation.Binding;
 import jadex.platform.service.awareness.discovery.relay.IRelayAwarenessService;
 import jadex.platform.service.message.ISendTask;
@@ -99,7 +100,7 @@ public class HttpRelayTransport implements ITransport
 	
 	        // Install the all-trusting trust manager
             SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init( null, trustAllCerts, new java.security.SecureRandom());
+            sc.init( null, trustAllCerts, SSecurity.getSecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
             {

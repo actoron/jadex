@@ -3,7 +3,6 @@ package jadex.platform.service.message.transport.ssltcpmtp;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyStore;
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
@@ -24,8 +23,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.security.SSecurity;
 import jadex.platform.service.message.transport.tcpmtp.TCPTransport;
-import jadex.platform.service.security.SSecurity;
 
 /**
  *  The ssl based transport.
@@ -136,7 +135,7 @@ public class SSLTCPTransport extends TCPTransport
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 				tmf.init(ks);				
 				NaiveTrustManager tm = new NaiveTrustManager();
-				context.init(kmf.getKeyManagers(), new TrustManager[]{tm}, new SecureRandom());
+				context.init(kmf.getKeyManagers(), new TrustManager[]{tm}, SSecurity.getSecureRandom());
 
 //				context.init(kmf.getKeyManagers(), null, null);
 			}

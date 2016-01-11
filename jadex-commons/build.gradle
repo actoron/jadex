@@ -1,6 +1,6 @@
 dependencies 
 {
-	testCompile 'org.bouncycastle:bcprov-jdk15on:1.52'
+	testCompile 'com.madgag.spongycastle:prov:1.54.0.0'
 }
 
 // testjar is needed for jadex-android-xmlpull tests

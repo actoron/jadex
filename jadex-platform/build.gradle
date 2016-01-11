@@ -1,13 +1,13 @@
 dependencies 
 {
 	compile project(':jadex-commons')
+	compile project(':jadex-commons-security')
 	compile project(':jadex-xml')
 	compile project(':jadex-bridge')
 	compile project(':jadex-kernel-base')
 	compile project(':jadex-kernel-micro')
 	compile project(':jadex-javaparser')
 	
-	compileNoAndroidRuntime 'org.bouncycastle:bcprov-jdk15on:1.52'
 	compileNoAndroidRuntime 'javax.mail:mail:1.4.5'
 }
 

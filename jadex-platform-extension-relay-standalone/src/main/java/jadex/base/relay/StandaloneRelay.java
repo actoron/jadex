@@ -26,7 +26,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.X509KeyManager;
 
 import jadex.bridge.VersionInfo;
-import jadex.platform.service.security.SSecurity;
+import jadex.commons.security.SSecurity;
 
 /**
  *  Relay as a simple java application.

@@ -20,7 +20,7 @@ import javax.swing.JTextArea;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
-import jadex.platform.service.security.SSecurity;
+import jadex.commons.security.SSecurity;
 
 /**
  *  Panel for displaying a certificate.
