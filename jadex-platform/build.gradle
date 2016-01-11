@@ -1,7 +1,7 @@
 dependencies 
 {
 	compile project(':jadex-commons')
-	compile project(':jadex-commons-security')
+	compile project(':jadex-commons:jadex-commons-security')
 	compile project(':jadex-xml')
 	compile project(':jadex-bridge')
 	compile project(':jadex-kernel-base')

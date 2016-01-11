@@ -185,7 +185,7 @@ public class SSecurity
 			}
 		};
 		
-		// Combine AES-CTR-DRBG, AES-HMAC-DRBG and Java SecureRandom
+		// Combine AES-CTR-DRBG, AES-HMAC-DRBG
 		List<SecureRandom> prngs = new ArrayList<SecureRandom>();
 		SP800SecureRandomBuilder builder = new SP800SecureRandomBuilder(esp);
 		AESFastEngine eng = new AESFastEngine();
@@ -193,8 +193,6 @@ public class SSecurity
 		
 		Mac m = new HMac(new SHA512Digest());
 		prngs.add(builder.buildHMAC(m, esp.get(512).getEntropy(), false));
-		
-		prngs.add(new SecureRandom());
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
 		ret = new SecureRandom()
