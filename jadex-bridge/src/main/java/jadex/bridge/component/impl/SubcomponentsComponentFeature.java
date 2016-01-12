@@ -231,7 +231,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		{
 			try
 			{
-				ret = (String)SJavaParser.evaluateExpression(si.getFilename().substring(2, si.getFilename().length()-3), model.getAllImports(), this.component.getFetcher(), this.component.getClassLoader());
+				ret = (String)SJavaParser.evaluateExpression(si.getFilename().substring(2, si.getFilename().length()-1), model.getAllImports(), this.component.getFetcher(), this.component.getClassLoader());
 			}
 			catch(Exception e)
 			{
