@@ -179,6 +179,10 @@ subprojects
             lintOptions {
                 abortOnError false
             }
+
+			dexOptions {
+				jumboMode = true
+			}
         }
 
         // include all resources that are placed inside src dirs
@@ -252,7 +256,7 @@ subprojects
     uploadArchives {
     	if (project.hasProperty('repouser')) {
 	        repositories {
-	        	if (isCommercial(project))
+	        	if (isCommercial(project) && repo_commercial)
 	        	{
 		            mavenDeployer {
 		                repository(url: repo_commercial) {
