@@ -26,7 +26,7 @@ project.ext.srcdir = 'src'
 
 project.ext.subprojectmap  = new HashMap()
 project.subprojects.each { sp ->
-	addSubproject('', sp)
+	addSubproject(sp)
 }
 
 project.ext.jadex_lastbuild_version=jadex_lastbuild_version
@@ -232,6 +232,12 @@ subprojects
 			}
         }
 
+//		test {
+//			reports {
+//				junitXml.enabled = true
+//				html.enabled = true
+//			}
+//		}
 
     }
 
@@ -564,11 +570,11 @@ task performanceTest() {
 }
 
 /* Recursively add subprojects */
-def addSubproject(prefix, proj)
+def addSubproject(proj)
 {
-	def pname = prefix + ':' + proj.name
+	def pname = proj.getPath()
 	project.ext.subprojectmap.put(pname, proj)
 	proj.subprojects.each { sp ->
-		addSubproject(pname, sp)
+		addSubproject(sp)
 	}
 }
