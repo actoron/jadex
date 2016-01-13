@@ -9,9 +9,9 @@ import java.util.Set;
 
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
-import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
+import jadex.commons.transformation.traverser.ImageProcessor;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -54,7 +54,7 @@ public class STypeInfosAWT
 			{
 				try
 				{
-					byte[] buf = SGUI.imageToStandardBytes((Image) val, "image/png");
+					byte[] buf = ImageProcessor.imageToStandardBytes((Image) val, "image/png");
 					return new String(Base64.encode(buf));
 				} 
 				catch (Exception e)
@@ -121,7 +121,7 @@ public class STypeInfosAWT
 				byte[] data = Base64.decode(encdata.getBytes());
 
 				String classname = (String) rawattributes.get("classname");
-				ret = SGUI.imageFromBytes(data, SReflect.findClass(classname, null, context.getClassLoader()));
+				ret = ImageProcessor.imageFromBytes(data, SReflect.findClass(classname, null, context.getClassLoader()));
 
 				// if(classname.indexOf("Toolkit")!=-1)
 				// {

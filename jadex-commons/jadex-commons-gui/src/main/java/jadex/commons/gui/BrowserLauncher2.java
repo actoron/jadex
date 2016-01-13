@@ -1,4 +1,4 @@
-package jadex.commons;
+package jadex.commons.gui;
 
 import java.applet.Applet;
 import java.io.IOException;

@@ -7,8 +7,8 @@ import java.util.Map;
 
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
-import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.ImageProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
@@ -42,7 +42,7 @@ public class JsonImageProcessor implements ITraverseProcessor
 		JsonWriteContext wr = (JsonWriteContext)context;
 		wr.addObject(traversed, object);
 	
-		byte[] encimg = SGUI.imageToStandardBytes((Image)object, "image/png");
+		byte[] encimg = ImageProcessor.imageToStandardBytes((Image)object, "image/png");
 		byte[] bytes = Base64.encode(encimg);
 		String enc = new String(bytes);
 		

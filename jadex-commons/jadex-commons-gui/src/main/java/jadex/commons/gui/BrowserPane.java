@@ -28,7 +28,6 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.ImageView;
 
-import jadex.commons.BrowserLauncher2;
 import jadex.commons.SUtil;
 
 

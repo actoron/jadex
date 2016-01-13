@@ -1,6 +1,7 @@
 dependencies 
 {
 	compile project(':jadex-commons')
+	compile project(':jadex-commons:jadex-commons-gui')
 	compile project(':jadex-rules')
 	
 	compile 'net.sourceforge.collections:collections-generic:4.01'

@@ -25,6 +25,7 @@ jadex-applications-webservice,,,X,,,X,,,,,,,,,X
 jadex-applications-wfms,,,,,,,,,,,,,,,X
 jadex-bridge,X,X,X,X,,,,,,,,,X,X,X
 jadex-commons,X,X,X,X,,,,,,,,,X,X,X
+jadex-commons:jadex-commons-gui,,X,X,,,,,,,,,,,X,X
 jadex-commons:jadex-commons-security,X,X,X,X,,,,,,,,,X,X,X
 jadex-distribution-android,,,,X,,,,,,,,,,,X
 jadex-distribution-minimal,X,X,X,,,,,,,,,,,,X

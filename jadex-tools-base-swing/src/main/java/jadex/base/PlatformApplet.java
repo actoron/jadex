@@ -3,7 +3,7 @@ package jadex.base;
 import java.applet.Applet;
 import java.util.StringTokenizer;
 
-import jadex.commons.BrowserLauncher2;
+import jadex.commons.gui.BrowserLauncher2;
 
 /**
  *  An applet used to start the Jadex platform.

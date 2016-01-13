@@ -1,6 +1,7 @@
 dependencies 
 {
 	compile project(':jadex-commons')
+	compile project(':jadex-commons:jadex-commons-gui')
 	compile project(':jadex-javaparser')
 	compile project(':jadex-bridge')
 	compile project(':jadex-xml')

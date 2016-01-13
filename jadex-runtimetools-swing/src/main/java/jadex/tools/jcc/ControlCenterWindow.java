@@ -38,7 +38,7 @@ import jadex.bridge.VersionInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.commons.BrowserLauncher;
+import jadex.commons.gui.BrowserLauncher;
 import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;

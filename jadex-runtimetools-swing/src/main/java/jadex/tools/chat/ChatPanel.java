@@ -120,6 +120,7 @@ import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.transformation.traverser.ImageProcessor;
 
 /**
  *  Panel for displaying the chat.
@@ -767,7 +768,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //									System.out.println("scaled: "+sw+" "+sh+" "+tw+" "+th);
 									
 									Image target = SGUI.scaleImage(src, tw, th, Image.SCALE_FAST);
-									data = SGUI.imageToStandardBytes(target, "image/png");
+									data = ImageProcessor.imageToStandardBytes(target, "image/png");
 								}
 								
 								getService().setImage(data);

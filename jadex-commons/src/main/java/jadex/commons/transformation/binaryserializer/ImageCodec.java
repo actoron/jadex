@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
-import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.ImageProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 
@@ -37,10 +37,10 @@ public class ImageCodec extends AbstractCodec
 	{
 		Image ret = null;
 		
-		// This is correct because this byte array is a technical object specific to the image and
-		// is not part of the object graph proper.
+		// This is correct (encoding during creation) because this byte array
+		// is a technical object specific to the image and not part of the object graph proper.
 		byte[] encimage = (byte[])BinarySerializer.decodeObject(context);
-		ret = SGUI.imageFromBytes(encimage, clazz);
+		ret = ImageProcessor.imageFromBytes(encimage, clazz);
 		
 		return ret;
 	}
@@ -63,7 +63,7 @@ public class ImageCodec extends AbstractCodec
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
-		byte[] encimg = SGUI.imageToStandardBytes((Image)object, "image/png");
+		byte[] encimg = ImageProcessor.imageToStandardBytes((Image)object, "image/png");
 		traverser.doTraverse(encimg, encimg.getClass(), traversed, processors, clone, null, ec);
 		
 		return object;

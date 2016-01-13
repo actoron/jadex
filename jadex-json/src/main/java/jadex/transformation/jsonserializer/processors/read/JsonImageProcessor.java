@@ -9,8 +9,8 @@ import com.eclipsesource.json.JsonObject;
 
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
-import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.ImageProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
@@ -47,7 +47,7 @@ public class JsonImageProcessor implements ITraverseProcessor
 		String b64 = obj.getString("value", null);
 		byte[] data = Base64.decode(b64.getBytes());
 		
-		Image ret = SGUI.imageFromBytes(data, clazz);
+		Image ret = ImageProcessor.imageFromBytes(data, clazz);
 //		traversed.put(object, ret);
 		((JsonReadContext)context).addKnownObject(ret);
 		
