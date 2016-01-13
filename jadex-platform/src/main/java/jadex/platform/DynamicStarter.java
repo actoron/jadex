@@ -57,7 +57,7 @@ public class DynamicStarter
 		
 		try
 		{
-			starter.getMethod("createPlatform", platformconf).invoke(null, cfg);
+			starter.getMethod("createPlatform", platformconf, boolean.class).invoke(null, cfg, true);
 		}
 		catch (IllegalAccessException e)
 		{

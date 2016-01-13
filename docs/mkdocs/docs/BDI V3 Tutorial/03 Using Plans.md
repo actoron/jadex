@@ -6,7 +6,7 @@ Plans play a central role in Jadex, because they encapsulate the recipe for achi
 
 For a plan the triggering events and goals can be specified in the plan head to let the agent know what kinds of events this plan can handle. When an agent receives an event, the BDI reasoning engine builds up the so called applicable plan list (that are all plans which can handle the current event or goal) and candidate(s) are selected and instantiated for execution. 
 
-Often a plan does some action and then wants to wait until the action has been done before continuing (e.g. dispatching a subgoal). Therefore a plan can use one of the various waitFor() methods of the plan API, that come in quite different flavors. The plan API can be retrieved as object via two mechanisms. First, the @PlanAPI annotation can used above a field of type IPlan in plan classes. The engine will automatically inject the plan API when a plan instance is created. When using a method as plan this is not possible. Hence, the signature of the plan method can be used to retrieve the plan API just by adding a parameter of type IPlan. Please note that in Jadex methods that are invoked by the framework can have any signature. The engine will do its best to automatically determine which values are expected and set the as parameter values. If the engine does not find a suitable value of a given type the value will be null.
+Often a plan does some action and then wants to wait until the action has been done before continuing (e.g. dispatching a subgoal). Therefore a plan can use one of the various waitFor() methods of the plan API, that come in quite different flavors. The plan API can be retrieved as an object via two mechanisms. First, the @PlanAPI annotation can used above a field of type IPlan in plan classes. The engine will automatically inject the plan API when a plan instance is created. When using a method as plan this is not possible. Hence, the signature of the plan method can be used to retrieve the plan API just by adding a parameter of type IPlan. Please note that in Jadex methods that are invoked by the framework can have any signature. The engine will do its best to automatically determine which values are expected and set them as parameter values. If the engine does not find a suitable value of a given type the value will be null.
 
 <span>Exercise B1 - A Plan as Normal Java Class</span> 
 ------------------------------------------------------
@@ -48,7 +48,11 @@ public class TranslationPlan
 **Add the plan to the agent: **
 
 -   Add the annotation to the agent class: @Plans(@Plan(body=@Body(TranslationPlan.class)))
--   Add a field called agent to the agent class and put above the annotation @Agent. The field should be of type BDIAgent. This will let the engine automatically inject the bdi agent (api) to the pojo agent class. 
+-   Add a field called bdi to the agent class and annotate it with @AgentFeature. The field should be of type IBDIAgentFeature. This will let the engine automatically inject the bdi agent (api) to the pojo agent class. 
+```java
+@AgentFeature protected IBDIAgentFeature bdi;
+```
+
 -   Add an agent body method that is automatically invoked when the agent is started and adopt a plan using
 
 
@@ -57,7 +61,7 @@ public class TranslationPlan
 @AgentBody
 public void body()
 {
-  agent.adoptPlan(new TranslationPlan());
+  bdi.adoptPlan(new TranslationPlan());
 }
 
 ```
@@ -101,7 +105,7 @@ Start the agent as explained in the preceding exercise. Observe if the same outp
 -----------------------------------------
 
 Once again, in this lecture the same functionality will be created. But this time, the plan will be represented as method. This can be very helpful, if the plan is rather simple. Furthermore, using methods as plans helps reducing the number of classes in a project.\
-  \
+\
 Again, copy the agent file from the last lecture and do the following:
 
 -   Copy the word table field from the inner to the agent class
@@ -121,7 +125,7 @@ public void init()
 
 -   Adapt the adoptPlan() method call to 
 ```java
-agent.adoptPlan("translateEnglishGerman");
+bdi.adoptPlan("translateEnglishGerman");
 ```
 . Instead a plan object we just give the name of the method representing the plan.
 -   Create a method as plan using the following code
@@ -154,7 +158,7 @@ In this exercise we will explore other plan methods. Besides the already known b
 
 try
 {
-  agent.adoptPlan(new TranslatePlan()).get();
+  bdi.adoptPlan(new TranslatePlan()).get();
 }
 catch(Exception e)
 {
@@ -196,17 +200,17 @@ public void failed(Exception e)
 ```java
 
 @PlanBody
-public String translateEnglishGerman()
+public void translateEnglishGerman()
 {
   throw new PlanFailureException();
-  // return wordtable.get("dog");
+  // System.out.println("Translated: dog - " + wordtable.get("dog"));
 }
 
 ```
 
 
 **Start and test the agent**\
-After starting the agent you should observe that due to the exception in the plan body the failed method is invoked. In the agent body the exception is rethrown when the get() on the result future of adoptPlan() is invoked. Try also out what happens when you do not throw the exception in the plan body.
+After starting the agent you should observe that due to the exception in the plan body the failed method is invoked. In the agent body the exception is rethrown when the get() on the result future of adoptPlan() is invoked. Also try out what happens when you do not throw the exception in the plan body.
 
 <span>Exercise B5 - Plan Context Conditions</span> 
 --------------------------------------------------
@@ -226,15 +230,26 @@ As preparation we can copy the agent from the last exercise and modify the follo
 ```
 
 
--   In the agent body method we do not wait until plan completion. Instead we wait for one second and afterwards set the context field to false.
+-   To access the waitFor methods we add another @AgentFeature of type IExecutionFeature to our agent. 
+
+
+```java
+
+  @AgentFeature
+  protected IExecutionFeature execution;
+
+```
+
+
+-   In the agent body method we do not wait until plan completion. Instead we wait for one second and afterwards set the context field to false. 
 
 
 ```java
 
 try
 {
-  agent.adoptPlan(new TranslatePlan());
-  agent.waitForDelay(1000).get();
+  bdi.adoptPlan(new TranslatePlan());
+  execution.waitForDelay(1000).get();
   context = false;
   System.out.println("context set to false");
 }
@@ -246,7 +261,7 @@ catch(Exception e)
 ```
 
 
--   In the inner plan class we add a field for the plan API and a method for the context condition. The plan API is of type IPlan and needs the @Plan annotation. This ensures that the API will be automatically injected to the field when the plan is created. The context method should have a @PlanContextCondition annotation. Furthermore, we want the condition to be reevaluated whenever the belief context changes. This is achieved by adding a dependency to the context belief via the beliefs declaration in the annotation. The method itself should simply return the value of the context field. 
+-   In the inner plan class we add a field for the plan API and a method for the context condition. The plan API is of type IPlan and needs the @PlanAPI annotation. This ensures that the API will be automatically injected to the field when the plan is created. The context method should have a @PlanContextCondition annotation. Furthermore, we want the condition to be reevaluated whenever the belief context changes. This is achieved by adding a dependency to the context belief via the beliefs declaration in the annotation. The method itself should simply return the value of the context field. 
 
 
 ```java
@@ -269,12 +284,13 @@ public boolean checkCondition()
 ```java
 
 @PlanBody
-public String translateEnglishGerman()
+public void translateEnglishGerman()
 {
   System.out.println("Plan started.");
   plan.waitFor(10000).get();
   System.out.println("Plan resumed.");
-  return wordtable.get(gword);
+
+  System.out.println("Translated: dog - " + wordtable.get("dog"));
 }
 
 ```

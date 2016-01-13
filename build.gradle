@@ -265,7 +265,7 @@ subprojects
 		                uniqueVersion=false
 		            }
 		        }
-		        else
+		        else if (repo_noncommercial)
 		        {
 		        	mavenDeployer {
 						repository(url: repo_noncommercial) {

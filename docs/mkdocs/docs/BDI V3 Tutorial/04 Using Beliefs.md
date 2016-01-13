@@ -42,10 +42,11 @@ wordtable.put("bugger", "Flegel");
 ```java
 
 @Plan(trigger=@Trigger(factaddeds="wordtable"))
-public void checkWordPairPlan(Map.Entry<String, String> wordpair)
+public void checkWordPairPlan(ChangeEvent event)
 {
-  if(wordpair.getKey().equals("bugger"))
-    System.out.println("Warning, a colloquial word pair has been added: "+wordpair.getKey()+" "+wordpair.getValue());
+    ChangeInfo<String> change = ((ChangeInfo<String>)event.getValue());
+    if(change.getInfo().equals("bugger"))
+        System.out.println("Warning, a colloquial word pair has been added: "+change.getInfo()+" "+change.getValue());
 }
 
 ```

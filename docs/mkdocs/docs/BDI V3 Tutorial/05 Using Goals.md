@@ -145,6 +145,7 @@ public void body()
 
 
 ```java
+
  
 @Plan(trigger=@Trigger(goals=Translate.class))
 protected String translate(String eword)
@@ -277,7 +278,7 @@ public class Translate
 ```
 
 
--   Add a recur condition to the goal the reacts on changes to the dictionary map. Therefore, create a new method named checkRecur with boolean return value. Add the @GoalRecurCondition to the method and set beliefs to wordtable.
+-   Add a recur condition to the goal that reacts on changes to the dictionary map. To achieve this create a new method named checkRecur with boolean return value. Add the @GoalRecurCondition to the method and set beliefs to wordtable.
 
 
 ```java
@@ -286,10 +287,10 @@ public class Translate
 public boolean checkRecur()
 {
   return true;
-} 
+}
 
 ```
- 
+
 
 -   Change the plan body to throw a PlanFailureException when a word is not contained in the dictionary.
 
@@ -340,11 +341,17 @@ Start the agent and check whether the goal is reactivated by the recur condition
 <span>D6 - Maintain Goals</span> 
 --------------------------------
 
-As we have illustrated in the introduction of this lecture, in Jadex different goal types can be used. In the new BDI V3 we have changed the way these goal types can be used. Instead of declaring a goal type explicitly (as in BDI V1 & V2) in V3 it is sufficient to use the corresponding codition types, i.e. a maintain condition in case of a maintain goal. In the translation example we will use a maintain goal to restrict the number of word pairs in the dictionary.
+As we have illustrated in the introduction of this lecture, in Jadex different goal types can be used. In the new BDI V3 we have changed the way these goal types can be used. Instead of declaring a goal type explicitly (as in BDI V1 & V2) in V3 it is sufficient to use the corresponding condition types, i.e. a maintain condition in case of a maintain goal. In the translation example we will use a maintain goal to restrict the number of word pairs in the dictionary.
 
-\*We start by creating a TranslationBDI Java file by copying it from the last exercise.
+-   We start by creating a TranslationBDI Java file by copying it from the last exercise.
 
-\*We delete the translation goal and instead create a new MaintainStorageGoal as inner class. In the goal annotation we set the exclude mode to never (excludemode=ExcludeMode.Never). This allows a plan to be executed again and again without being excluded. Furthermore, we add two methods (without paramters and boolean return value), one called maintain and the other one target. To the first we add the @GoalMaintainCondition(beliefs="egwords") and to the second @GoalTargetCondition(beliefs="egwords") annotation. This leads to a reevaluation of the conditions whenever the dictionary egwords changes. We want the maintain condition to trigger when the number of entries in the dictionary exceeds. As consequence a plan for removing entries is triggered and it will be entries removed until less than 3 word pairs are contained.
+<!-- -->
+
+-   We delete the translation goal and instead create a new MaintainStorageGoal as inner class. In the goal annotation we set the exclude mode to never (excludemode=ExcludeMode.Never). This allows a plan to be executed again and again without being excluded. 
+
+<!-- -->
+
+-   Furthermore, we add two methods (without paramters and boolean return value), one called maintain and the other one target. To the first we add the @GoalMaintainCondition(beliefs="wordtable") and to the second @GoalTargetCondition(beliefs="wordtable") annotation. This leads to a reevaluation of the conditions whenever the dictionary wordtable changes. We want the maintain condition to trigger when the number of entries in the dictionary exceeds. As consequence a plan for removing entries is triggered and it will remove entries until less than 3 word pairs are contained.
 
 
 ```java
@@ -352,25 +359,27 @@ As we have illustrated in the introduction of this lecture, in Jadex different g
 @Goal(excludemode=ExcludeMode.Never)
 public class MaintainStorageGoal
 {
-  @GoalMaintainCondition(beliefs="egwords")
+  @GoalMaintainCondition(beliefs="wordtable")
   protected boolean maintain()
   {
-    return egwords.size()<=4;
+    return wordtable.size()<=4;
   }
 		
-  @GoalTargetCondition(beliefs="egwords")
+  @GoalTargetCondition(beliefs="wordtable")
   protected boolean target()
   {
-    return egwords.size()<3;
+    return wordtable.size()<3;
   }
 }
 
 ```
- 
 
-\*As next step we add a method plan called removeEntry without parameters and return value. In the plan annotation add the maintain storage goal as trigger. In the method just fetch an arbitrary entry from the dictionary egwords and remove it and print out which entry has been removed.
 
-\*Finally we add an agent body method called body using the @AgentBody annotation. In the method we first create and dispatch a maintain storage goal as top-level goal of the agent. Next, we create the egwords hash table and add four different word pairs. To activate the maintain goal we add a new word pair each two seconds. For this purpose we create a component step that declares an int field cnt (as counter). In the execute method of the step we add a new word pair using the cnt to make it unique each time. The cnt should be increased after it has been used for one word pair. Afterwards, we print the contents of the dictionary and use the wait mwthod of the agent to reschedule the step after it has been executed. In order to activate the step in the agent we use the waitFor method also at the end of the agent body method.
+-   As next step we add a method plan called removeEntry without parameters and return value. In the plan annotation add the maintain storage goal as trigger. In the method just fetch an arbitrary entry from the dictionary wordtable and remove it and print out which entry has been removed.
+
+<!-- -->
+
+-   Finally we add an agent body method called body using the @AgentBody annotation. In the method we first create and dispatch a maintain storage goal as top-level goal of the agent. Next, we create the wordtable hash table and add four different word pairs. To activate the maintain goal we add a new word pair every two seconds. For this purpose we create a component step that declares an integer field cnt (as counter). In the execute method of the step we add a new word pair using the cnt to make it unique each time. The cnt should be increased after it has been used for one word pair. Afterwards, we print the contents of the dictionary and use the wait method of the agent to reschedule the step after it has been executed. In order to activate the step in the agent we also use the waitFor method at the end of the agent body method.
 
 
 ```java
@@ -380,19 +389,20 @@ public void body()
 {
   agent.dispatchTopLevelGoal(new MaintainStorageGoal());
 
-  egwords = new HashMap<String, String>();
-  egwords.put("milk", "Milch");
-  egwords.put("cow", "Kuh");
-  egwords.put("cat", "Katze");
-  egwords.put("dog", "Hund");
+  wordtable = new HashMap<String, String>();
+  wordtable.put("milk", "Milch");
+  wordtable.put("cow", "Kuh");
+  wordtable.put("cat", "Katze");
+  wordtable.put("dog", "Hund");
 
   IComponentStep<Void> step = new IComponentStep<Void>()
   {
     int cnt = 0;
     public IFuture<Void> execute(IInternalAccess ia)
     {
-      egwords.put("eword_#"+cnt, "gword_#"+cnt++);
-      System.out.println("egwords: "+egwords);
+      wordtable.put("eword_#"+cnt, "gword_#"+cnt);
+      cnt++;
+      System.out.println("wordtable: "+wordtable);
       agent.waitFor(2000, this);
       return IFuture.DONE;
     }

@@ -1,4 +1,4 @@
-Reuasability is a key aspect of software engineering as it allows for applying a once developed solution at several places. Regarding BDI agents reusability can be achieved by two different approaches. First, in BDI V3 it is possible to exploit the existing Java inheritance mechanism and design a base agent class that contains common functionality and is extended by different application agent classes. Of course, this mechanism suffers from the fact that in Java no multi-inheritance is possible. Hence, in case you want to reuse different functionalities these can be encapsulated in so called BDI capabilities. A BDI capability represents a module that may contains belief, goals and plans like a normal agent. Capabilities realize a hierarchical (de)composition concept meaning that it is possible to include any number of subcapabilities that may again represent composite entities. 
+Reusability is a key aspect of software engineering as it allows for applying a once developed solution at several places. Regarding BDI agents reusability can be achieved by two different approaches. First, in BDI V3 it is possible to exploit the existing Java inheritance mechanism and design a base agent class that contains common functionality and is extended by different application agent classes. Of course, this mechanism suffers from the fact that in Java no multi-inheritance is possible. Hence, in case you want to reuse different functionalities these can be encapsulated in so called BDI capabilities. A BDI capability represents a module that may contain belief, goals and plans like a normal agent. Capabilities realize a hierarchical (de)composition concept meaning that it is possible to include any number of subcapabilities that may again represent composite entities. 
 
 A module has to provide an explicit boundary which allows for connecting it with an agent or with another module. In contrast to BDI V2, in which it had to be explicitly declared which beliefs, goals and plans are exported and thus visible to the outside of a module, in BDI V3 these specifications have been pushed to the Java level. This means that the visibility modifiers you use in Java determines also if beliefs, goals and plans are visible. There is basically one additional feature that goes beyond these rules. In order to allow the specification of abstract beliefs, which should be available in the module but are made concrete and are assigned at the level of the outer, i.e. including module, unimplemented beliefs can be specified. Such unimplemented beliefs are represented as native getter/setter pairs without method body. In the outer capability an explicit belief mapping has to be stated which describes the connection of a local and the abstract belief of the submodule. 
 
@@ -9,25 +9,9 @@ In Jadex V3 a capability is typically represented as a:
 <span>E1 - Creating a Capability</span> 
 ---------------------------------------
 
-In this first exercise we just create a capability that encapsultaes the translation agent behaviour. The agent itself in reduced to use the capability and dispatch a translation goal from the capability.
+In this first exercise we just create a capability that encapsulates the translation agent behaviour. The agent itself is reduced to use the capability and dispatch a translation goal from the capability.
 
 -   Create a new class file called TranslationCapability and add the @Capability annotation above the class definition.
-
-<!-- -->
-
--   Add a belief named wordtable of type Map&lt;String, String&gt;  and create an instance of it.
-
-<!-- -->
-
--   Create a goal as inner class named Translate and add a goal parameter named eword of type String and a goal result named gword of type String. Also add a constructor which takes the eword as parameter and assigns it to the goal parameter.
-
-<!-- -->
-
--   Add a method plan that reacts to the translate goal. It should take the eword as parameter and return the translated word using the normal lookup in the word table.
-
-<!-- -->
-
--   Finally, add an empty constructor which adds some word pairs to the word table.
 
 
 ```java
@@ -41,15 +25,31 @@ public class TranslationCapability
 ```
 
 
--   Create a empty agent file called TranslationBDI with the corresponding annotation.
+-   Add a belief named wordtable of type Map&lt;String, String&gt;  and create an instance of it.
 
 <!-- -->
 
--   Add a field of type BDIAgent called agent and add the @Agent annotation.
+-   Add an empty constructor to TranslationCapability, which adds some word pairs to the word table.
+
+For the actual goal we will use an inner class called Translate:
+
+-   Create a goal as inner class named Translate. Add two fields of type String named eword ang gword to the inner class and annotate them with @GoalParameter and @GoalResult respectively. Also add a constructor which takes the eword as parameter and assigns it to the goal parameter.
 
 <!-- -->
 
--   Add a field called capability of type TranslationCapability and assign an instance of it.
+-   Add a method plan that reacts to the translate goal. It should take the eword as parameter and return the translated word using the normal lookup in the word table. (Annotate with @Plan(trigger=@Trigger(goals=Translate.class)) )
+
+Last we will need to create the actual agent:
+
+-   Create an empty agent file called TranslationBDI with the corresponding annotation.
+
+<!-- -->
+
+-   Add a field of type IBDIAgentFeature called bdi and add the @AgentFeature annotation.
+
+<!-- -->
+
+-   Add a field called capability of type TranslationCapability , annotate it with @Capability and assign an instance of it.
 
 
 ```java
@@ -61,6 +61,16 @@ protected TranslationCapability capa = new TranslationCapability();
 
 
 -   Create an agent body which creates and dispatches a translation goal from the included capability. Wait for the goal to be finished and print out the result of the translation.
+
+
+```java
+
+String eword = "dog";
+String gword = (String) bdi.dispatchTopLevelGoal(capa.new Translate(eword)).get();
+System.out.printf("Translating %s to %s", eword, gword);
+
+```
+
 
 **Start and test the agent**
 
