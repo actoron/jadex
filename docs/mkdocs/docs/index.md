@@ -1,4 +1,4 @@
-# Welcome to the Jadex Documentation
+# Welcome to the Jadex ${jadexversion} Documentation
 
 For API Documentation visit the [Active Components Website](http://www.activecomponents.org/docs/).
 

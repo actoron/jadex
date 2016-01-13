@@ -34,15 +34,35 @@ enum ACTION {serve, build}
 defaultTasks 'buildDocs'
 
 /**
+ * Process docs to replace variables like version
+ */
+task processDocs(type: Copy) {
+    into project.buildDir.getCanonicalPath() + "${File.separator}mkdocs"
+//    outputs.upToDateWhen {false}
+    from('docs') {
+        include '**/*'
+        exclude 'index.md'
+        into 'docs'
+    }
+    from('.') {
+        include 'mkdocs.yml'
+        include 'docs/index.md'
+        expand(jadexversion: version.toString())
+    }
+}
+
+/**
  * Build static pages with mkdocs
  */
-task buildDocs (type: MkDocsTask) {
+task buildDocs (type: MkDocsTask, dependsOn: processDocs) {
     action=ACTION.build
     dockerImageName = 'andrglo/mkdocs:latest'
 }
 
+
+
 task buildDocsZip (type: Zip, dependsOn: buildDocs) {
-    from "${project.buildDir}${File.separator}site${File.separator}"
+    from "${project.buildDir}${File.separator}mkdocs${File.separator}site${File.separator}"
     baseName = 'jadex-mkdocs'
     version = project.version
 //    into "$baseName-${version.replaceAll('-SNAPSHOT','')}"
@@ -61,7 +81,7 @@ task serveDocs (type: MkDocsTask) {
 /**
  * Build a PDF from docs.
  */
-task buildDocsPdf (type:PandocTask, dependsOn: 'buildPandocDockerImage') {
+task buildDocsPdf (type:PandocTask, dependsOn: ['buildPandocDockerImage', processDocs]) {
     baseName = 'jadex-mkdocs'
     version = jadex_build_version
     dockerImageName = 'jadexpandoc'
@@ -85,7 +105,7 @@ class PandocTask extends DockerTask {
         // copy doc source to work dir
         java.nio.file.Path target = Paths.get(project.buildDir.path,"work")
         jadex.commons.SUtil.deleteDirectory(target.toFile())
-        org.apache.commons.io.FileUtils.copyDirectory(Paths.get(project.projectDir.path, "docs").toFile(), target.toFile())
+        org.apache.commons.io.FileUtils.copyDirectory(Paths.get(project.buildDir.path, "mkdocs", "docs").toFile(), target.toFile())
 
         Map<String,List<String>> mdFiles = new HashMap<String,List<String>>()
 
@@ -184,17 +204,25 @@ class MkDocsTask extends DockerTask {
 
     @TaskAction
     def action() {
-        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$project.projectDir${File.separator}:/workspace/"];
-        def builder =  getProcessBuilderForCommand("mkdocs", null, dockerArgs, true)
+        List<String> command = new ArrayList<String>()
+        String workDir
         if (action == ACTION.serve) {
-            builder.command.add("serve")
+            // directly use sources to enable auto-refresh in browser when editing .mds
+            workDir = "$project.projectDir${File.separator}"
+            command.add("serve")
         } else if (action == ACTION.build) {
-            builder.command.add("build")
-            builder.command.add("--clean")
-            builder.command.add("--site-dir")
-            builder.command.add("build/site")
+            // use processed mkdocs files
+            workDir = "$project.buildDir${File.separator}mkdocs${File.separator}"
+            command.add("build")
+            command.add("--clean")
+            command.add("--site-dir")
+            command.add("site")
         }
 
+        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$workDir:/workspace/"];
+        def builder =  getProcessBuilderForCommand("mkdocs", null, dockerArgs, true)
+        builder.command.addAll(command)
+        builder.directory(new File(workDir)) // only works without docker?
         launchDockerProcess(builder)
     }
 
@@ -260,7 +288,7 @@ class DockerTask extends DefaultTask {
         return result;
     }
 
-    def void pullDockerImage() {
+    def void pullDockerImage(dockerImageName) {
         def builder = new ProcessBuilder(docker, 'pull', dockerImageName)
         builder.redirectErrorStream(true)
         def p = builder.start()

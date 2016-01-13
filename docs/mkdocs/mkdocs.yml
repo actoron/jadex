@@ -1,4 +1,4 @@
-site_name: Jadex 2.5 Documentation
+site_name: Jadex ${jadexversion} Documentation
 theme: readthedocs
 pages:
 #- 'index.md'
