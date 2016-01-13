@@ -70,7 +70,7 @@ class ProjectVersion {
         if (patch) {
             fullVersion += ".$patch"
         } else {
-            fullVersion +=".unknown"
+            fullVersion +="-DEVELOPMENT"
         }
 
         fullVersion

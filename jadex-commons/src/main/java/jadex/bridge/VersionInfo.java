@@ -70,13 +70,14 @@ public class VersionInfo
 				while(start.exists() && start.getParentFile()!=null)
 				{
 					start	= start.getParentFile();
-					File	settings	= new File(start, "gradle.properties");
+					File	settings	= new File(start, "src/main/buildutils/jadexversion.properties");
 					if(settings.exists())
 					{
 						is	= new FileInputStream(settings);
 						props.load(is);
 						is.close();
-						version	= props.getProperty("jadex_build_version");
+						version	= props.getProperty("jadexversion_major")
+							+ "." + props.getProperty("jadexversion_minor") + "-DEVELOPMENT";
 						break;
 					}
 				}
