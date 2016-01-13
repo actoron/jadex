@@ -47,6 +47,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
 
@@ -235,20 +236,29 @@ public class Starter
 	
 	/**
 	 *  Create the platform.
-	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
 	 */
 	public static IFuture<IExternalAccess> createPlatform()
 	{
 		return createPlatform(PlatformConfiguration.getDefault());
 	}
-	
+
 	/**
 	 *  Create the platform.
-	 *  @param args The command line arguments.
+	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config)
+	{
+		return createPlatform(config, false);
+	}
+
+	/**
+	 *  Create the platform.
+	 *  @param config The PlatformConfiguration object.
+	 *  @return The external access of the root component.
+	 */
+	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config, boolean printExceptions)
 	{
 		RootComponentConfiguration rootConfig = config.getRootConfig();
 		
@@ -429,6 +439,20 @@ public class Starter
 			{
 				ret	= new Future<IExternalAccess>(e);
 			}
+		}
+
+		if (printExceptions) {
+			ret.addResultListener(new IResultListener<IExternalAccess>() {
+				public void exceptionOccurred(Exception exception) {
+					System.out.println(exception.getMessage());
+					if (Future.DEBUG) {
+						exception.printStackTrace();
+					}
+				}
+
+				public void resultAvailable(IExternalAccess result) {
+				}
+			});
 		}
 		
 		return ret;
