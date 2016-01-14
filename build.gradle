@@ -504,13 +504,11 @@ def createDistZip(distname, arts, isaddon)
 							runtimeConfig = sp.configurations.runtimeAndroid
 						}
 						
-						if (!isaddon) {
-							def detached = getDetachedConfiguration(sp, runtimeConfig)
-							detached.each { file ->
-								if (!extdists.contains(file)) {
-									zipfileset file: file, prefix: foldername + '/lib/'
-									extdists.add(file)
-								}
+						def detached = getDetachedConfiguration(sp, runtimeConfig)
+						detached.each { file ->
+							if (!extdists.contains(file)) {
+								zipfileset file: file, prefix: foldername + '/lib/'
+								extdists.add(file)
 							}
 						}
 					}
