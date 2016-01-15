@@ -61,24 +61,20 @@ String content; * The content of the reply message event.\
 
 In this exercise we will create a translation capability.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
  \
 \*Create a new Capability ADF\*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 -   Create a new file TranslationD1.capability.xml with the skeleton code from the following code snippet. Now copy the definition of imports, plans, beliefs, events (including the newly defined ones from above) and expressions (in this case there are no goals) from TranslationC2.agent.xml into this file.
 
 {code:xml}\
-&lt;capability xmlns="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex-bdi</span>](http://jadex.sourceforge.net/jadex-bdi)</span>"\
-            xmlns:xsi="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://www.w3.org/2001/XMLSchema-instance</span>](http://www.w3.org/2001/XMLSchema-instance)</span>"\
-            xsi:schemaLocation="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex-bdi</span>](http://jadex.sourceforge.net/jadex-bdi)</span>\
-                                <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex-bdi-2.0.xsd</span>](http://jadex.sourceforge.net/jadex-bdi-2.0.xsd)</span>"\
+&lt;capability xmlns="http://jadex.sourceforge.net/jadex-bdi ](http://jadex.sourceforge.net/jadex-bdi) "\
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance ](http://www.w3.org/2001/XMLSchema-instance) "\
+            xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi ](http://jadex.sourceforge.net/jadex-bdi) \
+                                http://jadex.sourceforge.net/jadex-bdi-2.0.xsd ](http://jadex.sourceforge.net/jadex-bdi-2.0.xsd) "\
   name="TranslationD1"\
   package="jadex.bdi.tutorial"&gt;\
   ...\
@@ -103,13 +99,9 @@ Load the agent model in the RMA and start the agent. Test the agent with add wor
 1.1 Exercise D2 - Exported Beliefs\
 In this exercise we will extend the translation agent by making it capable to find synonyms for English words. Therefore we extend the agent from D1 with a new find synonyms plan which will directly be contained in the agent description. Because the plan needs to access the dictionary from the translation capability, the egwords belief will be made usable from external.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Create a new plan\*
 

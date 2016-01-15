@@ -4,15 +4,13 @@ The term capability is used for different purposes in the agent community. In th
 
 *Figure 1: Capability concept*
 
-<span>Capability Definition</span> 
+Capability Definition
 ----------------------------------
 
  \
 A capability is basically the same as an agent, but without its own reasoning process. On the other hand, an agent can be seen as a collection (i.e. subcapability hierarchy) of capabilities plus a separate reasoning process shared by all its capabilities. Each agent has at least one capability (sometimes called root capability) which is given by the beliefs, goals, plans, etc. contained in the agent's XML file. To create additional capabilities for reuse in different agents, the developer has to write capability definition files. A capability definition file is similar to an agent definition file, but with the &lt;agent&gt; tag replaced by &lt;capability&gt;. The &lt;capability&gt; tag has the same substructure as the &lt;agent&gt; tag.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Note that the &lt;capability&gt; tag has *name* and *package* attributes. As there are so many similarities between agent definition files and capability definition files, we commonly use the term ADF to denote both.
 
@@ -36,7 +34,7 @@ Note that the &lt;capability&gt; tag has *name* and *package* attributes. As the
 
 *Figure 2: Capability XML file header*
 
-<span>Using Capabilities</span> 
+Using Capabilities
 -------------------------------
 
  \
@@ -63,7 +61,7 @@ Agents and capabilities may be composed of any number of subcapabilities which a
 
  
 
-<span>Elements of a Capability</span> 
+Elements of a Capability
 -------------------------------------
 
  \
@@ -73,17 +71,15 @@ The capability introduces a scoping of the BDI concepts. By default all beliefs,
 \
 *Figure 2: The Jadex references XML schema elements (using beliefs as example)*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<span>Making an Element Accessible for the Outer Capability</span> 
+Making an Element Accessible for the Outer Capability
 ------------------------------------------------------------------
 
 For this purpose the element must declare itself as exported (using the exported="true" attribute) in the inner capability. In the outer capability, a reference (e.g., &lt;beliefref&gt;) has to be declared, which directly references the original element (using dot notation "capname.belname") within the concrete tag. An example for an exported belief is shown below.\
    
 
-### <span>Inner Capability A</span> 
+### Inner Capability A
 
 
 ```xml
@@ -96,7 +92,7 @@ For this purpose the element must declare itself as exported (using the exported
 \
    
 
-### <span>Outer Capability B includes A under the name mysubcap</span> 
+### Outer Capability B includes A under the name mysubcap
 
 
 ```xml
@@ -110,13 +106,13 @@ For this purpose the element must declare itself as exported (using the exported
 
     
 
-<span>Defining an Abstract Element</span> 
+Defining an Abstract Element
 -----------------------------------------
 
 This means the element itself provides no implementation and needs to be assigned from an outer capability. For this purpose an abstract element reference (e.g., &lt;beliefref&gt;) has to be declared. An outer capability can provide an implementation for this abstract element by defining a concrete element (or another reference) and assigning it to the abstract reference (using the &lt;assignto&gt; tag). In addition, the abstract element can be declared as optional (using the optional="true" attribute of the abstract tag) requiring no outer element assignment. At runtime, such unassigned abstract elements are not accessible, and trying to use them will result in runtime exceptions. For some of the elements (e.g., beliefs) it can be tested at runtime with the *isAccessible()* method from within plans, if a reference is connected.\
    
 
-### <span>Inner Capability A</span> 
+### Inner Capability A
 
 
 ```xml
@@ -130,7 +126,7 @@ This means the element itself provides no implementation and needs to be assigne
 
     
 
-### <span>Outer Capability B includes A under the name mysubcap</span> 
+### Outer Capability B includes A under the name mysubcap
 
 
 ```xml

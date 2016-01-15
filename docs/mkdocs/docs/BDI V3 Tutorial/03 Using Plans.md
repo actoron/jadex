@@ -8,7 +8,7 @@ For a plan the triggering events and goals can be specified in the plan head to 
 
 Often a plan does some action and then wants to wait until the action has been done before continuing (e.g. dispatching a subgoal). Therefore a plan can use one of the various waitFor() methods of the plan API, that come in quite different flavors. The plan API can be retrieved as an object via two mechanisms. First, the @PlanAPI annotation can used above a field of type IPlan in plan classes. The engine will automatically inject the plan API when a plan instance is created. When using a method as plan this is not possible. Hence, the signature of the plan method can be used to retrieve the plan API just by adding a parameter of type IPlan. Please note that in Jadex methods that are invoked by the framework can have any signature. The engine will do its best to automatically determine which values are expected and set them as parameter values. If the engine does not find a suitable value of a given type the value will be null.
 
-<span>Exercise B1 - A Plan as Normal Java Class</span> 
+Exercise B1 - A Plan as Normal Java Class
 ------------------------------------------------------
 
 In this exercise we will use a plan for translating words from English to German. Create a new TranslationBDI.java file by copying the file from the last lecture.
@@ -70,7 +70,7 @@ public void body()
 **Start and test the agent**\\\
 Create a translation agent via the Jadex Control Center and observe the output. You should see it printing the translated word.
 
-<span>Exercise B2 - A Plan as Inner Class</span> 
+Exercise B2 - A Plan as Inner Class
 ------------------------------------------------
 
 In the lecture we will use an inner class as plan instead of an extra plan class. The functionality remains the same. Again, copy the translation agent class from the last lecture and apply the following changes:
@@ -101,7 +101,7 @@ public class TranslationBDI
 **Start and test the agent**\\   \
 Start the agent as explained in the preceding exercise. Observe if the same output is produced.
 
-<span>Exercise B3 - Plan as Method</span> 
+Exercise B3 - Plan as Method
 -----------------------------------------
 
 Once again, in this lecture the same functionality will be created. But this time, the plan will be represented as method. This can be very helpful, if the plan is rather simple. Furthermore, using methods as plans helps reducing the number of classes in a project.\
@@ -146,12 +146,12 @@ public void translateEnglishGerman()
     **Start and test the agent**\
     Test and verify that the agent behavior is the same as in the last exercise.
 
-<span>Exercise B4 - Using Other Plan Methods</span> 
+Exercise B4 - Using Other Plan Methods
 ---------------------------------------------------
 
 In this exercise we will explore other plan methods. Besides the already known body method three other plan lifecycle methods exist, which are called respectively when the plan passes successfully (@PlanPassed), fails with exception (@PlanFailed) or is aborted (@PlanAborted) e.g. when the context of plan becomes invalid. This time, we need a translation agent with an inner plan class to be able to add the aforementioned method. Hence, it is most convenient to take the class from exercise B2 as starting point and copy its content to the new file. Afterwards we need to apply the following changes:
 
--   Add a try-catch-block to the adoptPlan() call and wait for the plan to be finished using get() at the end of the invocation. The get() turns the future based asynchronous call into a synchronous one. For more information about asynchronous programming with futures in Jadex please refer to the <span class="wikiexternallink">[AC User Guide](../AC%20User%20Guide/03%20Asynchronous%20Programming)</span>. The agent body method should look like this:
+-   Add a try-catch-block to the adoptPlan() call and wait for the plan to be finished using get() at the end of the invocation. The get() turns the future based asynchronous call into a synchronous one. For more information about asynchronous programming with futures in Jadex please refer to the [AC User Guide](../AC%20User%20Guide/03%20Asynchronous%20Programming) . The agent body method should look like this:
 
 
 ```java
@@ -212,7 +212,7 @@ public void translateEnglishGerman()
 **Start and test the agent**\
 After starting the agent you should observe that due to the exception in the plan body the failed method is invoked. In the agent body the exception is rethrown when the get() on the result future of adoptPlan() is invoked. Also try out what happens when you do not throw the exception in the plan body.
 
-<span>Exercise B5 - Plan Context Conditions</span> 
+Exercise B5 - Plan Context Conditions
 --------------------------------------------------
 
 Besides the lifecycle methods that have been introduced in the former exercise a plan may also have a pre- and/or a context condition. The precondition is evaluated before a plan is going to be executed and if it evaluates to false to plan will be excluded. In contrast, the context condition has to hold during all the time a plan is executing. If it turns to false at some point in time, the plan will be aborted. In this execise we will learn how a context condition can be used.

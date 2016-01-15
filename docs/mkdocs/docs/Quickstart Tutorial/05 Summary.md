@@ -1,4 +1,3 @@
-<span>Chapter 05 - Summary</span> 
-=================================
+# Summary
 
 how challenges are met in concrete example

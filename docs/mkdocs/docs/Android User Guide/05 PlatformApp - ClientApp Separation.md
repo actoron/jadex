@@ -11,21 +11,21 @@ Nevertheless, the mentioned separation is desirable, because if user application
 
 Since version 2.4 (which is currently only available as night build) of jadex-android, this separation is supported.
 
-The Platform and all it's libraries are now packaged into a <span class="wikiexternallink">[standalone Android APK](https://www.activecomponents.org/bin/view/Download/Overview)</span>.
+The Platform and all it's libraries are now packaged into a [standalone Android APK](https://www.activecomponents.org/bin/view/Download/Overview) .
 
 This document describes how to develop applications using the *ClientApp* model.
 
-<span>Installation of the Platform App</span> 
+Installation of the Platform App
 ---------------------------------------------
 
-1.  Download the Jadex platformApp from <span class="wikiexternallink">[nightly builds](http://www.activecomponents.org/download)</span>.\
+1.  Download the Jadex platformApp from [nightly builds](http://www.activecomponents.org/download) .\
     2. Install it on your phone or emulator. For emulator, use *adb install jadex-android-platformapp-2.4-SNAPSHOT.apk*.\
     For installation on your phone, enable the *unknown sources* setting, located in * settings &gt; security *, download the APK to your phone and execute it.
 
 The Platform App will create a Startup icon just like any other android app.\
 However, selecting this icon will not start the platform, instead, it is started by launching client applications.
 
-<span>Functionality of separated Platform and Client</span> 
+Functionality of separated Platform and Client
 -----------------------------------------------------------
 
 When a client application is started, the following steps are performed as illustrated in the image below:
@@ -38,16 +38,16 @@ When a client application is started, the following steps are performed as illus
 
 The next step will explain how to create client applications.
 
-<span>Developing a Jadex ClientApp</span> 
+Developing a Jadex ClientApp
 -----------------------------------------
 
-### <span>Prerequisites</span> 
+### Prerequisites
 
 **Important:** Currently, it is only possible to develop Jadex ClientApps using maven!
 
-Before you can start developing, please follow steps 1-3 from <span class="wikiexternallink">[here](02%20Installation)</span> to install Eclipse and the Android SDK.
+Before you can start developing, please follow steps 1-3 from [here](02%20Installation)  to install Eclipse and the Android SDK.
 
-### <span>Using the ClientApp example</span> 
+### Using the ClientApp example
 
 For a quick start, use the example project *jadex-android-clientapp-example-maven* included in the jadex-android-example-projects file.
 
@@ -61,12 +61,12 @@ For a quick start, use the example project *jadex-android-clientapp-example-mave
 -   to build the project with maven **which is required as of jadex-android-2.4**, use the included launch config *Build clientapp example* 
 -   to run the maven build, use the included launch config *Run clientapp example* which will deploy and run the project on any android devices plugged in or emulators running.
 
-### <span>The ClientApp</span> 
+### The ClientApp
 
 In Contrast to a normal android application, each Jadex ClientApp has an entry point (Activity) that **has** to extend *JadexApplication*. This Class only needs to overwrite one Method, *getClassName()*.\
 The String it returns should be the fully-qualified class name of a ClientAppFragment.
 
-#### <span>ClientApp Fragments</span> 
+#### ClientApp Fragments
 
 Because Fragments can be added dynamically to views, we use Fragments to display the developers application content.\
 That means, instead of creating *Activity* classes, you should instead extend from *ClientAppFragment*, which offers mostly the same functionality.\

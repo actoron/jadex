@@ -1,21 +1,17 @@
-<span>Chapter 2. Starting an Agent</span> 
+Chapter 2. Starting an Agent
 =========================================
 
 Setting up the Jadex environment properly is pretty easy and can be done in a few simple steps. Generally, Jadex is realized as reasoning engine meaning that it can be used on top of different (agent) middlewares. In this tutorial we will use the Standalone version of Jadex. The Jadex distribution should be extracted to some local directory, called JADEX\_HOME here. Then you basically have two options how to start Jadex. The first is by setting the Java CLASSPATH variable by hand to all the jars contained in the JADEX\_HOME/lib directory. The second one is by using the -jar option when starting via the java command.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The alternative commands for launching the Jadex Standalone platform are:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 **java jadex.standalone.Platform**or\\ **java -jar jadex-launch-2.0-rc1.jar**\\
 
-<span>Exercise A1 - Creating a Project</span> 
+Exercise A1 - Creating a Project
 ---------------------------------------------
 
 Start the Jadex platform with the command explained above. After some short time the Jadex Control Center (JCC) should show up with its user interface. The JCC provides a project management facility that simplifies working on specific applications. Basically, a project contains settings about the used project folders as well as miscellaneous tool and user interface settings. All your settings - as window settings, added paths and so on - will be stored in a .project.xml file and additional properties-files will be created automatically to store the individual settings for the plugins you are using. \\\
@@ -23,13 +19,11 @@ Start the Jadex platform with the command explained above. After some short time
 
 To add files to your project, hit the "Add Path" button. For saving the project settings on disk select "Save Settings" from the "File"-menu. Additionally, the settings are also saved automatically when shutting down the JCC via its window close button or "Exit" from the "File"-menu. You can also use multiple projects with different settings. To switch projects simply click on "Load Settings from File" in the "File"-menu and choose the settings file of the project you want to work with.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 **Verify project behaviour.**\\ In order to verify that you project has been set up correctly you should perform some visible changes such as changing the JCC's window size or switching to another plugin than the starter. After that you should shut down the JCC and platform and restart it. If the project has been created correctly, the JCC will show up in exactly the same state you left it, i.e. the last active plugin will be activated and the gui settings are remembered, too.
 
-<span>Exercise A2 - Executing Example Applications</span> 
+Exercise A2 - Executing Example Applications
 ---------------------------------------------------------
 
 The Jadex distribution already contains a couple of example applications. The objective of this exercise consists in trying out the examples and also in roughly understanding their application purpose. Open the JCC and select the starter view as described in exercise A1. On the left hand side of the starter you can see the agent and application files that can be loaded in a tree like structure. As top-level elements the starter can handle jar files or directories representing the root of Java packages (often named "classes", "bin" or "build"). Since the newer versions of Jadex a default project is automatically loaded at startup so that you can already see example folders in that panel. In case you want to add a new directory with agent models, you should choose the ![](newaddfolder.png) button ("Add Path") and browse to the corresponding directory you want to add. All Jadex examples are contained in the different 'jadex-applications-xyz.jar' files in the JADEX\_HOME/lib directory. The content of the new jar will be added as new node to the model tree. At the bottom you can now see this jar-file beeing scanned (if the scanning option has not been disabled). Next, you can expand the model tree by double clicking on the corresponding top-level node, which represents the jar-file. After openening the folders "jadex" and "examples" you will see the different example folders containing several different kinds of single- and multi-agent applications. Concretely the following BDI example applications are currently available:
@@ -48,25 +42,19 @@ The Jadex distribution already contains a couple of example applications. The ob
 
 Starting an example can in most cases be done by opening the corresponding folder and searching for an application file (a file ending with ".application.xml"). Such an application definition has the purpose to start-up all relevant application agents and may also setup further application components. In case there is no application file the example can be started by selecting the agent directly (e.g. Helloworld or Puzzle).
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 ![](marsworld.png)\\ *Figure 1 The marsworld example*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the same way you can add other paths and execute your own applications and agents later. In this case you will not add jar-files, but the root directory of your packages.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 **Explain example behaviour.**\\ Choose one of the more complex examples for a more detailed analysis. Select the application of the example and read through its documentation shown in the starter panel. Then look into the selected example directory and read also the documentation of the agents which belong to that application. Finally, open the source code of these agents in your source code editor and try to grasp roughly of what they are comprised. Write down a (simple!) explanation how the multi-agent system and the involved agents work.
 
-<span>Exercise A3 - Create first simple Jadex agent</span> 
+Exercise A3 - Create first simple Jadex agent
 ----------------------------------------------------------
 
 Open a source code editor or an IDE of your choice and create a new agent definition file (ADF) called TranslationA1.agent.xml (cf. Figure 2, "A1 XML ADF"). We recommend using eclipse with web-tools plug-in for editing ADFs or some other advanced XML-Editor. In this file all important agent startup properties are defined in a way that complies to the Jadex schema specification. First property of the agent is its type name which must be the same as the file name (similar to Java class files), in this case it is set to TranslationA1. Additionally you can specify a package attribute, which has a similar meaning as in Java programs and serves for grouping purposes only (you will need to alter the package name with respect to your actually used directory structure). All plans and other Java classes from the agent's package are automatically known and need not to be imported via an import tag.

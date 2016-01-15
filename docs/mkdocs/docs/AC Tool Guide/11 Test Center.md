@@ -1,9 +1,9 @@
-<span>Chapter 11 - Test Center</span> 
+Chapter 11 - Test Center
 =====================================
 
 ![11 Test Center@testcenter\_ov.png](testcenter_ov.png)
 
-The test center can be used to execute component unit tests within test suites. Therefore, the tool is very similar to the well known visual <span class="wikiexternallink">[JUnit](http://www.junit.org/)</span> test environment. The test center mainly consists of three areas (cf. screenshot above). A model tree on the left, a test suite view on the upper right and a test suite report on the lower right. The general scheme the tool is used consists of the following steps:
+The test center can be used to execute component unit tests within test suites. Therefore, the tool is very similar to the well known visual [JUnit](http://www.junit.org/)  test environment. The test center mainly consists of three areas (cf. screenshot above). A model tree on the left, a test suite view on the upper right and a test suite report on the lower right. The general scheme the tool is used consists of the following steps:
 
 1.  Select the folders in which your tests reside.
 2.  Select the test cases and add them to the current test suite.

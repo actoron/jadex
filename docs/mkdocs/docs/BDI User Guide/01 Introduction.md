@@ -1,30 +1,18 @@
-Jadex BDI is an agent-oriented reasoning engine for writing rational agents with XML and the Java programming language. Thereby, Jadex represents a conservative approach towards agent-orientation for several reasons. One main aspect is that no new programming language is introduced. Instead, Jadex agents can be programmed in the state-of-the art object-oriented integrated development environments (IDEs) such as \[eclipse&gt;<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://www.eclipse.org/</span>](http://www.eclipse.org/)</span>\]. The other important aspect concerns the middleware independence of Jadex. As Jadex BDI is loosely coupled with its underlying middleware, Jadex can be used in very different scenarios on top of agent platforms as well as enterprise systems such as J2EE.
+Jadex BDI is an agent-oriented reasoning engine for writing rational agents with XML and the Java programming language. Thereby, Jadex represents a conservative approach towards agent-orientation for several reasons. One main aspect is that no new programming language is introduced. Instead, Jadex agents can be programmed in the state-of-the art object-oriented integrated development environments (IDEs) such as \[eclipse&gt;http://www.eclipse.org/ ](http://www.eclipse.org/) \]. The other important aspect concerns the middleware independence of Jadex. As Jadex BDI is loosely coupled with its underlying middleware, Jadex can be used in very different scenarios on top of agent platforms as well as enterprise systems such as J2EE.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Similar to the paradigm shift towards object-orientation agents represent a new conceptual level of abstraction extending well-known and accepted object-oriented practices. Agent-oriented programs add the explicit concept of autonomous actors to the world of passive objects. In this respect agents represent active components with individual resoning capabilities. This means that agents can exhibit reactive behavior (responding to external events) as well as pro-active behavior (motivated by the agents own goals).
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 This tutorial will cover the following topics, which correspond coarsely to the available Jadex language elements:
 

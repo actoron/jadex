@@ -6,7 +6,7 @@ An agent's beliefbase represents its knowledge about the world. The agent is awa
 
 If you already know the former versions of Jadex BDI, you may be aware of the distinction between beliefs and belief sets. This distinction is not necessary in V3 any longer and instead all elements are marked with the @Belief annotation. Please note that in case of a getter/setter pair it is required to add @Belief to both methods. The function of making things beliefs is that the agent becomes aware of changes of these elements. This means that is the value of a belief is set to a new value the agent recognizes this change and can act according to this change. 
 
-<span>Exercise C1 - Belief Triggering Plan</span> 
+Exercise C1 - Belief Triggering Plan
 -------------------------------------------------
 
 In this exercise we will develop a translation agent that checks if only good word pairs are added to his dictionary. For this purpose we will make the wordtable become a belief and create a check plan that is activated always when the dictionary changes. This time we start with a fresh agent file and do the following:
@@ -55,7 +55,7 @@ public void checkWordPairPlan(ChangeEvent event)
 **Start and test the agent**\
 Create a translation agent via the Jadex Control Center and observe the output. You should see it printing the warning.
 
-<span>Exercise C2 - Dynamic Beliefs</span> 
+Exercise C2 - Dynamic Beliefs
 ------------------------------------------
 
 Besides normal beliefs it is sometimes helpful to have a belief that directly depends on other beliefs and is automatically reevaluated whenever one of the beliefs changes it relies on. For such dynamic beliefs it is required that they are fields with an init expression directly in its declaration, i.e. e.g. private String name = othername+id assuming that othername and id are other beliefs.
@@ -100,7 +100,7 @@ public void checkWordPairPlan(ChangeEvent event)
 **Start and test the agent**\
 Start the agent and verify that it behaves the same way as in the last exercise.
 
-<span>Exercise C3 - Getter/Setter Belief</span> 
+Exercise C3 - Getter/Setter Belief
 -----------------------------------------------
 
 In this and the following exercises in this chapter we will use a different example as it better fits to show further belief features. The example is a very simple clock which is able to print the current time to the standard out. 
@@ -152,7 +152,7 @@ protected void printTime()
 **Start and test the agent**\
 Start the agent and check that it prints out the current time.
 
-<span>Exercise C4 - Getter/Setter Belief without Field</span> 
+Exercise C4 - Getter/Setter Belief without Field
 -------------------------------------------------------------
 
 This lecture will show that you can use also a getter/setter belief without an underlying field representation.  
@@ -178,7 +178,7 @@ This lecture will show that you can use also a getter/setter belief without an u
 **Start and test the agent**\
 Start the agent and check that it prints out the current time. Think about why it works? You just call an empty method (setTime()), don't you?
 
-<span>Exercise C5 - Belief with Update Rate</span> 
+Exercise C5 - Belief with Update Rate
 --------------------------------------------------
 
 In order to print out the current time regularily and not just once we will use a belief with update rate. This means that the value of the belief is automatically reevaluated in certain time intervals. 

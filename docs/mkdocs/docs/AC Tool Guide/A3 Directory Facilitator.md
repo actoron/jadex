@@ -1,4 +1,4 @@
-<span>Chapter A3 - Directory Facilitator</span> 
+Chapter A3 - Directory Facilitator
 ===============================================
 
 ![A3 Directory Facilitator@df\_ov.png](df_ov.png)

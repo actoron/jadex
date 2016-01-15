@@ -1,48 +1,36 @@
-<span>Chapter 3 - Asynchronous Programming</span> 
+Chapter 3 - Asynchronous Programming
 =================================================
 
 ![03 Asynchronous Programming@synccall.png](synccall.png)  
 *Synchronous call*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Understanding the difference between the synchronous and the asynchrnonous programming style is fundamental for using active components. The meaning of a typical synchronous call is shown in the figure above. It can be seen that a *Caller* is calling e.g. a method on a *Callee*. The result of this call is computed by the callee and delivered to the caller as result afterwards. It is important to note here that the caller is *blocked* while the callee is calculating the result of the call. Such blocking is uncritical when calls are very fast and the blocking does not hinder the caller to perform other tasks in the meantime. In distributed systems using the synchronous invocation scheme has a severe drawback besides the performance loss. The scheme is inherently deadlock prone as call graphs may lead to cycles so that no participant has a chance to leave its waiting state and continue processing. For this reason asynchronous calls should be used (The asynchronous call scheme has successfully been introduced in other areas such as in the context of the web with HTTP with AJAX or as programming model in the Google AppEngine).
 
-<span>Asynchronous Call Concepts</span> 
+Asynchronous Call Concepts
 ---------------------------------------
 
 ![03 Asynchronous Programming@asynccall.png](asynccall.png)  
 *a) Asynchronous call with wait by necessity                        b) Asynchronous call with listener notification*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 An asynchronous call is simply a call that does not block the caller while the callee is serving the request. Hence, the question arises how the caller can determine if the processing of the callee has been finished and how it can fetch the result of the call. For this purpose the *future* abstraction has been introduced (In Jadex it is represented by *jadex.commons.future.IFuture*). A future represents the result of an asynchronous call and can be seen as a container for the real result of the call. The underlying idea is that the callee delivers immediately a future object to the caller and uses the future itself to store the real result after having finished its processing. A future allows the caller to check if the result is already available without blocking (*isDone()*). Furthermore, if the caller cannot proceed further without knowing the result of the call, it can decide to wait for the result in a possibly blocking manner (*get()*). If the call blocks depends on whether the result has already been provided by the callee or not. Fetching the result in this way is called *wait by necessity*. The blocking variant is shown in the figure above. As there is a chance for blocking in *wait by necessity* using this scheme should also be avoided in the distributed case. A purely non-blocking invocation scheme can be derived when the callee takes over the responsibility for notifying the caller when processing has finished. This means that the caller installs a result listener (in Jadex the *jadex.commons.future.IResultListener*) on the future and this result listener is called in the moment the callee provides the result value. This scheme is shown in figure *b)* and is the basis of the Jadex active components programming model.
 
-<span>Programming Futures and Listeners</span> 
+Programming Futures and Listeners
 ----------------------------------------------
 
 ![03 Asynchronous Programming@futures\_new.png](futures_new.png)  
 *Future types*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 As can be seen in the Figure above, in Jadex several different future types can be used, which all extend the common base interface *jadex.commons.future.IFuture*. On the one hand *ITerminableFuture*s allow for aborting an ongoing asynchronous method execution from the caller side by calling terminate at any time and on the other hand *IIntermediateFuture*s can be used when more than one result value is expected. Intermediate futures can return these result values one by one allowing a caller to continue processing as soon as the first result becomes available. Of course, also a terminable version of an intermediate future exists. Finally, very similar to terminable intermediate futures are *ISubscriptionFuture*s, which only relax result storage, i.e. a subscription future immediately forgets intermediate results as soon as they have been passed to one subscriber (listener).\
 It follows a brief introduction of all currently available future types:
@@ -104,7 +92,7 @@ public interface IResultListener<E>
 ```
 
 
-<span>Programming Intermediate Futures and Listeners</span> 
+Programming Intermediate Futures and Listeners
 -----------------------------------------------------------
 
 In certain situations an asynchronous call might not only return a single result but a collection of result values. Of course, for this purpose a future of type collection could be used (for example *IFuture&lt;Collection&lt;String&gt;&gt;*), but if the result values are computed independently of each other this can lead to the severe drawback that the caller has to wait until the last value has been provided till it can continue processing. In case that the caller wants to use the values as soon as they are available an alternative result value scheme has to be used. This scheme is based on *IIntermediateFuture&lt;E&gt;* and *IIntermediateResultListener&lt;E&gt;* both from the package *jadex.commons.future*. 
@@ -147,7 +135,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 ```
 
 
-### <span>Example</span> 
+### Example
 
 Let us assume we want to use the intermediate listener to search for different chat service providers sitting on arbitrary nodes in a network. Each chat service has a method *message()* that can be invoked to send a text message to the corresponding chat partner. The example intermediate listener implementation below shows that the *resultAvailable()* method as well as the intermediate counterparts *intermediateResultAvailable()* and *finished()* are used. With this technique the listener reacts failsafe with respect to the implementation of the callee, i.e. it will work if the callee truely provides intermediate results or just one bulk result. Hence, if the implementation of the callee is unknown both result listener methods should be implemented. In the example, it can also be seen that if processing of results is independent from the mode they are delivered, it is convenient to call *intermediateResultAvailable()* in *resultAvailable()* for each partial result value.
 
@@ -163,23 +151,19 @@ public interface IIntermediateResultListener<E> extends IResultListener<Collecti
 ```
 
 
-<span>Library Support for Listeners</span> 
+Library Support for Listeners
 ------------------------------------------
 
 ![03 Asynchronous Programming@listeners.png](listeners.png)  
 *Result listeners*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In Jadex there are several ready to use listeners that help with recurring use cases. These ready to use listeners are described in the following. Using these listeners can speed up development and simplify the code. For most of the listener implementations also intermediate versions exist. An overview of the currently supported listener types is given in the figure above. It was made to help you finding the right listener class quickly by reading it from left to right and taking a choice in each column. The first column describes the task that is achieved by the listener, the second column reveals on which thread the listener call will be performed (if not explicitly stated no thread switch will be done) and the third column distinguishes between singe result and intermediate listener versions. Finally, in the fourth column you find the concrete Java class that can be used. It has additionally to be noted that listeners in the lower part of the table (below the heading 'Listeners Supporting Delegation') allow for an easy chaining of multiple listeners. This is achieved by delegation to another listenerm which has to be provided to the new listener (in most cases as constructor argument). To show you how the table can be used consider the case you want to create a listener that signals a single result to the user in a Swing user interface and adds a timeout to the underlying call. In this case one could chain a *SwingResultListener* with a *TimeoutResultListener*.
 
-### <span>DefaultResultListener&lt;E&gt;</span> 
+### DefaultResultListener&lt;E&gt;
 
 If exceptions cannot be handled or need not to be handled default result listeners can be used. They implement the exception occurred method by logging a severe message. The logger to be used can be either supplied via the listener constructor or a default logger with the name "default-result-listener" will be used. As a default listener already implements *exceptionOccurred()* only the *resultAvailable()* method needs to be implemented by the developer. In the example code snippet below it can be seen how a default result listener can be used in context of using a service.  
 
@@ -213,7 +197,7 @@ fut.addResultListener(new IIntermediateResultListener<IChatService>()
 ```
 
 
-### <span>DelegationResultListener&lt;E&gt;</span> 
+### DelegationResultListener&lt;E&gt;
 
 In Java methods can either use try-catch blocks to handle exceptions themselves or they can declare to throw exceptions in order to let the caller of a method handle potentially occurring exceptions. The same styles of programming are useful in the asynchronous listener based case as well. In order to let an exception be treated by a caller, delegation listener can be used. They forward *resultAvailable()* and *exceptionOccurred()* to a specified future. When using the generically typed version of the delegation listener this means that the future and the listener have to be of the same type. As an example consider a method that calls another method and wants to forward exceptions of the invoked method to the caller. The method itself uses a delegation result listener that overrides the *customResultAvailable()* method to modify the result retrieved from calling the *sayHello()* method. Should *sayHello()* raise an exception, the delegation listener will set this exception automatically on the future of the *sayHello2()* method.
 
@@ -232,7 +216,7 @@ fut.addResultListener(new DefaultResultListener<IClockService>()
 ```
 
 
-### <span>ExceptionDelegationResultListener&lt;E, T&gt;</span> 
+### ExceptionDelegationResultListener&lt;E, T&gt;
 
 In order to allow also chaining of futures and listeners with different generic types the exception variant of the delegation listener can be used. The generic types &lt;E, T&gt; denote the type of the received and forwarded result respectively. In constrast to the delegation listener the exception delegation listener only implements the *exceptionOccurred()* method so that the *customResultAvailable* method always has to be implemented by the developer himself. The example below illustrates how a result type can be transformed from String to String\[\] using the exception delegation listener. The method *sayHellos()* returns a String\[\] but gets a String from the *sayHello()* method. Therefore, it overrides the *customResultAvailable()* to set a result of of type String\[\]. 
 
@@ -255,13 +239,11 @@ public IFuture<String> sayHello2()
 ```
 
 
-### <span>TimeoutResultListener&lt;E&gt;</span> 
+### TimeoutResultListener&lt;E&gt;
 
 For writing robust programs it is often essential not to wait indefinitely for a result. Instead one often assumes that an error occurred, if the result is not made available after some predefined timeout. The *TimeoutResultListener* captures this assumption. It is created with a target result listener and a timeout value in milliseconds. If the result is made available before the timeout, it is immediately forwarded to the target listener. When the timeout passes without a result being available, the *exceptionOccurred()* method is called with a timeout exception. In the latter case, the result will never be forwarded to the target listener, even if it becomes eventually available after the timeout.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The timeout result listener uses any available clock service for measuring the timeout. Therefore it needs to be created with an *IExternalAccess* object used to lookup the clock service. The constructor signature is as follows:
 
@@ -284,9 +266,7 @@ public IFuture<String[]> sayHellos()
 ```
 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The following snippet shows how the timeout listener can be used:
 
@@ -298,7 +278,7 @@ public TimeoutResultListener(long timeout, IExternalAccess exta, IResultListener
 ```
 
 
-### <span>SwingDefaultResultListener&lt;E&gt;</span> 
+### SwingDefaultResultListener&lt;E&gt;
 
 In many cases it is of importance on which thread the listener methods are called. In context of Java AWT or Swing GUI programming it needs to be ensured that widgets are only accessed from the Swing thread. This can always be achieved by calling *SwingUtilities.invokeLater()* and providing a *Runnable* that is executed on the Swing thread later on. To avoid manually calling invoke later in the listener methods the Swing variants of the listeners can be used (package *jadex.base.gui*). They ensure that listener methods are only called on the Swing thread.
 
@@ -329,7 +309,7 @@ sayHello().addResultListener(new TimeoutResultListener<String>(3000, agent.getEx
 ```
 
 
-### <span>SwingDelegationResultListener&lt;E&gt;</span> 
+### SwingDelegationResultListener&lt;E&gt;
 
 The *SwingDelegationResultListener* is the swing variant of the *DelegationResultListener*.\
 It allows forwarding the result or exception to another future. In addition, the listener methods\
@@ -353,11 +333,11 @@ sayHello().addResultListener(new SwingDefaultResultListener<String>(panel)
 ```
 
 
-### <span>ExceptionSwingDelegationResultListener&lt;E, T&gt;</span> 
+### ExceptionSwingDelegationResultListener&lt;E, T&gt;
 
 Represents the exception variant of the *SwingDelegationResultListener&lt;E&gt;*. Also ensures that all listener calls are performed on the Swing thread. Behaves in the same way as the *SwingDelegationResultListener&lt;E&gt;* so that no further explanation is given here.
 
-### <span>CounterResultListener&lt;E&gt;</span> 
+### CounterResultListener&lt;E&gt;
 
 The counter result listener is useful when a known number of calls needs to be done and after all calls have been finished processing should continue. A common use case is a loop with asynchronous calls inside. In this case, the loop is sequential but the calls itself may be executed concurrently. The counter result listener needs to be initialized with the expected number of calls and a target listener that is called once all results have been received. Using the *ignorefailures* flag it can be customized how exceptions of single calls are treated. Using the default behaviour (ignorefailures=false) an exception immediately leads to calling *exceptionOccurred()* on the delegation listener. If ignorefailures is set to true, always *resultAvailable()* is called on the target listener, after all calls have terminated but independently of how many exceptions occurred. Please note that the counter result listener does not collect results of the single calls and thus expects a result listener of type void as delegation listener. To collect the result the collection result listener can be used (see below). If intermediate results or exceptions are of interest two corresponding methods can be overridden (*intermediateResultAvailable()* and *intermediateExceptionOccurred()*). 
 
@@ -387,7 +367,7 @@ public CounterResultListener(int num, boolean ignorefailures, IResultListener<Vo
 ```
 
 
-### <span>CollectionResultListener&lt;E&gt;</span> 
+### CollectionResultListener&lt;E&gt;
 
 The collection result listener is similar to the counter result listener but collects the intermediate results in contrast to the latter. It needs to be supplied with the expected number of calls and a target result listener of type collection. Additionally, the *ignorefailures* flag can be used to customize error behavior in the same way as described above in the context of the counter result listener. The constrcutor of the listener is also shown below for convenience. Using a collection listener for a known number of asynchronous calls allows for concurrent call processing and afterwards downstream handling of the collected results. Please note that the number of results is equal to the number of calls only if ignorefailures is false. Otherwise, the result collection may contain fewer result values.
 
@@ -424,13 +404,11 @@ public CollectionResultListener(int num, boolean ignorefailures, IResultListener
 ```
 
 
-### <span>ComponentResultListener&lt;E&gt;</span> 
+### ComponentResultListener&lt;E&gt;
 
 The component result listener is similar to the swing result listeners, as it can also be used to execute listener methods on another thread. Here, the listener methods are called on the thread of a specific component. Executing on the right component thread is important to establish state consistency: When always accessing the internal state of a component from the same thread, no race conditions can occur and inconsistent modifications are effectively prevented.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In many cases, the Jadex framework takes care of executing code on the right component thread. By default, calls to service implementations as well as results from service searches and subsequent service calls are automatically executed on the component thread. E.g. in the example below, an agent searches for and invokes the hello service and stores the result in a field. This is safe, because both *resultAvailable* methods are called on the agent's thread.
 
@@ -457,15 +435,11 @@ for(int i=0; i<cmslist.size(); i++)
 ```
 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Typical cases, where the automatic thread management of listener methods is not in control is when using the static methods of the *SServiceProvider* helper class and when scheduling steps on other components using *IExternalAccess.scheduleStep()*. In these cases, a component result listener should be created manually. The component result listener needs to be supplied with another result listener and an external access of the component on which the listener should be executed. The corresponding constructor is shown below. The result listener that is passed as arguments to the component result listener is used for delegation, i.e. this listener should contain the domain logic to be executed. In many component kernels there is a convenience method called *createResultListener(IResultListener listener)*, which creates a component result listener behind the scenes and hides passing the external access of the component. 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The example code assumes that the body method of a micro agent is executed and the component management service of the platform has been fetched to a variable named "cms" using the *SServiceProvider* helper class. On the component managament service the method *createComponent()* is utilized to create a new component instance of type *HelloWorldAgent*. After creation has finished successfully, the listener prints out that the component identifier. This print statement is executed on the component thread of the micro agent. 
 
@@ -507,7 +481,7 @@ public ComponentResultListener(IResultListener<E> listener, IExternalAccess acce
 ```
 
 
-<span>Sequential Asynchronous Loops</span> 
+Sequential Asynchronous Loops
 ------------------------------------------
 
 In the previous examples loops were used in which the asynchronous calls have been processed potentially concurrently. In some cases a sequential loop containing asynchronous calls is needed. This can be achieved by using a method that recursively calls itself. The code example shown below again creates hello world agents at all known platforms. But in contrast to the variants shown before, this time the loop is realized with a method that calls itself as long as the iterator has more elements. The method calls the asynchronous method *createComponent()* and adds an exception  delegation listener to the future. In case an exception occurs it is delegated to the future that is returned by the method. Otherwise it calls recusively itself and uses a delegation result listener to chain the results. If the iterator has no more elements the method returns a future with result null. This will cause the recursion to end and the chain of listeners and futures to be finished as well so that the outermost caller of the method is notified.

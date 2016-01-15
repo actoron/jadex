@@ -2,27 +2,19 @@
 
 Communication takes place at two different abstraction levels in Jadex. The so called intra-agent communication is necessary when two or more plans inside of an agent want to exchange information. They can utilize several techniques to achieve this. The encouraged possibility is to use beliefs (and conditions). Beliefs in Jadex are containers for normal Java objects, but they are a specially designed concept for agent modelling and therefore using beliefs has several advantages. One advantage is that they allow the usage of conditions to trigger events depending on belief states (e.g. creating a new goal when a new fact is added to a belief set). A further advantage is that using the beliefbase one is able to formulate queries and retrieve only entities that correspond to the query-expression. Another possibility of internal communication is to use explicit internal events. In contrast to goals, events are (per default) dispatched to all interested plans but do not support any BDI-mechanisms (e.g. retry). Therefore the originator of an internal event is usually not interested in the effect the internal event may produce but only wants to inform some interested parties about some (important) occurence.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-On the other hand inter-agent communication describes the act of information exchange between two or more different agents. The inter-agent information exchange in Jadex is based on asynchronous message event passing. Each message event in Jadex has a dedicated \~jadex.bridge.MessageType\~ which constrains the allowed parameters and the parameter types of the message event. Currently, only the \[FIPA message type&gt;<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://fipa.org/specs/fipa00061/SC00061G.html</span>](http://fipa.org/specs/fipa00061/SC00061G.html)</span>\] is supported. It equips a message type with all possible FIPA parameters such as sender, receivers, performative, content, etc. Besides the underlying message type (which is normally not of very much importance for agent programmers) in the ADF user defined message event types are specified, such as the request\_translation message event we already encountered in earlier exercises. Note that the message event types are only locally visible and each agent uses its own message event types for sending and receiving messages. Hence, when an agent receives a message it has to decide which local message event type will be used to represent this message. The details of this process will be outlined in one of the following exercises. In this tutorial we will only show how a basic communication between two agents is implemented, when one agent offers a service that the other one seeks. The supplier therefore has to register it's services by the Directory Facilitator (DF) and is further on available as service provider. Another agent seeks a service by asking the DF and receives the providers address which it subsequently uses for the direct communication with the provider.
+On the other hand inter-agent communication describes the act of information exchange between two or more different agents. The inter-agent information exchange in Jadex is based on asynchronous message event passing. Each message event in Jadex has a dedicated \~jadex.bridge.MessageType\~ which constrains the allowed parameters and the parameter types of the message event. Currently, only the \[FIPA message type&gt;http://fipa.org/specs/fipa00061/SC00061G.html ](http://fipa.org/specs/fipa00061/SC00061G.html) \] is supported. It equips a message type with all possible FIPA parameters such as sender, receivers, performative, content, etc. Besides the underlying message type (which is normally not of very much importance for agent programmers) in the ADF user defined message event types are specified, such as the request\_translation message event we already encountered in earlier exercises. Note that the message event types are only locally visible and each agent uses its own message event types for sending and receiving messages. Hence, when an agent receives a message it has to decide which local message event type will be used to represent this message. The details of this process will be outlined in one of the following exercises. In this tutorial we will only show how a basic communication between two agents is implemented, when one agent offers a service that the other one seeks. The supplier therefore has to register it's services by the Directory Facilitator (DF) and is further on available as service provider. Another agent seeks a service by asking the DF and receives the providers address which it subsequently uses for the direct communication with the provider.
 
 1.1 Exercise F1 - Internal Events
 
 In this exercise we will use internal events to broadcast information. We extend the simple translation agent from exercise C2 with a plan that shows the processed requests in a gui triggered by an internal event.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Create a new GUI class named TranslationGuiF1.java as an extension of a JFrame\*\
    
@@ -142,23 +134,15 @@ Start the agent and send several translation requests to the agent. Observe if t
 
 This exercise will explain how the mapping of received messages to the agent's message events works. Whenever an agent receives a message it has to decide which message event will internally be used for representing the message. This mapping is very important because any agent behavior such as e.g. plan triggers may only depend on the interpreted message event type. In general the event mapping works automatically and an agent designer does not have to worry about the mappings. Nevertheless, there are situations in which more than one mapping from a received message to different message events are available (normally this is undesirable and should be avoided by using more specific message event declarations). In such situations the agent rates the alternatives by specificity that is simply estimated by the number of parameters used for the declaration and chooses the one with the highest specificity. If more than one alternative has the same specificity the first one is chosen, although this case indicates an implementation flaw and might lead to undesired behavior when the wrong mapping is chosen. In any case the developer is informed with a logging message whenever more than one mapping was found by the agent.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 As starting point for this exercise we take agent B2, which only has one passive translation plan which reacts on request messages. Other kinds of messages are simply ignored by the agent. To improve this situation and let the agent answer on all incoming messages we use the ready to use NotUnderstoodPlan from the Jadex plan library. Additionally, instead of the original B2 translation plan we take the enhanced one from section 5.1 which sends back inform/failure  messages to the requesting agent.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Modify the copied file TranslationF2.agent.xml to include the new not-understood plan\*
 
@@ -217,13 +201,9 @@ The added plan provides the agent with the ability to react on arbitrary message
 1.1 Exercise F3 - Service Publication\
 We make the services of our translation agent publicly available by registering its service description at the Directory Facilitator (DF).
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Use the translation agent D1 as starting point and extend its copied ADF by performing the following steps\*
 
@@ -278,35 +258,27 @@ Start the agent and open the DF GUI. Observe if an entry for the agent exists. U
 
 As a little highlight we now extend our scenario from F3 to become a real multi-agent system. The conceptual scenario is depicted in the following figure. The user wishes to translate a sentence and sends its requests via the conversation center to the user agent. The user agent searches for a translation service at the DF and subsequently sends for each word from the sentence, a translation request to the translation agent. The user agent collects the translated words and sends back the translated sentence to the message center, where it is visible for the user.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 ![](scenariof4.png)
 
 \~Figure 1 The multi-agent scenario\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Create a new UserAgentF4.agent.xml\*
 
 -   Create a new agent called UserAgent by creating an ADF and one plan called EnglishGermanTranslateSentencePlanF4. In the ADF define the translate sentence plan with an appropriate waitqueue that handles message events of the new type request\_translatesentence. The new request\_translatesentence message event should be declared to match request messages that start with "translate\_sentence english\_german". Additionally incorporate the DF and Protocols capabilities in the capabilities section and create references for the rp\_initiate (request protocol initiate) and df\_search goals. This agent uses the df search goal to find a translation agent and the request goal to communicate in a similar standard way with the translation agent.
 
 {code:xml}\
-&lt;agent xmlns="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex-bdi</span>](http://jadex.sourceforge.net/jadex-bdi)</span>"\
-       xmlns:xsi="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://www.w3.org/2001/XMLSchema-instance</span>](http://www.w3.org/2001/XMLSchema-instance)</span>"\
-       xsi:schemaLocation="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex-bdi</span>](http://jadex.sourceforge.net/jadex-bdi)</span>\
-                           <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex-bdi-2.0.xsd</span>](http://jadex.sourceforge.net/jadex-bdi-2.0.xsd)</span>"\
+&lt;agent xmlns="http://jadex.sourceforge.net/jadex-bdi ](http://jadex.sourceforge.net/jadex-bdi) "\
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance ](http://www.w3.org/2001/XMLSchema-instance) "\
+       xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi ](http://jadex.sourceforge.net/jadex-bdi) \
+                           http://jadex.sourceforge.net/jadex-bdi-2.0.xsd ](http://jadex.sourceforge.net/jadex-bdi-2.0.xsd) "\
   name="UserF4"\
   package="jadex.bdi.tutorial"&gt;\
   \
