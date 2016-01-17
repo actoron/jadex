@@ -58,7 +58,7 @@ import jadex.micro.annotation.Publish;
 		"(e.g. web service), the id (e.g. a web service url) and the service type," +
 		"i.e. interface to be specified." +
 		"The service is published at:" +
-		"<a href=\"http://localhost:8080/banking1/\">http://localhost:8080/banking1/</a>")
+		"<a href=\"http://localhost:8081/banking1/\">http://localhost:8081/banking1/</a>")
 public class BankingAgent
 {
 }
