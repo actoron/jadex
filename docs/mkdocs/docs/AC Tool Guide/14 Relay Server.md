@@ -1,9 +1,9 @@
-<span>Chapter 14 - Relay Server</span> 
+Chapter 14 - Relay Server
 ======================================
 
 The relay server acts as a rendezvous point for allowing platforms from different protected networks discover and connect to each other.
 
-<span>Relay Web Application</span> 
+Relay Web Application
 ----------------------------------
 
 ![14 Relay Server@relay-web.png](relay-web.png)

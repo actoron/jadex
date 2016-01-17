@@ -1,9 +1,9 @@
-<span>Chapter A1 - Conversation Center</span> 
+Chapter A1 - Conversation Center
 =============================================
 
 ![A1 Conversation Center@convcenter\_ov.png](convcenter_ov.png)
 
-The conversation center is a tool that can be used to send messages to specific components. This can e.g. be used to test if a component reacts as desired on reception of a message. The tool offers a message composition panel (cf. screenshot above on the right), in which the different parameters of a message can be set. Currently, the tool supports the definition of <span class="wikiexternallink">[FIPA](http://www.fipa.org/)</span> messages only (FIPA is a standard for agent communication). The properties of a message are the following:
+The conversation center is a tool that can be used to send messages to specific components. This can e.g. be used to test if a component reacts as desired on reception of a message. The tool offers a message composition panel (cf. screenshot above on the right), in which the different parameters of a message can be set. Currently, the tool supports the definition of [FIPA](http://www.fipa.org/)  messages only (FIPA is a standard for agent communication). The properties of a message are the following:
 
 -   **Performative:** The speech act of the message. It describes the intention of the message. Examples are inform to send information, cfp to initiate a call for proposal etc.
 -   **Sender:** The component identifier of the sender. Per default the platform is set as sender of the message.

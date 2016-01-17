@@ -1,16 +1,12 @@
-<span>Chapter 2 - Jadex Control Center Overview</span> 
+Chapter 2 - Jadex Control Center Overview
 ======================================================
 
 ![02 JCC Overview@jcc.png](jcc.png)  
 *JCC Overview*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The Jadex Control Center (JCC) is the heart of most Swing based runtime tools. The JCC itself uses an extensible plugin-based mechanism to offer differnt functionalties to the user. As can be seen in the screenshot above it consists of different areas that are explained in the following:
 
@@ -28,7 +24,7 @@ Adding a tool plugin via popup menu on toolbar
 
 **Status line**: The status line is used by the plugins and the JCC itself to announce recent events to the user. The messages will be displayed for several seconds and vanish automatically. In additiona, on the right hand side of the status line current  processing activities may be visualized.
 
-<span>Overview of Plugins</span> 
+Overview of Plugins
 --------------------------------
 
 ![02 JCC Overview@starter.png](starter.png): The **starter plugin** for starting and stopping applications and components.\

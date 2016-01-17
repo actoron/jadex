@@ -360,11 +360,12 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 		ant.sequential {
 			ant.delete dir: sourcedir
 			ant.zip destfile: destinationDir.getCanonicalPath() + '.zip', {
-				zipfileset dir: destinationDir.getCanonicalPath(), prefix: destinationDir.getName() + '/', erroronmissingdir: false
+				zipfileset dir: destinationDir.getCanonicalPath(), prefix: 'javadoc' + '/', erroronmissingdir: false
 			}
 			ant.delete dir: destinationDir
 		}
 	}
+	outputs.upToDateWhen {false}
 }
 
 task exampleZips << {

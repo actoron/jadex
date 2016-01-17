@@ -1,32 +1,28 @@
-<span>Chapter 10. Expressions</span> 
+Chapter 10. Expressions
 ====================================
 
 For many elements (parameter values, default and initial facts of beliefs, etc.) the developer has to specify expressions in the ADF. The most important part of an expression is the expression string. In addition, some meta information can be attached to expressions, e.g., to specify the class the resulting value should have. 
 
-<span>Expression Syntax</span> 
+Expression Syntax
 ------------------------------
 
 The expression language follows a Java-like syntax. In general, all of the *operators* of the Java language are supported (with the exception of assignment operators), while no other constructs can be used. Operators are, for example, math operators (+-\*/%), logical operators (&&, ||, !), and method, or constructor invocations. Other unsupported constructs are loops, class declarations, variable declarations, if-then-else blocks, etc. As a rule you can use every Java code that can be contained in the right hand side of a variable assignment (e.g., *var* = &lt;expression&gt;). There are just two exceptions to this rule: Declarations of anonymous inner classes are not supported. Assignment operators (=, +=, \*=...) as well as de- and increment operators (++, --) are not allowed, because they would violate declarativeness.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-In addition to the Java-like syntax, the language has some extensions: Parameters give access to specific elements depending on the context of the expression. OQL-like select statements allow to create complex queries, e.g., for querying the beliefbase. To simplify the Java statements in the expressions, imports can be declared in the ADF (see <span class="wikiexternallink">[Imports](04%20Imports)</span>) that allow to use unqualified class names. The imports are defined once, and can be used for all expressions throughout the ADF.\
+In addition to the Java-like syntax, the language has some extensions: Parameters give access to specific elements depending on the context of the expression. OQL-like select statements allow to create complex queries, e.g., for querying the beliefbase. To simplify the Java statements in the expressions, imports can be declared in the ADF (see [Imports](04%20Imports) ) that allow to use unqualified class names. The imports are defined once, and can be used for all expressions throughout the ADF.\
   
 
-<span>Expression Properties</span> 
+Expression Properties
 ----------------------------------
 
 Expressions have properties which can be specified as attributes of the enclosing XML tag. The optional class attribute can be specified for any expression, and is used for cross checking the expression string against the expected return type. This allows to detect errors in the ADF already at load time, which could otherwise only be reported at runtime. 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The evaluation mode influences when and how often the expression is evaluated at runtime. A "static" expression caches the value once the expression created, while the value of a "dynamic" expression is reevaluated for ervery access. The default values of these properties depend on the context in which the expression is used. E.g. initial facts of beliefs are usually static, while conditions are dynamic.   
 
-<span>Reserved Variables</span> 
+Reserved Variables
 -------------------------------
 
 Within expressions, several variables can be accessed depending on the context the expression is used in. Generally, the following variable names are reserved for agent components and can be accessed directly by their name. In the following table the reserved variables, their type and accessibility settings are summarized. Values of beliefs and belief sets (from the \$beliefbase) and parameter(set)s (from \$plan, \$event, \$goal, and \$ref) can be accessed using a shortcut notation (allowing to write statements like "\$beliefbase.mybelief", which is the same as "\$beliefbase.getBelief("mybelief").getFact()).\
@@ -62,7 +58,7 @@ Within expressions, several variables can be accessed depending on the context t
                                        *Reserved expression variables*
   --------------------------------------------------------------------------------------------------------------------
 
-<span>Expressions Examples</span> 
+Expressions Examples
 ---------------------------------
 
  \
@@ -88,7 +84,7 @@ In the following, two example expressions are shown. Here the expressions are us
 
 *Example expressions*
 
-<span>ADF Expressions</span> 
+ADF Expressions
 ----------------------------
 
 The expression language cannot only be used to specify values for beliefs, plans, etc. in the ADF but also for dynamic evaluation, e.g., to perform queries on the state of the agent, most notably the current beliefs. Expressions (*jadex.bdi.runtime.IExpression*) can be created at runtime by providing an expression string. A better way is to predefine expressions in the ADF in the expression base (see Figure below). Because predefined expressions only have to be parsed and precompiled once and can be reused by different plans, they are more efficient. The following example shows a predefined expression for searching the beliefbase for a certain person contained in the belief persons, using the OQL-like language extension described in more detail below. Moreover, this example uses a custom parameter \$surname to specify which person to retrieve from the belief set.
@@ -134,7 +130,7 @@ public void body
 *Evaluating an expression from a plan*\
  
 
-<span>OQL-like Select Statements</span> 
+OQL-like Select Statements
 ---------------------------------------
 
  \

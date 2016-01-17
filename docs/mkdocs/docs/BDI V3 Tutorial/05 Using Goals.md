@@ -7,7 +7,7 @@ Concretely, a goal type can come in the following flavors in V3:
 -   **Inner Class**: If a goal is private to an agent it is often elegant and helpful to use an inner class to represent the goal type. The inner class has natural access to the fields and beliefs of the agent which makes programming less complex. In some cases it is also required to use a static inner class. In this case the aforementioned advantage is not existent, but you could pass the agent as explicit argument in the constructor to gain access to the agent aspects.
 -   **Class**: A goal can also be represented as a normal Java class. In this case there is no direct connection to the agent available and one again has to pass whatever is need via the constructor call or other methods.  
 
-<span>D1 - Using a Top-Level Goal</span> 
+D1 - Using a Top-Level Goal
 ----------------------------------------
 
 The first thing we will try out in this exercise is dispatching a top-level goal. The difference between a top-level and a subgoal can be understood as its part in the BDI goal-plan hierarchy. For each goal different plans can be tried out, which in turn may produce subgoals to fulfill parts of their work. These subgoals again may have other subgoals leading to the already mentioned goal-plan tree. In this sense a top-level goal is just a goal that has no parent, i.e. which is on the top level of the hierarchy.   
@@ -92,7 +92,7 @@ public void body()
 
 After starting the agent it should print out the word for which we have created and dispatched a goal.
 
-<span>D2 - Using Parameters and Results</span> 
+D2 - Using Parameters and Results
 ----------------------------------------------
 
 \
@@ -160,7 +160,7 @@ protected String translate(String eword)
 
 After starting the agent it should behave in the same way as in the last exercise.
 
-<span>D3 - Goal Retry</span> 
+D3 - Goal Retry
 ----------------------------
 
  
@@ -201,7 +201,7 @@ protected String translateB(String eword)
 
 After starting the agent you should see that first plan A and afterwards plan B is executed. Think about what happens if the second plan would also throw an exception? Also ask yourself what the agent would do when the plans would be declared in different order or if the second would have a higher priority? Verify your thoughs by trying these things out in the source code.
 
-<span>D4 - Goal Creation Condition</span> 
+D4 - Goal Creation Condition
 -----------------------------------------
 
 Until now we have created goals manually, but ofter one also wants to create a goal in response to a belief change. This we will try out in the following. Concretely, we want our translation agent to create a new translation goal whenever our belief with the English word changes.
@@ -254,7 +254,7 @@ public void body()
 
 After starting the agent you should see that for each belief assignment a new print out is produced. In this exercise we have used the constructor as creation condition because we wanted to create a goal on every change of that belief. But where to place condition code if we want to perform some checks and create a goal only in certain circumstances? 
 
-<span>D5 - Goal Recur</span> 
+D5 - Goal Recur
 ----------------------------
 
  
@@ -338,7 +338,7 @@ public void body()
 
 Start the agent and check whether the goal is reactivated by the recur condition triggers.
 
-<span>D6 - Maintain Goals</span> 
+D6 - Maintain Goals
 --------------------------------
 
 As we have illustrated in the introduction of this lecture, in Jadex different goal types can be used. In the new BDI V3 we have changed the way these goal types can be used. Instead of declaring a goal type explicitly (as in BDI V1 & V2) in V3 it is sufficient to use the corresponding condition types, i.e. a maintain condition in case of a maintain goal. In the translation example we will use a maintain goal to restrict the number of word pairs in the dictionary.

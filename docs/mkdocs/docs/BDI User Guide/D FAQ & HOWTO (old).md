@@ -1,4 +1,4 @@
-<span>Appendix D. FAQ & HOWTO</span> 
+Appendix D. FAQ & HOWTO
 ====================================
 
 The Jadex frequently asked questions (FAQ) of Jadex are managed in the Jadex Wiki at activecomponents.org. At this wiki you can find always the current questions and answers. If you want to add a question/answer that you find missing feel free to add it here (the wiki is public meaning that everyone has the chance to add her/his stuff there).

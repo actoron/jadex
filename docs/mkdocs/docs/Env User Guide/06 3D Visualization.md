@@ -10,15 +10,15 @@ BEGIN MACRO: box param: cssClass="floatinginfobox" title="**Contents**"\
 
 <div>
 
-<span>3D Visualization</span> 
+3D Visualization
 =============================
 
-In this section the 3D visualization concepts are described. This section only focuses the **use** of existing 3D-objects in the Enviroment. The creation of new 3D Objects for Jadex 3D is a complex topic which will<span class="hps"> be considered</span> <span class="hps"> later in a different chapter</span>
+In this section the 3D visualization concepts are described. This section only focuses the **use** of existing 3D-objects in the Enviroment. The creation of new 3D Objects for Jadex 3D is a complex topic which will later in a different chapter
 
 ![](example.PNG)\
 A running 3D Example
 
-<span>Coordinate System</span> 
+Coordinate System
 ------------------------------
 
 The coordinate system consists of:
@@ -34,36 +34,28 @@ The coordinate system consists of:
 
 Every point in 3D space is defined by its (x,y,z) coordinates. The data type for vectors is Vector3Double or Vector3Int.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<span>**Drawable3d declaration part of XML schema**</span> 
+**Drawable3d declaration part of XML schema**
 ----------------------------------------------------------
 
 A **drawable3d **represents the visual counterpart of a space object type. As can be seen in the schema part above it consists of property elements and arbitrary many geometrical meshes composing the look of the object (sphere, box, cylinder, dome, torus, object3d, arrow, text3d, sky, terrain, rndterrain and sound3d).
 
 ![](drawable3d_overview01.JPG)
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The primitve mesh-elements are sphere, box, cylinder, dome, torus and object. Complex mesh types are object3d (which loads a complex 3d mesh from a file) and terrain (generator for a 3d-terrain ground). Text3d, sky and sound3d can be considered as special types. We will describe all these types in detail later.\
 The drawable3d itself is further specified by associating it to a specific objecttype.\
 Additionally, the width, height and rotation can be set. Each geometrical mesh based shape contained in the drawable is of type **drawableelement **and has the attributes described in the list below. 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 For all Elements, the **Drawable3d **and the Visual Objects inside have at least the three Attributes Position, Size and Rotation.
 
 For instance, if you set the Size for the **Drawable3d** all Objects inside are influenced. If you set the Size for just one Visual Object only the Object is influenced relative to the size value of the **Drawable3d**.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
  Name 
  Default Value 
@@ -72,7 +64,7 @@ For instance, if you set the Size for the **Drawable3d** all Objects inside are 
 **position**
 Vector3Double(0,0,0)
 An IVector3 or String for the 3d position of the object (relative to the drawable position)\
-*<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">Use this or x, y, z instead (then you have to set all three)</span>*<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA"></span>
+*<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">Use this or x, y, z instead (then you have to set all three) *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">
  Vector3Int\
 Vector3Double
  x
@@ -92,7 +84,7 @@ The zvalue of the position
   ---------- ----------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -----------------------
   **size**    Vector3Double(1,1,1)   An IVecor3 or String for the shape size (relative to the drawable size).\                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   string / Vector3Int\
                                      If it is a String it must be a property name of the drawable the value is bound to\                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Vector3Double
-                                     *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">Use this or</span>*<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA"> *width, height, depth instead (then you have to set all three).*</span>   
+                                     *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">Use this or *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA"> *width, height, depth instead (then you have to set all three).*
 
   width       1                      The height value of the size                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                int / double
 
@@ -105,7 +97,7 @@ The zvalue of the position
    Name           Default Value           Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Type
   -------------- ----------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------
   **rotation**    Vector3Double(0,0,0)   An IVecor3 or String for the rotation according to x, y, z axis (relative to the drawable rotation) in radians.\                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              String or Vector3Double
-                                         *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">Use this or rotatex, rotatey, rotatez instead</span>* *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">(then you have to set all three).</span>*<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA"></span>   
+                                         *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">Use this or rotatex, rotatey, rotatez instead * *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">(then you have to set all three). *<span lang="EN-US" style="font-size:12.0pt; line-height:115%;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;mso-fareast-font-family: &quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:DE;mso-bidi-language: AR-SA">
 
    rotatex        0                      The rotation value along the x axis                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            int / double
 
@@ -116,9 +108,7 @@ The zvalue of the position
 
 Beside this very basic Attributes all the Visuals (not the Drawable3d itself) have this three attributes:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
    Name              Default Value     Description                                                                                                                                                                                                                             Type
   ----------------- ----------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------
@@ -128,14 +118,12 @@ Beside this very basic Attributes all the Visuals (not the Drawable3d itself) ha
 
 Moreover, some elements have certain special properties, which are not applicable to all Drawables. The easiest way to find out about the properties is to use eclipse's auto-complete to gain an overview. We will describe this special Attributes in detail for each visual Object if necessary in the list of predefined visuals below.
 
-### <span>Rotation in Detail</span> 
+### Rotation in Detail
 
 You can use frequently used predifined rotations for every angle. The predefined values are 45, 90, 135, 180, 235 and 270 degree. To use it just type rotation="\$DEG{value}{x|y|z}".\
 For example if you want to rotate 180 degree on the y-angle just type rotation="\$DEG180y".
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 To define the rotation by yourself just remember its defined in radians. To use degree you have to calculate it by Pi/180\*value. For example if you want to rotate 40 degree on x, 170 degree on y and 80 degree on z just type:\
 rotation="new Vector3Double((Math.PI/180)\*40, (Math.PI/180)\*170, (Math.PI/180)\*80)"
@@ -144,7 +132,7 @@ The three Dimensions are explained in the Picture below:
 
 ![](rotation.jpg)
 
-### <span>ShadowType Example</span> 
+### ShadowType Example
 
 In this example we have four objects who cast shadows and one plane below this objects to Receive the shadows.\
 You can see the result in the rendered Picture.\
@@ -162,12 +150,12 @@ You can see the result in the rendered Picture.\
 
 ![](shadowexample.PNG)
 
-<span>List of usable predefined 3D-Primitives</span> 
+List of usable predefined 3D-Primitives
 ----------------------------------------------------
 
 Now we describe the easiest Objects you can use to make an jump-start for you Application possible. These Objects are sphere, box, cylinder, dome, torus and arrow. You can replace them later to use complex 3d-Objects you create or get from external sources.
 
-#### <span>Sphere</span> 
+#### Sphere
 
 Additional Values: (none)
 
@@ -188,7 +176,7 @@ Example:\
 
 ![](sphere_example.PNG)
 
-#### <span>Box</span> 
+#### Box
 
 Additional Values: (none)
 
@@ -208,7 +196,7 @@ Example:\
 
 ![](box_example.PNG)
 
-#### <span>Cylinder</span> 
+#### Cylinder
 
 Additional Values: radius
 
@@ -220,9 +208,7 @@ As you can see from the example, you have to rotate a Cylinder 90 degree on the 
 
 You only need the **height **and the **radius **value to define a Cylinder.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Example:\
 
@@ -239,7 +225,7 @@ Example:\
 
 ![](cylinder.PNG)
 
-#### <span>Dome</span> 
+#### Dome
 
 Additional Values: (none)
 
@@ -251,9 +237,7 @@ Additional Values: (none)
 
 Look at the Picture to understand the influence of planes and samples.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Example:\
 
@@ -271,7 +255,7 @@ Example:\
 
 ![](dome.PNG)
 
-#### <span>Torus</span> 
+#### Torus
 
 Additional Values: (none)
 
@@ -299,7 +283,7 @@ Example:\
 
 ![](torus.PNG)
 
-#### <span>Arrow</span> 
+#### Arrow
 
 Additional Values: (none)
 
@@ -325,17 +309,15 @@ Example:\
 
 ![](Arrows.JPG)
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<span>Working with Materials</span> 
+Working with Materials
 -----------------------------------
 
 A Geometry like all them above is just the shape of the object. The Engine cannot render a shape without knowing anything about its surface properties. You need to apply at least a color or better a texture to the surface to make them visible. Colors and textures are represented as Material objects. You can just add a color or one picure as Texture and the implementation creates the Material Object automatically.\
 If you want to have more influence and want to use complex Materials with Normal maps or shiness you have to create the Material files by yourself. But it is not complicated if you understand the mechanics.
 
-### <span>Simple Case: One Imagefile as Material</span> 
+### Simple Case: One Imagefile as Material
 
 If you just want to change the "basic" look of an surface, just add an Picture (can be JPG or PNG) as Texture. You cant make any additional Settings to the Material like offset or how it is rendered on the Object. This way is only recommended for very basic objects.
 
@@ -349,10 +331,10 @@ If you just want to change the "basic" look of an surface, just add an Picture (
 
 ![](Box_with_texture_simple.JPG)
 
-### <span>Complex Case: Using Materials with .j3m Files</span> 
+### Complex Case: Using Materials with .j3m Files
 
 You can define small Textfiles with additional informations about the Materials. How this is working is perfectly described by the official JMonkey Tutorials here:\
-<span class="wikiexternallink">[JMonkey Materials Definition](http://hub.jmonkeyengine.org/wiki/doku.php/jme3:advanced:j3m_material_files)</span>
+[JMonkey Materials Definition](http://hub.jmonkeyengine.org/wiki/doku.php/jme3:advanced:j3m_material_files)
 
 In the Code you just Link to the Material File you Created.\
 
@@ -389,7 +371,7 @@ With this as Result (You can see the NormalMap Effect):
 
 ![](Box_with_texture_complex.JPG)
 
-### <span>Complex Case 2: Defening and using Materials with the jMonkey SDK</span> 
+### Complex Case 2: Defening and using Materials with the jMonkey SDK
 
 If you want to use the jMonkey SDK it is pretty simple to create complex j3me Files with an Wizard. Look into the jMonkey SDK Documentation (TODO) to see how this SDK can help you alot using it along with Eclipse.
 
@@ -399,55 +381,49 @@ Defining the Material:\
 Adding it to an Asset:\
 ![](chicken_example.JPG)
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
+
 
 </div>
 
 </div>
 
-</div>
-
-<span>Working with complex 3d Objects</span> 
+Working with complex 3d Objects
 ============================================
 
 todo
 
-<span>3D Objects in general</span> 
+3D Objects in general
 ----------------------------------
 
 todo
 
-<span>JMonkey 3D Object Format</span> 
+JMonkey 3D Object Format
 -------------------------------------
 
 todo
 
-<span>Using 3D Objects in Jadex</span> 
+Using 3D Objects in Jadex
 --------------------------------------
 
 todo
 
-<span>Working with Animations</span> 
+Working with Animations
 ------------------------------------
 
 You create animated models for complex Objects with a tool such as Blender. Take some time and learn how to create your own models in Tutorials. If you downloaded an Model with Animations, the first Step is to find out the Names of the Animation the model contains.
 
-### <span>Step 1: Finding the Animations Names</span> 
+### Step 1: Finding the Animations Names
 
 If you donwloaded a Model an have it in the correct .jme Format you can open the Model in the jMonkey SDK. You can see all Animations listed in the Scene Explorer Window. Click on the Animation-Control. For the Chicken we have the following Animations:\
 ![](Animations.JPG)\
 The Chicken play the Pick Animation:\
 ![](Pick_animation.PNG)
 
-### <span>Step 2: Using the Animations</span> 
+### Step 2: Using the Animations
 
 Inside an object3d tag you can define Animations. For example if you just want to play the "idle" Animation from the chicken all the time, you can simply write this:\
 

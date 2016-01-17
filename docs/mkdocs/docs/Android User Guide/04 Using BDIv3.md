@@ -1,4 +1,4 @@
-<span>Using BDIv3 on Android</span> 
+Using BDIv3 on Android
 ===================================
 
 The BDI v3 programming model heavily depends on code-generation based on java annotations.\
@@ -12,7 +12,7 @@ So you **need to setup a maven project to use BDIv3** Components!
 
 Additionally, you need to have a copy of the jadex-android-maven-plugin, so this is the first step
 
-<span>jadex-android-maven-plugin</span> 
+jadex-android-maven-plugin
 ---------------------------------------
 
 The simplest way to get the plugin is to insert the following code in your pom.xml, which adds my jadex repository:
@@ -30,9 +30,7 @@ The simplest way to get the plugin is to insert the following code in your pom.x
 ```
 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Then, in the build section of your pom, define that you want to use the plugin:
 

@@ -1,9 +1,7 @@
-<span>Chapter 7 - Deployer</span> 
+Chapter 7 - Deployer
 =================================
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The deployer tool can be used to transfer files between computers. In this sense it is very similar to a typical ftp tool but it could be convenient to use the Jadex deployer tool for the following reasons:
 
@@ -12,7 +10,7 @@ The deployer tool can be used to transfer files between computers. In this sense
 -   The deployer will automatically try to find the most efficient connection to the target and will also tolerate if one (of several available connections) to the target dimishes.
 -   There is no need to install further software on the hosts with the platform, i.e. no server and/or client.
 
-<span>Transferring Files</span> 
+Transferring Files
 -------------------------------
 
 ![07 Deployer@host\_selection.png](host_selection.png)
@@ -21,13 +19,13 @@ Select the hosts you want to use by choosing the corresponding Jadex platforms (
 
 <div>
 
-<span style="line-height: 19.600000381469727px;">![](copy.png)</span>
+<span style="line-height: 19.600000381469727px;">![](copy.png)
 
-<span style="font-family: sans-serif; font-size: 14px; font-style: normal; line-height: 19.600000381469727px; text-align: start; ">Copying a file can be achieved in two ways. The first option is to select the source file that should be transferred and either use drag and dop to pull it directly to the target folder on the other side. The second option is not based on drag & drop. Instead, first the target folder has to be selected and then the source file has to be chosen. To start the copy process the Copy file action from the popup menu has to be used as shown in the screenshot above.</span>
+<span style="font-family: sans-serif; font-size: 14px; font-style: normal; line-height: 19.600000381469727px; text-align: start; ">Copying a file can be achieved in two ways. The first option is to select the source file that should be transferred and either use drag and dop to pull it directly to the target folder on the other side. The second option is not based on drag & drop. Instead, first the target folder has to be selected and then the source file has to be chosen. To start the copy process the Copy file action from the popup menu has to be used as shown in the screenshot above.
 
 </div>
 
-<span>Further Commands</span> 
+Further Commands
 -----------------------------
 
 In addition to copying files between hosts, the deployer also allows for renaming, deleting and opening files. In order to initiate such actions, select a file in the file tree and choose it from the popup menu.

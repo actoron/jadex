@@ -1,6 +1,6 @@
 One prominent application for agents is wrapping legacy systems and "agentifying" them. Hence, it is an important point how separate processes can interact with Jadex agents as these applications often use other means of communications such as sockets or RMI. A Jadex agent executes behavior sequentially and does not allow any parallel access to its internal structures due to integrity constraints. For this reason it is disallowed and discouraged to block the active plan thread e.g. by opening sockets and waiting for connections or simply by calling *Thread.sleep()*. This can cause the whole agent to hang because the agent waits for the completion of the current plan step. When external processes need to interact directly with the agent, they have to use methods from the so called *jadex.runtime.IExternalAccess* interface, which offers the most common agent methods.
 
-<span>Exercise G1 - Socket Communication</span> 
+Exercise G1 - Socket Communication
 -----------------------------------------------
 
 We create a simple translation with a plan that sets up a server socket which listens for translation requests. Whenever a new request is issued (e.g. from a browser) a new goal containing the client connection is created and dispatched. The translation plan handles this translation goal and sends back some HTML content including some text and the translated word.
@@ -148,4 +148,4 @@ public void translate(Translate trans)
 ```
 
 
-**Start and test the agent**\\ Start the agent and open a browser to issue translation request. This can be done by entering the server url and appending the word to translate, e.g. <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://localhost:9099/dog.</span>](http://localhost:9099/dog.)</span> The result should be printed out in the returned web page.
+**Start and test the agent**\\ Start the agent and open a browser to issue translation request. This can be done by entering the server url and appending the word to translate, e.g. http://localhost:9099/dog. ](http://localhost:9099/dog.)  The result should be printed out in the returned web page.

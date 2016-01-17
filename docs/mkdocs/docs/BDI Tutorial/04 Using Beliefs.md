@@ -6,73 +6,45 @@ An agent's beliefbase represents its knowledge about the world. The beliefbase i
 
 From this point the copying and renaming of files is not explicitly stated anymore. Furthermore, from now on we use a syntax in the request format that looks like this:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*\\&lt;action\\&gt; \\&lt;language(s)\\&gt; \\&lt;content\\&gt;\*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 To translate a word we have to send a request in the form:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*translate english\_german \\&lt;word\\&gt;\*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 To add a new word pair to the database we have to send a request in the format:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*add english\_german \\&lt;eword\\&gt; \\&lt;gword\\&gt;\*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In this first exercise we will use the beliefbase for letting more than one plan having access to the word table by using a belief for storing the word table. 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Modify the existing plan to support the request format and introduce a new plan for adding word pairs\*
 
@@ -80,21 +52,13 @@ In this first exercise we will use the beliefbase for letting more than one plan
 -   Modify the EnglishGermanTranslationPlanC1 so, that it uses the word table stored as single belief in the beliefbase. Additionally the plan has to check the newly introduced request format by using a \~java.util.StringTokenizer\~.
 -   Add a static getDictionary() method to the EnglishGermanTranslationPlanC1. This method should return a hashmap with some wordpairs contained in it. Besides the static method you also need to declare a static variable for storing the dictionary:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:java}\
 protected static Map dictionary;\
@@ -112,63 +76,39 @@ public static Map getDictionary()\
 }\
 {code}
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Update the ADF to incorporate the new plan and the new belief\* 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The updated version of the translation agent ADF is outlined in the following code snippet. Note that the agent now has two plans named "addword" for adding a word pair to the database and "egtrans" for translating from English to German. The belief declaration is enclosed by a beliefs tag that denotes that an arbitrary number of belief declarations may follow. The ADF defines the beliefs and belief sets of an agent, optionally with default fact(s).  The belief for storing the wordtable is named "egwords" and typed through the class attribute to \~java.util.Map\~. The tag of this element is set to \\&lt;belief\\&gt; (in contrast to \\&lt;beliefset\\&gt;) denoting that only one fact can be stored.  Further it is necessary to clarify which kinds of events trigger the plans. Therefore, the events section is extended to include a new \~request\_addword\~ event type which also matches request messages. To be able to distinguish between both kinds of events they are refined to match only messages that start with a specific content string. The match expressions use a logical AND (\\&\\&), that has to be written a little bit awkwardly with the xml entities \\&amp;\\&amp;.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:xml}\
-&lt;agent xmlns="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex</span>](http://jadex.sourceforge.net/jadex)</span>"\
-       xmlns:xsi="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://www.w3.org/2001/XMLSchema-instance</span>](http://www.w3.org/2001/XMLSchema-instance)</span>"\
-       xsi:schemaLocation="<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex</span>](http://jadex.sourceforge.net/jadex)</span>\
-                           <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.sourceforge.net/jadex-bdi-2.3.xsd</span>](http://jadex.sourceforge.net/jadex-bdi-2.3.xsd)</span>"\
+&lt;agent xmlns="http://jadex.sourceforge.net/jadex ](http://jadex.sourceforge.net/jadex) "\
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance ](http://www.w3.org/2001/XMLSchema-instance) "\
+       xsi:schemaLocation="http://jadex.sourceforge.net/jadex ](http://jadex.sourceforge.net/jadex) \
+                           http://jadex.sourceforge.net/jadex-bdi-2.3.xsd ](http://jadex.sourceforge.net/jadex-bdi-2.3.xsd) "\
   name="TranslationC1"\
   package="jadex.bdi.tutorial"&gt;
 
@@ -218,25 +158,15 @@ The updated version of the translation agent ADF is outlined in the following co
 &lt;/agent&gt;\
 {code}
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Start and test the agent\* 
 
@@ -245,19 +175,13 @@ Send several add-word and translation requests to the agent and observe, if it b
 
 Using a belief set for storing the word-pairs and employing beliefbase queries to look-up a word in the word table belief set. In this example each word pair is saved in a data structure called \~jadex.commons.Tuple\~ which is a list of entities similar to an object array. In contrast to an object array two tuples are considered to be equal when they contain the same objects. \*Of course, in belief sets arbitrary Java objects can be stored, not just Tuples.\*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Modify the plans\*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 -   Modify the EnglishGermanTranslationPlanC2 so, that it uses a query to search the requested word in the belief set. Therefore use an expression defined in the ADF: \~this.queryword = getExpression("query\_egword");\~ (Assuming that the \~jadex.bdi.runtime.IExpression\~ queryword is declared as instance variable in the plan). To apply the query insert the following code at the corresponding place inside the plan's body method: \~String gword = (String)queryword.execute("\$eword", eword);\~
 
@@ -267,9 +191,7 @@ Using a belief set for storing the word-pairs and employing beliefbase queries t
 
 \*Modify the ADF\* 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 -   For checking if a word pair is contained in the wordtable and for retrieving a wordpair from the wordtable a query expression will be used. Insert the following code into the ADF below the events section:
 
@@ -294,9 +216,7 @@ Send several add-word and translation requests to the agent and observe, if it b
 1.1 Exercise C3 - Belief Conditions\
 In this exercise we will use a condition for triggering a passive plan that congratulates every 10th user.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
  \
 \*Create and modify plans\*
@@ -309,9 +229,7 @@ In this exercise we will use a condition for triggering a passive plan that cong
 
 \*Modify the ADF\*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 -   Modify the ADF by defining the new ThankYouPlanC3 as passive plan (with the name thankyou in the ADF) in the plans section. Instead of defining a triggering event for this passive plan we define a condition that activates the new ThankYouPlanC3. A condition has the purpose to monitor some state of affair of the agent. In this case we want to monitor the belief "transcnt" and get notified whenever 10 translations have been requested. Insert the code from the following snippet in the plan's trigger. This condition consists of two parts: This first transcnt\\&gt;0 makes sure that at least one translation has been done and the second part checks if transcnt modulo 10 has no rest indicating that 10\*x translations have been requested. The two parts are connected via a logical AND (&amp;&amp;), that has to be written a little bit awkwardly with the xml entities \\&amp;\\&amp;.
 

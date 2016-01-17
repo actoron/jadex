@@ -156,7 +156,8 @@ def addSchemaTasks(Project project) {
         ant.xslt(
                 basedir: "${project.projectDir}/src/main/schema/",
                 destdir: "${project.buildDir}/schemadocs/",
-                extension: "-${project.version}.html",
+//                extension: "-${project.version}.html",
+                extension: ".html",
                 force: "true",
                 style: "${project.rootProject.projectDir}/src/main/buildutils/xs3p.xsl",
                 includes: "*.xsd"

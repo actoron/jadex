@@ -1,29 +1,23 @@
-<span>Chapter 3. Using Plans</span> 
+Chapter 3. Using Plans
 ===================================
 
 Plans play a central role in Jadex, because they encapsulate the recipe for achieving some state of affair. Generally, a plan consists of two parts in Jadex. The plan body is a standard Java class that extends a predefined Jadex framework class (*jadex.bdi.runtime.Plan*) and has at least to implement the abstract *body()* method which is invoked after plan instantiation. The plan body is associated to a plan head in the ADF. This means that in the plan head several properties of the plan can be specified, e.g. the circumstances under which it is activated and its importance in relation to other plans.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In contrast to other well-known PRS-like systems, Jadex supports two styles of plans. A so called *service plan* is a plan that has service character in the sense that a plan instance of the plan is usually running and waits for service requests. It represents an easy way to react on service requests sequentially without the need to synchronize different plan instances for the same plan. Therefore a service plan can setup its private event waitqueue and receive events for later processing, even when it is working at the moment.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-A so called *PRS-style or passive plan* is the normal version of a plan, as can be found in all other PRS-systems. This means that usually such a plan is only running, when it has a task to achieve. For this kind of plan the triggering events and goals must be specified in the agent definition file to let the agent know what kinds of events this plan can handle. When an agent receives an event, the BDI reasoning engine builds up the so called applicable plan list (that are all plans which can handle the current event or goal) and candidate(s) are selected and instantiated for execution. PRS-style plans are a good choice, when the parallel execution of one kind of task is needed or is at least not disturbing. For more detailed information about plans have a look in the <span class="wikiexternallink">[BDI User Guide](../BDI%20User%20Guide/01%20Introduction)</span>.
+A so called *PRS-style or passive plan* is the normal version of a plan, as can be found in all other PRS-systems. This means that usually such a plan is only running, when it has a task to achieve. For this kind of plan the triggering events and goals must be specified in the agent definition file to let the agent know what kinds of events this plan can handle. When an agent receives an event, the BDI reasoning engine builds up the so called applicable plan list (that are all plans which can handle the current event or goal) and candidate(s) are selected and instantiated for execution. PRS-style plans are a good choice, when the parallel execution of one kind of task is needed or is at least not disturbing. For more detailed information about plans have a look in the [BDI User Guide](../BDI%20User%20Guide/01%20Introduction) .
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 BEGIN MACRO: html param: clean="false" wiki="true"\
 \
-Often a plan does some action and then wants to wait until the action has been done before continuing (e.g. dispatching a subgoal, sending a message and waiting for the reply). Therefore a plan can use one of the various waitFor() methods, that come in quite different flavors. Coming back to the examples mentioned, e.g. the dispatchSubgoalAndWait(IGoal subgoal, long timeout) can be used to dispatch a subgoal and wait for its completion (optionally with some timeout). Similar, for sending a message and waiting for a reply the sendMessageAndWait(IMessageEvent me, long timeout) method can be used. For an extensive overview of all available methods, please refer to the <span class="wikiexternallink">[BDI User Guide](../BDI%20User%20Guide/01%20Introduction)</span> or the API docs contained in the Jadex release. &lt;!-- &lt;a href="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/jadex-0.96x/kernel/index.html"&gt;API documentation&lt;/a&gt;.--&gt;\\
+Often a plan does some action and then wants to wait until the action has been done before continuing (e.g. dispatching a subgoal, sending a message and waiting for the reply). Therefore a plan can use one of the various waitFor() methods, that come in quite different flavors. Coming back to the examples mentioned, e.g. the dispatchSubgoalAndWait(IGoal subgoal, long timeout) can be used to dispatch a subgoal and wait for its completion (optionally with some timeout). Similar, for sending a message and waiting for a reply the sendMessageAndWait(IMessageEvent me, long timeout) method can be used. For an extensive overview of all available methods, please refer to the [BDI User Guide](../BDI%20User%20Guide/01%20Introduction)  or the API docs contained in the Jadex release. &lt;!-- &lt;a href="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/jadex-0.96x/kernel/index.html"&gt;API documentation&lt;/a&gt;.--&gt;\\
 
-<span>Exercise B1 - Service Plans</span> 
+Exercise B1 - Service Plans
 ----------------------------------------
 
 In this exercise we will use a service plan for translating words from English to German. Create a new TranslationB1.agent.xml file by copying the TranslationA1.agent.xml file and modify all occurrences of "A1" to "B1".&lt;br/&gt;\
@@ -108,9 +102,9 @@ public class EnglishGermanTranslationPlanB1 extends Plan {
 
 **Start and test the agent**\\\
 &lt;p/&gt;\
-Create a translation agent via the Control Center and observe the standard output, if the initial plan is created at startup. Use the Conversation Center (in new Jadex versions the conversation center needs to be activated via popup menu on the toolbar, see <span class="wikiexternallink">[Tool Guide](../AC%20Tool%20Guide/02%20JCC%20Overview)</span>) to send a translation request to the TranslationAgent by setting the performative to *request* and the content to some word to translate. Observe the TranslationAgent's output on the console when it receives the request.
+Create a translation agent via the Control Center and observe the standard output, if the initial plan is created at startup. Use the Conversation Center (in new Jadex versions the conversation center needs to be activated via popup menu on the toolbar, see [Tool Guide](../AC%20Tool%20Guide/02%20JCC%20Overview) ) to send a translation request to the TranslationAgent by setting the performative to *request* and the content to some word to translate. Observe the TranslationAgent's output on the console when it receives the request.
 
-<span>Exercise B2 - Passive Plans</span> 
+Exercise B2 - Passive Plans
 ----------------------------------------
 
 In constrast to the last exercise we will now use a passive plan to react on translation requests. To show the difference between the two forms of plans we now modify the service plan slightly to become a passive plan. Create the files EnglishGermanTranslationPlanB2.java and TranslationB2.agent.xml by copying the files from exercise B1.&lt;br/&gt;\
@@ -141,7 +135,7 @@ In constrast to the last exercise we will now use a passive plan to react on tra
    \
 Start the agent as explained in the preceding exercise. Observe that a new instance of the translation plan is created everytime an appropriate event arrives. The passive plan is instantiated and each instance processes a different message event. Many different plan instances may remain active while processing their triggers.
 
-<span>Exercise B3 - Plan Parameters</span> 
+Exercise B3 - Plan Parameters
 ------------------------------------------
 
 In this exercise we will use plan parameters to supply the plan with arguments. Plan parameters can directly be accessed from within the plan body via the getParameter("paramname") and getParameterSet("paramsetname") methods. Generally parameters can have the directions *in*, *out* and *inout* describing parameters that are used for supplying values or resp. gathering return values from the plan. Plan parameters can be supplied with fixed values via the &lt;value&gt; or &lt;values&gt; tags. More interestingly parameter values can be mapped from and to the triggers by using parameter mappings. If a plan could be activated by more than one trigger (e.g. two different messages, or a message and a goal, etc.) multiple goal mappings (one for each trigger type) have to be used to unify the plans view on its arguments.&lt;br/&gt;\
@@ -177,14 +171,14 @@ Create the files EnglishGermanTranslationPlanB3.java and TranslationB3.agent.xml
 **Start and test the agent**\\\
 Test and verify that the agent behavior is the same as in the last exercise.
 
-<span>Exercise B4 - Plan Selection</span> 
+Exercise B4 - Plan Selection
 -----------------------------------------
 
 In this exercise we will use plan priorities to establish a plan selection order. Create the files EnglishGermanTranslationPlanB4.java and TranslationB4.agent.xml by copying the files from exercise B2. Apply the same replacements B2-&gt;B4 as in the previous exercise.&lt;br/&gt;\
   \
 **Create a new plan file named SearchTranslationOnlineB4.java**
 
--   This plan should be used when the agent cannot find the word in its (currently very small) dictionary. In this case the online search plan will try to connect to a web dictionary and report the found translations. The address of a simple English-German dictionary is <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://wolfram.schneider.org/dict/dict.cgi</span>](http://wolfram.schneider.org/dict/dict.cgi)</span> (you may use any other dictionary for this purpose if you are not afraid of parsing the result HTML page). To issue a query against this online database you need to create a URL and read the data from there as outlined below. You will have to add code for fetching the "eword" that should be translated and a try/catch block when creating the URL, i.e. if the dictionary is not available. 
+-   This plan should be used when the agent cannot find the word in its (currently very small) dictionary. In this case the online search plan will try to connect to a web dictionary and report the found translations. The address of a simple English-German dictionary is http://wolfram.schneider.org/dict/dict.cgi ](http://wolfram.schneider.org/dict/dict.cgi)  (you may use any other dictionary for this purpose if you are not afraid of parsing the result HTML page). To issue a query against this online database you need to create a URL and read the data from there as outlined below. You will have to add code for fetching the "eword" that should be translated and a try/catch block when creating the URL, i.e. if the dictionary is not available. 
 
 
 ```java
@@ -302,7 +296,7 @@ public static boolean containsWord(String name) {
 &lt;p/&gt;\
 When the agent receives translation request it searches applicable plans to handle this request. If the word is contained in the dictionary both plans are applicable and the one with the higher priority is chosen (in this case it is the egtrans plan because the standard priority is 0). When the word is not contained in the dictionary only the searchonline plan is applicable and will be used.
 
-<span>Exercise B5 - BDI Debugger</span> 
+Exercise B5 - BDI Debugger
 ---------------------------------------
 
 The Jadex debugging perspective is conceived to support you in the debugging of agents and helps you to understand what happens inside an agent. You could use it for the agents from the previous excercises, e.g. to grasp the differences between B1 and B2.&lt;br/&gt;\
@@ -329,7 +323,7 @@ The Jadex debugging perspective is conceived to support you in the debugging of 
 -   Press the "step" button several times in the debugger and observe in the rule engine tab how an activation (rule) from the agenda is executed. 
 -   The debugger also offers a breakpoint view (on the left). Try out working with breakpoints by selecting some of them and pressing "run". In case the selected breakpoint (rule) is activated the debugger will automatically set the agent to step mode so that it can be easily inspected and executed step by step. 
 
-<span>Exercise B6 - Log-Outputs</span> 
+Exercise B6 - Log-Outputs
 --------------------------------------
 
 In this exercise we will use log-outputs instead of directly printing console outputs. The log outputs will typically be printed to the System.err stream, which is displayed in red color in eclipse. Create the files EnglishGermanTranslationPlanB6.java and TranslationB6.agent.xml by copying the files from exercise B2.&lt;br/&gt;\

@@ -2,19 +2,13 @@
 
 The documentation of the predefined capabilities is not yet finished.\
 Please also take a look at the \[BDI Tutorial&gt;BDI Tutorial.07 Using Events\] (Exercise F4)\
-and at the \[legacy documentation of Jadex 0.96&gt;<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef\_cap.html</span>](http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef_cap.html)</span>\].
+and at the \[legacy documentation of Jadex 0.96&gt;http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef\_cap.html ](http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef_cap.html) \].
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Jadex uses capabilities for the modularization of agents (see \[Chapter 5. Capabilities&gt;05 Capabilities\]), whereby\
 capabilities contain ready to use functionalities. The Jadex distribution contains several\
@@ -28,9 +22,7 @@ This chapter aims at depicting their usage by offering the application programme
 an overview and explanation of their functionalities and additionally a selection of short code snippets\
 that can directly be used in your applications. 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The test capability for writing agent-based unit test is explained in the\
 \~Jadex Tool Guide\~, which also illustrates the usage of the corresponding\
@@ -41,18 +33,14 @@ Test Center user interface.\
 
 1.1 The Component Management Service (CMS) Capability
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The Component Management Service (CMS) capability provides goals, that allow the application programmer\
 to use functionalties of the local or some remote CMS. Basically the CMS is responsible for\
 managing the component lifecycle and for interacting with the platform. Concretely this means the CMS\
 capability can be used for:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 -   \[Creating Components&gt;\#HCreatingComponents\]
 -   \[Destroying Components&gt;\#HDestroying Components\]
@@ -66,16 +54,12 @@ capability can be used for:
 
 1.1.1 Creating Components
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The goal \~cms\_create\_component\~ creates a new component via the CMS on the platform.\
 This goal has the following parameters:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {table}\
 Name            | Type                 | Description\
@@ -89,20 +73,14 @@ componentidentifier \\\[out\\\] | IComponentIdentifier | Output parameter contai
 {table}\
 \~Parameters for cms\_create\_component goal (\* denotes optional parameters)\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 To use the "cms\_create\_component"-goal, you must first of all include the CMS-capability in your ADF (if not\
 yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below. The name of the goal reference can be arbitrarily chosen, but it will be assumed here for convenience that the same as the original name will be used.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:xml}\
 ...\
@@ -121,19 +99,13 @@ yet done in order to use other goals of the CMS-capability) and set a reference 
 {code}\
 \~Including the CMS capability and the cms\_create\_component-goal\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Now you can use this goal to create a component in your plan:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:java}\
 public void body()\
@@ -149,25 +121,17 @@ public void body()\
 {code}\
 \~Creating a component on the local platform\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the above listing - in order to create a component - you instantiate a new goal using the \~createGoal()\~-method with the paramter "cms\_create\_component". Then you set its parameters to the desired values, dispatch the subgoal and wait. After the goal has succeeded, you can fetch the \~IComponentIdentifier\~ of the created component by calling the \~getValue()\~-method on the parameter "componentidentifier".
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The same goal is used for remote creation of a component:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:java}\
 public void body()\
@@ -175,7 +139,7 @@ public void body()\
   IComponentManagementService cms = IComponentManagementService)getScope()\
     .getServiceContainer().getService(IComponentManagementService.class);\
   IComponentIdentifier remote\_cms\_id = cms.createComponentIdentifier("cms@remoteplatform",\
-    false, new String\[\]{"<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">nio-mtp://134.100.11.232:5678</span>](nio-mtp://134.100.11/232:5678)</span>"});
+    false, new String\[\]{"nio-mtp://134.100.11.232:5678 ](nio-mtp://134.100.11/232:5678) "});
 
   IGoal cc = createGoal("cms\_create\_component");\
   cc.getParameter("type").setValue("mypackage.MyComponent");\
@@ -188,38 +152,28 @@ public void body()\
 {code}\
 \~Creating a component on a remote platform\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the above listing you can see how to create a component on a remote platform\
 using its remote CMS. In order to do so, it's of course crucial that you know at least one address of the remote CMS.\
 Moreover, the corresponding transport must be available on the local platform. The transport used by the other\
 platform can be recognized by the prefix of the address (ending with the :*). In this case the prefix\
-is \~<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">nio-mtp://\~\~</span>](nio-mtp://~~)</span>, which represents the transport \~jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport\~.*
+is \~nio-mtp://\~\~ ](nio-mtp://~~) , which represents the transport \~jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport\~.*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 If you know the address of the remote CMS and you're sure that the local platform supports its transport, you must\
 create an \~IComponentIdentifier\~ using the local component management service and set its name and address to that of the CMS that should create the new component.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Thereafter you can instantiate a new goal using the \~createGoal()\~-method with the\
 paramter "cms\_create\_component". Then you set its parameters to the desired values, dispatch the subgoal\
 and wait. After the goal has succeeded, you can fetch the \~IComponentIdentifier\~ of the created component by calling the \~getValue()\~-method on the parameter "componentidentifier".
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 &lt;! ~~** CMS: DESTROY COMPONENTS ** ~~&gt;
 
@@ -231,9 +185,7 @@ components, both on a local as well as on remote platforms.\
 
 The goal has the following parameters:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {table}\
 Name                | Type                 | Description\
@@ -242,13 +194,9 @@ cms\\\*               | IComponentIdentifier | The component ident
 {table}\
 \~Parameters for cms\_destroy\_component (\* denotes optional parameters)\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 To use the \~cms\_destroy\_component\~-goal, you must first of all include the CMS-capability in your ADF (if\
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below:
@@ -270,19 +218,13 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 {code}\
 \~Including the CMS capability and the cms\_destroy\_component-goal\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Thus you can destroy a component in your plan:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:java}\
 public void body()\
@@ -324,20 +266,14 @@ componentdescription \\\[out\\\] | ICMSComponentDescription | This output parame
 {table}\
 \~Parameters for cms\_suspend\_component (\* denotes optional parameters)\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 To use the "cms\_suspend\_component"-goal, you must first of all include the CMS-capability in your ADF (if\
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:xml}\
 ...\
@@ -356,19 +292,13 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 {code}\
 \~Including the CMS capability and the cms\_suspend\_component-goal\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Thus you can suspend a component in your plan:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:java}\
 public void body()\
@@ -384,13 +314,9 @@ public void body()\
 {code}\
 \~Suspending a component on a local/remote platform\~*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the listing above - in order to suspend a component - you instantiate a\
 new goal using the \~createGoal()\~-method with the paramter\
@@ -414,17 +340,13 @@ componentdescription \\\[out\\\] | ICMSComponentDescription | This output parame
 {table}\
 \~Parameters for cms\_resume\_component (\* denotes optional parameters)\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
   \
 To use the "cms\_resume\_component"-goal, you must first of all include the CMS-capability in your ADF (if\
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:xml}\
 ...\
@@ -460,13 +382,9 @@ public void body()\
 {code}\
 \~Resuming a component on a local/remote platform\~*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the above listing - in order to resume a component - you instantiate a\
 new goal using the \~createGoal()\~-method with the paramter\
@@ -483,39 +401,29 @@ The goal "cms\_search\_components" allows you to search for components, both on\
 the local platform and on remote platforms, thereby determining if the component\
 is available at all and learning about its state (e.g. active or suspended).
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The goal has the following parameters:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {table}\
 Name                | Type                     | Description\
 description         | ICMSComponentDescription | The template description to search for matching components.\
 cms\\\*               | IComponentIdentifier     | The component identifier of the CMS (only required for remote requests)\
-constraints\\\*       | ISearchConstraints       | Representation of a set of constraints to limit the search process. As a default, only one matching result is returned. You can set the max-results setting of the search constraints to -1 for unlimited number of search results. See \[FIPA Agent Management Specification&gt;<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://www.fipa.org/specs/fipa00023/XC00023H.html\#\_Toc526742642</span>](http://www.fipa.org/specs/fipa00023/XC00023H.html#_Toc526742642)</span>\].\
+constraints\\\*       | ISearchConstraints       | Representation of a set of constraints to limit the search process. As a default, only one matching result is returned. You can set the max-results setting of the search constraints to -1 for unlimited number of search results. See \[FIPA Agent Management Specification&gt;http://www.fipa.org/specs/fipa00023/XC00023H.html\#\_Toc526742642 ](http://www.fipa.org/specs/fipa00023/XC00023H.html#_Toc526742642) \].\
 result \\\[set\\\]\\\[out\\\] | ICMSComponentDescription | This output parameter set contains the component descriptions that have been found.\
 {table}\
 \~Parameters for cms\_search\_components (\* denotes optional parameters)\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 To use the "cms\_search\_components"-goal, you must first of all include the CMS-capability in your ADF (if\
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:xml}\
 ...\
@@ -534,19 +442,13 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 {code}\
 \~Including the CMS capability and the cms\_search\_components-goal\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 To search for components in your plan use the goal in the following manner:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:java}\
 public void body()\
@@ -563,13 +465,9 @@ public void body()\
 {code}\
 \~Searching a component on a local/remote platform\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the listing above - in order to search for a component - you instantiate a\
 new goal using the \~createGoal()\~-method with the paramter\
@@ -584,32 +482,22 @@ returning all components on the platform.\
 In case of a remote request you have to set the component identifier\
 of the remote CMS well.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The documentation of the predefined capabilities is not yet finished.\
 Please also take a look at the \[BDI Tutorial&gt;BDI Tutorial.07 Using Events\] (Exercise F4)\
-and at the \[legacy documentation of Jadex 0.96&gt;<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef\_cap.html</span>](http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef_cap.html)</span>\].
+and at the \[legacy documentation of Jadex 0.96&gt;http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef\_cap.html ](http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef_cap.html) \].
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 &lt;!~~\
 The same goal is used to search for remote components:~~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 {code:java}\
 public void body()\
@@ -628,13 +516,9 @@ public void body()\
 {code}\
 \~Searching for a component on a remote platform\~
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the above listing a component with the name "my\_component" is sought-after.\
 Assuming that the remote CMS was created as per description in section \[Creating Components&gt;\#HCreatingComponents\], you have to\
@@ -642,9 +526,7 @@ create the \~CMSComponentDescription\~ with a new \~ComponentIdentifier\~ as par
 you must instantiate the "cms\_destroy\_component"-goal by using the\
 \~createGoal()\~-method with the parameter "cms\_search\_components".
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 After dispatching the goal and waiting for success, you can fetch the result by calling\
 \~getParameterSet("result").getValues()\~ on the goal and casting to an array of\

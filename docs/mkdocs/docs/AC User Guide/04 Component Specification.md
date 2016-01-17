@@ -1,4 +1,4 @@
-<span>Chapter 4 - Component Specification</span> 
+Chapter 4 - Component Specification
 ================================================
 
 In Jadex all component types (e.g. micro agents, BDI agents, BPMN workflows) share the same active component characteristics. Depending on the type of the component the definition is based on Java annotations or XML elements. The following explanations make extensive use of XML-based structure diagrams, but they are valid for annotations as well.  \
@@ -7,36 +7,24 @@ As can be seen in the figure below an active component specification is composed
 ![04 Component Specification@componenttype.png](componenttype.png)  
 *Component type*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-### <span>Imports</span> 
+### Imports
 
 The imports can be used in the same way as in Java to specify the classes and packages that should be used for class and resource loading. In addition, these imports are helpful if Java expressions are used because the expressions are evaluated taking into account the defined imports. It has to be noted that normal Java imports cannot be used for expression evaluation as the import statements are not preserved within the class file. For this reason the annotation *@Imports* can be employed. As usual, single classes are defined per name and packages using the \*-notation. 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 ![04 Component Specification@imports.png](imports.png)  
 *Imports*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the examples below the package *java.util.\** and the class *java.net.URL* are imported. 
 
@@ -63,7 +51,7 @@ In the examples below the package *java.util.\** and the class *java.net.URL* ar
 ```
 
 
-### <span>Arguments</span> 
+### Arguments
 
 Active components can have arguments and results. The arguments are supplied at startup of the component and the results can be fetched after the component has terminated. This allows to use components in a functional way, i.e. a component can be started and given argument values. The functional component computes something, sets its result values and terminates itself. The component creator is notified that the component has ended and can read the results for further processing. In order to use arguments and results at runtime it is necessary in the component type to declare the allowed argument and result types. For each argument and result type the following details can be specified:
 
@@ -74,13 +62,9 @@ Active components can have arguments and results. The arguments are supplied at 
 ![04 Component Specification@arguments.png](arguments.png)  
 *Arguments*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The example code snippets shows how two arguments with the names "number" and "obj" and one result called "res". The type of the first is *Integer* and the type of the latter is *Customer* (if Customer has a package it has to be declared either fully qualified or it has to be imported). Both arguments have default values, which are *10* and *new Customer("Sparky")* respectively. The result is of type *boolean* and has no default value.    
 
@@ -109,7 +93,7 @@ The example code snippets shows how two arguments with the names "number" and "o
 ```
 
 
-### <span>Component Types</span> 
+### Component Types
 
 Active components allow for hierarchical decomposition, i.e. an active component may consist of an arbitrary number of subcomponents. The types of potentially created subcomponents should be declared within the component types section.\
 The declaration of a subcomponent type is done using the following parameters:
@@ -120,13 +104,9 @@ The declaration of a subcomponent type is done using the following parameters:
 ![04 Component Specification@componenttypes.png](componenttypes.png)  
 *Component types*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 As example the declaration of a heatbug as subcomponent type is illustrated. It has the name *Heatbug* and refers to the file *jadex/micro/examples/heatbugs/HeatbugAgent.class*.
 
@@ -148,19 +128,15 @@ As example the declaration of a heatbug as subcomponent type is illustrated. It 
 ```
 
 
-### <span>Services</span> 
+### Services
 
 Active components realize component orientation in the same way as traditional component approaches. In order to ensure a high degree of self-containedness of components each component type has explicitly to declare which functionalities it uses and needs. These aspects are defined in terms of *required* and *provided* services.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-#### <span>Required Services</span> 
+#### Required Services
 
 ![04 Component Specification@requiredservicetype.png](requiredservicetype.png)  
 *Required service type*
@@ -194,18 +170,14 @@ The optional service *binding* has the following options:
 -   *componenttype*: The component type is currently used for two purposes (will be changed). First, it is used as search type in the same way as the component name. This allows for type level binding to peer or subcomponents. Furthermore, it is currently used as type for component creation if the create property is enabled. 
 -   *interceptors*: The interceptors are used for performing actions before and after service calls. The provider as well as the consumer side may have their own interceptor chains. If custom interceptors are defined they are positioned after the default interceptors, which are the decoupling (turn off via proxytype=direct) and receover (turn on via recover=true) interceptors.
 
-#### <span>Provided Services</span> 
+#### Provided Services
 
 ![04 Component Specification@providedservicetype.png](providedservicetype.png)  
 *Provided service type*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Provided services describe the functionalities offered by a component. The specification of a provided service consists of a service definition and an implementation definition. 
 
@@ -220,18 +192,14 @@ In most cases a service definition should include an implementation because othe
 -   *expression*: Can be used if the implementation class cannot have an empty constructor, e.g. because it needs arguments. The creation expression can be an arbitrary Java expression.
 -   *proxytype*: The proxytype of the service. It has the same meaning as in the binding explained above. The possible values are *decoupled*, *direct* and *raw*. The default interceptors are the *DecouplingInterceptor* to execute the service call on the client component, the *ValidationInterceptor* to check if the service is initialized (returns a *ServiceInvalidException* otherwise), the *ResolveInterceptor* to route service calls if it is a Pojo service and the *MethodInvocationInterceptor* to finally perform the call. 
 
-### <span>Properties</span> 
+### Properties
 
 ![04 Component Specification@properties.png](properties.png)  
 *Properties*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Properties can be used to define specific aspects of components. A property is only evaluated once at startup of the component. If the type of a property is *IFuture* the component will evaluate it to the underlying value, i.e. the component will wait for the property to be initialized.
 
@@ -241,18 +209,14 @@ A property has the following attributes:
 -   *class*: The property type. Please note the special handling of future properties described above.
 -   *expression*: The property value Java expression.
 
-### <span>Configurations</span> 
+### Configurations
 
 ![04 Component Specification@configurations.png](configurations.png)  
 *Configurations*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Configurations can be used to define different runtime settings of a component (a component may define an arbitrary number of different configurations). Each configuration has a name and at startup this name can be used to start the component in the underlying configurations. Configurations may differ in all runtime aspects from the type specification as can be seen also in the figure below.
 
@@ -264,11 +228,11 @@ The properties of a configuration are as follows:
 -   *daemon*: The daemon setting is used in combination with autoshutdown. If a component is started as daemon it does not prevent the parent from being terminated after the last non-daemon subcomponent has terminated.
 -   *autoshutdown*: In enabled, automatically terminates the component when the last child (non-daemon) has been killed.
 
-#### <span>Arguments</span> 
+#### Arguments
 
 -   *arguments*: The arguments section allow for defining new values for arguments and results that possibly override the default values specified at the type level. If arguments are passed from the outside to the component these values always have precedence over configuration or type level values. An argument or result type is referenced via its name.
 
-#### <span>Components</span> 
+#### Components
 
 ![04 Component Specification@configcomponents.png](configcomponents.png)  
 *Configuration components*
@@ -285,54 +249,40 @@ The properties of a configuration are as follows:
     -   *arguments*: The arguments for the subcomponent can be defined.
     -   *required services*: Using the name of the required services the corresponding binding can be overridden. The is e.g. helpful to statically link subcomponent services with parent or peer services.
 
-#### <span>Services</span> 
+#### Services
 
 ![04 Component Specification@configservices.png](configservices.png)  
 *Configuration Services*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 In the configuration of a component also the service details can be changed. With respect to provided services the implementation and with regard to required services the binding can be changed. The specifications require that a required or provided service is identified via its type name. The implementation or binding details can be redefined for the referenced service.
 
-#### <span>Extensions</span> 
+#### Extensions
 
 ![04 Component Specification@configextensions.png](configextensions.png)  
 *Extensions*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Extensions can be used to add extension instance elements to an active component. As can be seen in the figure the concrete extension elements depend on the extension type used. Examples for extensions that make use of the extension mechanism are the virtual environment EnvSupport used in many example applications and AGR (the agent-group-role model). Please also refer to the Extension Types section below for further explanations. 
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 (Current limitation: extensions cannot be used in annotation based Java components)
 
-#### <span>Steps</span> 
+#### Steps
 
 ![04 Component Specification@configsteps.png](configsteps.png)  
 *Steps*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Steps can be used to execute custom behavior at component creation or termination. The first can be achieved using *initial steps* and the latter using *end steps*. 
 
@@ -353,18 +303,14 @@ public interface IComponentStep<T>
 
 (Current difference: Micro agents have lifecycle methods instead of steps to execute behavior at creation and deletion time)
 
-### <span>Extension Types</span> 
+### Extension Types
 
 ![04 Component Specification@extensiontypes.png](extensiontypes.png)  
 *Extension types*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Extensions can be used to add new functionality to an active component. An extension consists of the following aspects:
 

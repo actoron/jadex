@@ -5,13 +5,9 @@ Goal-oriented programming is one of the key concepts in the agent-oriented parad
 1.1 Exercise E1 - Subgoals\
 In this exercise we will use a subgoal for translating words. Extend the translation agent C2 to have a second translation plan for translations from English to French. Introduce a ProcessTranslationRequestPlanE1 that receives all incoming translation requests and uses a subtask triggered by an achieve goal to perform the translation.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Remove, create and modify plans\*
 
@@ -43,9 +39,7 @@ catch(GoalFailureException e)\
 
 \*Modify the ADF\*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 -   Add the ProcessTranslationRequestPlanE1 to the ADF as initial plan with a waitqueue for translation requests. Add an configurations section and declare a configuration with an initial plan for the ProcessTranslationRequestPlanE1.\
          
@@ -110,13 +104,9 @@ Start the agent and supply it with some translation requests. Observe which plan
 
 Using the BDI-retry mechanism for trying out different plans for one goal. This can be useful, for example if there are  several plans for one specific goal, but all plans work under different circumstances. With the retry mechanism, all plans will be tried until one plan lets the goal succeed or any plan has been tried.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 \*Modify the following\*\
    

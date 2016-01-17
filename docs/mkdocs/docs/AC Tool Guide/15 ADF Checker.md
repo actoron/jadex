@@ -1,20 +1,16 @@
-<span>Chapter 15 - Eclipse ADF Checker Plugin</span> 
+Chapter 15 - Eclipse ADF Checker Plugin
 ====================================================
 
 The Jadex ADF Checker is an eclipse plugin that allows checking Jadex *agent definition files* (ADFs), i.e. Jadex source files like *.component.xml*, *.agent.xml*, *.bpmn* etc. These files typically contain Java expressions, which are only interpreted by Jadex and thus usually not checked by Eclipse. The ADF Checker closes this gap by attaching itself to the project build process and loading all ADFs in the current project for adding problem markers in eclipse, to show where errors are found in the files.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 ![15 ADF Checker@adfchecker.png](adfchecker.png)  
 *Figure 1: The ADF Checker in action*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<span>Requirements</span> 
+Requirements
 -------------------------
 
 The plugin should work with Eclipse 3.5 or later. It has been tested on Eclipse 3.6 (Helios), Eclipse 3.7 (Indigo) and Eclipse 4.2 (Juno). 
@@ -39,43 +35,33 @@ The plugin requires that all Jadex libraries, which are used in the project, are
     -   **.agent.xml** supported
     -   **.capability.xml** supported
 
-<span>Installation</span> 
+Installation
 -------------------------
 
-The plugin can be obtained from the eclipse update site <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://www2.activecomponents.org/eclipse/update/</span>](http://www2.activecomponents.org/eclipse/update/)</span>. In Eclipse, choose the menu *Help-&gt;Install New Software...*, enter the update site address at *Work with: * and select *Jadex Eclipse Plugins-&gt;Jadex ADF Checker*.
+The plugin can be obtained from the eclipse update site http://www2.activecomponents.org/eclipse/update/ ](http://www2.activecomponents.org/eclipse/update/) . In Eclipse, choose the menu *Help-&gt;Install New Software...*, enter the update site address at *Work with: * and select *Jadex Eclipse Plugins-&gt;Jadex ADF Checker*.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 ![15 ADF Checker@install.png](install.png)  
 *Figure 2: Installing the ADF Checker*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<span>Usage</span> 
+Usage
 ------------------
 
 The ADF Checker can be activated and deactivated individually for each Eclipse project. Right-click on the project and choose *Jadex-&gt;Enable ADF Checking on Selected Project(s)*.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 ![15 ADF Checker@activate.png](activate.png)  
 *Figure 3: Activating the ADF Checker*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The ADF Checker will be executed automatically as part of the Eclipse build process. It will check files that are contained in source folders and that are not excluded from the build path. This assures that it will behave as expected without further configuration for most Eclipse projects.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 When ADF checking is enabled on a project, the checking of files is automatically triggered as follows:
 
@@ -84,25 +70,19 @@ When ADF checking is enabled on a project, the checking of files is automaticall
 
 All found problems are reported in the corresponding files editor views as well as in the Eclipse *Problems* view as shown in Figure 1. An info note is added to files that are checked without errors as shown below:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 ![15 ADF Checker@info.png](info.png)  
 *Figure 4: Info Note on Successfully Validated ADF*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<span>Known Issues and Limitations</span> 
+Known Issues and Limitations
 -----------------------------------------
 
 The information reported by the ADF Checker corresponds to the error reports shown in the JCC when loading a broken model. Due to the interpreted nature of Jadex, loading an ADF does not check all aspects. Therefore, runtime errors are still possible, even when the file was successfully checked. We are continuously trying to improve error reports and add additional checks at load time, and we would be happy to listen to your suggestions on how to do that and what to check.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The following is a list of issues that we are already aware of:
 

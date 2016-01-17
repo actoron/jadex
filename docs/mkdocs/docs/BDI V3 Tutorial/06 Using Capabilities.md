@@ -6,7 +6,7 @@ In Jadex V3 a capability is typically represented as a:
 
 -   **Class**: As a capability should enable reuse it is the normal case to use a separate class file for the module. The module is declared and instantiated as normal field in the agent with corresponding meta information in terms of an annotation. 
 
-<span>E1 - Creating a Capability</span> 
+E1 - Creating a Capability
 ---------------------------------------
 
 In this first exercise we just create a capability that encapsulates the translation agent behaviour. The agent itself is reduced to use the capability and dispatch a translation goal from the capability.
@@ -76,7 +76,7 @@ System.out.printf("Translating %s to %s", eword, gword);
 
 After starting the agent you should see again the print out of the translated word.
 
-<span>E2 - Using an Abstract Belief</span> 
+E2 - Using an Abstract Belief
 ------------------------------------------
 
 In this exercise we will show how an abstract belief can be used. The application idea here is that the agent itself manages the word table (instead of the capability) and provide another plan to search for synonyms in that table. (In this simple case an alternative solution would have been making the word table accessible via public getter/setter methods. But the design here suggests that if more functionalities share a data structure that none of them really owns exclusively that it is better to move it to the agent level).

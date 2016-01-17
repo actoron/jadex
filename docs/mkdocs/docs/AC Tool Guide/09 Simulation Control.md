@@ -1,4 +1,4 @@
-<span>Chapter 9 - Simulation Control</span> 
+Chapter 9 - Simulation Control
 ===========================================
 
 ![09 Simulation Control@simulation.png](simulation.png)
@@ -7,7 +7,7 @@
 
 A fundamental concept realized in Jadex is **simulation transparency**, i.e. applications written in Jadex can be simulated or executed in real time without code changes. This is realized with a clock abstraction that is used for all timing aspects within an application. By exchanging the clock the timing behavior can be transparently changed. In the simulation control plugin, the clock type and its concrete settings can be defined. Looking at the screenshot above you can see that the simulation control panel consist of three main areas named **Clock Settings**, **Execution Control** and **Active Timers**, which are explained in the following.
 
-<span>Clock Settings</span> 
+Clock Settings
 ---------------------------
 
 The clock settings area shows details of the clock currently used by the platform.
@@ -35,7 +35,7 @@ The clock settings area shows details of the clock currently used by the platfor
 
 *Note:* Although all clock types are very similar from the interface they offer, there is a fundamental difference between simulation and normal clocks. Simulation clocks are passive in the sense that they do not advance time on their own. Instead, time advancement is triggered explicitly whenever all components have finished their execution with respect to the current point in time. In contrast, normal clocks are active and time automatically advances even if nothing else happens or if components are still busy.
 
-<span>Execution Control</span> 
+Execution Control
 ------------------------------
 
 The execution control field can be directly used to stop, resume, and step the currently used clock. The following buttons can be used:
@@ -45,7 +45,7 @@ The execution control field can be directly used to stop, resume, and step the c
 -   ![09 Simulation Control@single\_step\_time.png](single_step_time.png): The step time button is also valid only for simulation clocks. It advances the clock to the next timepoint, i.e. it will activate all timing entries until one timing entry belongs to a time after those of the current clock reading.
 -   ![09 Simulation Control@pause.png](pause.png): This button allows for pausing the active clock (the system clock cannot really be paused, but will stop triggering timing events). Having paused the clock applications that rely on timing will not execute further.
 
-<span>Active Timers</span> 
+Active Timers
 --------------------------
 
 The list of active timers shows the registered timing events. This visualizes the next timer entries that will get executed by the clock. On the left hand side of the table the time point is given at which the timer will be fired and on the right hand side the object that will be executed is shown. As it costs resources to update the timer entry list the check box **Update timer events** can be used to turn off/on the automatic table refresh.

@@ -65,8 +65,8 @@ task buildDocsZip (type: Zip, dependsOn: buildDocs) {
     from "${project.buildDir}${File.separator}mkdocs${File.separator}site${File.separator}"
     baseName = 'jadex-mkdocs'
     version = project.version
-//    into "$baseName-${version.replaceAll('-SNAPSHOT','')}"
-    into "$baseName-$version"
+//    into "$baseName-$version"
+    into baseName
     destinationDir = file("$project.buildDir")
     outputs.upToDateWhen { false }
 }

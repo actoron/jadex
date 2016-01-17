@@ -1,49 +1,37 @@
-<span>Chapter 6 - Web Service Integration</span> 
+Chapter 6 - Web Service Integration
 ------------------------------------------------
 
 In this chapter it will be explained how existing standard web technologies can be used in concert with Jadex active components. Jadex allows for seamless usage of existing web services as well as publishing Jadex services with minimal effort in the web. Classical WSDL-based web services as well as RESTful web services are supported. In order to use the web service support the Jadex module *jadex-platform-extension-webservice* has to be included. Example applications that make use of the presented techniques can be found in the package *jadex-applications-webservices*. In order to publish WSDL or RESTful services the platform has to provide corresponding publish services. The default publish implementations can be automatically started at startup of the platform by using the arguments *-wspublish true* and *-rspublish true* respectively.
 
-### <span>Integration Concept</span> 
+### Integration Concept
 
 The integration of Jadex components with web services includes two directions. The first deals with using existing web services with Jadex applications in a transparent manner. The latter considers how Jadex services can be made available as web services also for non-Jadex users.  
 
-#### <span>Integrating Existing Web Services</span> 
+#### Integrating Existing Web Services
 
 ![06 Web Service Integration@wscall.png](wscall.png)  
 *Web Service Invocation Architecture*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 The objective of the web service call integration consists in integrating an external web service as normal Jadex component service within the Jadex platform. This allows for using the web service in the same way as other Jadex services, i.e. it can be used as required service or dynamically searched in other components. The general approach is sketched in the figure above. It can be seen that a Jadex wrapper agent is used to offer the web service as Jadex service. This Jadex service offers an asynchronous variant of the synchronous web service. The wrapper agent forwards service calls to the web service and returns the results to the caller. As the web service call is synchronous and therefore blocking it has to be ensured that the wrapper agents can handle multiple calls concurrently. This is achieved by creating a new invocation component for each call. This invocation component only perform the web service invocation, is blocked during the call, and afterwards returns the results to the wrapper component and terminates.
 
-#### <span>Publishing Jadex Services as Web Services</span> 
+#### Publishing Jadex Services as Web Services
 
 ![06 Web Service Integration@wspublish.png](wspublish.png)  
 *Web Service Publish Architecture*
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Publishing Jadex services as web service has the underlying idea that one can easily make available Jadex selected services in a standards compliant manner. The Jadex publishing mechanism is inspired by the same mechanism in SCA. For each provided service within a component it can be specified if and how this service should be published. After starting a service (usually at component startup) this publishing information is inspected and a corresponding publishing service (according to the publishing type) is invoked in order to publish the service. In the same way, at shutdown of the service the publish service is requested to end publishing. Publishing a service as web service typically means that some kind of web container is instructed to listen at a given url and handle web service requests with a created web service implementation. When using the default WSDL or RESTful publishing mechanisms a proxy service component is created within the web container, which hands over requests towards the backend Jadex service.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 At the moment of publishing the Jadex interpreter searches for all available *IPublishService*s. In order to add new kinds of publishing or use alternative publishing mechanisms just the available publish services at the platorm need to be changed. This interface contains the following methods: 
 
@@ -65,27 +53,21 @@ public interface IPublishService
 All these methods are automatically called by Jadex. The *isSupported()* method is used to check whether the publish service is able to publish the given type. If yes, the component interpreter will call the *publishService()* method in order to publish the service on the endpoint. Here the logic has to be filled in which knows the concrete endpoint type and can supply it with the necessary artifacts to make the web service available. The parameters include the current classloader, the Jadex service to which web service requests should be forwarded and a publish info object that represents just a struct with information about the publishing properties (publishtype, publishid and servicetype). The last method is called when the service is terminated, e.g. if the component is killed. Here the service identifier is passed as parameter in order to find the service and instruct the\
 endpoint to stop the web service.
 
-### <span>WSDL Web Services</span> 
+### WSDL Web Services
 
-#### <span>Integrating Existing WSDL Web Services</span> 
+#### Integrating Existing WSDL Web Services
 
 A Jadex wrapper agent needs to be created that provides access to the external web service as a separate Jadex component service. The interfaces of both services differ with respect to the return value of the method signatures. The return value of the Jadex service interface always has to be a *IFuture&lt;originaltype&gt;* that contains the original type as generic part. This has to be done to make the synchroneous web service asynchronous. The input parameters of methods directly correspond to the generated parameter types coming from the Java included *wsimport* tool, which itself relies on *JAXB*. Service calls on the Jadex service will be forwarded from the wrapper agent to the original web service and the result will be returned to the caller. In order to avoid that the wrapper agent is blocked by the synchronous web service call and cannot process any further invocations, internally a subcomponent is created for each call. This subcomponent will be automatically deleted immediately after the call has returned.
 
-<div class="wikimodel-emptyline">
 
-</div>
 
-<div class="wikimodel-emptyline">
 
-</div>
 
 Implementation steps:
 
-<div class="wikimodel-emptyline">
 
-</div>
 
--   **The Java web service classes and data types have to be generated using wsimport** (usually available in the *bin* directory of the JDK). The most important options are: -keep for not deleting the source files, -p for specifying the target package (example: *wsimport -keep -p jadex.micro.examples.ws.geoip.gen <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://www.webservicex.net/geoipservice.asmx?WSDL</span>](http://www.webservicex.net/geoipservice.asmx?WSDL)</span>*). The following block shows the service interface as generated by the wsimport tool. The tool automatically includes all the annotations required by the JAX-WS framework that allows publishing and invoking web services seamlessly from Java. Between all the annotations, you can see that the interface defined two methods: *getGeoIP(ipAddress)* and *getGeoIPContext()*.
+-   **The Java web service classes and data types have to be generated using wsimport** (usually available in the *bin* directory of the JDK). The most important options are: -keep for not deleting the source files, -p for specifying the target package (example: *wsimport -keep -p jadex.micro.examples.ws.geoip.gen http://www.webservicex.net/geoipservice.asmx?WSDL ](http://www.webservicex.net/geoipservice.asmx?WSDL) *). The following block shows the service interface as generated by the wsimport tool. The tool automatically includes all the annotations required by the JAX-WS framework that allows publishing and invoking web services seamlessly from Java. Between all the annotations, you can see that the interface defined two methods: *getGeoIP(ipAddress)* and *getGeoIPContext()*.
 
 
 ```java
@@ -144,7 +126,7 @@ public class GeoIPWebServiceAgent extends WebServiceAgent
 ```
 
 
-#### <span>Publishing Jadex Services as Web Services</span> 
+#### Publishing Jadex Services as Web Services
 
 It is also possible to make a Jadex component service accessible as Web Service. Jadex reuses existing publishing mechanisms for this purpose and encapsulates their functionality in services. For each provided service publishing information can be given by using the *@Publish* annotation (or in XML components the publish tag). This annotation allows for specifying:
 
@@ -223,9 +205,9 @@ public class BankingAgent
 
 A current limitation is that only the Java internal web service endpoint can be used for publishing. Other publishing services that can deploy on other common infrastructures like e.g. Glassfish are not yet available. If a deployment is needed on another kind of endpoint a new publish service has to be created and provided by a component. Custum publish services need to implement the *IPublishService* already mentioned.
 
-### <span>REST Web Services</span> 
+### REST Web Services
 
-#### <span>Integrating Existing REST Web Services</span> 
+#### Integrating Existing REST Web Services
 
 In order to make existing REST web services usable inside of Jadex system, a wrapper agent needs to be defined, which offers a Jadex service that corresponds to the REST service. The wrapper agent uses a new invocation sub-agent for each incoming REST service call. It maps the Jadex service call to a suitable REST call and uses the invocation agent to execute the call. Parameters and the result value are converted if needed.  
 
@@ -233,7 +215,7 @@ Implementation steps:
 
 -   **Jadex service interface specification.** Currently, the Jadex service interface has to be defined manually based on reading the documentation of the REST service that should be used. (It could also be an option to start with the Java wadl2java tool if the REST service offers a WADL description and generate Java classes from it. A WADL description is the REST pendant to the WSDL description for SOAP based web services). The Jadex service interface should abstract away from the REST service syntax and use a clean object oriented style with typed parameters and return value (instead of only using String etc.). The reason is that the Jadex service should be designed in a way that makes it easy to use it from other Jadex components and services (these do not know that the Jadex service implmentation is a web service). 
 
-As an example a small cutout of the <span class="wikiexternallink">[Google chart API](http://code.google.com/intl/de-DE/apis/chart/)</span> is used. In this case methods for creating images for bar, pie and line charts will be specified. The corresponding Jadex service interface is shown below. The reference annotation for result and color parameters is used to pass them via *call-by-reference* semantics. This is acceptable if parameters are considered immutable objects. With and height describe the size of the resulting chart image in pixels, data represents the data values of possibly more than one data series, labels define description texts and colors specify how the different data series are visualized.
+As an example a small cutout of the [Google chart API](http://code.google.com/intl/de-DE/apis/chart/)  is used. In this case methods for creating images for bar, pie and line charts will be specified. The corresponding Jadex service interface is shown below. The reference annotation for result and color parameters is used to pass them via *call-by-reference* semantics. This is acceptable if parameters are considered immutable objects. With and height describe the size of the resulting chart image in pixels, data represents the data values of possibly more than one data series, labels define description texts and colors specify how the different data series are visualized.
 
 
 ```java
@@ -296,7 +278,7 @@ public interface IRSChartService
 ```
 
 
-It can be seen that the *getBarChart()* method is annotated to produce REST requests. The request URL is composed of the general path *<span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">https://chart.googleapis.com</span>](https://chart.googleapis.com)</span> * and the concrete method path *chart*. Furthermore, the http request type is set to *get* and the acceptable media type is set to binary. The rest of the mapping declaration deals with parameter conversion. Here, it is shown how a mapping per parameter can be done, i.e. for (most) of the parameters it is stated how they should be converted to a rest parameter. As the chart API requires the size to be given in the format *widthxheight* a chart specific *SizeStringMapper* class is used. Normally, a parameter mapper only gets its own parameter as input. If more are needed, these can be stated using the *source* attribute, which takes a set of integer values representing the absolute numbers of the parameters. The second parameter is used in the first mapper so that it does not declare its own mapper. The mapping of data series is a bit more complex. It requires a format that looks like the following example *t:s11,s12,s13|s21,s22|s31 ...*. The corresponding mapper is called *IterableStringMapper*, which iterates over some form of collection or array and concatenates the entries with a given separator. In addition a prefix (here t:) and postfix can be specified if needed. In order to map the two dimensional array the mapper can be equipped with a submapper, which it calls for each entry. In this way another mapper can be used to handle the inner series data. The labels are also mapped using an *IterableStringMapper*, which produces the format *label1|label2|label3 ...*. Finally, the colors a mapped to hex string values using a *ColorStringMapper*. It prodcues a format like *\#rrggbb, example \#FF2233*.  
+It can be seen that the *getBarChart()* method is annotated to produce REST requests. The request URL is composed of the general path *https://chart.googleapis.com ](https://chart.googleapis.com)  * and the concrete method path *chart*. Furthermore, the http request type is set to *get* and the acceptable media type is set to binary. The rest of the mapping declaration deals with parameter conversion. Here, it is shown how a mapping per parameter can be done, i.e. for (most) of the parameters it is stated how they should be converted to a rest parameter. As the chart API requires the size to be given in the format *widthxheight* a chart specific *SizeStringMapper* class is used. Normally, a parameter mapper only gets its own parameter as input. If more are needed, these can be stated using the *source* attribute, which takes a set of integer values representing the absolute numbers of the parameters. The second parameter is used in the first mapper so that it does not declare its own mapper. The mapping of data series is a bit more complex. It requires a format that looks like the following example *t:s11,s12,s13|s21,s22|s31 ...*. The corresponding mapper is called *IterableStringMapper*, which iterates over some form of collection or array and concatenates the entries with a given separator. In addition a prefix (here t:) and postfix can be specified if needed. In order to map the two dimensional array the mapper can be equipped with a submapper, which it calls for each entry. In this way another mapper can be used to handle the inner series data. The labels are also mapped using an *IterableStringMapper*, which produces the format *label1|label2|label3 ...*. Finally, the colors a mapped to hex string values using a *ColorStringMapper*. It prodcues a format like *\#rrggbb, example \#FF2233*.  
 
 Using different mappers per parameter makes the mapper code simpler and facilitates reuse. On the other hand it leads to complex looking signatures. As an alternative also a paramaters mapper can be used which takes all input parameters at once and produces the complete REST parameters. The equivalent method mapping of getBarChart is shown below:
 
@@ -334,7 +316,7 @@ public class ChartProviderAgent extends RestServiceAgent
 
 The wrapper component is very simple and specifies the chart service as provided service. The implementation is an expression that takes the interface and mapping as arguments. Please note that the method *createServiceImplementation* is either available via the *RestServiceAgent* if it is extended or via the class *SRest* as static method. In this case the method takes the internal access of the component as further argument. After having started the component, its chart service can be searched and used as any other Jadex component service.
 
-#### <span>Publishing Jadex Services as REST Web Services</span> 
+#### Publishing Jadex Services as REST Web Services
 
 The publication of a Jadex service as RESTful web service can be used to make Jadex functionality available to external system users. As REST web service interfaces are quite different from object oriented service interfaces the publication can be customized to a high degree. The mapping from the Jadex service interface to the REST service interface can be done in the following ways:
 
@@ -442,5 +424,5 @@ public class BankingAgent
 ```
 
 
--   In order to test if publishing has work you can start the component and check if the service info page in available. Per default the info page is reachable under the base url. Please note that due to some Jersey issues the base url has to contain a trailing slash. The example from above can be reached using <span class="wikiexternallink">[<span class="wikigeneratedlinkcontent">http://localhost:8080/banking/</span>](http://localhost:8080/banking/)</span>.
+-   In order to test if publishing has work you can start the component and check if the service info page in available. Per default the info page is reachable under the base url. Please note that due to some Jersey issues the base url has to contain a trailing slash. The example from above can be reached using http://localhost:8080/banking/ ](http://localhost:8080/banking/) .
 
