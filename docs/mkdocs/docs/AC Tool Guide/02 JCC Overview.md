@@ -27,12 +27,12 @@ Adding a tool plugin via popup menu on toolbar
 Overview of Plugins
 --------------------------------
 
-![02 JCC Overview@starter.png](starter.png): The **starter plugin** for starting and stopping applications and components.\
-![02 JCC Overview@awareness.png](awareness.png): The **awareness plugin** that can be used to configure awareness options such as in- or excluded nodes.\
+![02 JCC Overview@starter.png](starter_icon.png): The **starter plugin** for starting and stopping applications and components.\
+![02 JCC Overview@awareness.png](awareness_icon.png): The **awareness plugin** that can be used to configure awareness options such as in- or excluded nodes.\
 ![02 JCC Overview@security.png](security.png): The **security plugin** allows for configuring platform security settings.\
-![02 JCC Overview@libcenter.png](libcenter.png): The **library plugin** can be used to add custom resources (jars or directories) to the Java classpath.\
+![02 JCC Overview@libcenter.png](libcenter_icon.png): The **library plugin** can be used to add custom resources (jars or directories) to the Java classpath.\
 ![02 JCC Overview@deployer.png](deployer.png): The **deloyer plugin** is similar to a ftp tool and can be used to transfer files from/to other platforms.\
-![02 JCC Overview@chat.png](chat.png): The **chat plugin** can be used to chat with users from other platforms.\
+![02 JCC Overview@chat.png](chat_icon.png): The **chat plugin** can be used to chat with users from other platforms.\
 ![02 JCC Overview@stopwatch.png](stopwatch.png): With the **simulation plugin** the execution mode and time progress can be controlled.\
 ![02 JCC Overview@configure.png](configure.png): The **component viewer** can be used to view components and services that expose user interfaces.\
 ![02 JCC Overview@new\_testcenter.png](new_testcenter.png): The **test center** is a front end for executing junit like component based test cases.\

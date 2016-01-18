@@ -59,7 +59,8 @@ class Convert {
 
                         def content = readXWikiContent(zip.getInputStream(it), targetDir)
                         // write attachments
-                        content.attachments.each { it.writeToPath(targetDir) }
+                        targetDir.resolve(fileName).toFile().mkdir()
+                        content.attachments.each { it.writeToPath(targetDir.resolve(fileName)) }
 
                         def processedString = content.stringContent
                         processedString = preprocessXwikiString(content.stringContent)

@@ -53,7 +53,7 @@ You may have noticed in the previous exercise, that the *args* parameter of the 
 -   Open the run configuration created in the previous exercise (e.g. right-click in editor and choose  *Run As -&gt; Run Configurations...*).
 -   Change to the *Arguments* tab and add the line '-gui false'.
 
-![09 Application Integration@arguments.png](arguments.png)  
+![09 Application Integration@arguments.png](09%20Application%20Integration-arguments.png)  
 * Changing launch arguments in eclipse*
 
 -   Run the application and check, that the JCC does not appear.

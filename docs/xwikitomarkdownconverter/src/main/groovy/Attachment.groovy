@@ -16,6 +16,9 @@ class Attachment {
     void writeToPath(Path path) {
         path = path.resolve(fileName)
         println "writing attachment to ${path}"
+        if (path.toFile().exists()) {
+            System.err.println("Warning: file exists: " + path);
+        }
         def decoder = new Base64.Decoder(false, false)
         def bytes = decoder.decode(attachmentContent.toString())
 
