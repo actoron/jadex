@@ -83,21 +83,17 @@ public class TranslationBDI
 		egwords.put("cat", "Katze");
 		egwords.put("dog", "Hund");
 
-		IComponentStep<Void> step = new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).repeatStep(0, 2000, new IComponentStep<Void>()
 		{
 			int cnt = 0;
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				egwords.put("eword_#"+cnt, "gword_#"+cnt++);
-//				System.out.println("added: "+rand);
+            public IFuture<Void> execute(IInternalAccess ia)
+            {
+            	egwords.put("eword_#"+cnt, "gword_#"+cnt++);
 				System.out.println("egwords: "+egwords);
-//				context = false;
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, this, true);
 				return IFuture.DONE;
-			}
-		};
+            }
+		});
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step, true);
 		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{

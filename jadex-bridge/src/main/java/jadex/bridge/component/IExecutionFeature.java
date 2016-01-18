@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  The execution feature allows to schedule steps
@@ -96,4 +97,24 @@ public interface IExecutionFeature
 	 *  component thread.
 	 */
 	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener);
+
+	/**
+	 * Repeats a ComponentStep periodically, until terminate() is called on result future or a failure occurs in a step.
+	 * @param initialDelay delay before first execution in milliseconds
+	 * @param delay delay between scheduled executions of the step in milliseconds
+	 * @param step The component step
+	 * @return The intermediate results
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step);
+	
+	/**
+	 * Repeats a ComponentStep periodically, until terminate() is called on result future.
+	 * @param initialDelay delay before first execution in milliseconds
+	 * @param delay delay between scheduled executions of the step in milliseconds
+	 * @param step The component step
+	 * @param ignorefailures Don't terminate repeating after a failed step.
+	 * @return The intermediate results
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step, boolean ignorefailures);
+	
 }

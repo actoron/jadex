@@ -51,6 +51,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
+import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
@@ -64,7 +65,10 @@ import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
 
 /**
@@ -257,6 +261,83 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			wakeup();
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 * Repeats a ComponentStep periodically, until terminate() is called on result future or a failure occurs in a step.
+	 * @param initialDelay delay before first execution in milliseconds
+	 * @param delay delay between scheduled executions of the step in milliseconds
+	 * @param step The component step
+	 * @return The intermediate results
+	 */
+	@Override
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step)
+	{
+		return repeatStep(initialDelay, delay, step, false);
+	}
+	
+	/**
+	 * Repeats a ComponentStep periodically, until terminate() is called on result future.
+	 * @param initialDelay delay before first execution in milliseconds
+	 * @param delay delay between scheduled executions of the step in milliseconds
+	 * @param step The component step
+	 * @param ignorefailures Don't terminate repeating after a failed step.
+	 * @return The intermediate results
+	 */
+	@Override
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step, boolean ignorefailures)
+	{
+		final MutableObject<Boolean>	stillRepeating	= new MutableObject<Boolean>(true);
+		
+		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<T>(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				stillRepeating.set(Boolean.FALSE);
+			}
+		});
+		
+		// schedule the initial step
+		waitForDelay(initialDelay, step)
+			.addResultListener(new IResultListener<T>()
+		{
+			@Override
+			public void resultAvailable(T result)
+			{
+				ret.addIntermediateResult(result);
+				proceed();
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				if(ignorefailures)
+				{
+					proceed();
+				}
+				else
+				{
+					ret.setException(exception);
+				}
+			}
+			
+			private void proceed()
+			{
+				if (Boolean.TRUE.equals(stillRepeating.get()))
+				{
+					// reschedule this step if we're still repeating
+					waitForDelay(delay, step)
+						.addResultListener(this);
+				}
+				else
+				{
+					ret.setFinished();
+				}
+			}
+		});
 		
 		return ret;
 	}
