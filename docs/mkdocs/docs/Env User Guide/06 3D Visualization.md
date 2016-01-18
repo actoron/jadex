@@ -24,11 +24,11 @@ Coordinate System
 The coordinate system consists of:
 
 -   The origin, a single point in space.
-    -   This point is always at coordinate (0,0,0)
+    - This point is always at coordinate (0,0,0)
 -   Three coordinate axes that are mutually perpendicular, and meet in the origin.
-    -   The X axis is "right/left"
-    -    The Y axis is "up/down"
-    -   The Z axis is "towards you/away from you"
+    - The X axis is "right/left"
+    -  The Y axis is "up/down"
+    - The Z axis is "towards you/away from you"
 
 ![](3dkoord.png)
 

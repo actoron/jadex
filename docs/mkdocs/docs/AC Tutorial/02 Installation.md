@@ -21,26 +21,22 @@ In this lesson you will set up an initial eclipse environment that will be used 
 
 Start eclipse. Start the 'New Java Project' wizard, disable the 'Use default location' checkbox and browse to the directory, where you unpacked the Jadex distribution. Note that the name of the directory might slightly differ due to changing Jadex version numbers.
 
-![02 Installation@eclipseprojectcreate.png](eclipseprojectcreate.png)
-
+![02 Installation@eclipseprojectcreate.png](eclipseprojectcreate.png)  
 *Create Java project in eclipse*
 
 Click 'Finish' - the project will be created. Your project should now look like the picture below. 
 
-![02 Installation@eclipseprojectfinal.png](eclipseprojectfinal.png)
-
+![02 Installation@eclipseprojectfinal.png](eclipseprojectfinal.png)  
 *Final Jadex eclipse project layout*
 
 Note that depending on your eclipse configuration, the 'Referenced Libraries' node might by hidden and instead the jars from the lib folder will be displayed as direct child of the project. If you wish, you can change the appearence in the explorer menu by (de)selecting the "Show 'Referenced Libraries' Node" checkbox.
 
-![02 Installation@eclipseexplorermenu.png](eclipseexplorermenu.png)
-
+![02 Installation@eclipseexplorermenu.png](eclipseexplorermenu.png)  
 *Show/hide the 'Referenced Libraries' node*
 
 This project will be used as a basis for your own development projects. To make the Jadex libraries accessible to other projects it is necessary in eclipse to export them. Right-click on the project, choose 'Build Path -&gt; Configure Build Path...'. Go to the 'Order and Export' tab, choose 'Select All' and hit 'OK'.
 
-![02 Installation@eclipsebuildpathexport.png](eclipsebuildpathexport.png)
-
+![02 Installation@eclipsebuildpathexport.png](eclipsebuildpathexport.png)  
 *Export jars from build path*
 
 For further simplifying later development, you should attach the sources to the Jadex jars, as this will enable eclipse to provide better context sensitive help on method signatures, etc. Open the 'Referenced Libraries' node (if shown) and the 'jadex-applications-micro-2.0-rc7.jar'. In the 'jadex.micro.examples.helloworld' package double click on the 'HelloWorldAgent.class' file. The file will be opened, showing the reverse engineered byte code. Click the 'Attach Source...' button, choose 'Workspace...' and select the 'sources.zip' file contained in the Jadex project. Click 'OK'. The Java source of the hello world agent should now be displayed. Repeat these steps for the other Jadex jars. It is recommended for this tutorial to add the sources at least to the 'jadex-bridge', 'jadex-commons', 'jadex-kernel-micro' jars.
@@ -53,8 +49,7 @@ In this lesson we will create a launch configuration to start the Jadex platform
 
 As we imported the Jadex distribution in lesson A1, we are almost ready to go. Right-click on the Jadex eclipse project and choose 'Run As' &gt; 'Java Application' from the popup menu. Eclipse will search for main types, i.e. startable Java classes (with a *main()* method). Select *Starter* from the package *jadex.base* in the appearing dialog (just entering an 's' will probably be enough to find the starter class easily in the list).
 
-![02 Installation@eclipsemainclass.png](eclipsemainclass.png)
-
+![02 Installation@eclipsemainclass.png](eclipsemainclass.png)  
 *Select main class for starting Jadex*
 
 
@@ -68,14 +63,12 @@ The JCC has its own way (distinct from eclipse) of loading and saving settings. 
 
 To execute any applications you need to add the corresponding path to the JCC project. We will now set up the platform for starting some examples. Right-click in the upper left area (called the model explorer, as it is used to browse for models of e.g. processes) and choose 'Add Path'.
 
-![02 Installation@jccaddpath.png](jccaddpath.png)
-
+![02 Installation@jccaddpath.png](jccaddpath.png)  
 *Add path in JCC*
 
 A file requester appears that should initially present the directory, where you unpacked the Jadex distribution. Open the *lib* directory and select the file *jadex-applications-micro-2.0-rc7.jar*. Note that depending on your Jadex version the '2.0-rc7' part might slightly differ in your setting. You can now unfold the contents of the jar file and browse to the helloworld example in the *jadex/examples* package. After you selected the *HelloWorldAgent.class* in the tree, you can start the process by clicking 'Start'.
 
-![02 Installation@jccstartmodel.png](jccstartmodel.png)
-
+![02 Installation@jccstartmodel.png](jccstartmodel.png)  
 *Start a component*
 
 
@@ -104,14 +97,12 @@ Create a new Java project in eclipse. Choose a name as you like (e.g. 'tutorial'
 
 Add a reference to the project with the Jadex distribution. To do so, right-click on the tutorial project and select 'Build Path -&gt; Configure Build Path...'. In the 'Projects' tab click 'Add...', check the 'jadex-2.0-rc7' checkbox and hit 'OK'. Close the build path window by hitting 'OK' again.
 
-![02 Installation@eclipsebuildpath.png](eclipsebuildpath.png)
-
+![02 Installation@eclipsebuildpath.png](eclipsebuildpath.png)  
 *Add project dependency*
 
 Now change the launch configuration to start from the newly created project. Therefore, choose the 'Run -&gt; Run Configurations...' menu. Right-click the 'Starter' configuration and choose 'Duplicate'. Change 'Starter (1)' to a more telling name of your choice (e.g. 'Start Jadex Tutorial Platform'). In the 'Main' tab select 'Browse...' besides the project textfield and choose your 'tutorial' project. Select 'Run' to save the launch configuration and start the platform.
 
-![02 Installation@eclipselaunchconfig.png](eclipselaunchconfig.png)
-
+![02 Installation@eclipselaunchconfig.png](eclipselaunchconfig.png)  
 *Create Jadex launch configuration in eclipse*
 
 ### Jadex Setup
@@ -140,8 +131,7 @@ This exercise describes an alternative way of setting up a Jadex project for dev
 -   Enter the plugin URL [http://download.eclipse.org/technology/m2e/releases ]()  (for newer eclipse versions, the Maven plugin is available from the default, e.g. Juno, eclipse update site)
 -   Select "Maven Integration for Eclipse" and install the plugin.
 
-![02 Installation@mvninstall.png](mvninstall.png)
-
+![02 Installation@mvninstall.png](mvninstall.png)  
 *Install the m2eclipse plugin*
 
 
@@ -150,20 +140,17 @@ This exercise describes an alternative way of setting up a Jadex project for dev
 
 -   Use "File -&gt; Import -&gt; Maven / Existing Maven Projects" and choose "Next".
 
-![02 Installation@mvnimport1.png](mvnimport1.png)
-
+![02 Installation@mvnimport1.png](mvnimport1.png)  
 *Import maven project (1)*
 
 -   "Browse..." to the directory where you unzipped the jadex-example-project.zip. Maven will detect the project, which is described in the 'pom.xml' file.
 
-![](mvnimport2.png)
-
+![](mvnimport2.png)  
 *Import maven project (2)*
 
 -   Click "Finish". Maven will import the project and start the build process thereby download the necessary Jadex libraries from the web.
 
-![](eclipsemavenproject.png)
-
+![](eclipsemavenproject.png)  
 *Imported example project in eclipse*
 
 

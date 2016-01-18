@@ -273,7 +273,7 @@ ServiceOutputConnection ocon = new ServiceOutputConnection();
 ```
 
 
-<!-- -->
+
 
 -   Fetch the corresponding input connection using\
     
@@ -282,7 +282,7 @@ IInputConnection icon = con.getInputConnection();
 ```
 
 
-<!-- -->
+
 
 -   Call the service method and provide the input connection\
     
@@ -291,7 +291,7 @@ service.m1(icon)
 ```
   
 
-<!-- -->
+
 
 -   Start writing data to the output connection. This can be performed manually by calling\
     

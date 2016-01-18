@@ -56,7 +56,7 @@ For a quick start, use the example project *jadex-android-clientapp-example-mave
 -   choose *File -&gt; Import -&gt; Maven -&gt; Existing Maven Projects*
 -   select your workspace folder, select the *jadex-android-clientapp-example-maven* directory and click *next* / *finish* until import is completed
 
-<!-- -->
+
 
 -   to build the project with maven **which is required as of jadex-android-2.4**, use the included launch config *Build clientapp example* 
 -   to run the maven build, use the included launch config *Run clientapp example* which will deploy and run the project on any android devices plugged in or emulators running.

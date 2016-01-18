@@ -51,7 +51,7 @@ public class EnglishGermanTranslationPlanB1 extends Plan {
     &lt;p/&gt;\
     **Add the plan to the agent by putting it into the agent definition file:**
 
-<!-- -->
+
 
 -   Therefore, a new plans section is introduced, in which all plans for the agent have to be declared. In this simple example only one plan named here "egtrans" is added. As part of the plan the Java class name for the plan body is stated. Additionally, the plan's waitqueue is declared to handle all message events of type "request\_translation". This means that the plan has its own event waitqueue in which all matching events are dispatched, even when the plan is busy and currently waits for other events. These events are collected in its queue till it calls a suitable *waitFor()* matching one of the collected events. In this case this collected event is directly dispatched to the plan.
 -   The plan should be started when the agent is born. For this purpose a configuration has to be declared within the ADF. It is sufficient in this case to define one configuration (named "default") with an initial plan. The initial plan simply references the plan for which an instance should be created.
@@ -100,7 +100,7 @@ public class EnglishGermanTranslationPlanB1 extends Plan {
 ```
 
 
-**Start and test the agent**\\\
+### Starting and testing the agent\\\
 &lt;p/&gt;\
 Create a translation agent via the Control Center and observe the standard output, if the initial plan is created at startup. Use the Conversation Center (in new Jadex versions the conversation center needs to be activated via popup menu on the toolbar, see [Tool Guide](../AC%20Tool%20Guide/02%20JCC%20Overview) ) to send a translation request to the TranslationAgent by setting the performative to *request* and the content to some word to translate. Observe the TranslationAgent's output on the console when it receives the request.
 
@@ -116,7 +116,7 @@ In constrast to the last exercise we will now use a passive plan to react on tra
     &lt;p/&gt;\
     **Modify the copied file TranslationB2.agent.xml**\\
 
-<!-- -->
+
 
 -   Replace all occurrences of "B1" in the ADF file with "B2"
 -   Modify the plan declaration in the ADF by removing the configurations section. Additionally a passive plan needs a trigger, that specifies under what circumstances a new plan instance is created. Therefore remove the waitqueue statement and add a new statement for the plan trigger:
@@ -131,7 +131,7 @@ In constrast to the last exercise we will now use a passive plan to react on tra
 ```
 
 
-**Start and test the agent**\\\
+### Starting and testing the agent\\\
    \
 Start the agent as explained in the preceding exercise. Observe that a new instance of the translation plan is created everytime an appropriate event arrives. The passive plan is instantiated and each instance processes a different message event. Many different plan instances may remain active while processing their triggers.
 
@@ -148,7 +148,7 @@ Create the files EnglishGermanTranslationPlanB3.java and TranslationB3.agent.xml
     &lt;p/&gt;\
     **Modify the copied file TranslationB3.agent.xml to include the new plan parameter**\\
 
-<!-- -->
+
 
 -   Add the new plan parameter with a message event mapping to the ADF:
 
@@ -168,7 +168,7 @@ Create the files EnglishGermanTranslationPlanB3.java and TranslationB3.agent.xml
 ```
 
 
-**Start and test the agent**\\\
+### Starting and testing the agent\\\
 Test and verify that the agent behavior is the same as in the last exercise.
 
 Exercise B4 - Plan Selection
@@ -292,7 +292,7 @@ public static boolean containsWord(String name) {
 ```
 
 
-**Start and test the agent**\\\
+### Starting and testing the agent\\\
 &lt;p/&gt;\
 When the agent receives translation request it searches applicable plans to handle this request. If the word is contained in the dictionary both plans are applicable and the one with the higher priority is chosen (in this case it is the egtrans plan because the standard priority is 0). When the word is not contained in the dictionary only the searchonline plan is applicable and will be used.
 
@@ -334,7 +334,7 @@ In this exercise we will use log-outputs instead of directly printing console ou
     &lt;p/&gt;\
     **Modify the copied file TranslationB3.agent.xml**
 
-<!-- -->
+
 
 -   Add an imports section and the import statement for the java.logging classes to the imports section:
 
@@ -363,7 +363,7 @@ In this exercise we will use log-outputs instead of directly printing console ou
 
 These properties can be used to control the agent logging. The log-level decides what kind of log-outputs shall be considered for logging, according to the java.util.logging level hierarchy. Increasing the level value, e.g. to warning means, that only log-outputs at this or a higher level are conisdered by the logger. The useParentHandlers property can be used to turn on or off the standard console logging handler (per default it is set to true).&lt;br/&gt;\
 &lt;p/&gt;\
-**Start and test the agent**\\\
+### Starting and testing the agent\\\
 Start the translation agent. Send a translation request to the translation agent and watch the console and logger output. To turn off the console output simply set the property useParentHandlers in the ADF to false.
 
  END MACRO: html

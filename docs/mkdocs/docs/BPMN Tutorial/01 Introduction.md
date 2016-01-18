@@ -6,9 +6,9 @@ Currently, with BPMN and GPMN two workflow types are supported. Both workflow ty
 
 This tutorial provides step-by-step instructions for learning how to use the Jadex process infrastructure and BPMN modelling features. You will learn how to install and use the process infrastructure (i.e. the Jadex platform) for executing modelled processes and how to install and use the extended eclipse BPMN modeller tool. In particular, the following topics are covered in the upcoming chapters:
 
--   Chapter \[02 Installation\] describes the steps necessary to install and run the Jadex process engine and modelling tools.
--   Chapter \[03 Basic Processes\] illustrates how to use the editor and platform to create and execute simple processes.
--   Chapter \[04 Data and Parameters\] covers how data can be accessed from and passed between process activities.
--   Chapter \[05 Events and Messages\] shows how to react to and issue events as well as send and receive messages.
--   Chapter \[06 Custom Functionality\] describes the various ways to extend Jadex BPMN with custom functionality.
+-   [Installation](02 Installation) describes the steps necessary to install and run the Jadex process engine and modelling tools.
+-   [Basic Processes](03 Basic Processes) illustrates how to use the editor and platform to create and execute simple processes.
+-   [Data and Parameters](04 Data and Parameters) covers how data can be accessed from and passed between process activities.
+-   [Events and Messages](05 Events and Messages) shows how to react to and issue events as well as send and receive messages.
+-   [Custom Functionality](06 Custom Functionality) describes the various ways to extend Jadex BPMN with custom functionality.
 

@@ -139,7 +139,7 @@ agent.getServiceContainer().getRequiredService("regservice")
 ```
 
 
-- Create a second component definition by copying the first one and change the component *name* to chatter2 as well as the *nickname* to Franz.
+-   Create a second component definition by copying the first one and change the component *name* to chatter2 as well as the *nickname* to Franz.
 
 ### Verify the component behavior
 
@@ -154,8 +154,8 @@ In this small lecture we will create the registry component on demand, i.e. when
 
 ## Defining the chat composite component
 
-- Create the component xml file called *ChatE4.component.xml* by copying the content from *ChatE3.component.xml*.
-- Delete the registry component definition, i.e. the following line:
+-   Create the component xml file called *ChatE4.component.xml* by copying the content from *ChatE3.component.xml*.
+-   Delete the registry component definition, i.e. the following line:
 
 
 ```xml
@@ -164,7 +164,7 @@ In this small lecture we will create the registry component on demand, i.e. when
 
 ```
 
-- We change the required service binding of both chat component instance definitions to look like the following:
+-   We change the required service binding of both chat component instance definitions to look like the following:
 
 
 ```xml
@@ -219,9 +219,9 @@ else
 
 ### Defining the chat composite component
 
-- Create the component xml file called *ChatE5.component.xml* by copying the content from *ChatE3.component.xml*.
-- Change the componenttype definition of the chatagent to *tutorial.ChatE5Agent.class*
-- Add an argument in the component instance argument section for the *partner* attribute. For the first chat agent with name *Hans* the partner should be *Franz* and for the second chat agent vice versa.
+-   Create the component xml file called *ChatE5.component.xml* by copying the content from *ChatE3.component.xml*.
+-   Change the componenttype definition of the chatagent to *tutorial.ChatE5Agent.class*
+-   Add an argument in the component instance argument section for the *partner* attribute. For the first chat agent with name *Hans* the partner should be *Franz* and for the second chat agent vice versa.
 
 ### Verify the component behavior
 

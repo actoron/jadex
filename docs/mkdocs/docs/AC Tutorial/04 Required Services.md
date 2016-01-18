@@ -34,8 +34,7 @@ public class ChatC1Agent
 
 To understand the code it is necessary to explain the underlying concepts of the component service container. Each active component (regardless of its type) contains a service container that basically fulfills three aspects. It allows for *fetching required services*, *searching services*, and *providing services*.  In the Starter of the JCC the each component is displayed with its service container. Within the service container node the provided and required services can be seen. In the screenshot below the ChatC1 agent instance with its service container the required clock service is shown.
 
-![04 Required Services@Image2.png](Image2.png)
-
+![04 Required Services@Image2.png](Image2.png)  
 *Component tree in Starter*
 
 ## Exercise C2 - Invoking a Predefined Service
@@ -84,8 +83,7 @@ In this execise we will use another service of the platform and invoke a method 
 
 Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the IComponentManagementService interface to learn more about theses functionalities.
 
-![04 Required Services@console1.png](console1.png)
-
+![04 Required Services@console1.png](console1.png)  
 * Console snaphsot*
 
 Please note that, besides the interface type itself, the most important factor of searches and required service specifications is the search scope. It defines the area of the search and is per default set to *application*. This means that only components within the started application are considered within the search. Knowing this it becomes clear why we had to change the scope to *platform* in all lectures so far. Otherwise the search would have stopped at the application component and the platform services would not have been found. In the figure below a visual representation of search scopes is given.

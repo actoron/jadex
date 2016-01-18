@@ -4,8 +4,7 @@ This chapter will deal with aspects of how to implement and provide component se
 
 Learning how to build provided services allows building an initial version of the chat application as described in [01 Introduction](01 Introduction). The design figure is repeated below for completeness. Now that the concepts of active components and services has been introduced, you should be able to grasp some more details of this figure. First, each chat instance is represented by an active component. Second, the chat components communicate using a provided and required service called *IChatService*. Third, this service provides a method *message()* that is called on all running components, whenever a chat component whishes to send a message.
 
-![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)
-
+![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)  
 *Conceptual design of the chat application*
 
 
@@ -56,14 +55,13 @@ return ret;
 
 ```
 
-- The code of the agent body should be changed to fetch the chat services using the call *agent.getServiceContainer().getRequiredServices("chatservices")*. As result you will retrieve a *java.util.Collection* of the available chat services (at least the one our agent is offering itself). Iterate through this collection and invoke the *message* method on each service with your own component name as sender *getComponentIdentifier().getName()* and some arbitrary text as message content. 
+-   The code of the agent body should be changed to fetch the chat services using the call *agent.getServiceContainer().getRequiredServices("chatservices")*. As result you will retrieve a *java.util.Collection* of the available chat services (at least the one our agent is offering itself). Iterate through this collection and invoke the *message* method on each service with your own component name as sender *getComponentIdentifier().getName()* and some arbitrary text as message content. 
 
 ### Verify the Component Behavior
 
 Start the component and observe if it prints out the message text to the console. Then try out to start another chat agent with another name. If you didn't change the name the platform will complain that it cannot start the agent due to a naming conflict. You can activate the *Auto Generate* option in the Starter to ensure that the platform automatically creates a new component instance name for each started component. Whenever you start a new component you should see in the output that it sends a message to all existing agents. Below you can see the output that has been produced from three chat agents.
 
-![05 Provided Services@chatconsole.png](chatconsole.png)
-
+![05 Provided Services@chatconsole.png](chatconsole.png)  
 ## Exercise D2 - Chat User Interface
 
 In this lecture we will add a small graphical chat user interface. The interface will display chat messages of other chat users and allow us to send manually entered chat messages.
@@ -74,11 +72,11 @@ In this lecture we will add a small graphical chat user interface. The interface
 -   Add a field of type *JTextArea* and name it *received*. It will be used to display the received messages.
 -   Add a method *addMessage* that adds new chat messages to the content of the text area.
 -   Create a constructor with one parameter *ChatGuiD2(final IExternalAccess agent)*. The external access allows the user interface to work on the agent. In the constructor the following needs to be done:
-    -   Set the title of the chat window to the component name by calling *super(agent.getComponentIdentifier().getName())*
-    -   Create the user interface components, the *received* text area, a *JTextField* called *message* for the user to enter a message text and a *JButton* called *send* for sending messages.
-    -   Layout the gui components using some LayoutManager, e.g. using a *BorderLayout*
-    -   Show the gui by calling *pack()* and *setVisible(true)*
-    -   Add an *ActionListener* to the send button to notify the available chat services of the new message. The code should look like the following:
+    - Set the title of the chat window to the component name by calling *super(agent.getComponentIdentifier().getName())*
+    - Create the user interface components, the *received* text area, a *JTextField* called *message* for the user to enter a message text and a *JButton* called *send* for sending messages.
+    - Layout the gui components using some LayoutManager, e.g. using a *BorderLayout*
+    - Show the gui by calling *pack()* and *setVisible(true)*
+    - Add an *ActionListener* to the send button to notify the available chat services of the new message. The code should look like the following:
 
 
 ```java
@@ -174,8 +172,7 @@ After starting several chat agents you should be able to enter text messages and
 
 The figure below shows the interplay between the implemented Java classes when executing a chat component. The component is defined in the file *ChatD2Agent.java*, where the provided and required services are specified. Both specifications refer to the service interface defined in the file *IChatService.java*. The provided service annotation further specifies the service implementation *ChatServiceD2.java*. On startup, the service implementation creates a user interface as defined in *ChatGuiD2.java*. Whenever a chat message is received through the provided service interface, the *message()* method of the chat service implementation gets executed. It calls the *addMessage()* method of the user interface, such that the chat message is displayed. Moreover, when the user hits the "send" button in the gui, the gui will fetch the available chat service as specified in the required services and call the *message()* method on the remote chat services.
 
-![AC Tutorial.05 Provided Services@chatimpl.png](chatimpl.png)
-
+![AC Tutorial.05 Provided Services@chatimpl.png](chatimpl.png)  
 *Interplay between implemented Java classes inside a chat component*
 
 ## Exercise D3 - Service Interfaces
@@ -230,7 +227,7 @@ agent.scheduleStep(new IComponentStep<Void>()
 
 Use the JCC to start several chat agents. Check if the new *Profiles* button is present in the chat user interface and if hitting the button causes the profiles of currently online users to be printed out. Below a screenshot of the solution with imaginary profiles of three chatters are shown.
 
-![AC Tutorial.05 Provided Services@profiles.png](profiles.png)\
+![AC Tutorial.05 Provided Services@profiles.png](profiles.png)
  
 
 ## Exercise D4 - Service Interceptor

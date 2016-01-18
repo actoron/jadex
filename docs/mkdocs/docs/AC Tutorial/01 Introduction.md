@@ -15,8 +15,7 @@ This tutorial provides step-by-step instructions to learn how to use the Jadex a
 
 In this tutorial a simple chat application will be implemented. The chat application can be used to send messages to other users. This base functionality will be extended in the different exercises, but it is not our goal to build up a solution that combines all the extensions, because this would lead to difficulties concerning the complexity of the application. Instead this tutorial will concentrate on setting up simple components that explain the Jadex concepts step by step.
 
-![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)
-
+![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)  
 *Conceptual design of the Chat application*
 
 The figure above shows the conceptual design of the chat application. On different computers, so called 'Chat' components are running, each of which provides a graphical interface to a local user. When a user enters a new chat message (e.g. in 'Chat 1'), the message gets forwarded to all chat components in the network (e.g. 'Chat 2' and 'Chat 3).

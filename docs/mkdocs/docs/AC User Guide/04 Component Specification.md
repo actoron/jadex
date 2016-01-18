@@ -155,13 +155,13 @@ The optional service *binding* has the following options:
 *Search scopes*
 
 -   *scope*: The scope of the search (cf. also the figure above). Static constants for search scopes are available via the class RequiredServiceInfo. Currently several predefined scopes are available (*application* being the default):
-    -   *local*: Consider only service within the component itself (the one that issues the search).
-    -   *component*: Includes services of the component itself and all subcomponents. 
-    -   *application*: It is assumed that applications are directly started on the platform (not as subcomponents). The application scope includes services of all components up to the uppermost application component (the platform is excluded). Please note that currently application scope does not support distributed applications. If a distributed search is needed scope global has to used.
-    -   *platform*: This scope includes all components of the platform the component is running on.
-    -   *global*: Global scope extends platform scope towards connected remote platforms. These connected remote platforms are represented as proxy compoents on the platform. (If platform awareness is enabled these proxies are automatically created and delete as platforms are discovered or leave. Without awareness such proxy objects can be created programmatically or via the connect button in the Starter of the JCC).
-    -   *parent*: (not shown in figure) Parent scope refers to services of the parent component only. (This scope is also used for static component service connections, e.g having a component A with two subcomponents B and C, in A it should be defined (or overriden) that B uses a service of C. Then B can define a binding with parent scope and component name C to state that the service should be picked from C of its parent. An example is shown in jadex.micro.testcases.semiautomatic.compositeservice). 
-    -   *upwards*: The upwards only searches upwards from the component towards the platform, i.e. root node.
+    - *local*: Consider only service within the component itself (the one that issues the search).
+    - *component*: Includes services of the component itself and all subcomponents. 
+    - *application*: It is assumed that applications are directly started on the platform (not as subcomponents). The application scope includes services of all components up to the uppermost application component (the platform is excluded). Please note that currently application scope does not support distributed applications. If a distributed search is needed scope global has to used.
+    - *platform*: This scope includes all components of the platform the component is running on.
+    - *global*: Global scope extends platform scope towards connected remote platforms. These connected remote platforms are represented as proxy compoents on the platform. (If platform awareness is enabled these proxies are automatically created and delete as platforms are discovered or leave. Without awareness such proxy objects can be created programmatically or via the connect button in the Starter of the JCC).
+    - *parent*: (not shown in figure) Parent scope refers to services of the parent component only. (This scope is also used for static component service connections, e.g having a component A with two subcomponents B and C, in A it should be defined (or overriden) that B uses a service of C. Then B can define a binding with parent scope and component name C to state that the service should be picked from C of its parent. An example is shown in jadex.micro.testcases.semiautomatic.compositeservice). 
+    - *upwards*: The upwards only searches upwards from the component towards the platform, i.e. root node.
 -   *dynamic*: If declared as dynamic, static is default, each call to a *getRequiredService(s)* method of the service container will cause a new search. If the binding is not dynamic, the result from the first search will be cached and returned to subsequent invocations, too. In order to issue a new search for a static binding *getRequiredService(s)* can be called with the flag *rebind* set to true.
 -   *proxytype*: The proxytype defines how calls are handled on the caller side with respect to interceptors. The possible values are *raw* for direct call routing and no interceptors and *decoupled* (default) for including the decoupling interceptor. If *direct* is specififed the interceptor chain is built but the decoupling interceptor is not used. Decoupling means that a service call result is shifted back to the component thread that called the service.
 -   *create*: If enabled a component is created when no service of the given type could be found. The create flag requires the *componenttype* property to be specified in oder to know what kind of component need to be started. 
@@ -238,16 +238,16 @@ The properties of a configuration are as follows:
 *Configuration components*
 
 -   *components*: The components section allows for creating component instances of specified subcomponent types. These component instances can be customized by the follow properties:
-    -   *type*: The local component type that is one of the names of the declared subcomponent types.
-    -   *name*: The optional instance name for the component. The name can be an expression. If a number of agents is created (see next property) using *\$n* can be used as predefined expression variable that contains the current number of the instance. 
-    -   *number*: The number of components that should be started. The number is allowed to be a Java expression.
-    -   *configuration*: The configuration name the subcomponent will be started with. 
-    -   *suspend*: If set to true the subcomponent will be started in suspended mode.
-    -   *master*: If set to true the subcomponent will be started as master. If a master subcomponent is terminated the parent will be terminated as well.
-    -   *daemon*: If set to true the subcomponent will be started as daemon. A daemon subcomponent will not hinder the autoshutdown of the parent component (if the parent has autoshutdown set to true).
-    -   *shutdown*: If autoshutdown is true the component counts the number of subcomponents. If the last subcomponent is terminated the parent component will be shutdowned.
-    -   *arguments*: The arguments for the subcomponent can be defined.
-    -   *required services*: Using the name of the required services the corresponding binding can be overridden. The is e.g. helpful to statically link subcomponent services with parent or peer services.
+    - *type*: The local component type that is one of the names of the declared subcomponent types.
+    - *name*: The optional instance name for the component. The name can be an expression. If a number of agents is created (see next property) using *\$n* can be used as predefined expression variable that contains the current number of the instance. 
+    - *number*: The number of components that should be started. The number is allowed to be a Java expression.
+    - *configuration*: The configuration name the subcomponent will be started with. 
+    - *suspend*: If set to true the subcomponent will be started in suspended mode.
+    - *master*: If set to true the subcomponent will be started as master. If a master subcomponent is terminated the parent will be terminated as well.
+    - *daemon*: If set to true the subcomponent will be started as daemon. A daemon subcomponent will not hinder the autoshutdown of the parent component (if the parent has autoshutdown set to true).
+    - *shutdown*: If autoshutdown is true the component counts the number of subcomponents. If the last subcomponent is terminated the parent component will be shutdowned.
+    - *arguments*: The arguments for the subcomponent can be defined.
+    - *required services*: Using the name of the required services the corresponding binding can be overridden. The is e.g. helpful to statically link subcomponent services with parent or peer services.
 
 #### Services
 

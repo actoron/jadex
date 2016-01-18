@@ -48,7 +48,7 @@ public class Customer
 ```
 
 
-\\ \\
+ 
 
 For simplicity Java class should be created in the same package as the process. If you want to create the class in a different package, you need to add a corresponding import statement in the process (see below).
 
@@ -56,7 +56,7 @@ For simplicity Java class should be created in the same package as the process. 
 
 Create a new process in the same package as the customer class. Make sure to set the 'package' property of the process accordingly, otherwise the customer class can not be resolved and the process will not execute.
 
-![06 Custom Functionality@06 Custom Functionality@eclipsecustomobject.png](eclipsecustomobject.png)\\ \\
+![06 Custom Functionality@06 Custom Functionality@eclipsecustomobject.png](06%20Custom%20Functionality/06%20Custom%20Functionality-eclipsecustomobject.png) 
 
 Use a UserInteractionTask with 'name', 'gender', 'age', and 'married' as in-parameters for the 'Input Customer Data' activity. Set the types of the parameters to string, string, int, and boolean as required for the attributes of the customer Java class. Also, set some values for the parameters. This will save typing when later testing the process.
 
@@ -105,7 +105,7 @@ public class OKTask extends AbstractTask
 ```
 
 
-\\ \\
+ 
 
 To implement a simple (synchronous) task, extend the *jadex.bpmn.runtime.task.AbstractTask* class. This class defines one abstract method, that you have to implement: *doExecute(ITaskContext context, BpmnInterpreter instance)*. In this method you can put any custom functionality as required by your application, e.g. simple calculations, calling legacy systems, etc. The parameters *context* and *instance* provide access to the running process, e.g. to read or write process data.
 
@@ -115,7 +115,7 @@ The 'OKTask' first reads two parameter values from the process context, which ar
 
 We use a simple checklist process to demonstrate the custom task. The process includes three unrelated tasks that are all mapped to the new 'OKTask' implementation. The process terminates, when all requesters have been closed. The picture below shows the process and also the inclusion of the 'OKTask'.
 
-![06 Custom Functionality@eclipseparty.png](eclipseparty.png)\\ \\
+![06 Custom Functionality@eclipseparty.png](06%20Custom%20Functionality/06%20Custom%20Functionality-eclipseparty.png) 
 
 As we expect that the checklist items can be checked in any order, we do not impose ordering restrictions between the tasks, i.e. there are no flow connectors in the process. Also, because the process and the custom task implementation reside in the same package, we can simply write 'OKTask' instead of a fully qualified name like 'jadex.bpmn.tutorial.OKTask'. If you have problems ('Class OKTask not found in imports') remember to set the package property of the process accordingly.
 
@@ -144,7 +144,7 @@ public class OKTask extends AbstractTask
 ```
 
 
-\\
+
 
 The annotations provide a human readable description for the task as well as information about the task parameters, such as name, type (clazz), direction, initial value (not shown) and a description of the parameter. When you edit the party process in the BPMN editor, you will notice that this information is displayed, when the task class is selected. In addition, you have the option to add the parameters to the parameter section of the properties editor.
 
@@ -216,4 +216,4 @@ public class AsynchronousOKTask implements ITask
 ```
 
 
-\\ \\
+ 

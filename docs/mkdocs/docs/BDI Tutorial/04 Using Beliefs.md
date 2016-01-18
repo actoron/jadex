@@ -185,7 +185,7 @@ Using a belief set for storing the word-pairs and employing beliefbase queries t
 
 -   Modify the EnglishGermanTranslationPlanC2 so, that it uses a query to search the requested word in the belief set. Therefore use an expression defined in the ADF: \~this.queryword = getExpression("query\_egword");\~ (Assuming that the \~jadex.bdi.runtime.IExpression\~ queryword is declared as instance variable in the plan). To apply the query insert the following code at the corresponding place inside the plan's body method: \~String gword = (String)queryword.execute("\$eword", eword);\~
 
-<!-- -->
+
 
 -   Modify the EnglishGermanAddWordPlanC2 so, that it also uses the same query to find out, if a word pair is already contained in the belief set. Apply the query before inserting a new word pair. When the word pair is already contained log some warning message. To add a new fact to an existing belief set you can use the method: \~getBeliefbase().getBeliefSet("egwords").addFact(new jadex.commons.Tuple(eword, gword));\~
 
@@ -205,7 +205,7 @@ Using a belief set for storing the word-pairs and employing beliefbase queries t
 
 -   We don't cover the details of the query construction in this tutorial. If you are interested in understanding the details of the Jadex OQL query language, please consult the \[BDI User Guide&gt;BDI User Guide.01 Introduction\].
 
-<!-- -->
+
 
 -   Modify the ADF by defining a belief set for the wordtable. Therefore change the tag type from "belief" to "belief set" and the class from "Map" to "Tuple". Note that Tuple is a helper class that is located in jadex.commons and has to be added to the imports section if you don't specify the fully-qualified classname. Remove the old Map fact declaration and put in four new facts each surrounded by the fact tag. Put in the same values as before \~new Tuple("milk", "Milch"))\~ etc. for each fact.
 
@@ -223,7 +223,7 @@ In this exercise we will use a condition for triggering a passive plan that cong
 
 -   Create a new passive ThankYouPlanC3 that prints out a congratulation message and the actual number of processed requests. The number of processed requests will be stored in a belief called "transcnt" in the ADF. Retrieve the actual request number by getting the fact from the beliefbase with: \~int cnt = ((Integer)getBeliefbase().getBelief("transcnt").getFact()).intValue();\~
 
-<!-- -->
+
 
 -   Modify the EnglishGermanTranslationPlanC3 to count the translation requests: \~int cnt = ((Integer)getBeliefbase().getBelief("transcnt").getFact()).intValue(); getBeliefbase().getBelief("transcnt").setFact(new Integer(cnt+1));\~
 
@@ -253,11 +253,11 @@ In this exercise we will use agent arguments for the custom initialization of an
 
 -   Use the translation agent C3 as starting point and specify an agent argument in the ADF. Arguments are beliefs for which a value can be supplied from outside during the agent start-up. For declaring a belief being an agent argument simply mark it as argument by using the corresponding belief attribute \~argument="true"\~. In this case we want the belief "transcnt" being the argument. Note that only beliefs not belief sets can be used as arguments.
 
-<!-- -->
+
 
 -   Use the Starter to create instances of the new agent model. The Starter automatically displays textfields for all agent arguments and also shows the default model value (if any) that will be used when the user does not supply a value. Try entering different values into the textfield: What happens if you enter e.g. a string instead of the integer value that is needed here? 
 
-<!-- -->
+
 
 -   Start the agent with different argument values. Verfify, that the agent immediately invokes the congratulation plan if the initial number of translation requests is e.g. 10.\
     \

@@ -29,11 +29,11 @@ BPMN Process Debugger
 The BPMN process debugger comprises three views:
 
 -   **Process threads:** In Jadex, parallel execution within one BPMN workflow are described with (virtual) process threads. A process thread is characterized by the current program counter (the BPMN activity or element that gets executed next) and its own state (variable values within this thread) and execution state (if it is waiting or ready). Concretly the following properties are shown:
-    -   Process id: The unique id of the process thread.
-    -   Activity, Pool, Lane: The activity the thread wants to execute and the location of that activity with respect to the pools and lanes.
-    -   Exception: The exception instance if one has occurred during execution of the process thread.
-    -   Data: A map containing the specific variable values as name, value pairs.
-    -   Status: The current state of the thread. If it is ready the next step can be executed if it is waiting some conditional has to be met before execution can continue.
+    - Process id: The unique id of the process thread.
+    - Activity, Pool, Lane: The activity the thread wants to execute and the location of that activity with respect to the pools and lanes.
+    - Exception: The exception instance if one has occurred during execution of the process thread.
+    - Data: A map containing the specific variable values as name, value pairs.
+    - Status: The current state of the thread. If it is ready the next step can be executed if it is waiting some conditional has to be met before execution can continue.
 -   **History of steps: **In the history the executed steps and their association to the process thread that executed them are shown.
 -   **Breakpoints: **In the breakpoint list of BPMN process all its activities, gateways and events are showns.** **By selecting such an element and executing the process the debugger will suspend execution until such an element is reached.
 

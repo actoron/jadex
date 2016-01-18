@@ -1,4 +1,6 @@
-So far we have explored how BDI can be used to define the internal behaviour of an agent. In this part we move on towards multi-agent scenarios and show how a BDI agents can be made to interact with each other. The typical way for realizing interactions with active components is using services. A service is defined by an interface that determines to available methods and a service implmentation that can be either a separate class of just part of the agent itself. If you are unfamiliar with services please have a look at the active components [user guide](../AC%20User%20Guide/01%20Introduction) .
+# Using Services
+
+So far we have explored how BDI can be used to define the internal behaviour of an agent. In this part we move on towards multi-agent scenarios and show how a BDI agents can be made to interact with each other. The typical way for realizing interactions with active components is using services. A service is defined by an interface that determines to available methods and a service implmentation that can be either a separate class of just part of the agent itself. If you are unfamiliar with services please have a look at the active components [user guide](../AC User Guide/01 Introduction) .
 
 F1 - Creating a Service
 ------------------------------------
@@ -35,13 +37,7 @@ public class TranslationBDI implements ITranslationService
 
 
 -   Add two fields to the agent. First, we need the agent API that should be injected to a field called agent and that is of type BDIAgent. Second, we need the wordtable. As in previous lectures declare it with name wordtable and type Map&lt;String, String&gt;.  
-
-<!-- -->
-
 -   Add an agent init method using the @AgentCreated annotation. Create the word table in it and add some word pairs to it.
-
-<!-- -->
-
 -   Implement the interface method by just looking up the word in the map and returning it via a new future.
 
 
@@ -104,7 +100,7 @@ SServiceProvider.getServices(agent.getServiceProvider(), ITranslationService.cla
 ```
 
 
-**Start and test the agents**
+### Starting and testing the agents
 
 From the JCC, start both agents. The user interface should appear after the user agent has been started. Enter a word and press the Translate button. You should see the translated word appearing immediately in the text field below. 
 
@@ -114,9 +110,6 @@ F2 - Mapping a Service to Plans
 One of the strength of BDI is that it provides a flexible runtime execution by selecting suitable plans at runtime. This concept cannot only be used with goals but also directly with plans. This means we can created plans and just state that these plans realize a service call. In this case an incoming service call is automatically delegated to a suitable plan (checking the pre- and context conditions of the plans. Please note that only one plan is executed and no retries are performed (is this is necessary we need to map the service to a goal and not a plan as described in the next exercise).
 
 -   The interface and the user agent need no changes. Just copy them from the last exercise.
-
-<!-- -->
-
 -   In the translation agent we first need to state that we want the bdi agent to implement the translation interface via plans. This is done by declaring the implementation of the provided service to be the BDIAgent. Additionally remove the 'extends ITranslationService' part of the class definition. The interface is now only implemented indirectly via plans. Hence, also remove the translateEnglishGerman method from the agent completely.
 
 
@@ -207,7 +200,7 @@ public String internetTranslate(Object[] params)
 ```
 
 
-**Start and test the agents**
+### Starting and testing the agents
 
 Again, start both agents from the JCC. Now try out if internal as well as internet translations are displayed when entering translation requests in the gui.
 
@@ -217,9 +210,6 @@ F3 - Goal Delegation
 Sometimes, mapping a service call to goal is more appropriate than a plan. This is the case if the BDI means-end reasong should be used for executing the service call. Another advantage of a service to goal mapping is that it allows for goal delegation between different agents. This means we can just create a translation goal in the user agent and dispatch it. The goal will automatically to forwarded (as service call) to the translation agent which will reify the call to a goal and try to achieve it.
 
 -   Copy the unchanged ITranslationService interface.
-
-<!-- -->
-
 -   Create a new class called TranslationGoal representating the shared goal between both agents. For this reason we do not want to define it as inner class of one of the agents. Use the @Goal annotation to make it become a goal. Moreover, add two fields of type String: one called gword and one called eword. Make eword become a goal parameter (@GoalParameter) and gword become the goal result (@GoalResult). Add a constructor taking eword as parameter and generate getter/setter methods for both fields.
 
 
@@ -298,9 +288,6 @@ public class TranslationBDI
 
 
 -   Keep the two field definitions and the agent init method.
-
-<!-- -->
-
 -   Delete both plans and instead add a new simple method plan that reacts on the translation goal. It just looks up the word and return the translation. 
 
 
@@ -315,6 +302,6 @@ public String translatePlan(String eword)
 ```
 
 
-**Start and test the agents**
+### Starting and testing the agents
 
 Start both agents from the JCC and verify that translation requests get executed.

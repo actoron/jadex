@@ -15,18 +15,14 @@ In this chapter you will learn how to model your own processes. This chapter cov
 Exercise B1 - Creating a First Process
 ---------------------------------------------------
 
-In this lesson, you will create and execute a first process. First, start the Jadex BPMN editor using the run configuration created in the last section. The editor will automatically create a new unnamed BPMN model. To save the model under a custom name e.g. 'B1\_simple' use 'Save as' in the 'File' menu. The destination folder should be located in the Java 'src' folder of your eclipse 'bpmntutorial' project, i.e. you need to navigate to the eclipse workspace to find it. For easy reference the tutorial files are named according to the corresponding lesson, but you are free to choose a different name.  
+In this lesson, you will create and execute a first process. First, start the Jadex BPMN editor using the run configuration created in the last section. The editor will automatically create a new unnamed BPMN model. To save the model under a custom name e.g. 'B1_simple' use 'Save as' in the 'File' menu. The destination folder should be located in the Java 'src' folder of your eclipse 'bpmntutorial' project, i.e. you need to navigate to the eclipse workspace to find it. For easy reference the tutorial files are named according to the corresponding lesson, but you are free to choose a different name.  
 
 ### Jadex Project Setup
 
-The just created process can already be executed without further editing. As you have created the BPMN process using the Jadex editor, first you will have to refresh the 'bpmntutorial' project using 'refresh' from the popup menu or by selecting the project and pressing 'F5'. Now, start the Jadex platform using your existing launch configuration (see [Exercise A3](02%20Installation) ). The JCC window will appear, probably showing the example project that you created in Lesson A3. Right-click in the model explorer and choose 'Add Path'. Browse to your eclipse workspace an select the 'bin' or 'classes' folder from the eclipse project that you created in the beginning of this lesson. When you unfold the contents, you should find the package(s) that you created and the process contained within.
+The just created process can already be executed without further editing. As you have created the BPMN process using the Jadex editor, first you will have to refresh the 'bpmntutorial' project using 'refresh' from the popup menu or by selecting the project and pressing 'F5'. Now, start the Jadex platform using your existing launch configuration (see [Exercise A3](02%20Installation#exercise-a3-running-example-processes) ). The JCC window will appear, probably showing the example project that you created in Lesson A3. Right-click in the model explorer and choose 'Add Path'. Browse to your eclipse workspace an select the 'bin' or 'classes' folder from the eclipse project that you created in the beginning of this lesson. When you unfold the contents, you should find the package(s) that you created and the process contained within.
 
-![03 Basic Processes@1.png](1.png)
-
-
-
-
-
+![03 Basic Processes@1.png](03%20Basic%20Processes/03%20Basic%20Processes-1.png)
+ 
 Select your process in the tree and click the 'Start' button. You might think that nothing happens, but actually the process is instantiated and executed. The reason that you cannot observe anything is that the process does not contain activities and therefore immediately terminates without producing any output. In the next sections, you will change this and actually see some process output. Before going back to the diagram editor, you should save the JCC project ('Save Settings' in 'File' menu).
 
 ### Process Properties
@@ -58,17 +54,29 @@ Finally, you probably want to see that the process is really executed, when you 
 -   **Properties:** Properties are settings that are directly related to the BPMN element, e.g. a time duration for a timer event. Thus, all BPMN elements of the same type expose the same properties. 
 -   **Parameters:** Input and output parameters for the activity.
 
-Jadex provides some ready-to-use task implementations, which can be choosen from the drop-down list. The available contents of the list is found by scanning the class path of the editor. To include the standard Jadex task implementation we need to add the Jadex jars to the classpath of the editor. To do this, go to the 'File' menu and open the 'Settings' dialog. Switch to the 'Class Path' tab and choose 'Add Project'. Here, choose the Jadex distribution directory. The editor will automatically scan the folder structure for jars and add them to the classpath. You should see the Jadex jars in the dialog afterwards. After exiting the settings dialog you will see the editor refreshing its class cache used for the autocompletion. You can also manually start rescanning by pressing the refresh button ![03 Basic Processes@2.png](2.png) at the lower left of the editor panel. 
+Jadex provides some ready-to-use task implementations, which can be choosen from the drop-down list. 
+The available contents of the list is found by scanning the class path of the editor. 
+To include the standard Jadex task implementation we need to add the Jadex jars to the classpath of the editor.   
+To do this, go to the 'File' menu and open the 'Settings' dialog.
+Switch to the 'Class Path' tab and choose 'Add Project'. Here, choose the Jadex distribution directory. 
+The editor will automatically scan the folder structure for jars and add them to the classpath. 
+You should see the Jadex jars in the dialog afterwards.  
+After exiting the settings dialog you will see the editor refreshing its class cache used for the autocompletion.
+You can also manually start rescanning by pressing the refresh button ![03 Basic Processes@2.png](03%20Basic%20Processes/03%20Basic%20Processes-2.png) at the lower left of the editor panel. 
 
-![03 Basic Processes@3.png](3.png)
+![03 Basic Processes@3.png](03%20Basic%20Processes/03%20Basic%20Processes-3.png)
 
 
 
 You can also implement your own tasks, by writing corresponding Java classes. The available task implementations as well as how to produce your own tasks will be covered later. For this lesson, just select the 'jadex.bpmn.runtime.task.PrintTask', which allows printing some text to the console.
 
-You will see that some description text about the task is displayed. Among other things, the description tells you that this task implementation expects an input parameter 'text' of type String. To set the text that should be printed we first have to switch to the 'Parameters' tab and afterwards include the default parameters of the selected task class. This is done by clicked this button ![03 Basic Processes@4.png](4.png). Enter "The task has been executed" in the 'Initial Value' column of the parameter table. The value is entered as a Java expression, which is why you have to enclose your text in quotes. To make the process better readable, also draw a start and end event and connect them to the task. It should look like the diagram below.
+You will see that some description text about the task is displayed. Among other things, the description tells you that this task implementation expects an input parameter 'text' of type String. To set the text that should be printed we first have to switch to the 'Parameters' tab and afterwards include the default parameters of the selected task class. 
+This is done by clicked this button ![03 Basic Processes@4.png](03%20Basic%20Processes/03%20Basic%20Processes-4.png). 
+Enter "The task has been executed" in the 'Initial Value' column of the parameter table. 
+The value is entered as a Java expression, which is why you have to enclose your text in quotes. 
+To make the process better readable, also draw a start and end event and connect them to the task. It should look like the diagram below.
 
-![03 Basic Processes@5.png](5.png)
+![03 Basic Processes@5.png](03%20Basic%20Processes/03%20Basic%20Processes-5.png)
 
 
 
@@ -81,13 +89,13 @@ In this lesson you will learn how to execute tasks in sequence, i.e. one after a
 
 ### Creating Tasks and Flow Connectors
 
-Create a new BPMN diagram with a name of your choice, e.g. 'B2\_Sequence'. Create three tasks connected by flow connection arrows. Flow connection arrows have a continuous line and a solid head. There are different options to create tasks and flow connections. You can select the task or flow connection element in the palette above the diagram and add the task at the required place or draw a connection between tasks. Another way is using the input/output connectors that appear when clicking in the middle of existing elements as shown below. Just drag a connector to an empty place and select the element to be created.
+Create a new BPMN diagram with a name of your choice, e.g. 'B2_Sequence'. Create three tasks connected by flow connection arrows. Flow connection arrows have a continuous line and a solid head. There are different options to create tasks and flow connections. You can select the task or flow connection element in the palette above the diagram and add the task at the required place or draw a connection between tasks. Another way is using the input/output connectors that appear when clicking in the middle of existing elements as shown below. Just drag a connector to an empty place and select the element to be created.
 
-![03 Basic Processes@6.png](6.png)
+![03 Basic Processes@6.png](03%20Basic%20Processes/03%20Basic%20Processes-6.png)
 
 
 
-To easily observe how the different tasks are executed, change the task implementations to the PrintTask and enter some message in each of the text parameters (see last lesson for details). Execute your process using the JCC and observe the console output. You might have to refresh the model tree (e.g. by right-clicking of the folder and selecting 'Refresh' or by just pressing \[F5\]) for the new process to show up.
+To easily observe how the different tasks are executed, change the task implementations to the PrintTask and enter some message in each of the text parameters (see last lesson for details). Execute your process using the JCC and observe the console output. You might have to refresh the model tree (e.g. by right-clicking of the folder and selecting 'Refresh' or by just pressing [F5]) for the new process to show up.
 
 Exercise B3 - Parallel Activities
 ----------------------------------------------
@@ -96,9 +104,9 @@ This lesson introduces forms of parallelism in processes. Each process can execu
 
 ### Creating the Process
 
-Create a new process called, e.g. 'B3\_Parallel'. Add tasks, connectors and gateways as shown below.
+Create a new process called, e.g. 'B3_Parallel'. Add tasks, connectors and gateways as shown below.
 
-![03 Basic Processes@7.png](7.png)
+![03 Basic Processes@7.png](03%20Basic%20Processes/03%20Basic%20Processes-7.png)
 
 
 
@@ -110,7 +118,7 @@ Second, the tasks 'Task 2a I' and 'Task 2a II' are parallel tasks, because of th
 
 To see some results during the execution, you can make use of the PrintTask as in the previous lessons. You can also observe the execution of the process in the debugger. 
 
-![03 Basic Processes@8.png](8.png)
+![03 Basic Processes@8.png](03%20Basic%20Processes/03%20Basic%20Processes-8.png)
 
 
 
@@ -119,9 +127,9 @@ In the example screenshot you can see, that there are currently three control fl
 Exercise B4 - Conditional Branch
 ---------------------------------------------
 
-In this lesson, an XOR gateway is used to split the control flow into one of two branches. Therefore it is shown how to add conditions to flow connectors. Create a new BPMN diagram called, e.g., 'B4\_Choice'. Draw BPMN elements as shown in the picture.
+In this lesson, an XOR gateway is used to split the control flow into one of two branches. Therefore it is shown how to add conditions to flow connectors. Create a new BPMN diagram called, e.g., 'B4_Choice'. Draw BPMN elements as shown in the picture.
 
-![03 Basic Processes@9.png](9.png)
+![03 Basic Processes@9.png](03%20Basic%20Processes/03%20Basic%20Processes-9.png)
 
 The process simulates the toss of a coin. Either the 'Head' activity should be executed or the 'Tail' activity. Note the use of the XOR gateway to distinguish between the two cases. The expression 'Math.random() &gt; 0.5' is Java code. To enter the condition expression, first click on the upper sequence flow. This will activate the properties tab in the lower area of the editor. In this view the expression can be placed in the 'Condition' input field. 
 
@@ -140,11 +148,11 @@ The subprocess element of the BPMN editor is used to specify both types of supro
 
 ### Defining a Subprocess
 
-Draw a new process diagram as shown below. The 'Print Finished' task should be a PrintTask that prints out some finished message. Instead of drawing tasks into to subprocess (as you would do with an internal subprocess), the file name of an external diagram is specified. The 'file' property is used for this purpose. Enter the file name of another process, e.g. 'B2\_Sequence.bpmn'. 
+Draw a new process diagram as shown below. The 'Print Finished' task should be a PrintTask that prints out some finished message. Instead of drawing tasks into to subprocess (as you would do with an internal subprocess), the file name of an external diagram is specified. The 'file' property is used for this purpose. Enter the file name of another process, e.g. 'B2_Sequence.bpmn'. 
 
-![03 Basic Processes@10.png](10.png)
+![03 Basic Processes@10.png](03%20Basic%20Processes/03%20Basic%20Processes-10.png)
 
-It is useful to understand, how the file of the subprocess will be loaded at runtime. The process files are loaded from the classpath in the same way that Java loads Java classes. If you used a package for the processes, it is useful to set the package property as recommended in [Exercise B1]() . Because the B5 and B2 processes are in the same package, you do not need to fully qualify the name of the subprocess. Otherwise, you will have to write e.g. 'jadex/bpmn/tutorial/B2\_Sequence.bpmn' or add a 'jadex.tutorial.bpmn.\*' to the imports section of the outer process (in case you used jadex.bpmn.tutorial as package).
+It is useful to understand, how the file of the subprocess will be loaded at runtime. The process files are loaded from the classpath in the same way that Java loads Java classes. If you used a package for the processes, it is useful to set the package property as recommended in [Exercise B1](03 Basic Processes#exercise-b1-creating-a-first-process) . Because the B5 and B2 processes are in the same package, you do not need to fully qualify the name of the subprocess. Otherwise, you will have to write e.g. 'jadex/bpmn/tutorial/B2_Sequence.bpmn' or add a 'jadex.tutorial.bpmn.*' to the imports section of the outer process (in case you used jadex.bpmn.tutorial as package).
 
 ### Execute the Process
 

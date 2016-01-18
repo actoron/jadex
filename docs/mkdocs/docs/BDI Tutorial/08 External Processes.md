@@ -205,4 +205,4 @@ client.close();
 ```
 
 
-**Start and test the agent**\\ Start the agent and open a browser to issue translation request. This can be done by entering the server url and appending the word to translate, e.g. http://localhost:9099/dog. ](http://localhost:9099/dog.)  The result should be printed out in the returned web page.
+### Starting and testing the agent\\ Start the agent and open a browser to issue translation request. This can be done by entering the server url and appending the word to translate, e.g. http://localhost:9099/dog. ](http://localhost:9099/dog.)  The result should be printed out in the returned web page.

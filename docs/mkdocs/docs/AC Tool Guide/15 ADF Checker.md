@@ -18,22 +18,22 @@ The plugin should work with Eclipse 3.5 or later. It has been tested on Eclipse 
 The plugin requires that all Jadex libraries, which are used in the project, are available in the project's build path, e.g. as referenced libraries or as maven dependencies. The ADF checker uses whatever version of Jadex is in the build path for loading the ADFs. Therefore, you can choose the Jadex version that you want to use yourself. Due to some changes in the Jadex code base, not all file types are supported for all recent Jadex versions:
 
 -   Jadex 2.0 final
-    -   **.component.xml** supported, but no extensions
-    -   **.application.xml** supported
-    -   **.bpmn** supported
-    -   **.gpmn** not supported
-    -   **.agent.xml** not supported
-    -   **.capability.xml** not supported
+    - **.component.xml** supported, but no extensions
+    - **.application.xml** supported
+    - **.bpmn** supported
+    - **.gpmn** not supported
+    - **.agent.xml** not supported
+    - **.capability.xml** not supported
 
-<!-- -->
+
 
 -   Jadex 2.1-SNAPSHOT or later (nightly build or maven snapshot from 02/2012 or newer)
-    -   **.component.xml** supported
-    -   **.application.xml** supported
-    -   **.bpmn** supported
-    -   **.gpmn** supported
-    -   **.agent.xml** supported
-    -   **.capability.xml** supported
+    - **.component.xml** supported
+    - **.application.xml** supported
+    - **.bpmn** supported
+    - **.gpmn** supported
+    - **.agent.xml** supported
+    - **.capability.xml** supported
 
 Installation
 -------------------------

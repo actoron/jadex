@@ -118,7 +118,7 @@ In this exercise we will extend the translation agent by making it capable to fi
     this.queryfind = createExpression(find, new String\[\]{"\$gword", "\$eword"}, new Class\[\]{String.class, String.class});\
     {code}
 
-<!-- -->
+
 
 -   In the body method, search for synonyms when the message format is correct, what means that the request has exactly three tokens. Use a \~StringTokenizer\~ to parse the request and apply the translation query on the the given English word. When a translation was found, use the result to apply the query find for searching for synonyms. Create a reply and send back the found synonyms as an inform message in the success case and a failure message with a failure reason in the error case. The following code snippet outlines how the second query can be realized (eword is the English word for which synonyms are searched, gword is the German translation of the given English word):
 

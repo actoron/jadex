@@ -67,7 +67,7 @@ IInternalEvent event = waitForInternalEvent("gui\_update");\
     event.getParameter("content").getValue();\
     {code}     
 
-<!-- -->
+
 
 -   In addition the plan's aborted method can be used to close the gui automatically when the agent is terminated:\
     {code:java}\
@@ -82,7 +82,7 @@ IInternalEvent event = waitForInternalEvent("gui\_update");\
     }\
     {code}
 
-<!-- -->
+
 
 -   Modify the EnglishGermanTranslationPlanF1 so that it produces an internal event after translation processing:
 
@@ -96,7 +96,7 @@ dispatchInternalEvent(event);\
 
 -   The addword plan and event declarations are not used and can be removed for clarity.
 
-<!-- -->
+
 
 -   Modify the ADF so, that it contains the declaration for the new gui plan without specifying a trigger:
 

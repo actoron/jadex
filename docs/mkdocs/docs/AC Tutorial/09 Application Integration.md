@@ -14,14 +14,14 @@ Starting a platform with standard arguments is very easy using the *createPlatfo
 
 ### Write a Main Class
 
-- Create a new java class file named *MainH1.java*.
-- In the class add a main method, i.e. a method with the following signature:
+-   Create a new java class file named *MainH1.java*.
+-   In the class add a main method, i.e. a method with the following signature:
 
 ```java
 public static void main(String[] args)
 ```
 
--  as explained above, place the following code in the method body:
+-    as explained above, place the following code in the method body:
 
 ```java
 
@@ -37,8 +37,7 @@ System.out.println("Started platform: "+platform.getComponentIdentifier());
 
 For starting the newly written class as a Java program in eclipse, right-click in the editor and choose *Run As -&gt; Java Application*.
 
-![09 Application Integration@runas.png](runas.png)
-
+![09 Application Integration@runas.png](runas.png)  
 * Starting a Java application from eclipse*
 
 If everything is OK the JCC should appear. In addition to the normal Jadex outputs you should also see the 'Started platform: ...' line that was printed from the above code.
@@ -54,8 +53,7 @@ You may have noticed in the previous exercise, that the *args* parameter of the 
 -   Open the run configuration created in the previous exercise (e.g. right-click in editor and choose  *Run As -&gt; Run Configurations...*).
 -   Change to the *Arguments* tab and add the line '-gui false'.
 
-![09 Application Integration@arguments.png](arguments.png)
-
+![09 Application Integration@arguments.png](arguments.png)  
 * Changing launch arguments in eclipse*
 
 -   Run the application and check, that the JCC does not appear.
@@ -207,14 +205,12 @@ When you develop with eclipse you are almost done, because eclipse allows export
 -   In the appearing dialog choose *Java -&gt; Runnable JAR File* and hit *Next &gt;* (see image for step 1).
 -   In the next dialog, choose your launch configuration to be exported, the target file name and specify the library handling (see image for step 2).
 
-![09 Application Integration@export1.png](export1.png)
-
+![09 Application Integration@export1.png](export1.png)  
 *Exporting a jar file (step 1)*
 
 In the second step as shown below you can specify the way the dependencies of the application are exported. Your application depends on the jars from the Jadex distribution. You can either extract, package, or copy the required libraries. Extraction means that classes and support files from the dependency jars are extracted and repackaged directly in the newly produced jar file. For packaging, the dependent jar files are kept unchanged but are included in the new jar file, such that as before only one output file is produced. In the last option 'copy' the dependencies are stored in a separate folder besides the generated jar. Which option you choose is mostly a matter of taste.
 
-![09 Application Integration@export2.png](export2.png)
-
+![09 Application Integration@export2.png](export2.png)  
 *Exporting a jar file (step 2)*
 
 -   Export your application with the chosen options.
@@ -242,8 +238,7 @@ java -classpath "<path to jadex launch jar>:bin" tutorial.MainH4
 -   Of course in bith scripts you have to change the path to the Jadex launch jar to the actual value on your system and also change the package, if your package is not name 'tutorial'.
 -   The scripts assume that your compiled classes are in the *bin* directory, which is the default for eclipse. Your directory structure should look like the following:
 
-![09 Application Integration@script.png](script.png)
-
+![09 Application Integration@script.png](script.png)  
 *Location of start scripts*
 
 -   Launch your start script (from a console or by double clicking it in the windows explorer or a linux file browser).

@@ -39,8 +39,7 @@ For this exercise, remove the security annotations from the chat service interfa
 
 At startup, each Jadex platform prints out the platform as stored in its *.settings.xml*. Find the password of the second platform in the console. Go to the starter panel in the JCC of the first platform, unfold the *platforms* node and right-klick on the node of the second platform (see below).
 
-![](set_password.png)
-
+![](set_password.png)  
 *Entering a password for a remote platform*
 
 Enter the password of the second platform in the appearing dialog. The first platform should now be able to access all services of the second platform. As a result, the node of the second platform will change its color to green. Repeat the process by entering the first platform's password in the second platform's JCC. Now the two chat components should be able to communicate with each other.
