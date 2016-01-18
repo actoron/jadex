@@ -287,11 +287,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 * @return The intermediate results
 	 */
 	@Override
-	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step, boolean ignorefailures)
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, final long delay, final IComponentStep<T> step, final boolean ignorefailures)
 	{
 		final MutableObject<Boolean>	stillRepeating	= new MutableObject<Boolean>(true);
 		
-		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<T>(new TerminationCommand()
+		final SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<T>(new TerminationCommand()
 		{
 			@Override
 			public void terminated(Exception reason)
