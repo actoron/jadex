@@ -1,4 +1,4 @@
-1 Chapter 1 - Introduction
+# 1 Chapter 1 - Introduction
 
 The Jadex Processes project aims at providing modelling and execution facilities for workflows. Main focus is on graphical forms of process representation (e.g. the Business Process Modelling Notation - BPMN) and direct execution of modelled processes (i.e. without prior code generation).
 
