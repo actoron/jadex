@@ -117,9 +117,15 @@ class PandocTask extends DockerTask {
             FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
                 def fileName = file.toFile().getName().toLowerCase()
                 if (fileName.endsWith(".png") || fileName.endsWith(".jpg")) {
-                    def targetFile = target.resolve(file.toFile().getName())
+                    def relImagePath = target.relativize(file);
+                    relImagePath = relImagePath.subpath(1,relImagePath.getNameCount());
+//                    def targetFile = target.resolve(file.toFile().getName())
+                    def targetFile = target.resolve(relImagePath);
+                    targetFile.getParent().toFile().mkdirs()
                     if (!targetFile.toFile().exists()) {
                         Files.move(file, targetFile)
+                    } else {
+                        System.err.println("File already exists: " + file + ". Duplicate file names not supported for PDF generation.")
                     }
                 } else if (file.toFile().getName().endsWith(".md")) {
                     def chapter = file.getParent().toFile().getName()
