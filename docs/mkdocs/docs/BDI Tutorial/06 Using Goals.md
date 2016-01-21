@@ -21,13 +21,13 @@ goal.getParameter("direction").setValue(dir);
 goal.getParameter("word").setValue(word);
 try
 {
-  dispatchSubgoalAndWait(goal);
-  getLogger().info("Translated from "+goal+" "+
-  word+" - "+goal.getParameter("result").getValue());
+  dispatchSubgoalAndWait(goal);
+  getLogger().info("Translated from "+goal+" "+
+  word+" - "+goal.getParameter("result").getValue());
 }
 catch(GoalFailureException e)
 {
-  getLogger().info("Word is not in database: "+word);
+  getLogger().info("Word is not in database: "+word);
 };
 ```
 
@@ -47,18 +47,18 @@ catch(GoalFailureException e)
 
 ```xml
 <plan name="egtrans">
-    <parameter name="word" class="String">
-        <goalmapping ref="translate.word"/>
-    </parameter>
-    <parameter name="result" class="String" direction="out">
-        <goalmapping ref="translate.result"/>
-    </parameter>
-    <body class="EnglishGermanTranslationPlanE1"/>
-    <trigger>
-        <goal ref="translate">
-            <match>"english_german".equals($goal.getParameter("direction").getValue())</match>
-        </goal>
-    </trigger>
+    <parameter name="word" class="String">
+        <goalmapping ref="translate.word"/>
+    </parameter>
+    <parameter name="result" class="String" direction="out">
+        <goalmapping ref="translate.result"/>
+    </parameter>
+    <body class="EnglishGermanTranslationPlanE1"/>
+    <trigger>
+		<goal ref="translate">
+            <match>"english_german".equals($goal.getParameter("direction").getValue())</match>
+        </goal>
+    </trigger>
 </plan>
 ```
      
@@ -67,7 +67,7 @@ catch(GoalFailureException e)
 
 {code:xml}
 <goals>
-    <achievegoal name="translate">
+	<achievegoal name="translate">
         <parameter name="direction" class="String"/>
         <parameter name="word" class="String"/>
         <parameter name="result" class="String" direction="out"/>
