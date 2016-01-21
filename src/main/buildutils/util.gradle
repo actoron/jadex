@@ -39,18 +39,22 @@ def isAndroidLibraryProject(project) {
     project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
 }
 
-def onVariant(project, String variantName, Closure c) {
+def onVariant(Project project, String variantName, Closure c) {
+    onAllVariants(project) {variant ->
+        if (variant.buildType.name.equals(variantName)) {
+            c(variant)
+        }
+    }
+}
+
+def onAllVariants(Project project, Closure c) {
     if (isAndroidLibraryProject(project)) {
         project.android.libraryVariants.all {variant ->
-            if (variant.buildType.name.equals(variantName)) {
-                c(variant)
-            }
+            c(variant)
         }
     } else {
         project.android.applicationVariants.all {variant ->
-            if (variant.buildType.name.equals(variantName)) {
-                c(variant)
-            }
+            c(variant)
         }
     }
 }
@@ -62,7 +66,7 @@ def onVariant(project, String variantName, Closure c) {
  * @param c callback
  * @return void
  */
-def onVariantOutput(project, String variantName, Closure c) {
+def onVariantOutput(Project project, String variantName, Closure c) {
     onVariant(project, variantName) { variant ->
         def output = variant.outputs.find({ o -> o.name.contains(variantName)})
         c(output)
@@ -301,6 +305,60 @@ def androidSdkExists() {
     return false;
 }
 
+/**
+ * Add a javadoc task to the given project.
+ * The output of the javadoc jar will be included in the project artifacts list.
+ * @param p
+ * @return
+ */
+def addJavaDocJarTask(Project p) {
+    if (isAndroidProject(p)) {
+        onAllVariants(p) {variant ->
+            def javadocTask = p.tasks.create("generate${variant.name}Javadoc", Javadoc) {
+                description "Generates Javadoc for $variant.name."
+                source = variant.javaCompile.source
+                ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
+                classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+            }
+            def javadocJar = p.tasks.create("javadoc${variant.name}Jar", Jar) {
+                classifier = 'javadoc'
+                from javadocTask
+            }
+            p.artifacts {archives javadocJar}
+        }
+    } else {
+        def javadocJar = p.tasks.create('javadocJar', Jar) {
+            classifier = 'javadoc'
+            from p.javadoc
+        }
+        p.artifacts {archives javadocJar}
+    }
+}
+
+/**
+ * Add a sources jar task to the given project.
+ * The output of the sources jar will be included in the project artifacts list.
+ * @param p
+ * @return
+ */
+def addSourcesJarTask(Project p) {
+    if (isAndroidProject(p)) {
+        onAllVariants(p) { variant ->
+            def sourcesJar = p.tasks.create("build${variant.name}SourcesJar", Jar) {
+                classifier = 'sources'
+                from p.android.sourceSets.main.java.srcDirs
+            }
+            p.artifacts {archives sourcesJar}
+        }
+    } else {
+        def sourcesJar = p.tasks.create('sourcesJar', Jar) {
+            classifier = 'sources'
+            from p.sourceSets.main.allSource
+        }
+        p.artifacts {archives sourcesJar}
+    }
+}
+
 // make functions externally visible
 
 ext {
@@ -317,4 +375,6 @@ ext {
     excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime
     addParentScopeMappings = this.&addParentScopeMappings
     getDetachedConfiguration = this.&getDetachedConfiguration
+    addJavaDocJarTask = this.&addJavaDocJarTask
+    addSourcesJarTask = this.&addSourcesJarTask
 }
