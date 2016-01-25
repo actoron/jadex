@@ -359,6 +359,98 @@ def addSourcesJarTask(Project p) {
     }
 }
 
+/**
+ * Adds maven pom metadata to an uploadTask.
+ * @param uploadTask
+ * @return
+ */
+def configurePomMetadata(Task uploadTask) {
+    uploadTask.project.afterEvaluate {
+        uploadTask.configure {
+            repositories.mavenDeployer.pom {
+                project {
+                    name uploadTask.project.name
+                    description uploadTask.project.description
+
+                    scm {
+                        url 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
+                    }
+
+                    url 'https://www.activecomponents.org'
+
+                    // beware: organization needs '=' assignment:
+                    // https://issues.gradle.org/browse/GRADLE-2719
+                    developers {
+                        developer {
+                            id 'alex'
+                            name 'Alexander Pokahr'
+                            email 'pokahr@gmx.net'
+//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/84'
+//                organization 'University of Hamburg'
+//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
+                            organization = 'Actoron GmbH'
+                            organizationUrl 'https://actoron.com/'
+                        }
+                        developer {
+                            id 'lars'
+                            name 'Lars Braubach'
+                            email 'braubach@gmx.net'
+//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/80'
+//                organization 'University of Hamburg'
+//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
+                            organization = 'Actoron GmbH'
+                            organizationUrl 'https://actoron.com/'
+                        }
+                        developer {
+                            id 'kai'
+                            name 'Kai Jander'
+                            email 'kai.jander@googlemail.com'
+//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
+//                organization 'University of Hamburg'
+//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
+                            organization = 'Actoron GmbH'
+                            organizationUrl 'https://actoron.com/'
+                        }
+                        developer {
+                            id 'julian'
+                            name 'Julian Kalinowski'
+                            email 'kalinowski@informatik.uni-hamburg.de'
+//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
+//                organization = 'Actoron GmbH'
+//                organizationUrl 'https://actoron.com/'
+                            organization = 'University of Hamburg'
+                            organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (isCommercial(uploadTask.project)) {
+        uploadTask.configure {
+            repositories.mavenDeployer.pom.project {
+                licenses {
+                    license {
+                        name 'Actoron GmbH Commercial Licence'
+                    }
+                }
+            }
+        }
+    } else {
+        uploadTask.configure {
+            repositories.mavenDeployer.pom.project {
+                licenses {
+                    license {
+                        name 'GNU GENERAL PUBLIC LICENSE Version 3 or later'
+                        url 'http://www.activecomponents.org/bin/view/Download/License'
+                        distribution 'repo'
+                    }
+                }
+            }
+        }
+    }
+}
+
 // make functions externally visible
 
 ext {
@@ -377,4 +469,5 @@ ext {
     getDetachedConfiguration = this.&getDetachedConfiguration
     addJavaDocJarTask = this.&addJavaDocJarTask
     addSourcesJarTask = this.&addSourcesJarTask
+    configurePomMetadata = this.&configurePomMetadata
 }

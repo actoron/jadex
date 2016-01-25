@@ -267,6 +267,9 @@ subprojects
 	        	if (isCommercial(project) && repo_commercial)
 	        	{
 		            mavenDeployer {
+						beforeDeployment {
+							MavenDeployment deployment -> signing.signPom(deployment);
+						}
 		                repository(url: repo_commercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
@@ -276,6 +279,9 @@ subprojects
 		        else if (repo_noncommercial)
 		        {
 		        	mavenDeployer {
+						beforeDeployment {
+							MavenDeployment deployment -> signing.signPom(deployment);
+						}
 						repository(url: repo_noncommercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
@@ -285,6 +291,7 @@ subprojects
 	        }
 	    }
     }
+	configurePomMetadata(uploadArchives)
 }
 
 // Hack, helper to generate dep-tree
