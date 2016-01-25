@@ -448,6 +448,21 @@ public class RootComponentConfiguration
 		this.model = model;
 	}
 
+	private static final String[] BOOLEAN_ARGS = {
+			WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION, PERSIST,
+			UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM, USEPASS,
+			PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT, NIOTCPTRANSPORT, RELAYTRANSPORT,
+			RELAYSECURITY, RELAYAWAONLY, SSLTCPTRANSPORT, WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
+			MONITORINGCOMP, SENSORS, DF, CLOCK, MESSAGE, SIMUL, FILETRANSFER, MARSHAL, SECURITY,
+			LIBRARY, SETTINGS, CONTEXT, ADDRESS, DHT_PROVIDE
+	};
+
+//	private static final String[] OTHER_ARGS = {
+//			JCCPLATFORMS, LOGGING_LEVEL, LIBPATH, BASECLASSLOADER, AWAMECHANISMS, AWADELAY, AWAINCLUDES,
+//			AWAEXCLUDES, NETWORKNAME, NETWORKPASS, VIRTUALNAMES, VALIDITYDURATION, TCPPORT, NIOTCPPORT ,
+//			RELAYADDRESS, SSLTCPPORT, RSPUBLISHCOMPONENT, KERNELS, THREADPOOLCLASS, CONTEXTSERVICECLASS
+//	};
+
 	/**
 	 * Kernel names enum.
 	 */
@@ -1244,17 +1259,43 @@ public class RootComponentConfiguration
 		Object publish = getValue(RSPUBLISH);
 		Object publishComponent = getValue(RSPUBLISHCOMPONENT);
 		
-//		System.out.println("publish: "+RSPUBLISHCOMPONENT+" "+publishComponent);
-		
-		if(Boolean.TRUE.equals(publish) && publishComponent == null)
+		if(Boolean.TRUE.equals(publish) && (publishComponent == null || "".equals(publishComponent)))
 		{
 			errorText.append(RSPUBLISH + " set to true, but no " + RSPUBLISHCOMPONENT + " found.");
+		}
+
+		Object kernels = getValue(KERNELS); // may need to get value from model
+		if (kernels == null || ((String) kernels).trim().isEmpty()) {
+			errorText.append("No Kernels set. Cannot start platform.");
+		}
+
+		for (String argName:BOOLEAN_ARGS) {
+			if (!isBoolean(rootargs.get(argName))) {
+				errorText.append(USEPASS + " must be a boolean value (or null), but is set to: " + getValue(USEPASS));
+			}
 		}
 
 		if(errorText.length() != 0)
 		{
 			throw new RuntimeException("Configuration consistency error: \n" + errorText.toString());
 		}
+	}
+
+	/**
+	 * Check whether value can be converted to boolean or not.
+	 * @param value
+	 * @return
+	 */
+	private boolean isBoolean(Object value) {
+		boolean result = false;
+		if (value != null) {
+			if (value instanceof Boolean) {
+				result = true;
+			}
+		} else {
+			result = true;
+		}
+		return result;
 	}
 
 	/**
