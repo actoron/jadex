@@ -2,7 +2,6 @@ import java.nio.file.Paths
 import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 
-apply plugin: 'signing'
 //apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
 apply plugin: 'maven' // use gradle install to install in local .m2 
@@ -102,10 +101,11 @@ subprojects
     def junit       = 'junit:junit:4.11'
     def allSource   = ''
 
+	apply plugin: 'signing'
 	apply plugin: 'maven'
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
-    
+
     ext.libraries = [
             android_support: "com.android.support:support-v4:23.1.0",
             android_compat: "com.android.support:appcompat-v7:23.1.0",
@@ -134,7 +134,7 @@ subprojects
         {
             apply plugin: 'android-library'
         }
-        else 
+        else
         {
             apply plugin: 'com.android.application'
         }
@@ -215,12 +215,12 @@ subprojects
         //sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
         sourceSets.test.resources.srcDirs    testSrcDir
         //sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
-        
+
         dependencies
         {
             testCompile junit
         }
-        
+
         processResources {
 			filesMatching('**/version.properties')
 			{
@@ -254,6 +254,10 @@ subprojects
 
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
+
+	signing {
+		sign configurations.archives
+	}
 
     sourceCompatibility = 1.6
     
