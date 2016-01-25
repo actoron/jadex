@@ -1,4 +1,6 @@
-dependencies 
+description 'BDIV3 Kernel that supports annotated POJOs and uses byte code manipulation for performance improvements.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-javaparser')

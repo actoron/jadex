@@ -1,4 +1,6 @@
-dependencies 
+description 'Small Java annotation-based event-condition-action rule engine.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-javaparser')

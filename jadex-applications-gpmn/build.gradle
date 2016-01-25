@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex micro applications package contains several example applications, benchmarks and testcases using micro agents.'
+
+dependencies
 {
 	compile project(':jadex-kernel-gpmn')
 }

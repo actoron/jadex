@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex BDI V3 applications package contains several example applications, benchmarks and testcases using BDI V3 agents.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')

@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex kernel extension envsupport allows for using 2D spaces in concert with components.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')

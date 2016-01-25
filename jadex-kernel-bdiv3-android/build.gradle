@@ -1,4 +1,6 @@
-dependencies 
+description 'BDIV3 kernel for Jadex-Android.'
+
+dependencies
 {
     compile project(':jadex-kernel-bdiv3')
     compile project(':jadex-android-commons')

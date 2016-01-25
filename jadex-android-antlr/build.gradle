@@ -1,3 +1,5 @@
+description 'ANTLR runtime libraries for android'
+
 dependencies
 {
 }

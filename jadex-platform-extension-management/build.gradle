@@ -1,4 +1,6 @@
-dependencies 
+description 'Services that allow spawning new platforms and updating running platforms to new versions.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-bridge')

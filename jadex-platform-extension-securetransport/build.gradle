@@ -1,4 +1,6 @@
-dependencies 
+description 'Message transport protocols supporting encryption and authentication.'
+
+dependencies
 {
 	compile project(':jadex-platform')
 }

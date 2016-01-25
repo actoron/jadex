@@ -1,4 +1,6 @@
-dependencies 
+description 'Standalone server application for Jadex relay.'
+
+dependencies
 {
 	compile project(':jadex-platform-extension-relay')
 }

@@ -1,4 +1,6 @@
-dependencies 
+description 'The server distribution of the Jadex middleware includes useful modules for running server side jadex applications.'
+
+dependencies
 {
 	compile project(':jadex-distribution-minimal')
 	compile project(':jadex-model-bpmn')

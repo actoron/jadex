@@ -1,3 +1,5 @@
+description 'Servletfilter Web-App.'
+
 apply plugin: 'war'
 apply plugin: 'eclipse-wtp'
 

@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex applications Java 8 package contains several example applications using Java 8 language features.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-bridge')

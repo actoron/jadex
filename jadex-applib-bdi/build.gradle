@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex applib BDI package contains ready to use functionalities for BDI agents mostly in form of modules called capabilities.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-bridge')

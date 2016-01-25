@@ -1,4 +1,6 @@
-dependencies 
+description 'The pro distribution of the Jadex middleware includes all modules of the standard distribution plus several extra modules not available as open source.'
+
+dependencies
 {
 	compile project(':jadex-distribution-standard')
 	compile project(':jadex-platform-extension-maven')

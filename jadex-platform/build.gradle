@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex platform package contains implementations of platform services as well as the platform component itself.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')

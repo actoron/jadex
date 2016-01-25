@@ -1,4 +1,6 @@
-dependencies 
+description 'Performance tests'
+
+dependencies
 {
 	compile project(':jadex-integration-test')
 	compile project(':jadex-applications-micro')

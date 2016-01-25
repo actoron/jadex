@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex tools bpmn package contains JCC plugins for Jadex BPMN components.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-bridge')

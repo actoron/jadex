@@ -1,4 +1,6 @@
-dependencies 
+description 'Jadex bridge is a base package for kernels and platforms, i.e. it is used by both and provides commonly used interfaces and classes for active components and their management.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-javaparser')

@@ -1,4 +1,6 @@
-dependencies 
+description 'Common security support classes.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile 'com.madgag.spongycastle:core:1.54.0.0'

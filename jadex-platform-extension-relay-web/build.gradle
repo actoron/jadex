@@ -1,3 +1,5 @@
+description 'Web-App server application for Jadex relay.'
+
 apply plugin: 'war'
 //apply plugin: 'eclipse-wtp'
 

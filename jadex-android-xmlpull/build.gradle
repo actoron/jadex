@@ -1,3 +1,5 @@
+description 'This Project includes a variant of the Jadex XML Parser that uses the Android XML Pull API.'
+
 dependencies
 {
     compileNoAndroidRuntime libraries.android

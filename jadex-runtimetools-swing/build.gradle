@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex rules tools package contains tools for the Jadex active components infrastructure.'
+
+dependencies
 {
 	compile project(':jadex-tools-base-swing')
 	compile project(':jadex-platform')

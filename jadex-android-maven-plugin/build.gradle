@@ -1,3 +1,5 @@
+description 'Maven Plugin for BDI V3 class generation on compile time.'
+
 ext.props = new Properties()
 props.load(new FileReader(file("../gradle.properties")))
 

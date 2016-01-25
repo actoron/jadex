@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex BPMN kernel provides a workflow kernel for the standardized business process modeling notation. The kernel relies on annotated BPMN diagrams, which include detailed execution information.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')

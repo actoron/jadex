@@ -1,3 +1,6 @@
+description 'This is the jadex platformapp. \n' +
+        '\tIt has to be installed on the android device independently and can be used by creating JadexClientAppFragments.'
+
 dependencies
 {
     compile project(':jadex-android-platformclient')

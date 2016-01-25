@@ -1,3 +1,5 @@
+description 'Bluetooth ad-hoc communication for Jadex-Android.'
+
 dependencies
 {
 	compile project(':jadex-bridge')

@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex BDI-BPMN applications package contains several example applications, benchmarks and testcases using BDI agents that have BPMN plans.'
+
+dependencies
 {
 	compile project(':jadex-bridge')
 	compile project(':jadex-xml')

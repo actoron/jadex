@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex mixed applications package contains example applications using mixed types of components.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-bridge')

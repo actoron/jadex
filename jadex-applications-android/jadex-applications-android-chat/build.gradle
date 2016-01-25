@@ -1,3 +1,5 @@
+description 'Jadex-Android chat sample application'
+
 dependencies
 {
     compile project(':jadex-platform-android')

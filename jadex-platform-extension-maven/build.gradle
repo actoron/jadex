@@ -1,3 +1,5 @@
+description 'An advanced library service that can retrieve dependencies from maven repositories.'
+
 def mavenversion = "3.0.3"
 def wagonversion = "2.2"
 
