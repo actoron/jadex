@@ -289,9 +289,9 @@ subprojects
 		            }
 		        }
 	        }
+			configurePomMetadata(uploadArchives)
 	    }
     }
-	configurePomMetadata(uploadArchives)
 }
 
 // Hack, helper to generate dep-tree
