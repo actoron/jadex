@@ -255,8 +255,10 @@ subprojects
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
 
-	signing {
-		sign configurations.archives
+	if (project.hasProperty('signing.secretKeyRingFile')) {
+		signing {
+			sign configurations.archives
+		}
 	}
 
     sourceCompatibility = 1.6
