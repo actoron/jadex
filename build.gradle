@@ -207,7 +207,12 @@ subprojects
     }
     else
     {
-        apply plugin: 'java'
+		if (isWebApplicationProject(project)) {
+			apply plugin: 'war'
+		} else {
+        	apply plugin: 'java'
+		}
+
         compileJava.options.encoding = 'UTF-8'
         allSource   = sourceSets.main.allSource
         // include all resources that are placed inside src dirs
