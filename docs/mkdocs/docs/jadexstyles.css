@@ -1,3 +1,39 @@
+.hljs {
+	font-size: 90%;
+}
+
+.hljs-string, .hljs-tag .hljs-value {
+	color:#00F;
+}
+
+.hljs-comment, .hljs-javadoc {
+	color: #2C6700;
+}
+
+.hljs-keyword {
+	color:#6F0000;
+}
+
+.hljs-attribute {
+	color: #800080;
+}
+
+.hljs-title, .hljs-class .hljs-title {
+	color:#000;
+	font-weight: normal;
+}
+
+.hljs-tag .hljs-title {
+	color:#008080;
+}
+
+p {
+	text-align: justify;
+}
+
+li {
+	font-size: 16px;
+}
 code {
 	font-size: 90%;
 }
