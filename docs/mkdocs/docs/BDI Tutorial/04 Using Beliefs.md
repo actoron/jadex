@@ -45,7 +45,7 @@ public static Map getDictionary()
 
 The updated version of the translation agent ADF is outlined in the following code snippet. Note that the agent now has two plans named "addword" for adding a word pair to the database and "egtrans" for translating from English to German. The belief declaration is enclosed by a beliefs tag that denotes that an arbitrary number of belief declarations may follow. The ADF defines the beliefs and belief sets of an agent, optionally with default fact(s).  
 The belief for storing the wordtable is named "egwords" and typed through the class attribute to `java.util.Map`. The tag of this element is set to <belief\> (in contrast to <beliefset\>) denoting that only one fact can be stored.  Further it is necessary to clarify which kinds of events trigger the plans.  
-Therefore, the events section is extended to include a new `request_addword` event type which also matches request messages. To be able to distinguish between both kinds of events they are refined to match only messages that start with a specific content string. The match expressions use a logical AND (&&), that has to be written a little bit awkwardly with the xml entities &amp;&amp;.
+Therefore, the events section is extended to include a new `request_addword` event type which also matches request messages. To be able to distinguish between both kinds of events they are refined to match only messages that start with a specific content string. The match expressions use a logical AND (&&), that has to be written a little bit awkwardly with the xml entities &amp;amp;&amp;amp;.
 
 <!-- TODO: schema locations in all doc pages? -->
 
@@ -153,7 +153,7 @@ In this exercise we will use a condition for triggering a passive plan that cong
 -   Modify the ADF by defining the new ThankYouPlanC3 as passive plan (with the name thankyou in the ADF) in the plans section. Instead of defining a triggering event for this passive plan we define a condition that activates the new ThankYouPlanC3.  
 A condition has the purpose to monitor some state of affair of the agent. In this case we want to monitor the belief "transcnt" and get notified whenever 10 translations have been requested. Insert the code from the following snippet in the plan's trigger.  
 This condition consists of two parts: The first (transcnt>0) makes sure that at least one translation has been done and the second part checks if transcnt modulo 10 has no rest indicating that 10*x translations have been requested. 
-The two parts are connected via a logical AND (&&), that has to be written a little bit awkwardly with the xml entities `&amp;&amp;`.
+The two parts are connected via a logical AND (&&), that has to be written a little bit awkwardly with the xml entities &amp;amp;&amp;amp;.
 
 ```xml
 <condition>$beliefbase.transcnt>0 &amp;&amp; $beliefbase.transcnt%10==0</condition>

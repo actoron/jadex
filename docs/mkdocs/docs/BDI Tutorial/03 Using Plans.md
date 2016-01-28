@@ -32,7 +32,6 @@ Create a new file called EnglishGermanTranslationPlanB1.java responsible for a b
 -   Create the plan as extension to the jadex.bdi.runtime.Plan class:
 
 ```java
-
 public class EnglishGermanTranslationPlanB1 extends Plan {
     // Plan attributes.
 
@@ -44,7 +43,6 @@ public class EnglishGermanTranslationPlanB1 extends Plan {
         // Plan code.
     }
 }
-
 ```
 
 -   Import the needed classes: *jadex.bridge.fipa.SFipa, jadex.bdi.runtime.IMessageEvent, jadex.bdi.runtime.Plan, java.util.HashMap, java.util.Map*
@@ -61,7 +59,6 @@ public class EnglishGermanTranslationPlanB1 extends Plan {
 
 
 ```xml
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
@@ -98,7 +95,6 @@ public class EnglishGermanTranslationPlanB1 extends Plan {
     </configuration>
   </configurations>
 </agent>
-
 ```
 
 
@@ -125,11 +121,9 @@ In constrast to the last exercise we will now use a passive plan to react on tra
 
 
 ```xml
-
 <trigger>
   <messageevent ref="request_translation"/>
 </trigger>
-
 ```
 
 
@@ -154,7 +148,6 @@ Create the files EnglishGermanTranslationPlanB3.java and TranslationB3.agent.xml
 
 
 ```xml
-
 <plan name="egtrans">
   <parameter name="eword" class="String">
     <messageeventmapping ref="request_translation.content"/>
@@ -164,7 +157,6 @@ Create the files EnglishGermanTranslationPlanB3.java and TranslationB3.agent.xml
     <messageevent ref="request_translation"/>
   </trigger>
 </plan>
-
 ```
 
 
@@ -186,13 +178,12 @@ You will have to add code for fetching the "eword" that should be translated and
 
 
 ```java
-
 URL dict = new URL("http://wolfram.schneider.org/dict/dict.cgi?query="+eword);
 BufferedReader in = new BufferedReader(new InputStreamReader(dict.openStream()));
 String inline;
 while((inline = in.readLine())!=null) 
 {
-  if(inline.indexOf("<td>")!=-1 &amp;&amp; inline.indexOf(eword)!=-1) 
+  if(inline.indexOf("<td>")!=-1 && inline.indexOf(eword)!=-1) 
   {
     try 
     {
@@ -214,7 +205,6 @@ while((inline = in.readLine())!=null)
   }
 }
 in.close();
-
 ```
 
 
@@ -224,7 +214,6 @@ in.close();
 
 
 ```java
-
 static {
   wordtable = new HashMap();
   wordtable.put("coffee", "Kaffee");
@@ -233,7 +222,6 @@ static {
   wordtable.put("cat", "Katze");
   wordtable.put("dog", "Hund");
 }
-
 ```
 
 
@@ -241,11 +229,9 @@ static {
 
 
 ```java
-
 public static boolean containsWord(String name) {
   return wordtable.containsKey(name);
 }
-
 ```
 
 
@@ -255,14 +241,12 @@ public static boolean containsWord(String name) {
 
 
 ```xml
-
 <plan name="searchonline" priority="-1">
   <body class="SearchTranslationOnlineB4"/>
   <trigger>
     <messageevent ref="request_translation"/>
   </trigger>
 </plan>
-
 ```
 
 
@@ -270,11 +254,9 @@ public static boolean containsWord(String name) {
 
 
 ```xml
-
 <imports>
   <import>jadex.bridge.fipa.*</import>
 </imports>
-
 ```
 
 
@@ -282,7 +264,6 @@ public static boolean containsWord(String name) {
 
 
 ```xml
-
 <plan name="egtrans">
   <body class="EnglishGermanTranslationPlanB4"/>
   <trigger>
@@ -292,7 +273,6 @@ public static boolean containsWord(String name) {
     EnglishGermanTranslationPlanB4.containsWord((String)$event.getParameter(SFipa.CONTENT).getValue())
   </precondition>
 </plan>
-
 ```
 
 
@@ -312,11 +292,9 @@ The Jadex debugging perspective is conceived to support you in the debugging of 
 
 
 ```xml
-
 <properties>
   <property name="debugging">true</property>
 </properties>
-
 ```
 
 
@@ -342,11 +320,9 @@ In this exercise we will use log-outputs instead of directly printing console ou
 
 
 ```xml
-
 <imports>
   <import>java.util.logging.*</import>
 </imports>
-
 ```
 
 
@@ -354,12 +330,10 @@ In this exercise we will use log-outputs instead of directly printing console ou
 
 
 ```xml
-
 <properties>
   <property name="logging.level">Level.INFO</property>
   <property name="logging.useParentHandlers">true</property>
 </properties>
-
 ```
 
 

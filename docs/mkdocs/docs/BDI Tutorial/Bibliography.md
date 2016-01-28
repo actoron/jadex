@@ -2,7 +2,7 @@
 
 *[Bauer et al. 2001]* B. Bauer, J. Müller, and J. Odell. Agent UML: A Formalism for Specifying Multiagent Interaction. P. Ciancarini and M. Wooldridge. Proceedings of the First International Workshop on Agent-Oriented Software Engineering (AOSE 2000). Springer. Berlin, New York. 2001. pp.91-103.
 
-*[Bellifemine et al. 2007]* F. Bellifemine, G. Caire, and D. Greenwood. Developing Multi-Agent Systems with JADE. John Wiley &amp; Sons. New York, USA. 2007.
+*[Bellifemine et al. 2007]* F. Bellifemine, G. Caire, and D. Greenwood. Developing Multi-Agent Systems with JADE. John Wiley & Sons. New York, USA. 2007.
 
 *[Bratman 1987]* M. Bratman. Intention, Plans, and Practical Reason. Harvard University Press. Cambridge, MA, USA. 1987.
 

@@ -302,7 +302,7 @@ The user agent collects the translated words and sends back the translated sente
       <parameter name="performative" class="String" direction="fixed">
         <value>SFipa.REQUEST</value>
       </parameter>
-      <match>$content instanceof String &amp;amp;&amp;amp; ((String)$content).startsWith("translate_sentence english_german")</match>
+      <match>$content instanceof String &amp;&amp; ((String)$content).startsWith("translate_sentence english_german")</match>
     </messageevent>
 
     <messageevent name="inform" direction="send" type="fipa">
