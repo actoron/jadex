@@ -39,6 +39,10 @@ def isAndroidLibraryProject(project) {
     project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
 }
 
+def isWebApplicationProject(project) {
+    project.hasProperty("webArchiveProject") && project.property("webArchiveProject") == 'true'
+}
+
 def onVariant(Project project, String variantName, Closure c) {
     onAllVariants(project) {variant ->
         if (variant.buildType.name.equals(variantName)) {
@@ -459,6 +463,7 @@ ext {
 	isAddon = this.&isAddon
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
+    isWebApplicationProject = this.&isWebApplicationProject
     androidSdkExists = this.&androidSdkExists
     onVariant = this.&onVariant
     onVariantOutput = this.&onVariantOutput

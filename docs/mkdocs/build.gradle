@@ -51,6 +51,13 @@ task processDocs(type: Copy) {
     }
 }
 
+task copyLatexTemplate(type: Copy) {
+    into project.buildDir.getCanonicalPath() + "${File.separator}mkdocs${File.separator}docs"
+    from('.') {
+        include 'template.latex'
+    }
+}
+
 /**
  * Build static pages with mkdocs
  */
@@ -81,7 +88,7 @@ task serveDocs (type: MkDocsTask) {
 /**
  * Build a PDF from docs.
  */
-task buildDocsPdf (type:PandocTask, dependsOn: ['buildPandocDockerImage', processDocs]) {
+task buildDocsPdf (type:PandocTask, dependsOn: ['buildPandocDockerImage', processDocs, copyLatexTemplate]) {
     baseName = 'jadex-mkdocs'
     version = jadex_build_version
     dockerImageName = 'jadexpandoc'
@@ -105,6 +112,7 @@ class PandocTask extends DockerTask {
         // copy doc source to work dir
         java.nio.file.Path target = Paths.get(project.buildDir.path,"work")
         jadex.commons.SUtil.deleteDirectory(target.toFile())
+
         org.apache.commons.io.FileUtils.copyDirectory(Paths.get(project.buildDir.path, "mkdocs", "docs").toFile(), target.toFile())
 
         Map<String,List<String>> mdFiles = new HashMap<String,List<String>>()
@@ -182,7 +190,7 @@ class PandocTask extends DockerTask {
 
     def ProcessBuilder getPandocProcessBuilder() {
         def String[] dockerArgs = ["--rm", "-v", "$project.buildDir${File.separator}work${File.separator}:/source/"];
-        def String[] args = ["-s", "-f", "markdown", "-t", "latex", "-o", "doc.pdf"]
+        def String[] args = ["-s", "-f", "markdown", "-t", "latex", "--template=template.latex", "-o", "doc.pdf"]
         return getProcessBuilderForCommand("pandoc", args, dockerArgs, false)
     }
 }

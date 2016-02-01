@@ -165,7 +165,6 @@ public void body()
 
 ```java
 
- 
 @Plan(trigger=@Trigger(goals=Translate.class))
 protected String translate(String eword)
 {

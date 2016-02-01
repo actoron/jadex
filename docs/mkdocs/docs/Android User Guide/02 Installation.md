@@ -20,7 +20,7 @@ Step 1
 
 To develop Android applications with jadex-android you need to:
 
--   Install the Android SDK (from http://developer.android.com/sdk/index.html ](http://developer.android.com/sdk/index.html) )
+-   Install the Android SDK (from [http://developer.android.com/sdk/index.html](http://developer.android.com/sdk/index.html) )
 -   Download the SDK Platform API for Android 2.2 or higher using the *Android SDK Manager*
 -   Download and extract *jadex-android* ([Download Section](https://www.activecomponents.org/bin/view/Download/Overview) )
 
@@ -31,8 +31,8 @@ Step 2
 
 In order to develop Android applications using Eclipse (with or without maven), you need:
 
--   Eclipse 3.6 or newer (http://www.eclipse.org/downloads/ ](http://www.eclipse.org/downloads/) )
--   The Android Developer Tools (ADT), Eclipse Update Site: https://dl-ssl.google.com/android/eclipse/ ](https://dl-ssl.google.com/android/eclipse/)
+-   Eclipse 3.6 or newer ([http://www.eclipse.org/downloads/](http://www.eclipse.org/downloads/) )
+-   The Android Developer Tools (ADT), Eclipse Update Site: [https://dl-ssl.google.com/android/eclipse/](https://dl-ssl.google.com/android/eclipse/)
 -   In Eclipse, set the path to the Android SDK in *Window -&gt; Preferences -&gt; Android *and click *Apply*
 
 Proceed to the next step if you wish to use maven OR to step 5 if you don't.
@@ -42,10 +42,10 @@ Step 3
 
 If you want to use Maven as Build System (required for the included example project):
 
--   set the *\$ANDROID\_HOME* environment variable to the directory where the Android SDK is located
--   install a JDK (not JRE), available at http://www.oracle.com/technetwork/java/javase/downloads/index.html ](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
--   configure Eclipse to run with a JDK (http://matsim.org/node/372 ](http://matsim.org/node/372) ) and set a JDK as default JRE (*Window -&gt; Preferences -&gt; Java -&gt; Installed JREs*, add your JDK here and check it)
--   install m2eclipse plugin in eclipse (for eclipse 3.6 users, use the old update site: http://download.eclipse.org/technology/m2e/releases ](http://download.eclipse.org/technology/m2e/releases) )
+-   set the *$ANDROID_HOME* environment variable to the directory where the Android SDK is located
+-   install a JDK (not JRE), available at [http://www.oracle.com/technetwork/java/javase/downloads/index.html](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+-   configure Eclipse to run with a JDK ([http://matsim.org/node/372](http://matsim.org/node/372) ) and set a JDK as default JRE (*Window -&gt; Preferences -&gt; Java -&gt; Installed JREs*, add your JDK here and check it)
+-   install m2eclipse plugin in eclipse (for eclipse 3.6 users, use the old update site: [http://download.eclipse.org/technology/m2e/releases](http://download.eclipse.org/technology/m2e/releases) )
 
 Since Jadex 2.2 the jadex-android artifacts are available through the maven central repository. Eclipse will download these as necessary for your Jadex Android projects.
 
@@ -81,8 +81,8 @@ To import the non-maven sample project in eclipse (after following step 1 and 2)
 Hints
 ------------------
 
--   if Eclipse cannot find a suitable M2E connector and you already have an older version of m2e-android installed, try updating it manually using the Eclipse Installer and the following Update Site: http://rgladwell.github.com/m2e-android/updates/ ](http://rgladwell.github.com/m2e-android/updates/)
+-   if Eclipse cannot find a suitable M2E connector and you already have an older version of m2e-android installed, try updating it manually using the Eclipse Installer and the following Update Site: [http://rgladwell.github.com/m2e-android/updates/](http://rgladwell.github.com/m2e-android/updates/)
 -   if building is slow or if you get Exceptions related to memory ("Out of Heap Space", "GC overhead limit") during compilation, try setting *-Xms128m -Xmx1024m* in your *eclipse.ini*
--   bug in m2e-android (https://github.com/rgladwell/m2e-android/issues/31%29 ](https://github.com/rgladwell/m2e-android/issues/31%29)
--   ~~NIOTCP Transport doesn't work in a 2.2 emulator, see http://code.google.com/p/android/issues/detail?id=9431 ](http://code.google.com/p/android/issues/detail?id=9431)  ~~ **Update (Feb. 2012):** This is now fixed, NIOTCP was now successfully tested with FroYo (Android 2.2) and Gingerbread (Android 2.3).
+-   bug in m2e-android ([https://github.com/rgladwell/m2e-android/issues/31%29](https://github.com/rgladwell/m2e-android/issues/31%29)
+-   ~~NIOTCP Transport doesn't work in a 2.2 emulator, see [http://code.google.com/p/android/issues/detail?id=9431](http://code.google.com/p/android/issues/detail?id=9431)  ~~ **Update (Feb. 2012):** This is now fixed, NIOTCP was now successfully tested with FroYo (Android 2.2) and Gingerbread (Android 2.3).
 

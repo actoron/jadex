@@ -207,7 +207,12 @@ subprojects
     }
     else
     {
-        apply plugin: 'java'
+		if (isWebApplicationProject(project)) {
+			apply plugin: 'war'
+		} else {
+        	apply plugin: 'java'
+		}
+
         compileJava.options.encoding = 'UTF-8'
         allSource   = sourceSets.main.allSource
         // include all resources that are placed inside src dirs
@@ -255,8 +260,10 @@ subprojects
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
 
-	signing {
-		sign configurations.archives
+	if (project.hasProperty('signing.secretKeyRingFile')) {
+		signing {
+			sign configurations.archives
+		}
 	}
 
     sourceCompatibility = 1.6
@@ -289,9 +296,9 @@ subprojects
 		            }
 		        }
 	        }
+			configurePomMetadata(uploadArchives)
 	    }
     }
-	configurePomMetadata(uploadArchives)
 }
 
 // Hack, helper to generate dep-tree

@@ -36,7 +36,7 @@ public class Customer
 
   public boolean isRiskTaking()
   {
-    return gender.equals("male") &amp;&amp; age < 40 &amp;&amp; !married;
+    return gender.equals("male") && age < 40 && !married;
   }	
 
   public String toString()

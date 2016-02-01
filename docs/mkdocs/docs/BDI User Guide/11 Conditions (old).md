@@ -1,5 +1,5 @@
-Chapter 11. Conditions
-===================================
+# Chapter 11. Conditions
+
 
 In essence, a condition is a monitored boolean expression, what means that whenever some of the referenced entities (e.g., beliefs) change the expression of the condition is evaluated. Associated with a condition is an action, that gets executed whenever the condition is triggered. Context-specific conditions as defined in the ADF have special associated actions (e.g., for activating goals).
 
@@ -11,31 +11,27 @@ The following example uses the "timer" belief from Section 6.3 to execute some 
 
 
 ```xml
-
 <agent ...>
     ...
     <expressions>
-        <condition name="alarmtime&#95;reached">
-            $beliefbase.timer >= $beliefbase.alarmtime
+        <condition name="alarmtime_reached">
+            $beliefbase.timer &gt;= $beliefbase.alarmtime
         </condition>
         ...
     </expressions>
     ...
 </agent>
-
 ```
 
 
 
 ```java
-
 public void body
 {
-    ICondition condition = getCondition("alarmtime&#95;reached");
+    ICondition condition = getCondition("alarmtime_reached");
     ...
     IEvent event = waitForCondition(condition); 
     ...
 }
-
 ```
 

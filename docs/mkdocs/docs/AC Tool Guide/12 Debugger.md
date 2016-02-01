@@ -44,7 +44,7 @@ Micro Agent Debugger
 ```java
 public boolean isAtBreakpoint(String[] breakpoints)
 ```
-. See *jadex.micro.testcases.semiautomatic.BeakpointAgent *and *PojoBreakpointAgent* for example code.
+See *jadex.micro.testcases.semiautomatic.BeakpointAgent *and *PojoBreakpointAgent* for example code.
 
 **Note:** Currently, the XML component types 'component' and 'application' do not posses a dedicated debugger. Instead, if a component of such a type is selected for debugging an Object Inspector view will be shown. This view displays the object structure of the underlying component and can be used to get information about the current state of the object.
 

@@ -1,13 +1,13 @@
 Using BDIv3 on Android
 ===================================
 
-The BDI v3 programming model heavily depends on code-generation based on java annotations.\
-It's using the ASM Bytecode manipulation framework to generate the code.\
+The BDI v3 programming model heavily depends on code-generation based on java annotations.
+It's using the ASM Bytecode manipulation framework to generate the code.
 Android not only uses a different virtual machine than any Java SE environment, the Dalvik Virtual Machine (DVM), it also uses a different bytecode representation, which is not supported by ASM.
 
 As runtime bytecode generation is slow on android anyway, we use a different mechanism to make BDIv3 work: Generating the bytecode at compile time, which is then processed and converted by standard android tools.
 
-For this method to work, however, we need to include an additional compile step, which is done using maven.\
+For this method to work, however, we need to include an additional compile step, which is done using maven.
 So you **need to setup a maven project to use BDIv3** Components!
 
 Additionally, you need to have a copy of the jadex-android-maven-plugin, so this is the first step
