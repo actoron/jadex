@@ -12,20 +12,23 @@
 		<jadex.version>${jadex_build_version}</jadex.version>
 	</properties>
 	
-	<!-- Additional repositories (only required when using snapshot and/or pro version of Jadex).
-	     You may use www0.activecomponents.org/..., www1.activecomponents.org/... to address mirrors directly. -->
+	<!-- Additional repositories (only required when using nightlies and/or pro version of Jadex). -->
 	<repositories>
 		<repository>
-			<id>jadex-snapshots</id>
-			<url>http://www.activecomponents.org/nexus/content/repositories/snapshots</url>
+			<id>jadex-oss-releases</id>
+			<url>https://nexus.actoron.com/content/repositories/oss</url>
 		</repository>
 		<repository>
-			<id>jadex-pro-snapshots</id>
-			<url>http://www.activecomponents.org/nexus/content/repositories/pro-snapshots</url>
+			<id>jadex-oss-nightlies</id>
+			<url>https://nexus.actoron.com/content/repositories/oss-nightlies</url>
 		</repository>
 		<repository>
 			<id>jadex-pro-releases</id>
-			<url>http://www.activecomponents.org/nexus/content/repositories/pro-releases</url>
+			<url>http://nexus.actoron.com/nexus/content/repositories/pro</url>
+		</repository>
+		<repository>
+			<id>jadex-pro-nightlies</id>
+			<url>http://nexus.actoron.com/nexus/content/repositories/pro-nightlies</url>
 		</repository>
 	</repositories>
 	
@@ -57,7 +60,7 @@
 			 Pro: Standard + all commercial add-ons (requires access to pro-repository)
 		 -->
 		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
+			<groupId>org.activecomponents.jadex</groupId>
 			<artifactId>jadex-distribution-standard</artifactId>
 			<!-- <artifactId>jadex-distribution-minimal</artifactId> -->
 			<!-- <artifactId>jadex-distribution-pro</artifactId> -->
@@ -67,7 +70,7 @@
 		<!-- Webservice extension (enable if needed) -->
 		<!--
 		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
+			<groupId>org.activecomponents.jadex</groupId>
 			<artifactId>jadex-platform-extension-webservice</artifactId>
 			<version>${jadex.version}</version>
 		</dependency>
