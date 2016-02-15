@@ -1,4 +1,6 @@
-dependencies 
+description 'Integration Tests'
+
+dependencies
 {
 	def launcharts = new HashSet<String> ([
 										   // Core API

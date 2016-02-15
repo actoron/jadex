@@ -1,4 +1,5 @@
-apply plugin: 'war'
+description 'Web-App server application for Jadex relay.'
+
 //apply plugin: 'eclipse-wtp'
 
 dependencies 

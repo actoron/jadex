@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex tools comanalyzer package contains the ComAnalyzer JCC plugin for observing the communication between Jadex components.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-bridge')

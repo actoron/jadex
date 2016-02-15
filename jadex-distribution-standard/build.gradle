@@ -1,4 +1,6 @@
-dependencies 
+description 'The standard distribution of the Jadex middleware including all typical modules such as all standard kernels and tools.'
+
+dependencies
 {
 	compile project(':jadex-distribution-minimal')
 

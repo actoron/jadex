@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex web service applications package contains several example applications, benchmarks and testcases using web service integration.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-xml')

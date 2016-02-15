@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -273,6 +274,33 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		};
 		
 		libservice.addLibraryServiceListener(liblistener);
+		
+		// Add base classpath
+		ClassLoader basecl = MultiFactory.class.getClassLoader();
+		while (basecl != null)
+		{
+			if (basecl instanceof URLClassLoader)
+			{
+				URL[] urls = ((URLClassLoader) basecl).getURLs();
+				for (URL url : urls)
+				{
+					// Hack to avoid at least some Java junk.
+					if (!url.toString().contains("jre/lib/ext"))
+					{
+						try
+						{
+							URI uri = url.toURI();
+							potentialuris.add(uri);
+							validuris.add(uri);
+						}
+						catch (URISyntaxException e)
+						{
+						}
+					}
+				}
+			}
+			basecl = basecl.getParent();
+		}
 		
 		libservice.getAllURLs().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{

@@ -38,7 +38,7 @@ The plugin requires that all Jadex libraries, which are used in the project, are
 Installation
 -------------------------
 
-The plugin can be obtained from the eclipse update site http://www2.activecomponents.org/eclipse/update/ ](http://www2.activecomponents.org/eclipse/update/) . In Eclipse, choose the menu *Help-&gt;Install New Software...*, enter the update site address at *Work with: * and select *Jadex Eclipse Plugins-&gt;Jadex ADF Checker*.
+The plugin can be obtained from the [eclipse update site](http://www2.activecomponents.org/eclipse/update/) . In Eclipse, choose the menu *Help-&gt;Install New Software...*, enter the update site address at *Work with: * and select *Jadex Eclipse Plugins-&gt;Jadex ADF Checker*.
 
 
 

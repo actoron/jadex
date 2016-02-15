@@ -1,4 +1,8 @@
-dependencies 
+description 'The jadex-android-platformclient project contains classes that are required \n' +
+        '\tby client apps for android that make use of the jadex platformapp.\n' +
+        '\tNo other dependencies except for the android framework should be used.'
+
+dependencies
 {
     compile libraries.android
     compile libraries.android_support

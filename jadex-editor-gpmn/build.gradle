@@ -1,4 +1,6 @@
-dependencies 
+description 'Editor for Goal-oriented Process Management Notation (GPMN) and general-purpose graphical BDI agent editor.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')

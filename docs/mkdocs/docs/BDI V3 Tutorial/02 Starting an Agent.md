@@ -9,12 +9,9 @@ To start the platform via Java you basically have two options. The first is by s
 The alternative commands for launching the Jadex Standalone platform are:
 
 
-
-**java jadex.standalone.Platform**  
-or  
-**java -jar libjadex-platform-standalone-launch-3.0.0-RC1.jar**
-<!--TODO: outdated-->
-
+```java jadex.standalone.Platform```   <!-- 2 spaces generate a non-paragraph-line-break -->
+or     
+```java -jar libjadex-platform-standalone-launch-3.0.0-RC1.jar```   
 (As the name of the jar depends on the current release please be sure to use the correct version).
 
 ## Exercise A1 - Creating a Project

@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex launch package facilitates executing the Jadex standalone platform.'
+
+dependencies
 {
 	def launcharts = new HashSet<String> ([
 										   // Core API

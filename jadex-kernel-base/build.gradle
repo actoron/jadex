@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex base kernel provides basic support for all kinds of active components.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-javaparser')

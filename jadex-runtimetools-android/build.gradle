@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex rules tools package contains tools for the Jadex active components infrastructure.'
+
+dependencies
 {
     compile(project(':jadex-platform-android'))
     compile project(':jadex-android-commons')

@@ -1,4 +1,6 @@
-dependencies 
+description 'Editor for Business Process Model and Notation (BPMN).'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')

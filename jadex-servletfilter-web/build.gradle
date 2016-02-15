@@ -1,4 +1,5 @@
-apply plugin: 'war'
+description 'Servletfilter Web-App.'
+
 apply plugin: 'eclipse-wtp'
 
 dependencies 

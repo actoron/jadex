@@ -1,4 +1,6 @@
-dependencies 
+description 'Jadex commons is a base package containing frequently used functionality missing in standard Java utility classes.'
+
+dependencies
 {
 	testCompile 'com.madgag.spongycastle:prov:1.54.0.0'
 }

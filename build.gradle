@@ -2,7 +2,6 @@ import java.nio.file.Paths
 import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 
-apply plugin: 'signing'
 //apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
 apply plugin: 'maven' // use gradle install to install in local .m2 
@@ -102,10 +101,11 @@ subprojects
     def junit       = 'junit:junit:4.11'
     def allSource   = ''
 
+	apply plugin: 'signing'
 	apply plugin: 'maven'
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
-    
+
     ext.libraries = [
             android_support: "com.android.support:support-v4:23.1.0",
             android_compat: "com.android.support:appcompat-v7:23.1.0",
@@ -134,7 +134,7 @@ subprojects
         {
             apply plugin: 'android-library'
         }
-        else 
+        else
         {
             apply plugin: 'com.android.application'
         }
@@ -207,7 +207,12 @@ subprojects
     }
     else
     {
-        apply plugin: 'java'
+		if (isWebApplicationProject(project)) {
+			apply plugin: 'war'
+		} else {
+        	apply plugin: 'java'
+		}
+
         compileJava.options.encoding = 'UTF-8'
         allSource   = sourceSets.main.allSource
         // include all resources that are placed inside src dirs
@@ -215,12 +220,12 @@ subprojects
         //sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
         sourceSets.test.resources.srcDirs    testSrcDir
         //sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
-        
+
         dependencies
         {
             testCompile junit
         }
-        
+
         processResources {
 			filesMatching('**/version.properties')
 			{
@@ -255,6 +260,12 @@ subprojects
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
 
+	if (project.hasProperty('signing.secretKeyRingFile')) {
+		signing {
+			sign configurations.archives
+		}
+	}
+
     sourceCompatibility = 1.6
     
     uploadArchives {
@@ -263,6 +274,9 @@ subprojects
 	        	if (isCommercial(project) && repo_commercial)
 	        	{
 		            mavenDeployer {
+						beforeDeployment {
+							MavenDeployment deployment -> signing.signPom(deployment);
+						}
 		                repository(url: repo_commercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
@@ -272,6 +286,9 @@ subprojects
 		        else if (repo_noncommercial)
 		        {
 		        	mavenDeployer {
+						beforeDeployment {
+							MavenDeployment deployment -> signing.signPom(deployment);
+						}
 						repository(url: repo_noncommercial) {
 		                	authentication(userName: repouser, password: repopassword)
 		                }
@@ -279,6 +296,7 @@ subprojects
 		            }
 		        }
 	        }
+			configurePomMetadata(uploadArchives)
 	    }
     }
 }

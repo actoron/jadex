@@ -5,7 +5,7 @@ Once you have installed the necessary tools, the **jadex-android-example-project
 
 This guide, however, does **not** assume you are using the example project, but instead introduces the API of Jadex for Android step by step.
 
-To understand the basics of android application development, please take a look at http://developer.android.com/guide/ ](http://developer.android.com/guide/)  .\
+To understand the basics of android application development, please take a look at the [Android Developer Guide](http://developer.android.com/guide/)  .
 This guide and all included demo applications are currently using the API Level 8, which is supported in android 2.2 and above.
 
 We assume that you created a basic Android Application to start with.
@@ -13,7 +13,7 @@ We assume that you created a basic Android Application to start with.
 Differences to the desktop version of Jadex
 --------------------------------------------------------
 
-While programming components is the same on the standard jadex distribution and the android version, everything else is different.\
+While programming components is the same on the standard jadex distribution and the android version, everything else is different.
 We try to list some of the differences here to avoid confusion.
 
 -   **No JCC:** First, there is no JCC (Jadex Control Center). This has a simple reason: There are no Java Swing components included in the Android runtime libraries. But, when you develop Android Applications, you'll want to have a native UI anyway.
@@ -33,16 +33,16 @@ We try to list some of the differences here to avoid confusion.
 Start a Jadex Platform
 -----------------------------------
 
-To use Jadex components, you first have to start a Jadex Platform.\
+To use Jadex components, you first have to start a Jadex Platform.
 This can be done in different ways, both of them are described below.
 
 ### Use the Jadex Platform directly in an activity
 
-This method is only recommended for simple applications, e.g. if you **don't care** about running in **background**.\
-Also, the jadex **platform will shutdown** if the application gets destroyed, for example when **turning the device**.\
+This method is only recommended for simple applications, e.g. if you **don't care** about running in **background**.
+Also, the jadex **platform will shutdown** if the application gets destroyed, for example when **turning the device**.
 Skip this section if you don't like that.
 
-If such limitations doesn't matter or you simply want to test jadex on android, you can have your main activity extend the *JadexAndroidActivity* class.\
+If such limitations doesn't matter or you simply want to test jadex on android, you can have your main activity extend the *JadexAndroidActivity* class.
 This replaces the Android Activity class and provides additional, jadex-related functionality.
 
 The Jadex-Android-Example-Project shows how to use this method in the *jadex.android.exampleproject.simple* package.
@@ -67,16 +67,16 @@ public HelloWorldActivity()
 ```
 
 
-Available platform options are documented [here](http://www.activecomponents.org/jadex-applications-web/jadexdoc/view?model=/jadex/platform/Platform.component.xml) .\
+Available platform options are documented [here](http://www.activecomponents.org/jadex-applications-web/jadexdoc/view?model=/jadex/platform/Platform.component.xml) .
 Setting up an activity like this will start a jadex-platform during the *onCreate()* phase and inform the activity about the progress in the two methods 
 ```java
-onPlatformStarting()
+onPlatformStarting()  
 ```
- and 
+and   
 ```java
 onPlatformStarted()
 ```
-:
+like this:
 
 
 ```java
@@ -99,22 +99,22 @@ onPlatformStarted()
 ```
 
 
-The jadex platform will also be automatically be terminated during the *onDestroy()* phase, e.g. when the activity is terminated by the user.
+The jadex platform will also be automatically terminated during the *onDestroy()* phase, e.g. when the activity is terminated by the user.
 
 If you use 
 ```java
 setPlatformAutostart(false)
 ```
-, the platform can be started manually by calling 
+the platform can be started manually by calling 
 ```java
 startPlatform()
 ```
-.\
+
 Regardless of which method us beeing used, the platform can always be stopped by calling 
 ```java
 stopPlatforms()
 ```
-.
+
 
 ### Use the Jadex Platform in a service
 
@@ -136,24 +136,16 @@ public class MyJadexService extends JadexPlatformService
 ```
 
 
-By default, the service will autostart a jadex platform on creation.\
-To adjust Jadex Platform behaviour, use the methods 
+By default, the service will autostart a jadex platform on creation.
+To adjust Jadex Platform behaviour, use these methods 
 ```java
-setPlatformAutostart()
+setPlatformAutostart(...)
+setPlatformKernels(...)
+setPlatformName(...)
+setPlatformOptions(...)
 ```
-, 
-```java
-setPlatformKernels()
-```
-, 
-```java
-setPlatformName()
-```
- and 
-```java
-setPlatformOptions
-```
- in the service constructor, like below:
+
+in the service constructor, like below:
 
 
 ```java
@@ -173,14 +165,14 @@ When you implement Agents that should run on an Android device, use the specific
 ```java
 AndroidMicroAgent
 ```
-, ... (available since 2.4).\
+, ... (available since 2.4).
 These classes offer additional functionality, such as event dispatching (see next section).
 
 A Component is started by the method 
 ```
 startComponent()
 ```
-. As Parameters, you have to specify a component name and the path to it's model (xml) file. In case of MicroAgents, you can specify the Class of the Agent directly, e.g.
+As Parameters, you have to specify a component name and the path to it's model (xml) file. In case of MicroAgents, you can specify the Class of the Agent directly, e.g.
 
 
 ```java
@@ -195,22 +187,18 @@ startComponent("HelloWorldAgent", MyAgent.class).addResultListener(new DefaultRe
 ```
 
 
-With the Result Listener you will be informed when the Agent is created.\
-For more advanced scenarios, you can pass a 
-```java
-CreationInfo
-```
- object to the Agent which can contain additional parameters.
+With the Result Listener you will be informed when the Agent is created.
+For more advanced scenarios, you can pass a *CreationInfo* object to the Agent which can contain additional parameters.
 
 Agent &lt;-&gt; Android Service Coupling
 =====================================================
 
-The communication between Component and Service can be handled using a **ProvidedService** and **JadexAndroidEvents**.\
+The communication between Component and Service can be handled using a **ProvidedService** and **JadexAndroidEvents**.
 The Combination of the two offer an easy way of agent-service coupling.
 
 The idea is that the Android Service can invoke methods on the Agent through an interface, while the Agent can inform the Android Service about what's happening through events. Both ways are described below.
 
-Communication with the activity will not be mentioned in this tutorial, as it is recommended to **handle all agent-based communication in a service**, since activities are pause/resumed/destroyed on a regular basis and thus are not reliable.\
+Communication with the activity will not be mentioned in this tutorial, as it is recommended to **handle all agent-based communication in a service**, since activities are pause/resumed/destroyed on a regular basis and thus are not reliable.
 The image below shows an overview of the communication model:
 
 ![](fragment-service-platform-communication.png)
@@ -272,12 +260,8 @@ If you are using Jadex inside a JadexAndroidActivity, call getPlatformService() 
 Agent to Android Service
 -------------------------------------
 
-Agent to Android Service communication is done event-based.\
-First, create a custom Event Type that extends 
-```
-JadexAndroidEvent
-```
-:
+Agent to Android Service communication is done event-based.
+First, create a custom Event Type that extends *JadexAndroidEvent* :
 
 
 ```java
@@ -302,11 +286,7 @@ public class MyEvent extends JadexAndroidEvent
 
 
 
-For your Service to listen to Agent events, it has to register an EventReceiver (you can do this in 
-```java
-onCreate()
-```
-):
+For your Service to listen to Agent events, it has to register an EventReceiver (you can do this in *onCreate()* ):
 
 
 ```java
@@ -331,11 +311,7 @@ registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
 ```
 
 
-To dispatch events in an Agent, just use the 
-```java
-dispatchEvent()
-```
- method (you need to extend AndroidMicroAgent for this method):
+To dispatch events in an Agent, just use the *dispatchEvent()* method (you need to extend AndroidMicroAgent for this method):
 
 
 ```java
@@ -374,7 +350,7 @@ startMicroAgent()
 Accessing the platform
 -----------------------------------
 
-The provided methods for accessing the platform depend on whether you are using JadexAndroidActivity (running Jadex inside an activity) or JadexPlatformService (running Jadex inside a service).\
+The provided methods for accessing the platform depend on whether you are using JadexAndroidActivity (running Jadex inside an activity) or JadexPlatformService (running Jadex inside a service).
 You can, however, get the internal platform service from a JadexAndroidActivity by calling getPlatformService(). The returned object should contain all methods listed here.
 
 -   isPlatformRunning(): Checks whether the platform is running or not.
@@ -390,7 +366,7 @@ If you want to access the platform manually, for features not covered by provide
 Using remote services
 ==================================
 
-Jadex was designed for distributed systems and Jadex-Android supports all the distribution features, too.\
+Jadex was designed for distributed systems and Jadex-Android supports all the distribution features, too.
 To use a remote service, just declare the required service like usual in the agent:
 
 
@@ -402,7 +378,7 @@ To use a remote service, just declare the required service like usual in the age
 ```
 
 
-Be sure to use the same Interface on both the service consuming and the service providing application, e.g. *use the same package and class name* for the service interface.\
+Be sure to use the same Interface on both the service consuming and the service providing application, e.g. *use the same package and class name* for the service interface.
 If Binding scope is set to global, services running on a desktop platform will be discovered by android devices, too.
 
 

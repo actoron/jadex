@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex rules applications package contains several example applications using rules.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-rules')

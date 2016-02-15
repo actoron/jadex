@@ -1,4 +1,6 @@
-dependencies 
+description 'App that can contains the Jadex test agents. Does nothing. Started from external JUnit test launcher app.'
+
+dependencies
 {
 
     releaseProvided project(':jadex-android-platformapp')

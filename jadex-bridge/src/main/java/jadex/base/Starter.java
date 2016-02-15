@@ -319,7 +319,7 @@ public class Starter
 			rootConfig.setComponentFactory(cfac);
 			// Hack: what to use as rid? should not have dependency to standalone.
 //			final ResourceIdentifier rid = new ResourceIdentifier(null, 
-//				"net.sourceforge.jadex:jadex-standalone-launch:2.1");
+//				"org.activecomponents.jadex:jadex-standalone-launch:2.1");
 			
 //			System.out.println("Using config file: "+configfile);
 			

@@ -1,4 +1,5 @@
-apply plugin: 'war'
+description 'Jadex examples that can be deployed as web application.'
+
 apply plugin: 'eclipse-wtp'
 
 dependencies 

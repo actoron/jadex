@@ -1,3 +1,5 @@
+description 'Jadex-Android BDIV3 puzzle sample application'
+
 dependencies
 {
     compile project(':jadex-platform-android')

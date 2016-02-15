@@ -1,3 +1,5 @@
+description 'JSON support for Jadex.'
+
 //apply plugin: 'maven-publish'
 
 dependencies 

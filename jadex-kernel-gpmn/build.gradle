@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex GPMN (goal oriented process modeling notation) kernel provides a goal-oriented workflow kernel. The idea is that a workflow is specified as declarative goal hierarchy, which describes what has to be achieved to fulfill the workflow. At runtime goals are pursued by executing plans represented by standard BPMN workflows. The execution of goal-based workflows is achieved by conversion to BDI agents.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-xml')

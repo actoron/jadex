@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex webservice platform extension package contains basic functionality for WSDL web services and REST web services.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-xml')

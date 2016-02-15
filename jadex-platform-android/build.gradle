@@ -1,3 +1,5 @@
+description 'The jadex-platform-android package contains extensions needed to run a jadex platform on an android device.'
+
 dependencies
 {
     compile(project(':jadex-platform'))

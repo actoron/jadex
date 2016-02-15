@@ -1,3 +1,5 @@
+description 'This project contains an android application to demonstrate some jadex features.'
+
 dependencies
 {
     compile project(':jadex-platform-android')

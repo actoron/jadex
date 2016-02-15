@@ -1,4 +1,6 @@
-dependencies 
+description 'Dungeon Keeper with BDI Agents.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-bridge')

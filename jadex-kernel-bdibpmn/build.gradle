@@ -1,4 +1,6 @@
-dependencies 
+description 'The Jadex BDI-BPMN kernel allows to use BPMN workflow descriptions as alternative description for BDI agent plans.'
+
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-xml')

@@ -1,3 +1,4 @@
+description 'The Jadex android webservice platform extension package contains functionality for using (but not providing) REST web services.'
 
 configurations
 {

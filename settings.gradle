@@ -16,6 +16,8 @@ gradle.rootProject {
 		secprops.entrySet().each { entry ->
 			gradle.rootProject.ext[entry.getKey()] = entry.getValue()
 		}
+		// convert path to sign key to absolute, so subprojects can find it:
+		gradle.rootProject.ext['signing.secretKeyRingFile'] = file(gradle.rootProject.ext['signing.secretKeyRingFile'])
 	}
 }
 

@@ -1,4 +1,6 @@
-dependencies 
+description 'The android distribution of the Jadex middleware including all typical modules that can be used on Android.'
+
+dependencies
 {
     // do not use distribution-minimal, because we do not need platform-standalone-launch
 //    compile project(':jadex-distribution-minimal')
