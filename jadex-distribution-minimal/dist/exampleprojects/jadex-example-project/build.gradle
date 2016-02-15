@@ -19,7 +19,7 @@ repositories {
 		url "https://nexus.actoron.com/content/repositories/oss-nightlies"
 	}
 	maven {
-		url "http://nexus.actoron.com/nexus/content/repositories/pro-nightlies"
+		url "http://nexus.actoron.com/nexus/content/repositories/pro"
 	}
 	maven {
 		url "http://nexus.actoron.com/nexus/content/repositories/pro-nightlies"
