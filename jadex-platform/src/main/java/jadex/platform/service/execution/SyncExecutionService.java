@@ -184,7 +184,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		{
 			public void customResultAvailable(Void result)
 			{
-				SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 					.addResultListener(new IResultListener<IThreadPoolService>()
 				{
 					public void resultAvailable(IThreadPoolService result)
