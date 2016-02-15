@@ -1113,14 +1113,21 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		// kinds of result types according to the concrete step used.
 		if(schedulestep.equals(method))
 		{
-			try
+			if(args[0] instanceof IFutureReturnTypeComponentStep)
 			{
-				Method m = args[0].getClass().getMethod("execute", new Class[]{IInternalAccess.class});
-				ret = m.getReturnType();
+				ret	= ((IFutureReturnTypeComponentStep)args[0]).getFutureReturnType();
 			}
-			catch(Exception e)
+			else
 			{
-				throw new RuntimeException(e);
+				try
+				{
+					Method m = args[0].getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+					ret = m.getReturnType();
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
 			}
 		}
 		else
