@@ -8,6 +8,7 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IFutureReturnTypeComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.ServiceCall;
@@ -769,12 +770,36 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 //	}
 	
 	/**
-	 * 
+	 *  Create the future return type. 
 	 */
 	protected Future<Object> createReturnFuture(final IComponentIdentifier compid, final String callid, 
-		final Method method, final Class<?> type, final long to, final Map<String, Object> nonfunc, final ServiceInvocationContext sic)
+		final Method method, final Class<?> ftype, final long to, final Map<String, Object> nonfunc, final ServiceInvocationContext sic)
 	{
 		Future<Object> future;
+		
+		// Hack for scheduleStep return type
+		final Class<?> type;
+		if(method.getName().equals("scheduleStep") && sic!=null)
+		{
+			Object step = null;
+			Object[] args = sic.getArgumentArray();
+			if(args!=null)
+			{
+				for(Object arg: args)
+				{
+					if(arg instanceof IComponentStep)
+					{
+						step = arg;
+						break;
+					}
+				}
+			}
+			type = step instanceof IFutureReturnTypeComponentStep? ((IFutureReturnTypeComponentStep)step).getFutureReturnType(): ftype;
+		}
+		else
+		{
+			type = ftype;
+		}
 		
 		if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, type))
 		{

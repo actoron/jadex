@@ -22,6 +22,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IFutureReturnTypeComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
@@ -1453,7 +1454,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		try
 		{
 			Method method = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
-			Class<?> clazz = method.getReturnType();
+			Class<?> clazz = step instanceof IFutureReturnTypeComponentStep? ((IFutureReturnTypeComponentStep)step).getFutureReturnType(): method.getReturnType();
 //			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(getLogger()));
 			// Must not be fetched before properties are available!
 			ret = (Future<T>)FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(new IResultCommand<Logger, Void>()

@@ -11,6 +11,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IFutureReturnTypeComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -487,7 +488,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		
 		Method	m	= SReflect.getMethod(step.getClass(), "execute", new Class[]{IInternalAccess.class});
-		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(m.getReturnType(), new FutureFunctionality((Logger)null)) : new Future<T>();
+		Class<?> rt = step instanceof IFutureReturnTypeComponentStep? ((IFutureReturnTypeComponentStep)step).getFutureReturnType(): m.getReturnType();
+		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(rt, new FutureFunctionality((Logger)null)) : new Future<T>();
 		
 		if(!valid)
 		{
@@ -516,7 +518,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		
 		Method	m	= SReflect.getMethod(step.getClass(), "execute", new Class[]{IInternalAccess.class});
-		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(m.getReturnType(), new FutureFunctionality((Logger)null)) : new Future<T>();
+		Class<?> rt = step instanceof IFutureReturnTypeComponentStep? ((IFutureReturnTypeComponentStep)step).getFutureReturnType(): m.getReturnType();
+		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(rt, new FutureFunctionality((Logger)null)) : new Future<T>();
 		
 		if(!valid)
 		{
