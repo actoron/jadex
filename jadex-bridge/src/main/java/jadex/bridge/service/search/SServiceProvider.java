@@ -842,35 +842,19 @@ public class SServiceProvider
 		// Does not work for remote :-(
 		final TerminableIntermediateDelegationFuture<T> ret = new TerminableIntermediateDelegationFuture<T>();
 		
-		// Does not work for remote :-(
-//		provider.scheduleStep(new ImmediateComponentStep<Collection<T>>()
-//		{
-//			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)")
-//			public IFuture<Collection<T>> execute(IInternalAccess ia)
-//			{
-//				getServices(ia, type, scope, filter, false).addResultListener(new IntermediateDelegationResultListener<T>(ret));
-//				Future<Collection<T>> ret = new Future<Collection<T>>();
-//				ret.setResult(null);
-//				return ret;
-//			}
-//		});
-//		return ret;
-
-		// Does not work at all, because future type not preserved across schedule step :-(
-		return (ITerminableIntermediateFuture<T>)provider.scheduleStep(new ImmediateComponentStep<Collection<T>>()
+		provider.scheduleStep(new ImmediateComponentStep<Collection<T>>()
 		{
 			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)")
 			public IFuture<Collection<T>> execute(IInternalAccess ia)
 			{
-				return getServices(ia, type, scope, filter);
-			}
-			
-			@Override
-			public Class< ? extends IFuture> getFutureReturnType()
-			{
-				return ITerminableIntermediateFuture.class;
+				getServices(ia, type, scope, filter, false).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				Future<Collection<T>> ret = new Future<Collection<T>>();
+				ret.setResult(null);
+				return ret;
 			}
 		});
+
+		return ret;
 		
 		// Does not work at all, because future type not preserved across schedule step :-(
 //		return (ITerminableIntermediateFuture<T>)provider.scheduleStep(new ImmediateComponentStep<Collection<T>>()

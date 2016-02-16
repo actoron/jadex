@@ -259,6 +259,8 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 									{
 										public void resultAvailable(byte[] img)
 										{
+											if(ff==null)
+												System.out.println("hhh");
 											ff.setIcon(new ImageIcon(img));
 										}
 										
