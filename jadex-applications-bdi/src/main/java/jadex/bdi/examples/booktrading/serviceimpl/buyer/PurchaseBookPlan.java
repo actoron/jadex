@@ -35,7 +35,7 @@ public class PurchaseBookPlan extends Plan
 	public void body()
 	{
 		// Get order properties and calculate acceptable price.
-		Order order = (Order)getParameter("order").getValue();
+		final Order order = (Order)getParameter("order").getValue();
 		double time_span = order.getDeadline().getTime() - order.getStartTime();
 		double elapsed_time = getTime() - order.getStartTime();
 		double price_span = order.getLimit() - order.getStartPrice();
@@ -73,7 +73,7 @@ public class PurchaseBookPlan extends Plan
 				finished();
 			}
 
-			public void intermediateResultAvailable(IBuyBookService seller)
+			public void intermediateResultAvailable(final IBuyBookService seller)
 			{
 				cnt++;
 				
