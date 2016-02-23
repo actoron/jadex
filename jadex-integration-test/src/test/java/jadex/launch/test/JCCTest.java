@@ -70,7 +70,7 @@ public class JCCTest //extends TestCase
 			}
 		}).get(timeout*10);
 		
-		platform.killComponent().get(timeout);
+		platform.killComponent().get(timeout*10);
 		
 		fut	= null;
 		platform	= null;
