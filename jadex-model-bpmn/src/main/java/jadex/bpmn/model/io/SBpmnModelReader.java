@@ -674,13 +674,20 @@ public class SBpmnModelReader
 			edge.setName(edgename);
 			MActivity src = (MActivity) emap.get(attrs.get("sourceRef"));
 			MActivity tgt = (MActivity) emap.get(attrs.get("targetRef"));
-			edge.setSource(src);
-			edge.setTarget(tgt);
-			
-			src.addOutgoingMessagingEdge(edge);
-			tgt.addIncomingMessagingEdge(edge);
-			
-			emap.put(edge.getId(), edge);
+			if (src != null && tgt != null)
+			{	
+				edge.setSource(src);
+				edge.setTarget(tgt);
+				
+				src.addOutgoingMessagingEdge(edge);
+				tgt.addIncomingMessagingEdge(edge);
+				
+				emap.put(edge.getId(), edge);
+			}
+			else
+			{
+				System.out.println("Warning: Ignoring message edge with missing endpoints: " + edge.getId() + " src=" + String.valueOf(src) + " tgt=" + String.valueOf(tgt));
+			}
 		}
 		else if ("conditionExpression".equals(tag.getLocalPart()))
 		{
