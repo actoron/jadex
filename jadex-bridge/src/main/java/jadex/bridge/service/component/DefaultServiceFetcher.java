@@ -277,9 +277,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 //										{
 //											final IComponentManagementService cms = (IComponentManagementService)result;
 	
-											for(Iterator it=coll.iterator(); it.hasNext(); )
+											for(Iterator<IExternalAccess> it=coll.iterator(); it.hasNext(); )
 											{
-												final IExternalAccess ea = (IExternalAccess)it.next();
+												final IExternalAccess ea = it.next();
 //												final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
 	
 												SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, filter)

@@ -27,7 +27,7 @@ public class MavenTest2
 		};
 		String[]	gids	= new String[]{
 			"de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0",
-			"net.sourceforge.jadex:jadex-applications-bdi:2.0"
+			"org.activecomponents.jadex:jadex-applications-bdi:2.0"
 		};
 		
 		MavenDependencyResolverService	mh	= new MavenDependencyResolverService(new BasicComponentIdentifier("dummy"));

@@ -47,6 +47,9 @@ task processDocs(type: Copy) {
     from('.') {
         include 'mkdocs.yml'
         include 'docs/index.md'
+        if (project.hasProperty('noVersion') && project.property('noVersion')) {
+            expand(jadexversion: "")
+        }
         expand(jadexversion: version.toString())
     }
 }

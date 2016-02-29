@@ -11,7 +11,7 @@ public class MavenUpdateAgent extends UpdateAgent
 	//-------- attributes --------
 	
 	/** The resource to update. */
-	protected IResourceIdentifier rid = new ResourceIdentifier(null, new GlobalResourceIdentifier("net.sourceforge.jadex:jadex-platform-standalone:2.1", null, null));
+	protected IResourceIdentifier rid = new ResourceIdentifier(null, new GlobalResourceIdentifier("org.activecomponents.jadex:jadex-platform-standalone:2.1", null, null));
 
 //	/**
 //	 *  Start the update check.

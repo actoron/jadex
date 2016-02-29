@@ -1,23 +1,27 @@
 apply plugin: 'java'
 
+def jadex_version	= "${jadex_build_version}"
+
 dependencies {
-	compile 'net.sourceforge.jadex:jadex-distribution-standard:${jadex_build_version}' 
-	//compile 'net.sourceforge.jadex:jadex-distribution-minimal:${jadex_build_version}'
-	//compile 'net.sourceforge.jadex:jadex-distribution-server:${jadex_build_version}'
-	//compile 'net.sourceforge.jadex:jadex-distribution-pro:${jadex_build_version}'
+	compile 'org.activecomponents.jadex:jadex-distribution-standard:'+jadex_version
+	//compile 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version
+	//compile 'org.activecomponents.jadex:jadex-distribution-server:'+jadex_version
+	//compile 'org.activecomponents.jadex:jadex-distribution-pro:'+jadex_version
 }
 
 repositories {
 	mavenCentral()
-//	maven {
-//		url "http://www.activecomponents.org/nexus/content/repositories/snapshots"
-//	}
-//	maven {
-//		url "http://www.activecomponents.org/nexus/content/repositories/pro-snapshots"
-//	}
-//	maven {
-//		url "http://www.activecomponents.org/nexus/content/repositories/pro-releases"
-//	}
+	// Additional repositories (only required when using nightlies and/or pro version of Jadex).
+	maven {
+		url "https://nexus.actoron.com/content/repositories/oss"
+	}
+	maven {
+		url "https://nexus.actoron.com/content/repositories/oss-nightlies"
+	}
+	maven {
+		url "http://nexus.actoron.com/nexus/content/repositories/pro"
+	}
+	maven {
+		url "http://nexus.actoron.com/nexus/content/repositories/pro-nightlies"
+	}
 }
-
-

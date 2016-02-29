@@ -37,16 +37,16 @@ public class JadexMavenRunner
 //		String[]	gids	= new String[]
 //		{
 //			// Latest snapshot version.
-//			"net.sourceforge.jadex:jadex-tools-base:[2.0-SNAPSHOT,)",
-//			"net.sourceforge.jadex:jadex-platform-standalone:[2.0-SNAPSHOT,)",
-//			"net.sourceforge.jadex:jadex-kernel-component:[2.0-SNAPSHOT,)",
-//			"net.sourceforge.jadex:jadex-kernel-micro:[2.0-SNAPSHOT,)",
-//			"net.sourceforge.jadex:jadex-runtimetools:[2.0-SNAPSHOT,)"
+//			"org.activecomponents.jadex:jadex-tools-base:[2.0-SNAPSHOT,)",
+//			"org.activecomponents.jadex:jadex-platform-standalone:[2.0-SNAPSHOT,)",
+//			"org.activecomponents.jadex:jadex-kernel-component:[2.0-SNAPSHOT,)",
+//			"org.activecomponents.jadex:jadex-kernel-micro:[2.0-SNAPSHOT,)",
+//			"org.activecomponents.jadex:jadex-runtimetools:[2.0-SNAPSHOT,)"
 //			
-////			"net.sourceforge.jadex:jadex-platform-standalone:2.0",
-////			"net.sourceforge.jadex:jadex-kernel-component:2.0",
-////			"net.sourceforge.jadex:jadex-kernel-micro:2.0",
-////			"net.sourceforge.jadex:jadex-runtimetools:2.0"
+////			"org.activecomponents.jadex:jadex-platform-standalone:2.0",
+////			"org.activecomponents.jadex:jadex-kernel-component:2.0",
+////			"org.activecomponents.jadex:jadex-kernel-micro:2.0",
+////			"org.activecomponents.jadex:jadex-runtimetools:2.0"
 //		};
 		
 		IComponentIdentifier	cid	= new BasicComponentIdentifier("dummy");

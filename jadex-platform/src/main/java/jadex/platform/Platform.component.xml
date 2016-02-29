@@ -3,7 +3,7 @@
   The platform provides the basic services for running components.
   In addition, the platform exposes several configuration options as arguments.
   Further platform start parameters, e.g. for custom initial components, are defined in the 
-  <a href="http://www.activecomponents.org/docs/jadex-2.5-javadoc/index.html?jadex/base/Starter.html">jadex.base.Starter class</a>.
+  <a href="https://download.actoron.com/docs/latest/javadoc/index.html?jadex/base/Starter.html">jadex.base.Starter class</a>.
 -->
 <componenttype xmlns="http://www.activecomponents.org/jadex-component"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

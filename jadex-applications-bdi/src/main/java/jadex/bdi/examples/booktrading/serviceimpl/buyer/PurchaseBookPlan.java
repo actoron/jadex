@@ -9,12 +9,17 @@ import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
 import jadex.bdi.examples.booktrading.serviceimpl.IBuyBookService;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.ServiceCall;
+import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  * The plan tries to purchase a book.
@@ -30,7 +35,7 @@ public class PurchaseBookPlan extends Plan
 	public void body()
 	{
 		// Get order properties and calculate acceptable price.
-		Order order = (Order)getParameter("order").getValue();
+		final Order order = (Order)getParameter("order").getValue();
 		double time_span = order.getDeadline().getTime() - order.getStartTime();
 		double elapsed_time = getTime() - order.getStartTime();
 		double price_span = order.getLimit() - order.getStartPrice();
@@ -39,37 +44,107 @@ public class PurchaseBookPlan extends Plan
 
 //		System.out.println("PurchaseBookPlan: "+order);
 
-		// Find available seller agents.
-		IBuyBookService[] services = getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
-		if(services.length == 0)
-		{
-//			System.out.println("No seller found, purchase failed.");
-			generateNegotiationReport(order, null, acceptable_price);
-			fail();
-		}
-
-		// Initiate a call-for-proposal.
-		Future<Collection<Tuple2<IBuyBookService, Integer>>>	cfp	= new Future<Collection<Tuple2<IBuyBookService, Integer>>>();
-		final CollectionResultListener<Tuple2<IBuyBookService, Integer>>	crl	= new CollectionResultListener<Tuple2<IBuyBookService, Integer>>(services.length, true,
+		Future<Collection<Tuple2<IBuyBookService, Integer>>> cfp = new Future<Collection<Tuple2<IBuyBookService, Integer>>>();
+		final CollectionResultListener<Tuple2<IBuyBookService, Integer>> crl = new CollectionResultListener<Tuple2<IBuyBookService, Integer>>(true,
 			new DelegationResultListener<Collection<Tuple2<IBuyBookService, Integer>>>(cfp));
-		for(int i=0; i<services.length; i++)
+		
+		// Find available seller agents.
+		ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
+		IRequiredServicesFeature rsf = getAgent().getComponentFeature(IRequiredServicesFeature.class);
+		ITerminableIntermediateFuture<IBuyBookService>  fut = rsf.getRequiredServices("buyservice");
+		fut.addIntermediateResultListener(new TimeoutIntermediateResultListener<IBuyBookService>(5000, getExternalAccess(),
+			new IIntermediateResultListener<IBuyBookService>()
 		{
-			final IBuyBookService	seller	= services[i];
-			seller.callForProposal(order.getTitle()).addResultListener(new IResultListener<Integer>()
+			int cnt;
+			public void exceptionOccurred(Exception exception)
 			{
-				public void resultAvailable(Integer result)
+//				System.out.println("ex: "+exception);
+				if(exception instanceof TimeoutException)
+					finished();
+			}
+			
+			public void resultAvailable(Collection<IBuyBookService> result)
+			{
+//				System.out.println("ra: "+result);
+				for(IBuyBookService ser: result)
 				{
-					crl.resultAvailable(new Tuple2<IBuyBookService, Integer>(seller, result));
+					intermediateResultAvailable(ser);
 				}
+				finished();
+			}
+
+			public void intermediateResultAvailable(final IBuyBookService seller)
+			{
+				cnt++;
 				
-				public void exceptionOccurred(Exception exception)
+//				System.out.println("ira: "+seller+" "+cnt);
+				
+				seller.callForProposal(order.getTitle()).addResultListener(new IResultListener<Integer>()
 				{
-					crl.exceptionOccurred(exception);
-				}
-			});
-		}
+					public void resultAvailable(Integer result)
+					{
+//						System.out.println("cfp end");
+						crl.resultAvailable(new Tuple2<IBuyBookService, Integer>(seller, result));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						crl.exceptionOccurred(exception);
+					}
+				});
+			}
+			
+			public void finished()
+			{
+//				System.out.println("fini");
+				crl.setNumber(cnt);
+			}
+		}));
+		
+//		IBuyBookService[] services = getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
+//		if(services.length == 0)
+//		{
+//			System.out.println("No seller found, purchase failed.");
+//			generateNegotiationReport(order, null, acceptable_price);
+//			fail();
+//		}
+
+//		// Initiate a call-for-proposal.
+//		Future<Collection<Tuple2<IBuyBookService, Integer>>>	cfp	= new Future<Collection<Tuple2<IBuyBookService, Integer>>>();
+//		final CollectionResultListener<Tuple2<IBuyBookService, Integer>>	crl	= new CollectionResultListener<Tuple2<IBuyBookService, Integer>>(services.length, true,
+//			new DelegationResultListener<Collection<Tuple2<IBuyBookService, Integer>>>(cfp));
+//		for(int i=0; i<services.length; i++)
+//		{
+//			final IBuyBookService	seller	= services[i];
+//			seller.callForProposal(order.getTitle()).addResultListener(new IResultListener<Integer>()
+//			{cfp end
+//				public void resultAvailable(Integer result)
+//				{
+//					crl.resultAvailable(new Tuple2<IBuyBookService, Integer>(seller, result));
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					crl.exceptionOccurred(exception);
+//				}
+//			});
+//		}
+		
 		// Sort results by price.
-		Tuple2<IBuyBookService, Integer>[]	proposals	= cfp.get().toArray(new Tuple2[0]);
+//		System.out.println("before props: "+this);
+		Tuple2<IBuyBookService, Integer>[] proposals = cfp.get().toArray(new Tuple2[0]);
+//		System.out.println("after props: "+this);
+		
+		// Does not work because no intermediate results arrive this way
+//		Tuple2<IBuyBookService, Integer>[] proposals = null;
+//		try
+//		{
+//			proposals = cfp.get(5000).toArray(new Tuple2[0]);
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 		Arrays.sort(proposals, new Comparator<Tuple2<IBuyBookService, Integer>>()
 		{
 			public int compare(Tuple2<IBuyBookService, Integer> o1, Tuple2<IBuyBookService, Integer> o2)
@@ -96,7 +171,7 @@ public class PurchaseBookPlan extends Plan
 			
 			fail();
 		}
-		//System.out.println("result: "+cnp.getParameter("result").getValue());
+//		System.out.println("result: "+cnp.getParameter("result").getValue());
 	}
 	
 	/**
@@ -122,4 +197,16 @@ public class PurchaseBookPlan extends Plan
 		//System.out.println("REPORT of agent: "+getAgentName()+" "+report);
 		getBeliefbase().getBeliefSet("negotiation_reports").addFact(nr);
 	}
+	
+//	@Override
+//	public void failed()
+//	{
+//		System.out.println("failed: "+this);
+//	}
+//	
+//	@Override
+//	public void aborted()
+//	{
+//		System.out.println("aborted: "+this);
+//	}
 }
