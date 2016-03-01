@@ -35,7 +35,7 @@ public class BDICreationTest //extends TestCase
 		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
 		String projectroot = new String("jadex-integration-performance-test");
 		File resdir = SUtil.findResourceDir(projectroot, false);
-		System.out.println(resdir);
+//		System.out.println(resdir);
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
 			"-logging", "false",

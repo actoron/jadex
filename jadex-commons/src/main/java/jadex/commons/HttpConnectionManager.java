@@ -81,8 +81,6 @@ public class HttpConnectionManager
 	 */
 	public static	void	closeConnection(HttpURLConnection con)
 	{
-
-		
 		// Use sun.net.www.http.HttpClient.closeServer()
 		// as con.disconnect() just blocks for sun default implementation :-(
 		if(con.getClass().getName().startsWith("sun.net.www.protocol."))	// http+https impls.

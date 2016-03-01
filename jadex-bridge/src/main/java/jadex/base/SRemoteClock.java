@@ -409,30 +409,38 @@ public class SRemoteClock
 		 */
 		public void changeOccurred(ChangeEvent event)
 		{
-			// Code in component result listener as clock runs on its own thread. 
-			simservice.isExecuting().addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+			// Code in component thread as clock runs on its own thread.
+			instance.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
-				public void resultAvailable(Object result)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					try
+					simservice.isExecuting().addResultListener(new IResultListener<Boolean>()
 					{
-//							System.out.println("elementChanged");
-						boolean	executing	= ((Boolean)result).booleanValue();
-						IClockService	cs	= simservice.getClockService();
-						elementChanged("clock", new ClockState(cs.getClockType(), cs.getTime(), cs.getTick(), cs.getStarttime(),
-							cs.getDelta(), IClock.TYPE_CONTINUOUS.equals(cs.getClockType()) ? cs.getDilation() : 0, !executing));
-					}
-					catch(Exception e)
-					{
-						exceptionOccurred(e);
-					}
+						public void resultAvailable(Boolean result)
+						{
+							try
+							{
+//								System.out.println("elementChanged");
+								boolean	executing	= result.booleanValue();
+								IClockService	cs	= simservice.getClockService();
+								elementChanged("clock", new ClockState(cs.getClockType(), cs.getTime(), cs.getTick(), cs.getStarttime(),
+									cs.getDelta(), IClock.TYPE_CONTINUOUS.equals(cs.getClockType()) ? cs.getDilation() : 0, !executing));
+							}
+							catch(Exception e)
+							{
+								exceptionOccurred(e);
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							dispose();
+						}
+					});
+					
+					return IFuture.DONE;
 				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					dispose();
-				}
-			}));
+			});
 		}
 
 		/**
@@ -485,35 +493,43 @@ public class SRemoteClock
 		 */
 		public void changeOccurred(ChangeEvent event)
 		{
-			// Code in component result listener as clock runs on its own thread. 
-			simservice.isExecuting().addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+			// Code in component thread as clock runs on its own thread.
+			instance.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
-				public void resultAvailable(Object result)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					try
+					simservice.isExecuting().addResultListener(new IResultListener<Boolean>()
 					{
-						boolean	executing	= ((Boolean)result).booleanValue();
-						String	clocktype	= simservice.getClockService().getClockType();
-						boolean	clockok	= simservice.getClockService().getNextTimer()!=null;
-						
-						if(laststate==null || executing!=laststate.executing || clockok!=laststate.clockok
-							|| !clocktype.equals(laststate.clocktype))
+						public void resultAvailable(Boolean result)
 						{
-							laststate	= new SimulationState(executing, clocktype, clockok);
-							elementChanged("simulation", laststate);
+							try
+							{
+								boolean	executing	= result.booleanValue();
+								String	clocktype	= simservice.getClockService().getClockType();
+								boolean	clockok	= simservice.getClockService().getNextTimer()!=null;
+								
+								if(laststate==null || executing!=laststate.executing || clockok!=laststate.clockok
+									|| !clocktype.equals(laststate.clocktype))
+								{
+									laststate	= new SimulationState(executing, clocktype, clockok);
+									elementChanged("simulation", laststate);
+								}
+							}
+							catch(Exception e)
+							{
+								exceptionOccurred(e);
+							}
 						}
-					}
-					catch(Exception e)
-					{
-						exceptionOccurred(e);
-					}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							dispose();
+						}
+					});
+					
+					return IFuture.DONE;
 				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					dispose();
-				}
-			}));
+			});
 		}
 
 		/**

@@ -449,7 +449,9 @@ public class HttpReceiver
 									con	= transport.getConnectionManager().openReceiverConnection(adr,
 										HttpReceiver.this.access.getComponentIdentifier());
 									
+//									System.out.println("HttpReceiver before getInputStream: "+adr);
 									InputStream	in	= con.getInputStream();
+//									System.out.println("HttpReceiver after getInputStream: "+adr);
 									address	= RelayConnectionManager.relayAddress(adr);
 									transport.connected(address, false);
 //									System.out.println("connected to: "+address);
@@ -462,7 +464,9 @@ public class HttpReceiver
 									while(true)
 									{
 										// Read message type.
+//										System.out.println("HttpReceiver before read");
 										int	b	= in.read();
+//										System.out.println("HttpReceiver after read");
 										
 										// Update timer
 										long	newtime	= System.currentTimeMillis();
