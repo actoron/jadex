@@ -1,20 +1,6 @@
 site_name: Jadex ${jadexversion} Documentation
 theme: readthedocs
 pages:
-#- 'index.md'
-#- Tutorials:
-#    - Quickstart Tutorial: 'Quickstart Tutorial/01 Introduction.md'
-#    - 'AC Tutorial': 'AC Tutorial/01 Introduction.md'
-#    - 'BDI Tutorial': 'BDI Tutorial/01 Introduction.md'
-#    - 'BDI V3 Tutorial': 'BDI V3 Tutorial/01 Introduction.md'
-#    - 'BPMN Tutorial': 'BPMN Tutorial/01 Introduction.md'
-    
-#- Guides:
-#    - 'AC Tool Guide': 'AC Tool Guide/all.md'
-#    - 'AC User Guide': 'AC User Guide/01 Introduction.md'
-#    - 'Android User Guide': 'Android User Guide/01 Introduction.md'
-#    - 'BDI User Guide': 'BDI User Guide/01 Introduction.md'
-#    - 'Env User Guide': 'Env User Guide/01 Introduction.md'
 
 - 'index.md'
 

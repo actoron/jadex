@@ -1,3 +1,5 @@
+# PlatformApp - ClientApp Separation (DEPRECATED)
+
 On desktop systems, Jadex provides a platform for other (user) applications.
 Those applications can be started using the JCC and don't contain any Jadex libraries, as those are provided by the platform.
 

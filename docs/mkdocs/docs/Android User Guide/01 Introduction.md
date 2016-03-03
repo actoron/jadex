@@ -1,37 +1,46 @@
-Introduction
-=========================
+#  Introduction
 
-Jadex Android is a framework for developing software agents running on the Android platform. Agent-oriented Software Engineering (AOSE) is a software development paradigm especially suited for distributed Systems as the main buildings blocks are constituted by software agents, whose outstanding characteristics are - among others - autonomy, message-based and asynchronous communication, re- and proactivity, social abilities and cooperation, etc.\
+Jadex Android is a framework for developing software agents running on the Android platform. Agent-Oriented Software Engineering (AOSE) is a software development paradigm especially suited for distributed Systems as the main buildings blocks are constituted by software agents, whose outstanding characteristics are - among others - autonomy, message-based and asynchronous communication, re- and proactivity, social abilities and cooperation. 
 ![JadexAndroid-Logo.png](JadexAndroid-Logo.png)
 
-On the one hand, AOSE allows to model active objects, meaning that e.g. the user and her needs can naturally be represented by an agents, taking the responsibilty to autonomously achieve the user's goals. On the other hand AOSE abstracts from lower-level details such as multithreading and communication issues, as in this respect the Jadex framework takes care of all these.
+From the perspective of an Android developer, there are several advantages of using Jadex.
+Communication and thus developing distributed software is made easy, because Jadex provides features such as awareness (auto-discovery of other platforms), remote service calls and secure communication.
+Decomposing the software into Active Components allows the developer to migrate compute-intense tasks to a cloud infrastructure without touching interfaces or implementation. 
+
+Most of the content of this guide assumes you are already familiar with Jadex and only discusses Android specifics and additions.
 
 -   [Chapter 2 - Installation](02%20Installation)  describes how to install the required tools and libaries and start development of Jadex Android applications.
--   [Chapter 3 - Using Jadex on Android](03%20Using%20Jadex%20on%20Android)  gives an overview of available API functions
+-   [Chapter 3 - Using Jadex on Android](03%20Using%20Jadex%20on%20Android) gives an overview of available API functions
 
-State of Implementation
-------------------------------------
+## General Notes on Jadex Android
 
-Except for the UI, multiple Jadex modules were ported to android, replacing incompatible libraries and calls with ones that are compatible with android. Although we try to keep up with new jadex features, some things are still missing on android.\
-You can follow the release notes below to get an impression of the ongoing development, the latest implementation can be found in the [download](https://www.activecomponents.org/bin/view/Download/Overview)  section.
+Most of the Jadex features are available on Android, too.
+The probably most important difference is that there is no JCC and Android Apps are initialized very differently - you can read more about that in [Chapter 3](03 Using Jadex on Android/#differences-to-the-desktop-version-of-jadex).
 
+You can follow the release notes below to get an impression of the ongoing development, the latest distribution can be found on the [download page](https://www.activecomponents.org/bin/view/Download/Distributions).
 
+### Unsupported Modules
 
-### Supported Modules
+Most notably, there is no JCC and no envsupport available on Android.
+This is a more complete list of currently unsupported modules on Jadex Android:
 
-This is a list of all supported jadex modules as of version 2.4:
+-   jadex-json
+-   jadex-kernel-application
+-   jadex-kernel-extension-agr
+-   jadex-kernel-extension-envsupport
+-   jadex-platform-extension-management
+-   jadex-platform-extension-maven
+-   jadex-platform-extension-securetransport
+-   jadex-platform-extension-webservice (REST client is supported)
+-   jadex-servletfilter
+-   several jadex-tools modules
 
--   jadex-kernel-base
--   jadex-kernel-bdi
--   jadex-kernel-bdiv3 (only with compile-time generation, see here)
--   jadex-kernel-bpmn
--   jadex-kernel-bdibpmn
--   jadex-kernel-component
--   jadex-kernel-micro
--   jadex-platform-extension-webservice (REST client only)
+##  Release Notes
 
-Release Notes
---------------------------
+### 3.0-RC16
+
+-   PlatformConfiguration object for platform configuration
+-   Android Studio support (Eclipse support dropped!)
 
 ### 2.5-SNAPSHOT
 

@@ -30,6 +30,8 @@ We try to list some of the differences here to avoid confusion.
 
 -   **UI can be paused any time:** Because an Android UI Component can be paused or destroyed at any time, it is recommended to let the Jadex Platform run in an Android Service.
 
+-  **BDIV3 compile time generation**
+
 Start a Jadex Platform
 -----------------------------------
 
