@@ -1,5 +1,4 @@
-Using Jadex on Android
-===================================
+#  Using Jadex on Android (outdated)
 
 Once you have installed the necessary tools, the **jadex-android-example-project** can be helpful to get started.
 

@@ -13,7 +13,7 @@ This document will guide you through the setup that is necessary to develop appl
 
 ### **Note for 64-bit Ubuntu installations:**
 > If you have a 64bit ubuntu distributions, install the following packages first:  
-> ```sudo apt-get install lib32stdc++6```
+> ```sudo apt-get install lib32stdc++6 lib32z1```
 
 ### Install Android Studio
 First, set the *JAVA_HOME* environment variable to your JDK (This may be done automatically).
@@ -47,15 +47,18 @@ If you get an error like this:
 Open the SDK Manager by clicking on the provided link inside the error message, click the checkbox next to the SDK Platform with the API Level given in the error message (e.g. choose **Android 5.0.1** for API Level **21**) and click *OK*.  
 The required SDK platform will be downloaded and the project should build sucessfully.
 
+## Setting up an Android Virtual Device (AVD)
+If you haven't set up an Android Virtual Device at this point, follow this instructions.  
+Open the AVD manager by clicking on ![](studio_avd_icon.png). Click on *Create Virtual Device* and follow the instructions.  
+We recommend to choose a device which supports a minimum API Level of **21**.  
+Choosing an x86 ABI will result in a faster emulator, but can only run if hardware emulation is enabled on your system.
+Read more about this in the [Emulator documentation](http://developer.android.com/tools/devices/emulator.html#accel-vm)
+
 ## Run example Project
 
 When successfully imported and built, you can view the project files by activating the *Project* Tab on the left (![](studio_project_tab.png)).
 A run configuration will appear in the upper toolbar.  
-Click on the green arrow on the right of the configuration *jadex-android-example-project-gradle* to launch the project (![](studio_build_config_run.png)).
-
-### Setting up an Android Virtual Device (AVD)
-> If you haven't set up an Android Virtual Device at this point, android studio will ask you to do so.
-
-Once the APK is generated, it will be uploaded onto the AVD and executed.
+Click on the green arrow on the right of the configuration *jadex-android-example-project-gradle* to launch the project (![](studio_build_config_run.png)). Choose a running device or launch a new emulator as requested.  
+Once the APK is generated, it will be uploaded onto the AVD and executed.  
 Proceed to the next chapter to learn about how to create your own Jadex Android Application.
 
