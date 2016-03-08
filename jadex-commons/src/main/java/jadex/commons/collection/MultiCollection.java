@@ -95,7 +95,7 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 		{
 			K	key	= i.next();
 			Collection<V> coll = map.get(key);
-			size	+= coll.size();
+			size	+= (coll != null ? coll.size() : 0);
 		}
 		return size;
 	}
@@ -115,7 +115,7 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 	 * this map contains at a mapping for a key <tt>k</tt> such that
 	 * <tt>(key==null ? k==null : key.equals(k))</tt>.  (There can be
 	 * at most one such mapping.)
-	 *
+	 *Be
 	 * @param key key whose presence in this map is to be tested.
 	 * @return <tt>true</tt> if this map contains a mapping for the specified
 	 *         key.
