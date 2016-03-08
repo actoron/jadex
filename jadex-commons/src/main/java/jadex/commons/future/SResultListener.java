@@ -1,8 +1,11 @@
 package jadex.commons.future;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Logger;
 
 import jadex.commons.DebugException;
+import jadex.commons.SUtil;
 
 /**
  * Static helper class for creating result listeners.
@@ -73,7 +76,10 @@ public class SResultListener {
 					exception.printStackTrace();
 				}
 
-				getLogger().severe("Exception occurred: "+this+", "+ exception);
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				exception.printStackTrace(pw);
+				getLogger().severe("Exception occurred: "+this+", "+ sw.toString());
 			}
 		};
     }
@@ -103,7 +109,6 @@ public class SResultListener {
      * Creates an {@link IResultListener} that delegates results and exceptions to a given Future.
      * 
      * @param delegate The future used for success delegation.
-     * @param undone Flag if undone methods should be used.
      * @param customResultListener Custom result listener that overwrites the delegation behaviour.
      * @return {@link IResultListener}
      */
@@ -219,7 +224,7 @@ public class SResultListener {
 	 * SuccessListener and Exceptions to the given ExceptionListener.
 	 * 
 	 * @param sucListener The SuccessListener.
-	 * @param exListener The ExceptionListener. If <code>null</code>, exceptions are logged.
+	 * @param exceptionListener The ExceptionListener. If <code>null</code>, exceptions are logged.
 	 * @return {@link IResultListener}
 	 */
 	public static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exceptionListener)
