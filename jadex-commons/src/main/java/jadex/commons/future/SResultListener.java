@@ -14,7 +14,7 @@ public class SResultListener {
 	
 	/** Get the logger. */
 	private static Logger getLogger() {
-		if (logger != null) {
+		if (logger == null) {
 			logger = Logger.getLogger("s-result-listener");
 		}
 		return logger;
@@ -72,7 +72,8 @@ public class SResultListener {
 					debugException.printStackTrace();
 					exception.printStackTrace();
 				}
-				getLogger().severe("Exception occurred: "+this+", "+exception);
+
+				getLogger().severe("Exception occurred: "+this+", "+ exception);
 			}
 		};
     }
