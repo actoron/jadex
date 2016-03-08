@@ -84,6 +84,7 @@ pages:
     - 'Env User Guide/05 2D Visualization.md'
     - 'Env User Guide/06 3D Visualization.md'
     - 'Env User Guide/07 Environment Instance.md'
+    - 'Env User Guide/08 Standalone.md'
 - Android User Guide:
     - 'Android User Guide/01 Introduction.md'
     - 'Android User Guide/02 Installation.md'
