@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ExpandProperties
+
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -37,20 +39,32 @@ defaultTasks 'buildDocs'
  * Process docs to replace variables like version
  */
 task processDocs(type: Copy) {
+    // load doc variables
+    def props = new Properties()
+    new File("docvariables.properties").withInputStream {
+        stream -> props.load(stream)
+    }
+    props.each() { k, v ->
+        ant.properties[k] = v
+    }
+    ant.properties['ireallyneedajadexversion'] = version.toString()
+    if (project.hasProperty('noVersion') && project.property('noVersion')) {
+        ant.properties['jadexversion'] = ''
+    } else {
+        ant.properties['jadexversion'] = version.toString()
+    }
     into project.buildDir.getCanonicalPath() + "${File.separator}mkdocs"
 //    outputs.upToDateWhen {false}
-    from('docs') {
+    from('docs') { // everything but md source
         include '**/*'
-        exclude 'index.md'
+        exclude '*.md'
         into 'docs'
+
     }
-    from('.') {
+    from ('.') { // preprocess md source
+        include '**/*.md'
         include 'mkdocs.yml'
-        include 'docs/index.md'
-        if (project.hasProperty('noVersion') && project.property('noVersion')) {
-            expand(jadexversion: "")
-        }
-        expand(jadexversion: version.toString())
+        filter(ExpandProperties, project: ant.project)
     }
 }
 

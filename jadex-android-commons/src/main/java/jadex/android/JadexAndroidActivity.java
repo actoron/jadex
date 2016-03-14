@@ -118,6 +118,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 * Sets the Kernels.
 	 * See {@link jadex.base.RootComponentConfiguration.KERNEL} Constants for available Kernels.
 	 * @param kernels
+	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
 	 */
 	protected void setPlatformKernels(String ... kernels) {
 		this.platformConfiguration.getRootConfig().setKernels(kernels);
@@ -135,6 +136,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	/**
 	 * Sets the name of the platform that is started by this activity.
 	 * @param name
+	 * @deprecated use getPlatformConfiguration().setPlatformName() instead.
 	 */
 	protected void setPlatformName(String name) {
 		this.platformConfiguration.setPlatformName(name);

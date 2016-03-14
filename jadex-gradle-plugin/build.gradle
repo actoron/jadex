@@ -14,9 +14,6 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
 }
 
-//group = 'net.sourceforge.jadex'
-//version = gradleplugin_build_version
-
 test.testLogging.showStandardStreams = true
 
 repositories {

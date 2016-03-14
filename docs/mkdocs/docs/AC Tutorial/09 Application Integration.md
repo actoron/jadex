@@ -65,6 +65,7 @@ Instead of having to supply the arguments from the outside, you will typically w
 -   Copy the *MainH1* class to a new file *MainH2.java*.
 -   Change the body of the main method to the following:
 
+TODO: outdated configuration style
 
 ```java
 

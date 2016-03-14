@@ -1,46 +1,85 @@
-#  Using Jadex on Android (outdated)
+#  Using Jadex on Android
 
-Once you have installed the necessary tools, the **jadex-android-example-project** can be helpful to get started.
-
+Once you have installed the necessary tools, the **jadex-android-example-project** can be helpful to get started.  
 This guide, however, does **not** assume you are using the example project, but instead introduces the API of Jadex for Android step by step.
 
 To understand the basics of android application development, please take a look at the [Android Developer Guide](http://developer.android.com/guide/)  .
-This guide and all included demo applications are currently using the API Level 8, which is supported in android 2.2 and above.
+This guide and all included demo applications are currently using a minimum API Level of ${AndroidMinApiLevel}, which is supported in android ${AndroidMinAndroidVersion} and above.
 
 We assume that you created a basic Android Application to start with.
 
-Differences to the desktop version of Jadex
---------------------------------------------------------
+##  Differences to the desktop version of Jadex
 
-While programming components is the same on the standard jadex distribution and the android version, everything else is different.
+While developing Active Components is the same on the standard Jadex distribution and the android version, everything else is different.
 We try to list some of the differences here to avoid confusion.
 
--   **No JCC:** First, there is no JCC (Jadex Control Center). This has a simple reason: There are no Java Swing components included in the Android runtime libraries. But, when you develop Android Applications, you'll want to have a native UI anyway.
+-   **No JCC:** First, there is no JCC (Jadex Control Center). This has a simple reason: There are no Java swing components included in the Android runtime libraries. But, when you develop Android Applications, you'll want to have a native UI anyway.
 
+-   **UI as entry point:** In the Desktop variant of Jadex, you have Active Components that create their own UI. On Android, the entry point of an application IS the UI (e.g. an Activity). Because of this, components can never create the UI on Android.
 
-
--   **UI as entry point:** In Desktop Jadex, you have Active Components that create their own UI. On Android, the entry point of an application IS the UI (e.g. an Activity). Because of this, components can never create the UI on Android.
-
-
-
--   **The Jadex Platform runs inside an Application:** In consequence, instead of running the Jadex Platform and then starting applications, on Android, you will first start your application which then can launch a Jadex Platform. The Platform is also not shared across applications by default.
-
-
+-   **The Jadex Platform runs inside an Application:** In consequence, instead of running the Jadex Platform and then starting applications, on Android, you will first start your application which then can launch a Jadex Platform. The Platform is also not shared across applications. This is very similar to the Jadex [application integration](../AC Tutorial/09 Application Integration/), so most things written down there also apply for Jadex Android.
 
 -   **UI can be paused any time:** Because an Android UI Component can be paused or destroyed at any time, it is recommended to let the Jadex Platform run in an Android Service.
 
--  **BDIV3 compile time generation**
+-  **BDIV3 compile time generation:** If you want to use BDIV3 components on Android, you need to include a gradle plugin that handles the code generation that is required. As opposed to desktop variants, in Jadex Android, the required code is generated at compile time to save performance.
+ This is described in detail in [Chapter 04](04 Using BDIv3/).
 
-Start a Jadex Platform
------------------------------------
+##  Declare the required libraries
+To use Jadex for Android, first open your project's build.gradle. 
+It's usually located in *app/build.gradle* and shown in the *Gradle Scripts* section of android studio:
+
+![Build gradle](studio_build_gradle.png)
+
+
+Now add the following lines to include the Jadex dependencies:
+
+```groovy
+repositories {
+    mavenCentral()
+    maven
+    {
+        name 'jadexsnapshots'
+        url 'https://nexus.actoron.com/content/repositories/oss-nightlies/'
+    }
+    maven
+    {
+        name 'jadexreleases'
+        url 'https://nexus.actoron.com/content/repositories/oss/'
+    }
+}
+
+dependencies {
+    // required: 
+    compile 'org.activecomponents.jadex:jadex-platform-android:${ireallyneedajadexversion}'
+    
+    // optional:
+    compile 'org.activecomponents.jadex:jadex-kernel-bdiv3-android:${ireallyneedajadexversion}'
+    
+    compile 'org.activecomponents.jadex:jadex-kernel-bpmn:${ireallyneedajadexversion}'
+    compile 'org.activecomponents.jadex:jadex-kernel-component:${ireallyneedajadexversion}'
+    compile 'org.activecomponents.jadex:jadex-android-xmlpull:${ireallyneedajadexversion}'
+    compile 'org.activecomponents.jadex:jadex-android-antlr:${ireallyneedajadexversion}'
+    
+    // Control center: 
+    compile 'org.activecomponents.jadex:jadex-runtimetools-android:${ireallyneedajadexversion}'
+    // REST client:
+    compile 'org.activecomponents.jadex:jadex-platform-extension-webservice-android:${ireallyneedajadexversion}'
+}
+
+
+```
+
+You can of course leave out any optional dependency as long as you don't need it.
+
+## Start a Jadex Platform
 
 To use Jadex components, you first have to start a Jadex Platform.
-This can be done in different ways, both of them are described below.
+This can be done in two different ways, both of them are described below.
 
 ### Use the Jadex Platform directly in an activity
 
-This method is only recommended for simple applications, e.g. if you **don't care** about running in **background**.
-Also, the jadex **platform will shutdown** if the application gets destroyed, for example when **turning the device**.
+This method is only recommended for simple applications, e.g. if you **don't care** about the application's lifecycle, getting paused by the system or running in **background**.
+Also, the Jadex **platform will shutdown** if the application gets destroyed, for example when **turning the device**.
 Skip this section if you don't like that.
 
 If such limitations doesn't matter or you simply want to test jadex on android, you can have your main activity extend the *JadexAndroidActivity* class.
@@ -58,17 +97,18 @@ public class HelloWorldActivity extends JadexAndroidActivity
 public HelloWorldActivity()
   {
     super();
-    setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
     setPlatformAutostart(true);
-    setPlatformName("HelloPlatform");
-    setPlatformOptions("<insert normal jadex options here>");
+    PlatformConfiguration config = getPlatformConfiguration();
+    config.setPlatformName("HelloPlatform");
+    RootComponentConfiguration rootConfig = config.getRootConfig();
+    rootConfig.setAwareness(true);
+    rootConfig.setKernels(KERNEL_MICRO);
   }
 }
 
 ```
 
-
-Available platform options are documented [here](http://www.activecomponents.org/jadex-applications-web/jadexdoc/view?model=/jadex/platform/Platform.component.xml) .
+Available platform options are documented [here](${URLPlatformConfigDoc}) .
 Setting up an activity like this will start a jadex-platform during the *onCreate()* phase and inform the activity about the progress in the two methods 
 ```java
 onPlatformStarting()  
@@ -102,19 +142,10 @@ like this:
 
 The jadex platform will also be automatically terminated during the *onDestroy()* phase, e.g. when the activity is terminated by the user.
 
-If you use 
-```java
-setPlatformAutostart(false)
-```
-the platform can be started manually by calling 
-```java
-startPlatform()
-```
+If you use ```setPlatformAutostart(false)```, the platform can be started manually by calling ```startPlatform()```.
 
 Regardless of which method us beeing used, the platform can always be stopped by calling 
-```java
-stopPlatforms()
-```
+```stopPlatforms() ```.
 
 
 ### Use the Jadex Platform in a service
@@ -123,76 +154,61 @@ If you need to create a more complex application, which should perform backgroun
 
 The Jadex-Android-Example-Project shows how to use this method in the *jadex.android.exampleproject.extended* package.
 
-For your service class, extend 
-```java
-JadexPlatformService
-```
- like this:
-
+For your service class, extend ```JadexPlatformService``` like this:
 
 ```java
-
 public class MyJadexService extends JadexPlatformService
-
 ```
 
 
 By default, the service will autostart a jadex platform on creation.
-To adjust Jadex Platform behaviour, use these methods 
-```java
-setPlatformAutostart(...)
-setPlatformKernels(...)
-setPlatformName(...)
-setPlatformOptions(...)
-```
-
-in the service constructor, like below:
-
+To adjust Jadex Platform behaviour, implement the constructor like below:
 
 ```java
   public MyJadexService()
   {
+    super()
     setPlatformAutostart(false);
-    setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
-    setPlatformName("JadexAndroidExample");
-    setPlatformOptions("-awareness false");
+    PlatformConfiguration config = getPlatformConfiguration();
+    config.setPlatformName("HelloPlatform");
+    RootComponentConfiguration rootConfig = config.getRootConfig();
+    rootConfig.setAwareness(true);
+    rootConfig.setKernels(KERNEL_MICRO);
   }
 ```
-  
 
-### Create Agents/Components
-
-When you implement Agents that should run on an Android device, use the specific Classes 
+As with using jadex from an activity, you can override the methods
 ```java
-AndroidMicroAgent
+onPlatformStarting()  
 ```
-, ... (available since 2.4).
-These classes offer additional functionality, such as event dispatching (see next section).
+and   
+```java
+onPlatformStarted()
+```
+to get access to the platform inside the service.
 
-A Component is started by the method 
-```
-startComponent()
-```
-As Parameters, you have to specify a component name and the path to it's model (xml) file. In case of MicroAgents, you can specify the Class of the Agent directly, e.g.
+## Create Agents/Components
 
+Agents and components are implement just like in the Jadex desktop variant.
+
+A Component is started by the method ```startComponent()```, which is available both in the activity and the service base class.
+
+As Parameters, you have to specify a component name and the path to it's model (class or xml) file, like *jadex/android/applications/demos/bdi/HelloWorld.agent.xml*. In case of MicroAgents, you can specify the Class of the Agent directly, e.g.
 
 ```java
-
 startComponent("HelloWorldAgent", MyAgent.class).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
   public void resultAvailable(IComponentIdentifier result)
   {
     System.out.println("Agent started");
   }
 });
-
 ```
 
 
 With the Result Listener you will be informed when the Agent is created.
 For more advanced scenarios, you can pass a *CreationInfo* object to the Agent which can contain additional parameters.
 
-Agent &lt;-&gt; Android Service Coupling
-=====================================================
+## Agent <-> Android Service Coupling
 
 The communication between Component and Service can be handled using a **ProvidedService** and **JadexAndroidEvents**.
 The Combination of the two offer an easy way of agent-service coupling.
@@ -204,27 +220,21 @@ The image below shows an overview of the communication model:
 
 ![](fragment-service-platform-communication.png)
 
-Android Service to Agent
--------------------------------------
+###  Android Service to Agent
 
 To make a Component accessable by the Android Service, first create the required interface:
 
-
 ```java
-
 public interface IAgentInterface
 {
   void callAgent(String message);
 }
-
 ```
 
 
 Now let your Component implement that interface and add it to the ProvidedServices declaration:
 
-
 ```java
-
 @ProvidedServices({
   @ProvidedService(name="agentinterface", type=IAgentInterface.class)
 })
@@ -233,40 +243,31 @@ public class MyAgent extends AndroidMicroAgent implements IAgentInterface
 {
   public void callAgent(String message) { ... }
 }
-
 ```
 
 
 To gain access to the Component via the interface you created, use the following code in your Android **Service**:
 
-
 ```java
-
   IAgentInterface agent = getsService(IAgentInterface.class);
   agent.callAgent("Hello Agent!");
-
 ```
 
 
 If you are using Jadex inside a JadexAndroidActivity, call getPlatformService() first:
 
-
 ```java
-
   IAgentInterface agent = getPlatformService().getsService(IAgentInterface.class);
-
 ```
 
 
-Agent to Android Service
--------------------------------------
+### Agent to Android Service
 
 Agent to Android Service communication is done event-based.
 First, create a custom Event Type that extends *JadexAndroidEvent* :
 
 
 ```java
-
 public class MyEvent extends JadexAndroidEvent
 {
   private String message;
@@ -281,17 +282,11 @@ public class MyEvent extends JadexAndroidEvent
     this.message = msg;
   }
 }
-
 ```
-
-
-
 
 For your Service to listen to Agent events, it has to register an EventReceiver (you can do this in *onCreate()* ):
 
-
 ```java
-
 registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
 {
   @Override
@@ -308,48 +303,37 @@ registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
     });
   }
 });
-
 ```
 
 
-To dispatch events in an Agent, just use the *dispatchEvent()* method (you need to extend AndroidMicroAgent for this method):
+To dispatch events in an Agent, you need to add a service declaration to your agent type:
+```java
+@RequiredServices({
+	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+})
+public class...
+```
 
+Now, the service can be injected into a field:
+```java
+	@AgentService
+	protected IContextService	context;
+```
+
+And used inside the agent's body() method:
 
 ```java
-
-  MyEvent myEvent = new MyEvent();
-  myEvent.setMessage("Hello Service!");
-  dispatchEvent(myEvent);
-
+    @AgentBody
+	public IFuture<Void> executeBody()
+	{
+	    MyEvent myEvent = new MyEvent();
+        myEvent.setMessage("Hello Service!");
+        context.dispatchEvent(myEvent);
+		return new Future<Void>();
+	}
 ```
 
-
-Starting Components
-================================
-
-To simply start a (bdi, bpmn, ...) component, use 
-```java
-startComponent()
-```
- in your Activity or Service and provide a component name and a valid model path:
-
-
-```java
-
-startComponent("HelloWorldAgent", "jadex/android/applications/demos/bdi/HelloWorld.agent.xml")
-.addResultListener(bdiCreatedResultListener);
-
-```
-
-
-For micro agents, please use 
-```java
-startMicroAgent()
-```
- and provide the class of the agent.
-
-Accessing the platform
------------------------------------
+## Accessing the platform
 
 The provided methods for accessing the platform depend on whether you are using JadexAndroidActivity (running Jadex inside an activity) or JadexPlatformService (running Jadex inside a service).
 You can, however, get the internal platform service from a JadexAndroidActivity by calling getPlatformService(). The returned object should contain all methods listed here.
@@ -364,8 +348,7 @@ If you want to access the platform manually, for features not covered by provide
 
 -   getPlatformAccess(): returns the external access to the platform
 
-Using remote services
-==================================
+##  Using remote services
 
 Jadex was designed for distributed systems and Jadex-Android supports all the distribution features, too.
 To use a remote service, just declare the required service like usual in the agent:
@@ -384,7 +367,7 @@ If Binding scope is set to global, services running on a desktop platform will b
 
 
 
-### Using the jadex control center
+## Using the jadex control center
 
 Jadex-android provides a simple replacement for the Desktop-JCC to configure security and awareness settings:
 
