@@ -76,7 +76,10 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		{
 			throw new JadexAndroidError("Class JadexPlatformService not found. Did you include the library jadex-platform-android in your build?");
 		}
-		bindService(serviceIntent, this, Service.BIND_AUTO_CREATE);
+		boolean result = bindService(serviceIntent, this, Service.BIND_AUTO_CREATE);
+		if (!result) {
+			throw new JadexAndroidError("Could not bind JadexPlatformService. Please include the service declaration in your manifest like this: \n <service android:name=\"jadex.android.service.JadexPlatformService\" android:label=\"JadexPlatformService\"/>");
+		}
 	}
 	
 	protected void onDestroy()

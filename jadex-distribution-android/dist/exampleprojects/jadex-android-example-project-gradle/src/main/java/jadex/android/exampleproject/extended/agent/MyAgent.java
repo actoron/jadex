@@ -8,6 +8,7 @@ import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
@@ -39,6 +40,7 @@ public class MyAgent	implements IAgentInterface
 	/**
 	 *  Called when the agent is started.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 //		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying hello!");
