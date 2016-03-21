@@ -41,7 +41,8 @@ defaultTasks 'buildDocs'
 task processDocs(type: Copy) {
     // load doc variables
     def props = new Properties()
-    new File("docvariables.properties").withInputStream {
+    def propfile = file("docvariables.properties");
+    propfile.withInputStream {
         stream -> props.load(stream)
     }
     props.each() { k, v ->
