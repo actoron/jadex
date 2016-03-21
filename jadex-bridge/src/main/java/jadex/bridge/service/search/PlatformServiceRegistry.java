@@ -360,7 +360,7 @@ public class PlatformServiceRegistry
 		{
 			if(services!=null)
 			{
-				Set<T> sers = (Set<T>)services.get(new ClassInfo(type));
+				Set<T> sers = (Set<T>) getServices(type);
 				if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 				{
 					// filter checks in loop are possibly performed outside of synchornized block

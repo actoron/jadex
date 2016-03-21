@@ -7,15 +7,26 @@ import jadex.android.controlcenter.settings.ISettings;
 import jadex.android.service.JadexPlatformService;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
+import jadex.commons.future.SResultListener;
 import jadex.micro.annotation.Binding;
 
 import java.io.Serializable;
@@ -221,38 +232,42 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 		}
 	}
 
-	private void addViewableServices(IExternalAccess extAcc)
+	private void addViewableServices(final IExternalAccess extAcc)
 	{
-//		ISearchManager manager = SServiceProvider.getSearchManager(true, Binding.SCOPE_PLATFORM);
-//		IVisitDecider decider = SServiceProvider.getVisitDecider(false, Binding.SCOPE_PLATFORM);
-//		BasicResultSelector<IService> selector = new BasicResultSelector<IService>(ViewableFilter.VIEWABLE_FILTER, false);
-//		IIntermediateFuture<IService> services = sp.getServices(manager, decider, selector);
-
-		IIntermediateFuture<IService> services = SServiceProvider.getServices(extAcc, IService.class, Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
-		
-		services.addResultListener(new IntermediateDefaultResultListener<IService>()
-		{
-
+		extAcc.scheduleStep(new IComponentStep<Void>() {
 			@Override
-			public void resultAvailable(Collection<IService> result)
-			{
-				for (IService service : result)
-				{
-					intermediateResultAvailable(service);
-				}
-			}
+			public IFuture<Void> execute(IInternalAccess ia) {
+				final Future<Void> ret = new Future<>();
+				PlatformServiceRegistry registry = PlatformServiceRegistry.getRegistry(ia);
+				ISubscriptionIntermediateFuture services = registry.searchServices(null, extAcc.getComponentIdentifier(), Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
 
-			@Override
-			public void intermediateResultAvailable(IService service)
-			{
-				if (addServiceSettings(servicesCat, service))
-				{
-					Preference dummyPref = servicesCat.findPreference("dummy");
-					if (dummyPref != null)
-						servicesCat.removePreference(dummyPref);
-				}
-			}
+				services.addResultListener(new IntermediateExceptionDelegationResultListener<IService, Void>(ret) {
 
+					@Override
+					public void resultAvailable(Collection<IService> result) {
+						for (IService service : result) {
+							intermediateResultAvailable(service);
+						}
+//						ret.setResult(null);
+					}
+
+					@Override
+					public void intermediateResultAvailable(IService service) {
+						if (addServiceSettings(servicesCat, service)) {
+							Preference dummyPref = servicesCat.findPreference("dummy");
+							if (dummyPref != null)
+								servicesCat.removePreference(dummyPref);
+						}
+					}
+
+					@Override
+					public void finished() {
+						ret.setResult(null);
+					}
+				});
+
+				return ret;
+			}
 		});
 	}
 

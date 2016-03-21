@@ -49,7 +49,7 @@ public class ClassInfo
 	public ClassInfo(Class<?> type)
 	{
 		if(type==null)
-			throw new IllegalArgumentException("Must not null.");
+			throw new IllegalArgumentException("Type must not be null.");
 		this.type = type; // remember only classname to avoid classloader dependencies
 //		this.typename = SReflect.getClassName(type);
 	}
@@ -61,7 +61,7 @@ public class ClassInfo
 	public ClassInfo(Type type)
 	{
 		if(type==null)
-			throw new IllegalArgumentException("Must not null.");
+			throw new IllegalArgumentException("Type must not be null.");
 		
 		if(type instanceof ParameterizedType)
 		{ 
@@ -76,12 +76,12 @@ public class ClassInfo
 	
 	/**
 	 *  Create a new class info.
-	 *  @param type The class info.
+	 *  @param typename The class name.
 	 */
 	public ClassInfo(String typename)
 	{
 		if(typename==null)
-			throw new IllegalArgumentException("Must not null.");
+			throw new IllegalArgumentException("Typename must not be null.");
 		int pos = typename.indexOf("<");
 		if(pos!=-1)
 		{
@@ -105,7 +105,7 @@ public class ClassInfo
 
 	/**
 	 *  Set the name.
-	 *  @param name The name to set.
+	 *  @param typename The name to set.
 	 */
 	public void setTypeName(String typename)
 	{

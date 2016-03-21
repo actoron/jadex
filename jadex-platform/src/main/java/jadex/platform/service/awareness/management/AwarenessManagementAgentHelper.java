@@ -137,7 +137,7 @@ public class AwarenessManagementAgentHelper
 			@Classname("refreshSettings")
 			public IFuture<AwarenessSettingsData> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				AwarenessManagementAgent agent = getPojoAgent(ia);
 				AwarenessSettingsData ret = new AwarenessSettingsData();
 				// Object[] ai = agent.getAddressInfo();
 				// ret.address = (InetAddress)ai[0];
@@ -165,8 +165,7 @@ public class AwarenessManagementAgentHelper
 			@Classname("getDiscoveryInfos")
 			public IFuture<DiscoveryInfo[]> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-//				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
+				AwarenessManagementAgent agent = getPojoAgent(ia);
 				return new Future<DiscoveryInfo[]>(agent.getDiscoveryInfos());
 			}
 		});
@@ -219,7 +218,7 @@ public class AwarenessManagementAgentHelper
 			@Classname("applySettings")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
+				AwarenessManagementAgent agent = getPojoAgent(ia);
 				// agent.setAddressInfo(settings.address, settings.port);
 				agent.setDelay(settings.delay);
 				agent.setFastAwareness(settings.fast);
@@ -249,7 +248,7 @@ public class AwarenessManagementAgentHelper
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IFuture<Void> ret;
-				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
+				AwarenessManagementAgent agent = getPojoAgent(ia);
 				DiscoveryInfo dif = agent.getDiscoveryInfo(cid);
 				if(create && dif != null)
 				{
@@ -314,5 +313,14 @@ public class AwarenessManagementAgentHelper
 			});
 
 		return ret;
+	}
+
+	/**
+	 * Retrieve the pojo agent instance.
+	 * @param ia
+	 * @return
+	 */
+	private AwarenessManagementAgent getPojoAgent(IInternalAccess ia) {
+		return (AwarenessManagementAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 	}
 }

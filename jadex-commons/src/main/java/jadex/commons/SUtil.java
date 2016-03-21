@@ -4259,7 +4259,7 @@ public class SUtil
 
 		/**
 		 * Get Android API version. Possible values:
-		 * http://developer.android.com/reference/android/os/Build.VERSION_CODES.htm
+		 * http://developer.android.com/reference/android/os/Build.VERSION_CODES.html
 		 * 
 		 * @return Android API version
 		 */
