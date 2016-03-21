@@ -81,12 +81,12 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 ### 0.0.4
 
 -   updated maven projects to maven-andoid-plugin-3.0.0-alpha-14 -&gt; supports ADT R15
--   communication between platforms fixed, so remote mobile platform components are visible in JCC\
+-   communication between platforms fixed, so remote mobile platform components are visible in JCC
     (This requires the HTTP Relay Transport to be enabled if running in an emulator)
 -   added AndroidSettingsService for File Access on Android Devices
 -   introduced AndroidContextService to provide access to android files (TODO: properties)
--   Security Service is active by default. The generated Plattform Password will be written to LogCat and saved in\
-    */data/data/&lt;packagename&gt;/files/&lt;platformname&gt;.settings.xml*.\
+-   Security Service is active by default. The generated Plattform Password will be written to LogCat and saved in
+    */data/data/<packagename\>/files/<platformname\>.settings.xml*.
     To disable the Security Service, just uncomment the Service in your platform.component.xml
 
 ### 0.0.3

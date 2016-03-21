@@ -50,7 +50,7 @@ The required SDK platform will be downloaded and the project should build sucess
 ## Setting up an Android Virtual Device (AVD)
 If you haven't set up an Android Virtual Device at this point, follow this instructions.  
 Open the AVD manager by clicking on ![](studio_avd_icon.png). Click on *Create Virtual Device* and follow the instructions.  
-We recommend to choose a device which supports a minimum API Level of **21**.  
+We recommend to choose a device which supports an API Level of **21**.  
 Choosing an x86 ABI will result in a faster emulator, but can only run if hardware emulation is enabled on your system.
 Read more about this in the [Emulator documentation](http://developer.android.com/tools/devices/emulator.html#accel-vm)
 
