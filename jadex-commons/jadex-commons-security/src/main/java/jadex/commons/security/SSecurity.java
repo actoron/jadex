@@ -43,6 +43,7 @@ import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.x509.X509V1CertificateGenerator;
 
 import jadex.commons.Base64;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 
@@ -54,7 +55,10 @@ public class SSecurity
 	static
 	{
 		BouncyCastleProvider bc = new BouncyCastleProvider();
-		java.security.Security.addProvider(bc);
+		if (!(SReflect.isAndroid() && SUtil.androidUtils().getAndroidVersion() > 19 && SUtil.androidUtils().getAndroidVersion() < 23)) {
+			// see https://code.google.com/p/android/issues/detail?id=68562
+			java.security.Security.addProvider(bc);
+		}
 	}
 	
 	/** Common secure random number source. */
