@@ -5,7 +5,9 @@ import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.android.exception.WrongEventClassError;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -297,6 +299,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		message.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receiver);
 		IComponentIdentifier cid = platformId;
 		message.put(SFipa.FIPA_MESSAGE_TYPE.getSenderIdentifier(), cid);
+		message.put(SFipa.PERFORMATIVE, SFipa.INFORM);
 		return sendMessage(message, SFipa.FIPA_MESSAGE_TYPE, receiver);
 	}
 
@@ -313,11 +316,9 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 
 		final Future<Void> ret = new Future<Void>();
 
-		getMS().addResultListener(new DefaultResultListener<IMessageService>()
-		{
-			public void resultAvailable(IMessageService ms)
-			{
-				ms.sendMessage(message, type, platformId, null, receiver, null).addResultListener(new DelegationResultListener<Void>(ret));
+		getService(IMessageService.class).addResultListener(new DefaultResultListener<IMessageService>() {
+			public void resultAvailable(final IMessageService ms) {
+				ms.sendMessage(message, type, getExternalPlatformAccess().getComponentIdentifier(), getExternalPlatformAccess().getModel().getResourceIdentifier(), null, null).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 

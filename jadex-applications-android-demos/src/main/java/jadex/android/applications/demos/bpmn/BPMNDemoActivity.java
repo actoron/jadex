@@ -6,6 +6,8 @@ import jadex.android.EventReceiver;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.bpmn.tasks.StartActivityEvent;
 import jadex.android.commons.JadexPlatformOptions;
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Reference;
@@ -30,9 +32,10 @@ public class BPMNDemoActivity extends JadexAndroidActivity
 	{
 		super();
 		setPlatformAutostart(true);
-		getPlatformConfiguration().setDefaultTimeout(-1);
-		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BPMN);
-		setPlatformName("bpmnDemoPlatform");
+		PlatformConfiguration config = getPlatformConfiguration();
+		config.setDefaultTimeout(-1);
+		config.getRootConfig().setKernels(RootComponentConfiguration.KERNEL.micro, RootComponentConfiguration.KERNEL.component, RootComponentConfiguration.KERNEL.bpmn);
+		config.setPlatformName("bpmnDemoPlatform");
 	}
 	
 	@Override

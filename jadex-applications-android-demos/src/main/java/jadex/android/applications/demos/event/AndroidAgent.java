@@ -1,15 +1,24 @@
 package jadex.android.applications.demos.event;
 
+import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IMessageAdapter;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.AbstractMessageHandler;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentFeature;
+import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -33,18 +42,33 @@ public class AndroidAgent
 	/** This field is injected by jadex. */
 	@Agent
 	protected IInternalAccess	agent;
-	
+
+	@AgentFeature
+	protected IMessageFeature messageFeature;
+
+	@AgentService
+	protected IContextService androidcontext;
+
 	//-------- methods --------
 	
 	/**
 	 *  Called when the agent is started.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
+
 		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying hello!");
 		return new Future<Void>();
 	}
-	
+
+
+	@AgentMessageArrived
+	public void handleMessage(Map<String, Object> msg, MessageType type) {
+		if (msg.get(SFipa.CONTENT).equals("ping")) {
+			showAndroidMessage(agent.getComponentIdentifier().getLocalName()  + ": pong");
+		}
+	}
 	
 
 	/**
@@ -56,16 +80,6 @@ public class AndroidAgent
 		return IFuture.DONE;
 	}
 
-	/**
-	 *  Called when the agent receives a message.
-	 */
-	public void messageArrived(Map<String, Object> msg, MessageType mt)
-	{
-		if (msg.get(SFipa.CONTENT).equals("ping")) {
-			showAndroidMessage(agent.getComponentIdentifier().getLocalName()  + ": pong");
-		}
-	}
-	
 	//-------- helper methods --------
 
 	/**
@@ -76,25 +90,12 @@ public class AndroidAgent
 	{
 		final ShowToastEvent event = new ShowToastEvent();
 		event.setMessage(msg);
-		agent.getComponentFeature(IRequiredServicesFeature.class)
-			.getRequiredService("androidcontext").addResultListener(new DefaultResultListener<Object>() {
+		IFuture<Boolean> dispatchUiEvent = androidcontext.dispatchEvent(event);
+		dispatchUiEvent.addResultListener(new DefaultResultListener<Boolean>() {
 
-			public void resultAvailable(Object result) {
-				IContextService contextService = (IContextService) result;
-				IFuture<Boolean> dispatchUiEvent = contextService.dispatchEvent(event);
-				dispatchUiEvent.addResultListener(new DefaultResultListener<Boolean>()
-				{
-
-					@Override
-					public void resultAvailable(Boolean result)
-					{
-						Log.d("Agent", "dispatched: " + result);
-					}
-				});
-			}
-			
-			public void exceptionOccurred(Exception exception) {
-				exception.printStackTrace();
+			@Override
+			public void resultAvailable(Boolean result) {
+				Log.d("Agent", "dispatched: " + result);
 			}
 		});
 	}

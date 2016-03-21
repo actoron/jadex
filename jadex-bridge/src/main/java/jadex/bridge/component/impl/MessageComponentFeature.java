@@ -160,7 +160,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public IFuture<Void> addMessageHandler(final IMessageHandler handler)
 	{
 		if(handler.getFilter()==null)
-			throw new RuntimeException("Filter must not null in handler: "+handler);
+			throw new RuntimeException("Filter must not be null in handler: "+handler);
 			
 		if(messagehandlers==null)
 		{
