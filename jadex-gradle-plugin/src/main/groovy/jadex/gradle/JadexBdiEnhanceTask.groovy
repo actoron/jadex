@@ -71,7 +71,7 @@ class JadexBdiEnhanceTask extends DefaultTask {
 
     @TaskAction
     def generate() {
-        log( "Running jadex bdi enhance... xxx")
+        log( "Running jadex bdi enhance...")
 
         generateBDI(inputDir)
     }
