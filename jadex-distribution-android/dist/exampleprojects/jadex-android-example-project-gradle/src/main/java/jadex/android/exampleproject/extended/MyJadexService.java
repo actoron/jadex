@@ -12,6 +12,8 @@ import jadex.android.exampleproject.MyEvent;
 import jadex.android.exampleproject.extended.agent.IAgentInterface;
 import jadex.android.exampleproject.extended.agent.MyAgent;
 import jadex.android.service.JadexPlatformService;
+import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Reference;
@@ -77,8 +79,10 @@ public class MyJadexService extends JadexPlatformService
 	public MyJadexService()
 	{
 		setPlatformAutostart(false);
-		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
-		setPlatformName("JadexAndroidExample");
+		PlatformConfiguration config = getPlatformConfiguration();
+		RootComponentConfiguration rootConfig = config.getRootConfig();
+		rootConfig.setKernels(RootComponentConfiguration.KERNEL.micro);
+		config.setPlatformName("JadexAndroidExample");
 	}
 	
 	@Override

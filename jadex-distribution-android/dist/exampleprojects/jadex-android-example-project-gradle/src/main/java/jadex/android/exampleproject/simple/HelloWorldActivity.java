@@ -6,6 +6,7 @@ import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.android.exampleproject.MyEvent;
 import jadex.android.exampleproject.R;
+import jadex.base.RootComponentConfiguration;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -41,7 +42,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 	public HelloWorldActivity()
 	{
 		super();
-		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
+		getPlatformConfiguration().getRootConfig().setKernels(RootComponentConfiguration.KERNEL.micro);
 	}
 
 	/** Called when the activity is first created. */
@@ -141,7 +142,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 					startPlatformButton.setEnabled(false);
 					Thread thread = new Thread() {
 						public void run() {
-							stopPlatforms();
+							shutdownJadexPlatform();
 							runOnUiThread(new Runnable()
 							{
 								public void run()
