@@ -49,6 +49,10 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/license.txt'
     }
+
+    dexOptions {
+        jumboMode = true
+    }
 }
 
 def jadex_version = '${jadex_build_version}'

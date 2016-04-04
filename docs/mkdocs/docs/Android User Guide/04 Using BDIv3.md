@@ -7,53 +7,43 @@ Android not only uses a different virtual machine than any Java SE environment, 
 
 As runtime bytecode generation is slow on android anyway, we use a different mechanism to make BDIv3 work: Generating the bytecode at compile time, which is then processed and converted by standard android tools.
 
-For this method to work, however, we need to include an additional compile step, which is done using maven.
-So you **need to setup a maven project to use BDIv3** Components!
+For this method to work, however, we need to include an additional compile step, which is done using a gradle plugin.
+So you **need to use gradle (android studio default) use BDIv3**!
 
-Additionally, you need to have a copy of the jadex-android-maven-plugin, so this is the first step
+Additionally, you need to include the jadex-gradle plugin in your *build.gradle*.
 
-jadex-android-maven-plugin
----------------------------------------
+# Applying the jadex-gradle BDIPlugin
 
-The simplest way to get the plugin is to insert the following code in your pom.xml, which adds my jadex repository:
+The simplest way to use the Jadex gradle plugin is to include the jadex repositories as buildscript dependency repositories, like the following extract from build.gradle shows:
 
 
-```xml
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+        mavenLocal()
+        mavenCentral()
+        maven
+        {
+            name 'jadexsnapshots'
+            url 'https://nexus.actoron.com/content/repositories/oss-nightlies/'
+        }
+        maven
+        {
+            name 'jadexreleases'
+            url 'https://nexus.actoron.com/content/repositories/oss/'
+        }
+    }
 
-<repositories>
-  <repository>
-    <id>jadex-android</id>
-    <url>http://jadex.julakali.org/nexus/content/groups/public/</url>
-  </repository>
-</repositories>
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.3.0' // this is probably already there
+        classpath "org.activecomponents.jadex:jadex-gradle-plugin:${ireallyneedajadexversion}"
+    }
+}
 
+apply plugin: 'com.android.application' // this is probably already there
+// for bdiv3 code generation:
+apply plugin: jadex.gradle.BDIPlugin
 ```
 
-
-
-
-Then, in the build section of your pom, define that you want to use the plugin:
-
-
-```xml
-
-<build>
-  <plugins>
-    <plugin>
-      <groupId>net.sourceforge.jadex</groupId>
-      <artifactId>jadex-android-maven-plugin</artifactId>
-      <executions>
-        <execution>
-          <goals>
-            <goal>generateBDI</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-  </plugins>
-</build>
-
-```
-
-
-If you compile your project with maven now, the plugin will run, detect all BDIV3 Agents and will enhance the classes as needed by the Jadex runtime.
+If you compile your project with gradle or android studio now (just click on "run"), the plugin will run, detect all BDIV3 Agents and will enhance the classes as needed by the Jadex runtime.
