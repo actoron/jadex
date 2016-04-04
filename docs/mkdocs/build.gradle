@@ -62,6 +62,11 @@ task processDocs(type: Copy) {
         into 'docs'
 
     }
+    from('theme') { // everything but md source
+        include '**/*'
+        into 'theme'
+
+    }
     from ('.') { // preprocess md source
         include '**/*.md'
         include 'mkdocs.yml'

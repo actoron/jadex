@@ -1,5 +1,5 @@
 site_name: Jadex ${jadexversion} Documentation
-theme: readthedocs
+theme_dir: 'theme'
 pages:
 
 - 'index.md'

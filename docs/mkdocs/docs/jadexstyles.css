@@ -37,3 +37,129 @@ li {
 code {
 	font-size: 90%;
 }
+
+/*This is for embedding the jadex header/navbar:*/
+
+nav.stickynav {
+	margin-left: unset;
+	bottom: 100px;
+	position: absolute;
+}
+
+.wy-body-for-nav {
+	background-image: none;
+	/*background-color: #343131;*/
+	background-color: #fefefe;
+/*	margin-left:5%;
+	margin-right:5%;*/
+}
+
+.wy-grid-for-nav {
+/*	margin-right: 5%;*/
+	/*width: unset;*/
+}
+
+
+.navbar {
+/*	margin-left:5%;
+	margin-right:5%;*/
+}
+
+.rst-versions {
+/*	margin-left:5%;*/
+}
+
+.wy-menu-vertical.affix {
+	position: relative;
+}
+
+
+.navbar li {
+	font-size: 14px;
+}
+
+.navbar a:visited {
+	color:#337ab7;
+}
+
+.wy-nav-content {
+	max-width: unset;
+}
+
+/* stickyheader: */
+#stickyheader {
+		width: 300px;
+}
+
+/* no bootstrap-styling for code: */
+pre {
+	border: unset;
+	padding: unset;
+	word-wrap: unset;
+	word-break: unset;
+}
+
+pre code {
+	white-space:unset;
+}
+
+
+@media screen and (max-width: 768px) {
+	.wy-nav-side {
+/*		left: -301px;*/
+	}
+	.wy-body-for-nav {
+		margin-left:unset;
+	}
+	.wy-nav-content-wrap.shift {
+
+		top: auto;
+	}
+	nav.stickynav {
+		position:fixed;
+	}
+	nav.shift {
+    	margin-left:unset;
+    }
+
+    .wy-nav-top {
+    }
+
+    #stickyheader.shift {
+    		width: 85%;
+    		position: absolute;
+    }
+
+    .navbar-brand>img {
+    	width: unset;
+    }
+}
+
+@media screen and (min-width: 1400px) {
+/*	.wy-body-for-nav {
+    	background-image: none;
+    	background-color: #343131;
+    	margin-left:5%;
+    	margin-right:5%;
+    }
+
+    .wy-grid-for-nav {
+    	margin-right: 5%;
+    	width: 100%;
+    }*/
+
+/*	.wy-nav-content {
+		margin: unset;
+		background:#fcfcfc
+	}*/
+
+	.wy-nav-content-wrap {
+		background: #fcfcfc;
+		margin-right: 10%;
+	}
+
+	.wy-grid-for-nav {
+        	margin-right: 5%;
+        	width: 100%;
+    }
+}
