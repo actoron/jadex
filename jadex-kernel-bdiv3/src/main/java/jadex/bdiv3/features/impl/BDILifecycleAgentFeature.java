@@ -1819,19 +1819,21 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							// create the complete inhibitorset for a newly adopted goal
 							RGoal goal = (RGoal)event.getContent();
 							return delstr.goalIsAdopted(goal);
-							
-//							for(RGoal other: bdif.getCapability().getGoals())
-//							{
-//		//						if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
-//		//							&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
-//								if(!other.isInhibitedBy(goal) && other.inhibits(goal, component))
-//								{
-////									if(goal.getModelElement().getName().indexOf("achievecleanup")!=-1)
-////										System.out.println("inhibit");
-//									goal.addInhibitor(other, component);
-//								}
-//							}
-//							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					rulesystem.getRulebase().addRule(rule);
+					
+					events = new ArrayList<EventType>();
+					events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED, EventType.MATCHALL}));
+					rule = new Rule<Void>("goal_removegoalfromdelib", 
+						ICondition.TRUE_CONDITION, new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+						{
+							// Remove a goal completely from 
+							RGoal goal = (RGoal)event.getContent();
+							return delstr.goalIsDropped(goal);
 						}
 					});
 					rule.setEvents(events);
@@ -1843,11 +1845,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						{
 							public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 							{
-		//						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
-		//							System.out.println("maintain");
-//									if(getComponentIdentifier().getName().indexOf("Ambu")!=-1)
-//										System.out.println("addin");
-								
 								// return true when other goal is active and inprocess
 								boolean ret = false;
 								EventType type = event.getType();
@@ -1863,32 +1860,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						{
 							RGoal goal = (RGoal)event.getContent();
 							return delstr.goalIsActive(goal);
-							
-//							if(goal.getId().indexOf("PerformPatrol")!=-1)
-//								System.out.println("addinh: "+goal);
-//							MDeliberation delib = goal.getMGoal().getDeliberation();
-//							if(delib!=null)
-//							{
-//								Set<MGoal> inhs = delib.getInhibitions(bdif.getCapability().getMCapability());
-//								if(inhs!=null)
-//								{
-//									for(MGoal inh: inhs)
-//									{
-//										Collection<RGoal> goals = bdif.getCapability().getGoals(inh);
-//										for(RGoal other: goals)
-//										{
-//		//									if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
-//											if(!goal.isInhibitedBy(other) && goal.inhibits(other, component))
-//											{
-////												if(other.getModelElement().getName().indexOf("achievecleanup")!=-1)
-////													System.out.println("inh achieve");
-//												other.addInhibitor(goal, component);
-//											}
-//										}
-//									}
-//								}
-//							}
-//							return IFuture.DONE;
 						}
 					});
 					rule.setEvents(events);
@@ -1908,7 +1879,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								if(event.getContent() instanceof RGoal)
 								{
 									RGoal goal = (RGoal)event.getContent();
-									ret = ChangeEvent.GOALSUSPENDED.equals(type.getType(0)) || ChangeEvent.GOALOPTION.equals(type.getType(0))
+									ret = ChangeEvent.GOALSUSPENDED.equals(type.getType(0)) 
+										|| ChangeEvent.GOALOPTION.equals(type.getType(0))
+//										|| ChangeEvent.GOALDROPPED.equals(type.getType(0)) 
 										|| !RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState());
 								}
 //									return ret? ICondition.TRUE: ICondition.FALSE;
@@ -1921,96 +1894,25 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							// Remove inhibitions of this goal 
 							RGoal goal = (RGoal)event.getContent();
 							return delstr.goalIsNotActive(goal);
-							
-//							MDeliberation delib = goal.getMGoal().getDeliberation();
-//							if(delib!=null)
-//							{
-//								Set<MGoal> inhs = delib.getInhibitions(bdif.getCapability().getMCapability());
-//								if(inhs!=null)
-//								{
-//									for(MGoal inh: inhs)
-//									{
-//			//							if(goal.getId().indexOf("AchieveCleanup")!=-1)
-//			//								System.out.println("reminh: "+goal);
-//										Collection<RGoal> goals = bdif.getCapability().getGoals(inh);
-//										for(RGoal other: goals)
-//										{
-//											if(goal.equals(other))
-//												continue;
-//											
-//											if(other.isInhibitedBy(goal))
-//												other.removeInhibitor(goal, component);
-//										}
-//									}
-//								}
-//								
-//								// Remove inhibitor from goals of same type if cardinality is used
-//								if(delib.isCardinalityOne())
-//								{
-//									Collection<RGoal> goals = bdif.getCapability().getGoals(goal.getMGoal());
-//									if(goals!=null)
-//									{
-//										for(RGoal other: goals)
-//										{
-//											if(goal.equals(other))
-//												continue;
-//											
-//											if(other.isInhibitedBy(goal))
-//												other.removeInhibitor(goal, component);
-//										}
-//									}
-//								}
-//							}
-//						
-//							return IFuture.DONE;
 						}
 					});
 					rule.setEvents(events);
 					rulesystem.getRulebase().addRule(rule);
-					
-//					rule = new Rule<Void>("goal_inhibit", 
-//						new LifecycleStateCondition(RGoal.GoalLifecycleState.ACTIVE), new IAction<Void>()
-//					{
-//						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-//						{
-//							RGoal goal = (RGoal)event.getContent();
-//		//					System.out.println("optionizing: "+goal+" "+goal.inhibitors);
-//							goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
-//							return IFuture.DONE;
-//						}
-//					});
-//					rule.addEvent(new EventType(new String[]{ChangeEvent.GOALINHIBITED, EventType.MATCHALL}));
-//					rulesystem.getRulebase().addRule(rule);
 				}
 				
 				Rule<Void> rule = new Rule<Void>("goal_activate", 
-//					new CombinedCondition(new ICondition[]{
-						new LifecycleStateCondition(RGoal.GoalLifecycleState.OPTION),
-//						new ICondition()
-//						{
-//							public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-//							{
-//								RGoal goal = (RGoal)event.getContent();
-////									return !goal.isInhibited()? ICondition.TRUE: ICondition.FALSE;
-//								return new Future<Tuple2<Boolean,Object>>(!goal.isInhibited()? ICondition.TRUE: ICondition.FALSE);
-//							}
-//						}
-//					}),
+					new LifecycleStateCondition(RGoal.GoalLifecycleState.OPTION),
 					new IAction<Void>()
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						RGoal goal = (RGoal)event.getContent();
 						return delstr.goalIsOption(goal);
-//						if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-//							System.out.println("reactivating: "+goal);
-//						goal.setLifecycleState(component, RGoal.GoalLifecycleState.ACTIVE);
-//						return IFuture.DONE;
 					}
 				});
 //				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, EventType.MATCHALL}));
 				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALOPTION, EventType.MATCHALL}));
-//					rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED, ChangeEvent.GOALOPTION}));
+//				rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED, ChangeEvent.GOALOPTION}));
 				rulesystem.getRulebase().addRule(rule);
 			}
 			

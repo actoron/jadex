@@ -51,6 +51,8 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	 */
 	public IFuture<Void> goalIsAdopted(RGoal goal)
 	{
+//		System.out.println(inhibitions.size()+" "+inhibitions);
+		
 		Collection<RGoal>	others	= getCapability().getGoals();
 		for(RGoal other: others)
 		{
@@ -62,6 +64,24 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 //					System.out.println("inhibit");
 				addInhibitor(goal, other);
 			}
+		}
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Called when a goal has been dropped.
+	 *  @param goal The goal.
+	 */
+	public IFuture<Void> goalIsDropped(RGoal goal)
+	{
+		// Remove the goal itself
+		inhibitions.remove(goal);
+
+		// Remove the goal from all other inhibition goal sets
+		for(Set<RGoal> inh: inhibitions.values())
+		{
+			inh.remove(goal);
 		}
 		
 		return IFuture.DONE;
@@ -203,6 +223,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 		{
 			if(inhibitors.remove(inhibitor) && inhibitors.size()==0)
 			{
+				inhibitions.remove(goal);
 //				System.out.println("goal not inhibited: "+this);
 //				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				reactivateGoal(goal);
@@ -317,23 +338,23 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 		return ret;
 	}
 	
-	/**
-	 *  Get the inhibitors.
-	 *  @return The inhibitors.
-	 */
-	protected Set<RGoal> getInhibitors(RGoal goal)
-	{
-		return getInhibitions(goal, false);
-	}
-	
-	/**
-	 *  Get the rule system.
-	 */
-	protected RuleSystem getRuleSystem()
-	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
-	}
-	
+//	/**
+//	 *  Get the inhibitors.
+//	 *  @return The inhibitors.
+//	 */
+//	protected Set<RGoal> getInhibitors(RGoal goal)
+//	{
+//		return getInhibitions(goal, false);
+//	}
+//	
+//	/**
+//	 *  Get the rule system.
+//	 */
+//	protected RuleSystem getRuleSystem()
+//	{
+//		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+//	}
+//	
 	/**
 	 *  Get the capability.
 	 */
@@ -348,10 +369,13 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	protected Set<RGoal> getInhibitions(RGoal goal, boolean create)
 	{
 		Set<RGoal> inhibitors = inhibitions.get(goal);
-		if(inhibitors==null)
+		if(create)
 		{
-			inhibitors = new HashSet<RGoal>();
-			inhibitions.put(goal, inhibitors);
+			if(inhibitors==null)
+			{
+				inhibitors = new HashSet<RGoal>();
+				inhibitions.put(goal, inhibitors);
+			}
 		}
 		return inhibitors;
 	}

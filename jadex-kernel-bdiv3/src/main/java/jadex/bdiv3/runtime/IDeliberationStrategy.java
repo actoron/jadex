@@ -22,6 +22,12 @@ public interface IDeliberationStrategy
 	public IFuture<Void> goalIsAdopted(RGoal goal);
 	
 	/**
+	 *  Called when a goal has been dropped.
+	 *  @param goal The goal.
+	 */
+	public IFuture<Void> goalIsDropped(RGoal goal);
+	
+	/**
 	 *  Called when a goal becomes an option.
 	 *  @param goal The goal.
 	 */

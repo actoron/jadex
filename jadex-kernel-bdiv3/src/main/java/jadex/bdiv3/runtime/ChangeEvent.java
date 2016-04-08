@@ -41,7 +41,7 @@ public class ChangeEvent<T>
 
 	
 	/** Event type that a goal has been added. */
-	public static final String GOALACTIVE = "goaladopted";
+	public static final String GOALACTIVE = "goaladopted"; // goaladopted?! or goalactive
 	
 	/** Event type that a goal has been optionized. */
 	public static final String GOALOPTION = "goaloption";
