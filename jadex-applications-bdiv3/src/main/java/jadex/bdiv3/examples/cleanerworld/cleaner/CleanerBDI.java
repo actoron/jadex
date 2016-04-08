@@ -644,7 +644,7 @@ public class CleanerBDI
 		
 		// Create a representation of myself.
 		final Cleaner cl = new Cleaner(getMyLocation(),
-			getAgent().getComponentIdentifier().getName(),
+			getAgent().getComponentIdentifier().getLocalName(),
 			getCarriedWaste(), getMyVision(),
 			getMyChargestate());
 

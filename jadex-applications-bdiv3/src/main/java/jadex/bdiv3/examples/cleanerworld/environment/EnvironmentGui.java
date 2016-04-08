@@ -151,7 +151,7 @@ public class EnvironmentGui	extends JFrame
 						options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
 						final JCheckBox	daytime	= new JCheckBox("", env.getDaytime());
 						daytime.setHorizontalTextPosition(SwingConstants.LEFT);
-						final JLabel	wastecnt	= new JLabel("0");
+						final JLabel wastecnt = new JLabel("0");
 
 						final JComboBox wastebinchoice = new JComboBox();
 						Wastebin[] wastebins = env.getWastebins();
@@ -186,11 +186,11 @@ public class EnvironmentGui	extends JFrame
 						final Image	background_image	= ((ImageIcon)icons.getIcon("background")).getImage();
 						final Image	background_night_image	= ((ImageIcon)icons.getIcon("background_night")).getImage();
 
-						final JLabel	waste	= new JLabel(new ImageIcon(waste_image), JLabel.CENTER);
-						final JLabel	wastebin	= new JLabel("dummy", new ImageIcon(wastebin_image), JLabel.CENTER);
+						final JLabel waste	= new JLabel(new ImageIcon(waste_image), JLabel.CENTER);
+						final JLabel wastebin	= new JLabel("dummy", new ImageIcon(wastebin_image), JLabel.CENTER);
 						wastebin.setVerticalTextPosition(JLabel.BOTTOM);
 						wastebin.setHorizontalTextPosition(JLabel.CENTER);
-						final JLabel	wastebin_full	= new JLabel("dummy", new ImageIcon(wastebin_full_image), JLabel.CENTER);
+						final JLabel wastebin_full	= new JLabel("dummy", new ImageIcon(wastebin_full_image), JLabel.CENTER);
 						wastebin_full.setVerticalTextPosition(JLabel.BOTTOM);
 						wastebin_full.setHorizontalTextPosition(JLabel.CENTER);
 						final JLabel	chargingstation	= new JLabel("dummy", new ImageIcon(chargingstation_image), JLabel.CENTER);
@@ -330,6 +330,7 @@ public class EnvironmentGui	extends JFrame
 									cleaner.setForeground(daytime ? new Color(age*2,age*2,age*2)
 										: new Color(255-age*2,255-age*2,255-age*2));
 									render(g, cleaner, new Point(p.x+45, p.y));	// Hack!!!
+//									render(g, cleaner, new Point(p.x, p.y));	// Hack!!!
 								}
 							}
 						};
