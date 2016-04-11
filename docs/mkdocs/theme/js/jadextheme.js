@@ -41,16 +41,24 @@
   xdLoader.scheduleLoad['bottomnavbar.html'] = function (data) {
       var element = navbarLoaded2(data);
       $('#bottomNavBar').html(element);
-    };
+  };
 
+  xdLoader.finish = function() {
+  	var stickyHeaderTop = $('#stickyheader').offset().top;
+
+	$(window).scroll(function(){
+	  if( $(window).scrollTop() > stickyHeaderTop ) {
+			  $('#stickyheader').css({position: 'fixed', top: '0px'}); //marginLeft: '5%'
+			  <!--$('#stickyalias').css('display', 'block');-->
+	  } else {
+			  $('#stickyheader').css({position: 'absolute', top: '0px', marginLeft: 'unset'});
+			  <!--$('#stickyalias').css('display', 'none');-->
+	  }
+	});
+  }
 
   xdLoader.execute();
 
-//  xdLoader.finish = function() {
-//    $(window).on('resize', function () {
-//      adjustLayout();
-//    });
-//    }
 
 
 //  var app = angular.module('doc', [])

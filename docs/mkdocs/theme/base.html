@@ -124,23 +124,6 @@
 <script type="text/javascript" src='https://actoron.com/acmaintest/xdloader.js'></script>
 <script type="text/javascript" src="{{ base_url }}/js/jadextheme.js"></script>
 
-<script>
-    $(document).ready(function() {
-            // Check the initial Poistion of the Sticky Header
-            var stickyHeaderTop = $('#stickyheader').offset().top;
-
-            $(window).scroll(function(){
-                    if( $(window).scrollTop() > stickyHeaderTop ) {
-                            $('#stickyheader').css({position: 'fixed', top: '0px'}); //marginLeft: '5%'
-                            <!--$('#stickyalias').css('display', 'block');-->
-                    } else {
-                            $('#stickyheader').css({position: 'absolute', top: '0px', marginLeft: 'unset'});
-                            <!--$('#stickyalias').css('display', 'none');-->
-                    }
-            });
-    });
-  </script>
-
 </html>
 {% if current_page and current_page.is_homepage %}
 <!--
