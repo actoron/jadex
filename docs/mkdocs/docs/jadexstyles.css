@@ -94,6 +94,10 @@ nav.stickynav {
 	max-width: unset;
 }
 
+.wy-nav-content-wrap {
+	margin-bottom: 26px;
+}
+
 /* stickyheader: */
 #stickyheader {
 		width: 300px;
