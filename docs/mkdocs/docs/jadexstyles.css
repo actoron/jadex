@@ -42,7 +42,7 @@ code {
 
 nav.stickynav {
 	margin-left: unset;
-	bottom: 100px;
+/*	bottom: 100px;*/
 	position: absolute;
 }
 
@@ -69,6 +69,12 @@ nav.stickynav {
 
 .rst-versions a {
 	/*color: #337ab7;*/
+}
+
+.wy-nav-side {
+	min-height: unset;
+	height: unset;
+	bottom: 56px;
 }
 
 .wy-menu-vertical.affix {
