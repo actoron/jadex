@@ -1,5 +1,5 @@
    var navbarLoaded2 = function(data) {
-      var acpath = "http://actoron.com/acmaintest/"
+      var acpath = "https://actoron.com/acmaintest/"
       var acindexpage = acpath + "index.html#/"
 
 //      var $topbar = $("#topbar");
