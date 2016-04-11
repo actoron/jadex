@@ -14,7 +14,7 @@
   {# CSS #}
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
-  <link rel="stylesheet" href="http://actoron.com/acmaintest/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://actoron.com/acmaintest/bootstrap/css/bootstrap.min.css" />
   <link rel="stylesheet" href="{{ base_url }}/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="{{ base_url }}/css/theme_extra.css" type="text/css" />
   <link rel="stylesheet" href="{{ base_url }}/css/highlight.css">
@@ -51,17 +51,18 @@
   </script>
   {% endif %}
 
-    <script src="http://actoron.com/acmaintest/bootstrap/js/bootstrap.min.js"/></script>
-    <link rel="stylesheet" href="http://actoron.com/acmaintest/navbar.css" />
-    <link rel="stylesheet" href="http://actoron.com/acmaintest/conf.css" />
-    <link rel="stylesheet" href="http://actoron.com/acmaintest/prism/prism.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js"></script>
-    <!--<script src="http://actoron.com/acmaintest/angularjs/angular.min.js"></script>-->
-    <script type="text/javascript" src="{{ base_url }}/js/jadextheme.js"></script>
-    <script type="text/javascript" src="http://actoron.com/acmaintest/prism/prism.js"></script>
+    <script src="https://actoron.com/acmaintest/bootstrap/js/bootstrap.min.js"/></script>
+    <link rel="stylesheet" href="https://actoron.com/acmaintest/navbar.css" />
+    <link rel="stylesheet" href="https://actoron.com/acmaintest/conf.css" />
+    <link rel="stylesheet" href="https://actoron.com/acmaintest/prism/prism.css" />
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js"></script>-->
+    <script src="https://actoron.com/acmaintest/angularjs/angular.min.js"></script>
+
+    <script type="text/javascript" src="https://actoron.com/acmaintest/prism/prism.js"></script>
+
 </head>
 
-<body class="wy-body-for-nav" role="document" ng-app="doc">
+<body class="wy-body-for-nav" role="document" >
 
 {%- block header %}
 {% include "header.html" %}
@@ -119,6 +120,9 @@
 {% include "versions.html" %}
 
 </body>
+
+<script type="text/javascript" src='https://actoron.com/acmaintest/xdloader.js'></script>
+<script type="text/javascript" src="{{ base_url }}/js/jadextheme.js"></script>
 
 <script>
     $(document).ready(function() {

@@ -1,21 +1,9 @@
-
-  var app = angular.module('doc', [])
-  app.config(function($sceDelegateProvider) {
-      $sceDelegateProvider.resourceUrlWhitelist([
-          'http://actoron.com/**',
-          '**',
-          'topnavbar.html',
-      ]);
-  });
-
-  function docController($scope) {
-    $scope.navbarLoaded = function(domId) {
-      console.log(domId);
+   var navbarLoaded2 = function(data) {
       var acpath = "http://actoron.com/acmaintest/"
       var acindexpage = acpath + "index.html#/"
 
 //      var $topbar = $("#topbar");
-	  var $topbar = $("#" + domId)
+      var $topbar = $(data)
       $topbar.find("a[href^=#]").each(function (index, element) {
           element.href = acindexpage + element.attributes.href.value.substring(1);
         }
@@ -38,10 +26,44 @@
       var manualsli = docsdropdownli.find('ul > li:has(> a:contains("Manuals"))');
       manualsli.addClass('active');
 
-      $(window).on('resize', function () {
-        adjustLayout();
-      });
-    };
-  }
 
-  app.controller('docController', [ '$scope', docController]);
+
+      return $topbar;
+    };
+
+
+  var xdLoader = new XDLoader('http://actoron.com/acmaintest/');
+  xdLoader.scheduleLoad['topnavbar.html'] = function (data) {
+    var element = navbarLoaded2(data);
+    $('#topNavBar').html(element);
+  };
+
+  xdLoader.scheduleLoad['bottomnavbar.html'] = function (data) {
+      var element = navbarLoaded2(data);
+      $('#bottomNavBar').html(element);
+    };
+
+
+  xdLoader.execute();
+
+//  xdLoader.finish = function() {
+//    $(window).on('resize', function () {
+//      adjustLayout();
+//    });
+//    }
+
+
+//  var app = angular.module('doc', [])
+//  app.config(function($sceDelegateProvider) {
+//      $sceDelegateProvider.resourceUrlWhitelist([
+//          'http://actoron.com/**',
+//          '**',
+//          'topnavbar.html',
+//      ]);
+//  });
+//
+//  function docController($scope) {
+//    $scope.navbarLoaded = navbarLoaded;
+//  }
+//
+//  app.controller('docController', [ '$scope', docController]);
