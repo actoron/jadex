@@ -32,7 +32,7 @@
     };
 
 
-  var xdLoader = new XDLoader('http://actoron.com/acmaintest/');
+  var xdLoader = new XDLoader('https://actoron.com/acmaintest/');
   xdLoader.scheduleLoad['topnavbar.html'] = function (data) {
     var element = navbarLoaded2(data);
     $('#topNavBar').html(element);
