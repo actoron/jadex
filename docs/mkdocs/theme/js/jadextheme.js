@@ -49,8 +49,9 @@
 		  if( $(window).scrollTop() > stickyHeaderTop ) {
 				  $('#stickyheader').css({position: 'fixed', top: '0px', bottom: navMarginBottom + 'px'});
 		  } else {
-				var visibleHeaderPx = (stickyHeaderTop - $(window).scrollTop())
-				  $('#stickyheader').css({position: 'absolute', top: '0px', marginLeft: 'unset', bottom: navMarginBottom + visibleHeaderPx + 'px'});
+		  		var h = $('#topbar').height()
+				var visibleHeaderPx = (h - $(window).scrollTop())
+			  	$('#stickyheader').css({position: 'absolute', top: '0px', marginLeft: 'unset', bottom: navMarginBottom + visibleHeaderPx + 'px'});
 		  }
 	}
 
@@ -61,6 +62,10 @@
 	setStickyPositions(stickyHeaderTop);
 
 	$(window).scroll(function () {
+		setStickyPositions(stickyHeaderTop);
+	});
+
+	$(window).resize(function () {
 		setStickyPositions(stickyHeaderTop);
 	});
   }
