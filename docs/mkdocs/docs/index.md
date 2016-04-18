@@ -1,6 +1,6 @@
 # Welcome to the Jadex ${jadexversion} Documentation
 
-For API Documentation visit the [Active Components Website](http://www.activecomponents.org/docs/).
+For API Documentation of Jadex ${jadexversion} visit the [Active Components Website](../javadoc).
 
 To quickly get an overview about what Jadex is about you can have a look at the [Quickstart Tutorial](Quickstart Tutorial/01 Introduction).
 

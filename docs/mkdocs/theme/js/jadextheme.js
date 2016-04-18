@@ -72,19 +72,7 @@
 
   xdLoader.execute();
 
-
-
-//  var app = angular.module('doc', [])
-//  app.config(function($sceDelegateProvider) {
-//      $sceDelegateProvider.resourceUrlWhitelist([
-//          'http://actoron.com/**',
-//          '**',
-//          'topnavbar.html',
-//      ]);
-//  });
-//
-//  function docController($scope) {
-//    $scope.navbarLoaded = navbarLoaded;
-//  }
-//
-//  app.controller('docController', [ '$scope', docController]);
+  var currentChapter = $("li .current");
+  var searchHeader = $(".wy-side-nav-search");
+  console.log(searchHeader.height());
+  $("#stickyheader").scrollTop(currentChapter.offset().top-(searchHeader.height()+20));
