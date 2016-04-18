@@ -81,7 +81,6 @@ nav.stickynav {
 	position: relative;
 }
 
-
 .wy-nav-content {
 	max-width: unset;
 }
@@ -101,11 +100,12 @@ nav.stickynav {
 
 .navbar li {
 	font-size: 14px;
+	color: #000000;
 }
 
-.navbar a:visited {
+/*.navbar a:visited {
 	color:#337ab7;
-}
+}*/
 
 /* no bootstrap-styling for code: */
 pre {
