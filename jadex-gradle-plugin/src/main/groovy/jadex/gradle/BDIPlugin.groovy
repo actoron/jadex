@@ -1,51 +1,40 @@
 package jadex.gradle
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.api.ApplicationVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.ApplicationPlugin
+import org.gradle.api.plugins.GroovyPlugin
+import org.gradle.api.plugins.JavaPlugin
 
 class BDIPlugin implements Plugin<Project> {
 
     void apply(Project project) {
 
-        project.extensions.create('jadexArgs', JadexPluginExtension)
+        project.extensions.create('jadexBdi', JadexPluginExtension, project)
 
+        def logger = project.logger
         if (!project.hasProperty('android')) {
-            println 'Error, no android plugin found for project: ' + project.name
+            logger.error('Error, no android plugin found for project: ' + project.name);
         }
 
-        def AppExtension android = project.android
+        project.plugins.withType(JavaPlugin) {
+        }
 
-        project.afterEvaluate {
-            applyForVariants(project, android.applicationVariants)
+        project.plugins.withType(GroovyPlugin) {
+        }
+
+        project.plugins.withId('com.android.application') {
+            project.apply plugin: BDIAndroidPlugin
+        }
+
+        project.plugins.withId('com.android.library') {
+            project.apply plugin: BDIAndroidPlugin
+        }
+
+        project.plugins.withType(ApplicationPlugin) {
         }
 
     }
 
-    void applyForVariants(Project project, Collection<ApplicationVariant> applicationVariants) {
-        applicationVariants.each { variant ->
-            createEnhanceTaskForVariant(project, variant)
-        }
-    }
-
-    void createEnhanceTaskForVariant(Project project, ApplicationVariant variant) {
-        def name = variant.buildType.name
-        def camelName = name.charAt(0).toUpperCase().toString() + name.substring(1)
-        def File dir = variant.getJavaCompiler().destinationDir;
-
-        def JadexBdiEnhanceTask enhanceTask = project.task("jadexBdiEnhance${camelName}", type: JadexBdiEnhanceTask)
-
-        enhanceTask.buildType = variant.buildType
-        enhanceTask.inputDir = dir
-
-        enhanceTask.dependsOn(variant.getJavaCompiler())
-        variant.getDex().dependsOn(enhanceTask)
-    }
 }
 
-class JadexPluginExtension {
-    String name
-    String message
-
-}

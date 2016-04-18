@@ -1,7 +1,5 @@
 package jadex.gradle
 
-import com.android.build.gradle.AppExtension
-import com.android.builder.model.BuildType
 import jadex.bdiv3.AbstractAsmBdiClassGenerator
 import jadex.bdiv3.ByteKeepingASMBDIClassGenerator
 import jadex.bdiv3.KernelBDIV3Agent
@@ -13,116 +11,96 @@ import jadex.micro.annotation.NameValue
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.IOFileFilter
 import org.apache.commons.io.filefilter.TrueFileFilter
-import org.gradle.api.DefaultTask
 import org.gradle.api.GradleScriptException
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 
-class JadexBdiEnhanceTask extends DefaultTask {
-
-    def BuildType buildType
-
-    def File inputDir
-
-    def AppExtension android
-
-//    def File classesDir
-//
-//    @OutputDirectory
-//    def File outputDir
-//
-//    @Input
-//    def inputProperty
-
-//    @TaskAction
-//    void execute(IncrementalTaskInputs inputs) {
-//        println "Running jadex bdi enhance..."
-//        println inputs.incremental ? "CHANGED inputs considered out of date"
-//                : "ALL inputs considered out of date"
-//        if (!inputs.incremental)
-//            project.delete(outputDir.listFiles())
-//
-//        inputs.outOfDate { change ->
-//            println "out of date: ${change.file.name}"
-//            def targetFile = new File(outputDir, change.file.name)
-//            targetFile.text = change.file.text.reverse()
-//        }
-//
-//        inputs.removed { change ->
-//            println "removed: ${change.file.name}"
-//            def targetFile = new File(outputDir, change.file.name)
-//            targetFile.delete()
-//        }
-//    }
+/**
+ * Created by kalinowski on 12.04.16.
+ */
+class BDIEnhanceExec {
 
 
+    FileCollection classpath
+    File inputDir;
+    File outputDir;
+    FileCollection includedFiles
+    MavenBDIModelLoader modelLoader
+    ByteKeepingASMBDIClassGenerator gen
+    private Logger logger
+    Project project
 
+    IOFileFilter bdiFileFilter;
 
-//    def org.slf4j.Logger logger
+    public BDIEnhanceExec(Project project) {
+        this.project = project;
 
-    def ByteKeepingASMBDIClassGenerator gen
-    def MavenBDIModelLoader modelLoader
-
-    def public JadexBdiEnhanceTask() {
-//        org.apache.log4j.Logger.rootLogger.setLevel(org.apache.log4j.Level.INFO)
         modelLoader = new MavenBDIModelLoader()
         gen = new ByteKeepingASMBDIClassGenerator();
         modelLoader.setGenerator(gen);
-    }
+        logger = Logging.getLogger(this.getClass());
 
-    @TaskAction
-    def generate() {
-        log( "Running jadex bdi enhance...")
+        bdiFileFilter = new IOFileFilter() {
+            def kernelTypes = getBDIKernelTypes()
 
-        generateBDI(inputDir)
-    }
+            boolean accept(File dir, String name) {
+                boolean result = false;
+                for (String string : kernelTypes) {
+                    if (name.endsWith(string)) {
+                        result = true;
+                        break;
+                    }
+                }
+                return result;
+            }
 
-    def generateBDI(File classesDir) {
-        def inPlace = true
-        def outputDirectory = classesDir
-
-        if (!classesDir.exists()) {
-//            println "creating dir"
-            classesDir.mkdirs()
+            boolean accept(File file) {
+                return accept(file.getParentFile() as File, file.getName())
+            }
         }
+    }
 
-        Collection<File> allBDIFiles = FileUtils.listFiles(classesDir, bdiFileFilter, TrueFileFilter.INSTANCE);
-        String[] imports = getImportPath(allBDIFiles, outputDirectory);
+    def void log(msg) {
+        logger.info(msg);
+    }
+
+    public void exec() {
+        log("executing enhance...");
+        Collection<File> allBDIFiles = FileUtils.listFiles(inputDir, bdiFileFilter, TrueFileFilter.INSTANCE);
+        String[] imports = getImportPath(allBDIFiles, inputDir);
         ResourceIdentifier rid = new ResourceIdentifier();
 
         if (allBDIFiles.size() > 0)
         {
-            log("Found " + allBDIFiles.size() + " BDI V3 Agent classes in " + classesDir);
+            log("Found " + allBDIFiles.size() + " BDI V3 Agent classes in " + inputDir);
         } else {
-            log("Found no BDI V3 Agent classes in " + classesDir);
+            log("Found no BDI V3 Agent classes in " + inputDir);
         }
-        URL inputUrl = classesDir.toURI().toURL();
+        URL inputUrl = inputDir.toURI().toURL();
 
-//        setClassRealm();
-//        ClassLoader originalCl = descriptor.getClassRealm();
         ClassLoader originalCl = this.getClass().getClassLoader()
         URLClassLoader inputCl = new URLClassLoader([inputUrl] as URL[], originalCl)
 
-        Collection<File> allClasses = FileUtils.listFiles(classesDir, null, true);
+        Collection<File> allFiles = FileUtils.listFiles(inputDir, null, true);
 
-        for (File bdiFile : allClasses)
+        for (File bdiFile : allFiles)
         {
             gen.clearRecentClassBytes();
             BDIModel model = null;
 
             String relativePath = ResourceUtils
-                    .getRelativePath(bdiFile.getAbsolutePath(), classesDir.getAbsolutePath(), File.separator);
+                    .getRelativePath(bdiFile.getAbsolutePath(), inputDir.getAbsolutePath(), File.separator);
 
-            if (bdiFileFilter.accept(bdiFile) && hasDelta(bdiFile))
+            if (bdiFileFilter.accept(bdiFile) && (includedFiles == null || includedFiles.contains(bdiFile)))
             {
                 String agentClassName = relativePath.replace(File.separator, ".").replace(".class", "");
 
-                if (inPlace) {
-                    Class<?> loadClass = inputCl.loadClass(agentClassName);
-                    if (AbstractAsmBdiClassGenerator.isEnhanced(loadClass)) {
-                        log("Already enhanced: " + relativePath);
-                        continue;
-                    }
-//					tempLoader.close();
+                Class<?> loadClass = inputCl.loadClass(agentClassName);
+                if (AbstractAsmBdiClassGenerator.isEnhanced(loadClass)) {
+                    log("Already enhanced: " + relativePath);
+                    continue;
                 }
 
                 logger.debug("Loading Model: " + relativePath);
@@ -139,12 +117,11 @@ class JadexBdiEnhanceTask extends DefaultTask {
                         message = t.toString();
                     }
                     logger.error("Error loading model: " + agentClassName + ", exception was: " + t.toString());
-//                    buildContext.addMessage(bdiFile, 0, 0, "Error loading model: " + agentClassName, BuildContext.SEVERITY_ERROR, t);
                     throw new GradleScriptException("Error loading model: " + agentClassName, t)
                     // just copy file
-                    if (!classesDir.equals(outputDirectory))
+                    if (!inputDir.equals(outputDir))
                     {
-                        File newFile = new File(outputDirectory, relativePath);
+                        File newFile = new File(outputDir, relativePath);
                         if (!newFile.exists())
                         {
                             newFile.getParentFile().mkdirs();
@@ -155,25 +132,21 @@ class JadexBdiEnhanceTask extends DefaultTask {
                 }
 
                 log("Generating classes for: " + relativePath);
-//				classes = gen.generateBDIClass(agentClassName, model, outputCl);
 
                 Set<Map.Entry<String,byte[]>> classEntrySet = gen.getRecentClassBytes().entrySet();
 
-//				for (Class<?> clazz : classes)
                 for (Map.Entry<String, byte[]> entry : classEntrySet)
                 {
                     String className = entry.getKey();
                     byte[] classBytes = entry.getValue();
                     logger.debug("    ... " + className);
                     String path = className.replace('.' as char, File.separatorChar) + ".class";
-//					byte[] classBytes = gen.getClassBytes(clazz.getName());
                     try
                     {
                         // write enhanced class
-                        File enhancedFile = new File(outputDirectory, path);
+                        File enhancedFile = new File(outputDir, path);
                         enhancedFile.getParentFile().mkdirs();
                         DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhancedFile));
-//                        DataOutputStream dos = new DataOutputStream(buildContext.newFileOutputStream(enhancedFile));
                         dos.write(classBytes);
                         dos.close();
                     }
@@ -181,12 +154,9 @@ class JadexBdiEnhanceTask extends DefaultTask {
                     {
                         e.printStackTrace();
                         // URLClassLoader.close() not in JDK 1.6
-                    if (inputCl != null) {
-                        inputCl.close();
-                    }
-//                    if (outputCl != null) {
-//                        outputCl.close();
-//                    }
+                        if (inputCl != null) {
+                            inputCl.close();
+                        }
                         throw new Exception(e.getMessage());
                     }
                 }
@@ -194,9 +164,9 @@ class JadexBdiEnhanceTask extends DefaultTask {
             else
             {
                 // just copy file
-                if (!classesDir.equals(outputDirectory))
+                if (!inputDir.equals(outputDir))
                 {
-                    File newFile = new File(outputDirectory, relativePath);
+                    File newFile = new File(outputDir, relativePath);
                     if (!newFile.exists())
                     {
                         newFile.getParentFile().mkdirs();
@@ -206,13 +176,8 @@ class JadexBdiEnhanceTask extends DefaultTask {
             }
         }
         inputCl.close()
-//        outputCl.close()
     }
 
-    boolean hasDelta(File file) {
-        // TODO implement
-        true
-    }
 
     def private String[] getImportPath(Collection<File> allBDIFiles, File parentDir)
     {
@@ -230,24 +195,6 @@ class JadexBdiEnhanceTask extends DefaultTask {
         return result.toArray(new String[result.size()]);
     }
 
-    def IOFileFilter bdiFileFilter = new IOFileFilter() {
-        def kernelTypes = getBDIKernelTypes()
-
-        boolean accept(File dir, String name) {
-            boolean result = false;
-            for (String string : kernelTypes) {
-                if (name.endsWith(string)) {
-                    result = true;
-                    break;
-                }
-            }
-            return result;
-        }
-
-        boolean accept(File file) {
-            return accept(file.getParentFile() as File, file.getName())
-        }
-    }
 
     private List<String> getBDIKernelTypes()
     {
@@ -280,38 +227,5 @@ class JadexBdiEnhanceTask extends DefaultTask {
 
         logger.debug("KernelBDIV3 Types: " + kernelTypes);
         return kernelTypes;
-    }
-
-
-
-    def setClassRealm()
-    {
-        // collect runtime classpath elements of the user project
-//        List<String> classPathElements;
-//        try
-//        {
-//            final ClassRealm realm = descriptor.getClassRealm();
-//            classPathElements = project.getRuntimeClasspathElements();
-//            classPathElements.addAll(project.getCompileClasspathElements());
-//
-//            for (String element : classPathElements)
-//            {
-//                File elementFile = new File(element);
-//                realm.addURL(elementFile.toURI().toURL());
-//            }
-//
-//        }
-//        catch(DependencyResolutionRequiredException e1)
-//        {
-//            e1.printStackTrace();
-//        }
-//        catch(MalformedURLException e)
-//        {
-//            e.printStackTrace();
-//        }
-    }
-
-    def void log(msg) {
-        println msg
     }
 }
