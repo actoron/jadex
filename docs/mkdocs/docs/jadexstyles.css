@@ -67,8 +67,8 @@ nav.stickynav {
 	padding-top: 5px;
 }
 
-.rst-versions a {
-	/*color: #337ab7;*/
+.rst-current-version a:link, .rst-current-version a:visited, .rst-current-version a:hover {
+	color: #2a6699;
 }
 
 .wy-nav-side {
@@ -121,8 +121,15 @@ pre code {
 
 /* color scheme: */
 .wy-side-nav-search {
-	background-color: #1f79a0;
+	/*background-color: #1f79a0;*/
+	background-color: #2a6699;
+	/*color: unset;*/
+}
+
+.wy-side-nav-search > a:link, .wy-side-nav-search > a:hover, .wy-side-nav-search > a:visited {
 	color: unset;
+	background-color: unset;
+	text-decoration: none;
 }
 
 .wy-nav-side {
