@@ -40,6 +40,7 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonRectangleProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonImageProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonColorProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonDateProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonTupleProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonInetAddressProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLogRecordProcessor());
@@ -65,6 +66,7 @@ public class JsonTraverser extends Traverser
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonRectangleProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonImageProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonColorProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonDateProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonTupleProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonInetAddressProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLogRecordProcessor());
