@@ -123,11 +123,11 @@ pre code {
 .wy-side-nav-search {
 	/*background-color: #1f79a0;*/
 	background-color: #2a6699;
-	/*color: unset;*/
+	color: unset;
 }
 
-.wy-side-nav-search > a:link, .wy-side-nav-search > a:hover, .wy-side-nav-search > a:visited {
-	color: unset;
+.wy-side-nav-search > a, .wy-side-nav-search > a:link, .wy-side-nav-search > a:hover, .wy-side-nav-search > a:visited {
+	color: #ffffff;
 	background-color: unset;
 	text-decoration: none;
 }
@@ -147,7 +147,6 @@ pre code {
 .wy-menu-vertical li.current > a {
 	background: #73b4d0;
 }
-
 
 .wy-menu-vertical span {
 	color: #040404;

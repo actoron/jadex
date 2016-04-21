@@ -1,5 +1,5 @@
    var navbarLoaded2 = function(data) {
-      var acpath = "https://actoron.com/acmaintest/"
+      var acpath = "https://www.activecomponents.org/"
       var acindexpage = acpath + "index.html#/"
 
 //      var $topbar = $("#topbar");
@@ -32,7 +32,7 @@
     };
 
 
-  var xdLoader = new XDLoader('https://actoron.com/acmaintest/');
+  var xdLoader = new XDLoader('https://www.activecomponents.org/');
   xdLoader.scheduleLoad['topnavbar.html'] = function (data) {
     var element = navbarLoaded2(data);
     $('#topNavBar').html(element);
