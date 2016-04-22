@@ -4,11 +4,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
+import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.DefaultErrorReporter;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
@@ -187,6 +190,49 @@ public class JsonTraverser extends Traverser
 			traverser.traverse(val, null, writeprocs, null, wr);
 			byte[] ret = enc==null? wr.getString().getBytes(): wr.getString().getBytes(enc);
 			bos.close();
+			return ret;
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+			// System.out.println("Exception writing: "+val);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToString(Object val, ClassLoader classloader)
+	{
+		return objectToString(val, classloader, true);
+	}
+	
+	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass)
+	{
+		return objectToString(val, classloader, writeclass, null);
+	}
+	
+	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<ClassInfo, Set<String>> excludes)
+	{
+		String ret = null;
+		Traverser traverser = getWriteTraverser();
+		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
+		
+		try
+		{
+			traverser.traverse(val, null, writeprocs, null, wr);
+			ret = wr.getString();
 			return ret;
 		}
 		catch(RuntimeException e)

@@ -33,4 +33,11 @@ public class JsonTest extends jadex.commons.transformation.Test
 		JsonTest t = new JsonTest();
 		t.performTests();
 	}
+	
+//	/**
+//	 *  Test if excludes work.
+//	 */
+//	public void testExcludes()
+//	{
+//	}
 }

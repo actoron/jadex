@@ -1,9 +1,11 @@
 package jadex.transformation.jsonserializer.processors.write;
 
-import java.util.Map;
-
+import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.transformation.jsonserializer.JsonTraverser;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -14,14 +16,25 @@ public class JsonWriteContext
 	
 	protected boolean writeclass = true;
 	
+	protected Map<ClassInfo, Set<String>> excludes;
+	
 	protected int objectcnt = 0;
 	
 	/**
-	 * 
+	 *  Create a new write context.
 	 */
 	public JsonWriteContext(boolean writeclass)
 	{
 		this.writeclass = writeclass;
+	}
+	
+	/**
+	 *  Create a new write context.
+	 */
+	public JsonWriteContext(boolean writeclass, Map<ClassInfo, Set<String>> excludes)
+	{
+		this.writeclass = writeclass;
+		this.excludes = excludes;
 	}
 
 	/**
@@ -153,6 +166,14 @@ public class JsonWriteContext
 	public void incObjectCount()
 	{
 		objectcnt++;
+	}
+	
+	/**
+	 *  Test if a property should be excluded from serialization.
+	 */
+	public boolean isPropertyExcluded(String name)
+	{
+		return excludes!=null && excludes.containsKey(name);
 	}
 	
 	/**
