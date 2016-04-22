@@ -1,6 +1,7 @@
 package jadex.transformation.jsonserializer.processors.write;
 
 import java.lang.reflect.Type;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class JsonDateProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return SReflect.isSupertype(Date.class, clazz);
+		return SReflect.isSupertype(Date.class, clazz) && !SReflect.isSupertype(Timestamp.class, clazz);
 	}
 	
 	/**
