@@ -225,7 +225,7 @@ public class JsonTraverser extends Traverser
 	/**
 	 *  Convert to a string.
 	 */
-	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<ClassInfo, Set<String>> excludes)
+	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes)
 	{
 		String ret = null;
 		Traverser traverser = getWriteTraverser();

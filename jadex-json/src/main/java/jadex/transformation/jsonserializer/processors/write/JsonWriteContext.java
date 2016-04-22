@@ -16,7 +16,7 @@ public class JsonWriteContext
 	
 	protected boolean writeclass = true;
 	
-	protected Map<ClassInfo, Set<String>> excludes;
+	protected Map<Class<?>, Set<String>> excludes;
 	
 	protected int objectcnt = 0;
 	
@@ -31,7 +31,7 @@ public class JsonWriteContext
 	/**
 	 *  Create a new write context.
 	 */
-	public JsonWriteContext(boolean writeclass, Map<ClassInfo, Set<String>> excludes)
+	public JsonWriteContext(boolean writeclass, Map<Class<?>, Set<String>> excludes)
 	{
 		this.writeclass = writeclass;
 		this.excludes = excludes;
@@ -171,9 +171,15 @@ public class JsonWriteContext
 	/**
 	 *  Test if a property should be excluded from serialization.
 	 */
-	public boolean isPropertyExcluded(String name)
+	public boolean isPropertyExcluded(Class<?> clazz, String name)
 	{
-		return excludes!=null && excludes.containsKey(name);
+		boolean ret = false;
+		if(excludes!=null)
+		{
+			Set<String> exs = excludes.get(clazz);
+			ret = exs!=null && exs.contains(name);
+		}
+		return ret;
 	}
 	
 	/**

@@ -1,5 +1,13 @@
 package jadex.json.test;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import jadex.bridge.ClassInfo;
+import jadex.commons.transformation.A;
+import jadex.commons.transformation.B;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -31,13 +39,23 @@ public class JsonTest extends jadex.commons.transformation.Test
 	public static void main(String[] args)
 	{
 		JsonTest t = new JsonTest();
-		t.performTests();
+//		t.performTests();
+		t.testExcludes();
 	}
 	
-//	/**
-//	 *  Test if excludes work.
-//	 */
-//	public void testExcludes()
-//	{
-//	}
+	/**
+	 *  Test if excludes work.
+	 */
+	public void testExcludes()
+	{
+		A a = new A(3, "s", new B(), new B[0]);
+		Map<Class<?>, Set<String>> ex = new HashMap<Class<?>, Set<String>>();
+		Set<String> exs = new HashSet<String>();
+		exs.add("b");
+		ex.put(A.class, exs);
+		String ret = JsonTraverser.objectToString(a, null, false, ex);
+		System.out.println(ret);
+		
+		assertTrue(!ret.contains("\"b\":"));
+	}
 }
