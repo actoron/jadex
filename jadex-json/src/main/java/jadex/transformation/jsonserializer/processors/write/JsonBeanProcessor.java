@@ -84,19 +84,23 @@ public class JsonBeanProcessor implements ITraverseProcessor
 			try
 			{
 				String name = (String)it.next();
-				BeanProperty prop = (BeanProperty)props.get(name);
-				if(prop.isReadable() && prop.isWritable())
-				{
-					Object val = prop.getPropertyValue(object);
-					if(val!=null) 
+				
+				if(!wr.isPropertyExcluded(name))
+				{	
+					BeanProperty prop = (BeanProperty)props.get(name);
+					if(prop.isReadable() && prop.isWritable())
 					{
-						if(!first)
-							wr.write(",");
-						first = false;
-						wr.writeString(name);
-						wr.write(":");
-						
-						traverser.doTraverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
+						Object val = prop.getPropertyValue(object);
+						if(val!=null) 
+						{
+							if(!first)
+								wr.write(",");
+							first = false;
+							wr.writeString(name);
+							wr.write(":");
+							
+							traverser.doTraverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
+						}
 					}
 				}
 			}
