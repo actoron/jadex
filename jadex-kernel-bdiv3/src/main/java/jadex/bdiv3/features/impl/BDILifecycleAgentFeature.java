@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -375,7 +376,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					
 					// todo: bindings in config elems
 					
-					List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mplan);
+					List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mplan, null);
 					
 					if(bindings!=null)
 					{
@@ -532,7 +533,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						throw new RuntimeException("Could not create goal: "+cgoal);
 					}
 					
-					List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal);
+					List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal, null);
 					
 					if(goal==null)
 					{
@@ -742,7 +743,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				final Object fcapa = capa;
 				
 				// Automatic reevaluation if belief depends on other beliefs
-				if(!events.isEmpty() || mbel.getEvaluationMode().equals(EvaluationMode.PUSH))
+				if(!events.isEmpty() && mbel.getEvaluationMode().equals(EvaluationMode.PUSH))
 				{
 					Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
 						ICondition.TRUE_CONDITION, new IAction<Void>()
@@ -1143,7 +1144,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								{
 			//						System.out.println("create: "+create);
 									
-									List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal);
+									List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal, null);
 									
 									if(bindings!=null)
 									{
@@ -1219,7 +1220,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										}
 										else
 										{
-											if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+											if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{goal.getFetcherName()}, new Object[]{goal})))
 											{
 												if(!goal.isFinished())
 												{
@@ -1284,7 +1285,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										}
 										else
 										{
-											if(!evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+											if(!evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{goal.getFetcherName()}, new Object[]{goal})))
 											{
 												goal.setLifecycleState(component, RGoal.GoalLifecycleState.SUSPENDED);
 												goal.setState(RProcessableElement.State.INITIAL);
@@ -1335,7 +1336,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										}
 										else
 										{
-											if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+											if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{goal.getFetcherName()}, new Object[]{goal})))
 											{
 												goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
 											}
@@ -1404,7 +1405,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else
 									{
-										if(!goal.isFinished() && evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+										if(!goal.isFinished() && evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{goal.getFetcherName()}, new Object[]{goal})))
 										{
 											goal.targetConditionTriggered(component, event, rule, context);
 										}
@@ -1465,7 +1466,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										}
 										else
 										{
-											if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+											if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{goal.getFetcherName()}, new Object[]{goal})))
 											{
 												goal.setTriedPlans(null);
 												goal.setApplicablePlanList(null);
@@ -1526,7 +1527,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										}
 										else // xml expression
 										{
-											if(!evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+											if(!evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{goal.getFetcherName()}, new Object[]{goal})))
 											{
 												goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 											}
@@ -1573,7 +1574,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										}
 										else // xml expression
 										{
-											if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
+											if(evaluateCondition(component, cond, mgoal, SUtil.createHashMap(new String[]{goal.getFetcherName()}, new Object[]{goal})))
 											{
 												goal.targetConditionTriggered(component, event, rule, context);
 											}
@@ -1601,7 +1602,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					public IFuture<Void> execute(final IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						// Create all binding plans
-						List<MPlanInfo> cands = APL.createMPlanCandidates(component, mplan);
+						List<MPlanInfo> cands = APL.createMPlanCandidates(component, mplan, null);
 
 						final CollectionResultListener<MPlanInfo> lis = new CollectionResultListener<MPlanInfo>(cands.size(), 
 							new IResultListener<Collection<MPlanInfo>>()
@@ -1778,7 +1779,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							
 							for(final RPlan plan: coll)
 							{
-								if(!evaluateCondition(component, mcond, plan.getModelElement(), SUtil.createHashMap(new String[]{"$plan"}, new Object[]{plan})))
+								if(!evaluateCondition(component, mcond, plan.getModelElement(), Collections.singletonMap(plan.getFetcherName(), (Object)plan)))
 								{
 									plan.abort();
 								}

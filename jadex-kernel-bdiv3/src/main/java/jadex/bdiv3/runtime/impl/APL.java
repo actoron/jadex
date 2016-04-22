@@ -252,7 +252,7 @@ public class APL
 						List<MGoal> mgoals = mtrigger.getGoals();
 						if(mgoals!=null && mgoals.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan);
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, element);
 							precandidates.addAll(cands);
 						}
 					}
@@ -261,7 +261,7 @@ public class APL
 						List<MServiceCall> msers = mtrigger.getServices();
 						if(msers!=null && msers.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan);
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, element);
 							precandidates.addAll(cands);
 						}
 					}
@@ -270,7 +270,7 @@ public class APL
 						List<MMessageEvent> msgs = mtrigger.getMessageEvents();
 						if(msgs!=null && msgs.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan);
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, element);
 							precandidates.addAll(cands);
 						}
 					}
@@ -279,7 +279,7 @@ public class APL
 						List<MInternalEvent> ievs = mtrigger.getInternalEvents();
 						if(ievs!=null && ievs.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan);
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, element);
 							precandidates.addAll(cands);
 						}
 					}
@@ -315,7 +315,7 @@ public class APL
 						List<MGoal> mtrgoals = mtrigger.getGoals();
 						if(mtrgoals!=null && mtrgoals.contains(element.getModelElement()))
 						{
-							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal);
+							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal, element);
 							goalprecandidates.addAll(cands);
 						}
 					}
@@ -324,7 +324,7 @@ public class APL
 						List<MServiceCall> msers = mtrigger.getServices();
 						if(msers!=null && msers.contains(element.getModelElement()))
 						{
-							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal);
+							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal, element);
 							goalprecandidates.addAll(cands);
 						}
 					}
@@ -333,7 +333,7 @@ public class APL
 						List<MMessageEvent> msgs = mtrigger.getMessageEvents();
 						if(msgs!=null && msgs.contains(element.getModelElement()))
 						{
-							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal);
+							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal, element);
 							goalprecandidates.addAll(cands);
 						}
 					}
@@ -342,7 +342,7 @@ public class APL
 						List<MInternalEvent> ievs = mtrigger.getInternalEvents();
 						if(ievs!=null && ievs.contains(element.getModelElement()))
 						{
-							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal);
+							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal, element);
 							goalprecandidates.addAll(cands);
 						}
 					}
@@ -411,17 +411,9 @@ public class APL
 		{
 			vals.putAll(mplaninfo.getBinding());
 		}
-		if(element instanceof RGoal)
+		if(element!=null)
 		{
-			vals.put("$goal", element);
-		}
-		else if(element instanceof RMessageEvent || element instanceof RInternalEvent)
-		{
-			vals.put("$event", element);
-		}
-		else if(element instanceof RServiceCall)
-		{
-			vals.put("$call", element);
+			vals.put(element.getFetcherName(), element);
 		}
 		
 		// chack match expression
@@ -720,13 +712,13 @@ public class APL
 	/** 
 	 *  Create candidates for a matching mplan.
 	 *  Checks precondition and evaluates bindings (if any).
-	 *  @return apl	returns new apl object in case a null apl is supplied.
+	 *  @return List of plan info objects.
 	 */
-	public static List<MPlanInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan)
+	public static List<MPlanInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan, RProcessableElement element)
 	{
 		List<MPlanInfo> ret = new ArrayList<MPlanInfo>();
 		
-		List<Map<String, Object>> bindings = calculateBindingElements(agent, mplan);
+		List<Map<String, Object>> bindings = calculateBindingElements(agent, mplan, element);
 		
 		if(bindings!=null)
 		{
@@ -747,13 +739,13 @@ public class APL
 	/** 
 	 *  Create candidates for a matching mgoal.
 	 *  Checks precondition and evaluates bindings (if any).
-	 *  @return apl	returns new apl object in case a null apl is supplied.
+	 *  @return List of goal info objects.
 	 */
-	public static List<MGoalInfo> createMGoalCandidates(IInternalAccess agent, MGoal mgoal)
+	public static List<MGoalInfo> createMGoalCandidates(IInternalAccess agent, MGoal mgoal, RProcessableElement element)
 	{
 		List<MGoalInfo> ret = new ArrayList<MGoalInfo>();
 		
-		List<Map<String, Object>> bindings = calculateBindingElements(agent, mgoal);
+		List<Map<String, Object>> bindings = calculateBindingElements(agent, mgoal, element);
 		
 		if(bindings!=null)
 		{
@@ -773,13 +765,12 @@ public class APL
 	
 	/**
 	 *  Calculate the possible binding value combinations.
-	 *  @param state The state.
-	 *  @param mel The parameter element.
-	 *  @param cel The config parameter element.
-	 *  @param fetcher The value fetcher.
+	 *  @param agent The agent.
+	 *  @param melem The parameter element.
+	 *  @param element The element to process (if any).
 	 *  @return The list of binding maps.
 	 */
-	public static List<Map<String, Object>> calculateBindingElements(IInternalAccess agent, MParameterElement melem)
+	public static List<Map<String, Object>> calculateBindingElements(IInternalAccess agent, MParameterElement melem, RProcessableElement element)
 	{
 		List<Map<String, Object>> ret = null;
 		
@@ -825,7 +816,8 @@ public class APL
 						if(bindingparams==null)
 							bindingparams = new HashMap<String, Object>();
 						IParsedExpression exp = SJavaParser.parseExpression(bo, agent.getModel().getAllImports(), agent.getClassLoader());
-						Object val = exp.getValue(CapabilityWrapper.getFetcher(agent, bo.getLanguage()));
+						Object val = exp.getValue(CapabilityWrapper.getFetcher(agent, bo.getLanguage(),
+							element!=null ? Collections.singletonMap(element.getFetcherName(), (Object)element) : null));
 						bindingparams.put(param.getName(), val);
 					}
 				}

@@ -496,15 +496,15 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			System.out.println("dghfhj");
 		
 		final Future<T>	fut	= new Future<T>();
-		SServiceProvider.getService(getComponent(), type, scope).addResultListener(new DelegationResultListener<T>(fut)
-		{
-			// Not necessary any longer
+		SServiceProvider.getService(getComponent(), type, scope).addResultListener(new DelegationResultListener<T>(fut));
+//		{
+//			// Not necessary any longer
 //			public void customResultAvailable(Object result)
 //			{
 //				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
 //					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
 //			}
-		});
+//		});
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}
 	

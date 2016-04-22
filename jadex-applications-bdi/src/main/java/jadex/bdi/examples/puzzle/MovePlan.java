@@ -43,6 +43,11 @@ public class MovePlan extends Plan
 		// from the board occurs. This means that no further bean listeners will be notified (e.g gui).
 		startAtomic();
 		board.move(move);
+		if(board.isSolution())
+		{
+			System.out.println("solution: "+this);
+		}
+		
 		endAtomic();
 		
 		waitFor(delay);

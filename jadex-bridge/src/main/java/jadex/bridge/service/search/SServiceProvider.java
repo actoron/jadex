@@ -438,7 +438,7 @@ public class SServiceProvider
 	public static <T> IFuture<T> getService(final IInternalAccess component, final Class<T> type, final String scope, final IAsyncFilter<T> filter, final boolean proxy)
 	{
 		final Future<T> ret = new Future<T>();
-
+		
 		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -459,6 +459,25 @@ public class SServiceProvider
 						else
 						{
 							ret.setException(new ServiceNotFoundException(type.getName()));
+//							{
+//								public void printStackTrace(java.io.PrintStream s)
+//								{
+//									Thread.dumpStack();
+//									super.printStackTrace(s);
+//								}
+//								
+//								public void printStackTrace(java.io.PrintWriter s)
+//								{
+//									Thread.dumpStack();
+//									super.printStackTrace(s);									
+//								}
+//								
+//								public void printStackTrace()
+//								{
+//									Thread.dumpStack();
+//									super.printStackTrace();
+//								}
+//							});
 						}
 					}
 					else
@@ -763,9 +782,6 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)
 	{
-//		if(type.getName().indexOf("ITra")!=-1)
-//			System.out.println("gfdfgdfg");
-		
 		return provider.scheduleStep(new ImmediateComponentStep<T>()
 		{
 			@Classname("getService(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)")

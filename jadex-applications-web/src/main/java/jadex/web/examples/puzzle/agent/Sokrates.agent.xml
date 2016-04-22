@@ -18,6 +18,7 @@
 		<import>jadex.bridge.service.types.clock.*</import>
 		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
 	</imports>
 
 	<beliefs>

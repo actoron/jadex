@@ -22,7 +22,6 @@ import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.rules.eca.RuleSystem;
 
 /**
  *  The easy deliberation strategy.
@@ -316,7 +315,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 							if(uexp!=null && uexp.getValue()!=null && uexp.getValue().length()>0)
 							{
 								SimpleValueFetcher fet = new SimpleValueFetcher(CapabilityWrapper.getFetcher(agent, uexp.getLanguage()));
-								fet.setValue("$goal", goal);
+								fet.setValue(goal.getFetcherName(), goal);
 								fet.setValue("$ref", other);
 								
 								try

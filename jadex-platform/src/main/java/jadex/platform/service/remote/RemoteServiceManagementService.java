@@ -3,6 +3,7 @@ package jadex.platform.service.remote;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -574,7 +575,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			@Classname("getServiceProxies")
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
-				final Future fut = future;
+				Future fut = new IntermediateFuture<T>();
 //				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
 //				{
@@ -588,6 +589,19 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					}
 //				});
 				
+				((IntermediateFuture<T>)fut).addResultListener(new DelegationResultListener<Collection<T>>(future)
+				{
+					@Override
+					public void customResultAvailable(Collection<T> result)
+					{
+						if(result==null)	// Happens when some remote service classes not available locally?
+						{
+							result	= Collections.emptyList();
+						}
+						super.customResultAvailable(result);
+					}
+				});
+						
 //				return fut;
 				return new Future<Object>(null);
 			}

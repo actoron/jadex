@@ -261,7 +261,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 									{
 		//								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
 										// Create proxy info(s) for service(s)
-										Object content = null;
+										Object content;
 		//								if(result instanceof Collection)
 		//								{
 											List<IService> res = new ArrayList<IService>();

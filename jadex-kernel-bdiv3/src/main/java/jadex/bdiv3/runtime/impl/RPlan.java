@@ -380,7 +380,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		SimpleValueFetcher	ret	= super.wrapFetcher(fetcher);
 		if(reason instanceof RParameterElement)
 		{
-			ret.setValue(reason instanceof RGoal ? "$goal" : "$event", reason);
+			ret.setValue(((RParameterElement)reason).getFetcherName(), reason);
 		}
 		return ret;
 	}

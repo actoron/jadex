@@ -76,7 +76,20 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 			public void resultAvailable(ISettingsService settings)
 			{
 				settings.registerPropertiesProvider("puzzle", PuzzleService.this)
-					.addResultListener(new DelegationResultListener<Void>(ret));
+					.addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					@Override
+					public void customResultAvailable(Void result)
+					{
+						super.customResultAvailable(result);
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurred(exception);
+					}
+				});
 			}
 
 			public void exceptionOccurred(Exception exception)

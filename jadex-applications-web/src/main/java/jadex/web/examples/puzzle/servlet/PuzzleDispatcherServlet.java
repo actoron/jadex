@@ -17,6 +17,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.micro.annotation.Binding;
 import jadex.web.examples.puzzle.Board;
 import jadex.web.examples.puzzle.HighscoreEntry;
 import jadex.web.examples.puzzle.IPuzzleService;
@@ -52,6 +53,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		
 		String[]	args	= new String[]
 		{
+//			"-deftimeout", "-1",
 			"-kernels", "\"micro, component, bdi\"",
 			"-logging", "true",
 			"-awareness", "false",
@@ -61,7 +63,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		};
 		int	timeout	= 30000;
 		platform	= Starter.createPlatform(args).get(timeout);
-		puzzle	= SServiceProvider.getService(platform, IPuzzleService.class).get(timeout);
+		puzzle	= SServiceProvider.getService(platform, IPuzzleService.class, Binding.SCOPE_PLATFORM).get(timeout);
 	}
 	
 	/**
@@ -195,7 +197,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			}
 			
 			// Save platform settings in case of server crash
-			ISettingsService	settings	= SServiceProvider.getService(platform, ISettingsService.class).get(timeout);
+			ISettingsService	settings	= SServiceProvider.getService(platform, ISettingsService.class, Binding.SCOPE_PLATFORM).get(timeout);
 			settings.saveProperties().get(timeout);
 			
 			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";
