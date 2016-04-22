@@ -3,6 +3,8 @@ package jadex.base.relay;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import jadex.transformation.jsonserializer.JsonTraverser;
+
 /**
  *  Facade to the relay handler with operations to feed the dashboard, i.e. status page.
  */
@@ -32,36 +34,7 @@ public class RelayDashboard
 	 */
 	public void	writeAllPlatforms(OutputStream out)	throws IOException
 	{
-		boolean firstout = false;
-		out.write("{\"data\":[".getBytes("UTF-8"));		
-		PlatformInfo[]	pis	= handler.getCurrentPlatforms();
-		for(int i=0; i<pis.length; i++)
-		{
-			if(firstout)
-			{
-				out.write(",[\"".getBytes("UTF-8"));
-			}
-			else
-			{
-				firstout	= true;
-				out.write("[\"".getBytes("UTF-8"));
-			}
-			out.write(pis[i].getId().getBytes("UTF-8"));
-			out.write("\",\"".getBytes("UTF-8"));
-			out.write(pis[i].getHostName().getBytes("UTF-8"));
-			out.write("\",\"".getBytes("UTF-8"));
-			out.write(pis[i].getLocation().getBytes("UTF-8"));
-			out.write("\",\"".getBytes("UTF-8"));
-			out.write(pis[i].getCountryCode().getBytes("UTF-8"));
-			out.write("\",\"".getBytes("UTF-8"));
-			out.write(pis[i].getConnectTime().getBytes("UTF-8"));
-			out.write("\",\"".getBytes("UTF-8"));
-			out.write(Integer.toString(pis[i].getMessageCount()).getBytes("UTF-8"));
-			out.write("\",\"".getBytes("UTF-8"));
-			out.write(pis[i].getTransferRate().getBytes("UTF-8"));
-			out.write("\"]".getBytes("UTF-8"));
-		}
-		
-		out.write("]}".getBytes("UTF-8"));		
+		byte[]	val	= JsonTraverser.objectToByteArray(handler.getCurrentPlatforms(), null, "UTF-8", false);
+		out.write(val);
 	}
 }
