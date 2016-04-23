@@ -38,7 +38,7 @@ jadex-gradle-plugin,,,,,,,,,,X,,,,,X
 jadex-integration-test,,X,X,,,,,,,,,,,,X
 jadex-integration-performance-test,,,,,,,,,,,,,,,X
 jadex-javaparser,X,X,X,X,,,,,,,,,X,X,X
-jadex-json,,X,X,,,,,,,,,,,,X
+jadex-json,,X,X,,,,,,,,,,X,,X
 jadex-kernel-application,,X,X,,,,,,,,,,,,X
 jadex-kernel-base,X,X,X,X,,,,,,,,,X,,X
 jadex-kernel-bdibpmn,,,,,,,,,,,,,,,
