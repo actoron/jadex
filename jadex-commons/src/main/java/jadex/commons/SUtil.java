@@ -2313,6 +2313,38 @@ public class SUtil
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Sleep the current thread, ignore exceptions.
+	 *  @param  millis Time to sleep in milliseconds
+	 */
+	public static final void sleep(long millis)
+	{
+		try
+		{
+			Thread.sleep(millis);
+		}
+		catch (InterruptedException e)
+		{
+		}
+	}
+	
+	/**
+	 *  Re-throws a throwable as a RuntimeException.
+	 *  If the throwable is already a RuntimeException,
+	 *  the exception itself is thrown, otherwise it is
+	 *  wrapped.
+	 *  
+	 *  @param e The throwable to be thrown as RuntimeException
+	 */
+	public static final void rethrowAsUnchecked(Throwable e)
+	{
+		if (e instanceof RuntimeException)
+		{
+			throw ((RuntimeException) e);
+		}
+		throw new RuntimeException(e);
+	}
 
 	/**
 	 * Main method for testing. / public static void main(String[] args) {
