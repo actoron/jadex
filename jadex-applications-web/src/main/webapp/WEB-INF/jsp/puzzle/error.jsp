@@ -9,7 +9,7 @@
 		out.println(request.getAttribute("error"));
 %>
 	<br/>
-	Go back to <a href="index">puzzle board</a>.
+	Go back to <a href="<%= request.getAttribute("puzzlepath") %>/index">puzzle board</a>.
 </p>
 
 <jsp:include page="footer.jsp" flush="true"/>

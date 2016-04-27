@@ -7,7 +7,7 @@
 	{
 		List<Move>	moves	= board.getMoves();
 %>
-	<form action="takeback" method="post">
+	<form action="<%= request.getAttribute("puzzlepath") %>/takeback" method="post">
 		All Moves<br/>
 		<select name="moves" size="<%= board.getSize()*3-3 %>">
 <%

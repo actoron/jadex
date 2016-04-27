@@ -46,7 +46,7 @@
 	if(is_highscore!=null)
 	{
 %>
-		<form action="addhighscore" method="post">
+		<form action="<%= request.getAttribute("puzzlepath") %>/addhighscore" method="post">
 			<input type="submit" name="dummy" value="Add to Highscore"/>
 			<input type="text" value="<%= request.getSession().getAttribute("player")!=null?
 				""+request.getSession().getAttribute("player")
@@ -61,7 +61,7 @@
 	<table width=100% cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
-				<form action="new_game" method="post">
+				<form action="<%= request.getAttribute("puzzlepath") %>/new_game" method="post">
 					<input type="submit" name="dummy" value="New Game"/>
 					Size:<select name="boardsize">
 <%
@@ -87,7 +87,7 @@
 		</tr>
 		<tr>
 			<td>
-				<form action="hint" method="post">
+				<form action="<%= request.getAttribute("puzzlepath") %>/hint" method="post">
 					<input type="submit" name="dummy" value="Hint"/>
 					Timeout [secs]:<input type="text" size="2" value="<%= request.getSession()
 						.getAttribute("timeout")!=null?""+request.getSession().getAttribute("timeout")

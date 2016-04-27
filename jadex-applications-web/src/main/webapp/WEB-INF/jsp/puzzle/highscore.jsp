@@ -31,7 +31,7 @@
 	
 	<%= error!=null ? error: "" %> 
 
-	<form action="highscore" method="post">
+	<form action="<%= request.getAttribute("puzzlepath") %>/highscore" method="post">
 		<input type="submit" name="dummy" value="Show highscore"/> Size:<select name="boardsize">
 <%
 		for(int i=3; i<=11; i+=2)

@@ -82,6 +82,11 @@ public class PuzzleDispatcherServlet extends HttpServlet
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+//		System.out.println("getContextPath: "+request.getContextPath());
+//		System.out.println("getServletPath: "+request.getServletPath());
+//		System.out.println("getPathInfo: "+request.getPathInfo());
+		request.setAttribute("puzzlepath", request.getContextPath()+request.getServletPath());
+		
 		HttpSession	session	= request.getSession();
 		Board	board	= (Board)session.getAttribute("board");
 		if(board==null)
@@ -111,6 +116,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		request.setAttribute("puzzlepath", request.getContextPath()+request.getServletPath());
 		HttpSession	session	= request.getSession();
 		Board	board	= (Board)session.getAttribute("board");
 		if(board==null)

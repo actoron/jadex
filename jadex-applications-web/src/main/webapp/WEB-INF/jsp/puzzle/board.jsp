@@ -71,7 +71,7 @@
 					if(posmoves.contains(pos))
 					{
 %>
-			<form action="move" method="post">
+			<form action="<%= request.getAttribute("puzzlepath") %>/move" method="post">
 				<td><input type="image" src="<%= request.getContextPath() %>/resources/puzzle/<%= pic%>"/></td>
 				<input type="hidden" src="<%= request.getContextPath() %>/resources/puzzle/<%= pic%>" name="start" value="<%=pos%>"/>
 			</form>
