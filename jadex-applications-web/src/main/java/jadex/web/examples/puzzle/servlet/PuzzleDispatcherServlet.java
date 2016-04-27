@@ -177,6 +177,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			ThreadSuspendable	sus	= new ThreadSuspendable();
 			try
 			{
+				// It is safe to use the board object, as it is passed as a copy to the service automatically.
 				Move	move	= puzzle.hint(board, timeout).get(timeout+500);
 				hint	= move.getStart();
 			}

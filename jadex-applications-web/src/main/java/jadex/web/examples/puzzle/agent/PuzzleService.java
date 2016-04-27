@@ -24,6 +24,7 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -144,55 +145,16 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		final int depth	= board.getMoves().size();
 		
 		final IGoal	goal	= agent.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().createGoal("makemove");
-		goal.getParameter("board").setValue(board);
+		goal.getParameter("board").setValue(board);	// It is safe to use the board object, as it is passed as a copy to the service automatically.
 		long time = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
 		goal.getParameter("deadline").setValue(timeout!=-1 ? time+timeout : -1);
-//		goal.addGoalListener(new IGoalListener()
-//		{
-//			public void goalFinished(AgentEvent ae)
-//			{
-//				if(board.isSolution())
-//				{
-//					ret.setResult(board.getMoves().get(depth));
-//				}
-//				else if(goal.getException()!=null)
-//				{
-//					ret.setException(goal.getException());
-//				}
-//				else
-//				{
-//					ret.setException(new RuntimeException("timeout"));
-//				}
-//			}
-//			
-//			public void goalAdded(AgentEvent ae)
-//			{
-//				// ignore
-//			}
-//		});
 		
 		agent.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)
-		.addResultListener(new IResultListener<Object>()
+			.addResultListener(new ExceptionDelegationResultListener<Object, Move>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				if(board.isSolution())
-				{
-					ret.setResult(board.getMoves().get(depth));
-				}
-				else if(goal.getException()!=null)
-				{
-					ret.setException(goal.getException());
-				}
-				else
-				{
-					ret.setException(new RuntimeException("timeout"));
-				}
-			}
-
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("ex: "+exception);
+				ret.setResult(board.getMoves().get(depth));
 			}
 		});
 		return ret;
