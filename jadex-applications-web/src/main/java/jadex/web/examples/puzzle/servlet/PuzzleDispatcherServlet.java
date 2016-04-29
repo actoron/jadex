@@ -167,6 +167,14 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			session.setAttribute("board", board);
 			session.setAttribute("hint_count", Integer.valueOf(0));
 		}
+		else if("/highscore".equals(request.getPathInfo()))
+		{
+			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";
+			int	size	= Integer.parseInt(request.getParameter("boardsize"));
+			int	timeout	= 30000;
+			SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(size).get(timeout);
+			request.setAttribute("highscore", entries.toArray(new HighscoreEntry[entries.size()]));
+		}
 		else if("/hint".equals(request.getPathInfo()))
 		{
 			Object hint;
