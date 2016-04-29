@@ -72,8 +72,6 @@ import javax.swing.table.TableCellEditor;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import sun.awt.image.ImageRepresentation;
-import sun.awt.image.ToolkitImage;
 
 
 /**

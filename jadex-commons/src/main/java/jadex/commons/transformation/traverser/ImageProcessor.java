@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
@@ -24,8 +23,8 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 
 import jadex.commons.SReflect;
-import sun.awt.image.ImageRepresentation;
-import sun.awt.image.ToolkitImage;
+//import sun.awt.image.ImageRepresentation;
+//import sun.awt.image.ToolkitImage;
 
 /**
  * 
@@ -129,18 +128,50 @@ public class ImageProcessor implements ITraverseProcessor
 		// Retry with a BufferedImage.
 		int width = 0;
 		int height = 0;
-		if(image instanceof ToolkitImage)
+		boolean tki = false;
+		
+		Class<?> tst = image.getClass();
+		try
 		{
-			ImageRepresentation ir = ((ToolkitImage)image).getImageRep();
-			ir.reconstruct(ImageObserver.ALLBITS);
-			width = ir.getWidth();
-			height = ir.getHeight();
+			while(!tst.equals(Object.class) && !tki)
+			{
+				if(image.getClass().getName().equals("sun.awt.image.ToolkitImage"))
+				{
+					Method m = image.getClass().getMethod("getImageRep", new Class<?>[0]);
+					Object ir = m.invoke(image, new Object[0]);
+					m = ir.getClass().getMethod("reconstruct", new Class<?>[]{int.class});
+					m.invoke(ir, new Object[]{"ImageObserver.ALLBITS"});
+					m = ir.getClass().getMethod("getWidth", new Class<?>[0]);
+					width = (Integer)m.invoke(ir, new Object[0]);
+					m = ir.getClass().getMethod("getHeight", new Class<?>[0]);
+					height = (Integer)m.invoke(ir, new Object[0]);
+					tki = true;
+				}
+				tst = tst.getSuperclass();
+			}
 		}
-		else
+		catch(Exception e)
+		{
+		}
+		
+		if(!tki)
 		{
 			width = image.getWidth(null);
 			height = image.getHeight(null);
 		}
+		
+//		if(image instanceof ToolkitImage)
+//		{
+//			ImageRepresentation ir = ((ToolkitImage)image).getImageRep();
+//			ir.reconstruct(ImageObserver.ALLBITS);
+//			width = ir.getWidth();
+//			height = ir.getHeight();
+//		}
+//		else
+//		{
+//			width = image.getWidth(null);
+//			height = image.getHeight(null);
+//		}
 		ColorModel model = ColorModel.getRGBdefault();
 		WritableRaster raster = model.createCompatibleWritableRaster(width, height);
 		BufferedImage bufferedImage = new BufferedImage(model, raster,
