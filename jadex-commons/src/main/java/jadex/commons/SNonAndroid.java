@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -96,7 +97,18 @@ public class SNonAndroid
 		// calling ClassLoader.
 		for(int ix = 0;; ix++)
 		{
-			Class clz = sun.reflect.Reflection.getCallerClass(ix);
+			Class<?> clz = null;
+			try
+			{
+				Class<?> ref = Class.forName("sun.reflect.Reflection");
+				Method m = ref.getMethod("getCallerClass", new Class[]{int.class});
+				clz = (Class<?>)m.invoke(null, new Object[]{Integer.valueOf(ix)});
+			}
+			catch(Exception e)
+			{
+			}
+//			Class<?> clz = sun.reflect.Reflection.getCallerClass(ix);
+			
 			if(clz == null)
 			{
 				break;
