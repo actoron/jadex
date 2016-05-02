@@ -1,0 +1,17 @@
+.cell {
+	border: 1px solid black;
+}
+
+#startGame {
+	width: 120px;
+	padding: 10px;
+	margin-top: 5px;
+	text-align: center;
+	background-color: black;
+	color: white;
+}
+
+#startGame:hover {
+	color: red;
+	cursor: pointer;
+}
