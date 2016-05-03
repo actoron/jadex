@@ -24,19 +24,19 @@
     padding-bottom: 9%;
 }
 
-.red:not(.clickable) {
+.red:not(.moveable) {
 	background-image: url(images/red_piece.png);
 	background-size:	100% 100%;
 }
-.red.clickable {
+.red.moveable {
 	background-image: url(images/red_piece_glow.png);
 	background-size:	100% 100%;
 }
-.white:not(.clickable) {
+.white:not(.moveable) {
 	background-image: url(images/white_piece.png);
 	background-size:	100% 100%;
 }
-.white.clickable {
+.white.moveable {
 	background-image: url(images/white_piece_glow.png);
 	background-size:	100% 100%;
 }
@@ -44,7 +44,7 @@
 	background-image: url(images/empty_field.png);
 	background-size:	100% 100%;
 }
-.clickable:hover {
+.moveable:hover {
 	cursor: pointer;
 }
 

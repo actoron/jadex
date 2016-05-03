@@ -38,32 +38,47 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 		}
 	};
 	
-	//--- generate the clickable class
-	$scope.clickable	= function clickable(col, row)
+	//--- generate the moveable class ---
+	$scope.moveable	= function moveable(col, row)
 	{
-		check	= $scope.canMove(col, row)!=null;
-		return check ? "clickable" : "";
+		check	= $scope.getMove(col, row)!=null;
+		return check ? "moveable" : "";
 	}
 	
-	//--- check if a piece can move ---
-	$scope.canMove	= function canMove(col, row)
+	//--- get the possible move of a piece, if any ---
+	$scope.getMove	= function getMove(col, row)
 	{
 		ret	= null;
-		// white can move down or left
+		// white can move/jump down or left
 		if($scope.board[row][col]=="white")
 		{
 			ret	= row+1<$scope.boardsize && $scope.board[row+1][col]=="empty" ? [row+1, col]
-				: col+1<$scope.boardsize && $scope.board[row][col+1]=="empty" ? [row, col+1] : null;
+				: col+1<$scope.boardsize && $scope.board[row][col+1]=="empty" ? [row, col+1]
+				: row+2<$scope.boardsize && $scope.board[row+1][col]=="red" && $scope.board[row+2][col]=="empty" ? [row+2, col]
+				: col+2<$scope.boardsize && $scope.board[row][col+1]=="red" && $scope.board[row][col+2]=="empty" ? [row, col+2] : null;
 		}
-		// red can move up or right
+		// red can move/jump up or right
 		else if($scope.board[row][col]=="red")
 		{
 			ret	= row>0 && $scope.board[row-1][col]=="empty" ? [row-1, col]
-				: col>0 && $scope.board[row][col-1]=="empty" ? [row, col-1] : null;
+				: col>0 && $scope.board[row][col-1]=="empty" ? [row, col-1]
+				: row>1 && $scope.board[row-1][col]=="white" && $scope.board[row-2][col]=="empty" ? [row-2, col]
+				: col>1 && $scope.board[row][col-1]=="white" && $scope.board[row][col-2]=="empty" ? [row, col-2] : null;
 		}
 		return ret;
 	};
 		
+	//--- perform a move/jump ---
+	$scope.doMove	= function doMove(col, row)
+	{
+		move	= $scope.getMove(col, row);
+		if(move!=null)
+		{
+			$scope.board[move[0]][move[1]]	= $scope.board[row][col];
+			$scope.board[row][col]	= "empty";
+		}
+	};
+	
 	// --- init ---
 	$scope.newsize	= 5;
 	$scope.sizes	= [3,5,7,9,11];
