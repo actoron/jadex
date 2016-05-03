@@ -1,0 +1,63 @@
+.board {
+    width: 80%;
+    border-collapse: collapse;
+}
+
+.cell3 {
+	width:	33%;
+    padding-bottom: 33%;
+}
+.cell5 {
+	width:	20%;
+    padding-bottom: 20%;
+}
+.cell7 {
+	width:	14%;
+    padding-bottom: 14%;
+}
+.cell9 {
+	width:	11%;
+    padding-bottom: 11%;
+}
+.cell11 {
+	width:	9%;
+    padding-bottom: 9%;
+}
+
+.red:not(.clickable) {
+	background-image: url(images/red_piece.png);
+	background-size:	100% 100%;
+}
+.red.clickable {
+	background-image: url(images/red_piece_glow.png);
+	background-size:	100% 100%;
+}
+.white:not(.clickable) {
+	background-image: url(images/white_piece.png);
+	background-size:	100% 100%;
+}
+.white.clickable {
+	background-image: url(images/white_piece_glow.png);
+	background-size:	100% 100%;
+}
+.empty {
+	background-image: url(images/empty_field.png);
+	background-size:	100% 100%;
+}
+.clickable:hover {
+	cursor: pointer;
+}
+
+#startGame {
+	width: 120px;
+	padding: 10px;
+	margin-top: 5px;
+	text-align: center;
+	background-color: black;
+	color: white;
+}
+
+#startGame:hover {
+	color: red;
+	cursor: pointer;
+}
