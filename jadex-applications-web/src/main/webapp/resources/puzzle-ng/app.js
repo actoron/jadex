@@ -1,20 +1,30 @@
 angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeout, $window)
 {
-	var BOARD_SIZE = 5;
-
 	function setupBoard()
 	{
+		$scope.columnName	= function columnName(i)
+		{
+			// Cannot use String.fromCharCode in angular expression!?
+			c	= "A".charCodeAt(0)+i;
+			s	= String.fromCharCode(c);
+			return s;
+		};
+		
+		$scope.alert = alert.bind($window);	// for easy testing
+		$scope.boardsize = 5;
 		$scope.board = [];
-		for (var i = 0; i < BOARD_SIZE; i++)
+		var size2	= Math.floor($scope.boardsize/2);
+		for (var i = 0; i < $scope.boardsize; i++)
 		{
 			$scope.board[i] = [];
-			for (var j = 0; j < BOARD_SIZE; j++)
+			for(var j = 0; j < $scope.boardsize; j++)
 			{
 				$scope.board[i][j] =
-					i<=BOARD_SIZE/2		&& j<=BOARD_SIZE/2-1	? "white" :
-					i<=BOARD_SIZE/2-1	&& j<=BOARD_SIZE/2		? "white" :
-					i>=BOARD_SIZE/2		&& j>=BOARD_SIZE/2-1	? "red" :
-					i>=BOARD_SIZE/2-1	&& j>=BOARD_SIZE/2		? "red" : "_";
+					i<size2		&& j<=size2	? "white" :
+					i<=size2	&& j<size2	? "white" :
+					i>size2		&& j>=size2	? "red" :
+					i>=size2	&& j>size2	? "red" :
+					i==size2	&& j==size2	? "empty" : "";
 			}
 		}
 	}

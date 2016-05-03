@@ -1,5 +1,24 @@
-.cell {
-	border: 1px solid black;
+.board {
+    width: 80%;
+    border-collapse: collapse;
+}
+
+.cell5 {
+	width:	20%;
+    padding-bottom: 20%;
+}
+
+.red {
+	background-image: url(images/red_piece.png);
+	background-size:	100% 100%;
+}
+.white {
+	background-image: url(images/white_piece.png);
+	background-size:	100% 100%;
+}
+.empty {
+	background-image: url(images/empty_field.png);
+	background-size:	100% 100%;
 }
 
 #startGame {

@@ -6,12 +6,24 @@
 	<body ng-controller="PuzzleBoard">
 	
 		<div id="gameContainer">
-			<table>
-				<tr ng-repeat="column in board">
-					<td class="cell" ng-repeat="cell in column">{{cell}}</td>
+			<table class="board">
+				<tr>
+					<td></td>
+					<th ng-repeat="cell in board[0]">{{columnName($index)}}</th>
+					<td></td>
+				</tr>
+				<tr ng-repeat="row in board">
+					<th>{{$index+1}}</th>
+					<td class="cell{{boardsize}} {{cell}}" ng-repeat="cell in row"></td>
+					<th>{{$index+1}}</th>
+				</tr>
+				<tr>
+					<td></td>
+					<th ng-repeat="cell in board[0]">{{columnName($index)}}</th>
+					<td></td>
 				</tr>
 			</table>
-			<div id="startGame" ng-click="setupBoard()">Restart Game</div>
+			<div id="startGame" ng-click="columnName(3); setupBoard()">Restart Game</div>
 		</div>
 	
 		<script data-require="angular.js@1.0.7" data-semver="1.0.7" src="http://code.angularjs.org/1.0.7/angular.min.js"></script>
