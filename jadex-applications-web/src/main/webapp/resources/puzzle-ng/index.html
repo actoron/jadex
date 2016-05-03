@@ -9,24 +9,27 @@
 			<table class="board">
 				<tr>
 					<td></td>
-					<th ng-repeat="cell in board[0]">{{columnName($index, true)}}</th>
+					<th ng-repeat="cell in board[0] track by $index">{{columnName($index, true)}}</th>
 					<td></td>
 				</tr>
-				<tr ng-repeat="row in board">
-					<th>{{$index+1}}</th>
-					<td class="cell{{boardsize}} {{cell}}" ng-repeat="cell in row"></td>
-					<th>{{$index+1}}</th>
+				<tr ng-repeat="row in board track by $index">
+					<th>{{rowName($index, true)}}</th>
+					<td class="cell{{boardsize}} {{cell}}" ng-repeat="cell in row track by $index"></td>
+					<th>{{rowName($index, false)}}</th>
 				</tr>
 				<tr>
 					<td></td>
-					<th ng-repeat="cell in board[0]">{{columnName($index, false)}}</th>
+					<th ng-repeat="cell in board[0]  track by $index">{{columnName($index, false)}}</th>
 					<td></td>
 				</tr>
 			</table>
-			<div id="startGame" ng-click="columnName(3); setupBoard()">Restart Game</div>
+			<select name="singleSelect" ng-model="newsize">
+				<option ng-repeat="size in sizes" value="{{size}}">Size {{size}}</option>
+			</select>
+			<div id="startGame" ng-click="restart()">Restart Game</div>
 		</div>
 	
-		<script data-require="angular.js@1.0.7" data-semver="1.0.7" src="http://code.angularjs.org/1.0.7/angular.min.js"></script>
+		<script src="http://code.angularjs.org/1.5.2/angular.min.js"></script>
 		<script src="app.js"></script>
 	</body>
 </html>

@@ -3,9 +3,25 @@
     border-collapse: collapse;
 }
 
+.cell3 {
+	width:	33%;
+    padding-bottom: 33%;
+}
 .cell5 {
 	width:	20%;
     padding-bottom: 20%;
+}
+.cell7 {
+	width:	14%;
+    padding-bottom: 14%;
+}
+.cell9 {
+	width:	11%;
+    padding-bottom: 11%;
+}
+.cell11 {
+	width:	9%;
+    padding-bottom: 9%;
 }
 
 .red {
