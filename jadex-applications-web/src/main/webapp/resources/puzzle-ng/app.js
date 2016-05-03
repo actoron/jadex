@@ -2,12 +2,13 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 {
 	function setupBoard()
 	{
-		$scope.columnName	= function columnName(i)
+		$scope.columnName	= function columnName(i, first)
 		{
 			// Cannot use String.fromCharCode in angular expression!?
 			c	= "A".charCodeAt(0)+i;
 			s	= String.fromCharCode(c);
-			return s;
+			return first ? i*2<$scope.boardsize ? s : ""
+				: (i+1)*2>$scope.boardsize ? s : "";
 		};
 		
 		$scope.alert = alert.bind($window);	// for easy testing

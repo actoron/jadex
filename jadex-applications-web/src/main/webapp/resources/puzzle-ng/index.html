@@ -9,7 +9,7 @@
 			<table class="board">
 				<tr>
 					<td></td>
-					<th ng-repeat="cell in board[0]">{{columnName($index)}}</th>
+					<th ng-repeat="cell in board[0]">{{columnName($index, true)}}</th>
 					<td></td>
 				</tr>
 				<tr ng-repeat="row in board">
@@ -19,7 +19,7 @@
 				</tr>
 				<tr>
 					<td></td>
-					<th ng-repeat="cell in board[0]">{{columnName($index)}}</th>
+					<th ng-repeat="cell in board[0]">{{columnName($index, false)}}</th>
 					<td></td>
 				</tr>
 			</table>
