@@ -1,22 +1,10 @@
 angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeout, $window)
 {
-	//--- Define some helper functions ---
-	$scope.columnName	= function columnName(i, first)
-	{
-		// Cannot use String.fromCharCode in angular expression!?
-		c	= "A".charCodeAt(0)+i;
-		s	= String.fromCharCode(c);
-		return first ? i*2<$scope.boardsize ? s : ""
-			: i*2+1>=$scope.boardsize ? s : "";
-	};
-	$scope.rowName	= function rowName(i, first)
-	{
-		// Not necessary as could be done inline, but for consistency and changeability.
-		return first ? i*2<$scope.boardsize ? i+1 : ""
-			: i*2+1>=$scope.boardsize ? i+1 : "";
-	};
-	$scope.alert = alert.bind($window);	// for easy testing
-
+	//-------- attributes --------
+	$scope.newsize	= 5;
+	$scope.sizes	= [3,5,7,9,11];
+	$scope.moves	= [];
+	
 	//--- (re)set the board ---
 	$scope.restart	= function restart()
 	{		
@@ -76,11 +64,45 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 		{
 			$scope.board[move[0]][move[1]]	= $scope.board[row][col];
 			$scope.board[row][col]	= "empty";
+			$scope.moves.push([[row, col], move]);
 		}
 	};
 	
+	//--- take back a move/jump ---
+	$scope.takeback	= function takeback()
+	{
+		move	= $scope.moves.pop();
+		if(move!=null)
+		{
+			$scope.board[move[0][0]][move[0][1]]	= $scope.board[move[1][0]][move[1][1]];
+			$scope.board[move[1][0]][move[1][1]]	= "empty";
+		}		
+	};
+	
+	//--- Define some helper functions ---
+	$scope.columnName	= function columnName(i, first)
+	{
+		// Cannot use String.fromCharCode in angular expression!?
+		c	= "A".charCodeAt(0)+i;
+		s	= String.fromCharCode(c);
+		return first==undefined ? s:
+			first ? i*2<$scope.boardsize ? s : ""
+			: i*2+1>=$scope.boardsize ? s : "";
+	};
+	$scope.rowName	= function rowName(i, first)
+	{
+		// Not necessary as could be done inline, but for consistency and changeability.
+		return first==undefined ? i+1:
+			first ? i*2<$scope.boardsize ? i+1 : ""
+			: i*2+1>=$scope.boardsize ? i+1 : "";
+	};
+	$scope.moveName	= function moveName(move)
+	{
+		return $scope.columnName(move[0][1])+$scope.rowName(move[0][0])
+			+ " -> " + $scope.columnName(move[1][1])+$scope.rowName(move[1][0]);
+	};
+	$scope.alert = alert.bind($window);	// for easy testing
+
 	// --- init ---
-	$scope.newsize	= 5;
-	$scope.sizes	= [3,5,7,9,11];
 	$scope.restart();
 });
