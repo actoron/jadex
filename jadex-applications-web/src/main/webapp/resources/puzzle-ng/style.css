@@ -95,7 +95,7 @@
 .button {
 	width: 120px;
 	padding: 10px;
-	margin: 5px 7px 7px 5px;
+	margin: 5px 2px 2px 2px;
 	text-align: center;
 	border-radius: 5px;
 	background: #ce2121;
@@ -114,5 +114,10 @@
 
 .button:active {
 	box-shadow:	-1px -1px 3px rgba(105,17,18,0.9);
-	margin: 7px 5px 5px 7px;
+	margin: 7px 0px 0px 4px;
+}
+
+.controls {
+	padding: 1px; /* prevents button margins to be combined. */
+	float: left;
 }

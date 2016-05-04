@@ -6,22 +6,22 @@
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body ng-controller="PuzzleBoard">
-		<table class="board">
+		<table class="board controls">
 			<tr ng-repeat="row in board track by $index">
 				<td class="cell cell{{boardsize}} {{cell}} {{moveable($index, $parent.$index)}}"
 					ng-repeat="cell in row track by $index" ng-click="doMove($index, $parent.$index)"></td>
 			</tr>
 		</table>
 		<div class="controls">
+			<div class="button" ng-click="restart()">Restart Game</div>
 			<select name="newsize" ng-model="newsize">
 				<option ng-repeat="size in sizes" value="{{size}}">Size {{size}}</option>
 			</select>
-			<div class="button" ng-click="restart()">Restart Game</div>
 		</div>
 		<div class="controls">
 			<div class="button" ng-click="takeback()">Take Back</div>	
-			<ol class="moves">
-				<li ng-repeat="move in moves">{{moveName(move)}}</li>
+			<ol class="moves" reversed>
+				<li ng-repeat="move in moves.slice().reverse()">{{moveName(move)}}</li>
 			</ol>
 		</div>
 	</body>
