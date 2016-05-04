@@ -7,30 +7,22 @@
 	</head>
 	<body ng-controller="PuzzleBoard">
 		<table class="board">
-			<tr>
-				<td></td>
-				<th ng-repeat="cell in board[0] track by $index">{{columnName($index, true)}}</th>
-				<td></td>
-			</tr>
 			<tr ng-repeat="row in board track by $index">
-				<th>{{rowName($index, true)}}</th>
-				<td class="cell{{boardsize}} {{cell}} {{moveable($index, $parent.$index)}}"
+				<td class="cell cell{{boardsize}} {{cell}} {{moveable($index, $parent.$index)}}"
 					ng-repeat="cell in row track by $index" ng-click="doMove($index, $parent.$index)"></td>
-				<th>{{rowName($index, false)}}</th>
-			</tr>
-			<tr>
-				<td></td>
-				<th ng-repeat="cell in board[0]  track by $index">{{columnName($index, false)}}</th>
-				<td></td>
 			</tr>
 		</table>
-		<select name="newsize" ng-model="newsize">
-			<option ng-repeat="size in sizes" value="{{size}}">Size {{size}}</option>
-		</select>
-		<div class="button" ng-click="restart()">Restart Game</div>	
-		<div class="button" ng-click="takeback()">Take Back</div>	
-		<ol class="moves">
-			<li ng-repeat="move in moves">{{moveName(move)}}</li>
-		</ol>
+		<div class="controls">
+			<select name="newsize" ng-model="newsize">
+				<option ng-repeat="size in sizes" value="{{size}}">Size {{size}}</option>
+			</select>
+			<div class="button" ng-click="restart()">Restart Game</div>
+		</div>
+		<div class="controls">
+			<div class="button" ng-click="takeback()">Take Back</div>	
+			<ol class="moves">
+				<li ng-repeat="move in moves">{{moveName(move)}}</li>
+			</ol>
+		</div>
 	</body>
 </html>

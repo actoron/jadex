@@ -101,7 +101,7 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 		return $scope.columnName(move[0][1])+$scope.rowName(move[0][0])
 			+ " -> " + $scope.columnName(move[1][1])+$scope.rowName(move[1][0]);
 	};
-	$scope.alert = alert.bind($window);	// for easy testing
+	//$scope.alert = alert.bind($window);	// for easy testing
 
 	// --- init ---
 	$scope.restart();
