@@ -112,6 +112,12 @@
 	color: white;
 }
 
+.controls {
+	font-family: Sans-Serif;
+	padding: 1px; /* prevents button margins to be combined. */
+	float: left;
+}
+
 .button:hover {
 	color: black;
 	cursor: pointer;
@@ -122,8 +128,17 @@
 	margin: 7px 0px 0px 4px;
 }
 
-.controls {
-	font-family: Sans-Serif;
-	padding: 1px; /* prevents button margins to be combined. */
-	float: left;
+.controls select {
+	width: 50%;
+	margin: 5%;
+}
+.controls span.label {
+	width: 30%;
+	margin: 5%;
+}
+
+
+.controls ol {
+	width: 90%;
+	margin: 5%;
 }

@@ -3,13 +3,14 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 	//-------- attributes --------
 	$scope.newsize	= 5;
 	$scope.sizes	= [3,5,7,9,11];
-	$scope.moves	= [];
 	
 	//--- (re)set the board ---
 	$scope.restart	= function restart()
 	{		
 		$scope.boardsize = $scope.newsize;
 		$scope.board = [];
+		$scope.moves	= [];
+
 		var size2	= Math.floor($scope.boardsize/2);
 		for (var i = 0; i < $scope.boardsize; i++)
 		{
