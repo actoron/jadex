@@ -109,7 +109,6 @@
 	box-shadow:	1px 1px 3px rgba(105,17,18,0.9);
 	/*background:	linear-gradient(to bottom right, #9eaece, #8699c2);
 	box-shadow:	1px 1px 3px #8699c2;*/
-	font-family: Sans-Serif;
 	color: white;
 }
 
@@ -124,6 +123,7 @@
 }
 
 .controls {
+	font-family: Sans-Serif;
 	padding: 1px; /* prevents button margins to be combined. */
 	float: left;
 }
