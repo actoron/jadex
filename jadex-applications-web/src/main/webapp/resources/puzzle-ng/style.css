@@ -44,7 +44,8 @@
 	
 	border-radius: 50%;
 	background: #ce2121;
-	background:	linear-gradient(to bottom right, #e76b6b, #ce2121);
+	background-image: url(images/actoron.png), linear-gradient(to bottom right, #e76b6b, #ce2121);
+	background-size: cover;
 	
 	box-shadow:	1px 1px 3px rgba(105,17,18,0.9);
 }
@@ -60,7 +61,8 @@
 	
 	border-radius: 50%;
 	background: #ccaa99;
-	background:	linear-gradient(to bottom right, #ffffff, #dfcabf);
+	background-image: url(images/actoron.png), linear-gradient(to bottom right, #ffffff, #dfcabf);
+	background-size: cover;
 	
 	box-shadow:	1px 1px 3px rgba(139,92,69,0.9);
 }
@@ -69,6 +71,10 @@
 	background:	linear-gradient(to bottom right, #8699c2, #9eaece);
 	box-shadow: 0 0 20px rgba(134, 153, 194, 1);
 }
+.red span, .white span, .empty span {
+	display: none; /* span for making game appaer without css. */
+}
+
 
 .moveable:hover {
 	cursor: pointer;

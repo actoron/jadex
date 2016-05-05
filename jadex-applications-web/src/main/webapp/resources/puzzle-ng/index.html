@@ -9,7 +9,9 @@
 		<table class="board controls">
 			<tr ng-repeat="row in board track by $index">
 				<td class="cell cell{{boardsize}} {{cell}} {{moveable($index, $parent.$index)}}"
-					ng-repeat="cell in row track by $index" ng-click="doMove($index, $parent.$index)"></td>
+					ng-repeat="cell in row track by $index" ng-click="doMove($index, $parent.$index)">
+					<span>{{cell}}</span>
+				</td>
 			</tr>
 		</table>
 		<div class="controls">
