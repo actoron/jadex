@@ -1,27 +1,40 @@
+body {
+	font-family: Sans-Serif;
+	font-size: 2.4vw;
+}
+
 .board {
-    width: 50%;
+    width: 70%;
+    margin-left:	15%;
+    margin-right:	15%;
     border-collapse: collapse;
+	font-size: 1.8vw;
+}
+
+.board tr td:first-child, .board tr td:last-child 
+	.board tr th:first-child, .board tr th:last-child {
+	width:	5%;
 }
 
 .cell3 {
-	width:	33.333%;
-    padding-bottom: 33.333%;
+	width:	30%;
+    padding-bottom: 30%;
 }
 .cell5 {
-	width:	20%;
-    padding-bottom: 20%;
+	width:	18%;
+    padding-bottom: 18%;
 }
 .cell7 {
-	width:	14.286%;
-    padding-bottom: 14.286%;
+	width:	12.857%;
+    padding-bottom: 12.857%;
 }
 .cell9 {
-	width:	11.111%;
-    padding-bottom: 11.111%;
+	width:	10%;
+    padding-bottom: 10%;
 }
 .cell11 {
-	width:	9.091%;
-    padding-bottom: 9.091%;
+	width:	8.182%;
+    padding-bottom: 8.182%;
 }
 
 .cell {
@@ -99,22 +112,19 @@
 }
 
 .button {
-	width: 120px;
-	padding: 10px;
+	width: 10vw;
+	padding: .5vw;
 	margin: 5px 2px 2px 2px;
 	text-align: center;
 	border-radius: 5px;
 	background: #ce2121;
 	background:	linear-gradient(to bottom right, #e76b6b, #ce2121);
 	box-shadow:	1px 1px 3px rgba(105,17,18,0.9);
-	/*background:	linear-gradient(to bottom right, #9eaece, #8699c2);
-	box-shadow:	1px 1px 3px #8699c2;*/
 	color: white;
 }
 
 .controls {
-	font-family: Sans-Serif;
-	padding: 1px; /* prevents button margins to be combined. */
+	width:	50%;
 	float: left;
 }
 
@@ -128,13 +138,11 @@
 	margin: 7px 0px 0px 4px;
 }
 
-.controls select {
-	width: 50%;
-	margin: 5%;
-}
 .controls span.label {
-	width: 30%;
-	margin: 5%;
+	display:	block;
+	width:	90%;
+	margin:	5%;
+	text-align: center;
 }
 
 

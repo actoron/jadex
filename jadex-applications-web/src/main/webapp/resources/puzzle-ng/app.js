@@ -1,13 +1,12 @@
 angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeout, $window)
 {
 	//-------- attributes --------
-	$scope.newsize	= 5;
 	$scope.sizes	= [3,5,7,9,11];
 	
 	//--- (re)set the board ---
-	$scope.restart	= function restart()
+	$scope.restart	= function restart(size)
 	{		
-		$scope.boardsize = $scope.newsize;
+		$scope.boardsize = size;
 		$scope.board = [];
 		$scope.moves	= [];
 
@@ -105,5 +104,5 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 	//$scope.alert = alert.bind($window);	// for easy testing
 
 	// --- init ---
-	$scope.restart();
+	$scope.restart(5);
 });
