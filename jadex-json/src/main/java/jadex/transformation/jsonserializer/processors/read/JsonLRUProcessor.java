@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.collection.ILRUEntryCleaner;
@@ -46,10 +47,17 @@ public class JsonLRUProcessor implements ITraverseProcessor
 		LRU ret = (LRU)getReturnObject(object, clazz);
 		JsonObject obj = (JsonObject)object;
 //		traversed.put(object, ret);
-		((JsonReadContext)context).addKnownObject(ret);
+//		((JsonReadContext)context).addKnownObject(ret);
+		
+		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+		if(idx!=null)
+			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
 		int maxentries = (int)obj.getInt("max", 0);
-		ret.setMaxEntries(maxentries);
+		if(maxentries>0)
+		{
+			ret.setMaxEntries(maxentries);
+		}
 		
 		Object cl = traverser.doTraverse(obj.get("cleaner"), null, traversed, processors, clone, targetcl, context);
 		ret.setCleaner((ILRUEntryCleaner)cl);

@@ -69,6 +69,8 @@ public class JsonLoggingLevelProcessor implements ITraverseProcessor
 			wr.writeNameValue("id", id);
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
+			if(wr.isWriteId())
+				wr.write(",").writeId();
 			wr.write("}");
 		}
 		else
@@ -82,6 +84,8 @@ public class JsonLoggingLevelProcessor implements ITraverseProcessor
 			wr.writeNameValue("value", level.intValue());
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
+			if(wr.isWriteId())
+				wr.write(",").writeId();
 			wr.write("}");
 		}
 	

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.BasicTypeConverter;
@@ -16,6 +17,7 @@ import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  * 
@@ -54,7 +56,10 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		
 		ret = getReturnObject(object, clazz, targetcl);
 //		traversed.put(object, ret);
-		((JsonReadContext)context).addKnownObject(ret);
+		
+		JsonValue idx = (JsonValue)((JsonObject)object).get(JsonTraverser.ID_MARKER);
+		if(idx!=null)
+			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
 		try
 		{

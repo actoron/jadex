@@ -50,6 +50,8 @@ public class JsonImageProcessor implements ITraverseProcessor
 		wr.writeNameString("value", enc);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 	
 		return object;

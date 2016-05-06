@@ -46,6 +46,8 @@ public class JsonCalendarProcessor implements ITraverseProcessor
 		wr.writeNameValue("value", time);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 		
 		return object;

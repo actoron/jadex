@@ -53,7 +53,7 @@ public class JsonToStringProcessor implements ITraverseProcessor
 			if(object instanceof URI || object instanceof URL)
 				wr.addObject(traversed, object);
 			
-			if(!wr.isWriteClass())
+			if(!wr.isWriteClass())// && !wr.isWriteId())
 			{
 				wr.write(object.toString());
 			}
@@ -61,8 +61,10 @@ public class JsonToStringProcessor implements ITraverseProcessor
 			{
 				wr.write("{");
 				wr.writeNameString("value", object.toString());
-				wr.write(",");
-				wr.writeClass(object.getClass());
+				if(wr.isWriteClass())
+					wr.write(",").writeClass(object.getClass());
+//				if(wr.isWriteId())
+//					wr.write(",").writeId();
 				wr.write("}");
 			}
 		}

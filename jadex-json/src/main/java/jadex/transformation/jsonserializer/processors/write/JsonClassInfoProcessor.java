@@ -43,6 +43,8 @@ public class JsonClassInfoProcessor implements ITraverseProcessor
 		wr.writeNameValue("value", "\""+((ClassInfo)object).getGenericTypeName()+"\"");
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 		
 		return object;

@@ -48,6 +48,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		
 		JsonArray array;
 		Class<?> compclazz = null;
+		JsonValue idx = null;
 		if(((JsonValue)object).isArray())
 		{
 			compclazz = clazz!=null? clazz.getComponentType(): null;
@@ -58,11 +59,14 @@ public class JsonArrayProcessor implements ITraverseProcessor
 			JsonObject obj = (JsonObject)object;
 			compclazz = JsonTraverser.findClazzOfJsonObject(obj, targetcl);
 			array = (JsonArray)obj.get(JsonTraverser.ARRAY_MARKER);
+			idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
 		}
 			
 		Object ret = getReturnObject(array, compclazz, clone, targetcl);
 //		traversed.put(object, ret);
-		((JsonReadContext)context).addKnownObject(ret);
+		
+		if(idx!=null)
+			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
 		Class<?> ccl = ret.getClass().getComponentType();
 			

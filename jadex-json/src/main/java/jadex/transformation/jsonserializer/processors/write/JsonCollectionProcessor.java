@@ -44,15 +44,23 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		
 		Class<?> clazz = SReflect.getClass(type);
 		
-		if(wr.isWriteClass())
+		if(wr.isWriteClass() || wr.isWriteId())
 		{
 			wr.write("{");
-			wr.writeClass(clazz);
-			wr.write(",");
+			if(wr.isWriteClass())
+			{
+				wr.writeClass(clazz);
+				wr.write(",");
+			}
+			if(wr.isWriteId())
+			{
+				wr.writeId();
+				wr.write(",");
+			}
 			wr.writeString(JsonTraverser.COLLECTION_MARKER);
 			wr.write(":");
 		}
-		
+	
 		wr.write("[");
 		
 		Collection<?> col = (Collection<?>)object;

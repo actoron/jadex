@@ -60,7 +60,7 @@ public class JsonClassProcessor implements ITraverseProcessor
 		}
 		
 //		traversed.put(object, ret);
-		((JsonReadContext)context).addKnownObject(ret);
+//		((JsonReadContext)context).addKnownObject(ret);
 		return ret;
 	}
 }

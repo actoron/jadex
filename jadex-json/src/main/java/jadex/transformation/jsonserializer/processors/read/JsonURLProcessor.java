@@ -11,6 +11,7 @@ import com.eclipsesource.json.JsonValue;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Codec for encoding and decoding URL objects.
@@ -42,10 +43,12 @@ public class JsonURLProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		String v = null;
+		JsonValue idx = null;
 		if(object instanceof JsonObject)
 		{
 			JsonObject obj = (JsonObject)object;
 			v = obj.getString("value", null);
+			idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
 		}
 		else if(object instanceof JsonValue)
 		{
@@ -57,7 +60,11 @@ public class JsonURLProcessor implements ITraverseProcessor
 		{
 			URL ret = new URL(v);
 //			traversed.put(object, ret);
-			((JsonReadContext)context).addKnownObject(ret);
+//			((JsonReadContext)context).addKnownObject(ret);
+			
+			if(idx!=null)
+				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
+			
 			return ret;
 		}
 		catch(Exception e)

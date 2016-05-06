@@ -58,6 +58,8 @@ public class JsonTupleProcessor implements ITraverseProcessor
 		traverser.doTraverse(entities, entities.getClass(), traversed, processors, clone, targetcl, context);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 	
 		return object;

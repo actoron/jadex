@@ -53,6 +53,8 @@ public class JsonLogRecordProcessor implements ITraverseProcessor
 		wr.writeNameValue("millis", rec.getMillis());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 		
 		return object;

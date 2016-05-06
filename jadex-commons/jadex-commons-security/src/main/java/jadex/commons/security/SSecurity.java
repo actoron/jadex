@@ -70,11 +70,11 @@ public class SSecurity
 	 */
 	public static final SecureRandom getSecureRandom()
 	{
-		if (RANDOM == null)
+		if(RANDOM == null)
 		{
-			synchronized (SSecurity.class)
+			synchronized(SSecurity.class)
 			{
-				if (RANDOM == null)
+				if(RANDOM == null)
 				{
 					RANDOM = generateSecureRandom();
 				}

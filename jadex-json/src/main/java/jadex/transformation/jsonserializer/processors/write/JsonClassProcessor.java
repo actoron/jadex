@@ -42,6 +42,8 @@ public class JsonClassProcessor implements ITraverseProcessor
 		wr.writeNameValue("value", (Class<?>)object);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 		
 		return object;

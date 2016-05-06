@@ -59,6 +59,12 @@ public class JsonLRUProcessor extends JsonMapProcessor
 			wr.writeClass(object.getClass());
 		}
 		
+		if(wr.isWriteId())
+		{
+			wr.write(",");
+			wr.writeId();
+		}
+		
 		Set keyset = lru.keySet();
 		Object[] keys = keyset.toArray(new Object[keyset.size()]);
 		

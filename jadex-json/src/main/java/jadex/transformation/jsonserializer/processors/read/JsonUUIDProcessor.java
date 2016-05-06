@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  * 
@@ -47,7 +49,12 @@ public class JsonUUIDProcessor implements ITraverseProcessor
 			long msb = obj.getLong("msb", 0);
 			UUID ret = new UUID(msb, lsb);
 //			traversed.put(object, ret);
-			((JsonReadContext)context).addKnownObject(ret);
+//			((JsonReadContext)context).addKnownObject(ret);
+			
+			JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+			if(idx!=null)
+				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
+			
 			return ret;
 		}
 		catch(Exception e)
