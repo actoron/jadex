@@ -44,6 +44,7 @@ import javax.ws.rs.core.Response;
 
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
@@ -324,6 +325,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis);
                     final MappingInfo mi = tup.getFirstEntity();
                     Object[] params = tup.getSecondEntity();
+                    
+                    // Inject caller meta info
+                    Map<String, String> callerinfos = extractCallerValues(request);
+                    ServiceCall.getOrCreateNextInvocation().setProperty("webcallerinfos", callerinfos);
                     
                     // invoke the service method
                     final Method method = mi.getMethod();

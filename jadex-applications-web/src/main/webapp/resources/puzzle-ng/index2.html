@@ -3,20 +3,31 @@
 	<head>
 		<script src="https://code.angularjs.org/1.5.2/angular.min.js"></script>
 		<script src="app.js"></script>
-		<link rel="stylesheet" type="text/css" href="style.css">
+		<!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 	</head>
 	<body ng-controller="PuzzleBoard">
 		<table class="board controls">
+			<tr>
+				<td></td>
+				<th ng-repeat="cell in board[0] track by $index">{{columnName($index, true)}}</th>
+				<td></td>
+			</tr>
 			<tr ng-repeat="row in board track by $index">
+				<th>{{rowName($index, true)}}</th>
 				<td class="cell cell{{boardsize}} {{cell}} {{moveable($index, $parent.$index)}}"
 					ng-repeat="cell in row track by $index" ng-click="doMove($index, $parent.$index)">
 					<span>{{cell}}</span>
 				</td>
+				<th>{{rowName($index, false)}}</th>
+			</tr>
+			<tr>
+				<td></td>
+				<th ng-repeat="cell in board[0]  track by $index">{{columnName($index, false)}}</th>
+				<td></td>
 			</tr>
 		</table>
 		<div class="controls">
 			<div class="button" ng-click="restart()">Restart Game</div>
-			<span class="label">Size:</span>
 			<select name="newsize" ng-model="newsize">
 				<option ng-repeat="size in sizes" value="{{size}}">Size {{size}}</option>
 			</select>
