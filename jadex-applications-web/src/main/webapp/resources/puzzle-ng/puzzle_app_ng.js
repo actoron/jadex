@@ -1,15 +1,32 @@
-angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeout, $window)
+/**
+ *  Client side implementation of puzzle game.
+ */ 
+angular.module('PuzzleNG', []).controller('PuzzleBoard', function($scope, $timeout, $window)
 {
-	//-------- attributes --------
+	//-------- constants --------
+	
+	/** The possible board sizes to choose from. */
 	$scope.sizes	= [3,5,7,9,11];
 	
-	//--- (re)set the board ---
+	//--- constructors ---
+	
+	/**
+	 *  Create/reset the board (called at startup).
+	 */
 	$scope.restart	= function restart(size)
-	{		
+	{
+		//-------- attributes --------
+		
+		/** The size of the board. */
 		$scope.boardsize = size;
+		
+		/** The boards (as array of string arrays). */
 		$scope.board = [];
+		
+		/** The previous moves (as array of array of int array, e.g., B3->C3 = [[2,1], [2,2]]). */
 		$scope.moves	= [];
 
+		// initialize the board, only board fields get a value ("red", "white" or "empty"), other array indices remain unset.
 		var size2	= Math.floor($scope.boardsize/2);
 		for (var i = 0; i < $scope.boardsize; i++)
 		{
@@ -24,17 +41,26 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 					i==size2	&& j==size2	? "empty" : "";
 			}
 		}
+		
+		console.log("app init");
+		newGame(size);
 	};
 	
-	//--- generate the moveable class ---
-	$scope.moveable	= function moveable(col, row)
+	//-------- methods --------
+	
+	/**
+	 *  Generate the 'moveable' class.
+	 */
+	$scope.moveable	= function(col, row)
 	{
 		check	= $scope.getMove(col, row)!=null;
 		return check ? "moveable" : "";
 	}
 	
-	//--- get the possible move of a piece, if any ---
-	$scope.getMove	= function getMove(col, row)
+	/**
+	 *  Get the possible move of a piece, if any.
+	 */
+	$scope.getMove	= function(col, row)
 	{
 		ret	= null;
 		// white can move/jump down or left
@@ -56,8 +82,10 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 		return ret;
 	};
 		
-	//--- perform a move/jump ---
-	$scope.doMove	= function doMove(col, row)
+	/**
+	 *  Perform a move/jump.
+	 */
+	$scope.doMove	= function(col, row)
 	{
 		move	= $scope.getMove(col, row);
 		if(move!=null)
@@ -68,8 +96,10 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 		}
 	};
 	
-	//--- take back a move/jump ---
-	$scope.takeback	= function takeback()
+	/**
+	 *   Take back the last move/jump.
+	 */
+	$scope.takeback	= function()
 	{
 		move	= $scope.moves.pop();
 		if(move!=null)
@@ -79,30 +109,48 @@ angular.module('ngPuzzle', []).controller('PuzzleBoard', function($scope, $timeo
 		}		
 	};
 	
-	//--- Define some helper functions ---
-	$scope.columnName	= function columnName(i, first)
+	//-------- helper functions --------
+	
+	/**
+	 *  Convert column index to column name.
+	 *  @param first	When set to true or false, only names to be displayed in the first or last row are generated.
+	 */
+	$scope.columnName	= function(i, first)
 	{
-		// Cannot use String.fromCharCode in angular expression!?
 		c	= "A".charCodeAt(0)+i;
 		s	= String.fromCharCode(c);
 		return first==undefined ? s:
 			first ? i*2<$scope.boardsize ? s : ""
 			: i*2+1>=$scope.boardsize ? s : "";
 	};
-	$scope.rowName	= function rowName(i, first)
+	
+	/**
+	 *  Convert row index to row name.
+	 *  @param first	When set to true or false, only names to be displayed in the first or last column are generated.
+	 */
+	$scope.rowName	= function(i, first)
 	{
-		// Not necessary as could be done inline, but for consistency and changeability.
 		return first==undefined ? i+1:
 			first ? i*2<$scope.boardsize ? i+1 : ""
 			: i*2+1>=$scope.boardsize ? i+1 : "";
 	};
-	$scope.moveName	= function moveName(move)
+	
+	/**
+	 *  Convert move array to move name.
+	 */
+	$scope.moveName	= function(move)
 	{
 		return $scope.columnName(move[0][1])+$scope.rowName(move[0][0])
 			+ " -> " + $scope.columnName(move[1][1])+$scope.rowName(move[1][0]);
 	};
-	//$scope.alert = alert.bind($window);	// for easy testing
+	
+//	/**
+//	 *  Allow alert() being called inside angular expressions.
+//	 */
+//	$scope.alert = alert.bind($window);
 
-	// --- init ---
+	//-------- init --------
+	
+	/** Start with size 5. */
 	$scope.restart(5);
 });

@@ -76,7 +76,7 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		
 		wr.write("]");
 		
-		if(wr.isWriteClass())
+		if(wr.isWriteClass() || wr.isWriteId())
 		{
 			wr.write("}");
 		}

@@ -1,0 +1,25 @@
+{
+  "ecmaVersion": 5,
+  "ide": {
+    "scriptPaths": [
+      {
+        "type": "FOLDER",
+        "path": "src/main/webapp/resources/puzzle-ng"
+      }
+    ]
+  },
+  "plugins": {
+    "guess-types": {
+      
+    },
+    "outline": {
+      
+    },
+    "angular": {
+      
+    }
+  },
+  "libs": [
+    "browser"
+  ]
+}

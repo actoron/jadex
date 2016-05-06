@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html ng-app='ngPuzzle'>
+<html ng-app='PuzzleNG'>
 	<head>
 		<script src="https://code.angularjs.org/1.5.2/angular.min.js"></script>
-		<script src="app.js"></script>
+		<script src="jadex.js"></script>
+		<script src="puzzle_app_jadex.js"></script>
+		<script src="puzzle_app_ng.js"></script>
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body ng-controller="PuzzleBoard">
@@ -32,7 +34,7 @@
 		</div>
 		<div class="controls" ng-hide="moves.length==0">
 			<div class="button" ng-click="takeback()">Take Back</div>	
-			<ol class="moves" reversed>
+			<ol reversed>
 				<li ng-repeat="move in moves.slice().reverse()">{{moveName(move)}}</li>
 			</ol>
 		</div>
