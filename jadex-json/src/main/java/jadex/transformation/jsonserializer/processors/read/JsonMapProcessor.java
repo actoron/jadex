@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -46,7 +47,11 @@ public class JsonMapProcessor implements ITraverseProcessor
 		Map ret = (Map)getReturnObject(object, clazz);
 		JsonObject obj = (JsonObject)object;
 //		traversed.put(object, ret);
-		rc.addKnownObject(ret);
+//		rc.addKnownObject(ret);
+		
+		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+		if(idx!=null)
+			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
 		if(obj.get("__keys")==null)
 		{

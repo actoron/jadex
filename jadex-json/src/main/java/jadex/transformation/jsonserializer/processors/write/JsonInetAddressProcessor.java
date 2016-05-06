@@ -44,6 +44,8 @@ public class JsonInetAddressProcessor implements ITraverseProcessor
 		wr.writeNameString("value", ((InetAddress)object).getHostAddress());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 		
 		return object;

@@ -11,6 +11,7 @@ import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Codec for encoding and decoding class objects.
@@ -61,7 +62,11 @@ public class JsonClassInfoProcessor implements ITraverseProcessor
 		}
 		
 //		traversed.put(object, ret);
-		((JsonReadContext)context).addKnownObject(ret);
+//		((JsonReadContext)context).addKnownObject(ret);
+		
+//		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+//		if(idx!=null)
+//			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		return ret;
 	}
 }

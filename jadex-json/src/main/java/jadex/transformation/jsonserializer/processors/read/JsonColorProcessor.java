@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  * 
@@ -43,7 +45,11 @@ public class JsonColorProcessor implements ITraverseProcessor
 		int rgb = obj.getInt("value", 0);
 		Color ret = new Color(rgb);
 //		traversed.put(object, ret);
-		((JsonReadContext)context).addKnownObject(ret);
+//		((JsonReadContext)context).addKnownObject(ret);
+		
+		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+		if(idx!=null)
+			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		return ret;
 	}
 }

@@ -44,13 +44,21 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		Class<?> clazz = SReflect.getClass(type);
 		Class<?> compclazz = clazz.getComponentType();
 		
-		if(wr.isWriteClass())
+		if(wr.isWriteClass() || wr.isWriteId())
 		{
 			// just increase reference count because these helper objects do not count on read side
 //			wr.incObjectCount();
 			wr.write("{");
-			wr.writeClass(compclazz);
-			wr.write(",");
+			if(wr.isWriteClass())
+			{
+				wr.writeClass(compclazz);
+				wr.write(",");
+			}
+			if(wr.isWriteId())
+			{
+				wr.writeId();
+				wr.write(",");
+			}
 			wr.writeString(JsonTraverser.ARRAY_MARKER);
 			wr.write(":");
 		}
@@ -67,7 +75,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		
 		wr.write("]");
 		
-		if(wr.isWriteClass())
+		if(wr.isWriteClass() || wr.isWriteId())
 		{
 			wr.write("}");
 		}

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.commons.transformation.A;
 import jadex.commons.transformation.B;
 import jadex.transformation.jsonserializer.JsonTraverser;
@@ -39,7 +38,7 @@ public class JsonTest extends jadex.commons.transformation.Test
 	public static void main(String[] args)
 	{
 		JsonTest t = new JsonTest();
-//		t.performTests();
+		t.performTests(1);
 		t.testExcludes();
 	}
 	

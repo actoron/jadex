@@ -11,7 +11,6 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.DefaultErrorReporter;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
@@ -27,6 +26,7 @@ import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 public class JsonTraverser extends Traverser
 {
 	public final static String  CLASSNAME_MARKER = "__classname";
+	public final static String  ID_MARKER = "__id";
 	public final static String  REFERENCE_MARKER = "__ref";
 	public final static String  ARRAY_MARKER = "__array";
 	public final static String  COLLECTION_MARKER = "__collection";

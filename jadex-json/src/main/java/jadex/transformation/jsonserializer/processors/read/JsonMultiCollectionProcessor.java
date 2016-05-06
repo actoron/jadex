@@ -13,6 +13,7 @@ import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  * 
@@ -64,11 +65,15 @@ public class JsonMultiCollectionProcessor implements ITraverseProcessor
 		}
 
 //		traversed.put(object, ret);
-		((JsonReadContext)context).addKnownObject(ret);
+//		((JsonReadContext)context).addKnownObject(ret);
 		
 		JsonObject obj = (JsonObject)object;
 		String classname = obj.getString("type", null);
 		Class<?> ctype = SReflect.classForName0(classname, targetcl);
+		
+		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+		if(idx!=null)
+			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
 		Map<?, ?> map = null;
 		JsonValue m = obj.get("map");

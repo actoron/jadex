@@ -24,7 +24,7 @@ public class RelayDashboard
 	static
 	{
 		Map<Class<?>, Set<String>>	excludes	= new LinkedHashMap<Class<?>, Set<String>>();
-		excludes.put(PlatformInfo.class, Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList("awarenessInfo", "properties"))));
+//		excludes.put(PlatformInfo.class, Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList("awarenessInfo", "properties"))));
 		JSON_EXCLUDES	= Collections.unmodifiableMap(excludes);
 	}
 	

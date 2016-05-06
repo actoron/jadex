@@ -47,6 +47,8 @@ public class JsonDateProcessor implements ITraverseProcessor
 		wr.writeNameValue("value", d.getTime());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 	
 		return object;

@@ -13,6 +13,7 @@ import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  * 
@@ -130,7 +131,12 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 		if(ret!=null)
 		{
 //			traversed.put(object, ret);
-			((JsonReadContext)context).addKnownObject(ret);
+//			((JsonReadContext)context).addKnownObject(ret);
+			
+			JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+			if(idx!=null)
+				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
+			
 			JsonBeanProcessor.traverseProperties(object, clazz, traversed, processors, traverser, clone, targetcl, ret, context, intro);
 		}
 		

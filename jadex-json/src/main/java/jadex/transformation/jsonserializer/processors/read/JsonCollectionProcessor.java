@@ -47,6 +47,7 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		JsonArray array;
+		JsonValue idx = null;
 		Class<?> clazz = SReflect.getClass(type);
 		Class<?> compclazz = SReflect.unwrapGenericType(type);
 		if(((JsonValue)object).isArray())
@@ -58,11 +59,15 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 			JsonObject obj = (JsonObject)object;
 //			compclazz = JsonTraverser.findClazzOfJsonObject(obj, targetcl);
 			array = (JsonArray)obj.get(JsonTraverser.COLLECTION_MARKER);
+			idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
 		}
 		
 		Collection ret = (Collection)getReturnObject(object, clazz);
 //		traversed.put(object, ret);
-		((JsonReadContext)context).addKnownObject(ret);
+//		((JsonReadContext)context).addKnownObject(ret);
+		
+		if(idx!=null)
+			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
 		for(int i=0; i<array.size(); i++)
 		{

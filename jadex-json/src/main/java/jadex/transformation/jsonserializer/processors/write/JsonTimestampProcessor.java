@@ -47,6 +47,8 @@ public class JsonTimestampProcessor implements ITraverseProcessor
 		wr.write(",").writeNameValue("nanos", t.getNanos());
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
 		wr.write("}");
 	
 		return object;

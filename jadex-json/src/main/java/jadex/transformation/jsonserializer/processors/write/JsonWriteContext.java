@@ -16,6 +16,8 @@ public class JsonWriteContext
 	
 	protected boolean writeclass = true;
 	
+	protected boolean writeid = true;
+	
 	protected Map<Class<?>, Set<String>> excludes;
 	
 	protected int objectcnt = 0;
@@ -133,6 +135,18 @@ public class JsonWriteContext
 	}
 	
 	/**
+	 *  Write the classname.
+	 *  @param object
+	 */
+	public void writeId()
+	{
+		write("\"").write(JsonTraverser.ID_MARKER).write("\"");
+		write(":");
+		write(""+(objectcnt-1));
+//		write("\"").write(""+(objectcnt-1)).write("\"");
+	}
+	
+	/**
 	 * 
 	 */
 	public String getString()
@@ -151,6 +165,15 @@ public class JsonWriteContext
 		return writeclass;
 	}
 	
+	/**
+	 *  Get the writeid. 
+	 *  @return The writeid
+	 */
+	public boolean isWriteId() 
+	{
+		return writeid;
+	}
+
 	/**
 	 * 
 	 */

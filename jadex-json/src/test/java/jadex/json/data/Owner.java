@@ -130,15 +130,19 @@ public class Owner
 		Car car1 = new Car("fiat", 500, "white");
 		Car car2 = new Car("vw", 80, "grey");
 		Car car3 = new Car("tt", 888, "black");
-		car3.setCar(car3);
+		car3.setCar(car2); // car3
+		car2.setCar(car1);
+		car1.setCar(car3);
 		
 		List<Car> cars = new ArrayList<Car>();
 		cars.add(car1);
 		cars.add(car2);
 		
-		Transporter tr = new Transporter();
+		Transporter tr1 = new Transporter();
 //		tr.setCars(cars);
-		tr.setCars(new Car[]{car1, car2});
+		tr1.setCars(new Car[]{new Car("a", 700, "aa")});//, car2, car1, car2});
+		Transporter tr2 = new Transporter();
+		tr2.setCars(new Car[]{car1, car2, car1, car2});
 		
 		Map<Car, Car> map = new HashMap<Car, Car>();
 		map.put(car1, car1);
@@ -146,12 +150,31 @@ public class Owner
 //		Gson gson = new Gson();
 //		System.out.println(gson.toJson(car3));   
 		
-		byte[] ar = JsonTraverser.objectToByteArray(car3, null);
+		String str = JsonTraverser.objectToString(car3, null, false);
+		System.out.println(str);
+
+		str = JsonTraverser.objectToString(tr1, null, false);
+		System.out.println(str);
+	
+		str = JsonTraverser.objectToString(tr2, null, false);
+		System.out.println(str);
+		
+		Object o = JsonTraverser.objectFromString(str, null, null);
+		System.out.println(o);
+		System.out.println(car3.equals(o));
+		
+//		System.out.println(JsonTraverser.objectToString(map, null, false));
+//		byte[] ar = JsonTraverser.objectToByteArray(car3, null);
 		
 //		Traverser traverser = new Traverser();
 //		JsonWriteContext wr = new JsonWriteContext(false);
 //		traverser.traverse(car3, null, procs, null, wr);
 	
-		System.out.println(new String(ar));
+//		System.out.println(new String(ar));
+		
+		
+		str = "[{\"peerId\":\"907a59db-0a02-4585-bd7e-3d4ae6ce5da3\",\"hostName\":\"IP 127.0.0.1\",\"connectDate\":{\"value\":1462275136476},\"awarenessInfo\":{\"delay\":-1,\"excludes\":[],\"sender\":{\"addresses\":[\"local-mtp://LarsNB_8b5\",\"tcp-mtp://2001:0:5ef5:79fb:38a0:4d7:3da1:e779:49208\",\"tcp-mtp://192.168.56.1:49208\",\"tcp-mtp://192.168.130.25:49208\",\"relay-http://localhost:8080/relay/\"],\"name\":\"LarsNB_8b5\"},\"includes\":[],\"state\":\"online\",\"properties\":{\"jadex.date\":\"1458821173797\",\"java.specification.version\":\"1.8\",\"java.vendor\":\"Oracle Corporation\",\"jadex.version\":\"3.0-DEVELOPMENT\",\"awamechanism\":\"RelayDiscoveryAgent\",\"os.arch\":\"amd64\",\"os.name\":\"Windows 8.1\",\"os.version\":\"6.3\"}},\"hostIP\":\"127.0.0.1\",\"dBId\":1,\"id\":\"LarsNB_8b5\",\"properties\":{\"__ref\":8}}]";
+		o = JsonTraverser.objectFromString(str, null, null);
+		System.out.println("read: "+o);
 	}
 }

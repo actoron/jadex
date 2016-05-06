@@ -51,6 +51,14 @@ public class JsonMapProcessor implements ITraverseProcessor
 			first = false;
 		}
 		
+		if(wr.isWriteClass())
+		{
+			if(!first)
+				wr.write(",");
+			wr.writeClass(object.getClass());
+			first = false;
+		}
+		
 		Set keyset = map.keySet();
 		Object[] keys = keyset.toArray(new Object[keyset.size()]);
 		
