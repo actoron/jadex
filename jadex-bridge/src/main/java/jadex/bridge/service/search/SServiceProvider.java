@@ -63,7 +63,7 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(IComponentIdentifier component, Class<T> type)
 	{
-		return getLocalService(component, type);
+		return getLocalService(component, type, null);
 	}
 	
 	/**

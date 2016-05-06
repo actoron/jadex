@@ -27,10 +27,24 @@ import jadex.commons.future.IFuture;
  *  Publish service without Jersey directly using Jetty container.
  *  
  *  todo: make abstract base class without Jetty deps
+ *  
+ *  note: Jetty releases are Java 1.8 only.
+ *  
  */
 @Service
 public class JettyRestPublishService extends AbstractRestPublishService
 {
+	// Jetty requires 1.8
+//	static
+//	{
+//		String ver = System.getProperty("java.version");
+//		
+//		if(Float.parseFloat(ver.substring(0,3)) < 1.8f)
+//		{
+//			System.out.println("WARNING: Jetty requires Java 1.8");
+//		}
+//	}
+	
 	// Hack constant for enabling multi-part :-(
 	private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
 

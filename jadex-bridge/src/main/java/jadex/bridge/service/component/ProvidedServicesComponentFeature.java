@@ -328,9 +328,16 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				throw new RuntimeException("Service creation error: "+info, e);
 			}
 		}
-		else if(impl!=null && impl.getClazz()!=null && impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports())!=null)
+		else if(impl!=null && impl.getClazz()!=null)
 		{
-			ser = impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports()).newInstance();
+			if(impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports())!=null)
+			{
+				ser = impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports()).newInstance();
+			}
+			else
+			{
+				throw new RuntimeException("Could not load service implementation class: "+impl.getClazz());
+			}
 		}
 		
 		return ser;
