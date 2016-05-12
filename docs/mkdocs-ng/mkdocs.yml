@@ -1,4 +1,4 @@
-site_name: Jadex ${jadexversion} Documentation
+site_name: Jadex Active Components ${jadexversion} Documentation
 theme_dir: 'theme'
 pages:
 
@@ -41,7 +41,7 @@ pages:
     - 'env/06 3D Visualization.md'
     - 'env/07 Environment Instance.md'
     - 'env/08 Standalone.md'
-- Jadex Tools:
+- Jadex Active Components Tools:
     - 'tools/01 Introduction.md'
     - 'tools/02 JCC Overview.md'
     - 'tools/03 Starter.md'
@@ -77,7 +77,7 @@ pages:
     - 'tutorials/bpmn/04 Data and Parameters.md'
     - 'tutorials/bpmn/05 Events and Messages.md'
     - 'tutorials/bpmn/06 Custom Functionality.md'
-- AC User Guide:
+- Jadex Active Components User Guide:
     - 'guides/ac/01 Introduction.md'
     - 'guides/ac/02 Active Components.md'
     - 'guides/ac/03 Asynchronous Programming.md'

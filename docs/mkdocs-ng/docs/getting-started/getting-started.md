@@ -11,9 +11,6 @@ The figure below summarizes the general concept of an Active Component.
 ![03 Active Components@ac.png](ac.png)  
 *Active Component Structure*
 
-
-
-
 <!-- TODO: needs rewriting-->
 
 # IDE Setup
@@ -21,7 +18,6 @@ The figure below summarizes the general concept of an Active Component.
 In this chapter, you will learn how to install eclipse for developing with Jadex. Therefore, you will find instructions on setting up a proper eclipse working environment for programming and executing Jadex applications. If you use a different IDE the instructions and screenshots below should still be helpful for setting up your IDE accordingly.
 
 Note that this tutorial is not a replacement for the existing eclipse documentation. If you have questions about using eclipse try also looking for an answer at the [http://www.eclipse.org/documentation/](http://www.eclipse.org/documentation/)  site.
-
 
 ## Prerequisites
 

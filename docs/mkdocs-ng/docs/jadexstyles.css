@@ -151,8 +151,14 @@ pre code {
 }
 
 /* padding for subitems */
-.wy-menu-vertical ul.subnav > li.toctree-l1.current > ul > li > a {
+.wy-menu-vertical ul.subnav > li.toctree-l1.current > ul > li.toctree-l3 > a {
 	padding: 0.4045em 3.7em;
+}
+
+/* sub-subitems */
+.wy-menu-vertical ul > li.toctree-l1.current > ul > li > a.toctree-l4 {
+	padding: 0.4045em 4.2em;
+	font-size: 80%;
 }
 
 /* default link color */
@@ -181,6 +187,39 @@ pre code {
 	background-color: rgba(115, 180, 208, 0.4);
 }
 
+/* hint box */
+
+.rst-content div.hint:before {
+	content: "Hint: " attr(content) "\A";
+	font-weight: 300;
+	color: #2980b9;
+	font-size: 115%;
+	font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;
+}
+
+.rst-content div.hint {
+	background: unset;
+	padding: unset;
+	margin: unset;
+}
+
+.rst-content div.hint + p:before {
+/*	content: "Hint \A";
+	white-space: pre-wrap;
+	font-weight: 300;
+	color: #2980b9;
+	font-size: 115%;
+	font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;*/
+}
+
+.rst-content div.hint + p {
+	padding: 12px;
+	font-size:100%;
+    border-radius: 5px;
+    border: 1px solid grey;
+    width: 100%;
+	background: #e7f2fa;
+}
 
 @media screen and (max-width: 768px) {
 	.wy-nav-side {

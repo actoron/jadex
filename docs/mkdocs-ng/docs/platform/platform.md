@@ -9,8 +9,15 @@ This chapter will explain how to start a Jadex Platform from Java code (i.e. the
 Starting a platform with default parameters is easy. Use the ```jadex.base.Starter``` class:
 
 ```java
-IExternalAccess platform = Starter.createPlatform().get();
+IFuture<IExternalAccess> fut = Starter.createPlatform()
+IExternalAccess platform = fut.get();
 ```
+
+<div class="hint">test</div>
+The object returned by Starter.createPlatform() is called a *Future*.
+It represents a result that is not yet available - calls that return a Future will typically return it instantly.
+Futures are used for asynchronous programming - please refer to chapter [Futures](Futures).
+For now, using *get()* on a Future will lead to the expected result by waiting until the call is finished.
 
 If you want to adjust the platform to your needs, you can pass a ```PlatformConfiguration``` object:
 
