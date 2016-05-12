@@ -4,9 +4,7 @@ pages:
 
 - 'index.md'
 
-- Getting Started:
-    - 'getting-started/introduction.md'
-    - IDE Setup: 'getting-started/ide-setup.md'
+- Getting Started: 'getting-started/getting-started.md'
 - Platform: 'platform/platform.md'
 - Components:
     - 'components/introduction.md'
