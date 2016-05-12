@@ -136,19 +136,36 @@ pre code {
 	background: #fcfcfc;
 }
 
+/* 1. parent menu items without sub items */
+/* 2. parent menu items with sub items    */
+.wy-menu-vertical ul:not(.subnav) > li.toctree-l1 > a,
+ .wy-menu-vertical ul.subnav > li:not(.toctree-l1) > span {
+	color: #040404;
+	font-weight: bold;
+}
+
+/* current menu item (is subitem) */
+.wy-menu-vertical ul.subnav > li.toctree-l1.current > a {
+	font-weight: unset;
+	padding: 0.4045em 2.427em;
+}
+
+/* padding for subitems */
+.wy-menu-vertical ul.subnav > li.toctree-l1.current > ul > li > a {
+	padding: 0.4045em 3.7em;
+}
+
+/* default link color */
 .wy-menu-vertical li ul li a {
 	color: grey;
 }
 
-.wy-menu-vertical li.current a {
-	color: #040404;
-}
-
+/* current sublist color */
 .wy-menu-vertical li.current > a {
 	background: #73b4d0;
 }
 
-.wy-menu-vertical span {
+.wy-menu-vertical li.current > ul a {
 	color: #040404;
 }
 
