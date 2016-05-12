@@ -2,16 +2,15 @@
 
 In this chapter, you will learn how to install eclipse for developing with Jadex. Therefore, you will find instructions on setting up a proper eclipse working environment for programming and executing Jadex applications. If you use a different IDE the instructions and screenshots below should still be helpful for setting up your IDE accordingly.
 
-Note that this tutorial is not a replacement for the existing eclipse documentation. If you have questions about using eclipse try also looking for an answer at the [http://www.eclipse.org/documentation/]()  site.
+Note that this tutorial is not a replacement for the existing eclipse documentation. If you have questions about using eclipse try also looking for an answer at the [http://www.eclipse.org/documentation/](http://www.eclipse.org/documentation/)  site.
 
 
 ## Prerequisites
 
--   Download and install a recent Java environment from [http://java.sun.com/javase/downloads]() (if not already present).
--   Download and install a suitable eclipse distribution (&gt;= 3.5) from [http://www.eclipse.org/downloads/]()  (if not already present). The following has been tested with the 'Eclipse IDE for Java EE Developers' package.
--   *(Standard setup: A1-A3)* Download the latest Jadex distribution .zip from [https://www.activecomponents.org/bin/view/Download/Distributions]()  and unpack it to a place of your choice.
--   *(Alternative setup: A4)* Download the jadex-example-project.zip from [https://activecomponents.org/bin/view/Download/Distributions]()  and unpack it to a place of your choice.
-<!--TODO: outdated-->
+-   Download and install a recent Java environment from [http://www.oracle.com/technetwork/java/javase/downloads/](http://www.oracle.com/technetwork/java/javase/downloads/) (if not already present).
+-   Download and install a suitable eclipse distribution (&gt;= 3.5) from [http://www.eclipse.org/downloads/](http://www.eclipse.org/downloads/)  (if not already present). The following has been tested with the 'Eclipse IDE for Java EE Developers' package.
+-   *(Standard setup: A1-A3)* Download the latest Jadex distribution .zip from [https://www.activecomponents.org/index.html#/download](https://www.activecomponents.org/index.html#/download)  and unpack it to a place of your choice.
+-   *(Alternative setup: A4)* Download the jadex-example-project.zip from [https://www.activecomponents.org/index.html#/download](https://www.activecomponents.org/index.html#/download)  and unpack it to a place of your choice.
 
 Before starting with the exercises, you need to decide if you'd like to use the standard setup as described in exercises A1-A3 or the alternative setup with the Maven build tool as described in exercise A4. For inexperienced users, it is recommended to follow the standard setup, were most steps are performed manually and are thus explained in the exercises. 
 
@@ -122,13 +121,13 @@ This exercise describes an alternative way of setting up a Jadex project for dev
 
 ### Prerequisites
 
--   Download the jadex-example-project.zip from [http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Download/Available+Packages ]()  and unpack it to a place of your choice.
+-   Download the jadex-example-project.zip from [https://www.activecomponents.org/index.html#/download](https://www.activecomponents.org/index.html#/download)  and unpack it to a place of your choice.
 <!--TODO: outdated-->
 
 ### Installing the M2Eclipse plugin
 
 -   Select "Help -&gt; Install New Software..." from the menu.
--   Enter the plugin URL [http://download.eclipse.org/technology/m2e/releases ]()  (for newer eclipse versions, the Maven plugin is available from the default, e.g. Juno, eclipse update site)
+-   Enter the plugin URL [http://download.eclipse.org/technology/m2e/releases](http://download.eclipse.org/technology/m2e/releases)  (for newer eclipse versions, the Maven plugin is available from the default, e.g. Juno, eclipse update site)
 -   Select "Maven Integration for Eclipse" and install the plugin.
 
 ![02 Installation@mvninstall.png](mvninstall.png)  
@@ -164,8 +163,6 @@ This exercise describes an alternative way of setting up a Jadex project for dev
 You are now ready to continue with the tutorial. If you later wish to setup your own project you can unzip the jadex-example-project.zip again to a different location. Change the following line by replacing 'jadex-example-project' with a project name of your choice. Afterwards import the project in eclipse as described above.
 
 ```xml
-
 <artifactId>jadex-example-project</artifactId>
-
 ```
 
