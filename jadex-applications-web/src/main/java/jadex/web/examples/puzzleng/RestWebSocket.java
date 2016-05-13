@@ -224,7 +224,7 @@ public class RestWebSocket
 									
 									for(Method tmp1: ms)
 									{
-										if(tmp1.getParameterCount()==sim.getParameterValues().length)
+										if(tmp1.getParameterTypes().length==sim.getParameterValues().length)
 										{
 											msok.add(tmp1);
 										}
