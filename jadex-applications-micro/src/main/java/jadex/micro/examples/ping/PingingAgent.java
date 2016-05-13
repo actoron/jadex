@@ -50,7 +50,7 @@ public class PingingAgent
 	protected int dif;
 	
 	/** Hashset with conversation ids of sent messages. */
-	protected Set sent;
+	protected Set<String> sent;
 	
 	//-------- methods --------
 
@@ -66,9 +66,9 @@ public class PingingAgent
 		final int missed_max = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("missed_max")).intValue();
 		final long timeout = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("timeout")).longValue();
 		final Object content = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("content");
-		sent = new HashSet();
+		sent = new HashSet<String>();
 		
-		final IComponentStep step = new IComponentStep<Void>()
+		final IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -81,7 +81,7 @@ public class PingingAgent
 				else
 				{
 					String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getName());
-					Map msg = new HashMap();
+					Map<String, Object> msg = new HashMap<String, Object>();
 					msg.put(SFipa.CONTENT, content);
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
 					msg.put(SFipa.CONVERSATION_ID, convid);
@@ -123,7 +123,7 @@ public class PingingAgent
 	 *  Called when a message arrives.
 	 */
 	@AgentMessageArrived
-	public void messageArrived(Map msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
 		if(mt.equals(SFipa.FIPA_MESSAGE_TYPE))
 		{

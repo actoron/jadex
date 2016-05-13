@@ -25,13 +25,13 @@ public class PingAgent
 	 *  @param mt The message type.
 	 */
 	@AgentMessageArrived
-	public void messageArrived(Map msg, final MessageType mt)
+	public void messageArrived(Map<String, Object> msg, final MessageType mt)
 	{
 		String perf = (String)msg.get(SFipa.PERFORMATIVE);
 		if((SFipa.QUERY_IF.equals(perf) || SFipa.QUERY_REF.equals(perf)) 
 			&& "ping".equals(msg.get(SFipa.CONTENT)))
 		{
-			Map reply = mt.createReply(msg);
+			Map<String, Object> reply = mt.createReply(msg);
 			reply.put(SFipa.CONTENT, "alive");
 			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
 			reply.put(SFipa.SENDER, agent.getComponentIdentifier());
