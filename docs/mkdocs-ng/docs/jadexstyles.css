@@ -1,0 +1,282 @@
+.hljs {
+	font-size: 90%;
+}
+
+.hljs-string, .hljs-tag .hljs-value {
+	color:#00F;
+}
+
+.hljs-comment, .hljs-javadoc {
+	color: #2C6700;
+}
+
+.hljs-keyword {
+	color:#6F0000;
+}
+
+.hljs-attribute {
+	color: #800080;
+}
+
+.hljs-title, .hljs-class .hljs-title {
+	color:#000;
+	font-weight: normal;
+}
+
+.hljs-tag .hljs-title {
+	color:#008080;
+}
+
+p {
+	text-align: justify;
+}
+
+li {
+	font-size: 16px;
+}
+code {
+	font-size: 90%;
+}
+
+/*This is for embedding the jadex header/navbar:*/
+
+nav.stickynav {
+	margin-left: unset;
+/*	bottom: 100px;*/
+	position: absolute;
+}
+
+.wy-body-for-nav {
+	background-image: none;
+	/*background-color: #343131;*/
+	background-color: #fefefe;
+/*	margin-left:5%;
+	margin-right:5%;*/
+}
+
+.rst-versions {
+/*	margin-left:5%;*/
+	bottom: 20px;
+	border-top: unset;
+	background: unset;
+}
+
+.rst-versions .rst-current-version {
+	/*background-color: rgba(115, 180, 208, 0.4);*/
+	background-color: lightgrey;
+	padding-top: 5px;
+}
+
+.rst-current-version a:link, .rst-current-version a:visited, .rst-current-version a:hover {
+	color: #2a6699;
+}
+
+.wy-nav-side {
+	min-height: unset;
+	height: unset;
+	bottom: 56px;
+}
+
+.wy-menu-vertical.affix {
+	position: relative;
+}
+
+.wy-nav-content {
+	max-width: unset;
+}
+
+.wy-nav-content-wrap {
+	margin-bottom: 26px;
+}
+
+.wy-menu-vertical ul {
+	margin-bottom: unset;
+}
+
+/* stickyheader: */
+#stickyheader {
+		width: 300px;
+}
+
+.navbar li {
+	font-size: 14px;
+	color: #000000;
+}
+
+/*.navbar a:visited {
+	color:#337ab7;
+}*/
+
+/* no bootstrap-styling for code: */
+pre {
+	border: unset;
+	padding: unset;
+	word-wrap: unset;
+	word-break: unset;
+}
+
+pre code {
+	white-space:unset;
+}
+
+/* color scheme: */
+.wy-side-nav-search {
+	/*background-color: #1f79a0;*/
+	background-color: #2a6699;
+	color: unset;
+}
+
+.wy-side-nav-search > a, .wy-side-nav-search > a:link, .wy-side-nav-search > a:hover, .wy-side-nav-search > a:visited {
+	color: #ffffff;
+	background-color: unset;
+	text-decoration: none;
+}
+
+.wy-nav-side {
+	background: #fcfcfc;
+}
+
+/* 1. parent menu items without sub items */
+/* 2. parent menu items with sub items    */
+.wy-menu-vertical ul:not(.subnav) > li.toctree-l1 > a,
+ .wy-menu-vertical ul.subnav > li:not(.toctree-l1) > span {
+	color: #040404;
+	font-weight: bold;
+}
+
+/* current menu item (is subitem) */
+.wy-menu-vertical ul.subnav > li.toctree-l1.current > a {
+	font-weight: unset;
+	padding: 0.4045em 2.427em;
+}
+
+/* padding for subitems */
+.wy-menu-vertical ul.subnav > li.toctree-l1.current > ul > li.toctree-l3 > a {
+	padding: 0.4045em 3.7em;
+}
+
+/* sub-subitems */
+.wy-menu-vertical ul > li.toctree-l1.current > ul > li > a.toctree-l4 {
+	padding: 0.4045em 4.2em;
+	font-size: 80%;
+}
+
+/* default link color */
+.wy-menu-vertical li ul li a {
+	color: grey;
+}
+
+/* current sublist color */
+.wy-menu-vertical li.current > a {
+	background: #73b4d0;
+}
+
+.wy-menu-vertical li.current > ul a {
+	color: #040404;
+}
+
+.wy-menu-vertical li.current a:hover {
+	background-color: rgba(115, 180, 208, 0.4);
+}
+
+.wy-menu-vertical li.current > a:hover {
+	background-color: rgba(115, 180, 208, 0.4);
+}
+
+.wy-menu-vertical a:hover {
+	background-color: rgba(115, 180, 208, 0.4);
+}
+
+/* hint box */
+
+.rst-content div.hint:before {
+	content: "Hint: " attr(content) "\A";
+	font-weight: 300;
+	color: #2980b9;
+	font-size: 115%;
+	font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;
+}
+
+.rst-content div.hint {
+	background: unset;
+	padding: unset;
+	margin: unset;
+}
+
+.rst-content div.hint + p:before {
+/*	content: "Hint \A";
+	white-space: pre-wrap;
+	font-weight: 300;
+	color: #2980b9;
+	font-size: 115%;
+	font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;*/
+}
+
+.rst-content div.hint + p {
+	padding: 12px;
+	font-size:100%;
+    border-radius: 5px;
+    border: 1px solid grey;
+    width: 100%;
+	background: #e7f2fa;
+}
+
+@media screen and (max-width: 768px) {
+	.wy-nav-side {
+/*		left: -301px;*/
+	}
+	.wy-body-for-nav {
+		margin-left:unset;
+	}
+	.wy-nav-content-wrap.shift {
+
+		top: auto;
+	}
+	nav.stickynav {
+		position:fixed;
+	}
+	nav.shift {
+    	margin-left:unset;
+    }
+
+    .wy-nav-top {
+    }
+
+    #stickyheader.shift {
+    		width: 85%;
+    		position: absolute;
+    }
+
+    .navbar-brand>img {
+    	width: unset;
+    }
+}
+
+@media screen and (min-width: 1400px) {
+/*	.wy-body-for-nav {
+    	background-image: none;
+    	background-color: #343131;
+    	margin-left:5%;
+    	margin-right:5%;
+    }
+
+    .wy-grid-for-nav {
+    	margin-right: 5%;
+    	width: 100%;
+    }*/
+
+/*	.wy-nav-content {
+		margin: unset;
+		background:#fcfcfc
+	}*/
+
+	.wy-nav-content-wrap {
+		background: #fcfcfc;
+		margin-right: 10%;
+	}
+
+	.wy-grid-for-nav {
+        	margin-right: 5%;
+        	width: 100%;
+    }
+}
