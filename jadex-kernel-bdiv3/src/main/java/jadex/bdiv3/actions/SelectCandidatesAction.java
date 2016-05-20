@@ -155,6 +155,11 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 								return true;
 							}
 							
+							public boolean isAborted()
+							{
+								return true;
+							}
+							
 							public Exception getException()
 							{
 								return e;

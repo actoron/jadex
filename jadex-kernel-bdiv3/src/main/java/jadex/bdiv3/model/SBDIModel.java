@@ -179,7 +179,7 @@ public class SBDIModel
 			for(MGoal goal: capa.getCapability().getGoals())
 			{
 				MGoal goal2	= new MGoal(capaname+MElement.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
-					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
+					goal.isPostToAll(), goal.isRebuild(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
 					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), null,
 					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), convertTrigger(bdimodel, capaname, goal.getTrigger(), true));
 				

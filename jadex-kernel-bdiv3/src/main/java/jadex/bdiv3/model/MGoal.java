@@ -109,12 +109,12 @@ public class MGoal extends MClassBasedElement
 	/**
 	 *  Create a new goal model element.
 	 */
-	public MGoal(String name, String target, boolean posttoall, boolean randomselection, ExcludeMode excludemode,
+	public MGoal(String name, String target, boolean posttoall, boolean rebuild, boolean randomselection, ExcludeMode excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
 		boolean orsuccess, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
 		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, MTrigger trigger)//, List<String> triggergoals)
 	{
-		super(name, target, posttoall, randomselection, excludemode);
+		super(name, target, posttoall, rebuild, randomselection, excludemode);
 		this.retry = retry;
 		this.recur = recur;
 		this.retrydelay = retrydelay;

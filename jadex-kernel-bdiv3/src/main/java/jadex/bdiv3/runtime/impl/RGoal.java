@@ -1399,6 +1399,15 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	}
 	
 	/**
+	 *  Test if plan has been aborted.
+	 */
+	public boolean isAborted()
+	{
+		return isAborted();
+	}
+
+	
+	/**
 	 *  Check if the goal is the same as another goal
 	 *  with respect to uniqueness settings.
 	 *  When two goals are the same this does not mean

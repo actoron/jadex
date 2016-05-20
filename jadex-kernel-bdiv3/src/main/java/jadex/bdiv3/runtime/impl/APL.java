@@ -416,7 +416,7 @@ public class APL
 			vals.put(element.getFetcherName(), element);
 		}
 		
-		// chack match expression
+		// check match expression
 		if(element instanceof RGoal)
 		{
 			RGoal rgoal = (RGoal)element;
@@ -697,7 +697,8 @@ public class APL
 		{
 //			PlanLifecycleState state = rplan.getLifecycleState();
 			if((rplan.isPassed() && exclude.equals(MProcessableElement.ExcludeMode.WhenSucceeded))
-				|| (rplan.isFailed() && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed)))
+				|| (rplan.isFailed() && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed))
+				|| (rplan.isAborted() && rplan.getException()!=null && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed)))
 			{
 //			if(state.equals(RPlan.PlanLifecycleState.PASSED)
 //				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)

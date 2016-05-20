@@ -89,10 +89,11 @@ public class MProcessableElement extends MParameterElement
 	 *  Create a new element.
 	 */
 	// todo: add rebuild?
-	public MProcessableElement(String name, boolean posttoall, boolean randomselection, ExcludeMode excludemode)
+	public MProcessableElement(String name, boolean posttoall, boolean rebuild, boolean randomselection, ExcludeMode excludemode)
 	{
 		super(name);
 		this.posttoall = posttoall;
+		this.rebuild = rebuild;
 		this.randomselection = randomselection;
 		this.excludemode = excludemode==null? ExcludeMode.WhenTried: excludemode;
 	}

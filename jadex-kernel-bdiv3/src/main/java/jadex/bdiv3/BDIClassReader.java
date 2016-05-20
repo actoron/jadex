@@ -935,7 +935,7 @@ public class BDIClassReader extends MicroClassReader
 //			mtr.setGoalNames(triggergoals);
 		}
 		
-		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
+		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.rebuild(), goal.randomselection(), goal.excludemode(), 
 			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.orsuccess(), goal.unique(), mdel, params,
 			spmappings.size()>0? spmappings: null, srmappings.size()>0? srmappings: null, mtr);
 		

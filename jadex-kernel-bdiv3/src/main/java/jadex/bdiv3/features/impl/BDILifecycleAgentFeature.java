@@ -183,7 +183,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	/**
 	 *  Assemble fitting parameters from context and invoke a boolean method. 
 	 */
-	protected static IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, MElement modelelement, IEvent event, RPlan rplan, IInternalAccess component)
+	public static IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, MElement modelelement, IEvent event, RPlan rplan, IInternalAccess component)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
 		try

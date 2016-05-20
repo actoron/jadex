@@ -303,9 +303,17 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			{
 				try
 				{
-					Field fi = tmp.getClass().getDeclaredField("this$0");
-					fi.setAccessible(true);
-					tmp = fi.get(tmp);
+					// Does not work in innner inner classes $1 $2 ...
+//					Field fi = tmp.getClass().getDeclaredField("this$0");
+					Field[] fs = tmp.getClass().getDeclaredFields();
+					for(Field fi: fs)
+					{
+						if(f.getName().startsWith("this$"))
+						{
+							fi.setAccessible(true);
+							tmp = fi.get(tmp);
+						}
+					}
 				}
 				catch(Exception e)
 				{

@@ -25,6 +25,11 @@ public interface IInternalPlan extends IParameterElement
 	public boolean isFailed();
 	
 	/**
+	 *  Test if plan has been aborted.
+	 */
+	public boolean isAborted();
+	
+	/**
 	 *  Get the exception.
 	 */
 	public Exception getException();
