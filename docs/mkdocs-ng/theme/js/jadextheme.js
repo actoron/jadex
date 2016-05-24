@@ -76,3 +76,14 @@
   var searchHeader = $(".wy-side-nav-search");
   console.log(searchHeader.height());
   $("#stickyheader").scrollTop(currentChapter.offset().top-(searchHeader.height()+20));
+
+
+  // hint box
+//  var x-hint = document.registerElement('x-hint', {
+//  	prototype: Object.create(HTMLDivElement.prototype);
+//  });
+
+  $('x-hint').each(function(index, element) {
+  	$("<h4>Hint</h4>").insertBefore(element);
+  });
+

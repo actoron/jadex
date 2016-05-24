@@ -6,21 +6,18 @@ pages:
 
 - Getting Started: 'getting-started/getting-started.md'
 - Platform: 'platform/platform.md'
-- Components:
-    - 'components/introduction.md'
-    - 'components/implementation.md'
-    - 'components/annotations.md'
+- Components: 'components/components.md'
 - Services:
-    - 'services/introduction.md'
+    - 'services/services.md'
     - 'services/implementation.md'
     - 'services/annotations.md'
     - 'services/lifecycle.md'
     - 'services/providing.md'
     - 'services/using.md'
 - Futures:
-    - 'futures/introduction.md'
+    - 'futures/futures.md'
 - Remote:
-    - 'remote/introduction.md'
+    - 'remote/remote.md'
     - 'remote/awareness.md'
     - 'remote/security.md'
     - 'remote/transports.md'
@@ -31,6 +28,7 @@ pages:
     - 'android/03 Using Jadex on Android.md'
     - 'android/04 Using BDIv3.md'
 #    - 'android/05 PlatformApp - ClientApp Separation.md'
+- Web API: 'webapi/webapi.md'
 - Simulation: 'simulation/simulation.md'
 - Environment:
     - 'env/01 Introduction.md'
