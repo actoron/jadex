@@ -85,7 +85,78 @@ Now that you know how to start your own components, you can read more about [Ser
 ## Creation Info
 TODO
 
-# Annotations
+# Component Features
 
-## Lifecycle
-The result is only made available after all init code of the component and its services (if any) has completed.
+All component functionalities are available via **features**.
+By default, all components have a certain set of features, which can be injected into fields like this:
+```java
+@AgentFeature
+IExecutionFeature exeFeat;
+```
+
+Below is a list of important features commonly available for all components.
+For features specific to a component-type, take a look at [component types](../component-types/component-types).
+
+| Feature Name | Description |
+|--------------|-------------|
+|IArgumentsResultsFeature| TODO |
+|IExecutionFeature| TODO |
+|IMessageFeature| TODO |
+|IMonitoringComponentFeature| TODO |
+
+# Annotations
+The most important annotations common to all components are listed below.
+For a more complete guide, take a look at the [AC User Guide](../guides/ac/01 Introduction).
+For a full reference, have a look at the [jadex.micro.annotation](../../javadoc/jadex/micro/annotation/package-summary.html) package.
+
+## Lifecycle (Method) Annotations
+The Jadex Active Components Platform and the CMS implement a specific lifecycle for components. 
+For each step in the cycle there is an annotation which can be used on methods to perform actions during the lifecycle step.
+
+|Annotation | Description|
+|-----------|------------|
+| **@AgentCreated** | A method marked with this annotation will be called upon creation of the agent. This means services, injected fields etc. are not initialized at this point. |
+|**@AgentBody** | A method marked with this annotation will be called after creation of the agent is complete. At this point, all fields and required services are available and can be used.|
+|**@AgentKilled** | A method marked with this annotation will be called just before the component is removed from the platform.|  
+
+## Type Annotations
+These annotations can be applied to the component type definition, like this:
+```java
+@Agent
+public class MyAgent {...
+```
+
+|Annotation | Description|
+|-----------|------------|
+|**@Agent** | Marks the class as micro agent.|
+|**@Description** | Add a description to your component. |
+
+## Service Annotations
+TODO: Text here, maybe move to services
+
+|Annotation | Description|
+|-----------|------------|
+| **@ProvidedService** | TODO |
+| **@ProvidedServices** | TODO |
+| **@RequiredService** | TODO |
+| **@RequiredServices** | TODO |
+| **@Implementation** | TODO |
+| **@Binding** | TODO |
+| **@CreationInfo** | TODO |
+| **@Publish** | TODO |
+
+## Injection Annotations
+
+|Annotation | Applicable | Description|
+|-----------|------------|------------|
+| **@AgentFeature** | fields | Injects features of components.|
+| **@Agent** | fields | Injects the ```IExternalAccess``` of the component.|
+| **@AgentArgument** | fields | TODO |
+| **@AgentService** | methods/fields | TODO |
+| **@AgentServiceValue** | methods/fields | TODO |
+| **@Parent** | fields | TODO |
+
+
+## Messaging Annotations
+@AgentMessageArrived: method
+@AgentStreamArrived : method
