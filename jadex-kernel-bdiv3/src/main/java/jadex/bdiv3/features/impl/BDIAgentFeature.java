@@ -308,10 +308,11 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					Field[] fs = tmp.getClass().getDeclaredFields();
 					for(Field fi: fs)
 					{
-						if(f.getName().startsWith("this$"))
+						if(fi.getName().startsWith("this$"))
 						{
 							fi.setAccessible(true);
 							tmp = fi.get(tmp);
+							f	= fi;
 						}
 					}
 				}

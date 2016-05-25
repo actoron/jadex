@@ -217,7 +217,10 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				{
 					try
 					{
-	//					System.out.println("Check: "+abspath);
+//						if(abspath.indexOf("BDI")!=-1)
+//						{
+//							System.out.println("Check: "+abspath);							
+//						}
 						if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
 						{
 	//						System.out.println("Loadable: "+abspath);
@@ -260,7 +263,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 									}
 								}
 							}
-							else if(startable && model.getReport()!=null)
+							else if(startable && model.getReport()==null)
 							{
 								System.out.print(".");
 	//								System.out.println("Start: "+abspath);
