@@ -189,36 +189,31 @@ pre code {
 
 /* hint box */
 
-.rst-content div.hint:before {
-	content: "Hint: " attr(content) "\A";
+/*.rst-content x-hint:before {
+	content: attr(title) ":\A";
 	font-weight: 300;
 	color: #2980b9;
 	font-size: 115%;
 	font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;
-}
+}*/
 
-.rst-content div.hint {
-	background: unset;
-	padding: unset;
-	margin: unset;
-}
-
-.rst-content div.hint + p:before {
-/*	content: "Hint \A";
-	white-space: pre-wrap;
+/*.rst-content x-hint:before {
+	content: attr(title) ":\A";
 	font-weight: 300;
-	color: #2980b9;
-	font-size: 115%;
-	font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;*/
-}
+	color: #000000;
+	font-size: 100%;
+	font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;
+}*/
 
-.rst-content div.hint + p {
+
+.rst-content x-hint {
 	padding: 12px;
 	font-size:100%;
     border-radius: 5px;
     border: 1px solid grey;
     width: 100%;
 	background: #e7f2fa;
+	display: block;
 }
 
 @media screen and (max-width: 768px) {

@@ -303,6 +303,10 @@ public interface IComponentStep<T>
 
 (Current difference: Micro agents have lifecycle methods instead of steps to execute behavior at creation and deletion time)
 
+
+### Features
+TODO
+
 ### Extension Types
 
 ![04 Component Specification@extensiontypes.png](extensiontypes.png)  

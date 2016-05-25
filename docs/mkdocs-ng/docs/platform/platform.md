@@ -4,7 +4,7 @@ The Jadex Platform provides important runtime services such as lifecycle managem
 
 This chapter will explain how to start a Jadex Platform from Java code (i.e. the ```main()``` method), so in consequence, components can be started on this platform.
 
-## Starting a Platform
+# Starting a Platform
 
 Starting a platform with default parameters is easy. Use the ```jadex.base.Starter``` class:
 
@@ -13,11 +13,12 @@ IFuture<IExternalAccess> fut = Starter.createPlatform()
 IExternalAccess platform = fut.get();
 ```
 
-<div class="hint">test</div>
+<x-hint title="Futures">
 The object returned by Starter.createPlatform() is called a *Future*.
-It represents a result that is not yet available - calls that return a Future will typically return it instantly.
-Futures are used for asynchronous programming - please refer to chapter [Futures](Futures).
-For now, using *get()* on a Future will lead to the expected result by waiting until the call is finished.
+It represents a result that is not yet available - method calls returning a Future will typically return it instantly.
+Futures are used for asynchronous programming - please refer to chapter [Futures](Futures).  
+Using *get()* will block until the result is available so you can work with it.
+</x-hint>
 
 If you want to adjust the platform to your needs, you can pass a ```PlatformConfiguration``` object:
 
@@ -29,57 +30,77 @@ RootComponentConfiguration rootConfig = platformConfig.getRootConfig();
 IExternalAccess platform = Starter.createPlatform(platformConfig).get();
 ```
 
+The ```IExternalAccess``` object returned by the starter plays an important role for interaction with the platform, so be sure to keep it accessible. 
+
+Now that you know how to start a Jadex Active Components Platform you can proceed to [Components](../components/introduction) to see how to implement your own components and start them.
+
+# Configuring the Platform
 Both the PlatformConfiguration object and the RootComponentConfiguration object provide many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](../../javadoc/jadex/base/PlatformConfiguration.html) and [RootComponentConfiguration](../../javadoc/jadex/base/RootComponentConfiguration.html).
 
 The configuration options are also explained in more detail [here](http://www.activecomponents.org/jadex-applications-web/jadexdoc/view?model=/jadex/platform/Platform.component.xml).
 
 ## Configuration examples
 
-### Run without GUI (JCC) and CLI (common case)
+Here you can find some examples for commonly used configuration options.
+
+**Run without GUI (JCC) and CLI:**
 ```java
 rootConfig.setGui(false);
 rootConfig.setCli(false);
 ```
 
-### Enable logging (useful for debugging)
+**Enable logging (useful for debugging):**
 ```java
 rootConfig.setLogging(true); // enables the printing of info and warning messages in addition to severe messages.
 ```
 
-### Enable future debugging
+**Enable future debugging:**
 ```java
 platformConfig.setDebugFutures(true); // enables stacktraces of exceptions
 ```
 
-### Do not print password or welcome message
+**Do not print password or welcome message on startup:**
 ```java
 rootConfig.setWelcome(false);
 rootConfig.setPrintPass(false);
 ```
 
-### Set platform name
+**Set platform name:**
 ```java
 platformConfig.setPlatformName("jadexplatform");
 ```
 
-### Set available component kernels
+**Set available component kernels:**
 ```java
 rootConfig.setKernels(RootComponentConfiguration.KERNEL.micro,
 				RootComponentConfiguration.KERNEL.component,
 				RootComponentConfiguration.KERNEL.v3);
 ```
 
+**Disable platform awareness:**
+```java
+rootConfig.setAwareness(false);
+```
 
-TODO: awareness, passwords
+**Set Awareness mechanisms:**
+```java
+rootConfig.setAwaMechanisms(RootComponentConfiguration.AWAMECHANISM.broadcast, 
+    RootComponentConfiguration.AWAMECHANISM.relay);
+```
 
-## Platform services
+**Disable Password protection (Caution!):**
+```java
+rootConfig.setUsePass(false);
+```
+
+# Platform services
 TODO: List of all services a default platform provides. 
 
-## Packaging an Application
+# Packaging an Application
 
 If you deploy your application to end users you will want to have some deployment package of your application that can be started by a double-click.
 
-### Alternative 1: Executable Jar
+## Alternative 1: Executable Jar
 
 When you develop with eclipse you are almost done, because eclipse allows exporting a project directly as an executable jar file. An executable jar is in the essence a zip file including your Java classes and contains additional meta information, so that Java knows which main class to start, when the jar file is executed.
 
@@ -99,7 +120,7 @@ In the second step as shown below you can specify the way the dependencies of th
 -   Export your application with the chosen options.
 -   Test the exported application by double-clicking on the jar file.
 
-### Alternative 2: Launch Script
+## Alternative 2: Launch Script
 
 If you are a little bit used to Java, you may know that you can start an executable jar as produced in the last section by typing 'java -jar *filename*.jar' in the console. Therefore you can use the same command in a .bat file (on Windows) or an .sh script (on Linux). But it is also quite easy to start your application from the console or a batch script even without producing an executable jar file.
 
