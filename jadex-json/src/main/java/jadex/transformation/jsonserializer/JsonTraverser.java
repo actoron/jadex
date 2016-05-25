@@ -191,13 +191,21 @@ public class JsonTraverser extends Traverser
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, Map<Class<?>, Set<String>> excludes)
 	{
+		return objectToByteArray(val, classloader, enc, writeclass, null, null);
+	}
+	
+	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
+	{
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
 		
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			traverser.traverse(val, null, writeprocs, null, wr);
+			traverser.traverse(val, null, processors!=null? processors: writeprocs, null, wr);
 			byte[] ret = enc==null? wr.getString().getBytes(): wr.getString().getBytes(enc);
 			bos.close();
 			return ret;
@@ -327,6 +335,17 @@ public class JsonTraverser extends Traverser
 	 */
 	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz)
 	{
+		return objectFromString(val, classloader, null, clazz, null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz, List<ITraverseProcessor> processors)
+	{
 		rep = rep==null? DefaultErrorReporter.DEFAULT_ERROR_REPORTER: rep;
 		
 		try
@@ -334,7 +353,7 @@ public class JsonTraverser extends Traverser
 			JsonValue value = Json.parse(val);
 			JsonTraverser traverser = getReadTraverser();
 			JsonReadContext rc = new JsonReadContext();
-			Object ret = traverser.traverse(value, clazz, readprocs, null, rc);
+			Object ret = traverser.traverse(value, clazz, processors!=null? processors: readprocs, null, rc);
 	//		System.out.println("rc: "+rc.knownobjects);
 			return (T)ret;
 		}
@@ -348,6 +367,24 @@ public class JsonTraverser extends Traverser
 			// System.out.println("Exception writing: "+val);
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Get a copy of the default read processors.
+	 *  @return A copy of the read processor list.
+	 */
+	public static List<ITraverseProcessor> getDefaultReadProcessorsCopy()
+	{
+		return new ArrayList<ITraverseProcessor>(readprocs);
+	}
+	
+	/**
+	 *  Get a copy of the default read processors.
+	 *  @return A copy of the read processor list.
+	 */
+	public static List<ITraverseProcessor> getDefaultWriteProcessorsCopy()
+	{
+		return new ArrayList<ITraverseProcessor>(writeprocs);
 	}
 }
 

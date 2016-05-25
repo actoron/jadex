@@ -3,18 +3,19 @@ package jadex.bdiv3.examples.helloworld;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Description("Hello world agent that creates a hello plan.")
 public abstract class HelloWorldPlan2BDI implements IBDIAgent
 {
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	@AgentBody
 	public void body()
 	{
 		adoptPlan("printHello").get();

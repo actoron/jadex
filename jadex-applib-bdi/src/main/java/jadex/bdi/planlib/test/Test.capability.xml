@@ -57,12 +57,12 @@
 
 	<goals>
 		<achievegoal name="tests_finished">
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.testcase_cnt==$beliefbase.reports.length
 			</creationcondition>		
 		</achievegoal>
 		<achievegoal name="test_timeout">
-			<creationcondition language="jcl">
+			<creationcondition>
 				$beliefbase.timeout_failure
 			</creationcondition>		
 		</achievegoal>

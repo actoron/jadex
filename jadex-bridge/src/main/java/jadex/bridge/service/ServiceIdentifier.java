@@ -45,8 +45,16 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 */
 	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid, String scope)
 	{
+		this(providerid, new ClassInfo(type), servicename, rid, scope);
+	}
+	
+	/**
+	 *  Create a new service identifier.
+	 */
+	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, String servicename, IResourceIdentifier rid, String scope)
+	{
 		this.providerid = providerid;
-		this.type	= new ClassInfo(type);
+		this.type	= type;
 		this.servicename = servicename;
 		this.rid = rid;
 		this.scope = scope;

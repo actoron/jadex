@@ -4,6 +4,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
@@ -12,7 +13,7 @@ import jadex.micro.annotation.Imports;
 /**
  *  Hello World with plan driven print out.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Imports({"java.util.logging.*"})
 //@Properties({@NameValue(name="logging.level", value="Level.INFO")})
 @Description("Hello world agent that creates a hello plan.")
@@ -25,7 +26,7 @@ public class HelloWorldPlanBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	@AgentBody
 	public void body()
 	{
 		agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("printHello").get();
