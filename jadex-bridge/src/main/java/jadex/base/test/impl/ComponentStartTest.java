@@ -37,7 +37,7 @@ public class ComponentStartTest extends	ComponentTest
 {
 	//-------- attributes --------
 	
-	/** The delay before the component is stopped. */
+	/** The delay after which the started component is stopped again. */
 	// Extra to super.timeout, because timeout is used by super class also to stop init...
 	public long delay;
 	
@@ -76,9 +76,11 @@ public class ComponentStartTest extends	ComponentTest
 				public synchronized void resultAvailable(Void result)
 				{
 					IComponentManagementService	mycms	= cms;
+//					System.err.println("destroying: "+ComponentStartTest.super.toString()+", "+mycms);
 					if(mycms!=null)
 					{
-						mycms.destroyComponent(cid);
+						mycms.destroyComponent(cid).get();
+//						System.err.println("destroyed: "+ComponentStartTest.super.toString());
 					}
 				}
 			});
@@ -128,14 +130,6 @@ public class ComponentStartTest extends	ComponentTest
 	public String toString()
 	{
 		return "start: "+super.toString();
-	}
-	
-	/**
-	 *  Get the delay.
-	 */
-	public long	getDelay()
-	{
-		return delay;
 	}
 	
 	/**
