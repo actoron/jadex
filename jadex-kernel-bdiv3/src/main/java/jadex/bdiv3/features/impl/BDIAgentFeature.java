@@ -299,6 +299,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		while(f==null && tmp!=null)
 		{
 			f = findFieldWithSuperclass(tmp.getClass(), fieldname);
+			
+			// If field not found try searching outer class
 			if(f==null)
 			{
 				try
@@ -306,18 +308,23 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					// Does not work in innner inner classes $1 $2 ...
 //					Field fi = tmp.getClass().getDeclaredField("this$0");
 					Field[] fs = tmp.getClass().getDeclaredFields();
+					boolean found = false;
 					for(Field fi: fs)
 					{
-						if(f.getName().startsWith("this$"))
+						if(fi.getName().startsWith("this$"))
 						{
 							fi.setAccessible(true);
 							tmp = fi.get(tmp);
+							found = true;
+							break;
 						}
 					}
+					if(!found)
+						tmp = null;
 				}
 				catch(Exception e)
 				{
-//						e.printStackTrace();
+//					e.printStackTrace();
 					tmp=null;
 				}
 			}

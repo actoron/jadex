@@ -100,6 +100,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 				if(!wr.isPropertyExcluded(clazz, name))
 				{	
 					BeanProperty prop = (BeanProperty)props.get(name);
+					
 					if(prop.isReadable() && prop.isWritable())
 					{
 						Object val = prop.getPropertyValue(object);

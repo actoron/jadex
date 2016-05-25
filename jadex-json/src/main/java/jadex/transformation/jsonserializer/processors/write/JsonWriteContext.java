@@ -2,6 +2,7 @@ package jadex.transformation.jsonserializer.processors.write;
 
 import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
+import jadex.commons.transformation.traverser.Traverser;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 import java.util.Map;

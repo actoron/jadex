@@ -42,8 +42,6 @@ public class JsonToStringProcessor implements ITraverseProcessor
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		
-		Object ret = object.toString();
-
 		if(object instanceof String)
 		{
 			wr.writeString(object.toString());
@@ -55,7 +53,7 @@ public class JsonToStringProcessor implements ITraverseProcessor
 			
 			if(!wr.isWriteClass())// && !wr.isWriteId())
 			{
-				wr.write(object.toString());
+				wr.writeString(object.toString());
 			}
 			else
 			{

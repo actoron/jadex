@@ -245,6 +245,10 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 				Collections.singletonMap(rplan.getFetcherName(), (Object)rplan));
 			ret.setResult(context);
 		}
+		else
+		{
+			ret.setResult(context);
+		}
 		
 //		System.out.println("context cond: "+context+" "+mplan.getName());
 		
