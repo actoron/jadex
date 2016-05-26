@@ -29,7 +29,7 @@ public class HelloWorldBeliefBDI
 	
 	/** The text that is printed. */
 	@Belief
-	private String sayhello = "initial value";
+	private String sayhello;// = "initial value";
 	
 	/**
 	 *  Simple hello world goal.

@@ -11,7 +11,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
- * 
+ *  Handle primitive types and null.
  */
 public class JsonPrimitiveProcessor implements ITraverseProcessor
 {
@@ -26,7 +26,7 @@ public class JsonPrimitiveProcessor implements ITraverseProcessor
 	{
 		boolean ret = false;
 		JsonValue val = (JsonValue)object;
-		ret = val.isString() || val.isBoolean() || val.isNumber();
+		ret = val.isString() || val.isBoolean() || val.isNumber() || val.isNull();
 		return ret;
 	}
 	

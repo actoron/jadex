@@ -20,11 +20,10 @@ import jadex.commons.transformation.traverser.Traverser;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
- * 
+ *  Bean processor for reading json objects.
  */
 public class JsonBeanProcessor implements ITraverseProcessor
 {
-	
 	/** Bean introspector for inspecting beans. */
 	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(5000);
 	
@@ -191,7 +190,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	 */
 	public static Object convertBasicType(Object value, Class<?> targetclazz)
 	{
-		if(!SReflect.isSupertype(targetclazz, value.getClass()))
+		if(value!=null && !SReflect.isSupertype(targetclazz, value.getClass()))
 		{
 			// Autoconvert basic from string
 			if(value instanceof String)

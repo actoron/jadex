@@ -53,12 +53,28 @@ public class JsonToStringProcessor implements ITraverseProcessor
 			
 			if(!wr.isWriteClass())// && !wr.isWriteId())
 			{
-				wr.writeString(object.toString());
+				if(object instanceof Number
+					|| object instanceof Boolean)
+				{
+					wr.write(object.toString());
+				}
+				else
+				{
+					wr.writeString(object.toString());
+				}
 			}
 			else
 			{
 				wr.write("{");
-				wr.writeNameString("value", object.toString());
+				if(object instanceof Number
+					|| object instanceof Boolean)
+				{
+					wr.write("\"value\":"+object.toString());
+				}
+				else
+				{
+					wr.writeNameString("value", object.toString());
+				}
 				if(wr.isWriteClass())
 					wr.write(",").writeClass(object.getClass());
 //				if(wr.isWriteId())

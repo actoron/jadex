@@ -205,7 +205,7 @@ public class JsonTraverser extends Traverser
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			traverser.traverse(val, null, processors!=null? processors: writeprocs, null, wr);
+			traverser.traverse(val, null, processors!=null? processors: writeprocs, classloader, wr);
 			byte[] ret = enc==null? wr.getString().getBytes(): wr.getString().getBytes(enc);
 			bos.close();
 			return ret;
@@ -243,13 +243,21 @@ public class JsonTraverser extends Traverser
 	 */
 	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes)
 	{
+		return objectToString(val, classloader, writeclass, null, null);
+	}
+	
+	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
+	{
 		String ret = null;
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
 		
 		try
 		{
-			traverser.traverse(val, null, writeprocs, null, wr);
+			traverser.traverse(val, null, processors, classloader, wr);
 			ret = wr.getString();
 			return ret;
 		}
@@ -353,7 +361,7 @@ public class JsonTraverser extends Traverser
 			JsonValue value = Json.parse(val);
 			JsonTraverser traverser = getReadTraverser();
 			JsonReadContext rc = new JsonReadContext();
-			Object ret = traverser.traverse(value, clazz, processors!=null? processors: readprocs, null, rc);
+			Object ret = traverser.traverse(value, clazz, processors!=null? processors: readprocs, classloader, rc);
 	//		System.out.println("rc: "+rc.knownobjects);
 			return (T)ret;
 		}
