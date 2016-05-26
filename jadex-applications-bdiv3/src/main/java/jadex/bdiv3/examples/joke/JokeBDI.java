@@ -1,26 +1,10 @@
 package jadex.bdiv3.examples.joke;
 
-import java.awt.BorderLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
-import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
@@ -37,6 +21,21 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.rules.eca.ChangeInfo;
+
+import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 /**
  *  Tries to achieve a state of mood of a user.
@@ -63,17 +62,17 @@ public class JokeBDI
 	/** The gui. */
 	protected MoodGui gui = new MoodGui();
 	
-	/** The available jokes. */
+	/** The available slogans. */
 	@Belief
-	protected List<String> jokes;
+	protected List<String> slogans;
 	
 	@AgentCreated
 	public void init()
 	{
-		jokes = new ArrayList<String>();
-		jokes.add("Good luck bastard");
-		jokes.add("Life is a game");
-		jokes.add("The sun makes you smile");
+		slogans = new ArrayList<String>();
+		slogans.add("Good luck bastard");
+		slogans.add("Life is a game");
+		slogans.add("The sun makes you smile");
 	}
 	
 	@AgentBody
@@ -114,7 +113,7 @@ public class JokeBDI
 	/**
 	 *  Goal to achieve a certain state of mood.
 	 */
-	@Goal(excludemode=ExcludeMode.WhenFailed)//, rebuild=true)
+	@Goal(excludemode=ExcludeMode.WhenFailed, rebuild=true)
 	public class AchieveMoodGoal
 	{
 		/** The mood to achieve. */
@@ -144,7 +143,7 @@ public class JokeBDI
 			return mood;
 		}
 	}
-	
+
 	/**
 	 *  Plan to achieve a mood transfer.
 	 */
@@ -156,41 +155,66 @@ public class JokeBDI
 		@PlanBody
 		public void body()
 		{
-			if(jokes.size()==0)
+			if(slogans.size()==0)
 				throw new PlanFailureException();
 			
-			int idx = r.nextInt(jokes.size());
-			String slogan = jokes.remove(idx);
+			int idx = r.nextInt(slogans.size());
+			String slogan = slogans.remove(idx);
 			gui.setSlogan(slogan); // blocks until user feedback is received
 			System.out.println("plan end: "+this);
 		}
 		
-		@PlanContextCondition(beliefs="jokes")
-//		@PlanPrecondition
+//		@PlanContextCondition(beliefs="slogans")
+		@PlanPrecondition
 		public boolean checkJokeAvailable()
 		{
-			return jokes.size()>0;
+			return slogans.size()>0 && !Mood.ANGRY.equals(usermood);
 		}
 	}
 	
-//	/**
-//	 *  Plan to achieve a mood transfer.
-//	 */
-//	@Plan(trigger=@Trigger(goals=AchieveMoodGoal.class))
-//	public class OnlineSelectPlan
-//	{
-//		@PlanBody
-//		public void body() throws Exception
-//		{
-//			URLConnection con = new URL("http://tambal.azurewebsites.net/joke/random").openConnection();
-//			InputStream is = con.getInputStream();
-//			String json = new String(SUtil.readStream(is));
-//			String joke = json.substring(json.lastIndexOf(":")+2, json.length()-2);
-//			is.close();
-//			gui.setSlogan(joke); // blocks until user feedback is received
-//			System.out.println("plan end: "+this);
-//		}
-//	}
+	/**
+	 *  Plan to achieve a mood transfer.
+	 */
+	@Plan(trigger=@Trigger(goals=AchieveMoodGoal.class))
+	public class OnlineSelectPlan
+	{
+		@PlanBody
+		public void body() throws Exception
+		{
+			URLConnection con = new URL("http://tambal.azurewebsites.net/joke/random").openConnection();
+			InputStream is = con.getInputStream();
+			String json = new String(SUtil.readStream(is));
+			String joke = json.substring(json.lastIndexOf(":")+2, json.length()-2);
+			is.close();
+			gui.setSlogan(joke); // blocks until user feedback is received
+			System.out.println("plan end: "+this);
+		}
+		
+		@PlanPrecondition
+		public boolean checkJokeAvailable()
+		{
+			return !Mood.ANGRY.equals(usermood);
+		}
+	}
+	
+	/**
+	 *  Plan to achieve a mood transfer.
+	 */
+	@Plan(trigger=@Trigger(goals=AchieveMoodGoal.class))
+	public class AntiAngryPlan
+	{
+		@PlanBody
+		public void body() throws Exception
+		{
+			gui.setSlogan("Best joke ever"); // blocks until user feedback is received
+		}
+		
+		@PlanPrecondition
+		public boolean checkJokeAvailable()
+		{
+			return Mood.ANGRY.equals(usermood);
+		}
+	}
 	
 	@Plan(trigger=@Trigger(factaddeds="slogans"))
 	public void printNewSlogan(ChangeInfo<String> ci)
