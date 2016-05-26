@@ -34,7 +34,7 @@ public class HelloWorldBDI
 	
 	/** The text that is printed. */
 	@Belief
-	private String sayhello = "initial value";
+	private String sayhello;
 	
 	/**
 	 *  Simple hello world goal.
@@ -89,16 +89,26 @@ public class HelloWorldBDI
 	protected IFuture<Void> printHello1(HelloGoal goal)
 	{
 		System.out.println("1: "+goal.getText());
-		return new Future<Void>(new PlanFailureException());
+		throw new PlanFailureException();
 	}
 	
 	/**
-	 *  Second plan. Prints out goal text and passes.
+	 *  Second plan. Fails 'asynchronously' (i.e. exception in future).
 	 */
 	@Plan(trigger=@Trigger(goals=HelloGoal.class))
 	protected IFuture<Void> printHello2(HelloGoal goal)
 	{
 		System.out.println("2: "+goal.getText());
+		return new Future<Void>(new PlanFailureException());
+	}
+	
+	/**
+	 *  Third plan. Prints out goal text and passes.
+	 */
+	@Plan(trigger=@Trigger(goals=HelloGoal.class))
+	protected IFuture<Void> printHello3(HelloGoal goal)
+	{
+		System.out.println("3: "+goal.getText());
 		return IFuture.DONE;
 	}
 }

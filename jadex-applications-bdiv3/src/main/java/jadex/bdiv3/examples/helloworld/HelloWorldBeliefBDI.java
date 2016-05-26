@@ -29,7 +29,7 @@ public class HelloWorldBeliefBDI
 	
 	/** The text that is printed. */
 	@Belief
-	private String sayhello;// = "initial value";
+	private String sayhello;
 	
 	/**
 	 *  Simple hello world goal.
@@ -47,6 +47,7 @@ public class HelloWorldBeliefBDI
 		@GoalCreationCondition
 		public HelloGoal(@Event("sayhello") String text)
 		{
+//			System.out.println("New HelloGoal: "+text);
 			this.text = text;
 		}
 	}
