@@ -89,7 +89,7 @@ public class TreatVictimsService implements ITreatVictimsService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 		});
 		

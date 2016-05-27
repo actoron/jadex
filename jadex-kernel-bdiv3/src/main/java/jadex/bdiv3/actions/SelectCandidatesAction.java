@@ -254,6 +254,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					});
 					
 					RGoal.adoptGoal(rgoal, ia);
+					ret.setResult(null);
 				}
 				else if(cand.getClass().isAnnotationPresent(Plan.class))
 				{

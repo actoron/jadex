@@ -36,3 +36,4 @@ jadex-platform-standalone-launch/highscore.dmp
 /jadex-platform-standalone-launch/lwjgl64.dll
 /jadex-platform/.jadex
 .jadex
+/jadex-integration-test/highscore.dmp

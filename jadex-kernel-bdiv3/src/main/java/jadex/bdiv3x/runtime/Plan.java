@@ -171,10 +171,6 @@ public abstract class Plan
 		{
 			ret.get(timeout);
 		}
-		catch(BodyAborted e)
-		{
-			throw new GoalFailureException(null, new PlanAbortedException());
-		}
 		catch(GoalFailureException e)
 		{
 			throw e;

@@ -331,7 +331,14 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		public void setValue(Object value)
 		{
 			testWriteOK((MParameter)getModelElement());
-			
+			internalSetValue(value);
+		}
+		
+		/**
+		 *  Set the value without check.
+		 */
+		protected void internalSetValue(Object value)
+		{
 			if(value!=null && getModelElement()!=null)
 			{
 				Class<?>	clazz	= ((MParameter)getModelElement()).getClazz().getType(getAgent().getClassLoader(), getAgent().getModel().getAllImports());
@@ -352,7 +359,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public void	updateDynamicValue()
 		{
-			setValue(evaluateValue(inival));
+			internalSetValue(evaluateValue(inival));
 		}
 
 		/**
@@ -605,7 +612,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		 */
 		public void	updateDynamicValues()
 		{
-			setValues(evaluateValues(inivals));
+			internalSetValues(evaluateValues(inivals));
 		}
 
 		/**
@@ -645,6 +652,15 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		{
 			testWriteOK((MParameter)getModelElement());
 			
+			internalSetValues(values);
+		}
+		
+		/**
+		 *  The values to set.
+		 *  @param values The values to set
+		 */
+		protected void internalSetValues(List<Object> values)
+		{
 			this.values = values;
 		}
 		
