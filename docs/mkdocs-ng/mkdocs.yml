@@ -7,15 +7,8 @@ pages:
 - Getting Started: 'getting-started/getting-started.md'
 - Platform: 'platform/platform.md'
 - Components: 'components/components.md'
-- Services:
-    - 'services/services.md'
-    - 'services/implementation.md'
-    - 'services/annotations.md'
-    - 'services/lifecycle.md'
-    - 'services/providing.md'
-    - 'services/using.md'
-- Futures:
-    - 'futures/futures.md'
+- Services: 'services/services.md'
+- Futures: 'futures/futures.md'
 - Remote:
     - 'remote/remote.md'
     - 'remote/awareness.md'

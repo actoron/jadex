@@ -87,8 +87,8 @@ TODO
 
 # Component Features
 
-All component functionalities are available via **features**.
-By default, all components have a certain set of features, which can be injected into fields like this:
+All component functionalities are available via *features*.
+By default, all components have a certain set of features, which can be injected into fields by using an annotation:
 ```java
 @AgentFeature
 IExecutionFeature exeFeat;
@@ -104,6 +104,8 @@ For features specific to a component-type, take a look at [component types](../c
 |IMessageFeature| TODO |
 |IMonitoringComponentFeature| TODO |
 
+You can even define new component features. Please refer to [TODO](TODO) to see how.
+
 # Annotations
 The most important annotations common to all components are listed below.
 For a more complete guide, take a look at the [AC User Guide](../guides/ac/01 Introduction).
@@ -112,6 +114,13 @@ For a full reference, have a look at the [jadex.micro.annotation](../../javadoc/
 ## Lifecycle (Method) Annotations
 The Jadex Active Components Platform and the CMS implement a specific lifecycle for components. 
 For each step in the cycle there is an annotation which can be used on methods to perform actions during the lifecycle step.
+These annotations can be used on methods, like this:
+```java
+@AgentCreated
+public IFuture<Void> agentCreated() {...
+```
+
+TODO: Guessed parameters?
 
 |Annotation | Description|
 |-----------|------------|
@@ -131,20 +140,6 @@ public class MyAgent {...
 |**@Agent** | Marks the class as micro agent.|
 |**@Description** | Add a description to your component. |
 
-## Service Annotations
-TODO: Text here, maybe move to services
-
-|Annotation | Description|
-|-----------|------------|
-| **@ProvidedService** | TODO |
-| **@ProvidedServices** | TODO |
-| **@RequiredService** | TODO |
-| **@RequiredServices** | TODO |
-| **@Implementation** | TODO |
-| **@Binding** | TODO |
-| **@CreationInfo** | TODO |
-| **@Publish** | TODO |
-
 ## Injection Annotations
 
 |Annotation | Applicable | Description|
@@ -158,5 +153,7 @@ TODO: Text here, maybe move to services
 
 
 ## Messaging Annotations
-@AgentMessageArrived: method
-@AgentStreamArrived : method
+|Annotation|Description|Method declaration|
+|----------|-----------|------------------|
+| **@AgentMessageArrived** | Methods annotated with this will be called when the component receives messages.| void messageArrived(Map<String, Object> msg, MessageType mt)
+| **@AgentStreamArrived** | Methods annotated with this will be called when the component receives a new message stream. | TODO method header?
