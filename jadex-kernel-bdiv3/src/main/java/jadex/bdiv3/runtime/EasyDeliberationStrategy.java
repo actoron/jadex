@@ -223,7 +223,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 			if(inhibitors.remove(inhibitor) && inhibitors.size()==0)
 			{
 				inhibitions.remove(goal);
-//				System.out.println("goal not inhibited: "+this);
+//				System.err.println("goal not inhibited: "+goal);
 //				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				reactivateGoal(goal);
 //				getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, goal.getMGoal().getName()}), this));

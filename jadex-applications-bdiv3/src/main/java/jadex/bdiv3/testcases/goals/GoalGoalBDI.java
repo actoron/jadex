@@ -14,11 +14,8 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -114,20 +111,20 @@ public class GoalGoalBDI
 	{
 		final TestReport tr = new TestReport("#1", "Test if a goal condition can be triggered by a goal parameter.");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				if(!tr.isFinished())
-				{
-					tr.setFailed("Goal did not return");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-				}
-				
-				agent.killComponent();
-				return IFuture.DONE;
-			}
-		});
+//		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(6000, new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				if(!tr.isFinished())
+//				{
+//					tr.setFailed("Goal did not return");
+//					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+//				}
+//				
+//				agent.killComponent();
+//				return IFuture.DONE;
+//			}
+//		});
 		
 		Object res = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal1()).get();
 		System.out.println("Goal success: "+res);

@@ -424,13 +424,12 @@ public class RuleSystem
 //					ret.setResult(null);
 //				}
 //			});
-			
+						
 			// This works also if the mode is changed during execution and some events are in the queue
 			// execute rulesystem immediately to ensure that variable values are not changed afterwards
 			ret = processAllEvents();
-
 			
-//			// Simulate microplansteps by executing all effects immediately (hack: allow configuration sync/async)
+			// Simulate microplansteps by executing all effects immediately (hack: allow configuration sync/async)
 			FutureHelper.notifyStackedListeners();
 		}
 		else
