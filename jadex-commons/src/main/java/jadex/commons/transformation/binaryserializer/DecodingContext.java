@@ -274,4 +274,13 @@ public class DecodingContext extends AbstractDecodingContext
 			ret = -ret;
 		return ret;
 	}
+	
+	/**
+	 *  Returns the current offset of the decoding process for debugging.
+	 *  @return Current offset.
+	 */
+	public int getCurrentOffset()
+	{
+		return offset;
+	}
 }

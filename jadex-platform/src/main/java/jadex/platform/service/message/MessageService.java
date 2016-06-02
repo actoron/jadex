@@ -90,6 +90,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.binaryserializer.SerializerDecodingException;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.address.TransportAddressService;
@@ -2847,6 +2848,11 @@ public class MessageService extends BasicService implements IMessageService
 				{
 //					System.out.println("classloader: "+cl);
 //					e.printStackTrace();
+					String offsetstr="";
+					if (e instanceof SerializerDecodingException)
+					{
+						offsetstr=" at " + ((SerializerDecodingException) e).getContext().getCurrentOffset();
+					}
 					if(!(e instanceof ContentException))
 					{
 						// Todo: find out why 50MB sized messages are sent... 
@@ -2854,10 +2860,10 @@ public class MessageService extends BasicService implements IMessageService
 						{
 							byte[]	tmp = new byte[3000];
 							System.arraycopy(value, 0, tmp, 0, tmp.length);
-							logger.info("ContentException: "+((byte[])value).length+", "+fmessage+", "+new String(tmp, Charset.forName("UTF-8")));
+							logger.info("ContentException"+offsetstr+": "+((byte[])value).length+", "+fmessage+", "+new String(tmp, Charset.forName("UTF-8")));
 							value	= tmp;
 						}
-						e = new ContentException(new String((byte[])value, Charset.forName("UTF-8")), e);
+						e = new ContentException("ContentException"+offsetstr+", value:"+new String((byte[])value, Charset.forName("UTF-8")), e);
 					}
 					fmessage.put(name, e);
 				}

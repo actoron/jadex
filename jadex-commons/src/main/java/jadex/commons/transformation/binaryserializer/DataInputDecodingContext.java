@@ -29,6 +29,9 @@ public class DataInputDecodingContext extends AbstractDecodingContext
 	/** The package fragment pool. */
 	protected List<String> pkgpool;
 	
+	/** Current offset marker */
+	protected int offset;
+	
 	/**
 	 * Creates a new DecodingContext.
 	 * @param classloader The classloader.
@@ -78,6 +81,7 @@ public class DataInputDecodingContext extends AbstractDecodingContext
 			{
 				throw new RuntimeException("Stream ended unexpectedly during read.");
 			}
+			++offset;
 		}
 		catch (IOException e)
 		{
@@ -112,6 +116,7 @@ public class DataInputDecodingContext extends AbstractDecodingContext
 		try
 		{
 			di.readFully(array);
+			offset+=array.length;
 		}
 		catch (IOException e)
 		{
@@ -246,5 +251,14 @@ public class DataInputDecodingContext extends AbstractDecodingContext
 		if (neg)
 			ret = -ret;
 		return ret;
+	}
+	
+	/**
+	 *  Returns the current offset of the decoding process for debugging.
+	 *  @return Current offset.
+	 */
+	public int getCurrentOffset()
+	{
+		return offset;
 	}
 }
