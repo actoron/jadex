@@ -102,4 +102,10 @@ public interface IDecodingContext
 	 *  @return String encoded at the current position.
 	 */
 	public String readClassname();
+	
+	/**
+	 *  Returns the current offset of the decoding process for debugging.
+	 *  @return Current offset.
+	 */
+	public int getCurrentOffset();
 }

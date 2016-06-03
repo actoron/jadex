@@ -187,7 +187,16 @@ public class BinarySerializer
 			errorreporter = new DefaultErrorReporter();
 		}
 		IDecodingContext context = new DecodingContext(val, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter);
-		return decodeObject(context);
+		Object ret = null;
+		try
+		{
+			ret = decodeObject(context);
+		}
+		catch(Exception e)
+		{
+			throw new SerializerDecodingException(e, context);
+		}
+		return ret;
 	}
 	
 	/**

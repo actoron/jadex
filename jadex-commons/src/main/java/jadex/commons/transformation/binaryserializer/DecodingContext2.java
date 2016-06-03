@@ -28,6 +28,9 @@ public class DecodingContext2 extends AbstractDecodingContext
 	/** The package fragment pool. */
 	protected List<String> pkgpool;
 	
+	/** Current offset marker */
+	protected int offset;
+	
 	/**
 	 * Creates a new DecodingContext.
 	 * @param classloader The classloader.
@@ -50,6 +53,7 @@ public class DecodingContext2 extends AbstractDecodingContext
 		this.stringpool = new ArrayList<String>();
 		this.classnamepool = new ArrayList<String>();
 		this.pkgpool = new ArrayList<String>();
+		this.offset = 0;
 		//this.stringpool.addAll(BinarySerializer.DEFAULT_STRINGS);
 	}
 	
@@ -73,6 +77,7 @@ public class DecodingContext2 extends AbstractDecodingContext
 		try
 		{
 			ret = is.read();
+			++offset;
 			if (ret == -1)
 			{
 				throw new RuntimeException("Stream ended unexpectedly during read.");
@@ -113,7 +118,9 @@ public class DecodingContext2 extends AbstractDecodingContext
 		{
 			try
 			{
-				read += is.read(array, read, array.length - read);
+				int curread = is.read(array, read, array.length - read);
+				read += curread;
+				offset += curread;
 			}
 			catch (IOException e)
 			{
@@ -226,7 +233,9 @@ public class DecodingContext2 extends AbstractDecodingContext
 		{
 			try
 			{
-				read += is.read(content, read + 1, content.length - read - 1);
+				int curread = is.read(content, read + 1, content.length - read - 1);
+				read += curread;
+				offset += curread;
 			}
 			catch (IOException e)
 			{
@@ -252,5 +261,14 @@ public class DecodingContext2 extends AbstractDecodingContext
 		if (neg)
 			ret = -ret;
 		return ret;
+	}
+	
+	/**
+	 *  Returns the current offset of the decoding process for debugging.
+	 *  @return Current offset.
+	 */
+	public int getCurrentOffset()
+	{
+		return offset;
 	}
 }
