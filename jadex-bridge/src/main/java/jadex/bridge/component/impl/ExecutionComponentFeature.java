@@ -237,10 +237,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 			else
 			{
-				if(steps==null)
-				{
-					steps = new TreeSet<StepInfo>();
-				}
 				int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
 				addStep(new StepInfo(step, ret, new ThreadLocalTransferHelper(true), prio, stepcnt++));
 				
@@ -1985,7 +1981,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		 */
 		public String toString()
 		{
-			return "StepInfo(priority=" + priority + ")";
+			return "StepInfo(priority=" + priority + ", step=" + step + ")";
 		}
 	}
 }

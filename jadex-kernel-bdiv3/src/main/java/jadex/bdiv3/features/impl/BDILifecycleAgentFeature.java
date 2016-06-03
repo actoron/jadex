@@ -1607,11 +1607,13 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						final CollectionResultListener<MPlanInfo> lis = new CollectionResultListener<MPlanInfo>(cands.size(), 
 							new IResultListener<Collection<MPlanInfo>>()
 						{
-							public void resultAvailable(Collection<MPlanInfo> result)
+							public void resultAvailable(final Collection<MPlanInfo> result)
 							{
 								for(MPlanInfo mplaninfo: result)
 								{
+									System.out.println("Create plan 1: "+mplan);
 									RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, mplaninfo.getBinding(), null);
+									System.out.println("Create plan 2: "+mplan);
 									RPlan.executePlan(rplan, component);
 								}
 							}

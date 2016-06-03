@@ -24,6 +24,7 @@ public class TriggerPlan extends Plan
 	{
 		this.no	= ((Number)getParameter("number").getValue()).intValue();
 		this.description	= (String)getParameter("description").getValue();
+//		System.out.println("Trigger plan "+no+": "+description);
 
 		startAtomic();	// Hack!!! Todo: fix microplanstep semantics in V2
 		TestReport	report	= new TestReport("trigger"+no, description);

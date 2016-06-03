@@ -171,8 +171,8 @@ public class MatcherNode
 			rules.put(subtype, rs);
 		}
 		rs.add(rule);
-		if(subtype.equals("d"))
-			System.out.println("add: "+subtype+" "+rs);
+//		if(subtype.equals("d"))
+//			System.out.println("add: "+subtype+" "+rs);
 	}
 	
 	/**

@@ -77,7 +77,7 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 				{
 //					System.out.println("find applicable candidates 2b: "+element.getId()+" "+apl);
 					element.setState(RProcessableElement.State.APLAVAILABLE);
-					ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
+					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new SelectCandidatesAction(element));
 				}
 				ret.setResult(null);
 			}

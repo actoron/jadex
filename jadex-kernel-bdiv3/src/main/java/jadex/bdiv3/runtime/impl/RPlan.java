@@ -402,11 +402,11 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		Future<Object> ret = new Future<Object>();
 		
 //		if(rplan.getModelElement().getName().toLowerCase().indexOf("random")!=-1)
-//			System.out.println("hhhhzzzz");
+//			System.out.println("execute plan: "+rplan);
 		
 //		executePlan(rplan, ia, null);
 		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
-		ia.getExternalAccess().scheduleStep(action);
+		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(action);
 		
 		rplan.addListener(new DelegationResultListener<Object>(ret));
 		

@@ -270,4 +270,12 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 //		}
 //		return ret;
 //	}
+	
+	/**
+	 *  Return a string.
+	 */
+	public String	toString()
+	{
+		return "ExecutePlanStepAction("+rplan+")";
+	}
 }

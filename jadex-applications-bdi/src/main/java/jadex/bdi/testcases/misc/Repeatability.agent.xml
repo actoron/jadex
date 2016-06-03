@@ -74,18 +74,6 @@
 				<value>4</value>
 			</parameter>
 			<parameter name="description" class="String">
-				<value>"Second factadded trigger."</value>
-			</parameter>
-			<body class="TriggerPlan"/>
-			<trigger>
-				<factadded ref="d"/>
-			</trigger>
-		</plan>
-		<plan name="trigger5">
-			<parameter name="number" class="int">
-				<value>5</value>
-			</parameter>
-			<parameter name="description" class="String">
 				<value>"First belief condition trigger."</value>
 			</parameter>
 			<body class="TriggerPlan"/>
@@ -93,6 +81,18 @@
 				<condition>
 					$beliefbase.a.equals("test")
 				</condition>
+			</trigger>
+		</plan>
+		<plan name="trigger5">
+			<parameter name="number" class="int">
+				<value>5</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"Second factadded trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<factadded ref="d"/>
 			</trigger>
 		</plan>
 		<plan name="trigger6">

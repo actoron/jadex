@@ -459,7 +459,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				@Override
 				public void resultAvailable(Void result)
 				{
-					ia.getExternalAccess().scheduleStep(new DropGoalAction(RGoal.this));
+					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new DropGoalAction(RGoal.this));
 				}
 				
 				@Override
@@ -793,11 +793,11 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 						{
 							if(getMGoal().isRebuild())
 							{
-								ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(this));
+								ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new FindApplicableCandidatesAction(this));
 							}
 							else
 							{
-								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
+								ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new SelectCandidatesAction(this));
 							}
 						}
 					}
