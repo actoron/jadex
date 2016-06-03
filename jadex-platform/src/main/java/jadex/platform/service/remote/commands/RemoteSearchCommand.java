@@ -176,6 +176,9 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 */
 	public IIntermediateFuture<IRemoteCommand> execute(final IExternalAccess component, final RemoteServiceManagementService rsms)
 	{
+//		if(filter!=null)
+//			System.out.println("remote search command: "+filter);
+		
 		final TerminableIntermediateFuture<IRemoteCommand> ret = new TerminableIntermediateFuture<IRemoteCommand>(new TerminationCommand()
 		{
 			public void terminated(Exception reason)

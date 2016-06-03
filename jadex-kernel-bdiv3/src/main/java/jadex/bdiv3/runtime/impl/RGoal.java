@@ -1405,8 +1405,15 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public boolean isAborted()
 	{
-		// Todo: is this right?
-		return false;	// Goal is either succeeded or failed.
+		boolean aborted = false;
+		// methode is part of plan api (goal treated as plan)
+		// hence one can check if there is a plan above that was aborted
+		if(getParentGoal()!=null && getParentGoal().getParentPlan()!=null)
+		{
+			RPlan plan = getParentGoal().getParentPlan();
+			aborted = plan.isAborted();
+		}
+		return aborted;
 	}
 
 	

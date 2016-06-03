@@ -687,7 +687,33 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	}
 	
 	/**
-	 *  Get the provided service implementation object by name.
+	 *  Get the provided service implementation object by id.
+	 *  
+	 *  @param name The service identifier.
+	 *  @return The service.
+	 */
+	public Object getProvidedService(IServiceIdentifier sid)
+	{
+		Object ret = null;
+		
+		Object[] services = getProvidedServices(sid.getServiceType().getType(getComponent().getClassLoader()));
+		if(services!=null)
+		{
+			for(Object ser: services)
+			{
+				if(((IService)ser).getServiceIdentifier().equals(sid))
+				{
+					ret = (IService)ser;
+					break;
+				}
+			}
+		}
+		
+		return ret;	
+	}
+	
+	/**
+	 *  Get the provided service implementation object by id.
 	 *  
 	 *  @param name The service identifier.
 	 *  @return The service.
@@ -705,6 +731,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				if(((IService)ser).getServiceIdentifier().equals(sid))
 				{
 					service = (IService)ser;
+					break;
 				}
 			}
 			if(service!=null)
