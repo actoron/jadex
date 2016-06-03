@@ -107,6 +107,7 @@ public class ComponentTest extends TestCase
 		final IComponentIdentifier[]	cid	= new IComponentIdentifier[1];
 		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
 		Timer	t	= null;
+		final boolean[]	triggered	= new boolean[1];	
 		if(timeout!=Timeout.NONE)
 		{
 			t	= new Timer(true);
@@ -114,6 +115,7 @@ public class ComponentTest extends TestCase
 			{
 				public void run()
 				{
+					triggered[0]	= true;
 					boolean	b	= finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
 					if(b && cid[0]!=null)
 					{
@@ -144,7 +146,19 @@ public class ComponentTest extends TestCase
 				finished.setExceptionIfUndone(exception);
 			}
 		});
-		Map<String, Object>	res	= finished.get();
+		Map<String, Object>	res	= null;
+		try
+		{
+			res	= finished.get();
+		}
+		catch(TimeoutException te)
+		{
+			// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
+			if(triggered[0])
+			{
+				throw te;
+			}
+		}
 		if(t!=null)
 		{
 			t.cancel();

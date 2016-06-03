@@ -76,7 +76,8 @@ public class ComponentStartTest extends	ComponentTest
 				public synchronized void resultAvailable(Void result)
 				{
 					IComponentManagementService	mycms	= cms;
-//					System.err.println("destroying: "+ComponentStartTest.super.toString()+", "+mycms);
+//					if(cid.toString().indexOf("EndStateAbort")!=-1)
+//						System.err.println("destroying: "+ComponentStartTest.super.toString()+", "+mycms);
 					if(mycms!=null)
 					{
 						mycms.destroyComponent(cid).get();

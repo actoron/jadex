@@ -170,6 +170,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 					fut.setFinishedIfUndone();
 				}				
 			}
+			resfuts	= null;
 		}
 		
 		return IFuture.DONE;
