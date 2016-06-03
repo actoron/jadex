@@ -68,6 +68,14 @@ public interface IProvidedServicesFeature
 	public <T> T getProvidedService(Class<T> clazz);
 
 	/**
+	 *  Get the provided service implementation object by id.
+	 *  
+	 *  @param name The service identifier.
+	 *  @return The service.
+	 */
+	public <T> T getProvidedService(IServiceIdentifier sid);
+	
+	/**
 	 *  Get provided (declared) service.
 	 *  
 	 *  @param clazz The interface (null for all services).
