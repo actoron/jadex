@@ -11,6 +11,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
@@ -44,15 +45,18 @@ public class RuleSystem
 	/** The context for rule action execution. */
 	protected Object context;
 	
+	/** The logger for rule warnings. */
+	protected Logger	logger;
+	
 	/** The PropertyChangeManager to add/remove handlers and manage events */
 	protected PropertyChangeManager pcman;
 	
 	/** The execution mode (direct vs queue). */
 	protected boolean queueevents = true;
 	
-//	/** Flag if ruleengine is currently in processing (to avoid interleaved calls). */
-//	protected boolean processing = false;
-	
+	/** Flag to check if currently in processAllEvents (hack?). Required to avoid nested processAllEvents() call in addEvent() */
+	protected boolean processall;
+
 	//-------- constructors --------
 	
 	/**
@@ -60,15 +64,16 @@ public class RuleSystem
 	 */
 	public RuleSystem(Object context)
 	{
-		this(context, true);
+		this(context, null, true);
 	}
 	
 	/**
 	 *  Create a new rule system.
 	 */
-	public RuleSystem(Object context, boolean queueevents)
+	public RuleSystem(Object context, Logger logger, boolean queueevents)
 	{
 		this.context = context;
+		this.logger	= logger;
 		this.rulebase = new Rulebase();
 		this.rules = new IdentityHashMap<Object, Tuple2<Object, IRule<?>[]>>(); // objects may change
 		this.pcman = PropertyChangeManager.createInstance();
@@ -151,6 +156,8 @@ public class RuleSystem
 		{
 			if(rules[i].getCondition()!=null)
 			{
+//				System.out.println("Rule selected: "+rules[i]+", "+event);
+				
 				rules[i].getCondition().evaluate(event).addResultListener(new IResultListener<Tuple2<Boolean,Object>>()
 				{
 					public void resultAvailable(Tuple2<Boolean, Object> result)
@@ -217,6 +224,7 @@ public class RuleSystem
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						ret.setResult(null);
 					}
 				});
 			}
@@ -335,22 +343,46 @@ public class RuleSystem
 	{
 		if(pcman.hasEvents())
 		{
+			boolean	first	= !processall;
+			processall	= true;
+			
 			final Future<Void> ret = new Future<Void>();
-			processEvent().addResultListener(new IResultListener<Collection<RuleEvent>>()
+			try
 			{
-//				Exception ex = null;
-				public void resultAvailable(Collection<RuleEvent> result)
+				processEvent().addResultListener(new IResultListener<Collection<RuleEvent>>()
 				{
-					processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
-				}
-				
-				public void exceptionOccurred(Exception exception)
+	//				Exception ex = null;
+					public void resultAvailable(Collection<RuleEvent> result)
+					{
+						processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+	//					ex = exception;
+						processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
+			}
+			finally
+			{
+				if(first)
 				{
-					exception.printStackTrace();
-//					ex = exception;
-					processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
+					processall	= false;
+					
+					if(!ret.isDone())
+					{
+						// Simulate microplansteps by executing all effects immediately (hack: allow configuration sync/async)
+						FutureHelper.notifyStackedListeners();
+
+						if(logger!=null && !ret.isDone())
+						{
+							logger.warning("Asyncronous rule execution.");
+						}
+					}
 				}
-			});
+			}
 			
 			return ret;
 		}
@@ -413,7 +445,7 @@ public class RuleSystem
 		
 		pcman.addEvent(event);
 		
-		if(!queueevents)
+		if(!queueevents && !processall)
 		{
 			// If actions add further events they will be processed as well
 //			ret = new Future<Void>();
@@ -428,9 +460,6 @@ public class RuleSystem
 			// This works also if the mode is changed during execution and some events are in the queue
 			// execute rulesystem immediately to ensure that variable values are not changed afterwards
 			ret = processAllEvents();
-			
-			// Simulate microplansteps by executing all effects immediately (hack: allow configuration sync/async)
-			FutureHelper.notifyStackedListeners();
 		}
 		else
 		{

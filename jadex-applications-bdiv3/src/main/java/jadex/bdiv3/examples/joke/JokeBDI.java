@@ -88,8 +88,10 @@ public class JokeBDI
 		{
 			e.printStackTrace();
 		}
-				
-		gui.dispose();
+		finally
+		{
+			gui.dispose();
+		}
 	}
 	
 	/**

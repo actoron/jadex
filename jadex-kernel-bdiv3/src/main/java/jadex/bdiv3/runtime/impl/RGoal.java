@@ -199,7 +199,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public void setProcessingState(GoalProcessingState processingstate)
 	{
-		System.out.println("procstate: "+getId()+", "+processingstate);
+//		System.out.println("procstate: "+getId()+", "+processingstate);
 		this.processingstate = processingstate;
 		publishToolGoalEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
 	}
@@ -334,7 +334,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
-		System.out.println(ia.getComponentIdentifier()+" setLifecycleState: "+this+", "+lifecyclestate);
+//		System.out.println(ia.getComponentIdentifier()+" setLifecycleState: "+this+", "+lifecyclestate);
 		
 //		if(this.toString().indexOf("docnt")!=-1 && GoalLifecycleState.DROPPING.equals(lifecyclestate))
 //			System.out.println("setting life: "+this+" "+lifecyclestate);
@@ -380,7 +380,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		}
 		else if(GoalLifecycleState.ACTIVE.equals(lifecyclestate))
 		{
-			System.out.println("active->inprocess: "+getId());
+//			System.out.println("active->inprocess: "+getId());
 			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALACTIVE, getMGoal().getName()}), this));
 
 			// start means-end reasoning
@@ -397,7 +397,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		{
 			// ready to be activated via deliberation
 //			if(getId().indexOf("AchieveCleanup")!=-1)
-			System.out.println("option->idle: "+getId());
+//			System.out.println("option->idle: "+getId());
 			abortPlans().addResultListener(new IResultListener<Void>()
 			{
 				@Override

@@ -20,7 +20,7 @@ public class StoreReportPlan extends Plan
 	 */
 	public void body()
 	{
-		System.out.println("reports: "+getBeliefbase().getBeliefSet("testcap.reports").size());
+//		System.out.println("reports: "+getBeliefbase().getBeliefSet("testcap.reports").size());
 		
 		this.report = (TestReport)getParameter("report").getValue();
 		if(report==null)
