@@ -2,7 +2,7 @@
 
 With Jadex, the behaviour of a software is defined by the interaction between components, each of them providing a clearly defined functionality.
  
-When you create a new component, you have to choose between different component types. For now, we will focus on *Micro Agents*, the most basic type of component. For other component types, please refer to [Component Types](component-types/component-types).
+When you create a new component, you have to choose between different component types. For now, we will focus on *Micro Agents*, the most basic type of component. For other component types, please refer to [Component Types](../component-types/component-types).
 
 For a more complete guide into Active Components, take a look at the [AC User Guide](../guides/ac/01 Introduction).
 
@@ -37,7 +37,7 @@ public IFuture<Void> body()
 
 <x-hint title="Futures">
 Instead of the return type ```IFuture<Void>```, you can also use ```void```.
-Using a *futurized* return type allows you to perform work asynchronously, which is handled in chapter [Futures](futures/futures).
+Using a *futurized* return type allows you to perform work asynchronously, which is handled in chapter [Futures](../futures/futures).
 </x-hint>
 
 # Startup
