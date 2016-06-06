@@ -17,6 +17,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.bdiv3.runtime.*</import>
 		<import>jadex.bdiv3.runtime.interpreter.*</import>
 		<import>jadex.bdi.examples.disastermanagement.*</import>
@@ -109,7 +110,7 @@
 		
 		<!-- Plan for moving home. -->
 		<plan name="go_home_plan">
-			<parameter name="destination" class="ISpaceObject">
+			<parameter name="destination" class="IVector2">
 				<value>$beliefbase.home</value>
 			</parameter>
 			<body class="MoveToLocationPlan"/>

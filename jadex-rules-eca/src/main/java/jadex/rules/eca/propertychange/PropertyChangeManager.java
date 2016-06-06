@@ -139,5 +139,11 @@ public abstract class PropertyChangeManager
 			}
 		};
 	}
+//
+//	public Object getEvents()
+//	{
+//		// TODO Auto-generated method stub
+//		return events;
+//	}
 	
 }

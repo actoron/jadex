@@ -904,6 +904,12 @@ public class APL
 		{
 			this.binding = binding;
 		}
+		
+		@Override
+		public String toString()
+		{
+			return "MPlanInfo(plan="+mplan+", binding="+binding+")";
+		}
 	}
 	
 	/**

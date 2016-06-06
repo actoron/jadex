@@ -2,6 +2,7 @@ package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdi.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -21,7 +22,7 @@ public class ExtinguishFirePlan extends Plan
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		IExtinguishFireService force = (IExtinguishFireService)getParameter("rescueforce").getValue();
 		ef	= force.extinguishFire(disaster);
-		ef.get();
+		ef.get(Timeout.NONE);	// hack??? extinguishing fire may take longer than default timeout
 	}
 	
 	/**

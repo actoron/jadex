@@ -2,6 +2,7 @@ package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -26,7 +27,7 @@ public class TreatVictimsPlan extends Plan
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		ITreatVictimsService force = (ITreatVictimsService)getParameter("rescueforce").getValue();
 		tv	= force.treatVictims(disaster);
-		tv.get();
+		tv.get(Timeout.NONE);	// hack??? treating victims may take longer than default timeout
 	}
 	
 	/**

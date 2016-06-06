@@ -36,6 +36,7 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 		boolean inited = ((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited();
 		if(inited && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable())
 		{
+//			System.out.println("executeCycle.PAE start");
 			IFuture<Void> fut = bdif.getRuleSystem().processAllEvents();
 			if(!fut.isDone())
 				getComponent().getLogger().warning("No async actions allowed.");

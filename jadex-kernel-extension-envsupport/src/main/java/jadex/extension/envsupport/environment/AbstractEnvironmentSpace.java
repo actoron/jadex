@@ -1,5 +1,7 @@
 package jadex.extension.envsupport.environment;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1725,8 +1727,11 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 											{
 												public IFuture<Void> execute(IInternalAccess ia)
 												{
-													// Propagate exception: kills application!?
-													throw new RuntimeException("Could not create component: "+compotype, exception);
+													// Todo: Propagate exception to kill application!
+													StringWriter	sw	= new StringWriter();
+													exception.printStackTrace(new PrintWriter(sw));
+													ia.getLogger().severe("Could not create component: "+compotype+"\n"+exception);
+													return IFuture.DONE;
 												}
 											});
 										}
