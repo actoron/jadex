@@ -2,7 +2,9 @@
 
 With Jadex, the behaviour of a software is defined by the interaction between components, each of them providing a clearly defined functionality.
  
-When you create a new component, you have to choose between different component types. For now, we will focus on *Micro Agents*, the most basic type of component. For other component types, please refer to [Component Types](component-types/component-types).
+When you create a new component, you have to choose between different component types. For now, we will focus on *Micro Agents*, the most basic type of component. For other component types, please refer to [Component Types](../component-types/component-types).
+
+For a more complete guide into Active Components, take a look at the [AC User Guide](../guides/ac/01 Introduction).
 
 # Implementation
 Micro Agents are defined by plain java classes. In order for a java class to represent a Micro Agent, two requirements have to be met:
@@ -10,7 +12,7 @@ Micro Agents are defined by plain java classes. In order for a java class to rep
  - The name of the class has to end with "Agent" (e.g. ```MyAgent```, ```ChatAgent```, ...)
  - The class has to be annotated with the ```@Agent``` Annotation
   
-Optionally, it can provide a description using the ```@Description``` Annotation. For other possible annotations, see [annotations](#annotations).
+Optionally, it can provide a description using the ```@Description``` Annotation. The value is then shown inside the [JCC](../tools/02 JCC Overview).
 
 This leads to the following code for a basic micro agent:
 
@@ -35,13 +37,13 @@ public IFuture<Void> body()
 
 <x-hint title="Futures">
 Instead of the return type ```IFuture<Void>```, you can also use ```void```.
-Using a *futurized* return type allows you to perform work asynchronously, which is handled in chapter [Futures](futures/futures).
+Using a *futurized* return type allows you to perform work asynchronously, which is handled in chapter [Futures](../futures/futures).
 </x-hint>
 
 # Startup
 
 Starting of components is done by the Platform's ```ComponentManagementService``` (CMS). 
-Service instances in general can be retrieved using the static methods of the [SServiceProvider](../../javadoc/jadex/bridge/service/search/SServiceProvider.html) class.
+Service instances in general can be retrieved using the static methods of the [SServiceProvider](${URLJavaDoc}/jadex/bridge/service/search/SServiceProvider.html) class.
 
 ## Obtaining the CMS
 Remember the ```IExternalAccess platform``` object that you got when starting a platform? It is now required to retrieve the CMS:
@@ -60,7 +62,7 @@ In Jadex, Java interfaces are used for the interaction with services, so the imp
 
 ## Starting the component
 
-Once you get a reference to the CMS, you can use the ```createComponent()``` methods to start your components (See API documentation of [IComponentManagementService](../../javadoc/jadex/bridge/service/types/cms/IComponentManagementService.html)).
+Once you get a reference to the CMS, you can use the ```createComponent()``` methods to start your components (See API documentation of [IComponentManagementService](${URLJavaDoc}/jadex/bridge/service/types/cms/IComponentManagementService.html)).
 
 The preferred method to start a component has the following signature:
 ```java 
@@ -82,8 +84,21 @@ A ```Tuple2Future``` represents a promise that two different results are going t
 
 Now that you know how to start your own components, you can read more about [Services](../services/services), as they provide a way for components to interact with each other.
 
+## Destroying the component
+
+To destroy a component, the CMS has to be used again. Call ```destroyComponent(cid)``` and pass the Component Identifier returned on component startup:
+```java
+Map<String,Object> results = cms.destroyComponent(cid).get();
+```
+If the component has any results, they are contained in the returned map.
+
 ## Creation Info
 TODO
+
+# Arguments and Results
+TODO:
+@AgentArgument
+IArgumentsResultsFeature
 
 # Component Features
 
@@ -103,15 +118,12 @@ For features specific to a component-type, take a look at [component types](../c
 |IExecutionFeature| TODO |
 |IMessageFeature| TODO |
 |IMonitoringComponentFeature| TODO |
+|IRequiredServicesFeature | See [Services](../services/services#accessing-services) |
+|IProvidedServicesFeature | See [Services](../services/services#accessing-services) |
 
 You can even define new component features. Please refer to [TODO](TODO) to see how.
 
-# Annotations
-The most important annotations common to all components are listed below.
-For a more complete guide, take a look at the [AC User Guide](../guides/ac/01 Introduction).
-For a full reference, have a look at the [jadex.micro.annotation](../../javadoc/jadex/micro/annotation/package-summary.html) package.
-
-## Lifecycle (Method) Annotations
+# Component Lifecycle
 The Jadex Active Components Platform and the CMS implement a specific lifecycle for components. 
 For each step in the cycle there is an annotation which can be used on methods to perform actions during the lifecycle step.
 These annotations can be used on methods, like this:
@@ -128,32 +140,28 @@ TODO: Guessed parameters?
 |**@AgentBody** | A method marked with this annotation will be called after creation of the agent is complete. At this point, all fields and required services are available and can be used.|
 |**@AgentKilled** | A method marked with this annotation will be called just before the component is removed from the platform.|  
 
-## Type Annotations
-These annotations can be applied to the component type definition, like this:
-```java
-@Agent
-public class MyAgent {...
-```
+# Annotations
+The most important annotations common to all components were already discussed.
 
-|Annotation | Description|
-|-----------|------------|
-|**@Agent** | Marks the class as micro agent.|
-|**@Description** | Add a description to your component. |
+For a full reference, have a look at the [jadex.micro.annotation](${URLJavaDoc}/jadex/micro/annotation/package-summary.html) package.
 
-## Injection Annotations
+# Advanced Topics
 
-|Annotation | Applicable | Description|
-|-----------|------------|------------|
-| **@AgentFeature** | fields | Injects features of components.|
+## More Annotations
+InternalAccess
+TODO:
 | **@Agent** | fields | Injects the ```IExternalAccess``` of the component.|
-| **@AgentArgument** | fields | TODO |
-| **@AgentService** | methods/fields | TODO |
-| **@AgentServiceValue** | methods/fields | TODO |
+TODO:
 | **@Parent** | fields | TODO |
 
+## Messaging
+TODO
 
-## Messaging Annotations
 |Annotation|Description|Method declaration|
 |----------|-----------|------------------|
 | **@AgentMessageArrived** | Methods annotated with this will be called when the component receives messages.| void messageArrived(Map<String, Object> msg, MessageType mt)
 | **@AgentStreamArrived** | Methods annotated with this will be called when the component receives a new message stream. | TODO method header?
+
+## Composition
+TODO
+

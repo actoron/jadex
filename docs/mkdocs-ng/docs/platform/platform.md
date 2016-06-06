@@ -35,7 +35,7 @@ The ```IExternalAccess``` object returned by the starter plays an important role
 Now that you know how to start a Jadex Active Components Platform you can proceed to [Components](../components/introduction) to see how to implement your own components and start them.
 
 # Configuring the Platform
-Both the PlatformConfiguration object and the RootComponentConfiguration object provide many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](../../javadoc/jadex/base/PlatformConfiguration.html) and [RootComponentConfiguration](../../javadoc/jadex/base/RootComponentConfiguration.html).
+Both the PlatformConfiguration object and the RootComponentConfiguration object provide many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](${URLJavaDoc}/jadex/base/PlatformConfiguration.html) and [RootComponentConfiguration](${URLJavaDoc}/jadex/base/RootComponentConfiguration.html).
 
 The configuration options are also explained in more detail [here](http://www.activecomponents.org/jadex-applications-web/jadexdoc/view?model=/jadex/platform/Platform.component.xml).
 
