@@ -132,7 +132,9 @@ These annotations can be used on methods, like this:
 public IFuture<Void> agentCreated() {...
 ```
 
-TODO: Guessed parameters?
+<x-hint title="Parameters">
+All annotations also allow for methods with parameters, see [Parameter Guesser](#parameter-guesser).
+</x-hint>
 
 |Annotation | Description|
 |-----------|------------|
@@ -140,14 +142,18 @@ TODO: Guessed parameters?
 |**@AgentBody** | A method marked with this annotation will be called after creation of the agent is complete. At this point, all fields and required services are available and can be used.|
 |**@AgentKilled** | A method marked with this annotation will be called just before the component is removed from the platform.|  
 
-# Annotations
-The most important annotations common to all components were already discussed.
 
-For a full reference, have a look at the [jadex.micro.annotation](${URLJavaDoc}/jadex/micro/annotation/package-summary.html) package.
 
 # Advanced Topics
 
+
+This section discusses some of the more advanced topics regarding components.
+
 ## More Annotations
+The most important annotations common to all components were already discussed.
+The following is an uncomplete list of other potentially useful annotations. 
+For a full reference, have a look at the [jadex.micro.annotation](${URLJavaDoc}/jadex/micro/annotation/package-summary.html) package.
+
 InternalAccess
 TODO:
 | **@Agent** | fields | Injects the ```IExternalAccess``` of the component.|
@@ -165,3 +171,11 @@ TODO
 ## Composition
 TODO
 
+## Parameter Guesser
+What can be guessed: TODO
+
+- component features
+- agent capabilities
+- IInternalAccess
+- IExternalAccess
+- Agent Pojo

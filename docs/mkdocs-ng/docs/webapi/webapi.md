@@ -1,1 +1,2 @@
- # Jadex Web API
+# Jadex Web API
+Javascript / HTML5 websockets
