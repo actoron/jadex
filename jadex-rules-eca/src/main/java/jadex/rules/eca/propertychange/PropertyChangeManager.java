@@ -1,6 +1,9 @@
 package jadex.rules.eca.propertychange;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,19 +17,19 @@ import jadex.rules.eca.Event;
 import jadex.rules.eca.IEvent;
 
 /**
- * Abstract class to provide a Factory Method and common methods for
- * managing of PropertyChangeEvents/Listeners.
+ *  Basic property change manager w/o java bean support. Works on android, too.
  */
-public abstract class PropertyChangeManager
+public class PropertyChangeManager
 {
 	/** The event list. */
 	protected List<IEvent> events;
 	
 	/** 
 	 * The property change listeners. 
-	 * Value type must be object, because java.beans/jadex.commons.beans don't share an interface
+	 * Listener type must be object, because java.beans.PropertyChangeListener/jadex.commons.beans.PropertyChangeListener don't share an interface
 	 */
-	protected Map<Object, Map<Object, Object>> pcls;
+	protected Map<Object, Map<IResultCommand<IFuture<Void>, PropertyChangeEvent>, Object>> pcls;
+//	protected Map<Object, Map<IResultCommand<IFuture<Void>, PropertyChangeEvent>, PropertyChangeListener>> pcls;
 	
 	/** The argument types for property change listener adding/removal (cached for speed). */
 	protected static Class<?>[]	PCL	= new Class[]{jadex.commons.beans.PropertyChangeListener.class};
@@ -42,7 +45,7 @@ public abstract class PropertyChangeManager
 	{
 		if(SReflect.isAndroid()) 
 		{
-			return new PropertyChangeManagerAndroid();
+			return new PropertyChangeManager();
 		} 
 		else 
 		{
@@ -50,16 +53,99 @@ public abstract class PropertyChangeManager
 		}
 	}
 	
+	/**
+	 *  Remove a listener from an object.
+	 */
+	// Listener type must be object, because java.beans.PropertyChangeListener/jadex.commons.beans.PropertyChangeListener don't share an interface
+	protected void removePCL(Object object, Object pcl)
+	{
+		if(pcl!=null)
+		{
+			try
+			{
+//				System.out.println(getTypeModel().getName()+": Deregister: "+value+", "+type);						
+				// Do not use Class.getMethod (slow).
+				Method	meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", PCL);
+				if(meth!=null)
+					meth.invoke(object, new Object[]{pcl});
+			}
+			catch(IllegalAccessException e){e.printStackTrace();}
+			catch(InvocationTargetException e){e.printStackTrace();}
+		}
+	}
+	
 	/**  
 	 *  Add a property change listener.
 	 */
-	public abstract void addPropertyChangeListener(Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder);
+	public void	addPropertyChangeListener(Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
+	{
+		if(object!=null)
+		{
+			// Invoke addPropertyChangeListener on value
+			try
+			{
+				Method	meth = getAddMethod(object);
+				if(meth!=null)
+				{
+					if(pcls==null)
+						pcls = new IdentityHashMap<Object, Map<IResultCommand<IFuture<Void>, PropertyChangeEvent>, Object>>(); // values may change, therefore identity hash map
+					Map<IResultCommand<IFuture<Void>, PropertyChangeEvent>, Object> mypcls = pcls.get(object);
+					Object pcl = mypcls==null? null: mypcls.get(eventadder);
+					
+					if(pcl==null)
+					{
+						pcl = createPCL(meth, eventadder);
+						if(mypcls==null)
+						{
+							mypcls = new IdentityHashMap<IResultCommand<IFuture<Void>, PropertyChangeEvent>, Object>();
+							pcls.put(object, mypcls);
+						}
+						
+						mypcls.put(eventadder, pcl);
+					}
+					
+					meth.invoke(object, new Object[]{pcl});	
+				}
+			}
+			catch(IllegalAccessException e){e.printStackTrace();}
+			catch(InvocationTargetException e){e.printStackTrace();}
+		}
+	}
 	
 	/**
 	 *  Deregister a value for observation.
 	 *  if its a bean then remove the property listener.
 	 */
-	public abstract void removePropertyChangeListener(Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder);
+	public void	removePropertyChangeListener(Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
+	{
+		if(object!=null)
+		{
+//			System.out.println("deregister ("+cnt[0]+"): "+value);
+			// Stop listening for bean events.
+			if(pcls!=null)
+			{
+				Map<IResultCommand<IFuture<Void>, PropertyChangeEvent>, Object> mypcls = pcls.get(object);
+				if(mypcls!=null)
+				{
+					if(eventadder!=null)
+					{
+						Object pcl = mypcls.remove(eventadder);
+						removePCL(object, pcl);
+					}
+					else
+					{
+						for(Object pcl: mypcls.values())
+						{
+							removePCL(object, pcl);
+						}
+						mypcls.clear();
+					}
+					if(mypcls.size()==0)
+						pcls.remove(object);
+				}
+			}
+		}
+	}
 	
 	/**
 	 *  Add an event.
@@ -99,11 +185,9 @@ public abstract class PropertyChangeManager
 	// ---- Helper -----
 	
 	/**
-	 *  Create a property change listener.
-	 *  @param eventadder The event adder element.
-	 *  @return
+	 *  Create a listener.
 	 */
-	protected jadex.commons.beans.PropertyChangeListener createPCL(final IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
+	protected Object createPCL(Method meth, final IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
 	{
 		return new jadex.commons.beans.PropertyChangeListener()
 		{
@@ -139,11 +223,14 @@ public abstract class PropertyChangeManager
 			}
 		};
 	}
-//
-//	public Object getEvents()
-//	{
-//		// TODO Auto-generated method stub
-//		return events;
-//	}
-	
+
+	/**
+	 *  Get listener add method
+	 */
+	protected Method	getAddMethod(Object object)
+	{
+		// Do not use Class.getMethod (slow).
+		Method	meth = SReflect.getMethod(object.getClass(), "addPropertyChangeListener", PCL);
+		return meth;
+	}
 }
