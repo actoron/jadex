@@ -1400,32 +1400,35 @@ public class ImageProvider
 				try
 				{
 					InputStream svgstream = ImageProvider.class.getClassLoader().getResourceAsStream(IMAGE_DIR + svgname);
-					if (svgstream != null)
-					{
-						final BufferedImage[] bfimg = new BufferedImage[1];
-						ImageTranscoder tc = new ImageTranscoder()
-						{
-							public void writeImage(BufferedImage img, TranscoderOutput to)
-									throws TranscoderException
-							{
-								bfimg[0] = img;
-							}
-							
-							public BufferedImage createImage(int w, int h)
-							{
-								return new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-							}
-						};
-						 
-					    tc.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float) size.width);
-					    tc.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float) size.height);
-					    // Batik 1.7 bug workaround
-					    tc.addTranscodingHint(PNGTranscoder.KEY_AOI, new Rectangle2D.Float(0, 0, size.width, size.height));
-					    
-					    TranscoderInput input = new TranscoderInput(svgstream);
-					    tc.transcode(input, null);
-					    ret = bfimg[0];
-					}
+					//disable bugged svg loading, some collision between newer Java and Batik, it seems
+					if (svgstream!= null)
+						throw new RuntimeException("SVG loading disabled due to Batik/Java Bug.");
+//					if (svgstream != null)
+//					{
+//						final BufferedImage[] bfimg = new BufferedImage[1];
+//						ImageTranscoder tc = new ImageTranscoder()
+//						{
+//							public void writeImage(BufferedImage img, TranscoderOutput to)
+//									throws TranscoderException
+//							{
+//								bfimg[0] = img;
+//							}
+//							
+//							public BufferedImage createImage(int w, int h)
+//							{
+//								return new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//							}
+//						};
+//						 
+//					    tc.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float) size.width);
+//					    tc.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float) size.height);
+//					    // Batik 1.7 bug workaround
+//					    tc.addTranscodingHint(PNGTranscoder.KEY_AOI, new Rectangle2D.Float(0, 0, size.width, size.height));
+//					    
+//					    TranscoderInput input = new TranscoderInput(svgstream);
+//					    tc.transcode(input, null);
+//					    ret = bfimg[0];
+//					}
 				}
 				catch (Exception e)
 				{
