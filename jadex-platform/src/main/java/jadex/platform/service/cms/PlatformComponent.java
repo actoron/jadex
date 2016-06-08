@@ -172,6 +172,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			{
 				final Future<Void> ret = new Future<Void>();
 				
+//				if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+					System.out.println("shutdown component features start: "+getComponentIdentifier()+", "+ifeatures +", "+ lfeatures);
 				executeShutdownOnFeatures(ifeatures!=null ? ifeatures : lfeatures, 0)
 					.addResultListener(new IResultListener<Void>()
 				{
@@ -187,7 +189,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					
 					public void proceed(final Exception ex)
 					{
-						if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//						if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 							System.out.println("shutdown component features end: "+getComponentIdentifier()+", "+ex);
 						if(getComponentFeature0(IMonitoringComponentFeature.class)!=null 
 							&& getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
@@ -365,7 +367,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				getLogger().warning("Exception during component cleanup of "+getComponentIdentifier()+": "+fut.getException());
 				getLogger().info(sw.toString());
 			}
-			if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//			if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 				System.out.println("feature shutdown start: "+getComponentIdentifier()+" "+features.get(features.size()-cnt-1));
 			
 			fut	= features.get(features.size()-cnt-1).shutdown();
