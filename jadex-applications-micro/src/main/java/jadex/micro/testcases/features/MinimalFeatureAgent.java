@@ -28,7 +28,7 @@ import jadex.micro.features.impl.MicroPojoComponentFeature;
 	@Feature(type=IMicroInjectionFeature.class, clazz=MicroInjectionComponentFeature.class,
 		predecessors={IPojoComponentFeature.class, IArgumentsResultsFeature.class}),
 	@Feature(type=ILifecycleComponentFeature.class, clazz=MicroLifecycleComponentFeature.class,
-		predecessors={IPojoComponentFeature.class}, addlast=false),	
+		predecessors={IPojoComponentFeature.class}, addlast=false)
 })
 public class MinimalFeatureAgent
 {
