@@ -263,7 +263,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  @param info Additional start information such as parent component or arguments (optional).
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(String name, String model, CreationInfo info)
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(String name, final String model, CreationInfo info)
 	{
 //		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = new Tuple2Future<IComponentIdentifier, Map<String,Object>>();
 		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = (Tuple2Future<IComponentIdentifier, Map<String,Object>>)SFuture.getNoTimeoutFuture(Tuple2Future.class, agent);
@@ -271,6 +271,8 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			public void resultAvailable(Collection<jadex.commons.Tuple2<String,Object>> result) 
 			{
+				if(model.toString().indexOf("Feature")!=-1)
+					System.err.println("createComponent.resultAvailable: "+model+", "+result);
 				ret.setSecondResult(Argument.convertArguments(result));
 			}
 			
@@ -651,6 +653,8 @@ public class ComponentManagementService implements IComponentManagementService
 																			
 																			public void finished()
 																			{
+																				if(cid.toString().indexOf("Feature")!=-1)
+																					System.out.println("Terminated component (exitDestroy): "+cid.getName());
 																				// Wait for cleanup finished before posting results
 																				cfs.get(cid).addResultListener(new IResultListener<Map<String,Object>>()
 																				{
@@ -1498,16 +1502,21 @@ public class ComponentManagementService implements IComponentManagementService
 		ccs.remove(cid);
 		ret	= (Future<Map<String, Object>>)cfs.remove(cid);
 		
-//		System.out.println("Terminated component (exitDestroy): "+cid.getName());
+		if(cid.toString().indexOf("Feature")!=-1)
+			System.out.println("Terminated component (exitDestroy): "+cid.getName());
 		
 		if(ret!=null)
 		{
 			if(ex!=null)
 			{
+				if(cid.toString().indexOf("Feature")!=-1)
+					System.out.println("Terminated component (exitDestroy)1: "+cid.getName());
 				ret.setException(ex);
 			}
 			else
 			{
+				if(cid.toString().indexOf("Feature")!=-1)
+					System.out.println("Terminated component (exitDestroy)2: "+cid.getName());
 				ret.setResult(results);
 			}
 		}

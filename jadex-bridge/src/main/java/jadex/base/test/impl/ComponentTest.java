@@ -131,18 +131,24 @@ public class ComponentTest extends TestCase
 		{
 			public void intermediateResultAvailable(TupleResult result)
 			{
+				if(filename.toString().indexOf("Feature")!=-1)
+					System.err.println("intermediateResultAvailable: "+toString()+", "+result);
 				if(result.getNum()==0)
 				{
 					cid[0]	= (IComponentIdentifier)result.getResult();
 				}
 				else
 				{
+//					if(filename.toString().indexOf("Feature")!=-1)
+//						Thread.dumpStack();
 					finished.setResultIfUndone((Map<String, Object>)result.getResult());
 				}
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				if(filename.toString().indexOf("Feature")!=-1)
+					System.err.println("exceptionOccurred: "+toString()+", "+exception);
 				finished.setExceptionIfUndone(exception);
 			}
 		});

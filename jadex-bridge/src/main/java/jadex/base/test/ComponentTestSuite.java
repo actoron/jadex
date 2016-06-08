@@ -129,7 +129,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	public ComponentTestSuite(File[] path, File[] root, String[] excludes) throws Exception
 	{
 		this(path, root, excludes, true, true, true);
-//		this(path, root, excludes, true, false, false);
+//		this(path, root, excludes, false, false, true);
 	}
 	
 	/**
