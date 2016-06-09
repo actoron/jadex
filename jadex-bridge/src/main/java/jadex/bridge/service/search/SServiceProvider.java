@@ -985,7 +985,7 @@ public class SServiceProvider
 		return (IIntermediateFuture<IService>)provider.scheduleStep(new ImmediateComponentStep<Collection<IService>>()
 		{
 			@Classname("getDeclaredServices(IExternalAccess provider)")
-			public IFuture<Collection<IService>> execute(IInternalAccess ia)
+			public IIntermediateFuture<IService> execute(IInternalAccess ia)
 			{
 				return getDeclaredServices(ia, false);
 			}

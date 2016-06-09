@@ -151,6 +151,12 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			Throwable	t	= e instanceof InvocationTargetException
 					? ((InvocationTargetException)e).getTargetException() : e;
 			Exception re = t instanceof Exception ? (Exception)t : new RuntimeException(t);
+//			{
+//				public void printStackTrace() 
+//				{
+//					super.printStackTrace();
+//				}
+//			};
 			
 			if(DEBUG)
 			{
