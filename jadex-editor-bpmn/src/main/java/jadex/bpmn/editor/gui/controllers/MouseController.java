@@ -325,13 +325,15 @@ public class MouseController extends MouseAdapter
 	public static final void setScale(ModelContainer modelcontainer, double oldscale, double scale, mxPoint center)
 	{
 		center = center != null? center: new mxPoint(0.5, 0.5);
-		
 		mxGraphComponent gc = modelcontainer.getGraphComponent();
 		double rat = scale / oldscale;
 		JScrollBar vbar = gc.getVerticalScrollBar();
 		JScrollBar hbar = gc.getHorizontalScrollBar();
 		
-		Dimension grapharea = new Dimension(gc.getGraphControl().getMinimumSize());
+		// TODO: Check why minimum size was used here, using preferred size
+		// to avoid artifacts after adding new lanes and zooming
+//		Dimension grapharea = new Dimension(gc.getGraphControl().getMinimumSize());
+		Dimension grapharea = new Dimension(gc.getGraphControl().getPreferredSize());
 		//System.out.println("In: " + grapharea + " " + rat);
 		
 		grapharea.width = (int) Math.round(grapharea.width * rat);
@@ -352,7 +354,6 @@ public class MouseController extends MouseAdapter
 		
 		int px = (int) Math.round(hbar.getModel().getValue() * rat + hbar.getModel().getExtent() * (rat - 1.0) * center.getX());
 		int py = (int) Math.round(vbar.getModel().getValue() * rat + vbar.getModel().getExtent() * (rat - 1.0) * center.getY());
-		
 		hbar.getModel().setValue(Math.max(0, px));
 		vbar.getModel().setValue(Math.max(0, py));
 	}
