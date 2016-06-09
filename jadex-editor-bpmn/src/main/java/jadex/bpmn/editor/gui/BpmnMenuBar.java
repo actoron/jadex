@@ -291,6 +291,22 @@ public class BpmnMenuBar extends JMenuBar
 								 java.awt.Event.CTRL_MASK));
 		editmenu.add(pasteitem);
 		
+		JMenuItem deleteitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Delete"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ModelContainer mc = editorwindow.getSelectedModelContainer();
+				BpmnGraph graph = mc.getGraph();
+				graph.getModel().beginUpdate();
+				graph.removeCells();
+				graph.getModel().endUpdate();
+			}
+		});
+		deleteitem.setAccelerator(KeyStroke.getKeyStroke(
+								java.awt.event.KeyEvent.VK_D, 
+								java.awt.Event.CTRL_MASK));
+		editmenu.add(deleteitem);
+		
 		JMenu viewmenu = new JMenu(BpmnEditor.getString("View"));
 		add(viewmenu);
 		

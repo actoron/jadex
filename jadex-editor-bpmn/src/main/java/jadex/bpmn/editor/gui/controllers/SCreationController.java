@@ -155,6 +155,7 @@ public class SCreationController
 		}
 		
 		modelcontainer.getGraph().getModel().endUpdate();
+		modelcontainer.setDirty(true);
 		//modelcontainer.getGraph().getStacklayout().execute(modelcontainer.getGraph().getDefaultParent());
 		modelcontainer.getGraphComponent().refresh();
 		
