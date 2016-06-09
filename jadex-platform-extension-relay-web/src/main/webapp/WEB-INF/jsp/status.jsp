@@ -360,7 +360,7 @@ if(cnt>0)
 <% } else { %>
 
 <p>Currently there are no platforms connected to this relay.</p>
-<p>You can check the <a href="history">connection history</a> for more information.</p>
+<!-- <p>You can check the <a href="history">connection history</a> for more information.</p> -->
 
 <% } %>
 

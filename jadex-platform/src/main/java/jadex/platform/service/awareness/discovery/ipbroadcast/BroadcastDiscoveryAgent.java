@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -32,6 +33,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 })
 @Properties(@NameValue(name="system", value="true"))
 @Agent
+@Service
 public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 {
 	/** The receiver port. */

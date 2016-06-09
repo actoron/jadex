@@ -9,11 +9,7 @@ pages:
 - Components: 'components/components.md'
 - Services: 'services/services.md'
 - Futures: 'futures/futures.md'
-- Remote:
-    - 'remote/remote.md'
-    - 'remote/awareness.md'
-    - 'remote/security.md'
-    - 'remote/transports.md'
+- Remote: 'remote/remote.md'
 - Component Types: 'component-types/component-types.md'
 - Android:
     - 'android/01 Introduction.md'

@@ -1611,9 +1611,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							{
 								for(MPlanInfo mplaninfo: result)
 								{
-									System.out.println("Create plan 1: "+mplan);
+//									System.out.println("Create plan 1: "+mplan);
 									RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, mplaninfo.getBinding(), null);
-									System.out.println("Create plan 2: "+mplan);
+//									System.out.println("Create plan 2: "+mplan);
 									RPlan.executePlan(rplan, component);
 								}
 							}

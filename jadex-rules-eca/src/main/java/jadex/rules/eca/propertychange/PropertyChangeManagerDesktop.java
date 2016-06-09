@@ -2,7 +2,6 @@ package jadex.rules.eca.propertychange;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.IdentityHashMap;
 import java.util.Map;
 
 import jadex.commons.IResultCommand;
@@ -24,66 +23,6 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 	 */
 	protected PropertyChangeManagerDesktop()
 	{
-	}
-	
-	/**  
-	 *  Add a property change listener.
-	 */
-	public void	addPropertyChangeListener(Object object, final IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
-	{
-		if(object!=null)
-		{
-			// Invoke addPropertyChangeListener on value
-			try
-			{
-				if(pcls==null)
-					pcls = new IdentityHashMap<Object, Map<Object, Object>>(); // values may change, therefore identity hash map
-				Map<Object, Object> mypcls = pcls.get(object);
-				Object pcl = mypcls==null? null: mypcls.get(eventadder);
-				
-				// check if java.beans or jadex.commons are used:
-				boolean javaBeans = false;
-				// Do not use Class.getMethod (slow).
-				Method	meth = SReflect.getMethod(object.getClass(), "addPropertyChangeListener", PCL);
-				if(meth == null) 
-				{
-					meth = SReflect.getMethod(object.getClass(), "addPropertyChangeListener", JAVABEANS_PCL);
-					if(meth != null) 
-					{
-						javaBeans = true;
-					}
-				}
-				
-				if(pcl==null)
-				{
-					PropertyChangeListener jadexPcl = createPCL(eventadder);
-					if(mypcls==null)
-					{
-						mypcls = new IdentityHashMap<Object, Object>();
-						pcls.put(object, mypcls);
-					}
-					
-					if(javaBeans) 
-					{
-						pcl = wrapJadexPcl(jadexPcl);
-					} 
-					else 
-					{
-						pcl = jadexPcl;
-					}
-					
-					mypcls.put(eventadder, pcl);
-				}
-				
-				if(meth!=null)
-				{
-					meth.invoke(object, new Object[]{pcl});	
-				}
-				mypcls.put(object, pcl);
-			}
-			catch(IllegalAccessException e){e.printStackTrace();}
-			catch(InvocationTargetException e){e.printStackTrace();}
-		}
 	}
 	
 	/**
@@ -116,7 +55,7 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 			// Stop listening for bean events.
 			if(pcls!=null)
 			{
-				Map<Object, Object> mypcls = pcls.get(object);
+				Map<IResultCommand<IFuture<Void>, PropertyChangeEvent>, Object> mypcls = pcls.get(object);
 				if(mypcls!=null)
 				{
 					if(eventadder!=null)
@@ -168,4 +107,34 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 		}
 	}
 
+	/**
+	 *  Get listener add method
+	 */
+	@Override
+	protected Method	getAddMethod(Object object)
+	{
+		Method	meth = super.getAddMethod(object);
+		// check if java.beans or jadex.commons are used:
+		if(meth == null) 
+		{
+			// Do not use Class.getMethod (slow).
+			meth = SReflect.getMethod(object.getClass(), "addPropertyChangeListener", JAVABEANS_PCL);
+		}
+		
+		return meth;
+	}
+	
+	/**
+	 *  Create a listener.
+	 */
+	@Override
+	protected Object createPCL(Method meth, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
+	{
+		Object	ret	= super.createPCL(meth, eventadder);
+		if(meth.getParameterTypes()[0].equals(JAVABEANS_PCL[0]))
+		{
+			ret	= wrapJadexPcl((PropertyChangeListener)ret);
+		}
+		return ret;
+	}
 }

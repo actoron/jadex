@@ -1005,11 +1005,14 @@ public class SBpmnModelWriter
 			
 			// Write activity references
 			List<MActivity> activities = lane.getActivities();
-			for (MActivity activity : activities)
+			if (activities != null)
 			{
-				out.print(getIndent(ind) + "<semantic:flowNodeRef>");
-				out.print(escapeString(activity.getId()));
-				out.println("</semantic:flowNodeRef>");
+				for (MActivity activity : activities)
+				{
+					out.print(getIndent(ind) + "<semantic:flowNodeRef>");
+					out.print(escapeString(activity.getId()));
+					out.println("</semantic:flowNodeRef>");
+				}
 			}
 			
 			--ind;

@@ -68,14 +68,16 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 			{
 				if(apl.isEmpty())
 				{
-//					System.out.println("find applicable candidates 2a: "+element.getId()+" "+apl);
+//					if(element.toString().indexOf("go_home")!=-1)
+//						System.out.println("find applicable candidates 2a: "+element.getId()+" "+apl);
 					element.setState(RProcessableElement.State.NOCANDIDATES);
 					element.planFinished(ia, null);
 //					element.reason(ia);
 				}
 				else
 				{
-//					System.out.println("find applicable candidates 2b: "+element.getId()+" "+apl);
+//					if(element.toString().indexOf("go_home")!=-1)
+//						System.out.println("find applicable candidates 2b: "+element.getId()+" "+apl);
 					element.setState(RProcessableElement.State.APLAVAILABLE);
 					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new SelectCandidatesAction(element));
 				}

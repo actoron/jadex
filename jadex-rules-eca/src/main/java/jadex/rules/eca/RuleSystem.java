@@ -341,6 +341,12 @@ public class RuleSystem
 	 */
 	public IFuture<Void> processAllEvents()
 	{
+//		System.out.println("PAE events: "+pcman.getEvents());
+		
+		// Simulate microplansteps by executing all effects immediately (hack: allow configuration sync/async)
+		// Notify listeners before(!) checking next rules/events -> keep sensible execution order
+		FutureHelper.notifyStackedListeners();
+		
 		if(pcman.hasEvents())
 		{
 			boolean	first	= !processall;
@@ -354,6 +360,7 @@ public class RuleSystem
 	//				Exception ex = null;
 					public void resultAvailable(Collection<RuleEvent> result)
 					{
+//						System.out.println("processAllEvents.PAE start");
 						processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					
@@ -361,6 +368,7 @@ public class RuleSystem
 					{
 						exception.printStackTrace();
 	//					ex = exception;
+//						System.out.println("processAllEvents.PAE start");
 						processAllEvents().addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
@@ -384,10 +392,12 @@ public class RuleSystem
 				}
 			}
 			
+//			System.out.println("processAllEvents.PAE end: "+ret.isDone());
 			return ret;
 		}
 		else
 		{
+//			System.out.println("processAllEvents.PAE end: done");
 			return IFuture.DONE;
 		}
 	}
@@ -459,6 +469,7 @@ public class RuleSystem
 						
 			// This works also if the mode is changed during execution and some events are in the queue
 			// execute rulesystem immediately to ensure that variable values are not changed afterwards
+//			System.out.println("addEvent.PAE start: "+event);
 			ret = processAllEvents();
 		}
 		else

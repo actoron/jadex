@@ -7,9 +7,9 @@ This document will guide you through the setup that is necessary to develop appl
 ## Requirements
 
 - Java JDK, tested with JDK 7. On Linux, look for packages from your distributor. On Windows, get the JDK from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk).
-- Download Android Studio (currently tested with 1.5.1) from [here](http://developer.android.com/sdk/index.html) (Be sure to download **Android Studio**, not only the SDK)
+- Android Studio (currently tested with ${AndroidStudioTestedVersion}) from [here](http://developer.android.com/sdk/index.html) (Be sure to download **Android Studio**, not only the SDK)
 - Android SDK (usually included in Android Studio)
-- Download the latest Jadex Android distribution (release or nightly) from the [downloads page](https://www.activecomponents.org/bin/view/Download/Distributions) 
+- Latest Jadex Android distribution (release or nightly) from the [downloads page](https://www.activecomponents.org/bin/view/Download/Distributions) 
 
 ### **Note for 64-bit Ubuntu installations:**
 > If you have a 64bit ubuntu distributions, install the following packages first:  

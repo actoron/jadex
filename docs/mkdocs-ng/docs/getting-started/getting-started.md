@@ -15,9 +15,12 @@ The figure below summarizes the general concept of an Active Component.
 
 # IDE Setup
 
-In this chapter, you will learn how to install eclipse for developing with Jadex. Therefore, you will find instructions on setting up a proper eclipse working environment for programming and executing Jadex applications. If you use a different IDE the instructions and screenshots below should still be helpful for setting up your IDE accordingly.
+In this chapter, you will learn how to install eclipse for developing desktop applications with Jadex. Therefore, you will find instructions on setting up a proper eclipse working environment for programming and executing Jadex applications. If you use a different IDE the instructions and screenshots below should still be helpful for setting up your IDE accordingly.
+If you want to develop **Android applications** with Jadex, please refer to [Android](../android/02 Installation).
 
 Note that this tutorial is not a replacement for the existing eclipse documentation. If you have questions about using eclipse try also looking for an answer at the [http://www.eclipse.org/documentation/](http://www.eclipse.org/documentation/)  site.
+
+
 
 ## Prerequisites
 
@@ -179,3 +182,15 @@ You are now ready to continue with the tutorial. If you later wish to setup your
 <artifactId>jadex-example-project</artifactId>
 ```
 
+## Using IntelliJ IDEA
+
+Using IntelliJ IDEA for development with Jadex Active Components is not officially supported except for [Android development](../android/01 Introduction).
+If you still want to use IntelliJ IDEA, just try to import the Jadex Example Project - gradle support is provided by IntelliJ.
+
+If you want to compile the Jadex source code, import the project included in sources.zip.
+To start Jadex with the JCC, create a new Run Configuration using the following parameters:
+
+-   Main class:```jadex.base.Starter```
+-   Working directory: leave default
+-   Use classpath of module: *jadex-platform-standalone-launch*
+-   JRE: Set to a JDK with minimum version ${JavaSdkMinVersion}

@@ -190,6 +190,15 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
+		return killComponent(null);
+	}
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(final Exception e)
+	{
 //		System.out.println("exta killComp: "+getComponentIdentifier());
 		
 		boolean	kill	= false;
@@ -242,7 +251,7 @@ public class ExternalAccess implements IExternalAccess
 							}
 							else
 							{
-								ia.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(killfut)
+								ia.killComponent(e).addResultListener(new DelegationResultListener<Map<String, Object>>(killfut)
 								{
 									public void customResultAvailable(Map<String, Object> result)
 									{
@@ -264,13 +273,13 @@ public class ExternalAccess implements IExternalAccess
 	//					}
 					}); 
 				}
-				catch(final Exception e)
+				catch(final Exception ex)
 				{
 					Starter.scheduleRescueStep(cid, new Runnable()
 					{
 						public void run()
 						{
-							killfut.setException(e);
+							killfut.setException(ex);
 						}
 					});
 				}

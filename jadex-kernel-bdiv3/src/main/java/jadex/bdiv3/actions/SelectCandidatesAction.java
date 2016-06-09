@@ -74,7 +74,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-//		if(element.toString().indexOf("Analyze")!=-1)
+//		if(element.toString().indexOf("go_home")!=-1)
 //			System.out.println("select candidates: "+element);
 		
 		Future<Void> ret = new Future<Void>();
@@ -86,6 +86,8 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		
 		if(cands!=null && !cands.isEmpty())
 		{
+//			if(element.toString().indexOf("go_home")!=-1)
+//				System.out.println("select candidates: "+element+", "+cands);
 			element.setState(RProcessableElement.State.CANDIDATESSELECTED);
 			for(final Object cand: cands)
 			{
@@ -99,9 +101,11 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					}
 					catch(final Exception e)
 					{
+//						if(element.toString().indexOf("go_home")!=-1)
+//							System.out.println("select candidates fail: "+e);
 						StringWriter	sw	= new StringWriter();
 						e.printStackTrace(new PrintWriter(sw));
-						ia.getLogger().warning("Plan '"+cand+"' threw exception: "+sw);
+						ia.getLogger().severe("Plan '"+cand+"' threw exception: "+sw);
 						
 						element.planFinished(ia, new IInternalPlan()
 						{

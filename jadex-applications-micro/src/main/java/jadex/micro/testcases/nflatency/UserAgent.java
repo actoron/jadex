@@ -3,6 +3,7 @@ package jadex.micro.testcases.nflatency;
 import java.util.Collection;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
@@ -60,6 +61,10 @@ public class UserAgent
 //					INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
 //					Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
 					System.out.println("latency: "+lat);
+				}
+				else
+				{
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
 				}
 			}
 		}

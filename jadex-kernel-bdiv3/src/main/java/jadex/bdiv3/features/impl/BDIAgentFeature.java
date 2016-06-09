@@ -241,7 +241,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				if(rs.isQueueEvents() && ((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited())
-					rs.processAllEvents(); 
+				{
+//					System.out.println("writeField.PAE start");
+					rs.processAllEvents();
+				}
 			}
 			
 			// observe new value for property changes
@@ -563,7 +566,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				if(rs.isQueueEvents())
-					rs.processAllEvents(); 
+				{
+//					System.out.println("writeArrayField.PAE start");
+					rs.processAllEvents();
+				}
 			}
 		}
 	}
@@ -1032,7 +1038,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				if(rs.isQueueEvents())
-					rs.processAllEvents(); 
+				{
+//					System.out.println("writeArrayParameterField.PAE start");
+					rs.processAllEvents();
+				}
 			}
 		}
 	}

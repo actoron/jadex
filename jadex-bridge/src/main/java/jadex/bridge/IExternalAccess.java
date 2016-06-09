@@ -131,6 +131,12 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	public IFuture<Map<String, Object>> killComponent();
 	
 	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(Exception e);
+	
+	/**
 	 *  Get the children (if any) component identifiers.
 	 *  @return The children component identifiers.
 	 */

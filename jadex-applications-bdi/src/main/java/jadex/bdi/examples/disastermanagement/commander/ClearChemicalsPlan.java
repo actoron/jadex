@@ -2,6 +2,7 @@ package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdi.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -21,7 +22,7 @@ public class ClearChemicalsPlan extends Plan
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		IClearChemicalsService force = (IClearChemicalsService)getParameter("rescueforce").getValue();
 		cc	= force.clearChemicals(disaster);
-		cc.get();
+		cc.get(Timeout.NONE);	// hack??? clearing chemicals may take longer than default timeout
 	}
 	
 	/**

@@ -58,9 +58,9 @@
 														else
 														{
 													%>
-													<SPAN class="wikilink"><A href="history">
+													<!-- <SPAN class="wikilink"><A href="history">
 														<SPAN class="wikigeneratedlinkcontent">Connection History</SPAN>
-													</A></SPAN>
+													</A></SPAN> -->
 													<%
 														}
 													%>

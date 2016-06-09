@@ -100,7 +100,7 @@ public class RelayServlet extends HttpServlet
 			{
 				String	view	= null;
 				// todo: add request property
-				if("/history".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
+				if("/long_history".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
 					int	cnt	= -1;	// 20
 					try

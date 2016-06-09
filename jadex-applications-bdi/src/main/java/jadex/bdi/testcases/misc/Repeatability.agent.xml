@@ -38,7 +38,7 @@
 				<value>1</value>
 			</parameter>
 			<parameter name="description" class="String">
-				<value>"First beliefchange trigger."</value>
+				<value>"First belief change trigger."</value>
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
@@ -50,30 +50,6 @@
 				<value>2</value>
 			</parameter>
 			<parameter name="description" class="String">
-				<value>"Second beliefchange trigger."</value>
-			</parameter>
-			<body class="TriggerPlan"/>
-			<trigger>
-				<factchanged ref="b"/>
-			</trigger>
-		</plan>
-		<plan name="trigger3">
-			<parameter name="number" class="int">
-				<value>3</value>
-			</parameter>
-			<parameter name="description" class="String">
-				<value>"First factadded trigger."</value>
-			</parameter>
-			<body class="TriggerPlan"/>
-			<trigger>
-				<factadded ref="c"/>
-			</trigger>
-		</plan>
-		<plan name="trigger4">
-			<parameter name="number" class="int">
-				<value>4</value>
-			</parameter>
-			<parameter name="description" class="String">
 				<value>"First belief condition trigger."</value>
 			</parameter>
 			<body class="TriggerPlan"/>
@@ -83,21 +59,9 @@
 				</condition>
 			</trigger>
 		</plan>
-		<plan name="trigger5">
+		<plan name="trigger3">
 			<parameter name="number" class="int">
-				<value>5</value>
-			</parameter>
-			<parameter name="description" class="String">
-				<value>"Second factadded trigger."</value>
-			</parameter>
-			<body class="TriggerPlan"/>
-			<trigger>
-				<factadded ref="d"/>
-			</trigger>
-		</plan>
-		<plan name="trigger6">
-			<parameter name="number" class="int">
-				<value>6</value>
+				<value>3</value>
 			</parameter>
 			<parameter name="description" class="String">
 				<value>"Second belief condition trigger."</value>
@@ -109,12 +73,36 @@
 				</condition>
 			</trigger>
 		</plan>
-		<plan name="trigger7">
+		<plan name="trigger4">
 			<parameter name="number" class="int">
-				<value>7</value>
+				<value>4</value>
 			</parameter>
 			<parameter name="description" class="String">
-				<value>"First beliefset condition trigger."</value>
+				<value>"Second belief change trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<factchanged ref="b"/>
+			</trigger>
+		</plan>
+		<plan name="trigger5">
+			<parameter name="number" class="int">
+				<value>5</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"First fact added trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<factadded ref="c"/>
+			</trigger>
+		</plan>
+		<plan name="trigger6">
+			<parameter name="number" class="int">
+				<value>6</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"First belief set condition trigger."</value>
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
@@ -123,12 +111,12 @@
 				</condition>
 			</trigger>
 		</plan>
-		<plan name="trigger8">
+		<plan name="trigger7">
 			<parameter name="number" class="int">
-				<value>8</value>
+				<value>7</value>
 			</parameter>
 			<parameter name="description" class="String">
-				<value>"Second beliefset condition trigger."</value>
+				<value>"Second belief set condition trigger."</value>
 			</parameter>
 			<body class="TriggerPlan"/>
 			<trigger>
@@ -137,7 +125,18 @@
 				</condition>
 			</trigger>
 		</plan>
-
+		<plan name="trigger8">
+			<parameter name="number" class="int">
+				<value>8</value>
+			</parameter>
+			<parameter name="description" class="String">
+				<value>"Second fact added trigger."</value>
+			</parameter>
+			<body class="TriggerPlan"/>
+			<trigger>
+				<factadded ref="d"/>
+			</trigger>
+		</plan>
 	</plans>
 
 	<configurations>

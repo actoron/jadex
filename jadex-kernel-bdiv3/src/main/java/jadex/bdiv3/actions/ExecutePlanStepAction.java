@@ -1,13 +1,7 @@
 package jadex.bdiv3.actions;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
-import jadex.bdiv3.annotation.PlanContextCondition;
-import jadex.bdiv3.annotation.RawEvent;
-import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MPlan;
@@ -23,10 +17,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.rules.eca.EventType;
-import jadex.rules.eca.IAction;
-import jadex.rules.eca.IEvent;
-import jadex.rules.eca.IRule;
 
 // todo: use IPlan (and plan executor abstract to be able to execute plans as subcomponents)
 // todo: allow using multi-step plans
@@ -108,7 +98,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 //		if(!isReasonValid())
 //			System.out.println("executing invalid candidate: "+rplan);
 		
-//		if(rplan.toString().indexOf("Move")!=-1)
+//		if(rplan.toString().indexOf("go_home")!=-1)
 //			System.out.println("plan exe: "+rplan);
 		
 		// problem plan context for steps needed that allows to know

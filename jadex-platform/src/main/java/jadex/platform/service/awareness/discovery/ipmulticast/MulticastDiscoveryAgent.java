@@ -3,6 +3,7 @@ package jadex.platform.service.awareness.discovery.ipmulticast;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -27,6 +28,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 })
 @Properties(@NameValue(name="system", value="true"))
 @Agent
+@Service
 public class MulticastDiscoveryAgent extends DiscoveryAgent
 {
 	//-------- attributes --------
