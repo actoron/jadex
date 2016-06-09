@@ -153,8 +153,6 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	 */
 	public IFuture<Void>	shutdown()
 	{
-		if(getComponent().getComponentIdentifier().toString().indexOf("Feature")!=-1)
-			System.out.println("ArgumentsResultsComponentFeature.shutdown: "+getComponent().getComponentIdentifier().getName());
 		if(resfuts!=null)
 		{
 			Exception	ex	= getComponent().getException();
@@ -234,8 +232,6 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	 */
 	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
 	{
-		if(getComponent().getComponentIdentifier().toString().indexOf("Feature")!=-1)
-			System.out.println("subscribeToResults: "+getComponent().getComponentIdentifier().getName());
 		if(resfuts==null)
 		{
 			resfuts	= new LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();

@@ -76,21 +76,9 @@ public class ComponentStartTest extends	ComponentTest
 				public synchronized void resultAvailable(Void result)
 				{
 					IComponentManagementService	mycms	= cms;
-					if(cid.toString().indexOf("Feature")!=-1)
-						System.err.println("destroying: "+ComponentStartTest.super.toString()+", "+mycms);
 					if(mycms!=null)
 					{
-						try
-						{
-							mycms.destroyComponent(cid).get();
-							if(cid.toString().indexOf("Feature")!=-1)
-								System.err.println("destroyed: "+ComponentStartTest.super.toString());
-						}
-						catch(Throwable e)
-						{
-							if(cid.toString().indexOf("Feature")!=-1)
-								System.err.println("not destroyed: "+ComponentStartTest.super.toString()+", "+e);							
-						}
+						mycms.destroyComponent(cid).get();
 					}
 				}
 			});

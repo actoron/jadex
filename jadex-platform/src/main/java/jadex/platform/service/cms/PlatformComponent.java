@@ -173,7 +173,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				final Future<Void> ret = new Future<Void>();
 				
 //				if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-					System.out.println("shutdown component features start: "+getComponentIdentifier()+", "+ifeatures +", "+ lfeatures);
+//					System.out.println("shutdown component features start: "+getComponentIdentifier()+", "+ifeatures +", "+ lfeatures);
 				executeShutdownOnFeatures(ifeatures!=null ? ifeatures : lfeatures, 0)
 					.addResultListener(new IResultListener<Void>()
 				{
@@ -190,12 +190,12 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					public void proceed(final Exception ex)
 					{
 //						if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-							System.out.println("shutdown component features end: "+getComponentIdentifier()+", "+ex);
+//							System.out.println("shutdown component features end: "+getComponentIdentifier()+", "+ex);
 						if(getComponentFeature0(IMonitoringComponentFeature.class)!=null 
 							&& getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 						{
-							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-								System.out.println("shutdown component features end1: "+getComponentIdentifier()+", "+ex);
+//							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//								System.out.println("shutdown component features end1: "+getComponentIdentifier()+", "+ex);
 							MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
 								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
 							event.setProperty("details", getComponentDescription());
@@ -203,8 +203,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-										System.out.println("shutdown component features end2: "+getComponentIdentifier()+", "+ex);
+//									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//										System.out.println("shutdown component features end2: "+getComponentIdentifier()+", "+ex);
 									if(ex!=null)
 										ret.setException(ex);
 									else
@@ -213,16 +213,16 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-										System.out.println("shutdown component features end3: "+getComponentIdentifier()+", "+ex);
+//									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//										System.out.println("shutdown component features end3: "+getComponentIdentifier()+", "+ex);
 									ret.setException(exception);
 								}
 							});
 						}
 						else
 						{
-							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-								System.out.println("shutdown component features end4: "+getComponentIdentifier()+", "+ex);
+//							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//								System.out.println("shutdown component features end4: "+getComponentIdentifier()+", "+ex);
 							ret.setResult(null);
 						}
 					}
@@ -238,44 +238,36 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	protected IFuture<Void>	executeInitOnFeatures(final Iterator<IComponentFeature> features)
 	{
-		IFuture<Void>	fut	= IFuture.DONE;
-		while(fut.isDone() && fut.getException()==null && features.hasNext())
+		// Try synchronous init.
+		IFuture<Void>	ret	= IFuture.DONE;
+		while(ret.isDone() && ret.getException()==null && features.hasNext())
 		{
 			IComponentFeature	cf	= features.next();
-			if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
+//			if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
 			ifeatures.add(cf);
-			fut	= cf.init();
+			ret	= cf.init();
 		}
 		
-//		fut.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				System.out.println("ini fin: "+getComponentIdentifier());
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("ini ex: "+getComponentIdentifier());
-//			}
-//		});
-		
-		if(!fut.isDone())
+		// Wait for future but also check features, as future might have become done since check in loop.
+		if(!ret.isDone() || features.hasNext())
 		{
-			final Future<Void>	ret	= new Future<Void>();
-			fut.addResultListener(new DelegationResultListener<Void>(ret)
+			// Recurse for asynchronous feature.
+			final Future<Void>	fut	= new Future<Void>();
+			ret.addResultListener(new DelegationResultListener<Void>(fut)
 			{
 				public void customResultAvailable(Void result)
 				{
-					executeInitOnFeatures(features).addResultListener(new DelegationResultListener<Void>(ret));
+					executeInitOnFeatures(features).addResultListener(new DelegationResultListener<Void>(fut));
 				}
 			});
-			return ret;
+			ret	= fut;
 		}
+		
+		// Init complete
 		else
 		{
-			if(fut.getException()!=null)
+			if(ret.getException()!=null)
 			{
 //				System.out.println("Initing of "+getComponentIdentifier()+" failed due to "+fut.getException());
 				
@@ -289,9 +281,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				// Init succeeded: list no longer needed.
 				ifeatures	= null;
 			}
-			
-			return fut;
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -300,46 +292,24 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	protected IFuture<Void>	executeBodyOnFeatures(final Iterator<IComponentFeature> features)
 	{
 		List<IFuture<Void>>	undones	= new ArrayList<IFuture<Void>>();
-		IFuture<Void>	fut	= IFuture.DONE;
-		while(fut.getException()==null && features.hasNext())
+		IFuture<Void>	ret	= IFuture.DONE;
+		while(ret.getException()==null && features.hasNext())
 		{
 			IComponentFeature	cf	= features.next();
 //			if(getComponentIdentifier().getName().indexOf("Interceptor")!=-1)
 //				System.out.println("Starting "+cf+" of "+getComponentIdentifier());
-			fut	= cf.body();
+			ret	= cf.body();
 			
-			if(!fut.isDone())
+			if(!ret.isDone())
 			{
-				undones.add(fut);
+				undones.add(ret);
 			}
 		}
 		
-		if(fut.getException()==null && !undones.isEmpty())
+		if(ret.getException()==null)
 		{
-			final Future<Void>	ret	= new Future<Void>();
-			IResultListener<Void>	crl	= new CounterResultListener<Void>(undones.size(), new DelegationResultListener<Void>(ret)
-			{
-				public void customResultAvailable(Void result)
-				{
-					Boolean	keepalive	= getModel().getKeepalive(getConfiguration());
-					if(keepalive!=null && !keepalive.booleanValue())
-					{
-						killComponent();
-					}
-					ret.setResult(null);
-				}
-			});
-			
-			for(IFuture<Void> undone: undones)
-			{
-				undone.addResultListener(crl);
-			}
-			
-			return ret;
-		}
-		else
-		{
-			if(fut.getException()==null)
+			// Body already finished -> kill if not keep alive
+			if(undones.isEmpty())
 			{
 				Boolean	keepalive	= getModel().getKeepalive(getConfiguration());
 				if(keepalive!=null && !keepalive.booleanValue())
@@ -348,8 +318,36 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				}
 			}
 			
-			return fut;
+			
+			// Wait for body and then kill.
+			else
+			{
+				final Future<Void>	fut	= new Future<Void>();
+				IResultListener<Void>	crl	= new CounterResultListener<Void>(undones.size(), new DelegationResultListener<Void>(fut)
+				{
+					public void customResultAvailable(Void result)
+					{
+						Boolean	keepalive	= getModel().getKeepalive(getConfiguration());
+						if(keepalive!=null && !keepalive.booleanValue())
+						{
+							killComponent();
+						}
+						fut.setResult(null);
+					}
+				});
+				
+				for(IFuture<Void> undone: undones)
+				{
+					undone.addResultListener(crl);
+				}
+				
+				ret	= fut;
+			}
 		}
+		
+		// else body failed -> return fut.
+
+		return ret;
 	}
 	
 	/**
@@ -357,9 +355,11 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	protected IFuture<Void>	executeShutdownOnFeatures(final List<IComponentFeature> features, int cnt)
 	{
+		// Try synchronous shutdown.
 		IFuture<Void>	fut	= IFuture.DONE;
 		while(fut.isDone() && cnt<features.size())
 		{
+			// On exception -> print but continue shutdown with next feature
 			if(fut.getException()!=null)
 			{
 				StringWriter	sw	= new StringWriter();
@@ -368,13 +368,14 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				getLogger().info(sw.toString());
 			}
 //			if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-				System.out.println("feature shutdown start: "+getComponentIdentifier()+" "+features.get(features.size()-cnt-1));
+//				System.out.println("feature shutdown start: "+getComponentIdentifier()+" "+features.get(features.size()-cnt-1));
 			
 			fut	= features.get(features.size()-cnt-1).shutdown();
 			cnt++;
 		}
 		
-		if(!fut.isDone())
+		// Wait for future but also check features, as future might have become done since check in loop.
+		if(!fut.isDone() || cnt<features.size())
 		{
 			final int	fcnt	= cnt;
 			final Future<Void>	ret	= new Future<Void>();
@@ -382,7 +383,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			{
 				public void resultAvailable(Void result)
 				{
-					executeShutdownOnFeatures(features, fcnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+					executeShutdownOnFeatures(features, fcnt).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -392,7 +393,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					getLogger().warning("Exception during component cleanup of "+getComponentIdentifier()+": "+exception);
 					getLogger().info(sw.toString());
 					
-					executeShutdownOnFeatures(features, fcnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+					executeShutdownOnFeatures(features, fcnt).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 			return ret;
