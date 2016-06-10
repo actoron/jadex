@@ -118,7 +118,7 @@ public class DependencyResolver<T>
 			nodeps = dr2.getNodeps();
 		}
 		
-		System.out.println("Resolved: "+ret);
+//		System.out.println("Resolved: "+ret);
 		
 		return ret;
 	}

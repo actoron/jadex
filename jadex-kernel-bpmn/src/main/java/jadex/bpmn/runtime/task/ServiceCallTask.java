@@ -39,6 +39,7 @@ import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.StepAborted;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.nonfunctional.search.IServiceEvaluator;
@@ -396,7 +397,18 @@ public class ServiceCallTask implements ITask
 		}
 		catch(InvocationTargetException ite)
 		{
-			ret.setException((Exception)ite.getTargetException());
+			// Re-throw exception when current step is aborted 
+			if(ite.getTargetException() instanceof StepAborted)
+			{
+				throw (Error)ite.getTargetException();
+			}
+			else
+			{
+				Exception re = ite.getTargetException() instanceof Exception
+					? (Exception)ite.getTargetException()
+					: new RuntimeException(ite.getTargetException());
+				ret.setException(re);
+			}
 		}
 		catch(IllegalArgumentException e)
 		{

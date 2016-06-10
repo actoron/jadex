@@ -131,8 +131,6 @@ public class ComponentTest extends TestCase
 		{
 			public void intermediateResultAvailable(TupleResult result)
 			{
-				if(filename.toString().indexOf("Feature")!=-1)
-					System.err.println("intermediateResultAvailable: "+toString()+", "+result);
 				if(result.getNum()==0)
 				{
 					cid[0]	= (IComponentIdentifier)result.getResult();
@@ -147,8 +145,6 @@ public class ComponentTest extends TestCase
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				if(filename.toString().indexOf("Feature")!=-1)
-					System.err.println("exceptionOccurred: "+toString()+", "+exception);
 				finished.setExceptionIfUndone(exception);
 			}
 		});

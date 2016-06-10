@@ -653,8 +653,6 @@ public class ComponentManagementService implements IComponentManagementService
 																			
 																			public void finished()
 																			{
-																				if(cid.toString().indexOf("Feature")!=-1)
-																					System.out.println("Terminated component (exitDestroy): "+cid.getName());
 																				// Wait for cleanup finished before posting results
 																				cfs.get(cid).addResultListener(new IResultListener<Map<String,Object>>()
 																				{
@@ -1502,21 +1500,14 @@ public class ComponentManagementService implements IComponentManagementService
 		ccs.remove(cid);
 		ret	= (Future<Map<String, Object>>)cfs.remove(cid);
 		
-		if(cid.toString().indexOf("Feature")!=-1)
-			System.out.println("Terminated component (exitDestroy): "+cid.getName());
-		
 		if(ret!=null)
 		{
 			if(ex!=null)
 			{
-				if(cid.toString().indexOf("Feature")!=-1)
-					System.out.println("Terminated component (exitDestroy)1: "+cid.getName());
 				ret.setException(ex);
 			}
 			else
 			{
-				if(cid.toString().indexOf("Feature")!=-1)
-					System.out.println("Terminated component (exitDestroy)2: "+cid.getName());
 				ret.setResult(results);
 			}
 		}

@@ -4,8 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 
 import jadex.bridge.ServiceCall;
+import jadex.bridge.StepAborted;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -150,34 +152,29 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 
 			Throwable	t	= e instanceof InvocationTargetException
 					? ((InvocationTargetException)e).getTargetException() : e;
-			Exception re = t instanceof Exception ? (Exception)t : new RuntimeException(t);
-//			{
-//				public void printStackTrace() 
-//				{
-//					super.printStackTrace();
-//				}
-//			};
 			
 			if(DEBUG)
 			{
 				e.printStackTrace();
 			}
 			
-			if(sic.getMethod().getReturnType().equals(IFuture.class))
+			// Re-throw exception when synchronous method or current step is aborted 
+			if(t instanceof StepAborted
+				|| !SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType()))
 			{
-				sic.setResult(new Future(re));
+				if(t instanceof Error)
+				{
+					throw (Error)t;
+				}
+				else
+				{
+					throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+				}
 			}
 			else
 			{
-//				e.printStackTrace();
-				throw re instanceof RuntimeException ? (RuntimeException)re : new RuntimeException(re);
-//				{
-//					public void printStackTrace()
-//					{
-//						Thread.dumpStack();
-//						super.printStackTrace();
-//					}
-//				};
+				Exception re = t instanceof Exception ? (Exception)t : new RuntimeException(t);
+				sic.setResult(new Future(re));
 			}
 		}
 		
