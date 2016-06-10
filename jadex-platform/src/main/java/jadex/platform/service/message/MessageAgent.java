@@ -7,13 +7,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SReflect;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;

@@ -1,4 +1,4 @@
-package jadex.micro.annotation;
+package jadex.bridge.nonfunctional.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,4 +26,5 @@ public @interface NameValue
 	 *  The value as a class.
 	 */
 	public Class<?> clazz() default Object.class;
+	
 }

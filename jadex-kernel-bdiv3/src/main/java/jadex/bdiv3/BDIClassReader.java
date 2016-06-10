@@ -73,6 +73,8 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
@@ -90,7 +92,6 @@ import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.Publish;
 import jadex.micro.annotation.RequiredService;
@@ -465,10 +466,10 @@ public class BDIClassReader extends MicroClassReader
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 							Publish p = provs[j].publish();
 							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
-								p.mapping(), createUnparsedExpressions(p.properties()));
+								p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
 							
 							NameValue[] props = provs[j].properties();
-							List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(createUnparsedExpressions(props))) : null;
+							List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
 							
 							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, provs[j].scope(), pi, serprops);
 							configinfo.setProvidedServices(psis);

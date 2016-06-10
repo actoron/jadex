@@ -20,6 +20,7 @@ import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.NFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
+import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -97,7 +98,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 				try
 				{
 					Class<?> clazz = nfprop.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), null, null);
+					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), null, null, nfprop.getParameters());
 					cnt++;
 					getComponentPropertyProvider().addNFProperty(nfp).addResultListener(lis);
 				}
@@ -300,7 +301,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		for(NFProperty nfprop : nfprops.value())
 		{
 			Class<?> clazz = nfprop.value();
-			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, null);
+			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, null, SNameValue.createUnparsedExpressionsList(nfprop.parameters()));
 			prov.addNFProperty(prop).addResultListener(lis);
 		}
 		
@@ -319,7 +320,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		for(NFProperty nfprop : nfprops.value())
 		{
 			Class<?> clazz = ((NFProperty)nfprop).value();
-			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, mi);
+			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, mi, SNameValue.createUnparsedExpressionsList(nfprop.parameters()));
 			prov.addMethodNFProperty(mi, prop).addResultListener(lis);
 		}
 		

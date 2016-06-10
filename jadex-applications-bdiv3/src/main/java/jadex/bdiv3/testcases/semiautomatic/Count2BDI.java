@@ -11,11 +11,11 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.NameValue;
 import jadex.rules.eca.annotations.Event;
 
 /**

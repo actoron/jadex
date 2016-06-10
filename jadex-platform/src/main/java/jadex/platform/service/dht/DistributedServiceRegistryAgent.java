@@ -1,5 +1,6 @@
 package jadex.platform.service.dht;
 
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.dht.IDistributedKVStoreDebugService;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
@@ -12,7 +13,6 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;

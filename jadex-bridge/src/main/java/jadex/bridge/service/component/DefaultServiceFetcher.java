@@ -21,6 +21,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -890,7 +891,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										{
 											MethodInfo mi = nfprop.getMethodInfo();
 											Class<?> clazz = nfprop.getClazz().getType(ia.getClassLoader(), ia.getModel().getAllImports());
-											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo());
+											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo(), nfprop.getParameters());
 											if(mi==null)
 											{
 												nfpp.addNFProperty(nfp);
