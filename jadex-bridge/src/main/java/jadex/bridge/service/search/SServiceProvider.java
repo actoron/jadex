@@ -34,6 +34,8 @@ import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
@@ -996,9 +998,8 @@ public class SServiceProvider
 		});
 	}
 
-	
 	/**
-	 *  Get all services of a type.
+	 *  Get a service of a type.
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
@@ -1015,7 +1016,7 @@ public class SServiceProvider
 	}
 	
 	/**
-	 *  Find services by type and tags. Service must have all the tags.
+	 *  Find service by type and tags. Service must have all the tags.
 	 *  @param component The component.
 	 *  @param type The service type.
 	 *  @param scope The search scope.
@@ -1024,24 +1025,37 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getTaggedService(final IInternalAccess component, Class<T> type, String scope, final String... tags)
 	{
-		return getService(component, type, scope, 
-			new IAsyncFilter<T>()
+		return getService(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+	}
+	
+	/**
+	 *  Get all services of a type and tags. Services must have all the tags.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(IExternalAccess component, final Class<T> type, final String scope, final String... tags)
+	{
+		return (ITerminableIntermediateFuture<T>)component.scheduleStep(new ImmediateComponentStep<Collection<T>>()
 		{
-			public IFuture<Boolean> filter(T ts)
+			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final String... args)")
+			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
 			{
-				final Future<Boolean> ret = new Future<Boolean>();
-				IFuture<Collection<String>> fut = SNFPropertyProvider.getNFPropertyValue(component.getExternalAccess(), ((IService)ts).getServiceIdentifier(), TagProperty.NAME);
-				fut.addResultListener(new ExceptionDelegationResultListener<Collection<String>, Boolean>(ret)
-				{
-					public void customResultAvailable(Collection<String> result)
-					{
-						System.out.println("ser tag check: "+result);
-						ret.setResult(result!=null && result.containsAll(Arrays.asList(tags)));
-					}
-				});
-				return ret;
+				return getTaggedServices(ia, type, scope, tags);
 			}
 		});
+	}
+	
+	/**
+	 *  Find services by type and tags. Service must have all the tags.
+	 *  @param component The component.
+	 *  @param type The service type.
+	 *  @param scope The search scope.
+	 *  @param tags The tags.
+	 *  @return A matching service
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(final IInternalAccess component, Class<T> type, String scope, final String... tags)
+	{
+		return getServices(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
 	}
 	
 	//-------- other methods --------
@@ -1201,7 +1215,7 @@ public class SServiceProvider
 	}
 	
 	/**
-	 * 
+	 *  Proxy result listener.
 	 */
 	public static class IntermediateProxyResultListener<T> extends IntermediateDelegationResultListener<T>
 	{
@@ -1288,7 +1302,6 @@ public class SServiceProvider
 		}
 		return ret;
 	}
-	
 }
 
 

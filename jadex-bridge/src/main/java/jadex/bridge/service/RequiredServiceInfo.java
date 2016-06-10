@@ -1,12 +1,13 @@
 package jadex.bridge.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  *  Struct for information about a required service.
@@ -48,6 +49,9 @@ public class RequiredServiceInfo
 	
 	/** The type. */
 	protected ClassInfo type;
+	
+	/** The service tags to search for. */
+	protected Collection<String> tags;
 	
 	/** Flag if multiple services should be returned. */
 	protected boolean multiple;
@@ -102,26 +106,26 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class<?> type, String scope, Class<?> multiplextype)
 	{
-		this(name, type, false, multiplextype, new RequiredServiceBinding(name, scope), null);
+		this(name, type, false, multiplextype, new RequiredServiceBinding(name, scope), null, null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
 	public RequiredServiceInfo(String name, Class<?> type, boolean multiple, 
-		Class<?> multiplextype, RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops)
+		Class<?> multiplextype, RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
 	{
 		this(name, type!=null ? new ClassInfo(SReflect.getClassName(type)) : null,
 			multiple,
 			multiplextype!=null ? new ClassInfo(SReflect.getClassName(multiplextype)) : null,
-			binding, nfprops);
+			binding, nfprops, tags);
 	}
 
 	/**
 	 *  Create a new service info.
 	 */
 	public RequiredServiceInfo(String name, ClassInfo type, boolean multiple, 
-		ClassInfo multiplextype, RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops)
+		ClassInfo multiplextype, RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
 	{
 		this.name = name;
 		this.type	= type;
@@ -129,6 +133,7 @@ public class RequiredServiceInfo
 		this.multiplextype	= multiplextype;
 		this.binding = binding;
 		this.nfproperties = nfprops;
+		this.tags = tags;
 	}
 
 	//-------- methods --------
@@ -269,5 +274,23 @@ public class RequiredServiceInfo
 	public void setNFRProperties(List<NFRPropertyInfo> nfproperties)
 	{
 		this.nfproperties = nfproperties;
+	}
+
+	/**
+	 *  Get the tags.
+	 *  @return the tags
+	 */
+	public Collection<String> getTags()
+	{
+		return tags;
+	}
+
+	/**
+	 *  Set the tags.
+	 *  @param tags The tags to set
+	 */
+	public void setTags(Collection<String> tags)
+	{
+		this.tags = tags;
 	}
 }

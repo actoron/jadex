@@ -1,11 +1,8 @@
 package jadex.bridge.sensor.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
@@ -14,6 +11,12 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  *  Tagging a service with a string for searching specifically
@@ -27,6 +30,17 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 {
 	/** The name of the property. */
 	public static final String NAME = "tag";
+	
+	/** The argument constant. */
+	public static final String ARGUMENT = "argument";
+	
+	/** The platform name tag. */
+	private static final String PLATFORM_NAME_INTERNAL = "platform_name";
+	public static final String PLATFORM_NAME = "\""+PLATFORM_NAME_INTERNAL+"\"";
+	
+	/** The Jadex version tag. */
+	private static final String JADEX_VERSION_INTERNAL = "jadex_version";
+	public static final String JADEX_VERSION = "\""+JADEX_VERSION_INTERNAL+"\"";
 	
 	/** The component. */
 	protected IInternalAccess component;
@@ -56,17 +70,34 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 		boolean found = false;
 		if(params!=null)
 		{
+			Collection<String> tags = null;
+			
+			// get values directyl from init parameters under TAG
 			if(params.containsKey(NAME))
 			{
-				ret.setResult(convertToCollection(params.get(NAME)));
+				Object vals = params.get(NAME);
+				tags = createRuntimeTags(vals, component.getExternalAccess());
 				found = true;
 			}
-			else if(params.containsKey("argument"))
+			
+			// get values from component args under name specified in ARGUMENT
+			if(params.containsKey(ARGUMENT))
 			{
 				Map<String, Object> args = component.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
-				ret.setResult(convertToCollection(args.get((String)params.get("argument"))));
+				Collection<String> tags2 = convertToCollection(args.get((String)params.get(ARGUMENT)));
+				if(tags==null)
+				{
+					tags = tags2;
+				}
+				else
+				{
+					tags.addAll(tags2);
+				}
 				found = true;
 			}
+			
+			if(found)
+				ret.setResult(tags);
 		}
 		
 		// directly search argument "tag"
@@ -75,7 +106,8 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 			Map<String, Object> args = component.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 			if(args.containsKey(NAME))
 			{
-				ret.setResult(convertToCollection(args.get(NAME)));
+				Collection<String> tags = createRuntimeTags(args.get(NAME), component.getExternalAccess());
+				ret.setResult(tags);
 				found = true;
 			}
 		}
@@ -89,7 +121,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 	/**
 	 *  Convert user defined tag(s) to collection.
 	 */
-	protected Collection<String> convertToCollection(Object obj)
+	protected static Collection<String> convertToCollection(Object obj)
 	{
 		Collection<String> ret = null;
 		
@@ -112,6 +144,30 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 			}
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Create a collection of tags and replace the variable values.
+	 */
+	public static Collection<String> createRuntimeTags(Object vals, IExternalAccess component)
+	{
+		Collection<String> tags = convertToCollection(vals);
+		Iterator<String> it = tags.iterator();
+		List<String> ret = new ArrayList<String>();
+		for(int i=0; i<tags.size(); i++)
+		{
+			String tag = it.next();
+			if(PLATFORM_NAME_INTERNAL.equals(tag) || PLATFORM_NAME.equals(tag))
+			{
+				tag = component.getComponentIdentifier().getPlatformPrefix();
+			}
+			else if(JADEX_VERSION_INTERNAL.equals(tag) || JADEX_VERSION.equals(tag))
+			{
+				tag = VersionInfo.getInstance().getVersion();
+			}
+			ret.add(tag);
+		}
 		return ret;
 	}
 }

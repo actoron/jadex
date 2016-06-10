@@ -11,7 +11,7 @@ import jadex.commons.future.IFuture;
  *  A filter checks if an object matches
  *  the given subfilters.
  */
-public class  ComposedRemoteFilter implements IAsyncFilter, Serializable
+public class  ComposedRemoteFilter<T> implements IAsyncFilter<T>, Serializable
 {
 	//-------- constants --------
 
@@ -40,7 +40,7 @@ public class  ComposedRemoteFilter implements IAsyncFilter, Serializable
 	 *  @param filters The filters.
 	 *  @param operator The operator.
 	 */
-	public ComposedRemoteFilter(IAsyncFilter[] filters)
+	public ComposedRemoteFilter(IAsyncFilter<T>[] filters)
 	{
 		this(filters, AND);
 	}
@@ -50,7 +50,7 @@ public class  ComposedRemoteFilter implements IAsyncFilter, Serializable
 	 *  @param filters The filters.
 	 *  @param operator The operator.
 	 */
-	public ComposedRemoteFilter(IAsyncFilter[] filters, int operator)
+	public ComposedRemoteFilter(IAsyncFilter<T>[] filters, int operator)
 	{
 		this.filters	= filters.clone();
 		this.operator	= operator;
@@ -166,7 +166,7 @@ public class  ComposedRemoteFilter implements IAsyncFilter, Serializable
 	 *  Set the filters.
 	 *  @param filters The filters to set.
 	 */
-	public void setFilters(IAsyncFilter[] filters)
+	public void setFilters(IAsyncFilter<T>[] filters)
 	{
 		this.filters = filters.clone();
 	}
@@ -175,9 +175,9 @@ public class  ComposedRemoteFilter implements IAsyncFilter, Serializable
 	 *  Add a filter.
 	 *  @param filter The filter.
 	 */
-	public void addFilter(IAsyncFilter filter)
+	public void addFilter(IAsyncFilter<T> filter)
 	{
-		IAsyncFilter[] copy = new IAsyncFilter[filters==null? 1: filters.length+1];
+		IAsyncFilter<T>[] copy = new IAsyncFilter[filters==null? 1: filters.length+1];
 		if(filters!=null)
 			System.arraycopy(filter, 0, copy, 0, filters.length);
 		copy[copy.length-1] = filter;
@@ -222,7 +222,7 @@ public class  ComposedRemoteFilter implements IAsyncFilter, Serializable
 		boolean ret = false;
 		if(obj instanceof ComposedRemoteFilter)
 		{
-			ComposedRemoteFilter other = (ComposedRemoteFilter)obj;
+			ComposedRemoteFilter<T> other = (ComposedRemoteFilter<T>)obj;
 			ret = Arrays.equals(filters, other.filters) && operator == other.operator;
 		}
 		return ret;

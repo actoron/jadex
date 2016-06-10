@@ -43,7 +43,7 @@ public class SBDIModel
 			}
 			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
 			{
-				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(capaname+MElement.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding(), rsi.getNFRProperties());
+				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(capaname+MElement.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding(), rsi.getNFRProperties(), rsi.getTags());
 				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
 			}
 			

@@ -38,7 +38,7 @@ public class BDIRequiredServicesComponentFeature extends RequiredServicesCompone
 	 */
 	public <T> IFuture<T> getRequiredService(String name)
 	{
-		return super.getRequiredService(rename(name), false, null);
+		return super.getRequiredService(rename(name), false, (IAsyncFilter<T>)null);
 	}
 	
 	/**
@@ -48,7 +48,7 @@ public class BDIRequiredServicesComponentFeature extends RequiredServicesCompone
 	 */
 	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name)
 	{
-		return super.getRequiredServices(rename(name), false, null);
+		return super.getRequiredServices(rename(name), false, (IAsyncFilter<T>)null);
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class BDIRequiredServicesComponentFeature extends RequiredServicesCompone
 	 */
 	public <T> IFuture<T> getRequiredService(String name, boolean rebind)
 	{
-		return super.getRequiredService(rename(name), rebind, null);
+		return super.getRequiredService(rename(name), rebind, (IAsyncFilter<T>)null);
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class BDIRequiredServicesComponentFeature extends RequiredServicesCompone
 	 */
 	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
 	{
-		return super.getRequiredServices(rename(name), rebind, null);
+		return super.getRequiredServices(rename(name), rebind, (IAsyncFilter<T>)null);
 	}
 	
 	/**

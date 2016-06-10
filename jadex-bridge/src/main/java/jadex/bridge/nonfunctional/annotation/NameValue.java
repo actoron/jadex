@@ -23,6 +23,11 @@ public @interface NameValue
 	public String value() default "";
 	
 	/**
+	 *  The values as strings, will be individually parsed.
+	 */
+	public String[] values() default {};
+	
+	/**
 	 *  The value as a class.
 	 */
 	public Class<?> clazz() default Object.class;

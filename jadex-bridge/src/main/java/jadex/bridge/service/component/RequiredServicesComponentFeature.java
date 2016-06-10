@@ -1,11 +1,5 @@
 package jadex.bridge.service.component;
 
-import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -20,6 +14,7 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.TagFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -27,6 +22,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
+
+import java.lang.reflect.Proxy;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *  Feature for provided services.
@@ -68,7 +69,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		for(int i=0; i<ms.length; i++)
 		{
 			ms[i]	= new RequiredServiceInfo(/*getServicePrefix()+*/ms[i].getName(), ms[i].getType().getType(cl, model.getAllImports()), ms[i].isMultiple(), 
-				ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(cl, model.getAllImports()), ms[i].getDefaultBinding(), ms[i].getNFRProperties());
+				ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(cl, model.getAllImports()), ms[i].getDefaultBinding(), ms[i].getNFRProperties(), ms[i].getTags());
 			sermap.put(ms[i].getName(), ms[i]);
 		}
 
@@ -80,7 +81,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			{
 				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(/*getServicePrefix()+*/cs[i].getName());
 				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
-					ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(cl, model.getAllImports()), new RequiredServiceBinding(cs[i].getDefaultBinding()), ms[i].getNFRProperties());
+					ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(cl, model.getAllImports()), new RequiredServiceBinding(cs[i].getDefaultBinding()), ms[i].getNFRProperties(), ms[i].getTags());
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
@@ -93,7 +94,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			{
 				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
 				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
-					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(cl, model.getAllImports()), new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties());
+					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(cl, model.getAllImports()), new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties(), ms[i].getTags());
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
@@ -216,7 +217,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> IFuture<T> getRequiredService(String name, boolean rebind)
 	{
-		return getRequiredService(name, rebind, null);
+		return getRequiredService(name, rebind, (IAsyncFilter<T>)null);
 	}
 	
 	/**
@@ -225,7 +226,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
 	{
-		return getRequiredServices(name, rebind, null);
+		return getRequiredServices(name, rebind, (IAsyncFilter<T>)null);
 	}
 	
 //	/**
@@ -296,6 +297,31 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			return getRequiredServices(info, binding, rebind, filter);
 		}
 	}
+	
+	/**
+	 *  Get a required service using tags.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
+	 *  @param tags The service tags.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind, String... tags)
+	{
+		return getRequiredService(name, rebind, new TagFilter<T>(component.getExternalAccess(), tags));
+	}
+	
+	/**
+	 *  Get a required services using tags.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
+	 *  @param tags The service tags.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, String... tags)
+	{
+		return getRequiredServices(name, rebind, new TagFilter<T>(component.getExternalAccess(), tags));
+	}
+
 	
 	/**
 	 *  Get a multi service.

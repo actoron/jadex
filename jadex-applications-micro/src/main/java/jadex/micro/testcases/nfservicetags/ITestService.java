@@ -9,8 +9,18 @@ import jadex.commons.future.IFuture;
 /**
  *  Example service interface.
  */
-//@NFProperties(@NFProperty(value=TagProperty.class, parameters=@NameValue(name="tag", value="\"mytag\"")))
-@NFProperties(@NFProperty(value=TagProperty.class, parameters=@NameValue(name="argument", value="\"tag\"")))
+
+// per default use component argument 'tag' (shortcut for the second)
+@NFProperties(@NFProperty(value=TagProperty.class)) 
+//@NFProperties(@NFProperty(value=TagProperty.class, parameters=@NameValue(name=TagProperty.ARGUMENT, value="\"tag\"")))
+
+// directly add 'mytag'
+//@NFProperties(@NFProperty(value=TagProperty.class, parameters=@NameValue(name=TagProperty.NAME, value="\"mytag\"")))
+
+//@NFProperties(@NFProperty(value=TagProperty.class, parameters={
+//	@NameValue(name=TagProperty.NAME, values={TagProperty.PLATFORM_NAME, TagProperty.JADEX_VERSION, "\"mytag\""}), 
+//	@NameValue(name=TagProperty.ARGUMENT, value="\"tag\"") // additionally get tags from arguments 'tag'
+//}))
 public interface ITestService
 {
 	/**

@@ -482,7 +482,7 @@ public class BDIClassReader extends MicroClassReader
 							RequiredServiceBinding binding = createBinding(reqs[j].binding());
 							List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
-								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops);
+								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops, Arrays.asList(reqs[j].tags()));
 							configinfo.setRequiredServices(rsis);
 						}
 						
