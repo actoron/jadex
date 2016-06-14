@@ -102,15 +102,15 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
 		// Drop goal when future is terminated from service caller
-		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null)
-		{
+		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
+//		{
 //			public void terminate(Exception reason, IResultListener<Void> terminate)
 //			{
 //				System.out.println("terminated call: "+fgoal);
 //				ip.dropGoal(fgoal);
 //				super.terminate(reason, terminate);
 //			}
-		});
+//		});
 		
 //		Future<Void> ret = new Future<Void>();
 		

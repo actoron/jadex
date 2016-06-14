@@ -1,6 +1,7 @@
 package jadex.platform.service.clock;
 
 import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.ChangeEvent;
 
 
@@ -85,4 +86,29 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 	{
 		return IClock.TYPE_EVENT_DRIVEN;
 	}
+
+//	//-------- For debugging --------
+//	
+//	long last	= 0;
+//	
+//	@Override
+//	public void addTimer(ITimer timer)
+//	{
+//		super.addTimer(timer);
+//		
+//		synchronized(this)
+//		{
+//			if(STATE_RUNNING.equals(state) && timers.size()>0)
+//			{
+//				Timer	t = (Timer)timers.first();
+//				long tmptime = t.getNotificationTime();
+//				
+//				if(tmptime!=last)
+//				{
+//					System.out.println("next timepoint was "+last+", is now "+tmptime);
+//					last	= tmptime;
+//				}
+//			}
+//		}
+//	}
 }

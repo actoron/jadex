@@ -101,41 +101,56 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					{
 						runningexes.put(task, this);
 					}
-					super.run();
 					
-					Future<Void> idf = null;
-					
-					synchronized(AsyncExecutionService.this)
+					try
 					{
-						synchronized(this)
+						super.run();
+					}
+					catch(RuntimeException e)
+					{
+						throw e;
+					}
+					catch(Error e)
+					{
+						throw e;
+					}
+					finally
+					{
+						Future<Void> idf = null;
+						
+						synchronized(AsyncExecutionService.this)
 						{
-							// Do not remove when a new executor has already been added for the task.
-							// isRunning() refers to running state of executor!
-							if(!this.isRunning() && executors!=null && executors.get(task)==this)	
+							synchronized(this)
 							{
-								if(executors!=null && this.getThreadCount()==0)
+								// Do not remove when a new executor has already been added for the task.
+								// isRunning() refers to running state of executor!
+								if(!this.isRunning() && executors!=null && executors.get(task)==this)	
 								{
-									executors.remove(task);
+									if(executors!=null && this.getThreadCount()==0)
+									{
+										executors.remove(task);
+									}
+									runningexes.remove(task);
+									
+									// When no more executable threads, inform idle commands.				
+									if(state==State.RUNNING && idlefuture!=null && runningexes.isEmpty())
+									{
+										idf = idlefuture;
+										idlefuture = null;
+	//									System.out.println("idle");
+									}
 								}
-								runningexes.remove(task);
-								
-								// When no more executable threads, inform idle commands.				
-								if(state==State.RUNNING && idlefuture!=null && runningexes.isEmpty())
+								else if(executors!=null && executors.get(task)!=this && runningexes.get(task)==this)
 								{
-									idf = idlefuture;
-									idlefuture = null;
+									runningexes.remove(task);								
 								}
-							}
-							else if(executors!=null && executors.get(task)!=this && runningexes.get(task)==this)
-							{
-								runningexes.remove(task);								
 							}
 						}
-					}
-					
-					if(idf!=null)
-					{
-						idf.setResult(null);
+						
+						if(idf!=null)
+						{
+							idf.setResult(null);
+						}
 					}
 				}
 

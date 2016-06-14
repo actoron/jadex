@@ -27,7 +27,7 @@ public class RemoteReferenceTest //extends TestCase
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false",
 			"-gui", "false",
-			"-logging", "true",
+//			"-logging", "true",
 			"-awareness", "false", "-printpass", "false",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
@@ -39,7 +39,7 @@ public class RemoteReferenceTest //extends TestCase
 		// Start platform2 with (remote) search service. (underscore in name assures both platforms use same password)
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-			"-logging", "true",
+//			"-logging", "true",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(timeout);
 		
 		// Connect platforms by creating proxy agents.

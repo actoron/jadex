@@ -1,5 +1,7 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.logging.Logger;
 
@@ -73,6 +75,25 @@ public class FutureFunctionality
 		}
 		return logger;
 //		return logger!=null ? logger : Logger.getAnonymousLogger();
+	}
+	
+	/**
+	 *  Log an exception.
+	 */
+	protected void	logException(Exception e, Exception userex, boolean terminable, boolean undone, boolean async)
+	{
+		if(userex!=null)
+		{
+			StringWriter	sw	= new StringWriter();
+			userex.printStackTrace(new PrintWriter(sw));
+			getLogger().severe("Exception in future functionality: "+sw);
+		}
+//		e.printStackTrace(new PrintWriter(sw));
+//		Thread.dumpStack();
+//		if(!undone && ! async)
+//		{
+//			throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+//		}
 	}
 	
 	/**
@@ -432,9 +453,16 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			Collection<Object> res = (Collection<Object>)func.setResult(result);
 			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, false, false);
+			}
 		}
 	}
 	
@@ -450,9 +478,16 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
 			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.setResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
+			}
 		}
 		
 		return ret;
@@ -470,7 +505,14 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		}
 		catch(RuntimeException e)
 		{
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, false, false);
+			}
 		}
 	}
 	
@@ -486,9 +528,16 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			Object res = func.addIntermediateResultIfUndone(result);
 			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.addIntermediateResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
+			}
 		}
 		
 		return ret;
@@ -505,9 +554,16 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			func.setFinished((Collection<Object>)getIntermediateResults());
 			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setFinished();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, false, false);
+			}
 		}
 	}
 	
@@ -523,9 +579,16 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
 			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.setFinishedIfUndone();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
+			}
 		}
 		
 		return ret;
@@ -541,9 +604,16 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			Exception ex = func.setException(exception);
 			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setException(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, exception, true, false, false);
+			}
 		}
 	}
 	
@@ -556,12 +626,19 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		
 		try
 		{
-			func.setExceptionIfUndone(exception);
-			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			Exception ex = func.setExceptionIfUndone(exception);
+			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, exception, true, true, false);
+			}
 		}
 		
 		return ret;
@@ -582,7 +659,14 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+				if(!isDone())
+				{
+					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
     }
@@ -597,12 +681,17 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			public void resultAvailable(Void v)
 			{
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.pullIntermediateResult();
-			}	
+			}
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when terminating future: "+exception);
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+				if(!isDone())
+				{
+					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -620,9 +709,15 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when terminating future: "+exception);
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(reason);
+				if(!isDone())
+				{
+					// Hack!!! maybe wrong thread
+					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(reason);
+				}
+				else
+				{
+					func.logException(exception, reason, true, false, true);
+				}
 			}
 		});
 	}
@@ -640,9 +735,14 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending backward command: "+exception);
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -660,9 +760,14 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending forward command: "+exception);
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -707,9 +812,16 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			Collection<Object> res = (Collection<Object>)func.setResult(result);
 			DelegatingPullIntermediateDelegationFuture.super.setResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, false, false);
+			}
 		}
 	}
 	
@@ -725,9 +837,16 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
 			ret = DelegatingPullIntermediateDelegationFuture.super.setResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
+			}
 		}
 		
 		return ret;
@@ -745,7 +864,14 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		}
 		catch(RuntimeException e)
 		{
-			DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, false, false);
+			}
 		}
 	}
 	
@@ -761,9 +887,16 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			Object res = func.addIntermediateResultIfUndone(result);
 			ret = DelegatingPullIntermediateDelegationFuture.super.addIntermediateResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
+			}
 		}
 		
 		return ret;
@@ -780,9 +913,16 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			func.setFinished((Collection<Object>)getIntermediateResults());
 			DelegatingPullIntermediateDelegationFuture.super.setFinished();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, false, false);
+			}
 		}
 	}
 	
@@ -798,9 +938,16 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
 			ret = DelegatingPullIntermediateDelegationFuture.super.setFinishedIfUndone();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
+			}
 		}
 		
 		return ret;
@@ -816,9 +963,16 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			Exception ex = func.setException(exception);
 			DelegatingPullIntermediateDelegationFuture.super.setException(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, exception, true, false, false);
+			}
 		}
 	}
 	
@@ -831,12 +985,19 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		
 		try
 		{
-			func.setExceptionIfUndone(exception);
-			ret = DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			Exception ex = func.setExceptionIfUndone(exception);
+			ret = DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			if(!isDone())
+			{
+				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, exception, true, true, false);
+			}
 		}
 		
 		return ret;
@@ -857,7 +1018,14 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+				if(!isDone())
+				{
+					DelegatingPullIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
     }
@@ -875,9 +1043,14 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when terminating future: "+exception);
-				DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+				if(!isDone())
+				{
+					DelegatingPullIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -895,9 +1068,15 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when terminating future: "+exception);
-				DelegatingPullIntermediateDelegationFuture.super.terminate(reason);
+				if(!isDone())
+				{
+					// Hack!!! maybe wrong thread
+					DelegatingPullIntermediateDelegationFuture.super.terminate(reason);
+				}
+				else
+				{
+					func.logException(exception, reason, true, false, true);
+				}
 			}
 		});
 	}
@@ -915,9 +1094,14 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending backward command: "+exception);
-				DelegatingPullIntermediateDelegationFuture.super.sendBackwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingPullIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -935,9 +1119,14 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending forward command: "+exception);
-				DelegatingPullIntermediateDelegationFuture.super.sendForwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingPullIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -984,13 +1173,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, null, true, false, false);
 			}
 		}
 	}
@@ -1009,9 +1198,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
 			}
 		}
 		
@@ -1030,13 +1223,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, null, true, false, false);
 			}
 		}
 	}
@@ -1055,9 +1248,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
 			}
 		}
 		
@@ -1077,13 +1274,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, null, true, false, false);
 			}
 		}
 	}
@@ -1102,9 +1299,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
 			}
 		}
 		
@@ -1123,13 +1324,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, exception, true, false, false);
 			}
 		}
 	}
@@ -1143,14 +1344,18 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		
 		try
 		{
-			func.setExceptionIfUndone(exception);
-			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			Exception ex = func.setExceptionIfUndone(exception);
+			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(ex);
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, exception, true, true, false);
 			}
 		}
 		
@@ -1172,13 +1377,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+				if(!isDone())
 				{
 					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
 				}
 				else
 				{
-					throw exception instanceof RuntimeException ? (RuntimeException) exception : new RuntimeException(exception);
+					func.logException(exception, null, true, false, true);
 				}
 			}
 		});
@@ -1197,9 +1402,15 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when terminating future: "+exception);
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
+				if(!isDone())
+				{
+					// Hack!!! maybe wrong thread
+					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
+				}
+				else
+				{
+					func.logException(exception, reason, true, false, true);
+				}
 			}
 		});
 	}
@@ -1217,9 +1428,14 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending backward command: "+exception);
-				DelegatingSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -1237,9 +1453,14 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending forward command: "+exception);
-				DelegatingSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -1287,13 +1508,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, null, true, false, false);
 			}
 		}
 	}
@@ -1312,9 +1533,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
 			}
 		}
 		
@@ -1333,13 +1558,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, null, true, false, false);
 			}
 		}
 	}
@@ -1358,9 +1583,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
 			}
 		}
 		
@@ -1379,13 +1608,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, null, true, false, false);
 			}
 		}
 	}
@@ -1404,9 +1633,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
 			}
 		}
 		
@@ -1425,13 +1658,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, exception, true, false, false);
 			}
 		}
 	}
@@ -1445,14 +1678,18 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		
 		try
 		{
-			func.setExceptionIfUndone(exception);
-			ret = DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			Exception ex = func.setExceptionIfUndone(exception);
+			ret = DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(ex);
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, exception, true, true, false);
 			}
 		}
 		
@@ -1474,13 +1711,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+				if(!isDone())
 				{
 					DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
 				}
 				else
 				{
-					throw exception instanceof RuntimeException ? (RuntimeException) exception : new RuntimeException(exception);
+					func.logException(exception, null, true, false, true);
 				}
 			}
 		});
@@ -1499,9 +1736,15 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().warning("Exception when terminating future: "+exception);
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
+				if(!isDone())
+				{
+					// Hack!!! maybe wrong thread
+					DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
+				}
+				else
+				{
+					func.logException(exception, reason, true, false, true);
+				}
 			}
 		});
 	}
@@ -1519,9 +1762,14 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending backward command: "+exception);
-				DelegatingTerminableIntermediateDelegationFuture.super.sendBackwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -1539,9 +1787,14 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending forward command: "+exception);
-				DelegatingTerminableIntermediateDelegationFuture.super.sendForwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -1584,13 +1837,13 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, null, true, false, false);
 			}
 		}
 	}
@@ -1609,9 +1862,13 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, null, true, true, false);
 			}
 		}
 		
@@ -1630,13 +1887,13 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableDelegationFuture.super.terminate(e);
 			}
 			else
 			{
-				throw e;
+				func.logException(e, exception, true, false, false);
 			}
 		}
 	}
@@ -1650,14 +1907,18 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		
 		try
 		{
-			func.setExceptionIfUndone(exception);
-			ret = DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
+			Exception ex = func.setExceptionIfUndone(exception);
+			ret = DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(ex);
 		}
 		catch(RuntimeException e)
 		{
-			if(!DelegatingTerminableDelegationFuture.super.isDone())
+			if(!isDone())
 			{
 				DelegatingTerminableDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				func.logException(e, exception, true, true, false);
 			}
 		}
 		
@@ -1678,13 +1939,13 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 
 			public void exceptionOccurred(Exception exception)
 			{
-				if(!DelegatingTerminableDelegationFuture.super.isDone())
+				if(!isDone())
 				{
 					DelegatingTerminableDelegationFuture.super.terminate(exception);
 				}
 				else
 				{
-					throw exception instanceof RuntimeException ? (RuntimeException) exception : new RuntimeException(exception);
+					func.logException(exception, null, true, false, true);
 				}
 			}
 		});
@@ -1703,9 +1964,15 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when terminating future: "+exception);
-				DelegatingTerminableDelegationFuture.super.terminate(reason);
+				if(!isDone())
+				{
+					// Hack!!! maybe wrong thread
+					DelegatingTerminableDelegationFuture.super.terminate(reason);
+				}
+				else
+				{
+					func.logException(exception, reason, true, false, true);
+				}
 			}
 		});
 	}
@@ -1723,9 +1990,14 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending backward command: "+exception);
-				DelegatingTerminableDelegationFuture.super.sendBackwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingTerminableDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -1743,9 +2015,14 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending forward command: "+exception);
-				DelegatingTerminableDelegationFuture.super.sendForwardCommand(info);
+				if(!isDone())
+				{
+					DelegatingTerminableDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					func.logException(exception, null, true, false, true);
+				}
 			}
 		});
 	}
@@ -1777,9 +2054,9 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			Collection<Object> res = (Collection<Object>)func.setResult(result);
 			DelegatingIntermediateFuture.super.setResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
 	}
 	
@@ -1795,9 +2072,9 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
 			ret = DelegatingIntermediateFuture.super.setResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, true, false);
 		}
 		
 		return ret;
@@ -1814,9 +2091,9 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			Object res = func.addIntermediateResult(result);
 			DelegatingIntermediateFuture.super.addIntermediateResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
 	}
 	
@@ -1832,9 +2109,9 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			Object res = func.addIntermediateResultIfUndone(result);
 			ret = DelegatingIntermediateFuture.super.addIntermediateResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, true, false);
 		}
 		
 		return ret;
@@ -1851,9 +2128,9 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			func.setFinished((Collection<Object>)getIntermediateResults());
 			DelegatingIntermediateFuture.super.setFinished();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
 	}
 	
@@ -1869,9 +2146,9 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
 			ret = DelegatingIntermediateFuture.super.setFinishedIfUndone();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, true, false);
 		}
 		
 		return ret;
@@ -1887,9 +2164,9 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			Exception ex = func.setException(exception);
 			DelegatingIntermediateFuture.super.setException(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
+			func.logException(e, exception, true, false, false);
 		}
 	}
 	
@@ -1902,12 +2179,12 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		
 		try
 		{
-			func.setExceptionIfUndone(exception);
-			ret = DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
+			Exception ex = func.setExceptionIfUndone(exception);
+			ret = DelegatingIntermediateFuture.super.setExceptionIfUndone(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
+			func.logException(e, exception, true, true, false);
 		}
 		
 		return ret;
@@ -1964,9 +2241,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when starting scheduled notifications: "+exception);
-				DelegatingIntermediateFuture.super.startScheduledNotifications();
+				func.logException(exception, null, true, false, true);
 			}
 		});
     }
@@ -1984,9 +2259,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending forward command: "+exception);
-				DelegatingIntermediateFuture.super.sendForwardCommand(info);
+				func.logException(exception, null, true, false, true);
 			}
 		});
 	}
@@ -2013,17 +2286,14 @@ class DelegatingFuture extends Future<Object>
 	 */
 	public void	setResult(final Object result)
 	{
-//	   	if(result!=null && result.getClass().getName().indexOf("Log")!=-1)
-//    		System.out.println("ggg");
-
 		try
 		{
 			Object res = func.setResult(result);
 			DelegatingFuture.super.setResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
 	}
 	
@@ -2039,9 +2309,9 @@ class DelegatingFuture extends Future<Object>
 			Object res = func.setResultIfUndone(result);
 			ret = DelegatingFuture.super.setResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, true, false);
 		}
 		
 		return ret;
@@ -2057,9 +2327,9 @@ class DelegatingFuture extends Future<Object>
 			Exception ex = func.setException(exception);
 			DelegatingFuture.super.setException(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingFuture.super.setExceptionIfUndone(e);
+			func.logException(e, exception, true, false, false);
 		}
 	}
 	
@@ -2072,12 +2342,12 @@ class DelegatingFuture extends Future<Object>
 		
 		try
 		{
-			func.setExceptionIfUndone(exception);
-			ret = DelegatingFuture.super.setExceptionIfUndone(exception);
+			Exception ex = func.setExceptionIfUndone(exception);
+			ret = DelegatingFuture.super.setExceptionIfUndone(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingFuture.super.setExceptionIfUndone(e);
+			func.logException(e, exception, true, true, false);
 		}
 		
 		return ret;
@@ -2097,10 +2367,7 @@ class DelegatingFuture extends Future<Object>
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! functionality failed -> should change result of future to failure?
-//				System.out.println("Exception when notifying: "+exception+" "+listener);
-				func.getLogger().warning("Exception when notifying: "+exception);
-				DelegatingFuture.super.notifyListener(listener);
+				func.logException(exception, null, true, false, true);
 			}
 		});
 	}
@@ -2118,9 +2385,7 @@ class DelegatingFuture extends Future<Object>
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending forward command: "+exception);
-				DelegatingFuture.super.sendForwardCommand(info);
+				func.logException(exception, null, true, false, true);
 			}
 		});
 	}
@@ -2163,9 +2428,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			Object res = func.setFirstResult(result);
 			DelegatingTupleFuture.super.setFirstResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
     }
     
@@ -2181,9 +2446,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			Object res = func.setSecondResult(result);
 			DelegatingTupleFuture.super.setSecondResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
     }
 	
@@ -2197,9 +2462,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			Collection<TupleResult> res = (Collection<TupleResult>)func.setResult(result);
 			DelegatingTupleFuture.super.setResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
 	}
 	
@@ -2215,9 +2480,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			Collection<TupleResult> res = (Collection<TupleResult>)func.setResultIfUndone(result);
 			ret = DelegatingTupleFuture.super.setResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, true, false);
 		}
 		
 		return ret;
@@ -2235,7 +2500,7 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		}
 		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
 	}
 	
@@ -2251,9 +2516,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			TupleResult res = (TupleResult)func.addIntermediateResultIfUndone(result);
 			ret = DelegatingTupleFuture.super.addIntermediateResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, true, false);
 		}
 		
 		return ret;
@@ -2271,9 +2536,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			func.setFinished((Collection<Object>)col);
 			DelegatingTupleFuture.super.setFinished();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, false, false);
 		}
 	}
 	
@@ -2290,9 +2555,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			func.setFinishedIfUndone((Collection<Object>)col);
 			ret = DelegatingTupleFuture.super.setFinishedIfUndone();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, null, true, true, false);
 		}
 		
 		return ret;
@@ -2308,9 +2573,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			Exception ex = func.setException(exception);
 			DelegatingTupleFuture.super.setException(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, exception, true, false, false);
 		}
 	}
 	
@@ -2323,12 +2588,12 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		
 		try
 		{
-			func.setExceptionIfUndone(exception);
-			ret = DelegatingTupleFuture.super.setExceptionIfUndone(exception);
+			Exception ex = func.setExceptionIfUndone(exception);
+			ret = DelegatingTupleFuture.super.setExceptionIfUndone(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTupleFuture.super.setExceptionIfUndone(e);
+			func.logException(e, exception, true, true, false);
 		}
 		
 		return ret;
@@ -2349,7 +2614,7 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingTupleFuture.super.setExceptionIfUndone(exception);
+				func.logException(exception, null, true, false, true);
 			}
 		});
     }
@@ -2367,9 +2632,7 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when sending forward command: "+exception);
-				DelegatingTupleFuture.super.sendForwardCommand(info);
+				func.logException(exception, null, true, false, true);
 			}
 		});
 	}

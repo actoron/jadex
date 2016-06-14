@@ -215,7 +215,22 @@ public class ClockService extends BasicService implements IClockService, IProper
 				to.timeEventOccurred(System.currentTimeMillis());
 			}
 		};
-		timer.schedule(tt, time);
+//		try
+//		{
+			timer.schedule(tt, time);
+//		}
+//		catch(IllegalStateException e)
+//		{
+//			throw new IllegalStateException(e.getMessage())
+//			{
+//				@Override
+//				public void printStackTrace()
+//				{
+//					Thread.dumpStack();
+//					super.printStackTrace();
+//				}
+//			};
+//		}
 		return tt;
 	}
 	

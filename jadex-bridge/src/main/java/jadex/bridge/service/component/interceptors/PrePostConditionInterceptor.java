@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -87,7 +89,18 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 		}
 		else
 		{
-			ret.setException(ex);
+			if(SReflect.isSupertype(IFuture.class, context.getMethod().getReturnType()))
+			{
+				Future<?>	fut	= SFuture.getFuture(context.getMethod().getReturnType(), true, (IInternalAccess)null);
+				fut.setException(ex);
+				context.setResult(fut);
+				ret.setResult(null);
+			}
+			else
+			{
+				// Synchronous method -> have to throw exception!?
+				throw ex instanceof RuntimeException ? (RuntimeException)ex : new RuntimeException(ex);
+			}
 		}
 		
 		return ret;

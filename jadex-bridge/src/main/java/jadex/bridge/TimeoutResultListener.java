@@ -288,9 +288,9 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 										}
 									}
 								}
-								catch(Exception e)
+								catch(IllegalStateException e)
 								{
-									e.printStackTrace();
+//									e.printStackTrace();
 									// todo: should not happen
 									// causes null pointer exception on clock when clock is uninitialized
 								}

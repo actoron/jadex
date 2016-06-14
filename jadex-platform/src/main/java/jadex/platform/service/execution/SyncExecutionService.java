@@ -216,7 +216,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 //											System.out.println("Executing task: "+task);
 										again = task.execute();
 									}
-									catch(Exception e)
+									catch(Throwable e)
 									{
 										System.out.println("Exception during executing task: "+task);
 										e.printStackTrace();
