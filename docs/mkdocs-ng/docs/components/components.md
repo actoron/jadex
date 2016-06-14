@@ -79,7 +79,7 @@ System.out.println("Started component: " + cid);
 
 <x-hint title="Future types">
 Notice how you get a different Future object this time?
-A ```Tuple2Future``` represents a promise that two different results are going to be available. In this case, the first is the ```ComponentIdentifier```, which is used to identify the instantiated component. The second result is a Map that can be filled by the component (TODO: correct?) and is only returned upon termination of the component. Take a look at [Futures](../futures/futures) for different future types.
+A ```Tuple2Future``` represents a promise that two different results are going to be available. In this case, the first is the ```ComponentIdentifier```, which is used to identify the instantiated component. The second result is a Map that can be filled by the component (TODO: correct?) and is only returned upon termination of the component. Take a look at [Futures](../futures/futures/#future-types) for different future types.
 </x-hint>
 
 Now that you know how to start your own components, you can read more about [Services](../services/services), as they provide a way for components to interact with each other.
