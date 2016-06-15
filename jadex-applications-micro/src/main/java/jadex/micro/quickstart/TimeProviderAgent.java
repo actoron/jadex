@@ -148,6 +148,7 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 					// freegeoip sometimes has connection timeouts :-(
 					System.err.println("Cannot determine location: "+e);
 				}
+				fut.setResult(ret);
 			}
 		}).start();
 
