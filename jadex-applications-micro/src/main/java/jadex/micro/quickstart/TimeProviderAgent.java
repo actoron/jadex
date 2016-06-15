@@ -7,10 +7,13 @@ import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -120,28 +123,42 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 	 */
 	protected static String	determineLocation()
 	{
-		String	ret	= "unknown";
+		final Future<String>	fut	= new Future<String>();
+		new Thread(new Runnable()
+		{
+			public void run()
+			{
+				String	ret	= "unknown";
+				try
+				{
+					// Get geo location, e.g.
+					// 134.100.11.200,DE,Germany,HH,Hamburg,Hamburg,22767,Europe/Berlin,53.55,10.00,0
+					Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv/").openStream(), "UTF-8");
+					scanner.findInLine("([^,]*),");
+					scanner.findInLine("([^,]*),");
+					scanner.findInLine("([^,]*),");
+					ret	= scanner.match().group(1);	// Country
+					scanner.findInLine("([^,]*),");
+					scanner.findInLine("([^,]*),");
+					ret	= scanner.match().group(1) + ", " + ret;	// City
+					scanner.close();
+				}
+				catch(Exception e)
+				{
+					// freegeoip sometimes has connection timeouts :-(
+					System.err.println("Cannot determine location: "+e);
+				}
+			}
+		}).start();
+
 		try
 		{
-			// Get geo location, e.g.
-			// 134.100.11.200,DE,Germany,HH,Hamburg,Hamburg,22767,Europe/Berlin,53.55,10.00,0
-			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv/").openStream(), "UTF-8");
-			scanner.findInLine("([^,]*),");
-			scanner.findInLine("([^,]*),");
-			scanner.findInLine("([^,]*),");
-			ret	= scanner.match().group(1);	// Country
-			scanner.findInLine("([^,]*),");
-			scanner.findInLine("([^,]*),");
-			ret	= scanner.match().group(1) + ", " + ret;	// City
-			scanner.close();
+			return fut.get(Starter.getScaledRemoteDefaultTimeout(IComponentIdentifier.LOCAL.get(), 0.8));
 		}
-		catch(Exception e)
+		catch(TimeoutException e)
 		{
-			// freegeoip sometimes has connection timeouts :-(
-			System.err.println("Cannot determine location: "+e);
+			return "unknown";
 		}
-		
-		return ret;
 	}
 	
 	public static void main(String[] args) throws Exception
