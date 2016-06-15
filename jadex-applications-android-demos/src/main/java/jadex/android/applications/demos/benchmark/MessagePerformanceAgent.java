@@ -25,7 +25,7 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.NameValue;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
