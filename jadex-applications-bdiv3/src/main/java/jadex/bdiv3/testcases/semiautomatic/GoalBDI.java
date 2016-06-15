@@ -10,9 +10,9 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.NameValue;
 import jadex.rules.eca.annotations.Event;
 
 /**

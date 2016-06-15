@@ -23,4 +23,9 @@ public @interface NFProperty
 	 *  The type of the property.
 	 */
 	public Class<? extends INFProperty> value();
+	
+	/**
+	 *  The init parameter values.
+	 */
+	public NameValue[] parameters() default {};
 }

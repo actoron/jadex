@@ -3,6 +3,7 @@ package jadex.bridge.service.search;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -16,10 +17,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
 import jadex.bridge.nonfunctional.search.IServiceRanker;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener2;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -30,6 +33,9 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
@@ -985,13 +991,73 @@ public class SServiceProvider
 		return (IIntermediateFuture<IService>)provider.scheduleStep(new ImmediateComponentStep<Collection<IService>>()
 		{
 			@Classname("getDeclaredServices(IExternalAccess provider)")
-			public IFuture<Collection<IService>> execute(IInternalAccess ia)
+			public IIntermediateFuture<IService> execute(IInternalAccess ia)
 			{
 				return getDeclaredServices(ia, false);
 			}
 		});
 	}
 
+	/**
+	 *  Get a service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> IFuture<T> getTaggedService(IExternalAccess provider, final Class<T> type, final String scope, final String... tags)
+	{
+		return (IFuture<T>)provider.scheduleStep(new ImmediateComponentStep<T>()
+		{
+			@Classname("getService(IExternalAccess provider, final Class<T> type, final String scope, final String... args)")
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return getTaggedService(ia, type, scope, tags);
+			}
+		});
+	}
+	
+	/**
+	 *  Find service by type and tags. Service must have all the tags.
+	 *  @param component The component.
+	 *  @param type The service type.
+	 *  @param scope The search scope.
+	 *  @param tags The tags.
+	 *  @return A matching service
+	 */
+	public static <T> IFuture<T> getTaggedService(final IInternalAccess component, Class<T> type, String scope, final String... tags)
+	{
+		return getService(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+	}
+	
+	/**
+	 *  Get all services of a type and tags. Services must have all the tags.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(IExternalAccess component, final Class<T> type, final String scope, final String... tags)
+	{
+		return (ITerminableIntermediateFuture<T>)component.scheduleStep(new ImmediateComponentStep<Collection<T>>()
+		{
+			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final String... args)")
+			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
+			{
+				return getTaggedServices(ia, type, scope, tags);
+			}
+		});
+	}
+	
+	/**
+	 *  Find services by type and tags. Service must have all the tags.
+	 *  @param component The component.
+	 *  @param type The service type.
+	 *  @param scope The search scope.
+	 *  @param tags The tags.
+	 *  @return A matching service
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(final IInternalAccess component, Class<T> type, String scope, final String... tags)
+	{
+		return getServices(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+	}
+	
 	//-------- other methods --------
 	
 	/**
@@ -1014,7 +1080,8 @@ public class SServiceProvider
 		TerminableIntermediateDelegationFuture<Tuple2<S, Double>> ret = new TerminableIntermediateDelegationFuture<Tuple2<S, Double>>();
 		searchfut.addResultListener(new ServiceRankingDelegationResultListener2<S>(ret, searchfut, ranker, decider));
 		return ret;
-	}
+	}	
+	
 	
 	// todo: remove these methods, move to marshal service
 	
@@ -1127,7 +1194,7 @@ public class SServiceProvider
 	}
 	
 	/**
-	 * 
+	 *  Proxy result listener class.
 	 */
 	public static class ProxyResultListener<T> extends DelegationResultListener<T>
 	{
@@ -1148,7 +1215,7 @@ public class SServiceProvider
 	}
 	
 	/**
-	 * 
+	 *  Proxy result listener.
 	 */
 	public static class IntermediateProxyResultListener<T> extends IntermediateDelegationResultListener<T>
 	{
@@ -1235,7 +1302,6 @@ public class SServiceProvider
 		}
 		return ret;
 	}
-	
 }
 
 

@@ -174,6 +174,9 @@ private IRequiredServiceFeature reqFeat;
 Note that the name specified must match the required service declaration.
 By using the ```IProvidedServiceFeature```, you can also get access to services *provided* by your component.
 
+## The IService interface
+TODO
+
 # Accessing the Component
 
 Sometimes it is necessary to access component features, the InternalAccess or even the component's POJO object itself from inside the service.
@@ -209,9 +212,10 @@ This section discusses some of the more advanced topics regarding services.
 The most important annotations were already discussed. The following is an uncomplete list of other potentially useful annotations. 
 For a full reference, have a look at the [jadex.bridge.service.annotation](${URLJavaDoc}/jadex/bridge/service/annotation/package-summary.html) package.
 
-TODO:
-@ServiceIdentifier
-@Excluded
+|Annotation|Description|
+|----------|-----------|
+|**@ServiceIdentifier**| Can be used on fields to inject the [ServiceIdentifier](${URLJavaDoc}/jadex/bridge/service/annotation)|
+|**@Excluded**| Can be used on methods or classes that should not be available from remote. Will throw an UnsupportedOperationException when called.|
 
 ## Accessing non-declared Services
 
@@ -234,8 +238,23 @@ If you want to avoid calling other platforms during search and only want to look
 
 ## Embedding services
 You can also embed the service logic directly in your component, which might be a better choice in some cases.
+To do so, just add the ```@Service``` Annotation to your component class and let it implement the service interface:
+ 
+```java
+@Agent
+@Service
+@ProvidedServices({
+	@ProvidedService(type=ISumService.class)
+})
+public class SumAgent implements ISumService {...
+```
 
-TODO: how?
+Using ```@Agent(autoprovide=true)```, you can also leave out the ```@ProvidedServices``` Declaration:
+```java
+@Agent(autoprovide=true)
+@Service
+public class SumAgent implements ISumService {...
+```
 
 ## Auto-Instantiation of Required Services
 ** @CreationInfo **  

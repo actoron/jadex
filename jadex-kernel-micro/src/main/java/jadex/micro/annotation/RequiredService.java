@@ -23,6 +23,11 @@ public @interface RequiredService
 	 *  The service interface type. 
 	 */
 	public Class<?> type();
+	
+	/** 
+	 *  The service tags to search for. 
+	 */
+	public String[] tags() default {};
 
 	/** 
 	 *  Flag if multiple services should be returned. 

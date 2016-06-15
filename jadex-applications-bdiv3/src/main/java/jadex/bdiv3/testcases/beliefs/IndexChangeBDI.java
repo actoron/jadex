@@ -13,9 +13,9 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 

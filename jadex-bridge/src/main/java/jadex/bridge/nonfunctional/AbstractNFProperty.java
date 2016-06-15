@@ -4,14 +4,21 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
+import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.IService;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  A non-functional property.
@@ -78,7 +85,7 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 			for(NFProperty nfprop : nfprops)
 			{
 				Class<?> clazz = nfprop.value();
-				INFProperty<?, ?> prop = createProperty(clazz, comp, ser, mi);
+				INFProperty<?, ?> prop = createProperty(clazz, comp, ser, mi, SNameValue.createUnparsedExpressionsList(nfprop.parameters()));
 				
 				if(ret==null)
 					ret = new ArrayList<INFProperty<?,?>>();
@@ -92,7 +99,7 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 	/**
 	 *  Create a property instance from its type.
 	 */
-	public static INFProperty<?, ?> createProperty(Class<?> clazz, IInternalAccess comp, IService service, MethodInfo mi)
+	public static INFProperty<?, ?> createProperty(Class<?> clazz, IInternalAccess comp, IService service, MethodInfo mi, List<UnparsedExpression> params)
 	{
 		INFProperty<?, ?> prop = null;
 		try
@@ -116,7 +123,31 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 				}
 				catch(NoSuchMethodException ex2)
 				{
-					throw new RuntimeException("No suitable constructor: "+clazz, e);
+					try
+					{
+						Constructor<?> con = clazz.getConstructor(new Class[]{IInternalAccess.class, IService.class, MethodInfo.class, Map.class});
+						
+						Map<String, Object> ps = null;
+						if(params!=null && params.size()>0)
+						{
+							ps = new HashMap<String, Object>();
+							for(UnparsedExpression entry: params)
+							{
+								Object val = SJavaParser.evaluateExpression(entry.getValue(), comp.getModel().getAllImports(), comp.getFetcher(), comp.getClassLoader());
+								ps.put(entry.getName(), val);
+							}
+						}
+						
+						prop = (INFProperty<?, ?>)con.newInstance(comp, service, mi, ps);
+					}
+					catch(NoSuchMethodException ex3)
+					{
+						throw new RuntimeException("No suitable constructor: "+clazz, ex3);
+					}
+					catch(Exception eee)
+					{
+						throw new RuntimeException("Property creation exception: "+clazz, eee);
+					}
 				}
 				catch(Exception eee)
 				{

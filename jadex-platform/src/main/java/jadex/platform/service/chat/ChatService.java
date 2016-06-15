@@ -483,7 +483,8 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IIntermediateFuture<IChatService> message(final String text, final IComponentIdentifier[] receivers, boolean self)
 	{
-		final IntermediateFuture<IChatService>	ret	= new IntermediateFuture<IChatService>();
+		final IntermediateFuture<IChatService>	ret = (IntermediateFuture<IChatService>)SFuture.getNoTimeoutFuture(IntermediateFuture.class, agent);
+//		final IntermediateFuture<IChatService>	ret	= new IntermediateFuture<IChatService>();
 		
 		if(receivers!=null && receivers.length>0)
 		{

@@ -2,6 +2,7 @@ package jadex.platform.sensor.system;
 
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.sensor.cpu.CPULoadProperty;
 import jadex.bridge.sensor.cpu.CoreNumberProperty;
 import jadex.bridge.sensor.mac.MacAddressProperty;
@@ -12,7 +13,6 @@ import jadex.bridge.sensor.memory.UsedMemoryProperty;
 import jadex.bridge.sensor.memory.UsedPermGenMemoryProperty;
 import jadex.bridge.sensor.time.ComponentUptimeProperty;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 
 /**

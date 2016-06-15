@@ -21,6 +21,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -28,7 +29,9 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.TagFilter;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
@@ -91,12 +94,26 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required service.
 	 */
-	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind, final IAsyncFilter<T> filter)
+	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind, IAsyncFilter<T> filter)
 	{
 //		System.out.println("searching: "+info.getName());
 		
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
+		
+		if(info.getTags()!=null && info.getTags().size()>0)
+		{
+			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
+			if(filter==null)
+			{
+				filter = tf;
+			}
+			else
+			{
+				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
+			}
+		}
+		final IAsyncFilter<T> ffilter = filter;
 		
 //		System.out.println(info.getType().getTypeName().toString());
 //		if(info.getType().getTypeName().indexOf("IDis")!=-1)
@@ -124,7 +141,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
-								IFuture<T> fut = SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, filter);
+								IFuture<T> fut = SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
 								fut.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding));
 							}
 //							public void exceptionOccurred(Exception exception)
@@ -144,7 +161,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								if(coll!=null && coll.size()>0)
 								{
 									IExternalAccess ea = coll.iterator().next();
-									SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, filter)
+									SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
 										.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding));
 								}
 								else
@@ -157,7 +174,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					else
 					{
 						// Search service using search specification.
-						SServiceProvider.getService(ia, type, binding.getScope(), filter, false)
+						SServiceProvider.getService(ia, type, binding.getScope(), ffilter, false)
 							.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding)
 						{
 //							public void customResultAvailable(Object result)
@@ -177,7 +194,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								{
 									public void customResultAvailable(IExternalAccess ea)
 									{
-										SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, filter)
+										SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
 											.addResultListener(new StoreDelegationResultListener<T>(ret, provider, info, binding));
 									}
 								});
@@ -205,10 +222,24 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 *  todo: should also create component(s) when no service could be found
 	 */
 	public <T> ITerminableIntermediateFuture<T> getServices(final RequiredServiceInfo info, 
-		final RequiredServiceBinding bd, boolean rebind, final IAsyncFilter<T> filter)
+		final RequiredServiceBinding bd, boolean rebind, IAsyncFilter<T> filter)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
+		
+		if(info.getTags()!=null && info.getTags().size()>0)
+		{
+			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
+			if(filter==null)
+			{
+				filter = tf;
+			}
+			else
+			{
+				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
+			}
+		}
+		final IAsyncFilter<T> ffilter = filter;
 		
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
@@ -235,7 +266,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
-								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, filter);
+								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
 //								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL);
 								fut.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, ia, info, binding));
 							}
@@ -282,7 +313,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 												final IExternalAccess ea = it.next();
 //												final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
 	
-												SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, filter)
+												SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
 													.addResultListener(new IResultListener<T>()
 												{
 													public void resultAvailable(final T result)
@@ -321,7 +352,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					else
 					{
 						// Search service using search specification.
-						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), filter, false);
+						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), ffilter, false);
 						ifut.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, ia, info, binding)
 						{
 							public void exceptionOccurred(Exception exception)
@@ -331,7 +362,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 									public void customResultAvailable(IExternalAccess ea)
 									{
 //										SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
-										SServiceProvider.getServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, filter)
+										SServiceProvider.getServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
 											.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, provider, info, binding));
 									}
 									
@@ -890,7 +921,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										{
 											MethodInfo mi = nfprop.getMethodInfo();
 											Class<?> clazz = nfprop.getClazz().getType(ia.getClassLoader(), ia.getModel().getAllImports());
-											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo());
+											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo(), nfprop.getParameters());
 											if(mi==null)
 											{
 												nfpp.addNFProperty(nfp);

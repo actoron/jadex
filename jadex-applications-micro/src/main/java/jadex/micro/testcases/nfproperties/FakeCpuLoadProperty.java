@@ -6,7 +6,6 @@ import jadex.bridge.nonfunctional.SimpleValueNFProperty;
 
 /**
  *  Property simulating a random amount of CPU load.
- *
  */
 public class FakeCpuLoadProperty extends SimpleValueNFProperty<Double, Void>
 {

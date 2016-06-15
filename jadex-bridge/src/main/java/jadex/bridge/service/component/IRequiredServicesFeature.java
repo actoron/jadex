@@ -65,12 +65,16 @@ public interface IRequiredServicesFeature
 	
 	/**
 	 *  Get a required service.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
 	 *  @return The service.
 	 */
 	public <T> IFuture<T> getRequiredService(String name, boolean rebind);
 	
 	/**
 	 *  Get a required services.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
 	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind);
@@ -103,15 +107,39 @@ public interface IRequiredServicesFeature
 	
 	/**
 	 *  Get a required service.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
+	 *  @param tags The async filter.
 	 *  @return The service.
 	 */
 	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter);
 	
 	/**
 	 *  Get a required services.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
+	 *  @param tags The async filter.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
 	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter);
+	
+	/**
+	 *  Get a required service using tags.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
+	 *  @param tags The service tags.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind, String... tags);
+	
+	/**
+	 *  Get a required services using tags.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
+	 *  @param tags The service tags.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, String... tags);
 	
 	/**
 	 *  Get the result of the last search.

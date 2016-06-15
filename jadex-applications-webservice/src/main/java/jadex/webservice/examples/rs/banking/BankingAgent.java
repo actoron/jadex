@@ -1,10 +1,10 @@
 package jadex.webservice.examples.rs.banking;
 
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;

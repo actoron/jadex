@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -97,6 +98,30 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter)
 	{
 		return delegate.getRequiredServices(rename(name), rebind, filter);
+	}
+	
+	/**
+	 *  Get a required service using tags.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
+	 *  @param tags The service tags.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind, String... tags)
+	{
+		return delegate.getRequiredService(name, rebind, tags);
+	}
+	
+	/**
+	 *  Get a required services using tags.
+	 *  @param name The required service name.
+	 *  @param rebind If false caches results.
+	 *  @param tags The service tags.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, String... tags)
+	{
+		return delegate.getRequiredServices(name, rebind, tags);
 	}
 	
 	/**

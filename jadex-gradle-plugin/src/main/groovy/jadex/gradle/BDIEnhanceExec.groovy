@@ -6,8 +6,9 @@ import jadex.bdiv3.KernelBDIV3Agent
 import jadex.bdiv3.MavenBDIModelLoader
 import jadex.bdiv3.model.BDIModel
 import jadex.bridge.ResourceIdentifier
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.maven.ResourceUtils
-import jadex.micro.annotation.NameValue
+
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.IOFileFilter
 import org.apache.commons.io.filefilter.TrueFileFilter

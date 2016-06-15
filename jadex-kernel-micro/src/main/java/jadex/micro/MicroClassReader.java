@@ -43,6 +43,8 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
+import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
@@ -88,7 +90,6 @@ import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
-import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Parent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -440,7 +441,8 @@ public class MicroClassReader
 				
 				for(NFProperty prop: val.value())
 				{
-					nfps.add(new NFPropertyInfo(prop.name(), new ClassInfo(prop.value().getName())));
+					NameValue[] vals = prop.parameters();
+					nfps.add(new NFPropertyInfo(prop.name(), new ClassInfo(prop.value().getName()), SNameValue.createUnparsedExpressionsList(vals)));
 				}
 				
 				// todo!
@@ -532,7 +534,7 @@ public class MicroClassReader
 					}
 					
 					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
-						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding, nfprops);
+						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding, nfprops,  Arrays.asList(vals[i].tags()));
 					if(rsers.containsKey(vals[i].name()))
 					{
 						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
@@ -576,12 +578,12 @@ public class MicroClassReader
 					ProvidedServiceImplementation impl = createImplementation(im);
 					Publish p = vals[i].publish();
 					NameValue[] props = p.properties();
-					UnparsedExpression[] exps = createUnparsedExpressions(props);
+					UnparsedExpression[] exps = SNameValue.createUnparsedExpressions(props);
 					
 					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
 					
 					props = vals[i].properties();
-					List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(createUnparsedExpressions(props))) : null;
+					List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
 					
 					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? 
 						vals[i].name(): null, vals[i].type(), impl, vals[i].scope(), pi, serprops);
@@ -763,10 +765,10 @@ public class MicroClassReader
 									im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 								Publish p = provs[j].publish();
 								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
-									p.mapping(), createUnparsedExpressions(p.properties()));
+									p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
 								
 								NameValue[] props = provs[j].properties();
-								List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(createUnparsedExpressions(props))) : null;
+								List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
 								
 								ProvidedServiceInfo psi = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl,  provs[j].scope(), pi, serprops);
 		//						configinfo.setProvidedServices(psis);
@@ -783,7 +785,7 @@ public class MicroClassReader
 								RequiredServiceBinding binding = createBinding(reqs[j].binding());
 								List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
-									Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops);
+									Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops, Arrays.asList(reqs[j].tags()));
 		//						configinfo.setRequiredServices(rsis);
 								configinfo.addRequiredService(rsi);
 							}
@@ -1604,7 +1606,7 @@ public class MicroClassReader
 		NameValue[] args = comp.arguments();
 		if(args.length>0)
 		{
-			UnparsedExpression[] exps = createUnparsedExpressions(args);
+			UnparsedExpression[] exps = SNameValue.createUnparsedExpressions(args);
 			ret.setArguments(exps);
 		}
 		
@@ -1649,7 +1651,7 @@ public class MicroClassReader
 		NameValue[] args = comp.arguments();
 		if(args.length>0)
 		{
-			UnparsedExpression[] exps = createUnparsedExpressions(args);
+			UnparsedExpression[] exps = SNameValue.createUnparsedExpressions(args);
 			ret.setArguments(exps);
 		}
 		
@@ -1672,46 +1674,6 @@ public class MicroClassReader
 		}
 		return ret;
 	}
-	
-	/**
-	 *  Create unparsed expressions.
-	 */
-	protected UnparsedExpression[] createUnparsedExpressions(NameValue[] values)
-	{
-		UnparsedExpression[] ret = null;
-		if(values.length>0)
-		{
-			ret = new UnparsedExpression[values.length];
-			for(int i=0; i<values.length; i++)
-			{
-				String val = values[i].value();
-				String clname = values[i].clazz().getName();
-				ret[i] = new UnparsedExpression(values[i].name(), clname, (val==null || val.length()==0) && clname!=null? clname+".class": val, null);
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Create unparsed expressions.
-	 */
-	protected List<UnparsedExpression> createUnparsedExpressionsList(NameValue[] values)
-	{
-		List<UnparsedExpression>  ret = null;
-		if(values.length>0)
-		{
-			ret = new ArrayList<UnparsedExpression>();
-			for(int i=0; i<values.length; i++)
-			{
-				String val = values[i].value();
-				String clname = values[i].clazz().getName();
-				String v = (val==null || val.length()==0) && clname!=null? clname+".class": val;
-				ret.add(new UnparsedExpression(values[i].name(), (String)null, v, null));
-			}
-		}
-		return ret;
-	}
-	
 	
 	/**
 	 * Get the mirco agent class.

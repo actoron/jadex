@@ -1861,12 +1861,12 @@ public class BpmnXMLReader
 								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 								if(binding==null)
 									throw new RuntimeException("Unknown binding: "+bindingname);
-								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, new ClassInfo(mtypename), binding, null);
+								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, new ClassInfo(mtypename), binding, null, null);
 							}
 							else
 							{
 //								rsi = new RequiredServiceInfo(name, type);
-								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), false, new ClassInfo(mtypename), new RequiredServiceBinding(name, RequiredServiceInfo.SCOPE_APPLICATION), null);
+								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), false, new ClassInfo(mtypename), new RequiredServiceBinding(name, RequiredServiceInfo.SCOPE_APPLICATION), null, null);
 								rsi.setMultiple(multiple);
 							}
 							mi.addRequiredService(rsi);
@@ -1889,12 +1889,12 @@ public class BpmnXMLReader
 											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 											if(binding==null)
 												throw new RuntimeException("Unknown binding: "+bindingname);
-											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, new ClassInfo(mtypename), binding, null);
+											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, new ClassInfo(mtypename), binding, null, null);
 										}
 										else
 										{
 //											rsi = new RequiredServiceInfo(name, new ClassInfo(typename));
-											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), false, new ClassInfo(mtypename), new RequiredServiceBinding(name, RequiredServiceInfo.SCOPE_APPLICATION), null);
+											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), false, new ClassInfo(mtypename), new RequiredServiceBinding(name, RequiredServiceInfo.SCOPE_APPLICATION), null, null);
 											rsi.setMultiple(multiple);
 										}
 										ci.addRequiredService(rsi);
