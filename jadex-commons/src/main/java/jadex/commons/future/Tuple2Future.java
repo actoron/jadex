@@ -41,6 +41,18 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
 	}
 	
 	/**
+	 *  @deprecated - From 3.0. Use method without suspendable. 
+	 *  Will NOT use the suspendable that is supplied as parameter.
+     *  Get the first result.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getFirstResult(ThreadSuspendable sus)
+    {
+    	return (E)getXResult(0);
+    }
+	
+	/**
      *  Get the first result.
      *  @return	The next intermediate result.
      *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 

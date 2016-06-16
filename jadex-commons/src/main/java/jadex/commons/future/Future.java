@@ -166,6 +166,18 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	}
 	
 	/**
+	 *  @deprecated - From 3.0. Use the version without suspendable.
+	 *  Will NOT use the suspendable given as parameter.
+	 *  
+	 *  Get the result - blocking call.
+	 *  @return The future result.
+	 */
+	public E get(ThreadSuspendable sus)
+	{
+		return get(NONE); 
+	}
+	
+	/**
 	 *  Get the result - blocking call.
 	 *  @return The future result.
 	 */
@@ -190,7 +202,8 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	boolean suspend = false;
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
 
-		if(caller==null ) {
+		if(caller==null) 
+		{
 			caller = new ThreadSuspendable();
 		}
 

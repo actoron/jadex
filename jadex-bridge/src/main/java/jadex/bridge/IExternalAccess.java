@@ -52,11 +52,19 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 //	 */
 //	public IFuture<ITransportComponentIdentifier> getTransportComponentIdentifier();
 	
-//	/**
-//	 *  Get the service provider.
-//	 *  @return The service provider.
-//	 */
-//	public IServiceProvider getServiceProvider();
+	/**
+	 *  @deprecated From version 3.0 - replaced with external access.
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IExternalAccess getServiceProvider();
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with external access.
+	 *  Get the service container.
+	 *  @return The service container.
+	 */
+	public IExternalAccess getServiceContainer();
 	
 	/**
 	 *  Schedule a step of the component.

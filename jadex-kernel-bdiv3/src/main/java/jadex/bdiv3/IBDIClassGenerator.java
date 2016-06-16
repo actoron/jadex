@@ -5,7 +5,7 @@ import java.util.List;
 import jadex.bdiv3.model.BDIModel;
 
 /**
- * 
+ *  Interface for BDI class enhancement/generation.
  */
 public interface IBDIClassGenerator
 {

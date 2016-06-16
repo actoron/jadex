@@ -170,18 +170,30 @@ public class ExternalAccess implements IExternalAccess
 //		return adapter.getParent();
 //	}
 	
-//	/**
-//	 *  Get the application component.
-//	 */
-//	public IServiceProvider getServiceProvider()
-//	{
+	/**
+	 *  @deprecated From 3.0 - just use external access.
+	 *  Get the application component.
+	 */
+	public IExternalAccess getServiceProvider()
+	{
+		return this;
 //		if(!valid)
 //		{
 //			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
 //		}
 //
 //		return (IServiceProvider)ia.getServiceContainer();
-//	}
+	}
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with external access.
+	 *  Get the service container.
+	 *  @return The service container.
+	 */
+	public IExternalAccess getServiceContainer()
+	{
+		return this;
+	}
 	
 	protected volatile Future<Map<String, Object>> killfut;
 	

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -49,38 +50,78 @@ public class JsonPrimitiveObjectProcessor implements ITraverseProcessor
 		
 		JsonObject obj = (JsonObject)object;
 		Class<?> cl = getClazz(object, targetcl);
-		String val = obj.getString("value", null);
-		if(Byte.class.equals(cl) || byte.class.equals(cl))
+		JsonValue oval = obj.get("value");
+		
+		if(oval.isString())
 		{
-			ret = Byte.parseByte(val);
+			String val = oval.asString();
+			if(Byte.class.equals(cl) || byte.class.equals(cl))
+			{
+				ret = Byte.parseByte(val);
+			}
+			else if(Character.class.equals(cl) || char.class.equals(cl))
+			{
+				ret = val.charAt(0);
+			}
+			else if(Integer.class.equals(cl) || int.class.equals(cl))
+			{
+				ret = Integer.parseInt(val);
+			}
+			else if(Long.class.equals(cl) || long.class.equals(cl))
+			{
+				ret = Long.parseLong(val);
+			}
+			else if(Short.class.equals(cl) || short.class.equals(cl))
+			{
+				ret = Short.parseShort(val);
+			}
+			else if(Float.class.equals(cl) || float.class.equals(cl))
+			{
+				ret = Float.parseFloat(val);
+			}
+			else if(Double.class.equals(cl) || double.class.equals(cl))
+			{
+				ret = Double.parseDouble(val);
+			}
+			else if(Boolean.class.equals(cl) || boolean.class.equals(cl))
+			{
+				ret = Boolean.parseBoolean(val);
+			}
 		}
-		else if(Character.class.equals(cl) || char.class.equals(cl))
+		else if(oval.isBoolean())
 		{
-			ret = val.charAt(0);
+			ret = oval.asBoolean();
 		}
-		else if(Integer.class.equals(cl) || int.class.equals(cl))
+		else if(oval.isNumber())
 		{
-			ret = Integer.parseInt(val);
+			if(Byte.class.equals(cl) || byte.class.equals(cl))
+			{
+				ret = (byte)oval.asInt();
+			}
+			else if(Integer.class.equals(cl) || int.class.equals(cl))
+			{
+				ret = oval.asInt();
+			}
+			else if(Long.class.equals(cl) || long.class.equals(cl))
+			{
+				ret = oval.asLong();
+			}
+			else if(Short.class.equals(cl) || short.class.equals(cl))
+			{
+				ret = (short)oval.asInt();
+			}
+			else if(Float.class.equals(cl) || float.class.equals(cl))
+			{
+				ret = oval.asFloat();
+			}
+			else if(Double.class.equals(cl) || double.class.equals(cl))
+			{
+				ret = oval.asDouble();
+			}
 		}
-		else if(Long.class.equals(cl) || long.class.equals(cl))
+		else
 		{
-			ret = Long.parseLong(val);
-		}
-		else if(Short.class.equals(cl) || short.class.equals(cl))
-		{
-			ret = Short.parseShort(val);
-		}
-		else if(Float.class.equals(cl) || float.class.equals(cl))
-		{
-			ret = Float.parseFloat(val);
-		}
-		else if(Double.class.equals(cl) || double.class.equals(cl))
-		{
-			ret = Double.parseDouble(val);
-		}
-		else if(Boolean.class.equals(cl) || boolean.class.equals(cl))
-		{
-			ret = Boolean.parseBoolean(val);
+			throw new RuntimeException("Unknown primitive type");
 		}
 		
 		traversed.put(object, ret);

@@ -49,8 +49,8 @@ public class JokeBDI
 	}
 	
 	// todo: make bdi agent work only with feature (currently produces nullpointer)
-	@Agent
-	protected IInternalAccess agent;
+//	@Agent
+//	protected IInternalAccess agent;
 	
 	@AgentFeature
 	protected IBDIAgentFeature bdi;

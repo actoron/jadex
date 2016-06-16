@@ -3,8 +3,12 @@ package jadex.bridge;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
@@ -48,6 +52,85 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 //	}
 
 	//-------- IInternalAccess interface --------
+	
+	/**
+	 *  @deprecated From 3.0. Use getComponentFeature(IArgumentsResultsFeature.class).getArguments()
+	 *  Get an argument value per name.
+	 *  @param name The argument name.
+	 *  @return The argument value.
+	 */
+	public Object getArgument(String name)
+	{
+		return access.getArgument(name);
+	}
+	
+	/**
+	 *  @deprecated From 3.0. Use internal access.
+	 *  @return The interpreter.
+	 */
+	public IInternalAccess getInterpreter()
+	{
+		return this;
+	}
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with internal access.
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IInternalAccess getServiceContainer()
+	{
+		return this;
+	}
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with internal access.
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IInternalAccess getServiceProvider()
+	{
+		return this;
+	}
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with internal access.
+	 *  Get the internal access.
+	 *  @return The internal access.
+	 */
+	public IInternalAccess getInternalAccess()
+	{
+		return this;
+	}
+	
+	/**
+	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getRequiredService()
+	 *  Get a required service of a given name.
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(String name)
+	{
+		return getComponentFeature(IRequiredServicesFeature.class).getRequiredService(name);
+	}
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with getComponentFeature(IExecutionFeature.class).scheduleStep()
+	 *  Execute a component step.
+	 */
+	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
+	{
+		return getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+	}
+	
+	/**
+	 * 	@deprecated From version 3.0 - replaced with getComponentFeature(IExecutionFeature.class).waitForDelay()
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
+	{
+		return getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+	}
 	
 	/**
 	 *  Get the model of the component.
