@@ -6,7 +6,6 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -130,8 +129,7 @@ public class BrokenTestAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				IResultListener<Collection<Tuple2<String, Object>>> lis = new TimeoutResultListener<Collection<Tuple2<String, Object>>>(3000, 
-					agent.getExternalAccess(), new IResultListener<Collection<Tuple2<String, Object>>>()
+				IResultListener<Collection<Tuple2<String, Object>>> lis = new IResultListener<Collection<Tuple2<String, Object>>>()
 				{
 					public void resultAvailable(Collection<Tuple2<String, Object>> result)
 					{
@@ -152,7 +150,7 @@ public class BrokenTestAgent
 							ret.setResultIfUndone(null);
 						}
 					}
-				});
+				};
 				
 				cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), lis)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
