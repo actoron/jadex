@@ -19,6 +19,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
+import jadex.platform.service.cms.PlatformComponent;
 import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.Writer;
@@ -328,97 +329,6 @@ public class BTTransportTest {
 	}
 
 	private IInternalAccess createInternalAccess() {
-		return new IInternalAccess() {
-			
-			@Override
-			public IFuture<Map<String, Object>> killComponent(Exception e) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public IFuture<Map<String, Object>> killComponent() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public IParameterGuesser getParameterGuesser() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public IModelInfo getModel() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public Logger getLogger() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public IValueFetcher getFetcher() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public IExternalAccess getExternalAccess() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public Exception getException() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public String getConfiguration() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public IComponentIdentifier getComponentIdentifier() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public <T> T getComponentFeature0(Class<? extends T> type) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public <T> T getComponentFeature(Class<? extends T> type) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public IComponentDescription getComponentDescription() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public ClassLoader getClassLoader() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public IFuture<IComponentIdentifier[]> getChildren(String type) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		};
+		return new PlatformComponent();
 	}
 }
