@@ -71,28 +71,42 @@ public abstract class TestAgent
 	public IFuture<Void>	cleanup()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(platforms.size(), new DelegationResultListener<Void>(ret));
+		IResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(platforms.size(), new DelegationResultListener<Void>(ret))
+		{
+			@Override
+			public void resultAvailable(Map<String, Object> result)
+			{
+				System.out.println("result: "+result);
+				super.resultAvailable(result);
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("exception: "+exception);
+				super.exceptionOccurred(exception);
+			}
+		};
 		
 		for(IExternalAccess platform: platforms)
 		{
-//			platform.killComponent().addResultListener(crl);
-//			System.out.println("kill: "+platform.getComponentIdentifier());
+			System.out.println("kill: "+platform.getComponentIdentifier());
 			platform.killComponent().addResultListener(crl);
 		}
 		platforms	= null;
 		
-//		ret.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				System.out.println("finiii");
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("exxx");
-//			}
-//		});
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				System.out.println("finiii");
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("exxx");
+			}
+		});
 		
 		return ret;
 	}

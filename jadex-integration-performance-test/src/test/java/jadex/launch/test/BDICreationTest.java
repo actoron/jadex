@@ -1,6 +1,5 @@
 package jadex.launch.test;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,16 +29,15 @@ public class BDICreationTest //extends TestCase
 	 *  Test bdi v3 creation.
 	 */
 	@Test
-	public void	testBDICreation() throws Exception
+	public void	testBDICreation()
 	{
 		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
 		String projectroot = new String("jadex-integration-performance-test");
-		File resdir = SUtil.findResourceDir(projectroot, false);
 //		System.out.println(resdir);
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
 			"-logging", "false",
-			"-libpath", "new String[]{\""+SUtil.findBuildDir(projectroot).toURI().toURL().toString()+(resdir!=null? ("\",\""+resdir.toURI().toURL().toString()):"") + "\"}",
+			"-libpath", SUtil.getOutputDirsExpression(projectroot),
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",

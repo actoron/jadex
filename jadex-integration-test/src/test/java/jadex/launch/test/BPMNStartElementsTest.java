@@ -1,7 +1,5 @@
 package jadex.launch.test;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.Map;
 
 import org.junit.Test;
@@ -18,16 +16,15 @@ import jadex.commons.future.IFuture;
 public class BPMNStartElementsTest //extends TestCase
 {
 	@Test
-	public void testStartActivities() throws MalformedURLException
+	public void testStartActivities()
 	{
 //		System.err.println("starting platform");
 		String projectroot = new String("jadex-applications-bpmn");
-		File resdir = SUtil.findResourceDir(projectroot, false);
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 //				"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 				"-simulation", "true",
 				"-asyncexecution", "true",
-				"-libpath", "new String[]{\""+SUtil.findBuildDir(projectroot).toURI().toURL().toString()+(resdir!=null? ("\",\""+resdir.toURI().toURL().toString()):"") + "\"}",
+				"-libpath", SUtil.getOutputDirsExpression(projectroot),
 //				"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
 				"-logging_level", "java.util.logging.Level.WARNING",
 //				"-debugfutures", "true",
