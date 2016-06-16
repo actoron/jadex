@@ -202,7 +202,7 @@ public abstract class Test extends TestCase
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-		System.out.println("written is:"+new String((byte[])written));
+//		System.out.println("written is:"+new String((byte[])written));
 		
 		Object ro = doRead(written);
 		
