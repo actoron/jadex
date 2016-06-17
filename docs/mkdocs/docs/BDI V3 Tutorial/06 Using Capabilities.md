@@ -64,7 +64,7 @@ protected TranslationCapability capa = new TranslationCapability();
 ```java
 
 String eword = "dog";
-String gword = (String) bdi.dispatchTopLevelGoal(capa.new Translate(eword)).get();
+String gword = (String) bdiFeature.dispatchTopLevelGoal(capa.new Translate(eword)).get();
 System.out.printf("Translating %s to %s", eword, gword);
 
 ```

@@ -60,7 +60,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		"-simulation", "true",
 		"-asyncexecution", "true",
 //		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-//		"-logging", "true",
+		"-logging", "true",
 //		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 //		"-logging_level", "java.util.logging.Level.WARNING",
 //		"-debugfutures", "true",

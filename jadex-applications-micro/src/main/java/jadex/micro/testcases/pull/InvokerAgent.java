@@ -1,6 +1,5 @@
 package jadex.micro.testcases.pull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -172,7 +171,7 @@ public class InvokerAgent
 		// Start platform
 		try
 		{
-			String url	= "new String[]{\""+SUtil.findBuildDir("../jadex-applications-micro").toURI().toURL().toString()+"\"}";	// Todo: support RID for all loaded models.
+			String url	= SUtil.getOutputDirsExpression("../jadex-applications-micro");	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",

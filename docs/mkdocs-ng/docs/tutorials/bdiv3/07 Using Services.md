@@ -60,8 +60,11 @@ public IFuture<String> translateEnglishGerman(String eword)
 @Agent
 public class UserBDI
 {
+  @AgentFeature
+  protected IBDIAgentFeature bdiFeature;
+  
   @Agent
-  protected BDIAgent agent;
+  protected IInternalAccess agent;
 	
   @AgentBody
   public void body()
@@ -90,7 +93,7 @@ public class UserBDI
 
 ```java
 
-SServiceProvider.getServices(agent.getServiceProvider(), ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+SServiceProvider.getServices(agent, ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
   .addResultListener(new IntermediateDefaultResultListener<ITranslationService>()
 {
   public void intermediateResultAvailable(ITranslationService ts)
@@ -116,7 +119,7 @@ One of the strength of BDI is that it provides a flexible runtime execution by s
 ```java
 
 @ProvidedServices(@ProvidedService(name="transser", type=ITranslationService.class, 
-  implementation=@Implementation(BDIAgent.class)))
+  implementation=@Implementation(IBDIAgent.class))) // TODO
 
 ```
 
@@ -252,13 +255,13 @@ public class TranslationGoal
 
 ```java
 
-agent.scheduleStep(new IComponentStep<Void>()
+execFeature.scheduleStep(new IComponentStep<Void>()
 {
   public IFuture<Void> execute(IInternalAccess ia)
   {
     try
     {
-      final String gword = (String)agent.dispatchTopLevelGoal(new TranslationGoal(tfe.getText())).get();
+      final String gword = (String)bdiFeature.dispatchTopLevelGoal(new TranslationGoal(tfe.getText())).get();
       // set word in textfield on swing thread
     }
     catch(Exception e)

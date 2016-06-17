@@ -65,7 +65,8 @@ public class TranslationPlan
 -   Add the annotation to the agent class: @Plans(@Plan(body=@Body(TranslationPlan.class)))
 -   Add a field called bdi to the agent class and annotate it with @AgentFeature. The field should be of type IBDIAgentFeature. This will let the engine automatically inject the bdi agent (api) to the pojo agent class. 
 ```java
-@AgentFeature protected IBDIAgentFeature bdi;
+@AgentFeature 
+protected IBDIAgentFeature bdiFeature;
 ```
 
 -   Add an agent body method that is automatically invoked when the agent is started and adopt a plan using
@@ -75,7 +76,7 @@ public class TranslationPlan
 @AgentBody
 public void body()
 {
-  bdi.adoptPlan(new TranslationPlan());
+  bdiFeature.adoptPlan(new TranslationPlan());
 }
 
 ```
@@ -141,7 +142,7 @@ public void init()
 
 -   Adapt the adoptPlan() method call to 
 ```java
-bdi.adoptPlan("translateEnglishGerman");
+bdiFeature.adoptPlan("translateEnglishGerman");
 ```
 
 Instead a plan object we just give the name of the method representing the plan.
@@ -179,7 +180,7 @@ This time, we need a translation agent with an inner plan class to be able to ad
 
 try
 {
-  bdi.adoptPlan(new TranslatePlan()).get();
+  bdiFeature.adoptPlan(new TranslatePlan()).get();
 }
 catch(Exception e)
 {
@@ -259,7 +260,7 @@ As preparation we can copy the agent from the last exercise and modify the follo
 ```java
 
   @AgentFeature
-  protected IExecutionFeature execution;
+  protected IExecutionFeature execFeature;
 
 ```
 
@@ -271,8 +272,8 @@ As preparation we can copy the agent from the last exercise and modify the follo
 
 try
 {
-  bdi.adoptPlan(new TranslatePlan());
-  execution.waitForDelay(1000).get();
+  bdiFeature.adoptPlan(new TranslatePlan());
+  execFeature.waitForDelay(1000).get();
   context = false;
   System.out.println("context set to false");
 }

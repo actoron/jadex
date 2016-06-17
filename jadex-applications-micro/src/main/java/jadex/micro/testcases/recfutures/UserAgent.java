@@ -1,7 +1,5 @@
 package jadex.micro.testcases.recfutures;
 
-import java.io.File;
-
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -207,7 +205,7 @@ public class UserAgent
 		// Start platform
 		try
 		{
-			String url	= "new String[]{\""+SUtil.findBuildDir("jadex-applications-micro").toURI().toURL().toString()+"\"}";	// Todo: support RID for all loaded models.
+			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro");	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",

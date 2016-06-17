@@ -478,9 +478,6 @@ public class BlocksworldGui	extends JFrame
 
 						getContentPane().add(BorderLayout.SOUTH, zoom);
 
-						pack();
-						setLocation(SGUI.calculateMiddlePosition(BlocksworldGui.this));
-						setVisible(true);
 						addWindowListener(new WindowAdapter()
 						{
 							public void	windowClosing(WindowEvent we)
@@ -522,6 +519,9 @@ public class BlocksworldGui	extends JFrame
 						{
 							public void resultAvailable(Void result)
 							{
+								pack();
+								setLocation(SGUI.calculateMiddlePosition(BlocksworldGui.this));
+								setVisible(true);
 							}
 							
 							public void exceptionOccurred(Exception exception)

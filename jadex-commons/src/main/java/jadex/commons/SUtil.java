@@ -4905,7 +4905,38 @@ public class SUtil
 			return Collections.emptyMap();
 		}
 	}
-
+	
+	/**
+	 *  Try to find the correct classpath root directories for current build tool chain.
+	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
+	 *  and uses the directory with the newest file.
+	 *  @return an expression string of the fpr 'new String[]{...}'.
+	 */
+	public static String	getOutputDirsExpression(String projectroot)
+	{
+		StringBuffer	ret	= new StringBuffer("new String[]{");
+		for(File f: findOutputDirs(projectroot))
+		{
+			try
+			{
+				String	s	= f.toURI().toURL().toString();
+				if(ret.length()>13)
+				{
+					ret.append(", ");
+				}
+				ret.append("\"");
+				ret.append(s);
+				ret.append("\"");
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		ret.append("}");
+		return  ret.toString();
+	}
+	
 	/**
 	 *  Try to find the correct classpath root directories for current build tool chain.
 	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
@@ -4913,102 +4944,57 @@ public class SUtil
 	 */
 	public static File[]	findOutputDirs(String projectroot)
 	{
-		Set<File>	ret	= new LinkedHashSet<File>();
-		File	build	= findBuildDir(projectroot, false);
-		if(build!=null)
-		{
-			ret.add(build);
-		}
-		File	res	= findResourceDir(projectroot, false);
-		if(res!=null)
-		{
-			ret.add(res);
-		}
-		File	test	= findBuildDir(projectroot, true);
-		// Hack!!! Do not add bin for test, when build already found (would cause adding eclipse-generated bin folder in gradle build when no test dir present)
-		if(test!=null && (build==null || !test.equals(new File(projectroot, "bin"))))
-		{
-			ret.add(test);
-		}
-		File	testres	= findResourceDir(projectroot, true);
-		if(testres!=null)
-		{
-			ret.add(testres);
-		}
-		
-//		System.out.println("findOutputDirs("+projectroot+"): "+ret);
-		return ret.toArray(new File[ret.size()]);
-	}
-	
-
-	/**
-	 *  Try to find the correct classpath root directory for current build tool chain.
-	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
-	 *  and uses the directory with the newest file.
-	 */
-	public static File	findBuildDir(String projectroot)
-	{
-		return findBuildDir(projectroot, false);
-	}
-	
-	/**
-	 *  Try to find the correct classpath root directory for current build tool chain.
-	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
-	 *  and uses the directory with the newest file.
-	 *  @param test	Find test directory instead of main.
-	 */
-	public static File	findBuildDir(String projectroot, boolean test)
-	{
 		File projectDir = findDirForProject(projectroot);
-		List<File>	candidates	= new ArrayList<File>();
-		candidates.add(new File(projectDir, "bin"));
-		candidates.add(new File(new File(new File(projectDir, "build"), "classes"), test ? "test" : "main"));
-		candidates.add(new File(new File(projectDir, "target"), test ? "test-classes" : "classes"));
 		
-		return findOutputDir(projectDir, candidates);
-	}
-
-	/**
-	 *  Try to find a resource directory for current build tool chain.
-	 *  Tries bin (e.g. eclipse), build/resources/main (gradle), target/resources (maven)
-	 *  and uses the directory with the newest file.
-	 *  @param test	Find test directory instead of main.
-	 */
-	public static File	findResourceDir(String projectroot, boolean test)
-	{
-		File projectDir = findDirForProject(projectroot);
-		List<File>	candidates	= new ArrayList<File>();
-		candidates.add(new File(new File(new File(projectDir, "build"), "resources"), test ? "test" : "main"));
-		candidates.add(new File(new File(projectDir, "target"), test ? "test-resources" : "resources"));
-
-		return findOutputDir(projectDir, candidates);
-	}
-
-	/**
-	 *  Try to find the correct classpath root directory for current build tool chain
-	 *  from a list of candidates.
-	 *  
-	 * 	@param projectroot The project root.
-	 * 	@param candidates The candidates.
-	 */
-	public static File findOutputDir(File projectroot, List<File> candidates)
-	{
-		File	ret	= null;
+		List<List<File>>	candidates	= new ArrayList<List<File>>();
+		
+		// eclipse
+		candidates.add(new ArrayList<File>(Arrays.asList(
+			new File(projectDir, "bin"))));
+		
+		// gradle
+		candidates.add(new ArrayList<File>(Arrays.asList(
+			new File(new File(new File(projectDir, "build"), "classes"),  "main"),
+			new File(new File(new File(projectDir, "build"), "classes"),  "test"),
+			new File(new File(new File(projectDir, "build"), "resources"),  "main"),
+			new File(new File(new File(projectDir, "build"), "resources"),  "test"))));
+		
+		// maven
+		candidates.add(new ArrayList<File>(Arrays.asList(
+			new File(new File(projectDir, "target"), "classes"),
+			new File(new File(projectDir, "target"), "test-classes"),
+			new File(new File(projectDir, "target"), "resources"),
+			new File(new File(projectDir, "target"), "test-resources"))));
+		
+		// Choose newest list of files based on first entry
+		List<File>	found	= null;
 		long	retmod	= -1;
-		for(File cand: candidates)
+		for(List<File> cand: candidates)
 		{
-			if(cand.exists())
+			if(cand.get(0).exists())
 			{
-				long	mod	= SUtil.getLastModified(cand);
+				long	mod	= SUtil.getLastModified(cand.get(0));
 				if(mod>retmod)
 				{
-					ret	= cand;
+					found	= cand;
 					retmod	= mod;
 				}
 			}
 		}
 		
-		return ret;
+		// Remove non-existing files from chosen list
+		if(found!=null)
+		{
+			for(Iterator<File> it=found.iterator(); it.hasNext(); )
+			{
+				if(!it.next().exists())
+				{
+					it.remove();
+				}
+			}
+		}
+		
+		return found!=null ? found.toArray(new File[found.size()]) : new File[0];
 	}
 
 	/**

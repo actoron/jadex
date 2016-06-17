@@ -66,12 +66,12 @@ Runnable run = new Runnable()
 while(true)
 {
   final Socket client = server.accept();
-  agent.scheduleStep(new IComponentStep<Void>()
+  execFeature.scheduleStep(new IComponentStep<Void>()
   {
     @Classname("translate")
     public IFuture<Void> execute(IInternalAccess ia)
     {
-      agent.dispatchTopLevelGoal(new Translate(client));
+      bdiFeature.dispatchTopLevelGoal(new Translate(client));
       return IFuture.DONE;
     }
   });
