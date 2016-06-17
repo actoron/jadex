@@ -130,8 +130,15 @@ public class JokeBDI
 			this.mood = mood;
 		}
 		
-		@GoalTargetCondition(beliefs="usermood")
+//		@GoalTargetCondition(beliefs="usermood")
+		@GoalTargetCondition
 		public boolean moodAchieved()
+		{
+//			return mood.equals(usermood);
+			return mood.equals(getUserMood());
+		}
+		
+		public boolean moodAchieved(String bla)
 		{
 			return mood.equals(usermood);
 		}

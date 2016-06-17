@@ -678,6 +678,7 @@ public class SReflect
 			Type[] ptypes = method.getGenericParameterTypes();
 			for(int i=0; i<ptypes.length; i++)
 			{
+				// why unqualified?
 				buf.append(getUnqualifiedTypeName(ptypes[i].toString()));
 				if(i+1<ptypes.length)
 					buf.append(", ");

@@ -4,8 +4,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.asm.Opcodes;
@@ -23,10 +25,18 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MCondition;
+import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bridge.ClassInfo;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.collection.MultiCollection;
+import jadex.javaparser.javaccimpl.ParameterNode;
 import jadex.rules.eca.EventType;
 
 
@@ -41,6 +51,62 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	
 	public abstract List<Class<?>> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
 
+	/**
+	 *  Store which beliefs are accessed in a method.
+	 */
+	public static class MethodBeliefs
+	{
+		protected MethodNode methodNode;
+		protected Set<String> beliefs;
+
+		/**
+		 *  Create a new method beliefs.
+		 * @param methodNode
+		 * @param beliefs
+		 */
+		public MethodBeliefs(MethodNode methodNode, Set<String> beliefs)
+		{
+			this.methodNode = methodNode;
+			this.beliefs = beliefs;
+		}
+
+		/**
+		 *  Get the methodNode.
+		 *  @return The methodNode
+		 */
+		public MethodNode getMethodNode()
+		{
+			return methodNode;
+		}
+		
+		/**
+		 *  Set the methodNode.
+		 *  @param methodNode The methodNode to set
+		 */
+		public void setMethodNode(MethodNode methodNode)
+		{
+			this.methodNode = methodNode;
+		}
+		
+		/**
+		 *  Get the beliefs.
+		 *  @return The beliefs
+		 */
+		public Set<String> getBeliefs()
+		{
+			return beliefs;
+		}
+		
+		/**
+		 *  Set the beliefs.
+		 *  @param beliefs The beliefs to set
+		 */
+		public void setBeliefs(Set<String> beliefs)
+		{
+			this.beliefs = beliefs;
+		}
+	}
+	
 	/**
 	 * 
 	 * @param cn
@@ -57,11 +123,70 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		// static method call
 		MethodNode[] mths = (MethodNode[])cn.methods.toArray(new MethodNode[0]);
 
+		MultiCollection<String, MethodBeliefs> methodbeliefs = new MultiCollection<String, MethodBeliefs>();
 		for(MethodNode mn : mths)
 		{
 			transformArrayStores(mn, model, iclname);
+			Set<String> bels = findBeliefs(cn, mn, model);
+			if(bels.size()>0)
+				methodbeliefs.add(mn.name, new MethodBeliefs(mn, bels));
 		}
-
+		
+		List<MGoal> mgoals = model.getCapability().getGoals();
+		for(MGoal mgoal : mgoals)
+		{
+			for(Map.Entry<String, List<MCondition>> entry: mgoal.getConditions().entrySet())
+			{
+				List<MCondition> conds = entry.getValue();
+				for(MCondition cond: conds)
+				{
+					// nothing declared?
+					if(cond.getEvents().size()==0)
+					{
+						MethodInfo mi = cond.getMethodTarget();
+						Collection<MethodBeliefs> mbs = methodbeliefs.get(mi.getName());
+						
+						if(mbs!=null)
+						{
+							MethodBeliefs mb = null;
+							if(mbs.size()>1)
+							{
+								ClassInfo[] ptypes = cond.getMethodTarget().getParameterTypeInfos();
+								for(MethodBeliefs tmp: mbs)
+								{
+									List<ParameterNode> ps = tmp.getMethodNode().parameters;
+									int psize = ps==null? 0: ps.size();
+									if(psize==ptypes.length)
+									{
+										System.out.println("hhh");
+									}
+								}
+							}
+							else if(mbs.size()==1)
+							{
+								mb =  mbs.iterator().next();
+							}
+	
+							if(mb!=null)
+							{
+								for(String belname: mb.getBeliefs())
+								{
+									//BDIAgentFeature.addBeliefEvents(model.getCapability(), events, ev, cl);
+									cond.addEvent(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
+									cond.addEvent(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
+								
+									// todo: how to check if multi belief
+									cond.addEvent(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+									cond.addEvent(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+								}
+							}
+							System.out.println("Added belief dependency of condition: "+entry.getKey()+" "+cond.getName()+" "+cond.getEvents());
+						}
+					}
+				}
+			}
+		}
+		
 		if(agentclass)
 		{
 			List<String> ifaces = cn.interfaces;
@@ -309,6 +434,10 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 */
 	protected abstract void enhanceSetter(String iclname, MethodNode setter, String belname);
 
+	/**
+	 *  Find the beliefs used in a method.
+	 */
+	protected abstract Set<String> findBeliefs(ClassNode cn, MethodNode mn, BDIModel model);
 
 	// ----- Helper methods ------
 	
