@@ -962,7 +962,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			if(node instanceof FieldInsnNode)
 			{
 				FieldInsnNode fnode = (FieldInsnNode)node;
-				if(fnode.getOpcode()==Opcodes.GETFIELD)
+				//if(fnode.getOpcode()==Opcodes.GETFIELD)
 				if(model.getCapability().hasBelief(fnode.name))
 				{
 					ret.add(fnode.name);

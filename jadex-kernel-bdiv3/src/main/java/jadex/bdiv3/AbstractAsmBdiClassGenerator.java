@@ -1,5 +1,6 @@
 package jadex.bdiv3;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.ConstructorInfo;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MGoal;
@@ -387,49 +389,58 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		for(MCondition cond: conditions)
 		{
 			MethodInfo mi = cond.getMethodTarget();
+			Method m = null;
+			ConstructorInfo ci = cond.getConstructorTarget();
+			Constructor<?> c = null;
+			String clname = null;
 			if(mi!=null)
 			{
-				Method m = mi.getMethod(dummycl);
-				String clname = Type.getInternalName(m.getDeclaringClass());
-				if(cn.name.equals(clname))
+				m = mi.getMethod(dummycl);
+				clname = Type.getInternalName(m.getDeclaringClass());
+			}
+			else if(ci!=null)
+			{
+				c = ci.getConstructor(dummycl);
+				clname = Type.getInternalName(c.getDeclaringClass());
+			}
+			if(cn.name.equals(clname))
+			{
+				// nothing declared?
+				if(cond.getEvents().size()==0)
 				{
-					// nothing declared?
-					if(cond.getEvents().size()==0)
+					Collection<MethodBeliefs> mbs = methodbeliefs.get(mi!=null? mi.getName(): "<init>");
+					
+					MethodBeliefs mb = null;
+					if(mbs!=null && mbs.size()>1)
 					{
-						Collection<MethodBeliefs> mbs = methodbeliefs.get(mi.getName());
-						
-						MethodBeliefs mb = null;
-						if(mbs!=null && mbs.size()>1)
+						String mdesc = m!=null? Type.getMethodDescriptor(m): Type.getConstructorDescriptor(c);
+						for(MethodBeliefs tmp: mbs)
 						{
-							String mdesc = Type.getMethodDescriptor(m);
-							for(MethodBeliefs tmp: mbs)
+							if(tmp.getMethodNode().desc.equals(mdesc))
 							{
-								if(tmp.getMethodNode().desc.equals(mdesc))
-								{
-									mb = tmp;
-									break;
-								}
+								mb = tmp;
+								break;
 							}
 						}
-						else if(mbs!=null && mbs.size()==1)
-						{
-							mb =  mbs.iterator().next();
-						}
+					}
+					else if(mbs!=null && mbs.size()==1)
+					{
+						mb =  mbs.iterator().next();
+					}
 
-						if(mb!=null)
+					if(mb!=null)
+					{
+						List<EventType> events = new ArrayList<EventType>();
+						for(String belname: mb.getBeliefs())
 						{
-							List<EventType> events = new ArrayList<EventType>();
-							for(String belname: mb.getBeliefs())
-							{
-								BDIAgentFeature.addBeliefEvents(model.getCapability(), events, belname, dummycl);
-							}
-							cond.setEvents(events);
-							System.out.println("Added belief dependency of condition: "+cond.getName()+" "+cond.getEvents());
+							BDIAgentFeature.addBeliefEvents(model.getCapability(), events, belname, dummycl);
 						}
-						else
-						{
-							System.out.println("Warning: Found condition without triggering events (will never trigger): "+cond.getName());
-						}
+						cond.setEvents(events);
+						System.out.println("Added belief dependency of condition: "+cond.getName()+" "+cond.getEvents());
+					}
+					else
+					{
+						System.out.println("Warning: Found condition without triggering events (will never trigger): "+cond.getName());
 					}
 				}
 			}
