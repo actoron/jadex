@@ -83,7 +83,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 					AbstractJCCPlugin.this.main_panel = createView();
 					AbstractJCCPlugin.this.menu_bar = createMenuBar();
 					AbstractJCCPlugin.this.tool_bar = createToolBar();
-					ret.setException(null);
+					ret.setResult(null);
 				}
 				catch(Exception e)
 				{

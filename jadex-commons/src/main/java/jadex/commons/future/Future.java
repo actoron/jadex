@@ -55,9 +55,6 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	// Hack!!! Non-final to be setable from Starter 
 	public static boolean NO_STACK_COMPACTION = false;
 	
-	/** The empty future. */
-	public static final IFuture<?> EMPTY = new Future<Object>(null);
-		
 	/** Constant for no timeout. */
 	public static final long NONE = -1;
 	
@@ -272,21 +269,29 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    	}
     	}
     }
-    
-    /**
-     *  Set the exception. 
-     *  Listener notifications occur on calling thread of this method.
-     *  @param exception The exception.
-     */
-    public void	setException(Exception exception)
+	
+	/**
+	 *  Set the exception (internal implementation for normal and if-undone).
+	 */
+    protected boolean	doSetException(Exception exception, boolean undone)
     {
+    	if(exception==null)
+    		throw new IllegalArgumentException();
     	synchronized(this)
 		{
+    		if(undone)
+    		{
+    			this.undone	= undone;
+    		}
+    		
         	if(isDone())
         	{
-        		if(this.exception!=null)
+        		if(undone)
         		{
-//        			this.exception.printStackTrace();
+        			return false;
+        		}
+        		else if(this.exception!=null)
+        		{
             		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_EXCEPTION, this, this.exception, exception);
         		}
         		else
@@ -294,10 +299,6 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
             		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, this.result, exception);        			
         		}
         	}
-//        	else if(DEBUG)
-//        	{
-//        		first	= new DebugException("first setException()");
-//        	}
         	
       		this.exception = exception;
       		
@@ -309,6 +310,19 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         }
     	
     	resume();
+    	
+    	return true;
+    }
+	
+    
+    /**
+     *  Set the exception. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param exception The exception.
+     */
+    public void	setException(Exception exception)
+    {
+    	doSetException(exception, false);
     }
     
     /**
@@ -318,35 +332,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     public boolean setExceptionIfUndone(Exception exception)
     {
-    	if(exception==null)
-    		throw new IllegalArgumentException();
-    	synchronized(this)
-		{
-    		undone = true;
-    		// Return if is done. Should implement same logic as setResultIfUndone().
-        	if(isDone())
-        	{
-        		return false;
-        		// If done propagate exception.
-//        		if(exception instanceof RuntimeException)
-//        			throw (RuntimeException)exception;
-//        		else
-//        			throw new RuntimeException(exception);
-        	}
-        	else
-        	{
-        		this.exception = exception;
-//	        	System.out.println(this+" setResult: "+result);
-        		resultavailable = true;
-            	if(DEBUG)
-            	{
-            		first	= new DebugException("first setExceptionIfUndone()");
-            	}
-        	}
-		}
-    	
-    	resume();
-    	return true;
+    	return doSetException(exception, true);
     }
 
     /**
@@ -356,45 +342,9 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     public void	setResult(E result)
     {
-    	doSetResult(result);
+    	doSetResult(result, false);
     	
     	resume();
-    }
-    
-    /**
-     *  Set the result without notifying listeners.
-     */
-    protected synchronized void	doSetResult(E result)
-    {
-    	// There is an exception when this is ok.
-    	// In BDI when belief value is a future.
-//    	if(result instanceof IFuture)
-//    	{
-//    		System.out.println("Internal error, future in future.");
-//    		setException(new RuntimeException("Future in future not allowed."));
-//    	}
-    	
-    	if(isDone())
-    	{
-    		if(this.exception!=null)
-    		{
-//        		this.exception.printStackTrace();
-        		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
-    		}
-    		else
-    		{
-        		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
-    		}
-    	}
-    	else if(DEBUG)
-    	{
-    		first	= new DebugException("first setResult()");
-    	}
-    	
-//        System.out.println(this+" setResult: "+result);
-    	this.result = result;
-    	resultavailable = true;			
-//      this.resultex = new Exception();
     }
     
     /**
@@ -405,38 +355,58 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     public boolean	setResultIfUndone(E result)
     {
-    	boolean	ret	= doSetResultIfUndone(result);
+    	boolean	ret	= doSetResult(result, true);
     	if(ret)
     	{
     		resume();
     	}
     	return ret;
     }
-    
+
     /**
      *  Set the result without notifying listeners.
      */
-    protected synchronized boolean	doSetResultIfUndone(E result)
+    protected synchronized boolean doSetResult(E result, boolean undone)
     {
-		undone = true;
-		if(isDone())
-		{
-			return false;
-		}
-		else
-		{
-//        	System.out.println(this+" setResult: "+result);
-			this.result = result;
-			resultavailable = true;	
-	    	if(DEBUG)
-	    	{
-	    		first	= new DebugException("first setResultIfUndone()");
-	    	}
-		}
-		
+    	if(undone)
+    	{
+    		this.undone = true;
+    	}
+
+    	// There is an exception when this is ok.
+    	// In BDI when belief value is a future.
+//    	if(result instanceof IFuture)
+//    	{
+//    		System.out.println("Internal error, future in future.");
+//    		setException(new RuntimeException("Future in future not allowed."));
+//    	}
+    	
+    	if(isDone())
+    	{
+    		if(undone)
+    		{
+    			return false;
+    		}
+    		else if(this.exception!=null)
+    		{
+        		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
+    		}
+    		else
+    		{
+        		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
+    		}
+    	}
+    	else if(DEBUG)
+    	{
+    		first	= new DebugException("first result");
+    	}
+    	
+    	this.result = result;
+    	resultavailable = true;
+    	
     	return true;
     }
-
+    
 	/**
 	 *  Resume after result or exception has been set.
 	 */

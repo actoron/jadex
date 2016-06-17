@@ -142,7 +142,7 @@ public class ConditionAgent implements IContractService
 	public IFuture<Integer> doSomething(String a, int x, int y)
 	{
 //		System.out.println("invoked: "+a);
-		return "null".equals(a)? new Future(null): new Future<Integer>(Integer.valueOf(x/y));
+		return "null".equals(a)? new Future((Object)null): new Future<Integer>(Integer.valueOf(x/y));
 	}
 	
 	/**

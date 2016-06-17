@@ -533,14 +533,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				});
 			}
 			
-			public void sendBackwardCommand(Object info)
-			{
-				Future<Object> res = new Future<Object>();
-				final String mycallid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".ret.getServiceProxies");
-				RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
-//				System.out.println("sending backward cmd");
-				sendMessage(rrms, null, content, mycallid, Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier()), res, null, null);
-			}
+//			public void sendBackwardCommand(Object info)
+//			{
+//				Future<Object> res = new Future<Object>();
+//				final String mycallid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".ret.getServiceProxies");
+//				RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+////				System.out.println("sending backward cmd");
+//				sendMessage(rrms, null, content, mycallid, Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier()), res, null, null);
+//			}
 			
 			// Called from delegation listeners in RMS -> ignore if already terminated
 			public void setException(Exception exception)
@@ -603,7 +603,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				});
 						
 //				return fut;
-				return new Future<Object>(null);
+				return Future.getEmptyFuture();
 			}
 		});
 		

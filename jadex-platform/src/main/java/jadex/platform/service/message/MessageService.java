@@ -1288,7 +1288,7 @@ public class MessageService extends BasicService implements IMessageService
 		if(listeners==null)
 			listeners = new LinkedHashMap();
 		listeners.put(listener, filter);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1298,7 +1298,7 @@ public class MessageService extends BasicService implements IMessageService
 	public synchronized IFuture<Void> removeMessageListener(IMessageListener listener)
 	{
 		listeners.remove(listener);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1310,7 +1310,7 @@ public class MessageService extends BasicService implements IMessageService
 		if(contentcodecs==null)
 			contentcodecs = new ArrayList();
 		contentcodecs.add(codec);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1321,7 +1321,7 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		if(contentcodecs!=null)
 			contentcodecs.remove(codec);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1331,7 +1331,7 @@ public class MessageService extends BasicService implements IMessageService
 	public IFuture<Void> addMessageCodec(Class codec)
 	{
 		codecfactory.addCodec(codec);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1341,7 +1341,7 @@ public class MessageService extends BasicService implements IMessageService
 	public IFuture<Void> removeMessageCodec(Class codec)
 	{
 		codecfactory.removeCodec(codec);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 //	/**
