@@ -562,7 +562,7 @@ public class BDIClassReader extends MicroClassReader
 		{
 //			Class<?> acl =
 			gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
-//			System.out.println("genclazz: "+acl.hashCode()+" "+acl.getClassLoader());
+//			System.out.println("genclazz: "+agcl.getName()+" "+agcl.hashCode()+" "+agcl.getClassLoader());
 		}
 		
 		// Sort the plans according to their declaration order in the source file

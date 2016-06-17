@@ -938,6 +938,85 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		return ret;
 	}
 	
+	
+	/**
+	 *  Find beliefs accessed in methods.
+	 */
+	protected Set<String> findBeliefs(ClassNode cn, MethodNode mn, BDIModel model)
+	{
+		Set<String> ret = new HashSet<String>();
+		
+		InsnList l = mn.instructions;
+		LabelNode begin = null;
+		
+		for(int i=0; i<l.size(); i++)
+		{
+			AbstractInsnNode node = l.get(i);
+			
+			if(begin==null && node instanceof LabelNode)
+			{
+				begin = (LabelNode)node;
+			}
+			
+			// Find direct field accesses
+			if(node instanceof FieldInsnNode)
+			{
+				FieldInsnNode fnode = (FieldInsnNode)node;
+				if(fnode.getOpcode()==Opcodes.GETFIELD)
+				if(model.getCapability().hasBelief(fnode.name))
+					ret.add(fnode.name);
+			}
+			// Find getter accesses
+			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("get"))
+			{
+				MethodInsnNode gnode = (MethodInsnNode)node;
+				String name = gnode.name.substring(3);
+				String bname = model.getCapability().hasBeliefIgnoreCase(name);
+				if(bname!=null)
+					ret.add(bname);
+			}
+		}
+		
+//		System.out.println("Found belief accesses: "+cn.name+" "+ret+" in "+mn.name);
+		
+		return ret;
+	}
+	
+//	if(tododyn.remove(name))
+//	{
+//		MBelief mbel = model.getCapability().getBelief(name);
+//		Set<String>	bevs	= new LinkedHashSet<String>(mbel.getBeliefEvents());
+//		bevs.addAll(evs);
+//		mbel.setBeliefEvents(bevs);
+//	}
+	// Find writeField method calls
+//				if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.equals("writeField"))
+//				{
+////					System.out.println("found writeField node: "+min.name+" "+min.getOpcode());
+//					AbstractInsnNode start = node;
+//					String name = null;
+//					List<String> evs = new ArrayList<String>(); 
+//					while(!start.equals(begin))
+//					{
+//						// find method name via last constant load
+//						if(name==null && start instanceof LdcInsnNode)
+//							name = (String)((LdcInsnNode)start).cst;
+//						if(start.getOpcode()==Opcodes.GETFIELD)
+//						{
+//							String bn = ((FieldInsnNode)start).name;
+//							if(model.getCapability().hasBelief(bn))
+//							{
+//								evs.add(bn);
+//							}
+//						}
+//						start = start.getPrevious();
+//					}
+//					
+//					begin = null;
+//				}
+//				else 
+	
+	
 	/**
 	 * 
 	 */
