@@ -87,16 +87,16 @@ public class ComponentStartTest extends	ComponentTest
 //							System.out.println("destroying2 "+cid);
 					}
 				}
-			})
-			{
-				@Override
-				public void resultAvailable(Void result)
-				{
-//					if(cid.getName().indexOf("ParentProcess")!=-1)
-						System.out.println("waiting returned for "+cid);
-					super.resultAvailable(result);
-				}
-			};
+			});
+//			{
+//				@Override
+//				public void resultAvailable(Void result)
+//				{
+////					if(cid.getName().indexOf("ParentProcess")!=-1)
+//						System.out.println("waiting returned for "+cid);
+//					super.resultAvailable(result);
+//				}
+//			};
 			
 			IExternalAccess	ea	= cms.getExternalAccess(cms.getRootIdentifier().get()).get();
 			ea.scheduleStep(new IComponentStep<Void>()
@@ -104,7 +104,7 @@ public class ComponentStartTest extends	ComponentTest
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 //					if(cid.getName().indexOf("ParentProcess")!=-1)
-						System.out.println("waiting false for "+cid);
+//						System.out.println("waiting false for "+cid);
 					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, false);
 				}
 			}).addResultListener(lis);
@@ -113,7 +113,7 @@ public class ComponentStartTest extends	ComponentTest
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 //					if(cid.getName().indexOf("ParentProcess")!=-1)
-						System.out.println("waiting true for "+cid);
+//						System.out.println("waiting true for "+cid);
 					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, true);
 				}
 			}).addResultListener(lis);

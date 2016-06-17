@@ -241,7 +241,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 			{
 //				System.out.println("Warning, void method call will be executed asynchronously: "
 //					+method.getDeclaringClass()+" "+method.getName()+" "+Thread.currentThread());
-				future	= new Future(null);
+				future	= new Future<Object>((Object)null);
 			}
 		}
 		
@@ -820,16 +820,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 					}
 				}
 				
-				public void sendBackwardCommand(Object info)
-				{
-					Future<Object> res = new Future<Object>();
-					final String mycallid = SUtil.createUniqueId(compid.getName()+".pullsub."+method.toString());
-					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("sending backward cmd");
-					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
-						content, mycallid, to, res, nonfunc, sic);
-				}
+//				public void sendBackwardCommand(Object info)
+//				{
+//					Future<Object> res = new Future<Object>();
+//					final String mycallid = SUtil.createUniqueId(compid.getName()+".pullsub."+method.toString());
+//					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+//					// Can be invoked directly, because internally redirects to agent thread.
+////					System.out.println("sending backward cmd");
+//					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+//						content, mycallid, to, res, nonfunc, sic);
+//				}
 				
 				// Called from delegation listeners in RMS -> ignore if already terminated
 				public void setException(Exception exception)
@@ -882,16 +882,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 					}
 				}
 				
-				public void sendBackwardCommand(Object info)
-				{
-					Future<Object> res = new Future<Object>();
-					final String mycallid = SUtil.createUniqueId(compid.getName()+".pull."+method.toString());
-					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("sending backward cmd");
-					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
-						content, mycallid, to, res, nonfunc, sic);
-				}
+//				public void sendBackwardCommand(Object info)
+//				{
+//					Future<Object> res = new Future<Object>();
+//					final String mycallid = SUtil.createUniqueId(compid.getName()+".pull."+method.toString());
+//					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+//					// Can be invoked directly, because internally redirects to agent thread.
+////					System.out.println("sending backward cmd");
+//					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+//						content, mycallid, to, res, nonfunc, sic);
+//				}
 				
 				// Called from delegation listeners in RMS -> ignore if already terminated
 				public void setException(Exception exception)
@@ -933,16 +933,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 					}
 				}
 				
-				public void sendBackwardCommand(Object info)
-				{
-					Future<Object> res = new Future<Object>();
-					final String mycallid = SUtil.createUniqueId(compid.getName()+".sub."+method.toString());
-					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("sending backward cmd");
-					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
-						content, mycallid, to, res, nonfunc, sic);
-				}
+//				public void sendBackwardCommand(Object info)
+//				{
+//					Future<Object> res = new Future<Object>();
+//					final String mycallid = SUtil.createUniqueId(compid.getName()+".sub."+method.toString());
+//					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+//					// Can be invoked directly, because internally redirects to agent thread.
+////					System.out.println("sending backward cmd");
+//					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+//						content, mycallid, to, res, nonfunc, sic);
+//				}
 				
 				// Called from delegation listeners in RMS -> ignore if already terminated
 				public void setException(Exception exception)
@@ -992,16 +992,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 					}
 				}
 				
-				public void sendBackwardCommand(Object info)
-				{
-					Future<Object> res = new Future<Object>();
-					final String mycallid = SUtil.createUniqueId(compid.getName()+".interm."+method.toString());
-					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("sending backward cmd");
-					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
-						content, mycallid, to, res, nonfunc, sic);
-				}
+//				public void sendBackwardCommand(Object info)
+//				{
+//					Future<Object> res = new Future<Object>();
+//					final String mycallid = SUtil.createUniqueId(compid.getName()+".interm."+method.toString());
+//					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+//					// Can be invoked directly, because internally redirects to agent thread.
+////					System.out.println("sending backward cmd");
+//					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+//						content, mycallid, to, res, nonfunc, sic);
+//				}
 				
 				// Called from delegation listeners in RMS -> ignore if already terminated
 				public void setException(Exception exception)
@@ -1043,16 +1043,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 					}
 				}
 				
-				public void sendBackwardCommand(Object info)
-				{
-					Future<Object> res = new Future<Object>();
-					final String mycallid = SUtil.createUniqueId(compid.getName()+".term."+method.toString());
-					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("sending backward cmd");
-					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
-						content, mycallid, to, res, nonfunc, sic);
-				}
+//				public void sendBackwardCommand(Object info)
+//				{
+//					Future<Object> res = new Future<Object>();
+//					final String mycallid = SUtil.createUniqueId(compid.getName()+".term."+method.toString());
+//					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+//					// Can be invoked directly, because internally redirects to agent thread.
+////					System.out.println("sending backward cmd");
+//					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+//						content, mycallid, to, res, nonfunc, sic);
+//				}
 				
 				// Called from delegation listeners in RMS -> ignore if already terminated
 				public void setException(Exception exception)

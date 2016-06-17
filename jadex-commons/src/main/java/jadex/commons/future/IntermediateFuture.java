@@ -195,7 +195,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
         		throw new RuntimeException("setResult() only allowed without intermediate results:"+results);
         	}
 
-       		super.doSetResult(result);
+       		super.doSetResult(result, false);
    			this.results = result;
 		}
 
@@ -218,7 +218,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
 	    	else
 	    	{
-       			ret	= super.doSetResultIfUndone(result);
+       			ret	= super.doSetResult(result, true);
        			if(ret)
        			{
        				this.results = result;
@@ -243,7 +243,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	synchronized(this)
     	{
         	Collection<E>	res	= getIntermediateResults();
-        	super.doSetResult(res);
+        	super.doSetResult(res, false);
         	
 			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
     		// because getIntermediateResults() returns empty list when results==null.
@@ -264,25 +264,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	boolean	 ret;
     	synchronized(this)
 		{
-        	if(isDone())
-        	{
-        		ret	= false;
-        	}
-        	else
-        	{
-            	Collection<E>	res	= getIntermediateResults();
-        		ret	= super.doSetResultIfUndone(res);
-        		
-        		if(ret)
+        	Collection<E>	res	= getIntermediateResults();
+    		ret	= super.doSetResult(res, true);
+    		
+    		if(ret)
+    		{
+    			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
+        		// because getIntermediateResults() returns empty list when results==null.
+        		if(results==null)
         		{
-	    			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
-	        		// because getIntermediateResults() returns empty list when results==null.
-	        		if(results==null)
-	        		{
-	        			results	= res;
-	        		}
+        			results	= res;
         		}
-        	}
+    		}
 		}
 
     	if(ret)

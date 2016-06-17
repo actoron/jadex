@@ -218,12 +218,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			public IFuture messageReceived(IMessageAdapter msg)
 			{
 				addMessage(msg);
-				return new Future(null);
+				return IFuture.DONE;
 			}
 			public IFuture messageSent(IMessageAdapter msg)
 			{
 				addMessage(msg);
-				return new Future(null);
+				return IFuture.DONE;
 			}
 		};
 	}
