@@ -3,6 +3,7 @@ package jadex.bdiv3.model;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import jadex.bdiv3.BDIClassReader;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanContextCondition;
@@ -12,6 +13,7 @@ import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.runtime.impl.ServiceCallPlan;
 import jadex.bridge.ClassInfo;
 import jadex.commons.MethodInfo;
+import jadex.micro.MicroClassReader.DummyClassLoader;
 
 /**
  *  The plan mbody.
@@ -205,7 +207,7 @@ public class MBody
 					if(bodymethod==null)
 					{
 						Class<?> body = clazz.getType(cl);
-						bodymethod = getMethod(body, PlanBody.class);
+						bodymethod = getMethod(body, PlanBody.class, cl);
 						if(bodymethod==null)
 							throw  new RuntimeException("Plan has no body method: "+body);
 					}
@@ -230,7 +232,7 @@ public class MBody
 					if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
 					{
 						Class<?> body = clazz.getType(cl);
-						passedmethod = getMethod(body, PlanPassed.class);
+						passedmethod = getMethod(body, PlanPassed.class, cl);
 						if(passedmethod==null)
 							passedmethod = MI_NOTFOUND;
 					}
@@ -255,7 +257,7 @@ public class MBody
 					if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
 					{
 						Class<?> body = clazz.getType(cl);
-						failedmethod = getMethod(body, PlanFailed.class);
+						failedmethod = getMethod(body, PlanFailed.class, cl);
 						if(failedmethod==null)
 							failedmethod = MI_NOTFOUND;
 					}
@@ -280,7 +282,7 @@ public class MBody
 					if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
 					{
 						Class<?> body = clazz.getType(cl);
-						abortedmethod = getMethod(body, PlanAborted.class);
+						abortedmethod = getMethod(body, PlanAborted.class, cl);
 						if(abortedmethod==null)
 							abortedmethod = MI_NOTFOUND;
 					}
@@ -305,7 +307,7 @@ public class MBody
 					if(preconditionmethod==null && !MI_NOTFOUND.equals(preconditionmethod))
 					{
 						Class<?> body = clazz.getType(cl);
-						preconditionmethod = getMethod(body, PlanPrecondition.class);
+						preconditionmethod = getMethod(body, PlanPrecondition.class, cl);
 						if(preconditionmethod==null)
 							preconditionmethod = MI_NOTFOUND;
 					}
@@ -330,7 +332,7 @@ public class MBody
 					if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
 					{
 						Class<?> body = clazz.getType(cl);
-						contextconditionmethod = getMethod(body, PlanContextCondition.class);
+						contextconditionmethod = getMethod(body, PlanContextCondition.class, cl);
 						if(contextconditionmethod==null)
 							contextconditionmethod = MI_NOTFOUND;
 					}
@@ -343,7 +345,7 @@ public class MBody
 	/**
 	 * 
 	 */
-	public static MethodInfo getMethod(Class<?> body, Class<? extends Annotation> type)
+	public static MethodInfo getMethod(Class<?> body, Class<? extends Annotation> type, ClassLoader cl)
 	{
 		MethodInfo ret = null;
 		
@@ -354,7 +356,7 @@ public class MBody
 			Method[] ms = bcl.getDeclaredMethods();
 			for(Method m: ms)
 			{
-				if(m.isAnnotationPresent(type))
+				if(BDIClassReader.isAnnotationPresent(m, type, cl))
 				{
 					ret = new MethodInfo(m);
 					break;

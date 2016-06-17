@@ -64,6 +64,7 @@ public class InnerClassChangeBDI
 		/**
 		 *  Create a new goal whenever sayhello belief is changed.
 		 */
+		// todo: support me without belief ref
 		@GoalCreationCondition(beliefs="sayhello")
 //		public HelloGoal(@Event("sayhello") String text)
 		public HelloGoal(String text)

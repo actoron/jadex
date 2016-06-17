@@ -30,7 +30,7 @@ public class ABDI extends AABDI
 	@Goal(recur=true)
 	public class Cnt1Goal
 	{
-		@GoalTargetCondition(beliefs="num1")
+		@GoalTargetCondition//(beliefs="num1")
 		protected boolean checkTarget()
 		{
 			return num1==2;
@@ -40,7 +40,7 @@ public class ABDI extends AABDI
 	@Goal(recur=true)
 	public class Cnt2Goal
 	{
-		@GoalTargetCondition(beliefs="num2")
+		@GoalTargetCondition//(beliefs="num2")
 		protected boolean checkTarget()
 		{
 			return num2==3;

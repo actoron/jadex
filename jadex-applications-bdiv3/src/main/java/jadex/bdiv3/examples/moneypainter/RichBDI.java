@@ -58,7 +58,7 @@ public class RichBDI
 	@Goal
 	public class BecomeRich
 	{
-		@GoalTargetCondition(beliefs="money")
+		@GoalTargetCondition//(beliefs="money")
 		public boolean checkTarget()
 		{
 			return money==target;

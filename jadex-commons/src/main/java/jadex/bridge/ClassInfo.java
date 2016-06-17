@@ -29,7 +29,7 @@ public class ClassInfo
 	
 	/** The generic type info (e.g. when obtained via method parameter). */
 	protected String geninfo;
-
+	
 	//-------- constructors --------
 	
 	/**
@@ -118,9 +118,9 @@ public class ClassInfo
 	 */
 	public Class<?> getType(ClassLoader cl)
 	{
-		if(type==null && typename!=null && cl!=null)
+		if(mustReload(cl))
 		{
-			type = SReflect.classForName0(typename, cl);
+			type = SReflect.classForName0(getTypeName(), cl);
 		}
 		return type;
 	}
@@ -131,11 +131,21 @@ public class ClassInfo
 	 */
 	public Class<?> getType(ClassLoader cl, String[] imports)
 	{
-		if(type==null && typename!=null)
+		if(mustReload(cl))
 		{
-			type = SReflect.findClass0(typename, imports, cl);
+			type = SReflect.findClass0(getTypeName(), imports, cl);
 		}
 		return type;
+	}
+	
+	/**
+	 *  Check if the type must be loaded.
+	 *  @param cl The classloader
+	 *  @return True if must be reloaded.
+	 */
+	protected boolean mustReload(ClassLoader cl)
+	{
+		return cl!=null && (type==null || cl!=type.getClassLoader());
 	}
 	
 //	/**

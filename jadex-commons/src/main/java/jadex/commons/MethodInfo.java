@@ -32,9 +32,6 @@ public class MethodInfo
 	/** Cached method. */
 	protected Method method;
 
-	/** Cached classloader. */
-	protected ClassLoader classloader;
-	
 	//-------- constructors --------
 	
 	/**
@@ -221,7 +218,7 @@ public class MethodInfo
 	{
 		try
 		{
-			if(method==null || classloader != cl)
+			if(method==null || method.getClass().getClassLoader() != cl)
 			{
 				Class<?>[] types = new Class[parametertypes.length];
 				for(int i=0; i<types.length; i++)
@@ -230,7 +227,6 @@ public class MethodInfo
 				}
 				Class<?> cla = SReflect.findClass(classname, null, cl);
 				method = cla.getDeclaredMethod(name, types);
-				this.classloader = cl;
 			}
 			return method;
 		}

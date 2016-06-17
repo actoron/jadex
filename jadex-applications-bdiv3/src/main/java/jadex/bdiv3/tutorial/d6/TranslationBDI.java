@@ -1,8 +1,5 @@
 package jadex.bdiv3.tutorial.d6;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
@@ -18,6 +15,9 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  *  The translation agent E3. 
  *  
@@ -32,7 +32,7 @@ public class TranslationBDI
 	
 	/** The map of words. */
 	@Belief
-	protected Map<String, String> egwords = new HashMap<String, String>();
+	protected Map<String, String> egwords = new LinkedHashMap<String, String>();
 	
 	/** The max value of entries allowed in the map. */
 //	@Belief
@@ -48,14 +48,14 @@ public class TranslationBDI
 	@Goal(excludemode=ExcludeMode.Never)
 	public class MaintainStorageGoal
 	{
-		@GoalMaintainCondition(beliefs="egwords")
+		@GoalMaintainCondition//(beliefs="egwords")
 		protected boolean maintain()
 		{
 //			System.out.println("check maintain: "+egwords.size()+" "+(egwords.size()<=maxstorage));
 			return egwords.size()<=4;//maxstorage;
 		}
 		
-		@GoalTargetCondition(beliefs="egwords")
+		@GoalTargetCondition//(beliefs="egwords")
 		protected boolean target()
 		{
 //			System.out.println("check target: "+egwords.size()+" "+event);

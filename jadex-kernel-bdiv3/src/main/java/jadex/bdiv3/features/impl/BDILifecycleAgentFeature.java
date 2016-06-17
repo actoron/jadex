@@ -1720,57 +1720,61 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				
 				// context condition
 								
-				final MethodInfo mi = mplan.getBody().getContextConditionMethod(component.getClassLoader());
-				if(mi!=null)
-				{
-					PlanContextCondition pcc = mi.getMethod(component.getClassLoader()).getAnnotation(PlanContextCondition.class);
-					String[] evs = pcc.beliefs();
-					RawEvent[] rawevs = pcc.rawevents();
-					List<EventType> events = new ArrayList<EventType>();
-					for(String ev: evs)
-					{
-						BDIAgentFeature.addBeliefEvents(component, events, ev);
-					}
-					for(RawEvent rawev: rawevs)
-					{
-						events.add(BDIAgentFeature.createEventType(rawev));
-					}
-				
-					IAction<Void> abortplans = new IAction<Void>()
-					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-						{
-							Collection<RPlan> coll = rcapa.getPlans(mplan);
-							
-							for(final RPlan plan: coll)
-							{
-								invokeBooleanMethod(plan.getBody().getBody(), mi.getMethod(component.getClassLoader()), plan.getModelElement(), event, plan, component)
-									.addResultListener(new IResultListener<Boolean>()
-								{
-									public void resultAvailable(Boolean result)
-									{
-										if(!result.booleanValue())
-										{
-											plan.abort();
-										}
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-									}
-								});
-							}
-							return IFuture.DONE;
-						}
-					};
+//				final MethodInfo mi = mplan.getBody().getContextConditionMethod(component.getClassLoader());
+//				if(mi!=null)
+//				{
+//					PlanContextCondition pcc = mi.getMethod(component.getClassLoader()).getAnnotation(PlanContextCondition.class);
+//					String[] evs = pcc.beliefs();
+//					RawEvent[] rawevs = pcc.rawevents();
+//					List<EventType> events = new ArrayList<EventType>();
+//					for(String ev: evs)
+//					{
+//						BDIAgentFeature.addBeliefEvents(component, events, ev);
+//					}
+//					for(RawEvent rawev: rawevs)
+//					{
+//						events.add(BDIAgentFeature.createEventType(rawev));
+//					}f
+//				
+//					IAction<Void> abortplans = new IAction<Void>()
+//					{
+//						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+//						{
+//							Collection<RPlan> coll = rcapa.getPlans(mplan);
+//							
+//							for(final RPlan plan: coll)
+//							{
+//								invokeBooleanMethod(plan.getBody().getBody(), mi.getMethod(component.getClassLoader()), plan.getModelElement(), event, plan, component)
+//									.addResultListener(new IResultListener<Boolean>()
+//								{
+//									public void resultAvailable(Boolean result)
+//									{
+//										if(!result.booleanValue())
+//										{
+//											plan.abort();
+//										}
+//									}
+//									
+//									public void exceptionOccurred(Exception exception)
+//									{
+//									}
+//								});
+//							}
+//							return IFuture.DONE;
+//						}
+//					};
+//					
+//					Rule<Void> rule = new Rule<Void>("plan_context_abort_"+mplan.getName(), 
+//						new PlansExistCondition(mplan, rcapa), abortplans);
+//					rule.setEvents(events);
+//					rulesystem.getRulebase().addRule(rule);
+//				}
+//				else 
 					
-					Rule<Void> rule = new Rule<Void>("plan_context_abort_"+mplan.getName(), 
-						new PlansExistCondition(mplan, rcapa), abortplans);
-					rule.setEvents(events);
-					rulesystem.getRulebase().addRule(rule);
-				}
-				else if(mplan.getContextCondition()!=null)
+				if(mplan.getContextCondition()!=null)
 				{
+					final MethodInfo mi = mplan.getBody().getContextConditionMethod(component.getClassLoader());
+					final Method m = mi!=null? mi.getMethod(component.getClassLoader()): null;
 					final MCondition mcond = mplan.getContextCondition();
 					
 					IAction<Void> abortplans = new IAction<Void>()
@@ -1781,9 +1785,30 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							
 							for(final RPlan plan: coll)
 							{
-								if(!evaluateCondition(component, mcond, plan.getModelElement(), Collections.singletonMap(plan.getFetcherName(), (Object)plan)))
+								if(m!=null)
 								{
-									plan.abort();
+									invokeBooleanMethod(plan.getBody().getBody(), mi.getMethod(component.getClassLoader()), plan.getModelElement(), event, plan, component)
+										.addResultListener(new IResultListener<Boolean>()
+									{
+										public void resultAvailable(Boolean result)
+										{
+											if(!result.booleanValue())
+											{
+												plan.abort();
+											}
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									});
+								}
+								else
+								{
+									if(!evaluateCondition(component, mcond, plan.getModelElement(), Collections.singletonMap(plan.getFetcherName(), (Object)plan)))
+									{
+										plan.abort();
+									}
 								}
 							}
 							return IFuture.DONE;

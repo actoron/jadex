@@ -82,12 +82,12 @@ public class FutureFunctionality
 	 */
 	protected void	logException(Exception e, Exception userex, boolean terminable, boolean undone, boolean async)
 	{
-		if(userex!=null)
-		{
-			StringWriter	sw	= new StringWriter();
-			userex.printStackTrace(new PrintWriter(sw));
-			getLogger().severe("Exception in future functionality: "+sw);
-		}
+//		if(userex!=null)
+//		{
+//			StringWriter	sw	= new StringWriter();
+//			userex.printStackTrace(new PrintWriter(sw));
+//			getLogger().severe("Exception in future functionality: "+sw);
+//		}
 //		e.printStackTrace(new PrintWriter(sw));
 //		Thread.dumpStack();
 //		if(!undone && ! async)

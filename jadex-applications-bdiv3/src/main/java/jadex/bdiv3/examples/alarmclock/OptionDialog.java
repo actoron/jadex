@@ -46,9 +46,9 @@ public class OptionDialog extends JDialog
 	/** The image icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"Browse", SGUI.makeIcon(OptionDialog.class,	"/jadex/bdi/examples/alarmclock/images/dots_small.png")
+		"Browse", SGUI.makeIcon(OptionDialog.class,	"/jadex/bdiv3/examples/alarmclock/images/dots_small.png")
 	});
-
+	
 	//-------- attributes --------
 
 	/** The agent. */

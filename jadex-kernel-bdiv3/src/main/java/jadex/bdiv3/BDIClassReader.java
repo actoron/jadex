@@ -37,6 +37,7 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.ServicePlan;
@@ -57,6 +58,7 @@ import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
@@ -557,16 +559,17 @@ public class BDIClassReader extends MicroClassReader
 		}
 		
 		// Create enhanced classes if not already present.
-		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
+		
 		for(Class<?> agcl: agtcls)
 		{
 //			Class<?> acl =
-			gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
+			gen.generateBDIClass(agcl.getName(), bdimodel, cl);
 //			System.out.println("genclazz: "+agcl.getName()+" "+agcl.hashCode()+" "+agcl.getClassLoader());
 		}
 		
 		// Sort the plans according to their declaration order in the source file
 		// Must be done after class enhancement to contain the "__getLineNumber()" method
+		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		bdimodel.getCapability().sortPlans(classloader);
 		
 //		System.out.println("genclazz: "+genclazz);
@@ -795,6 +798,14 @@ public class BDIClassReader extends MicroClassReader
 			MBody mbody = new MBody(mi, ci, sp.name().length()==0? null: sp.name(), sp.method().length()==0? null: sp.method(), 
 				mapperclass==null? null: new ClassInfo(mapperclass), body.component().length()==0 ? null : body.component());
 			mplan = new MPlan(name, mbody, mtr, wmtr, p.priority());
+			
+			MethodInfo ccm = mbody.getContextConditionMethod(cl);
+			if(ccm!=null)
+			{
+				PlanContextCondition c = getAnnotation(ccm.getMethod(cl), PlanContextCondition.class, cl);
+				MCondition mcond = createMethodCondition(mplan, "context", c.beliefs(), c.rawevents(), null, bdimodel, ccm.getMethod(cl), cl);
+				mplan.setContextCondition(mcond);
+			}
 		}
 		
 		return mplan;
@@ -993,38 +1004,44 @@ public class BDIClassReader extends MicroClassReader
 			if(isAnnotationPresent(m, GoalCreationCondition.class, cl))
 			{
 				GoalCreationCondition c = getAnnotation(m, GoalCreationCondition.class, cl);
-				addMethodCondition(mgoal, MGoal.CONDITION_CREATION, 
+				MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_CREATION, 
 					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
+				mgoal.addCondition(MGoal.CONDITION_CREATION, mcond);
 			}
 			else if(isAnnotationPresent(m, GoalDropCondition.class, cl))
 			{
 				GoalDropCondition c = getAnnotation(m, GoalDropCondition.class, cl);
-				addMethodCondition(mgoal, MGoal.CONDITION_DROP, 
+				MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_DROP, 
 					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
+				mgoal.addCondition(MGoal.CONDITION_DROP, mcond);
 			}
 			else if(isAnnotationPresent(m, GoalMaintainCondition.class, cl))
 			{
 				GoalMaintainCondition c = getAnnotation(m, GoalMaintainCondition.class, cl);
-				addMethodCondition(mgoal, MGoal.CONDITION_MAINTAIN, 
+				MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_MAINTAIN, 
 					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
+				mgoal.addCondition(MGoal.CONDITION_MAINTAIN, mcond);
 			}
 			else if(isAnnotationPresent(m, GoalTargetCondition.class, cl))
 			{
 				GoalTargetCondition c = getAnnotation(m, GoalTargetCondition.class, cl);
-				addMethodCondition(mgoal, MGoal.CONDITION_TARGET, 
+				MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_TARGET, 
 					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
+				mgoal.addCondition(MGoal.CONDITION_TARGET, mcond);
 			}
 			else if(isAnnotationPresent(m, GoalContextCondition.class, cl))
 			{
 				GoalContextCondition c = getAnnotation(m, GoalContextCondition.class, cl);
-				addMethodCondition(mgoal, MGoal.CONDITION_CONTEXT, 
+				MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_CONTEXT, 
 					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
+				mgoal.addCondition(MGoal.CONDITION_CONTEXT, mcond);
 			}
 			else if(isAnnotationPresent(m, GoalRecurCondition.class, cl))
 			{
 				GoalRecurCondition c = getAnnotation(m, GoalRecurCondition.class, cl);
-				addMethodCondition(mgoal, MGoal.CONDITION_RECUR, 
+				MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_RECUR, 
 					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
+				mgoal.addCondition(MGoal.CONDITION_RECUR, mcond);
 			}
 		}
 		
@@ -1034,7 +1051,7 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected void addMethodCondition(MGoal mgoal, String condtype, String[] evs, RawEvent[] rawevs, String[] paramevs, 
+	protected MCondition createMethodCondition(MParameterElement mpelem, String condtype, String[] evs, RawEvent[] rawevs, String[] paramevs, 
 		BDIModel model, Method m, ClassLoader cl)
 	{
 		List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(m, cl), cl);
@@ -1046,13 +1063,17 @@ public class BDIClassReader extends MicroClassReader
 		{
 			events.add(BDIAgentFeature.createEventType(rawev)); 
 		}
-		for(String pev: paramevs)
+		if(paramevs!=null)
 		{
-			BDIAgentFeature.addParameterEvents(mgoal, model.getCapability(), events, pev, cl);
+			for(String pev: paramevs)
+			{
+				BDIAgentFeature.addParameterEvents(mpelem, model.getCapability(), events, pev, cl);
+			}
 		}
 		MCondition cond = new MCondition(condtype+"_"+m.toString(), events);
 		cond.setMethodTarget(new MethodInfo(m));
-		mgoal.addCondition(condtype, cond);
+		return cond;
+//		mgoal.addCondition(condtype, cond);
 	}
 	
 	/**

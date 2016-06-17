@@ -74,7 +74,7 @@ public class TranslationBDI
 	}
 	
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()

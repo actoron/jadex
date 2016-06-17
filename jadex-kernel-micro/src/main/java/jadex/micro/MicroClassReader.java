@@ -534,7 +534,7 @@ public class MicroClassReader
 					}
 					
 					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
-						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding, nfprops,  Arrays.asList(vals[i].tags()));
+						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding, nfprops, Arrays.asList(vals[i].tags()));
 					if(rsers.containsKey(vals[i].name()))
 					{
 						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
@@ -1757,7 +1757,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl)
+	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(clazz.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1766,7 +1766,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public <T extends Annotation> T getAnnotation(Field f, Class<T> anclazz, ClassLoader cl)
+	public static <T extends Annotation> T getAnnotation(Field f, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(f.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1775,7 +1775,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public <T extends Annotation> T getAnnotation(Method m, Class<T> anclazz, ClassLoader cl)
+	public static <T extends Annotation> T getAnnotation(Method m, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(m.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1784,7 +1784,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public <T extends Annotation> T getAnnotation(Constructor<?> c, Class<T> anclazz, ClassLoader cl)
+	public static <T extends Annotation> T getAnnotation(Constructor<?> c, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(c.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1793,7 +1793,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public Annotation[][]  getParameterAnnotations(Method m, ClassLoader cl)
+	public static Annotation[][]  getParameterAnnotations(Method m, ClassLoader cl)
 	{
 		Annotation[][] ret = null;
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
@@ -1815,7 +1815,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public Annotation[][]  getParameterAnnotations(Constructor c, ClassLoader cl)
+	public static Annotation[][]  getParameterAnnotations(Constructor c, ClassLoader cl)
 	{
 		Annotation[][] ret = null;
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
@@ -1837,7 +1837,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl1, ClassLoader cl2)
+	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl1, ClassLoader cl2)
 	{
 		return getProxyAnnotation(clazz.getAnnotation((Class<T>)getClass(anclazz, cl1)), cl2);
 	}
@@ -1882,7 +1882,7 @@ public class MicroClassReader
 	 *  Gets proxy annotation that can be invoked by corresponding classloader.
 	 * @return ret
 	 */
-	public <T extends Annotation> T getProxyAnnotation(final T an, final ClassLoader cl)
+	public static <T extends Annotation> T getProxyAnnotation(final T an, final ClassLoader cl)
 	{
 		T ret = null;
 		

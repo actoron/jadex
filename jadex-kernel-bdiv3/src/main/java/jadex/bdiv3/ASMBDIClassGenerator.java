@@ -28,6 +28,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -45,6 +46,7 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.micro.MicroClassReader.DummyClassLoader;
 
 
 /**
@@ -79,30 +81,33 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public List<Class<?>> generateBDIClass(String clname, BDIModel model, ClassLoader cl)
+	public List<Class<?>> generateBDIClass(String clname, BDIModel model, ClassLoader dummycl)
 	{
-		return generateBDIClass(clname, model, cl, new HashSet<String>());
+		return generateBDIClass(clname, model, dummycl, new HashMap<String, ClassNode>());
 	}
 	
 	/**
 	 *  Generate class.
 	 */
 	public List<Class<?>> generateBDIClass(final String clname, final BDIModel model, 
-		final ClassLoader cl, final Set<String> done)
+		ClassLoader dummycl, final Map<String, ClassNode> done)
 	{
 		List<Class<?>> ret = new ArrayList<Class<?>>();
+		final ClassLoader cl = ((DummyClassLoader)dummycl).getOriginal();
 		
 //		System.out.println("Generating with cl: "+cl+" "+clname);
 		
 		final List<String> todo = new ArrayList<String>();
-		done.add(clname);
 		
 		try
 		{
 	//		String clname = cma.getName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST;
 			
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-			ClassNode cn = new ClassNode();
+			final ClassNode cn = new ClassNode();
+			
+			done.put(clname, cn);
+			
 //			TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out))
 //			TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
 //			CheckClassAdapter cc = new CheckClassAdapter(cw);
@@ -281,7 +286,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 					{
 //						System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
 						String icln = name.replace("/", ".");
-						if(!done.contains(icln))
+						if(!done.containsKey(icln))
 							todo.add(icln);
 					}
 //					else
@@ -311,7 +316,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //				TraceClassVisitor tcv3 = new TraceClassVisitor(null, new PrintWriter(System.out));
 //				cr.accept(tcv2, 0);
 				cr.accept(cv, 0);
-				transformClassNode(cn, iclname, model);
+				transformClassNode(cn, iclname, model, dummycl, done);
 				cn.accept(cw);
 				byte[] data = cw.toByteArray();
 				
@@ -378,7 +383,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			for(String icl: todo)
 			{
-				List<Class<?>> classes = generateBDIClass(icl, model, cl, done);
+				List<Class<?>> classes = generateBDIClass(icl, model, dummycl, done);
 				ret.addAll(classes);
 			}
 		}
@@ -942,21 +947,16 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 *  Find beliefs accessed in methods.
 	 */
-	protected Set<String> findBeliefs(ClassNode cn, MethodNode mn, BDIModel model)
+	protected Set<String> findBeliefs(ClassNode cn, MethodNode mn, BDIModel model, Map<String, ClassNode> others)
 	{
 		Set<String> ret = new HashSet<String>();
 		
 		InsnList l = mn.instructions;
-		LabelNode begin = null;
+		String refob = null;
 		
 		for(int i=0; i<l.size(); i++)
 		{
 			AbstractInsnNode node = l.get(i);
-			
-			if(begin==null && node instanceof LabelNode)
-			{
-				begin = (LabelNode)node;
-			}
 			
 			// Find direct field accesses
 			if(node instanceof FieldInsnNode)
@@ -964,7 +964,13 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				FieldInsnNode fnode = (FieldInsnNode)node;
 				if(fnode.getOpcode()==Opcodes.GETFIELD)
 				if(model.getCapability().hasBelief(fnode.name))
+				{
 					ret.add(fnode.name);
+				}
+				else if(fnode.name.startsWith("this$"))
+				{
+					refob = fnode.name;
+				}
 			}
 			// Find getter accesses
 			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("get"))
@@ -975,47 +981,45 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				if(bname!=null)
 					ret.add(bname);
 			}
+			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("access$"))
+			{
+//				System.out.println("found access: "+((MethodInsnNode)node).name);
+				// found synthetic access to private field of e.g. outer class 
+				
+				// find the type of the field on which the access$ is performed
+				List<FieldNode> fns = cn.fields;
+				for(FieldNode fn: fns)
+				{
+					if(fn.name.equals(refob))
+					{
+						Type t = Type.getType(fn.desc);
+
+						// search the class (node) this$ refers to 
+						ClassNode ocl = others.get(t.getClassName());
+						if(ocl!=null)
+						{
+							// search the access$ method on that class
+							List<MethodNode> mnodes = ocl.methods;
+							for(MethodNode mnode: mnodes)
+							{
+								// add dependencies of that access$ method
+								if(mnode.name.equals(((MethodInsnNode)node).name))
+								{
+									ret.addAll(findBeliefs(ocl, mnode, model, others));
+									break;
+								}
+							}
+						}
+						break;
+					}
+				}
+			}
 		}
 		
 //		System.out.println("Found belief accesses: "+cn.name+" "+ret+" in "+mn.name);
 		
 		return ret;
 	}
-	
-//	if(tododyn.remove(name))
-//	{
-//		MBelief mbel = model.getCapability().getBelief(name);
-//		Set<String>	bevs	= new LinkedHashSet<String>(mbel.getBeliefEvents());
-//		bevs.addAll(evs);
-//		mbel.setBeliefEvents(bevs);
-//	}
-	// Find writeField method calls
-//				if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.equals("writeField"))
-//				{
-////					System.out.println("found writeField node: "+min.name+" "+min.getOpcode());
-//					AbstractInsnNode start = node;
-//					String name = null;
-//					List<String> evs = new ArrayList<String>(); 
-//					while(!start.equals(begin))
-//					{
-//						// find method name via last constant load
-//						if(name==null && start instanceof LdcInsnNode)
-//							name = (String)((LdcInsnNode)start).cst;
-//						if(start.getOpcode()==Opcodes.GETFIELD)
-//						{
-//							String bn = ((FieldInsnNode)start).name;
-//							if(model.getCapability().hasBelief(bn))
-//							{
-//								evs.add(bn);
-//							}
-//						}
-//						start = start.getPrevious();
-//					}
-//					
-//					begin = null;
-//				}
-//				else 
-	
 	
 	/**
 	 * 

@@ -141,7 +141,7 @@ public class CleanerBDI
 		 *  When the chargestate is below 0.2
 		 *  the cleaner will activate this goal.
 		 */
-		@GoalMaintainCondition(beliefs="my_chargestate")
+		@GoalMaintainCondition//(beliefs="my_chargestate")
 		public boolean checkMaintain()
 		{
 			return my_chargestate>0.2;
@@ -151,7 +151,7 @@ public class CleanerBDI
 		 *  The target condition determines when
 		 *  the goal goes back to idle. 
 		 */
-		@GoalTargetCondition(beliefs="my_chargestate")
+		@GoalTargetCondition//(beliefs="my_chargestate")
 		public boolean checkTarget()
 		{
 			return my_chargestate>=1.0;
@@ -200,7 +200,7 @@ public class CleanerBDI
 		/**
 		 *  Suspend the goal when night.
 		 */
-		@GoalContextCondition(beliefs="daytime")
+		@GoalContextCondition//(beliefs="daytime")
 		public boolean checkContext()
 		{
 			return isDaytime();
@@ -338,7 +338,7 @@ public class CleanerBDI
 		/**
 		 *  Suspend the goal at night.
 		 */
-		@GoalContextCondition(beliefs="daytime")
+		@GoalContextCondition//(beliefs="daytime")
 		public boolean checkContext()
 		{
 			return daytime;
@@ -354,7 +354,7 @@ public class CleanerBDI
 		/**
 		 *  Suspend the goal when daytime.
 		 */
-		@GoalContextCondition(beliefs="daytime")
+		@GoalContextCondition//(beliefs="daytime")
 		public boolean checkContext()
 		{
 			return !daytime;
@@ -448,7 +448,7 @@ public class CleanerBDI
 		 *  The goal is achieved when the position
 		 *  of the cleaner is near to the target position.
 		 */
-		@GoalTargetCondition(beliefs="my_location")
+		@GoalTargetCondition//(beliefs="my_location")
 		public boolean checkTarget()
 		{
 			return my_location.isNear(location);
@@ -473,7 +473,7 @@ public class CleanerBDI
 		/** The wastebin. */
 		protected Wastebin wastebin;
 		
-		@GoalTargetCondition(beliefs="wastebins")
+		@GoalTargetCondition//(beliefs="wastebins")
 		public boolean checkTarget()
 		{
 			wastebin = getNearestNonFullWastebin();

@@ -27,5 +27,5 @@ public interface IBDIClassGenerator
 	 *  Generate class, including inner classes.
 	 *  @return the List of classes generated.
 	 */
-	public List<Class<?>> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
+	public List<Class<?>> generateBDIClass(String clname, BDIModel micromodel, ClassLoader dummycl);
 }
