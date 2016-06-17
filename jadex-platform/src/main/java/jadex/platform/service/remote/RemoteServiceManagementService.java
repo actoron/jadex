@@ -1127,12 +1127,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						if(future instanceof ITerminableFuture)
 						{
 							((ITerminableFuture<?>)future).terminate(new TimeoutException("No reply received and timeout occurred: "
-								+receiver+", "+callid+", "+wci));						
+								+receiver+", "+callid+", "+wci+", "+timeout));						
 						}
 						else
 						{
 							future.setExceptionIfUndone(new TimeoutException("No reply received and timeout occurred: "
-								+receiver+", "+callid+", "+wci));
+								+receiver+", "+callid+", "+wci+", "+timeout));
 						}
 					}
 					return IFuture.DONE;
