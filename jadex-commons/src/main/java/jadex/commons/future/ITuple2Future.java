@@ -11,6 +11,14 @@ import java.util.NoSuchElementException;
 public interface ITuple2Future<E, F> extends IIntermediateFuture<TupleResult>
 {
 	/**
+	 *  @deprecated - From 3.0. Use method without suspendable. 
+     *  Get the first result.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getFirstResult(ThreadSuspendable sus);
+	
+	/**
      *  Get the first result.
      *  @return	The next intermediate result.
      *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 

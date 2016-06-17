@@ -74,6 +74,15 @@ public interface IFuture<E>
 	public E get(long timeout);
 
 	/**
+	 *  @deprecated - From 3.0. Use the version without suspendable.
+	 *  Will NOT use the suspendable given as parameter.
+	 *  
+	 *  Get the result - blocking call.
+	 *  @return The future result.
+	 */
+	public E get(ThreadSuspendable sus);
+	
+	/**
 	 *  Add a result listener.
 	 *  @param listener The listener.
 	 */

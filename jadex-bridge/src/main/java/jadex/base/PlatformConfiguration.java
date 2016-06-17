@@ -946,6 +946,30 @@ public class PlatformConfiguration
 		return config;
 	}
 	
+	/**
+	 *  Create a platform configuration.
+	 *  @param args The command line arguments.
+	 *  @return PlatformConfiguration
+	 */
+	public static PlatformConfiguration processArgs(Map<String, String> args)
+	{
+		PlatformConfiguration config = new PlatformConfiguration(); // ?! hmm needs to be passed as parameter also?
+		if(args!=null)
+		{
+			for(Map.Entry<String, String> arg: args.entrySet())
+			{
+				parseArg(arg.getKey(), arg.getValue(), config);
+			}
+		}
+		return config;
+	}
+	
+	/**
+	 *  Parse an argument.
+	 *  @param okey The key.
+	 *  @param val The value.
+	 *  @param config The config.
+	 */
 	public static void parseArg(String okey, String val, PlatformConfiguration config)
 	{
 		String key = okey.startsWith("-")? okey.substring(1): okey;

@@ -92,7 +92,7 @@ public class ComponentStartTest extends	ComponentTest
 //				@Override
 //				public void resultAvailable(Void result)
 //				{
-//					if(cid.getName().indexOf("ParentProcess")!=-1)
+////					if(cid.getName().indexOf("ParentProcess")!=-1)
 //						System.out.println("waiting returned for "+cid);
 //					super.resultAvailable(result);
 //				}

@@ -22,8 +22,11 @@ In this exercise we will develop a translation agent that checks if only good wo
 
 ```java
 
-@Agent
-protected BDIAgent agent;
+@AgentFeature
+protected IBDIAgentFeature bdiFeature;
+
+@AgentFeature
+protected IExecutionFeature execFeature;
 	
 @Belief
 protected Map<String, String> wordtable;

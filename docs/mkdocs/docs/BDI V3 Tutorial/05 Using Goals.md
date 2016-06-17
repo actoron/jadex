@@ -103,7 +103,7 @@ protected void translate(Translate goal)
 public void body()
 {
   String eword = "cat";
-  Translate goal = (Translate)agent.dispatchTopLevelGoal(new Translate(eword)).get();
+  Translate goal = (Translate)bdiFeature.dispatchTopLevelGoal(new Translate(eword)).get();
   System.out.println("Translated: "+eword+" "+goal.getGWord());
 } 
 
@@ -153,7 +153,7 @@ public class Translate
 public void body()
 {
   String eword = "cat";
-  String gword = (String)agent.dispatchTopLevelGoal(new Translate(eword)).get();
+  String gword = (String)bdiFeature.dispatchTopLevelGoal(new Translate(eword)).get();
   System.out.println("Translated: "+eword+" "+gword);
 }
 
@@ -326,7 +326,7 @@ protected String translate(String eword)
 @AgentBody
 public void body()
 {
-  agent.scheduleStep(new IComponentStep<Void>()
+  execFeature.scheduleStep(new IComponentStep<Void>()
   {
     public IFuture<Void> execute(IInternalAccess ia)
     {
@@ -336,7 +336,7 @@ public void body()
   }, 3000);
 		
   String eword = "bugger";
-  String gword = (String)agent.dispatchTopLevelGoal(new Translate(eword)).get();
+  String gword = (String)bdiFeature.dispatchTopLevelGoal(new Translate(eword)).get();
   System.out.println("Translated: "+eword+" "+gword);
 }
 
@@ -395,7 +395,7 @@ In order to activate the step in the agent we also use the waitFor method at the
 @AgentBody
 public void body()
 {
-  agent.dispatchTopLevelGoal(new MaintainStorageGoal());
+  bdiFeature.dispatchTopLevelGoal(new MaintainStorageGoal());
 
   wordtable = new HashMap<String, String>();
   wordtable.put("milk", "Milch");
@@ -411,12 +411,12 @@ public void body()
       wordtable.put("eword_#"+cnt, "gword_#"+cnt);
       cnt++;
       System.out.println("wordtable: "+wordtable);
-      agent.waitFor(2000, this);
+      execFeature.waitFor(2000, this);
       return IFuture.DONE;
     }
   };
 		
-  agent.waitFor(2000, step);
+  execFeature.waitFor(2000, step);
 }
 
 ```

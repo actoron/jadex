@@ -348,7 +348,7 @@ public class CronAgent implements ICronService
 												}
 											}));
 											
-											return new Future<Object>(null);
+											return Future.getEmptyFuture();
 										}
 									});
 								}

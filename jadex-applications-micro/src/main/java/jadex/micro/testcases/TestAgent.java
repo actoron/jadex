@@ -72,10 +72,24 @@ public abstract class TestAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		IResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(platforms.size(), new DelegationResultListener<Void>(ret));
+//		{
+//			@Override
+//			public void resultAvailable(Map<String, Object> result)
+//			{
+//				System.out.println("result: "+result);
+//				super.resultAvailable(result);
+//			}
+//			
+//			@Override
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("exception: "+exception);
+//				super.exceptionOccurred(exception);
+//			}
+//		};
 		
 		for(IExternalAccess platform: platforms)
 		{
-//			platform.killComponent().addResultListener(crl);
 //			System.out.println("kill: "+platform.getComponentIdentifier());
 			platform.killComponent().addResultListener(crl);
 		}

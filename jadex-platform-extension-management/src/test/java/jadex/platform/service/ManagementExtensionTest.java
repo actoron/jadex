@@ -1,7 +1,5 @@
 package jadex.platform.service;
 
-import java.io.File;
-
 import jadex.base.test.ComponentTestSuite;
 import junit.framework.Test;
 
@@ -19,9 +17,8 @@ public class ManagementExtensionTest extends ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
-//				"parallelizer\\User",	// Broken test? todo: fix! (lars?)
-//				"parallelizer/User",	// Broken test? todo: fix! (lars?)
-				"ManualUser",	// extends user to allow manual testing with gui.
+				"DaemonResponder",	// cannot be started without receiver parameter
+				"ManualUser",	// extends user test to allow manual testing with gui.
 				"TestSubprocessStartEvent",	// part of test and sometimes produces exception when started alone.
 				"TestIntermediateEvent"	// part of test and sometimes produces exception when started alone.
 			});

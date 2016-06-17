@@ -145,6 +145,31 @@ public class MCapability extends MElement
 	}
 	
 	/**
+	 *  Test if a belief is contained.
+	 *  @param name The name.
+	 *  @return The correctly spelled belief name or null.
+	 */
+	public String hasBeliefIgnoreCase(String name)
+	{
+		String ret = null;
+		name = name.toLowerCase();
+		
+		if(beliefs!=null && name!=null)
+		{
+			for(MBelief bel: beliefs)
+			{
+				if(name.equals(bel.getName().toLowerCase()))
+				{
+					ret = bel.getName();
+					break;
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get a belief.
 	 */
 	public MBelief getBelief(String name)

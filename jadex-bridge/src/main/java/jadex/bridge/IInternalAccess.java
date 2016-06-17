@@ -56,13 +56,6 @@ public interface IInternalAccess
 	public IComponentDescription	getComponentDescription();
 	
 	/**
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	// Todo: convenience object? -> fix search!?
-//	public IServiceContainer getServiceContainer();
-	
-	/**
 	 *  Kill the component.
 	 */
 	public IFuture<Map<String, Object>> killComponent();
@@ -110,7 +103,50 @@ public interface IInternalAccess
 	 */
 	// Todo: move to IPlatformComponent?
 	public IParameterGuesser getParameterGuesser();
+	
+	/**
+	 *  @deprecated From 3.0. Use getComponentFeature(IArgumentsResultsFeature.class).getArguments()
+	 *  Get an argument value per name.
+	 *  @param name The argument name.
+	 *  @return The argument value.
+	 */
+	public Object getArgument(String name);
+	
+	/**
+	 *  @deprecated From 3.0. Use internal access.
+	 *  @return The interpreter.
+	 */
+	public IInternalAccess getInterpreter();
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with internal access.
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IInternalAccess getServiceContainer();
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with internal access.
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IInternalAccess getServiceProvider();
+	
+	/**
+	 *  @deprecated From version 3.0 - replaced with internal access.
+	 *  Get the internal access.
+	 *  @return The internal access.
+	 */
+	public IInternalAccess getInternalAccess();
 		
+	/**
+	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getRequiredService()
+	 *  Get a required service of a given name.
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(String name);
+	
 //	/**
 //	 *  Get the arguments.
 //	 *  @return The arguments.
@@ -142,10 +178,11 @@ public interface IInternalAccess
 //	 */
 //	public IFuture getFileName(String ctype);
 	
-//	/**
-//	 *  Execute a component step.
-//	 */
-//	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step);
+	/**
+	 *  @deprecated From version 3.0 - replaced with getComponentFeature(IExecutionFeature.class).scheduleStep()
+	 *  Execute a component step.
+	 */
+	public <T> IFuture<T> scheduleStep(IComponentStep<T> step);
 //	
 //	/**
 //	 *  Execute an immediate component step,
@@ -158,10 +195,11 @@ public interface IInternalAccess
 //	 */
 //	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime);
 //
-//	/**
-//	 *  Wait for some time and execute a component step afterwards.
-//	 */
-//	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
+	/**
+	 * 	@deprecated From version 3.0 - replaced with getComponentFeature(IExecutionFeature.class).scheduleStep()
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
 //
 //	/**
 //	 *  Wait for some time.
