@@ -122,6 +122,8 @@ public class ClassInfo
 		{
 			type = SReflect.classForName0(getTypeName(), cl);
 		}
+		if(type==null)
+			throw new IllegalArgumentException("Type:"+getTypeName()+" cannot be loaded with classloader: "+cl);
 		return type;
 	}
 	
@@ -135,6 +137,8 @@ public class ClassInfo
 		{
 			type = SReflect.findClass0(getTypeName(), imports, cl);
 		}
+		if(type==null)
+			throw new IllegalArgumentException("Type:"+getTypeName()+" cannot be loaded with classloader: "+cl);
 		return type;
 	}
 	
