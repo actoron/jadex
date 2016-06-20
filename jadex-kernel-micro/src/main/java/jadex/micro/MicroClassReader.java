@@ -1921,7 +1921,7 @@ public class MicroClassReader
 							else if(ret.getClass().isArray() && ret.getClass().getComponentType().isAnnotation())
 							{
 								int len =  Array.getLength(ret);
-								Class<?> arclazz = MicroClassReader.this.getClass(ret.getClass().getComponentType(), cl);
+								Class<?> arclazz = MicroClassReader.getClass(ret.getClass().getComponentType(), cl);
 								Object nret = Array.newInstance(arclazz, len);
 								for(int i=0; i<len; i++)
 								{
