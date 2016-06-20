@@ -936,6 +936,9 @@ public class SReflect
 	 */
 	public static <T> Class<T>	findClass0(String clname, String[] imports, ClassLoader classloader)
 	{
+		if(clname==null)
+			throw new IllegalArgumentException("Classname must not null");
+		
 		clname = makeNiceArrayNotation(clname);
 		
 		if(classloader==null)

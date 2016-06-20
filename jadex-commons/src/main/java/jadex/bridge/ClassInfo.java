@@ -69,7 +69,6 @@ public class ClassInfo
 		}
 
 		this.type = SReflect.getClass(type);
-		
 //		this.type = type; // remember only classname to avoid classloader dependencies
 //		this.typename = SReflect.getClassName(type);
 	}
@@ -82,6 +81,7 @@ public class ClassInfo
 	{
 		if(typename==null)
 			throw new IllegalArgumentException("Typename must not be null.");
+		
 		int pos = typename.indexOf("<");
 		if(pos!=-1)
 		{
@@ -100,7 +100,8 @@ public class ClassInfo
 	 */
 	public String getTypeName()
 	{
-		return typename!=null? typename: type!=null? SReflect.getClassName(type): null;
+		String ret =  typename!=null? typename: type!=null? SReflect.getClassName(type): null;
+		return ret;
 	}
 
 	/**
@@ -118,12 +119,13 @@ public class ClassInfo
 	 */
 	public Class<?> getType(ClassLoader cl)
 	{
+		Class<?> oldtype = type;
 		if(mustReload(cl))
 		{
 			type = SReflect.classForName0(getTypeName(), cl);
 		}
 		if(type==null)
-			throw new IllegalArgumentException("Type:"+getTypeName()+" cannot be loaded with classloader: "+cl);
+			throw new IllegalArgumentException("Type:"+(oldtype!=null? oldtype: getTypeName())+" cannot be loaded with classloader: "+cl);
 		return type;
 	}
 	
@@ -133,12 +135,13 @@ public class ClassInfo
 	 */
 	public Class<?> getType(ClassLoader cl, String[] imports)
 	{
+		Class<?> oldtype = type;
 		if(mustReload(cl))
 		{
 			type = SReflect.findClass0(getTypeName(), imports, cl);
 		}
 		if(type==null)
-			throw new IllegalArgumentException("Type:"+getTypeName()+" cannot be loaded with classloader: "+cl);
+			throw new IllegalArgumentException("Type:"+(oldtype!=null? oldtype: getTypeName())+" cannot be loaded with classloader: "+cl);
 		return type;
 	}
 	
