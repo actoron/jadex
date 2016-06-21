@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  *
  *  The value of this precondition is used to determine
  *  the argument number with the collection or array to check
- *  the index against. The check tests index>=0 && index<collection.size()
+ *  the index against. The check tests index>=0 && collection.size()>index
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})

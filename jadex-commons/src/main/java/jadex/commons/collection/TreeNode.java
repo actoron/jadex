@@ -75,7 +75,7 @@ public class TreeNode
 	 *  Inserts a node at the specified position in the child list. Will
 	 *  throw an ArrayIndexOutOfBoundsException if the index does not exist.
 	 *  @param index the position to insert at.
-	 *  @param child the Node<T> object to insert.
+	 *  @param child the Node object to insert.
 	 *  @throws IndexOutOfBoundsException if thrown.
 	 */
 	public void insertChildAt(int index, TreeNode child) throws IndexOutOfBoundsException
@@ -93,7 +93,7 @@ public class TreeNode
 	}
 
 	/**
-	 * Remove the Node<T> element at index index of the List<Node<T>>.
+	 * Remove the Node element at index index of the List.
 	 * @param index the index of the element to delete.
 	 * @throws IndexOutOfBoundsException if thrown.
 	 */

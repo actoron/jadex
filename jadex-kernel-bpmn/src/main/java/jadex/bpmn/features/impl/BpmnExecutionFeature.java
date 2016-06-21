@@ -33,6 +33,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Bpmn execution logic.
  */
+// Todo: decouple from IInternalBpmnComponentFeature!!!
 public class BpmnExecutionFeature extends ExecutionComponentFeature
 {
 	/** The started flag. */
@@ -159,6 +160,17 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
         started = true;
         
         return IFuture.DONE;
+	}
+	
+	/**
+	 *  Shutdown the feature.
+	 */
+	@Override
+	public IFuture<Void> shutdown()
+	{
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+		bcf.getTopLevelThread().removeSubcontext();
+		return super.shutdown();
 	}
 	
 	/**
