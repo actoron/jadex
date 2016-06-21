@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.future.IResultListener;
@@ -164,7 +165,20 @@ public class ComponentActionList
 						try
 						{
 //							System.out.println("Action: "+entry);
-							if(!entry.isInvalid())
+							
+							// Check if it is a component action -> if yes, avatar must be available
+							boolean	noavatar	= false;
+							IComponentDescription actor = (IComponentDescription)entry.parameters.get(ISpaceAction.ACTOR_ID);
+							if(actor!=null)
+							{
+								ISpaceObject avatar = space.getAvatar(actor);
+								if(avatar==null)
+								{
+									noavatar	= true;
+								}
+							}
+							
+							if(!entry.isInvalid() && !noavatar)
 							{
 								Object ret = entry.action.perform(entry.parameters, space);
 								if(entry.listener!=null)
