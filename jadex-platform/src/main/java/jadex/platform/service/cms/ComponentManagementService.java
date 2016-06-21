@@ -1,5 +1,7 @@
 package jadex.platform.service.cms;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1488,8 +1490,9 @@ public class ComponentManagementService implements IComponentManagementService
 	
 	/**
 	 *  Exit the destroy method by setting description state and resetting maps.
+	 *  @return True, when somebody was notified.
 	 */
-	protected void exitDestroy(IComponentIdentifier cid, IComponentDescription desc, Exception ex, Map<String, Object> results)
+	protected boolean exitDestroy(IComponentIdentifier cid, IComponentDescription desc, Exception ex, Map<String, Object> results)
 	{
 //		Thread.dumpStack();
 		Future<Map<String, Object>>	ret;
@@ -1511,6 +1514,8 @@ public class ComponentManagementService implements IComponentManagementService
 				ret.setResult(results);
 			}
 		}
+		
+		return ret!=null;
 	}
 	
 	/**
@@ -1985,7 +1990,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			}
 			// else parent has just been killed.
 			
-			exitDestroy(cid, desc, exception, results);
+			boolean	notified	= exitDestroy(cid, desc, exception, results);
 
 			notifyListenersRemoved(cid, desc, results);
 			
@@ -1994,9 +1999,18 @@ public class ComponentManagementService implements IComponentManagementService
 			if(ex!=null)
 			{
 				// Unhandled component exception
-				// Todo: delegate printing to parent component (if any).
-				comp.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-				ex.printStackTrace();
+				if(notified)
+				{
+					// Delegated exception to some listener, only print info.
+					comp.getLogger().info("Fatal error, component '"+cid+"' will be removed due to "+ex);
+				}
+				else
+				{
+					// No listener -> print exception.
+					StringWriter	sw	= new StringWriter();
+					ex.printStackTrace(new PrintWriter(sw));
+					comp.getLogger().severe("Fatal error, component '"+cid+"' will be removed.\n"+sw);
+				}
 			}
 			
 //			System.out.println("CleanupCommand end.");
