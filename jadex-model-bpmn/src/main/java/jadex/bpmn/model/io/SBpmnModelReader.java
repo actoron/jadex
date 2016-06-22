@@ -149,6 +149,7 @@ public class SBpmnModelReader
 		Map<String, MLane> lanemap = new HashMap<String, MLane>();
 		Map<String, String> laneparents = new HashMap<String, String>();
 		Map<String, Object> buffer = new HashMap<String, Object>();
+		List<Runnable> sempostprocesstasks = new ArrayList<Runnable>();
 		buffer.put("subprocessstack", new LinkedList<MSubProcess>());
 		buffer.put("subprocesselementmap", new HashMap<String, MSubProcess>());
 		buffer.put("eventhandlerparentmap", new HashMap<String, String>());
@@ -238,7 +239,7 @@ public class SBpmnModelReader
 	    		}
 		    	
 //		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, tagstack.pop(), tagstack, attrstack.pop(), contentstack.pop(), buffer, vreader);
-		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, reader.getClosedTag(), reader.getXmlTagStack(), attrstack.removeFirst(), contentstack.removeFirst(), buffer, vreader);
+		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, reader.getClosedTag(), reader.getXmlTagStack(), attrstack.removeFirst(), contentstack.removeFirst(), buffer, sempostprocesstasks, vreader);
 		    }
 		}
 		
@@ -297,11 +298,12 @@ public class SBpmnModelReader
 											  Map<String, String> attrs,
 											  String content,
 											  Map<String, Object> buffer,
+											  List<Runnable> sempostprocesstasks,
 											  IBpmnVisualModelReader vreader)
 	{
 		if(buffer.get("semantic").equals(tag.getNamespace()))
 		{
-			handleSemanticElement(model, emap, lanemap, laneparents, tag, tagstack, attrs, content, buffer);
+			handleSemanticElement(model, emap, lanemap, laneparents, tag, tagstack, attrs, content, buffer, sempostprocesstasks);
 		}
 		else if(buffer.get("jadex").equals(tag.getNamespace()))
 		{
@@ -309,6 +311,12 @@ public class SBpmnModelReader
 		}
 		else if (vreader != null && (buffer.get("bpmndi").equals(tag.getNamespace()) || buffer.get("dc").equals(tag.getNamespace()) || buffer.get("di").equals(tag.getNamespace()) || buffer.get("jadexvisual").equals(tag.getNamespace())))
 		{
+			if (sempostprocesstasks != null)
+			{
+				while (!sempostprocesstasks.isEmpty())
+					sempostprocesstasks.remove(sempostprocesstasks.size() - 1).run();
+				sempostprocesstasks = null;
+			}
 			handleVisualElement(vreader, tag, attrs, content, laneparents, emap, buffer);
 		}
 	}
@@ -325,14 +333,15 @@ public class SBpmnModelReader
 	 *  @param buffer Buffered information.
 	 */
 	protected static final void handleSemanticElement(MBpmnModel model,
-													  Map<String, MIdElement> emap,
+													  final Map<String, MIdElement> emap,
 													  Map<String, MLane> lanemap,
 													  Map<String, String> laneparents,
 													  XmlTag tag,
 													  LinkedList<XmlTag> tagstack,
 													  Map<String, String> attrs,
 													  String content,
-													  Map<String, Object> buffer)
+													  Map<String, Object> buffer,
+													  List<Runnable> postprocesstasks)
 	{
 		
 		
@@ -667,27 +676,39 @@ public class SBpmnModelReader
 		}
 		else if("messageFlow".equals(tag.getLocalPart()))
 		{
-			MMessagingEdge edge = new MMessagingEdge();
-			edge.setId(attrs.get("id"));
-			String edgename = attrs.get("name");
-			edgename = edgename != null? XmlUtil.unescapeString(edgename) : null;
-			edge.setName(edgename);
-			MActivity src = (MActivity) emap.get(attrs.get("sourceRef"));
-			MActivity tgt = (MActivity) emap.get(attrs.get("targetRef"));
-			if (src != null && tgt != null)
-			{	
-				edge.setSource(src);
-				edge.setTarget(tgt);
-				
-				src.addOutgoingMessagingEdge(edge);
-				tgt.addIncomingMessagingEdge(edge);
-				
-				emap.put(edge.getId(), edge);
-			}
-			else
+			final String id = attrs.get("id");
+			final String edgename = attrs.get("name") != null? XmlUtil.unescapeString(attrs.get("name")) : null;
+			final String srcref = attrs.get("sourceRef");
+			final String tgtref = attrs.get("targetRef");
+			Runnable createmsgflow = new Runnable()
 			{
-				System.out.println("Warning: Ignoring message edge with missing endpoints: " + edge.getId() + " src=" + String.valueOf(src) + " tgt=" + String.valueOf(tgt));
-			}
+				public void run()
+				{
+					MMessagingEdge edge = new MMessagingEdge();
+					edge.setId(id);
+					edge.setName(edgename);
+					MActivity src = (MActivity) emap.get(srcref);
+					MActivity tgt = (MActivity) emap.get(tgtref);
+					if (src != null && tgt != null)
+					{	
+						edge.setSource(src);
+						edge.setTarget(tgt);
+						
+						src.addOutgoingMessagingEdge(edge);
+						tgt.addIncomingMessagingEdge(edge);
+						
+						emap.put(edge.getId(), edge);
+					}
+					else
+					{
+						System.out.println("Warning: Ignoring message edge with missing endpoints: " + edge.getId() + " src=" + String.valueOf(src) + " tgt=" + String.valueOf(tgt));
+					}
+				}
+			};
+			if (emap.get(srcref) != null && emap.get(tgtref) != null)
+				createmsgflow.run();
+			else
+				postprocesstasks.add(createmsgflow);
 		}
 		else if ("conditionExpression".equals(tag.getLocalPart()))
 		{
