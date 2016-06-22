@@ -16,6 +16,8 @@ public class CheckingPlan extends Plan
 		Environment env = (Environment)getBeliefbase().getBelief("env").getFact();
 		int size = env.getGridSize();
 		Position mypos = (Position)getBeliefbase().getBelief("pos").getFact();
+		// Todo: fix race condition in bdi init?
+//		assert mypos.equals(env.getPosition(getComponentName()));
 		Position newpos = computeNextPosition(mypos, size);
 
 //		System.out.println("Moving from "+mypos+" to: "+newpos);

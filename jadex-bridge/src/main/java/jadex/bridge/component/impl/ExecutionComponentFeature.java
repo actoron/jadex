@@ -1986,4 +1986,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			return "StepInfo(priority=" + priority + ", step=" + step + ")";
 		}
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ExecutionFeature("+getComponent().getComponentIdentifier()+")";
+	}
 }

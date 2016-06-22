@@ -99,6 +99,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				{
 					synchronized(AsyncExecutionService.this)
 					{
+//						System.err.println("non-idle: "+runningexes.keySet());
 						runningexes.put(task, this);
 					}
 					
@@ -131,13 +132,14 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 										executors.remove(task);
 									}
 									runningexes.remove(task);
+//									System.err.println("after task: "+state+", "+runningexes.keySet());
 									
 									// When no more executable threads, inform idle commands.				
 									if(state==State.RUNNING && idlefuture!=null && runningexes.isEmpty())
 									{
 										idf = idlefuture;
 										idlefuture = null;
-	//									System.out.println("idle");
+//										System.err.println("idle");
 									}
 								}
 								else if(executors!=null && executors.get(task)!=this && runningexes.get(task)==this)

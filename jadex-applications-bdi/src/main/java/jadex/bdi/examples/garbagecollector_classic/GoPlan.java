@@ -13,13 +13,12 @@ public class GoPlan extends Plan
 	public void body()
 	{
 		Environment env = (Environment)getBeliefbase().getBelief("env").getFact();
-
-		int size = env.getGridSize();
 		Position target = (Position)getParameter("pos").getValue();
+		int size = env.getGridSize();
+		Position mypos = (Position)getBeliefbase().getBelief("pos").getFact();
 
-		while(!target.equals(env.getPosition(getComponentName())))
+		while(!target.equals(mypos))
 		{
-			Position mypos = env.getPosition(getComponentName());
 			String dir = null;
 			int mx = mypos.getX();
 			int tx = target.getX();
@@ -47,6 +46,7 @@ public class GoPlan extends Plan
 			waitFor(100);
 			//System.out.println(getAgentName()+" "+getName());
 			env.go(getComponentName(), dir);
+			mypos = (Position)getBeliefbase().getBelief("pos").getFact();
 		}
 	}
 }
