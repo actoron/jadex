@@ -480,14 +480,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				if(!isFinished())
 				{
 					setProcessingState(GoalProcessingState.FAILED);
-					setException(new GoalFailureException(this.toString())
-					{
-						public void printStackTrace()
-						{
-							Thread.dumpStack();
-							super.printStackTrace();
-						}
-					});
+					setException(new GoalDroppedException(this.toString()));
 				}
 				super.notifyListeners();
 			}
@@ -678,7 +671,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	{
 //		return "RGoal(lifecyclestate=" + lifecyclestate + ", processingstate="
 //			+ processingstate + ", state=" + state + ", id=" + id + ")";
-		return id+" "+getPojoElement();
+		return id+(getPojoElement()!=null ? " "+getPojoElement() : "");
 	}
 	
 	/**

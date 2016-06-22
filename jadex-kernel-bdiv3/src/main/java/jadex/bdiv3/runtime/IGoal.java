@@ -28,7 +28,8 @@ public interface IGoal extends IParameterElement, IFinishableElement<Void>// nee
 		INPROCESS,
 		PAUSED,
 		SUCCEEDED,
-		FAILED,
+		FAILED
+		// Todo: ABORTED?
 	};
 	
 	/**

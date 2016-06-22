@@ -26,7 +26,7 @@ public class TakePlan extends Plan
 		dispatchSubgoalAndWait(go);
 
 		// Put down the garbarge.
-		//System.out.println("Calling drop: "+getAgentName()+" "+getRootGoal());
+//		System.out.println("Calling drop: "+getComponentName()+" "+getReason()+", @"+hashCode());
 		env.drop(getComponentName());
 
 		// Go back.

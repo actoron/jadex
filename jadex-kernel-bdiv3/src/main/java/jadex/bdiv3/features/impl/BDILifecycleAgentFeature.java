@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bdiv3.IBDIClassGenerator;
-import jadex.bdiv3.annotation.PlanContextCondition;
-import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature.GoalsExistCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.LifecycleStateCondition;
@@ -39,6 +37,7 @@ import jadex.bdiv3.runtime.EasyDeliberationStrategy;
 import jadex.bdiv3.runtime.IDeliberationStrategy;
 import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
+import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
@@ -566,7 +565,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					@Override
 					public void execute(Exception e)
 					{
-						component.getLogger().severe("Failure during config goal processing: "+SUtil.getExceptionStacktrace(e));
+						if(e instanceof GoalDroppedException)
+						{
+							component.getLogger().info("Config goal has been dropped: "+e);
+						}
+						else
+						{
+							component.getLogger().severe("Failure during config goal processing: "+SUtil.getExceptionStacktrace(e));							
+						}
 					}
 				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}

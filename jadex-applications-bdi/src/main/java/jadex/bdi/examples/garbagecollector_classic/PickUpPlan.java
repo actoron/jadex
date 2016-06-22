@@ -14,7 +14,7 @@ public class PickUpPlan extends Plan
 	{
 		Environment env = (Environment)getBeliefbase().getBelief("env").getFact();
 
-		//System.out.println("Calling pickup: "+getAgentName()+" "+getRootGoal());
+//		System.out.println("Calling pickup: "+getComponentName()+" "+getReason()+", @"+hashCode());
 		if(!env.pickup(getComponentName()))
 			fail();
 	}
