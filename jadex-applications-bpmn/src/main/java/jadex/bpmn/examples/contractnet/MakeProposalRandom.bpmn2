@@ -49,9 +49,6 @@
     <semantic:task name="No Proposal" id="_cpWuIVm8Ed-CVtZr0hfiVg">
       <semantic:incoming>_cpWuKlm8Ed-CVtZr0hfiVg</semantic:incoming>
       <semantic:outgoing>_eaAzcVm8Ed-CVtZr0hfiVg</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bdibpmn.examples.puzzle.ChooseMoveTask</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:exclusiveGateway id="_eKz50Vm8Ed-CVtZr0hfiVg">
       <semantic:incoming>_eKz52lm8Ed-CVtZr0hfiVg</semantic:incoming>

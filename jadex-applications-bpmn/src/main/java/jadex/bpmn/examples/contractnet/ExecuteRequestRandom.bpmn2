@@ -41,9 +41,6 @@
     </semantic:exclusiveGateway>
     <semantic:task name="Store Result" id="_9JVMsWJdEd-Q9q1HfsZXQw">
       <semantic:incoming>_9JVMumJdEd-Q9q1HfsZXQw</semantic:incoming>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bdibpmn.examples.puzzle.ChooseMoveTask</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:sequenceFlow sourceRef="_hVT5gVrFEd-ircvS5nprxA" targetRef="_gYN_IVrFEd-ircvS5nprxA" id="_hVdqgVrFEd-ircvS5nprxA">
     </semantic:sequenceFlow>

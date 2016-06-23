@@ -39,7 +39,6 @@
         </semantic:extensionElements>
       </semantic:task>
       <semantic:extensionElements>
-        <jadex:class>jadex.bdibpmn.examples.puzzle.ChooseMoveTask</jadex:class>
         <jadex:parameter direction="inout" name="proposals" type="java.util.Collection">proposals</jadex:parameter>
         <jadex:property name="items">proposals</jadex:property>
         <jadex:property name="iterator">proposals</jadex:property>
@@ -78,8 +77,6 @@
       </bpmndi:BPMNEdge>
       <di:Edge type="data" jadexElement="lnBroX1cs6Yubo+J">
       </di:Edge>
-      <bpmndi:BPMNEdge bpmnElement="dGGR/rkTeqLml2U4">
-      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </semantic:definitions>

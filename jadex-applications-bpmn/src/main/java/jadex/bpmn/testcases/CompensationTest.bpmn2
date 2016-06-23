@@ -11,13 +11,8 @@
     <jadex:modelname>CompensationTest</jadex:modelname>
     <jadex:description>Task compensation after component kill</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
-    <jadex:arguments>
-      <jadex:argument name="testresults" type="Testcase">
-        <jadex:description>The test results.</jadex:description>
-      </jadex:argument>
-    </jadex:arguments>
     <jadex:results>
-      <jadex:result name="testresults" type="Testcase">
+      <jadex:result name="testresults" type="jadex.base.test.Testcase">
         <jadex:description>The test results.</jadex:description>
       </jadex:result>
     </jadex:results>
