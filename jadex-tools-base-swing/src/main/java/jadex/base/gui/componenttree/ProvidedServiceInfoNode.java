@@ -241,7 +241,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 	{
 		final Future<Class<?>> ret = new Future<Class<?>>();
 		
-		if(service.getType().getType(null)==null)
+		if(service.getType().getType0()==null)
 		{
 			SServiceProvider.getService(platformea, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
@@ -263,7 +263,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		}
 		else
 		{
-			ret.setResult(service.getType().getType(null));
+			ret.setResult(service.getType().getType0());
 		}
 		
 		return ret;

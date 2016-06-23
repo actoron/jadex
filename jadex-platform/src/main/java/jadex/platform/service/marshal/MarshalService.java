@@ -502,7 +502,8 @@ public class MarshalService extends BasicService implements IMarshalService
 			
 			if(object instanceof IService)
 			{
-				Class<?> serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType(cl);
+				Class<?> serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType0();
+				assert serviceinterface!=null;
 				if(!ret.contains(serviceinterface))
 					ret.add(serviceinterface);
 			}

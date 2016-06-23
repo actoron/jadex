@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -43,8 +44,10 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
@@ -121,6 +124,22 @@ public class UserAgent
 //		ranker.addEvaluator(new ExecutionTimeEvaluator(new MethodInfo(IAService.class.getMethod("test", new Class[0]))));
 		
 		invoke();
+	}
+	
+	@AgentKilled
+	public void cleanup()
+	{
+		if(chart!=null)
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					SGUI.getWindowParent(getChartPanel()).dispose();
+				}
+			});
+		}
 	}
 	
 	/**

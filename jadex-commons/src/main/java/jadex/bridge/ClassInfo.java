@@ -119,13 +119,14 @@ public class ClassInfo
 	 */
 	public Class<?> getType(ClassLoader cl)
 	{
-		Class<?> oldtype = type;
-		if(mustReload(cl))
+		if(cl==null)
 		{
-			type = SReflect.classForName0(getTypeName(), cl);
+			throw new IllegalArgumentException("Not allowed with cl==null, use getType0() instead!");
 		}
-		if(type==null)
-			throw new IllegalArgumentException("Type:"+(oldtype!=null? oldtype: getTypeName())+" cannot be loaded with classloader: "+cl);
+		
+		// Todo: cache results -> reload only required for bdi class rewriting?
+		type = SReflect.classForName0(getTypeName(), cl);
+		assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
 		return type;
 	}
 	
@@ -135,35 +136,26 @@ public class ClassInfo
 	 */
 	public Class<?> getType(ClassLoader cl, String[] imports)
 	{
-		Class<?> oldtype = type;
-		if(mustReload(cl))
+		if(cl==null)
 		{
-			type = SReflect.findClass0(getTypeName(), imports, cl);
+			throw new IllegalArgumentException("Not allowed with cl==null, use getType0() instead!");
 		}
-		if(type==null)
-			throw new IllegalArgumentException("Type:"+(oldtype!=null? oldtype: getTypeName())+" cannot be loaded with classloader: "+cl);
+		
+		// Todo: cache results -> reload only required for bdi class rewriting?
+		type = SReflect.findClass0(getTypeName(), imports, cl);
+		assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
 		return type;
 	}
 	
 	/**
-	 *  Check if the type must be loaded.
-	 *  @param cl The classloader
-	 *  @return True if must be reloaded.
+	 *  Get the type, if available
+	 *  @return The type or null if not yet resolved.
 	 */
-	protected boolean mustReload(ClassLoader cl)
+	public Class<?> getType0()
 	{
-		return cl!=null && (type==null || cl!=type.getClassLoader());
+		return type;
 	}
 	
-//	/**
-//	 *  Get the type.
-//	 *  @return The type.
-//	 */
-//	public Class<?> getType()
-//	{
-//		return type;
-//	}
-
 	/**
 	 *  Set the type.
 	 *  @param type The type to set.

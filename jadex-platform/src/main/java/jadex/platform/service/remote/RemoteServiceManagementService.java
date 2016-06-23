@@ -73,9 +73,9 @@ import jadex.platform.service.message.contentcodecs.JadexXMLContentCodec;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.OutputConnection;
 import jadex.platform.service.remote.commands.AbstractRemoteCommand;
-import jadex.platform.service.remote.commands.RemoteFutureBackwardCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
+import jadex.platform.service.remote.commands.RemoteIntermediateResultCommand;
 import jadex.platform.service.remote.commands.RemoteSearchCommand;
 import jadex.platform.service.remote.xml.RMIPostProcessor;
 import jadex.platform.service.remote.xml.RMIPreProcessor;
@@ -585,7 +585,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, (IAsyncFilter<IService>)filter, caller);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
-						sendMessage(rrms, cid, content, callid, Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier()), fut, null, null); // todo: non-func
+						sendMessage(rrms, null, content, callid, Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier()), fut, null, null); // todo: non-func
 //					}
 //				});
 				
@@ -878,7 +878,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public void sendMessage(final IComponentIdentifier receiver, final IComponentIdentifier realrec, final Object content,
 		final String callid, final long to, final Future<Object> future, final Map<String, Object> nonfunc, final Object context)
 	{
-//		if(content instanceof RemoteMethodInvocationCommand && ((RemoteMethodInvocationCommand)content).getMethodName().equals("testThreading"))
+//		if(content instanceof RemoteIntermediateResultCommand)// && ((RemoteSearchCommand)content).getType().getTypeName().equals("jadex.micro.servicecall.IServiceCallService"))
 //		{
 //			System.out.println("RMS sending: "+System.currentTimeMillis()+", "+content+" "+receiver);
 //		}

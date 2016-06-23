@@ -63,7 +63,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 		getTextField("Scope").setText(sid!=null? sid.getScope(): "");
 //		getTextField("Implementation").setText();
 
-		if(service.getType().getType(null)==null)
+		if(service.getType().getType0()==null)
 		{
 			SServiceProvider.getService(ea, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
@@ -85,7 +85,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 		}
 		else
 		{
-			internalSetService(service.getType().getType(null));
+			internalSetService(service.getType().getType0());
 		}
 	}
 	

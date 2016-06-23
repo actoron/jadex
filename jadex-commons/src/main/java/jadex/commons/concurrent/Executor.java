@@ -193,6 +193,7 @@ public class Executor implements Runnable
 		{
 			synchronized(switchto)
 			{
+//				System.err.println("Notifying: "+switchto+", "+(throwables!=null ? throwables.get(switchto):""));
 				switchto.notify();
 			}
 		}
@@ -314,7 +315,7 @@ public class Executor implements Runnable
 	 */
 	public void	switchThread(Object monitor, Throwable t)
 	{
-//		System.out.println("switchThread: "+monitor);
+//		System.err.println("switchThread: "+monitor+", "+t);
 
 		synchronized(this)
 		{
@@ -365,6 +366,7 @@ public class Executor implements Runnable
 			finally
 			{
 				this.running = true;
+//				System.err.println("resumed: "+monitor+", "+(throwables!=null ? throwables.get(monitor):""));
 			}
 
 			if(throwables!=null)

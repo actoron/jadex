@@ -366,7 +366,7 @@ public class RemoteServiceManagementAgent
 								{
 									public void resultAvailable(Void v)
 									{
-										final Map reply = mt.createReply(msg);
+										final Map<String, Object> reply = mt.createReply(msg);
 										
 //										if((""+result).indexOf("RemoteSearchCommand")!=-1 && (""+result).indexOf("IServiceCallService")!=-1)
 //										{
