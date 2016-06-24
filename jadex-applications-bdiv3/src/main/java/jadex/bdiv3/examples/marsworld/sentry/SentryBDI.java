@@ -92,7 +92,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		/**
 		 * 
 		 */
-		@GoalContextCondition
+		@GoalContextCondition(beliefs="movecapa.mytargets")
 		public boolean checkContext()
 		{
 			Object mypos = outer.getMoveCapa().getMyself().getProperty(Space2D.PROPERTY_POSITION);
