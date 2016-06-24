@@ -18,6 +18,14 @@ public class ConstructorInfo
 	
 	/** The field (cached). */
 	protected Constructor<?> method;
+	
+	/** The classloader with which this info was loaded.
+	    Note 1: This must not be the same as method.getClass().getClassLoader() because 
+	    the latter returns the loader responsible for the class which could be higher
+	    in the parent hierarchy.
+	    Note 2: The check current_cl==last_cl is not perfect because when invoked
+	    with a parent classloader it will reload the class (although not necessary) */
+	protected ClassLoader classloader;
 
 	/**
 	 *  Create a new ConstructorInfo. 
@@ -50,13 +58,15 @@ public class ConstructorInfo
 	}
 
 	/**
-	 * 
+	 *  Get the constructor via classloader.
+	 *  @param cl The classloader.
+	 *  @return The constructor.
 	 */
 	public Constructor<?> getConstructor(ClassLoader cl)
 	{
 		try
 		{
-			if(method==null)
+			if(method==null || classloader != cl)
 			{
 				Class<?>[] types = new Class[parametertypes.length];
 				for(int i=0; i<types.length; i++)
@@ -65,6 +75,7 @@ public class ConstructorInfo
 				}
 				Class<?> cla = SReflect.findClass(classname, null, cl);
 				method = cla.getDeclaredConstructor(types);
+				classloader = cl;
 			}
 			return method;
 		}

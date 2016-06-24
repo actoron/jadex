@@ -30,6 +30,14 @@ public class ClassInfo
 	/** The generic type info (e.g. when obtained via method parameter). */
 	protected String geninfo;
 	
+	/** The classloader with which this info was loaded.
+	    Note 1: This must not be the same as method.getClass().getClassLoader() because 
+	    the latter returns the loader responsible for the class which could be higher
+	    in the parent hierarchy.
+	    Note 2: The check current_cl==last_cl is not perfect because when invoked
+	    with a parent classloader it will reload the class (although not necessary) */
+	protected ClassLoader classloader;
+	
 	//-------- constructors --------
 	
 	/**
@@ -124,9 +132,13 @@ public class ClassInfo
 			throw new IllegalArgumentException("Not allowed with cl==null, use getType0() instead!");
 		}
 		
-		// Todo: cache results -> reload only required for bdi class rewriting?
-		type = SReflect.classForName0(type!=null? SReflect.getClassName(type): typename, cl);
-		assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
+		if(classloader!=cl)
+		{
+			// Todo: cache results -> reload only required for bdi class rewriting?
+			type = SReflect.classForName0(type!=null? SReflect.getClassName(type): typename, cl);
+			classloader = cl;
+			assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
+		}
 		return type;
 	}
 	
@@ -141,9 +153,13 @@ public class ClassInfo
 			throw new IllegalArgumentException("Not allowed with cl==null, use getType0() instead!");
 		}
 		
-		// Todo: cache results -> reload only required for bdi class rewriting?
-		type = SReflect.findClass0(type!=null? SReflect.getClassName(type): typename, imports, cl);
-		assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
+		if(classloader!=cl)
+		{
+			// Todo: cache results -> reload only required for bdi class rewriting?
+			type = SReflect.findClass0(type!=null? SReflect.getClassName(type): typename, imports, cl);
+			classloader = cl;
+			assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
+		}
 		return type;
 	}
 	
