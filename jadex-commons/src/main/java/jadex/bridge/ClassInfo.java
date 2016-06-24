@@ -125,7 +125,7 @@ public class ClassInfo
 		}
 		
 		// Todo: cache results -> reload only required for bdi class rewriting?
-		type = SReflect.classForName0(getTypeName(), cl);
+		type = SReflect.classForName0(type!=null? SReflect.getClassName(type): typename, cl);
 		assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
 		return type;
 	}
@@ -142,7 +142,7 @@ public class ClassInfo
 		}
 		
 		// Todo: cache results -> reload only required for bdi class rewriting?
-		type = SReflect.findClass0(getTypeName(), imports, cl);
+		type = SReflect.findClass0(type!=null? SReflect.getClassName(type): typename, imports, cl);
 		assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
 		return type;
 	}
