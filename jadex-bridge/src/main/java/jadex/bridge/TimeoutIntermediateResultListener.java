@@ -97,26 +97,6 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 		}
 	}
     
-    /**
-	 *  Called when the result is available.
-	 *  @param result The result.
-	 */
-	public void resultAvailableIfUndone(Collection<E> result)
-	{
-		this.undone = true;
-		resultAvailable(result);
-	}
-	
-	/**
-	 *  Called when an exception occurred.
-	 *  @param exception The exception.
-	 */
-	public void exceptionOccurredIfUndone(Exception exception)
-	{
-		this.undone = true;
-		exceptionOccurred(exception);
-	}
-	
 	/**
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.

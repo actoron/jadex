@@ -137,7 +137,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		createPlatform(/*null*/new String[]{/*"-gui", "true",*/ "-logging", "true"}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		createPlatform(null/*new String[]{"-gui", "true", "-logging", "true"}*/).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)

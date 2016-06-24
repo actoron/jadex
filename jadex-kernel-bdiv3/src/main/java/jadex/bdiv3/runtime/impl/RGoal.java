@@ -480,7 +480,14 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				if(!isFinished())
 				{
 					setProcessingState(GoalProcessingState.FAILED);
-					setException(new GoalDroppedException(this.toString()));
+					setException(new GoalDroppedException(this.toString())
+					{
+						public void printStackTrace()
+						{
+							Thread.dumpStack();
+							super.printStackTrace();
+						}
+					});
 				}
 				super.notifyListeners();
 			}
@@ -1075,7 +1082,22 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			&& !GoalLifecycleState.DROPPING.equals(getLifecycleState()) 
 			&& !GoalLifecycleState.DROPPED.equals(getLifecycleState()))
 		{
-			addListener(new DelegationResultListener<Void>(ret));
+			addListener(new DelegationResultListener<Void>(ret)
+			{
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof GoalDroppedException)
+					{
+						// Goal dropped -> mission accomplished
+						customResultAvailable(null);
+					}
+					else
+					{
+						super.exceptionOccurred(exception);
+					}
+				}
+			});
 			setLifecycleState(getAgent(), GoalLifecycleState.DROPPING);
 		}
 		else

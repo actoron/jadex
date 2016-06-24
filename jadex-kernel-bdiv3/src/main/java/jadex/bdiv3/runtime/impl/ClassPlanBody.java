@@ -286,9 +286,13 @@ public class ClassPlanBody extends AbstractPlanBody
 			bodymethod.setAccessible(true);
 			return bodymethod.invoke(plan, params);
 		}
-		catch(Exception e)
+		catch(Throwable t)
 		{
-			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+			t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
+			if(t instanceof NoClassDefFoundError)
+			{
+				throw new PlanFailureException("Could not create plan "+getRPlan(), t);
+			}
 			if(t instanceof Error)
 			{
 				throw (Error)t;
@@ -301,7 +305,6 @@ public class ClassPlanBody extends AbstractPlanBody
 			{
 				throw new RuntimeException(t);
 			}
-//			throw t instanceof BodyAborted? (BodyAborted)t: t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 		}
 	}
 	

@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 import jadex.commons.DebugException;
 
 /**
- *  The default listener for just printing out result information.
- *  Is used as fallback when no other listener is available.
+ *  The default listener for logging exceptions as warning.
+ *  Is used when exceptions can de ignored.
  */
 public abstract class DefaultResultListener<E> implements IFutureCommandResultListener<E>
 {
@@ -91,7 +91,7 @@ public abstract class DefaultResultListener<E> implements IFutureCommandResultLi
 			this.exception.printStackTrace();
 			exception.printStackTrace();
 		}
-		logger.severe("Exception occurred: "+this+", "+exception);
+		logger.warning("Exception occurred: "+this+", "+exception);
 	}
 
 	

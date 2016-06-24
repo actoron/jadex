@@ -502,7 +502,14 @@ public class MarshalService extends BasicService implements IMarshalService
 			
 			if(object instanceof IService)
 			{
+				// Hack!!! Should not need class loader at all?
+				// getType0 required, cf. ServiceCallTest (why wrong class loader?)
 				Class<?> serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType0();
+				if(serviceinterface==null)
+				{
+					// getType(cl) required, cf. RemoteReferenceTest (remote proxy with only typename) -> use ClassInfo in ProxyInfo instead of Class<?>
+					serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType(cl);
+				}
 				assert serviceinterface!=null;
 				if(!ret.contains(serviceinterface))
 					ret.add(serviceinterface);

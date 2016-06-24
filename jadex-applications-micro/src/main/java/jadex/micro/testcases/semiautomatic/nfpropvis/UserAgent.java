@@ -129,14 +129,14 @@ public class UserAgent
 	@AgentKilled
 	public void cleanup()
 	{
-		if(chart!=null)
+		if(frame!=null)
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					SGUI.getWindowParent(getChartPanel()).dispose();
+					frame.dispose();
 				}
 			});
 		}
@@ -207,6 +207,9 @@ public class UserAgent
 	
 	
 	/** The frame. */
+	protected JFrame frame;
+	
+	/** The chart. */
 	protected JFreeChart chart;
 
 	/** The seriesmap. */
@@ -250,12 +253,12 @@ public class UserAgent
 		
 		ChartPanel panel = new ChartPanel(chart);
 		panel.setFillZoomRectangle(true);
-		JFrame f = new JFrame();
+		frame = new JFrame();
 		JPanel content = new JPanel(new BorderLayout());
 		content.add(panel, BorderLayout.CENTER);
-		f.setContentPane(panel);
-		f.pack();
-		f.setVisible(true);
+		frame.setContentPane(panel);
+		frame.pack();
+		frame.setVisible(true);
 		
 		return chart;
 	}

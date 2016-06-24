@@ -22,7 +22,7 @@ import jadex.commons.future.IUndoneResultListener;
  *  Listener that allows to automatically trigger a timeout when
  *  no result (or exception) was received after some timeout interval.
  */
-public class TimeoutResultListener<E> implements IResultListener<E>, IFutureCommandListener
+public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResultListener<E>, IFutureCommandListener
 {
 	//-------- attributes --------
 	
@@ -140,6 +140,26 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 		}
 	}
 	
+    /**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		this.undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		this.undone = true;
+		exceptionOccurred(exception);
+	}
+
 	/**
 	 *  Cancel the timeout.
 	 */

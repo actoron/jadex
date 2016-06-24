@@ -433,10 +433,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 							{
 								// Ignore outdated timer entries when component is already dead.
 								// propblem this can occur on clock thread
-								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
-								{
-									ret.setException(exception);									
-								}
+//								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
+//								{
+									ret.setExceptionIfUndone(exception);									
+//								}
 							}
 						});
 					}
@@ -1166,7 +1166,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
 					ex	= new ComponentTerminatedException(component.getComponentIdentifier());
 				}
-				step.getFuture().setException(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
+				step.getFuture().setExceptionIfUndone(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
 
 				// If no listener, print failed step to console for developer.
 				// Hard step failure with uncatched exception is shown also when no debug.

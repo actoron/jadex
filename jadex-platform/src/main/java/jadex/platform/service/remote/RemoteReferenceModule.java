@@ -160,6 +160,7 @@ public class RemoteReferenceModule
 				{
 					target	= ((BasicServiceInvocationHandler)handler).getDomainService();
 				}
+				
 			}
 		}
 		

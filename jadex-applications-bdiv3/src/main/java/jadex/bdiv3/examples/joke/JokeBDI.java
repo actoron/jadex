@@ -1,27 +1,5 @@
 package jadex.bdiv3.examples.joke;
 
-import jadex.bdiv3.annotation.Belief;
-import jadex.bdiv3.annotation.Goal;
-import jadex.bdiv3.annotation.GoalTargetCondition;
-import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.annotation.PlanBody;
-import jadex.bdiv3.annotation.PlanPrecondition;
-import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
-import jadex.bdiv3.runtime.impl.PlanFailureException;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.Boolean3;
-import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
-import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentFeature;
-import jadex.rules.eca.ChangeInfo;
-
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -36,6 +14,28 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalTargetCondition;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanPrecondition;
+import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
+import jadex.bdiv3.runtime.impl.GoalDroppedException;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.commons.Boolean3;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Tries to achieve a state of mood of a user.
@@ -83,6 +83,10 @@ public class JokeBDI
 		{
 			bdi.dispatchTopLevelGoal(g).get();
 			System.out.println("Achieved desired user mode: "+usermood);
+		}
+		catch(GoalDroppedException e)
+		{
+			// Killed before achieved -> ignore
 		}
 		catch(Exception e)
 		{

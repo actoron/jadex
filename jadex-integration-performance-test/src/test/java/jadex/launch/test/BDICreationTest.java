@@ -36,7 +36,7 @@ public class BDICreationTest //extends TestCase
 //		System.out.println(resdir);
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
-			"-logging", "false",
+//			"-logging", "true",
 			"-libpath", SUtil.getOutputDirsExpression(projectroot),
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",

@@ -35,7 +35,7 @@ public class BDIV3CreationTest //extends TestCase
 //		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
-			"-logging", "false",
+//			"-logging", "true",
 			"-libpath", SUtil.getOutputDirsExpression("jadex-integration-performance-test"),
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",

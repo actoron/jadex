@@ -134,10 +134,13 @@ public class ClassInfo
 		
 		if(classloader!=cl)
 		{
-			// Todo: cache results -> reload only required for bdi class rewriting?
 			type = SReflect.classForName0(type!=null? SReflect.getClassName(type): typename, cl);
-			classloader = cl;
-			assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
+			// Todo: assert that classloader is always the same -> currently reload required for bdi class rewriting?
+			assert type!=null || classloader==null : "Try to load type :"+getTypeName()+" with wrong classloader: "+classloader+", "+cl;
+			if(type!=null)
+			{
+				classloader = cl;
+			}
 		}
 		return type;
 	}
@@ -155,10 +158,13 @@ public class ClassInfo
 		
 		if(classloader!=cl)
 		{
-			// Todo: cache results -> reload only required for bdi class rewriting?
 			type = SReflect.findClass0(type!=null? SReflect.getClassName(type): typename, imports, cl);
-			classloader = cl;
-			assert type!=null : "Try to load type :"+getTypeName()+" with wrong classloader: "+type.getClassLoader()+", "+cl;
+			// Todo: assert that classloader is always the same -> currently reload required for bdi class rewriting?
+			assert type!=null || classloader==null : "Try to load type :"+getTypeName()+" with wrong classloader: "+classloader+", "+cl;
+			if(type!=null)
+			{
+				classloader = cl;
+			}
 		}
 		return type;
 	}
