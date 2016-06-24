@@ -45,6 +45,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Description;
 
 @Agent
 @Plans(
@@ -62,6 +63,7 @@ import jadex.micro.annotation.AgentBody;
 	@Plan(trigger=@Trigger(goals=CleanerBDI.DropWasteAction.class), priority=1, body=@Body(LocalDropWasteActionPlan.class)),
 	@Plan(trigger=@Trigger(goals=CleanerBDI.GetVisionAction.class), priority=1, body=@Body(LocalGetVisionActionPlan.class))
 })
+@Description("<h1>Cleaner Robot Agent</h1>")
 public class CleanerBDI
 {
 	/** The bdi agent. Automatically injected */
@@ -473,7 +475,7 @@ public class CleanerBDI
 		/** The wastebin. */
 		protected Wastebin wastebin;
 		
-		@GoalTargetCondition//(beliefs="wastebins")
+		@GoalTargetCondition(beliefs="wastebins")
 		public boolean checkTarget()
 		{
 			wastebin = getNearestNonFullWastebin();

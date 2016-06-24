@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +32,11 @@ import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
-import jadex.javaparser.javaccimpl.ParameterNode;
 import jadex.rules.eca.EventType;
 
 
@@ -135,7 +132,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				methodbeliefs.add(mn.name, new MethodBeliefs(mn, bels));
 		}
 		
-		System.out.println("Found bel usages: "+cn.name+" "+methodbeliefs);
+//		System.out.println("Found bel usages: "+cn.name+" "+methodbeliefs);
 		
 		List<MGoal> mgoals = model.getCapability().getGoals();
 		for(MGoal mgoal : mgoals)
@@ -436,11 +433,15 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 							BDIAgentFeature.addBeliefEvents(model.getCapability(), events, belname, dummycl);
 						}
 						cond.setEvents(events);
-						System.out.println("Added belief dependency of condition: "+cond.getName()+" "+cond.getEvents());
+						String	desc	= model.getModelInfo().getDescription();
+						String	info	= "<ul><li>Added belief dependency of condition: "+cond.getName()+" "+cond.getEvents()+"</li></ul>"; 
+						((ModelInfo)model.getModelInfo()).setDescription(desc!=null ? desc + "\n" +info : info);
+//						System.out.println(info);
 					}
 					else
 					{
-						System.out.println("Warning: Found condition without triggering events (will never trigger): "+cond.getName());
+						// Todo: add error to model report.
+						throw new RuntimeException("Found condition without triggering events (will never trigger): "+cond.getName());
 					}
 				}
 			}

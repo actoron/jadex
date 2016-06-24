@@ -981,6 +981,15 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				if(bname!=null)
 					ret.add(bname);
 			}
+			// Find boolean getter accesses
+			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("is"))
+			{
+				MethodInsnNode gnode = (MethodInsnNode)node;
+				String name = gnode.name.substring(2);
+				String bname = model.getCapability().hasBeliefIgnoreCase(name);
+				if(bname!=null)
+					ret.add(bname);
+			}
 			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("access$"))
 			{
 //				System.out.println("found access: "+((MethodInsnNode)node).name);
