@@ -1326,6 +1326,10 @@ public class ProcessThread	implements ITaskContext
 			{
 				getBpmnFeature(thread.getInstance()).getActivityHandler(act).cancel(act, thread.getInstance(), thread);
 			}
+			if(thread.getWaitInfo()!=null)
+			{
+				thread.getWaitInfo().cancel();
+			}
 			thread.setActivity(null);
 			// Notify the thread itself that it has finished
 			thread.notifyFinished();
