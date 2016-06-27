@@ -2,6 +2,7 @@ package jadex.commons;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import jadex.commons.beans.PropertyChangeEvent;
@@ -18,6 +19,8 @@ public class SimplePropertyChangeSupport	implements Serializable
 	private List<PropertyChangeListener>	listeners;
 
 	private Object		source;
+	
+//	private Object comp;
 
 	public SimplePropertyChangeSupport(Object sourceBean)
 	{
@@ -25,8 +28,9 @@ public class SimplePropertyChangeSupport	implements Serializable
 		{
 			throw new NullPointerException();
 		}
-		listeners = new ArrayList<PropertyChangeListener>();
+		listeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 		source = sourceBean;
+//		comp	= getComp();
 	}
 
 	/**
@@ -37,6 +41,7 @@ public class SimplePropertyChangeSupport	implements Serializable
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener listener)
 	{
+//		checkThread();
 		if(this.listeners.contains(listener))
 		{
 			System.out.println("dreck");
@@ -53,6 +58,7 @@ public class SimplePropertyChangeSupport	implements Serializable
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener listener)
 	{
+//		checkThread();
 		this.listeners.remove(listener);
 	}
 
@@ -68,6 +74,7 @@ public class SimplePropertyChangeSupport	implements Serializable
 	public void firePropertyChange(String propertyName, Object oldValue,
 			Object newValue)
 	{
+//		checkThread();
 		if(oldValue != null && newValue != null && oldValue.equals(newValue))
 		{
 			return;
@@ -76,9 +83,9 @@ public class SimplePropertyChangeSupport	implements Serializable
 		PropertyChangeEvent evt = new PropertyChangeEvent(source, propertyName,
 				oldValue, newValue);
 
-		for(int i = 0; i < listeners.size(); i++)
+		// Loop over copy of list for thread safeness
+		for(PropertyChangeListener oneListener: new ArrayList<PropertyChangeListener>(listeners))
 		{
-			PropertyChangeListener oneListener = (PropertyChangeListener)listeners.get(i);
 			oneListener.propertyChange(evt);
 		}
 	}
@@ -97,6 +104,7 @@ public class SimplePropertyChangeSupport	implements Serializable
 	 */
 	public void firePropertyChange(String propertyName, int oldValue, int newValue)
 	{
+//		checkThread();
 		if(oldValue == newValue)
 		{
 			return;
@@ -113,6 +121,7 @@ public class SimplePropertyChangeSupport	implements Serializable
 	 */
 	public void firePropertyChange(PropertyChangeEvent evt)
 	{
+//		checkThread();
 		Object oldValue = evt.getOldValue();
 		Object newValue = evt.getNewValue();
 		if(oldValue != null && newValue != null && oldValue.equals(newValue))
@@ -126,4 +135,26 @@ public class SimplePropertyChangeSupport	implements Serializable
 			oneListener.propertyChange(evt);
 		}
 	}
+	
+	// Check for thread safeness
+//	protected Object getComp()
+//	{
+//		Object ret	= null;
+//		try
+//		{
+//			Class<?>	clazz	= SReflect.classForName0("jadex.bridge.IComponentIdentifier", null);
+//			ThreadLocal<?>	tl	= (ThreadLocal<?>)clazz.getField("LOCAL").get(null);
+//			ret	= tl.get();
+//		}
+//		catch(Throwable t)
+//		{
+//		}
+//		
+//		return ret;
+//	}
+//	
+//	protected void	checkThread()
+//	{
+//		assert SUtil.equals(comp, getComp());
+//	}
 }
