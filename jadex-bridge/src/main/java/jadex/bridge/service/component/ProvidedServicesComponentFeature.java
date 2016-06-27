@@ -297,9 +297,13 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 		}
 
-		for(Class<?> servicetype: types)
+		PlatformServiceRegistry	registry	= PlatformServiceRegistry.getRegistry(component.getComponentIdentifier());
+		if(registry!=null) // Maybe null on rescue thread (todo: why remove() on rescue thread?)
 		{
-			PlatformServiceRegistry.getRegistry(component.getComponentIdentifier()).removeService(new ClassInfo(servicetype), service);
+			for(Class<?> servicetype: types)
+			{
+				registry.removeService(new ClassInfo(servicetype), service);
+			}
 		}
 	}
 	
