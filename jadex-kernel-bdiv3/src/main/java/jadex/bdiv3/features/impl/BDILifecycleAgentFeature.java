@@ -38,7 +38,6 @@ import jadex.bdiv3.runtime.IDeliberationStrategy;
 import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.GoalDroppedException;
-import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RParameterElement.RParameter;
@@ -1207,7 +1206,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						//								rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
 														if(!goal.isFinished())
 														{
-															goal.setException(new GoalFailureException("drop condition: "+m.getName()));
+															goal.setException(new GoalDroppedException("drop condition: "+m.getName()));
 //															{
 //																public void printStackTrace() 
 //																{
@@ -1230,7 +1229,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 											{
 												if(!goal.isFinished())
 												{
-													goal.setException(new GoalFailureException("drop condition: "+goal));
+													goal.setException(new GoalDroppedException("drop condition: "+goal));
 													goal.setProcessingState(component, RGoal.GoalProcessingState.FAILED);
 												}
 											}
