@@ -148,7 +148,7 @@ public class SSecurity
 					{
 						seed = WinCrypt.getRandomFromWindows(numbytes);
 					}
-					catch (Exception e)
+					catch(Throwable e)
 					{
 					}
 				}
