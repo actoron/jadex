@@ -68,14 +68,11 @@ import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.message.MessageService;
-import jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec;
-import jadex.platform.service.message.contentcodecs.JadexXMLContentCodec;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.OutputConnection;
 import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
-import jadex.platform.service.remote.commands.RemoteIntermediateResultCommand;
 import jadex.platform.service.remote.commands.RemoteSearchCommand;
 import jadex.platform.service.remote.xml.RMIPostProcessor;
 import jadex.platform.service.remote.xml.RMIPreProcessor;
@@ -198,30 +195,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.marshal = marshal;
 		this.msgservice = msgservice;
 		this.addresses = addresses;
-		
-		((MessageService)msgservice).setContentCodecInfo(component.getComponentIdentifier(), getCodecInfo());
-	}
-	
-	//-------- methods --------
-	
-	/**
-	 *  Get the rms codec info that needs to be used for encoding/decoding content.
-	 */
-	public Map<Class<?>, Object[]> getCodecInfo()
-	{
-		Map<Class<?>, Object[]> infos = new HashMap<Class<?>, Object[]>();
-
-		Object[] bininfo = new Object[]{getBinaryReadInfo(), getBinaryWriteInfo()};
-		infos.put(JadexBinaryContentCodec.class, bininfo);
-		
-		// Only use xml if jadex-xml module present (todo: remove compile time dependency)
-		if(!SReflect.isAndroid() && SReflect.classForName0("jadex.xml.reader.Reader", getClass().getClassLoader())!=null)
-		{
-			Object[] xmlinfo = new Object[]{getXMLReadInfo(), getXMLWriteInfo()};
-			infos.put(JadexXMLContentCodec.class, xmlinfo);
-		}
-		
-		return infos;
 	}
 	
 //	/**
@@ -394,13 +367,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public <T> IFuture<T> getServiceProxy(IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, String scope, IAsyncFilter<T> filter)
 	{
-//		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
+		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
 		getServiceProxies(caller, cid, service, scope, false, filter).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
 		{
 			public void customResultAvailable(Collection<T> result)
 			{
-//				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
+				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
 				if(result!=null && !result.isEmpty())
 				{
 					T o = result.iterator().next();

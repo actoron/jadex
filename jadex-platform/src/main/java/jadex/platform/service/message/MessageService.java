@@ -67,7 +67,6 @@ import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.EncodingContext;
 import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.IContentCodec;
 import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.bridge.service.types.message.IMessageListener;
 import jadex.bridge.service.types.message.IMessageService;
@@ -121,25 +120,6 @@ import jadex.platform.service.remote.RemoteMethodInvocationHandler;
 public class MessageService extends BasicService implements IMessageService
 {
 	//-------- constants --------
-	
-	/** The default codecs. */
-    public static IContentCodec[] CODECS = !SReflect.isAndroid() ? new IContentCodec[]
-    {
-        new jadex.platform.service.message.contentcodecs.JavaXMLContentCodec(),
-        new jadex.platform.service.message.contentcodecs.JadexXMLContentCodec(),
-        new jadex.platform.service.message.contentcodecs.NuggetsXMLContentCodec(),
-		new jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec()
-    }
-    : SUtil.androidUtils().hasXmlSupport()? 
-    	new IContentCodec[]
-	    {
-	    		new jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec()
-	    }
-        :new IContentCodec[]
-        {
-        	new jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec(),
-        	new jadex.platform.service.message.contentcodecs.JadexXMLContentCodec()
-        };
 
 	//-------- attributes --------
 
@@ -204,16 +184,9 @@ public class MessageService extends BasicService implements IMessageService
 
 	/** The participant connections. */
 	protected Map<Integer, AbstractConnectionHandler> pcons;
-
-	
-	/** The content codecs. */
-	protected List contentcodecs;
 	
 	/** The default content language (if not specified). */
 	protected String deflanguage;
-	
-	/** The map of content codec infos. */
-	protected Map<IComponentIdentifier, Map<Class<?>, Object[]>> contentcodecinfos;
 	
 	/** Enable strict communication (i.e. fail on recoverable decoding errors). */
 	protected boolean	strictcom;
@@ -227,7 +200,7 @@ public class MessageService extends BasicService implements IMessageService
 	public MessageService(IInternalAccess component, Logger logger, ITransport[] transports, 
 		MessageType[] messagetypes)
 	{
-		this(component, logger, transports, messagetypes, null, null, null, false);
+		this(component, logger, transports, messagetypes, null, null, false);
 	}
 	
 	/**
@@ -235,7 +208,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param platform
 	 */
 	public MessageService(IInternalAccess component, Logger logger, ITransport[] transports, 
-		MessageType[] messagetypes, IContentCodec[] contentcodecs, String deflanguage, CodecFactory codecfactory, boolean strictcom)
+		MessageType[] messagetypes, String deflanguage, CodecFactory codecfactory, boolean strictcom)
 	{
 		super(component.getComponentIdentifier(), IMessageService.class, null);
 		
@@ -260,13 +233,6 @@ public class MessageService extends BasicService implements IMessageService
 		this.logger = logger;
 		
 		this.managers = new LRU<IComponentIdentifier, SendManager>(800);
-		if(contentcodecs!=null)
-		{
-			for(int i=0; i<contentcodecs.length; i++)
-			{
-				addContentCodec(contentcodecs[i]);
-			}
-		}
 		this.codecfactory = codecfactory!=null? codecfactory: new CodecFactory();
 		
 		// The default language for content.
@@ -576,9 +542,6 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		final Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
 
-		// Conversion via platform specific codecs
-		// Hack?! Preprocess content to enhance component identifiers.
-		IContentCodec[] compcodecs = getContentCodecs(comp.getModel(), cl);
 		List<ITraverseProcessor> procs = Traverser.getDefaultProcessors();
 		procs.add(1, new ITraverseProcessor()
 		{
@@ -622,47 +585,6 @@ public class MessageService extends BasicService implements IMessageService
 			Object	value	= msgcopy.get(name);
 			value = Traverser.traverseObject(value, procs, false, null);
 			msgcopy.put(name, value);
-			
-			IContentCodec codec = type.findContentCodec(compcodecs, msgcopy, name);
-			if(codec==null)
-				codec = type.findContentCodec(getContentCodecs(), msgcopy, name);
-			
-			if(codec!=null)
-			{
-				msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier()), enccontext));
-			}
-			else if(value!=null && !((value instanceof String) || (value instanceof byte[])) 
-				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())
-				|| name.equals(type.getResourceIdIdentifier()) || name.equals(type.getNonFunctionalPropertiesIdentifier())
-				|| name.equals(type.getRealReceiverIdentifier())))
-			{	
-				// HACK!!!
-				if(SFipa.FIPA_MESSAGE_TYPE.equals(type) && !msgcopy.containsKey(SFipa.LANGUAGE))
-				{
-					Properties props = new Properties();
-					props.put(SFipa.LANGUAGE, deflanguage);
-					IContentCodec[] codecs = getContentCodecs();
-					for(int j=0; j<codecs.length; j++)
-					{
-						if(codecs[j].match(props))
-						{
-							codec = codecs[j];
-							msgcopy.put(SFipa.LANGUAGE, deflanguage);
-							break;
-						}
-					}
-				}	
-				
-				if(codec!=null)
-				{
-					msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier()), enccontext));
-				}
-				else if(!SFipa.JADEX_RAW.equals(msgcopy.get(SFipa.LANGUAGE)))
-				{
-					ret.setException(new ContentException("No content codec found for: "+name+", "+msgcopy));
-					return;
-				}
-			}
 		}
 		
 		IComponentIdentifier sender = (IComponentIdentifier)msgcopy.get(type.getSenderIdentifier());
@@ -782,41 +704,6 @@ public class MessageService extends BasicService implements IMessageService
 		return codecs;
 	}
 	
-	/**
-	 *  Get content codecs.
-	 *  @return The content codecs.
-	 */
-	public IContentCodec[] getContentCodecs()
-	{
-		return contentcodecs==null? CODECS: (IContentCodec[])contentcodecs.toArray(new IContentCodec[contentcodecs.size()]);
-	}
-	
-	/**
-	 *  Get a matching content codec.
-	 *  @param props The properties.
-	 *  @return The content codec.
-	 */
-	public IContentCodec[] getContentCodecs(IModelInfo model, ClassLoader cl)
-	{
-		List ret = null;
-		Map	props	= model.getProperties();
-		if(props!=null)
-		{
-			for(Iterator it=props.keySet().iterator(); it.hasNext();)
-			{
-				String name = (String)it.next();
-				if(name.startsWith("contentcodec."))
-				{
-					if(ret==null)
-						ret	= new ArrayList();
-					ret.add(model.getProperty(name, cl));
-				}
-			}
-		}
-
-		return ret!=null? (IContentCodec[])ret.toArray(new IContentCodec[ret.size()]): null;
-	}
-	
 //	/**
 //	 *  Get a matching content codec.
 //	 *  @param props The properties.
@@ -840,32 +727,6 @@ public class MessageService extends BasicService implements IMessageService
 //
 //		return ret;
 //	}
-	
-	/**
-	 *  Get a matching content codec.
-	 *  @param props The properties.
-	 */
-	// todo: called from rms, hack :-(
-	public void setContentCodecInfo(IComponentIdentifier cid, Map<Class<?>, Object[]> info)
-	{
-		if(contentcodecinfos==null)
-			contentcodecinfos = Collections.synchronizedMap(new HashMap<IComponentIdentifier, Map<Class<?>, Object[]>>());
-		contentcodecinfos.put(cid, info);
-	}
-	
-	/**
-	 *  Get a matching content codec.
-	 *  @param props The properties.
-	 *  @return The content codec.
-	 */
-	public Map<Class<?>, Object[]> getContentCodecInfo(IComponentIdentifier cid)
-	{
-		Map<Class<?>, Object[]> ret = (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
-//		if(ret==null)
-//			System.out.println("sdffdsdf");
-		return ret;
-//		return (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
-	}
 
 	/**
 	 *  Get the codec factory.
@@ -1298,29 +1159,6 @@ public class MessageService extends BasicService implements IMessageService
 	public synchronized IFuture<Void> removeMessageListener(IMessageListener listener)
 	{
 		listeners.remove(listener);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Add content codec type.
-	 *  @param codec The codec type.
-	 */
-	public IFuture<Void> addContentCodec(IContentCodec codec)
-	{
-		if(contentcodecs==null)
-			contentcodecs = new ArrayList();
-		contentcodecs.add(codec);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Remove content codec type.
-	 *  @param codec The codec type.
-	 */
-	public IFuture<Void> removeContentCodec(IContentCodec codec)
-	{
-		if(contentcodecs!=null)
-			contentcodecs.remove(codec);
 		return IFuture.DONE;
 	}
 	
@@ -2127,6 +1965,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					public void exceptionOccurred(Exception e)
 					{
+						e.printStackTrace();
 						errors.add(e);
 					}
 				};
@@ -2218,8 +2057,6 @@ public class MessageService extends BasicService implements IMessageService
 									
 									if(lis!=null)
 									{
-										// Decode message for listener. What if listener has different class loader?
-										decodeMessage(logger, messagetype, msg, classloader, null, component);
 										IMessageAdapter message = new DefaultMessageAdapter(msg, messagetype);
 										for(int i=0; i<lis.length; i++)
 										{
@@ -2317,7 +2154,6 @@ public class MessageService extends BasicService implements IMessageService
 						if(com!=null)
 						{
 							ClassLoader cl = classloader!=null? classloader: ia.getClassLoader();
-							decodeMessage(logger, messagetype, fmessage, cl, receiver, ia);
 							
 							try
 							{
@@ -2788,92 +2624,6 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		
 		return ret;
-	}
-
-	/**
-	 *  Decode a message.
-	 */
-	protected void decodeMessage(final Logger logger, final MessageType messagetype, final Map<String, Object> fmessage, ClassLoader cl, IComponentIdentifier rec, IInternalAccess component)
-	{
-//		System.out.println("dec: "+cl+" "+component.getComponentIdentifier()+" "+MessageService.this.component.getComponentIdentifier());
-		// Conversion via platform specific codecs
-		if(rec==null)
-		{
-			Object recs = fmessage.get(messagetype.getReceiverIdentifier());
-			if(SReflect.isIterable(recs))
-			{
-				rec = (IComponentIdentifier)SReflect.getIterator(recs).next();
-			}
-			else
-			{
-				rec = (IComponentIdentifier)recs;
-			}
-		}
-		IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
-		for(Iterator it=fmessage.keySet().iterator(); it.hasNext(); )
-		{
-			String name = (String)it.next();
-			Object value = fmessage.get(name);
-												
-			IContentCodec codec = messagetype.findContentCodec(compcodecs, fmessage, name);
-			if(codec==null)
-				codec = messagetype.findContentCodec(getContentCodecs(), fmessage, name);
-			
-			if(codec!=null)
-			{
-//				System.out.println("dec2: "+codec+fmessage);
-				try
-				{
-					final List<Exception>	errors	= new ArrayList<Exception>();
-					IErrorReporter	rep	= strictcom ? null :new IErrorReporter()
-					{
-						public void exceptionOccurred(Exception e)
-						{
-							errors.add(e);
-						}
-					};
-					Object val = codec.decode((byte[])value, cl, getContentCodecInfo(rec), rep);
-					
-					if(!errors.isEmpty())
-					{
-						logger.warning("Ignored errors during message decoding: "+errors);
-//						for(Exception e: errors)
-//						{
-//							e.printStackTrace();
-//						}
-					}
-					fmessage.put(name, val);
-				}
-				catch(Exception e)
-				{
-//					System.out.println("classloader: "+cl);
-//					e.printStackTrace();
-					String offsetstr="";
-					if (e instanceof SerializerDecodingException)
-					{
-						offsetstr=" at " + ((SerializerDecodingException) e).getContext().getCurrentOffset();
-					}
-					if(!(e instanceof ContentException))
-					{
-						// Todo: find out why 50MB sized messages are sent... 
-						if(((byte[])value).length>3000)
-						{
-							byte[]	tmp = new byte[3000];
-							System.arraycopy(value, 0, tmp, 0, tmp.length);
-							logger.info("ContentException"+offsetstr+": "+((byte[])value).length+", "+fmessage+", "+new String(tmp, Charset.forName("UTF-8")));
-							value	= tmp;
-						}
-						e = new ContentException("ContentException"+offsetstr+", value:"+new String((byte[])value, Charset.forName("UTF-8")), e);
-					}
-					fmessage.put(name, e);
-				}
-			}
-			
-			if(fmessage.get(name) instanceof byte[])
-			{
-				System.out.println("message problem\n"+new String((byte[])fmessage.get(name), Charset.forName("UTF-8")));
-			}
-		}
 	}
 }
 
