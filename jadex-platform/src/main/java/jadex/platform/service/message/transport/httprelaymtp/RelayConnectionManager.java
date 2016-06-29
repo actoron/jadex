@@ -11,6 +11,8 @@ import java.util.Scanner;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.HttpConnectionManager;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.ISuspendable;
 
 /**
  *  The connection manager performs http requests and further
@@ -120,7 +122,47 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	 *  @return The comma separated server list.
 	 *  @throws IOException on connection failures
 	 */
-	public String	getPeerServers(String peeraddress, String ownaddress, String ownid, int dbstate, boolean initial)	throws IOException
+	public String	getPeerServers(final String peeraddress, final String ownaddress, final String ownid, final int dbstate, final boolean initial)	throws IOException
+	{
+		// sun.net.www HttpUrlConnection hangs on openConnection without any means to abort :-(
+		// Use extra thread to not hold up platform shutdown due to not-responding relay.
+		
+		if(ISuspendable.SUSPENDABLE.get()!=null)
+		{
+			throw new IllegalStateException("Must not be called from managed thread: "+ISuspendable.SUSPENDABLE.get());
+		}
+		final Future<String>	ret	= new Future<String>();
+		Thread	t	= new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					ret.setResultIfUndone(doGetPeerServers(peeraddress, ownaddress, ownid, dbstate, initial));
+				}
+				catch(Exception e)
+				{
+					ret.setExceptionIfUndone(e);
+				}
+			}
+		});
+		t.setDaemon(true);
+		t.start();
+		return ret.get();
+	}
+	
+	/**
+	 *  Get known servers from a peer server.
+	 *  @param peeraddress	The remote server address.
+	 *  @param ownaddress	The local server address supplied for mutual connection (set to null if not connecting to peer).
+	 *  @param ownid	The local peer id supplied for history db synchronization (not used if not connecting to peer).
+	 *  @param peerstate	Contains id of the latest history entry of that peer to enable synchronization (not used if not connecting to peer).
+	 *  @param initial	True, when peer connects initially (not used if not connecting to peer).
+	 *  @return The comma separated server list.
+	 *  @throws IOException on connection failures
+	 */
+	public String	doGetPeerServers(String peeraddress, String ownaddress, String ownid, int dbstate, boolean initial)	throws IOException
 	{
 		String	ret;
 		HttpURLConnection	con	= null;

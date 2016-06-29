@@ -822,6 +822,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 			finally
 			{
+//				if(getComponent().toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("block done "+Thread.currentThread());
+//				}
+				
 				unblocked[0]	= true;
 				
 				// Todo: should also work for thread death (i.e. blocked threads terminated before component is gone).
@@ -862,6 +867,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
+//			System.out.println("unblock: "+monitor);
 			Executor exe = blocked.remove(monitor);
 			if(blocked.isEmpty())
 			{

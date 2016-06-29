@@ -122,13 +122,21 @@ public class Executor implements Runnable
 		
 		while(iwanttorun && !shutdown)
 		{
+//			if(toString().indexOf("Leaker")!=-1)
+//			{
+//				System.out.println("before code(): "+this+", "+running+", "+shutdown+", "+iwanttorun);
+//			}
 			iwanttorun = code();
 
+//			if(toString().indexOf("Leaker")!=-1)
+//			{
+//				System.out.println("after code(): "+this+", "+running+", "+shutdown+", "+iwanttorun);
+//			}
 			synchronized(this)
 			{
-//				if(toString().indexOf("Tester@")!=-1)
+//				if(toString().indexOf("Leaker")!=-1)
 //				{
-//					System.out.println("run exe: ");
+//					System.out.println("after code() 2: "+this+", "+running+", "+shutdown+", "+iwanttorun);
 //				}
 
 				if(switchtos!=null && switchtos.size()>0)
@@ -139,6 +147,10 @@ public class Executor implements Runnable
 			
 			if(switchto==null)
 			{
+//				if(toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("after code() 3: "+this+", "+running+", "+shutdown+", "+iwanttorun);
+//				}
 				// Setting flags in synchronized block assures,
 				// that execute is not called in between.
 				// Separating running and myrunning allows that this thread
@@ -155,7 +167,10 @@ public class Executor implements Runnable
 			}
 			else
 			{
-//				System.out.println("switchto: "+switchto);
+//				if(toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("after code() 4: "+this+", "+running+", "+shutdown+", "+iwanttorun);
+//				}
 				iwanttorun	= false;
 			}
 		}
@@ -173,6 +188,10 @@ public class Executor implements Runnable
 			
 			if(switchto==null && switchtos!=null && switchtos.size()>0)
 			{
+//				if(toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("after code() 5: "+this+", "+running+", "+shutdown+", "+iwanttorun);
+//				}
 				switchto = switchtos.remove(0);
 			}
 		}
@@ -193,7 +212,10 @@ public class Executor implements Runnable
 		{
 			synchronized(switchto)
 			{
-//				System.err.println("Notifying: "+switchto+", "+(throwables!=null ? throwables.get(switchto):""));
+//				if(toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("Notifying: "+switchto+", "+(throwables!=null ? throwables.get(switchto):""));
+//				}
 				switchto.notify();
 			}
 		}
@@ -223,6 +245,11 @@ public class Executor implements Runnable
 					execute	= true;
 				}
 			}
+			
+//			if(toString().indexOf("Leaker")!=-1)
+//			{
+//				System.out.println("execute(): "+this+", "+execute+", "+running+", "+shutdown+", "+wanttorun);
+//			}
 		}
 
 		if(execute)
@@ -315,10 +342,11 @@ public class Executor implements Runnable
 	 */
 	public void	switchThread(Object monitor, Throwable t)
 	{
-//		System.err.println("switchThread: "+monitor+", "+t);
+//		System.out.println("switchThread: "+monitor+", "+t);
 
 		synchronized(this)
 		{
+//			System.out.println("switchThread1: "+monitor+", "+t);
 			if(switchtos==null)
 			{
 				switchtos = new LinkedList<Object>();
@@ -358,6 +386,10 @@ public class Executor implements Runnable
 			try
 			{
 				monitor.wait();
+//				if(toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("after wait()");
+//				}
 			}
 			catch(InterruptedException e)
 			{
@@ -366,7 +398,10 @@ public class Executor implements Runnable
 			finally
 			{
 				this.running = true;
-//				System.err.println("resumed: "+monitor+", "+(throwables!=null ? throwables.get(monitor):""));
+//				if(toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("resumed: "+monitor+", "+(throwables!=null ? throwables.get(monitor):""));
+//				}
 			}
 
 			if(throwables!=null)

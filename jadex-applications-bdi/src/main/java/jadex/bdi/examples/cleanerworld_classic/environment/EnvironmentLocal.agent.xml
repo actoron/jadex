@@ -40,9 +40,9 @@
 
 	<configurations>
 		<configuration name="default">
-			<!-- todo: <plans>
+			<plans>
 				<endplan ref="clear_plan"/>
-			</plans> -->
+			</plans>
 		</configuration>
 	</configurations>
 	

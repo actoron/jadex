@@ -228,7 +228,7 @@ public class Starter
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(String[] args)
+	public static IFuture<IExternalAccess> createPlatform(String... args)
 	{
 		PlatformConfiguration config = PlatformConfiguration.processArgs(args);
 		return createPlatform(config);

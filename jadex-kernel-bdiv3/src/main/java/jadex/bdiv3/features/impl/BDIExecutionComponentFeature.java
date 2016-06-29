@@ -63,9 +63,17 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 	 */
 	protected void afterBlock()
 	{
+//		if(getComponent().toString().indexOf("Leaker")!=-1)
+//		{
+//			System.out.println("afterBlock "+Thread.currentThread());
+//		}
 		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
 		if(rplan!=null)
 		{
+//			if(getComponent().toString().indexOf("Leaker")!=-1)
+//			{
+//				System.out.println("afterBlock 1"+Thread.currentThread());
+//			}
 			rplan.afterBlock();
 		}
 	}

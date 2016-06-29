@@ -512,7 +512,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void setLifecycleState(PlanLifecycleState lifecyclestate)
 	{
 //		if(lifecyclestate.equals(PlanLifecycleState.ABORTED))
-//		System.out.println("state: "+this+", "+lifecyclestate);
+//			System.out.println("state: "+this+", "+lifecyclestate);
 		
 		this.lifecyclestate = lifecyclestate;
 		
@@ -900,16 +900,20 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				{
 					for(IGoal subgoal: subgoals)
 					{
+						// Todo: wait for goals dropped?
 						subgoal.drop();
 					}
 				}
 				
 				// Stop plan execution if any.
+//				System.out.println("aborting2: "+this);
 				body.abort();
+//				System.out.println("aborting3: "+this);
 				
 				// If plan is waiting interrupt waiting
 				if(PlanProcessingState.WAITING.equals(getProcessingState()))
 				{
+//					System.out.println("aborting4: "+this);
 	//				RPlan.executePlan(this, ia, new ICommand<Boolean>()
 	//				{
 	//					public void execute(Boolean args)
@@ -920,11 +924,15 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 					
 							ICommand<Tuple2<Boolean, Boolean>> resc = getResumeCommand();
 							if(resc!=null)
+							{
+//								System.out.println("aborting5: "+this+", "+resc);
 								resc.execute(null);
+							}
 							List<ICommand<Tuple2<Boolean, Boolean>>> rescoms = getResumeCommands();
 							if(rescoms!=null)
 							{
 								ICommand<Tuple2<Boolean, Boolean>>[] tmp = (ICommand<Tuple2<Boolean, Boolean>>[])rescoms.toArray(new ICommand[rescoms.size()]);
+//								System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
 								for(ICommand<Tuple2<Boolean, Boolean>> rescom: tmp)
 								{
 									rescom.execute(null);
@@ -1680,11 +1688,29 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	protected void testBodyAborted()
 	{
+//		if(agent.toString().indexOf("Leaker")!=-1)
+//		{
+//			System.out.println("testBodyAborted "+this);
+//		}
 		// Throw error to exit body method of aborted plan.
 		if(isFinishing() && PlanLifecycleState.BODY.equals(getLifecycleState()))
 		{
-//			System.out.println("aborting after block: "+this);
-			throw new BodyAborted();
+			BodyAborted	ba	= new BodyAborted();
+			try
+			{
+				if(agent.toString().indexOf("Leaker")!=-1)
+				{
+					System.out.println("before throw BodyAborted: "+Runtime.getRuntime().freeMemory());
+				}
+				throw ba;
+			}
+			finally
+			{
+				if(agent.toString().indexOf("Leaker")!=-1)
+				{
+					System.out.println("after throw BodyAborted: "+Runtime.getRuntime().freeMemory());
+				}
+			}
 		}
 	}
 
@@ -1773,10 +1799,12 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 						{
 							if(waitfuture instanceof ITerminableFuture)
 							{
+//								System.out.println("notify1: "+getId());
 								((ITerminableFuture<?>)waitfuture).terminate();
 							}
 							else
 							{
+//								System.out.println("notify2: "+getId());
 								waitfuture.setExceptionIfUndone(getException());
 							}
 						}
@@ -1787,11 +1815,13 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							{
 								o = ((ChangeEvent)o).getValue();
 							}
+//							System.out.println("notify3: "+getId());
 							waitfuture.setResultIfUndone(isvoid? null: (T)o);
 						}
 					}
 					else
 					{
+//						System.out.println("notify4: "+getId());
 						waitfuture.abortGet(sus);
 					}
 				}
@@ -1941,7 +1971,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 			{
-				System.out.println("Added to waitqueue: "+event);
+//				System.out.println("Added to waitqueue: "+event);
 				addToWaitqueue(new ChangeEvent(event));				
 				return IFuture.DONE;
 			}

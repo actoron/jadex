@@ -16,6 +16,8 @@ import jadex.commons.IPoolStrategy;
 import jadex.commons.SReflect;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
+import jadex.commons.future.ErrorException;
+import jadex.commons.future.Future;
 
 /**
  *  A thread pool manages pool and saves resources
@@ -23,6 +25,12 @@ import jadex.commons.collection.IBlockingQueue;
  */
 public class ThreadPool implements IThreadPool
 {
+	//-------- constants --------
+	
+	/** Threads waiting due to thread suspendable. */
+	// Stored here and not in thread suspendable, because thread suspendable is closer to user.
+	public static final Map<Thread, Future<?>>	WAITING_THREADS	= Collections.synchronizedMap(new HashMap<Thread, Future<?>>());
+	
 	//-------- profiling --------
 	
 	/** Enable call profiling. */
@@ -290,6 +298,11 @@ public class ThreadPool implements IThreadPool
 		
 		for(ServiceThread thread: pots)
 		{
+			if(WAITING_THREADS.containsKey(thread))
+			{
+//				System.out.println("Killing thread: "+thread);
+				WAITING_THREADS.get(thread).setExceptionIfUndone(new ErrorException(new ThreadDeath()));
+			}
 			synchronized(thread)
 			{
 				thread.terminated = true;
@@ -299,6 +312,11 @@ public class ThreadPool implements IThreadPool
 		
 		for(ServiceThread thread: pts)
 		{
+			if(WAITING_THREADS.containsKey(thread))
+			{
+//				System.out.println("Killing thread: "+thread);
+				WAITING_THREADS.get(thread).setExceptionIfUndone(new ErrorException(new ThreadDeath()));
+			}
 			synchronized(thread)
 			{
 				thread.terminated = true;
