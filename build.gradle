@@ -31,6 +31,8 @@ project.subprojects.each { sp ->
 project.ext.jadex_lastbuild_version=jadex_lastbuild_version
 project.ext.timestamp=timestamp
 
+def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
+
 buildscript 
 {
     apply from: "$rootDir/src/main/buildutils/util.gradle"
@@ -145,6 +147,8 @@ subprojects
         {
             apply plugin: 'com.android.application'
         }
+        
+        if (ENABLE_ECLIPSE_ANDROID_WORKAROUNDS) addEclipseWorkarounds(project)
 
 		// strip "-debug" from .aar and .apks to include them in dist
 		onVariantOutput(project, com.android.builder.core.BuilderConstants.RELEASE) {output ->
