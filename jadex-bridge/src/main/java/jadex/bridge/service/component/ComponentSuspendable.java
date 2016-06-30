@@ -84,10 +84,10 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 //			}
 			finally
 			{
-				if(agent.toString().indexOf("Leaker")!=-1)
-				{
-					System.out.println("ComponentSuspendable.unsuspend 3"+Thread.currentThread());
-				}
+//				if(agent.toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("ComponentSuspendable.unsuspend 3"+Thread.currentThread());
+//				}
 				afterSwitch();
 				this.future	= null;
 			}
