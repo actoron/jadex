@@ -139,7 +139,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 					((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 						.unblock(this, null);
 				}
-			}			
+			}
 		}
 //		System.out.println("ComponentSuspendable.unresume "+Thread.currentThread());
 	}

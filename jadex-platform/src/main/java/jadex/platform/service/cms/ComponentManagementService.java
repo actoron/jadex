@@ -273,8 +273,8 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			public void resultAvailable(Collection<jadex.commons.Tuple2<String,Object>> result) 
 			{
-				if(model.toString().indexOf("Feature")!=-1)
-					System.err.println("createComponent.resultAvailable: "+model+", "+result);
+//				if(model.toString().indexOf("Feature")!=-1)
+//					System.err.println("createComponent.resultAvailable: "+model+", "+result);
 				ret.setSecondResult(Argument.convertArguments(result));
 			}
 			

@@ -21,6 +21,18 @@ public class BDIXArgumentsResultsComponentFeature extends ArgumentsResultsCompon
 		super(component, cinfo);
 	}
 
+	@Override
+	protected void initDefaultArguments()
+	{
+		// NOP -> default arguments handled by beliefs.
+	}
+		
+	@Override
+	protected void initDefaultResults()
+	{
+		// NOP -> default results handled by beliefs.
+	}
+		
 	/**
 	 *  Set result values from beliefs.
 	 */
