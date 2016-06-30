@@ -135,7 +135,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 				if(future==this.future)
 				{
 //					System.out.println("ComponentSuspendable.resume7 "+Thread.currentThread());
-					beforeSwitch();
+//					beforeSwitch();	// Todo: why not beforeSwitch()?
 					((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 						.unblock(this, null);
 				}

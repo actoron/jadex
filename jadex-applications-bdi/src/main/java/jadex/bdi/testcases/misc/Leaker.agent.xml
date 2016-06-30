@@ -90,6 +90,9 @@
 				<initialbelief cref="testcap.testcase_cnt">
 					<fact>6</fact>
 				</initialbelief>
+				<initialbelief cref="testcap.timeout">
+					<fact>jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)</fact>
+				</initialbelief>
 			</beliefs>
 			<plans>
 				<initialplan ref="leaker"/>
