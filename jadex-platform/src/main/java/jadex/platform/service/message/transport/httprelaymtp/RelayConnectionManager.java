@@ -32,7 +32,42 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	 *  Ping a relay server.
 	 *  @throws IOException on connection failures
 	 */
-	public void	ping(String address)	throws IOException
+	public void	ping(final String address)	throws IOException
+	{
+		// sun.net.www HttpUrlConnection hangs on openConnection without any means to abort :-(
+		// Use extra thread to not hold up platform shutdown due to not-responding relay.
+		
+		if(ISuspendable.SUSPENDABLE.get()!=null)
+		{
+			throw new IllegalStateException("Must not be called from managed thread: "+ISuspendable.SUSPENDABLE.get());
+		}
+		final Future<Void>	ret	= new Future<Void>();
+		Thread	t	= new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					doPing(address);
+					ret.setResultIfUndone(null);
+				}
+				catch(Exception e)
+				{
+					ret.setExceptionIfUndone(e);
+				}
+			}
+		});
+		t.setDaemon(true);
+		t.start();
+		ret.get();
+	}
+	
+	/**
+	 *  Ping a relay server.
+	 *  @throws IOException on connection failures
+	 */
+	protected void	doPing(String address)	throws IOException
 	{
 		address	= httpAddress(address);
 		
@@ -74,7 +109,44 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	 *  @return The connection.
 	 *  @throws IOException on connection failures
 	 */
-	public HttpURLConnection	openReceiverConnection(String address, IComponentIdentifier receiver)	throws IOException
+	public HttpURLConnection	openReceiverConnection(final String address, final IComponentIdentifier receiver)	throws IOException
+	{
+		// sun.net.www HttpUrlConnection hangs on openConnection without any means to abort :-(
+		// Use extra thread to not hold up platform shutdown due to not-responding relay.
+		
+		if(ISuspendable.SUSPENDABLE.get()!=null)
+		{
+			throw new IllegalStateException("Must not be called from managed thread: "+ISuspendable.SUSPENDABLE.get());
+		}
+		final Future<HttpURLConnection>	ret	= new Future<HttpURLConnection>();
+		Thread	t	= new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					ret.setResultIfUndone(doOpenReceiverConnection(address, receiver));
+				}
+				catch(Exception e)
+				{
+					ret.setExceptionIfUndone(e);
+				}
+			}
+		});
+		t.setDaemon(true);
+		t.start();
+		return ret.get();
+
+	}
+	
+	/**
+	 *  Open a receiving connection.
+	 *  The connection should be removed when it is closed to avoid memory leaks. 
+	 *  @return The connection.
+	 *  @throws IOException on connection failures
+	 */
+	public HttpURLConnection	doOpenReceiverConnection(String address, IComponentIdentifier receiver)	throws IOException
 	{
 		address	= httpAddress(address);
 		HttpURLConnection	con	= null;
@@ -98,6 +170,9 @@ public class RelayConnectionManager	extends HttpConnectionManager
 		//					        });												
 		//						}
 
+		// Force connection
+		con.getInputStream();
+		
 		return con;
 	}
 	
