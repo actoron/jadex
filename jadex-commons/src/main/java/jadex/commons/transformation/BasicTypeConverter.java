@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import com.sun.org.apache.xml.internal.security.utils.Base64;
+
 /**
  *  Converter for basic types.
  */
@@ -52,6 +54,9 @@ public class BasicTypeConverter //implements ITypeConverter
 
 	/** String -> URI converter. */
 	public static final IStringObjectConverter URI_CONVERTER = new URITypeConverter();
+	
+//	/** String(base64) -> Byte Array converter. */
+//	public static final IStringObjectConverter BA_CONVERTER = new ByteArrayTypeConverter();
 
 	
 	/** The map of basic converters. */
@@ -86,6 +91,7 @@ public class BasicTypeConverter //implements ITypeConverter
 		extconverters.put(Date.class, DATE_CONVERTER);
 		extconverters.put(URI.class, URI_CONVERTER);
 		extconverters.put(URL.class, URL_CONVERTER);
+//		extconverters.put(byte[].class, BA_CONVERTER);
 	}
 	
 	/**
@@ -395,4 +401,30 @@ class URITypeConverter implements IStringObjectConverter
 		}
 	}
 }
+
+///**
+// *  String (base64) -> byte[].
+// */
+//class ByteArrayTypeConverter implements IStringObjectConverter
+//{
+//	/**
+//	 *  Convert a string value to another type.
+//	 *  @param val The string value to convert.
+//	 */
+//	public Object convertString(String val, Object context)
+//	{
+//		try
+//		{
+//			return Base64.decode(val);
+//		}
+//		catch(RuntimeException e)
+//		{
+//			throw e;
+//		}
+//		catch(Exception e)
+//		{
+//			throw new RuntimeException(e);
+//		}
+//	}
+//}
 
