@@ -115,10 +115,40 @@ Other Future types also provide support for functional interfaces - just look fo
 |**Tuple2Future**|*addTuple2ResultListener()*|
 |**IntermediateFuture**|*addIntermediateResultListener*|
 
+### Asynchronous Map Function
+With intermediate futures, you can receive many results from one call (see [future types](#future-types)).
+To loop over all results and ['map'](https://en.wikipedia.org/wiki/Map_(higher-order_function)) them with a given asynchronous function, you can use ```mapAsync()```.
+The result will be another intermediate future, where the results will be mapped by the given function:
 
-TODO: intermediate mapAsync
+```java
+IIntermediateFuture<String> fut = new IntermediateFuture<>(Arrays.asList("potato", "carrot", "onion"));
+IIntermediateFuture<String> res = abc.mapAsync(s -> new Future<String>(s.substring(0,1).toUpperCase() + s.substring(1)));
 
-TODO: thenApply, thenCompose, thenAccept, thenCombine?
+System.out.println(res.get());
+```
+
+### Asynchronous Combination
+Following the [Java 8 CompletableFuture API](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html), Jadex Futures provide the following methods to chain asynchronous tasks: *thenApply*, *thenCompose*, *thenAccept*, *thenCombine*, *applyToEither*, *acceptEither*.
+
+```java
+Future<String> fut = new Future<String>("hello")
+
+// apply a synchronous function that returns a result: 
+IFuture<String> thenApply = fut.thenApply(s -> s + "_test");
+
+// apply a synchronous function without result:
+fut.thenAccept(s -> System.out.println(s));
+
+// compose with a futurized function:
+IFuture<String> thenCompose = fut.thenCompose(s -> new Future<String>(s+"_test"));
+
+// combine two async results with a bifunction:
+IFuture<String> translated = fut.thenCombine(getTranslator(), (s, translator) -> translator.translate(s));
+```
+
+There are also variants of *apply* and *accept*: *applyToEither* and *acceptEither* will take a second future and apply the given function to the result that is available first, ignoring the second result. 
+
+For a complete documentation of these methods, please visit the [IFuture API documentation](${URLJavaDoc}/jadex/commons/future/IFuture.html).
 
 # Future Types
 The following is a short list of commonly used future types. For a more complete guide, visit [Asynchronous Programming](../guides/ac/03 Asynchronous Programming/#programming-futures-and-listeners).
@@ -199,40 +229,85 @@ fut.addIntermediateResultListener(new IntermediateDefaultResultListener<String>(
 ```
 
 ## Terminable Futures
-TODO:
-ITerminableFuture<E>: A terminable future allows the caller to cancel the task at any point in time by called terminate(). This termination will reach the called entity which may react to the request by stopping its activities regarding the invocation (the callee is not forced to do so). At callee side a termination command can be used to state what should be done when a call is cancelled.??
+A terminable future allows the caller to cancel the task at any point in time by calling terminate().
+ The callee may specify it's behaviour in this case by providing a ```TerminationCommand```. In any case, the future cannot transfer results after termination but will instead throw an Exception.
 
 ### Delivering Results
+
+```java
+TerminableFuture<String> fut = new TerminableFuture<String>();
+ITerminationCommand term = new ITerminationCommand() {
+
+    public boolean checkTermination(Exception reason) {
+        return true; // termination is accepted at this point
+    }
+
+    public void terminated(Exception reason) {
+        stopWork();
+    }
+};
+startWork(fut); // startWork() will call fut.setResult() eventually
+```
+
 ### Listening to Results
+Reception of the results works just like with any other future type.
+
+### Terminating
+To terminate the work that was scheduled, the caller can call ```terminate()``` and may also provide an exception as reason:
+```java
+fut.terminate(new RuntimeException("User clicked cancel"));
+```
 
 ## Pull Futures
-TODO
+While intermediate futures implement a *push* semantic where the caller is informed about an available result, with pull intermediate futures, the caller decides when it wants to check for new results and receive them by calling ```pullIntermediateResult()```.
+The callee has to specify how to deliver new results upon a pull request.
 
-IPullIntermediateFuture<E>: A pull future allows for realizing an iterator relationship between caller and callee. This means that is this case the caller can decide when it wants to receive the next result by calling pullIntermediateResult(). The functionality that should be executed in case of a pull of the caller is supplied as command by the callee.
-IPullSubscriptionIntermediateFuture<E>: The subscription version of the pull future.??
 
 ### Delivering Results
+```java
+ICommand<PullIntermediateFuture<String>> cmd = new ICommand<PullIntermediateFuture<String>>() {
+    public void execute(PullIntermediateFuture<String> args) {
+        args.addIntermediateResult("pull result");
+    }
+};
+IPullIntermediateFuture<String> fut = new PullIntermediateFuture<String>();
+
+```
 ### Listening to Results
+```java
+fut.addIntermediateResultListener(new IntermediateDefaultResultListener<String>() {
+    public void intermediateResultAvailable(String result) {
+        // handle intermediate result
+    }
+});
+fut.pullIntermediateResult();
+```
 
 # Special Result Listeners
 
+TODO: introduction
 ## Counting
-
+TODO
 ## Delegation
-
-# Debugging
 TODO
 
-# Common Pitfalls
 
-## No Error listener
+# Common Pitfalls
+This section discusses problems frequently encountered in the Jadex Active Components community. 
+
+## No Stack Trace, just a one-liner
+Because exceptions are generally passed through a chain of result listeners, sometimes you may forget to print stack traces and only get a one-line warning message.  
+Enabling future debugging as [configuration example](../platform/platform/#configuration-examples) suggests will always print useful stack traces when exceptions occur (if some kind of  ```DefaultResultListener``` is attached!).  
+Note that enabling this feature will seriously **decrease performance**, as debug information is remembered throughout the application!
+ 
+## No error message, calls silently fail
 When adding Future listeners, it is important to always have *exceptionOccurred* implemented in a senseful way.
 This is done by default by ```DefaultResultListener```, but needs to be done manually when using the interface ```IResultListener``` instead.
 Also, if there is **no** listener attached at all, exceptions will be silent as well.
  
 So if you're code doesn't do the right thing and no exceptions occur, this might be a good idea to start looking for.
  
-## get() on Main/UI Thread
+## Get() hangs on Main/UI Thread
 As the thread running the main() method is not managed by the Jadex concurrency model, *Future.get()* should not be executed while on the main thread. Instead, use the asynchronous *addResultListener()* methods. 
 Calling *get()* on the main thread may result in a hung-up program.
 

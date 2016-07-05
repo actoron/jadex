@@ -11,6 +11,9 @@ Please note that in case of a getter/setter pair it is required to add @Belief t
 The function of making things beliefs is that the agent becomes aware of changes of these elements. 
 This means that is the value of a belief is set to a new value the agent recognizes this change and can act according to this change. 
 
+TODO: field sample  
+TODO: only interfaces allowed in case of List, Set, Map!!
+
 Exercise C1 - Belief Triggering Plan
 -------------------------------------------------
 
