@@ -321,7 +321,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				// will be incarnated as new update methods
 				if(mn.name.equals("<init>"))
 				{
-					transformConstructor(cn, mn, model, tododyn);
+					transformConstructor(cn, mn, model, tododyn, others);
 				}
 				else if(todoset.contains(mn.name))
 				{
@@ -456,7 +456,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 * @param model
 	 * @param tododyn list of dynamic beliefs
 	 */
-	protected abstract void transformConstructor(ClassNode cn, MethodNode mn, BDIModel model, List<String> tododyn);
+	protected abstract void transformConstructor(ClassNode cn, MethodNode mn, BDIModel model, List<String> tododyn, Map<String, ClassNode> others);
 
 	/**
 	 * Replace native getter for abstract belief. 

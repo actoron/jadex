@@ -70,9 +70,9 @@ public class MParameter extends MElement
 	/** The message direction. */
 	public enum EvaluationMode
 	{
-		STATIC("static"),
-		PUSH("push"),
-		PULL("pull"),
+		STATIC("static"), 
+		PUSH("push"), // change when other beliefs change
+		PULL("pull"), // recalculate on access
 		POLLING("polling");
 		
 		protected String str;

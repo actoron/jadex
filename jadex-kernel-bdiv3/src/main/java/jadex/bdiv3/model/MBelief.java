@@ -108,9 +108,11 @@ public class MBelief extends MElement
 		this.beliefevents = beliefevents;
 		this.rawevents = rawevents;
 
-		// Set to push if user specified event dependencies (not if only deduced from an expression)
-		if(this.beliefevents!=null && this.beliefevents.size()>0 || this.rawevents!=null && this.rawevents.size()>0)
-			this.evaluationmode = MParameter.EvaluationMode.PUSH;
+		adaptEvaluationMode();
+		
+//		// Set to push if user specified event dependencies (not if only deduced from an expression)
+//		if(this.beliefevents!=null && this.beliefevents.size()>0 || this.rawevents!=null && this.rawevents.size()>0)
+//			this.evaluationmode = MParameter.EvaluationMode.PUSH;
 		
 //		System.out.println("bel: "+(target!=null?target.getName():"")+" "+dynamic);
 	}
@@ -130,12 +132,25 @@ public class MBelief extends MElement
 		this.beliefevents = beliefevents;
 		this.rawevents = rawevents;
 
-		// Set to push if user specified event dependencies (not if only deduced from an expression)
-		if(this.beliefevents!=null && this.beliefevents.size()>0 || this.rawevents!=null && this.rawevents.size()>0)
-			this.evaluationmode = MParameter.EvaluationMode.PUSH;
+		adaptEvaluationMode();
+		
+//		// Set to push if user specified event dependencies (not if only deduced from an expression)
+//		if(this.beliefevents!=null && this.beliefevents.size()>0 || this.rawevents!=null && this.rawevents.size()>0)
+//			this.evaluationmode = MParameter.EvaluationMode.PUSH;
 		
 //		System.out.println("bel: "+(target!=null?target.getName():"")+" "+dynamic);
 	}
+	
+	/**
+	 *  Adapt the evaluation mode according to the 
+	 */
+	protected void adaptEvaluationMode()
+	{
+		// Set to push if user specified event dependencies (not if only deduced from an expression)
+		if(this.beliefevents!=null && this.beliefevents.size()>0 || this.rawevents!=null && this.rawevents.size()>0)
+			this.evaluationmode = MParameter.EvaluationMode.PUSH;
+	}
+	
 	
 	/**
 	 *  Create a new belief.
@@ -793,6 +808,8 @@ public class MBelief extends MElement
 	public void setRawEvents(Set<EventType> rawevents)
 	{
 		this.rawevents = rawevents;
+		
+		adaptEvaluationMode();
 	}
 	
 	/**
@@ -818,6 +835,8 @@ public class MBelief extends MElement
 	public void setBeliefEvents(Set<String> events)
 	{
 		this.beliefevents	= events;
+		
+		adaptEvaluationMode();
 	}
 	
 	/**
