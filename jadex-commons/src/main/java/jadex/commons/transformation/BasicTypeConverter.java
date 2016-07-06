@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-
 /**
  *  Converter for basic types.
  */

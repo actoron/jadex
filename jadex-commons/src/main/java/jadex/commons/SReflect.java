@@ -2017,7 +2017,7 @@ public class SReflect
 //	}
 	
 	/** Cached flag for android check. */
-	protected static Boolean isAndroid;
+	protected static volatile Boolean isAndroid;
 	
 	/**
 	 *  Test if running on android.
@@ -2026,16 +2026,22 @@ public class SReflect
 	{
 		if(isAndroid==null)
 		{
-			try
+			synchronized (SReflect.class)
 			{
-				SReflect.class.getClassLoader().loadClass("android.app.Activity");
-				isAndroid = Boolean.TRUE;
+				if (isAndroid==null)
+				{
+					try
+					{
+						SReflect.class.getClassLoader().loadClass("android.app.Activity");
+						isAndroid = Boolean.TRUE;
+					}
+					catch(Exception e)
+					{
+						isAndroid = Boolean.FALSE;
+					}
+//					isAndroid	= Boolean.valueOf(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
+				}
 			}
-			catch(Exception e)
-			{
-				isAndroid = Boolean.FALSE;
-			}
-//			isAndroid	= Boolean.valueOf(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
 		}
 		return isAndroid.booleanValue();
 	}

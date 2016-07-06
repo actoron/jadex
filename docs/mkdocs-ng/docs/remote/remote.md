@@ -1,6 +1,54 @@
 # Remote
+Applications built with Jadex Active Components can be easily distributed across platforms, meaning that [service discovery](../services/services/#service-scopes) and [accessing services](../services/services/#accessing-services) works the same way, no matter if the target service is available at a local or remote platform.
+
+However, one additional aspect has to be addressed in the remote case: How can *platforms* discover each other to share services?
 
 # Awareness
+To solve the platform discovery problem, Jadex introduces a mechanism called *Awareness*.
+The goal is the detection of all available remote platforms in order to seamlessly communicate between each other if required. 
+
+To achieve this, several different kinds of discovery mechanisms are used:
+
+-   **Broadcast discovery** (enabled per default, local network): Uses IP broadcast to announce awareness infos. It uses the default port '55670'. As IP broadcast is only availble in IPV4 networks this mechanism will not work in pure IPV6 environments.
+-   **Multicast discovery** (enabled per default, local network): This mechanism uses IP multicasts to find other platforms. Per default it uses multicast address 224.0.0.0 and port 55667. As multicast requires receivers to register at the multicast address this mode does not send packets to other no Jadex nodes in the network.
+-   **IP-Scanner discovery** (disabled per default, local network): The scanner tries to find out the network type and send awareness infos to IP addresses within the network. The default port the scanner uses is 55668. Please note that ip scanning might conflict with the policies of your network administrator. First, the scanner floods the network with messages and second sending out messages to a bunch of network ips is\
+    sometimes considered to be an indication for virus behavior. For these reasons the scanner is deactivated per default.
+-   **Registry discovery** (disabled per default, global network): The registry mechanism allows for using a dedicated registry platform at which all other platforms register at runtime (using the address argument). The registry distributes its entries to all platforms. If you want to use the registry you should provide it with a unique platform id (otherwise it will use some fallback that is not guaranteed to be online).
+-   **Message discovery** (enabled per default, global network): Message discovery is based on message receipt of other platforms. Whenever a message is received the message service will forward it to this discovery agent which subsequently announces a new platform. Using message discovery is especially beneficial in asymmetric network settings, in which one partner can find the other but not vice versa. This e.g. occurss with broadcast or multicast in virtual networks using NAT (e.g. VirtualBox or Android emulator).
+-   **Relay discovery** (enabled per default, global network): The relay discovery is based on a web server that is used as a common rendezvouz point for the platforms, i.e. the web server distributes awareness infos among the currently connected nodes. Per default the relay uses a server at http://jadex.informatik.uni-hamburg.de/relay/ ](http://jadex.informatik.uni-hamburg.de/relay/) ](http://jadex.informatik.uni-hamburg.de/relay/) , but further servers are planned to be used. It is also possible to setup an own server using the relay WAR file from the downloads section, which allows for building up private platform networks.
+
+TODO : more info link
+
+
+
+Configuration
+--------------------------
+
+Awareness can be turned on/off with the argument: 
+
+
+
+
+
+**-awareness true/false**\
+\
+This will start the platform with or without the awareness component. If you want to disable awareness at runtime it is sufficient to kill the 'awa' component. On the other hand it is also possible to enable awareness at runtime by starting the awareness component (*jadex.base.service.awareness.management.AwarenessManagementAgent*) contained in the module *jadex-platform-base*. In addition to the global awareness setting it is also possible to determine the awareness mechanisms that should be used. This can be done by using the argument: 
+
+
+
+
+
+**-awamechanisms new String\[\]{"Broadcast", "Multicast", "Message", "Relay"}**
+
+
+
+
+
+At runtime the currently active awareness mechanisms can be seen by looking at the subcomponents of the awareness management component. To deactivate or activate mechanisms at runtime again subcomponents can be started or stopped. Furthermore, the delay between awareness announcements can be configured using the **-awadelay** argument, which per default is 20 seconds. This delay is propagted down to all awareness mechanisms at startup. At runtime the awareness settings can be further customized. For this puropose the awareness settings JCC plugin is available. 
+
+# Manual Connect
+
+TODO: how to manually add remote platforms
 
 # Security
 
