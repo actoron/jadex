@@ -287,7 +287,27 @@ fut.pullIntermediateResult();
 
 TODO: introduction
 ## Counting
-TODO
+
+TODO: no IFunctionalResultListener.
+```java
+        Future<String> fut1 = new Future<String>();
+        Future<String> fut2 = new Future<String>();
+        Future<String> fut3 = new Future<String>();
+
+        CounterResultListener<String> res = SResultListener.countResults(3, new IFunctionalResultListener<Void>() {
+            @Override
+            public void resultAvailable(Void result) {
+                successTarget.setResult("completed");
+            }
+        });
+
+        fut1.addResultListener(res);
+        fut2.addResultListener(res);
+        fut3.addResultListener(res);
+```
+
+TODO: can also be used by manually calling resultAvailable(null).
+
 ## Delegation
 TODO
 
@@ -313,5 +333,18 @@ Calling *get()* on the main thread may result in a hung-up program.
 
 # Advanced Topics
 
-
 ## SResultListener
+When using Java 8 and [functional result listeners](#java-8-features), there is no need to create inner classes, even if you want to delegate results to another future or count results with a *CounterResultListener*.  
+Instead, you can use the static methods of ```SResultListener```:
+```java
+// delegate results and exceptions:
+fut.addResultListener(SResultListener.delegate(myFut));
+
+// use results, delegate exceptions:
+fut.addResultListener(res -> ... , SResultListener.delegate(myFut));
+
+// delegate results, use exceptions:
+fut.addResultListener(SResultListener.delegate(myFut), ex -> ...);
+
+// count results and 
+```
