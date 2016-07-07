@@ -247,7 +247,6 @@ public class RemoteMarshalingConfig
 	 */
 	public void addPreprocessors(ITraverseProcessor[] processors)
 	{
-		System.out.println("ADDINGPREP " + Arrays.toString(processors));
 		preprocessors.addAll(Arrays.asList(processors));
 	}
 	
