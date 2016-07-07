@@ -1,5 +1,6 @@
 package jadex.commons.future;
 
+import jadex.commons.concurrent.ThreadPool;
 
 /**
  *  Suspendable for threads.
@@ -25,6 +26,8 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 		synchronized(this)
 		{
 			this.future	= future;
+			assert !ThreadPool.WAITING_THREADS.containsKey(Thread.currentThread());
+			ThreadPool.WAITING_THREADS.put(Thread.currentThread(), future);
 			try
 			{
 				if(timeout>0)
@@ -43,6 +46,8 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 			}
 			finally
 			{
+				assert ThreadPool.WAITING_THREADS.get(Thread.currentThread())==future;
+				ThreadPool.WAITING_THREADS.remove(Thread.currentThread());
 				// Restore the thread local values after switch
 				afterSwitch();
 				this.future	= null;

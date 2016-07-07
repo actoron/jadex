@@ -125,7 +125,7 @@ public interface IFuture<E>
 	public <T> IFuture<T> thenApply(Function<? super E, ? extends T> function, Class<?> futuretype);
 	
 	/**
-	 *  The result of this future is delegated to the given function.
+	 *  The result of this future is delegated to the given (future-returning) function.
 	 *  The result of the function will be available in the returned future.
 	 *  @param function Function that takes the result of this future as input and delivers future(t). 
 	 *  @return Future of the result of the second async call.
@@ -133,7 +133,7 @@ public interface IFuture<E>
 	public <T> IFuture<T> thenCompose(Function<? super E, IFuture<T>> function);
 	
 	/**
-	 *  The result of this future is delegated to the given function.
+	 *  The result of this future is delegated to the given (future-returning) function.
 	 *  The result of the function will be available in the returned future.
 	 *  @param function Function that takes the result of this future as input and delivers future(t). 
 	 *  @param futuretype The type of the return future. If null, a default future is created.
@@ -142,7 +142,7 @@ public interface IFuture<E>
 	public <T> IFuture<T> thenCompose(Function<? super E, IFuture<T>> function, Class<?> futuretype);
 	
 	/**
-	 *  Applies a function consuming the result after it is available.
+	 *  Applies a synchronous function consuming the result after it is available.
 	 *  @param consumer Consumer that takes the result of this future as input and consumes it. 
 	 *  @return Future of the result of the second async call.
 	 */

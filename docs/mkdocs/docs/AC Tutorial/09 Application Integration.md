@@ -10,7 +10,7 @@ In this chapter it will be shown how to start a Jadex platform and start and acc
 
 This exercise shows how a platform can be started from Java code.
 
-Starting a platform with standard arguments is very easy using the *createPlatform(...)* method of the *jadex.base.Starter* class. The return value of this method is a future object that contains the external access of the platform component, once the platform startup has finished successfully. For fetching the future result, you could use a result listener as known from the previous lessons. As the thread running the main() method is not managed by the Jadex concurrency model there is another option. Using a so called *ThreadSuspendable*, the main thread can be blocked until the future is available. This technique avoids the necessity of inner classes, which comes with the use of result listeners. Note, that usage of the thread suspendable is only allowed when running on threads, which are not managed by Jadex. If you try to use the thread suspendable in Jadex threads, e.g. in component or service code, the system will probably run into deadlocks.
+Starting a platform with standard arguments is very easy using the *createPlatform(...)* method of the *jadex.base.Starter* class. The return value of this method is a future object that contains the external access of the platform component, once the platform startup has finished successfully. For fetching the future result, you could use a result listener as known from the previous lessons. As the thread running the main() method is not managed by the Jadex concurrency model there is another option. Using a so called *ThreadSuspendable*, the main thread can be blocked until the future is available. This is used by default if *get()* is called outside a component context. This technique avoids the necessity of inner classes, which comes with the use of result listeners.
 
 ### Write a Main Class
 
@@ -26,8 +26,7 @@ public static void main(String[] args)
 ```java
 
 IFuture<IExternalAccess>	platfut	= Starter.createPlatform(args);
-ThreadSuspendable	sus	= new ThreadSuspendable();
-IExternalAccess	platform	= platfut.get(sus);
+IExternalAccess	platform	= platfut.get();
 System.out.println("Started platform: "+platform.getComponentIdentifier());
 
 ```
@@ -80,8 +79,7 @@ String[] newargs = new String[defargs.length+args.length];
 System.arraycopy(defargs, 0, newargs, 0, defargs.length);
 System.arraycopy(args, 0, newargs, defargs.length, args.length);
 IFuture<IExternalAccess>	platfut	= Starter.createPlatform(newargs);
-ThreadSuspendable sus = new ThreadSuspendable();
-IExternalAccess platform = platfut.get(sus);
+IExternalAccess platform = platfut.get();
 System.out.println("Started platform: "+platform.getComponentIdentifier());
 
 ```
@@ -120,7 +118,7 @@ In this exercise, we use the platform access to obtain the component management 
 ```java
 
 IComponentManagementService cms = SServiceProvider.getService(platform.getServiceProvider(),
-  IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+  IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 
 ```
 
@@ -140,7 +138,7 @@ The result of the *getService(...)* method is a future of the corresponding serv
 
 ```java
 
-IComponentIdentifier cid = cms.createComponent(null, ChatD2Agent.class.getName()+".class", null, null).get(sus);
+IComponentIdentifier cid = cms.createComponent(null, ChatD2Agent.class.getName()+".class", null, null).get();
 System.out.println("Started chat component: "+cid);
 
 ```
@@ -178,7 +176,7 @@ In this exercise we obtain the chat service of the chat component to print a wel
 
 ```java
 
-IChatService chat = SServiceProvider.getService(platform.getServiceProvider(), cid, IChatService.class).get(sus);
+IChatService chat = SServiceProvider.getService(platform.getServiceProvider(), cid, IChatService.class).get();
 chat.message("Main", "Chat started.");
 
 ```

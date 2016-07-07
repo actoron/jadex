@@ -45,9 +45,9 @@ public class DynamicBeliefBDI
 	protected void successPlan(int num)
 	{
 		System.out.println("plan activated: num2 changed to "+num);
-		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-		agent.killComponent();
+		if (num == 3) {
+			tr.setSucceeded(true);
+		}
 	}
 
 	/**
@@ -56,14 +56,14 @@ public class DynamicBeliefBDI
 	@AgentBody
 	public void body()
 	{
-		num1++;
-//		num1++;
+		num1 = 2;
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
-					tr.setFailed("Plan was not activated due to belief change.");
+					tr.setFailed("Plan was not activated due to belief change or incorrect event change.");
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killComponent();
 				return IFuture.DONE;
 			}

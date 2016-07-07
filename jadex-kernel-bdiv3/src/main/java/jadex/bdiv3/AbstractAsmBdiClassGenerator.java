@@ -321,7 +321,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				// will be incarnated as new update methods
 				if(mn.name.equals("<init>"))
 				{
-					transformConstructor(cn, mn, model, tododyn);
+					transformConstructor(cn, mn, model, tododyn, others);
 				}
 				else if(todoset.contains(mn.name))
 				{
@@ -456,7 +456,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 * @param model
 	 * @param tododyn list of dynamic beliefs
 	 */
-	protected abstract void transformConstructor(ClassNode cn, MethodNode mn, BDIModel model, List<String> tododyn);
+	protected abstract void transformConstructor(ClassNode cn, MethodNode mn, BDIModel model, List<String> tododyn, Map<String, ClassNode> others);
 
 	/**
 	 * Replace native getter for abstract belief. 
@@ -644,9 +644,12 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		}
 		catch(Exception e)
 		{
-			if (SReflect.isAndroid()) {
+			if(SReflect.isAndroid()) 
+			{
 				throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + ". On Android, this is done during build time by the jadex-gradle plugin. Be sure it is included in your build.gradle as explained in the jadex-android documentation!");
-			} else {
+			} 
+			else 
+			{
 				throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + " This may happen if the class is accessed directly in application code before loadModel() was called.");
 			}
 		}

@@ -58,6 +58,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	{
 //		System.out.println("cl: "+getComponent().getClassLoader());
 		
+		// Init the arguments with parameters.
 		if(cinfo.getArguments()!=null)
 		{
 			for(Iterator<Map.Entry<String, Object>> it=cinfo.getArguments().entrySet().iterator(); it.hasNext(); )
@@ -71,7 +72,40 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			}
 		}
 		
-		// Init the arguments with initial or default values.
+		initDefaultArguments();
+		
+		// Hack?! add component identifier to result as long as we don't have better future type for results
+		// could one somehow use the CallLocal for that purpose instead?
+		this.results	= new MapWrapper<String, Object>(new LinkedHashMap<String, Object>())
+		{
+			protected void entryAdded(String key, Object value)
+			{
+				postEvent(key, value);
+			}
+
+			protected void entryRemoved(String key, Object value)
+			{
+				postEvent(key, null);
+			}
+
+			protected void entryChanged(String key, Object oldvalue, Object newvalue)
+			{
+				postEvent(key, newvalue);
+			}
+		};
+		results.put(IComponentIdentifier.RESULTCID, getComponent().getComponentIdentifier());
+		
+		initDefaultResults();
+
+		return IFuture.DONE;
+	}
+
+	/**
+	 *  Init unset arguments from default values.
+	 */
+	protected void initDefaultArguments()
+	{
+		// Init the remaining arguments with initial or default values.
 		ConfigurationInfo	ci	= component.getConfiguration()!=null ? component.getModel().getConfiguration(component.getConfiguration()) : null;
 		if(ci!=null)
 		{
@@ -102,29 +136,15 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 				arguments.put(margs[i].getName(), SJavaParser.getParsedValue(margs[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 			}
 		}
-		
+	}
+	
+	/**
+	 *  Init unset results from default values.
+	 */
+	protected void initDefaultResults()
+	{
 		// Init the results with initial or default values.
-		
-		// Hack?! add component identifier to result as long as we don't have better future type for results
-		// could one somehow use the CallLocal for that purpose instead?
-		this.results	= new MapWrapper<String, Object>(new LinkedHashMap<String, Object>())
-		{
-			protected void entryAdded(String key, Object value)
-			{
-				postEvent(key, value);
-			}
-
-			protected void entryRemoved(String key, Object value)
-			{
-				postEvent(key, null);
-			}
-
-			protected void entryChanged(String key, Object oldvalue, Object newvalue)
-			{
-				postEvent(key, newvalue);
-			}
-		};
-		results.put(IComponentIdentifier.RESULTCID, getComponent().getComponentIdentifier());
+		ConfigurationInfo	ci	= component.getConfiguration()!=null ? component.getModel().getConfiguration(component.getConfiguration()) : null;
 		
 		if(ci!=null)
 		{
@@ -144,8 +164,6 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 				results.put(res[i].getName(), SJavaParser.getParsedValue(res[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 			}
 		}
-
-		return IFuture.DONE;
 	}
 	
 	/**

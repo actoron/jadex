@@ -66,11 +66,30 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 				((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 					.block(this, timeout);
 			}
+//			catch(Error e)
+//			{
+//				if(agent.toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("ComponentSuspendable.unsuspend 1"+Thread.currentThread());
+//				}
+//				throw e;
+//			}
+//			catch(RuntimeException e)
+//			{
+//				if(agent.toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("ComponentSuspendable.unsuspend 2"+Thread.currentThread());
+//				}
+//				throw e;
+//			}
 			finally
 			{
+//				if(agent.toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("ComponentSuspendable.unsuspend 3"+Thread.currentThread());
+//				}
 				afterSwitch();
 				this.future	= null;
-//				System.out.println("ComponentSuspendable.unsuspend "+Thread.currentThread());
 			}
 		}
 	}
@@ -84,15 +103,19 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 //		Thread.dumpStack();
 		if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
+//			System.out.println("ComponentSuspendable.resume1 "+Thread.currentThread());
 			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
+//					System.out.println("ComponentSuspendable.resume2 "+Thread.currentThread());
 					synchronized(ComponentSuspendable.this)
 					{
+//						System.out.println("ComponentSuspendable.resume3 "+Thread.currentThread());
 						// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 						if(future==ComponentSuspendable.this.future)
 						{
+//							System.out.println("ComponentSuspendable.resume4 "+Thread.currentThread());
 							beforeSwitch();
 							((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 								.unblock(ComponentSuspendable.this, null);
@@ -104,15 +127,19 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 		}
 		else
 		{
+//			System.out.println("ComponentSuspendable.resume5 "+Thread.currentThread());
 			synchronized(this)
 			{
+//				System.out.println("ComponentSuspendable.resume6 "+Thread.currentThread());
 				// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 				if(future==this.future)
 				{
+//					System.out.println("ComponentSuspendable.resume7 "+Thread.currentThread());
+//					beforeSwitch();	// Todo: why not beforeSwitch()?
 					((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 						.unblock(this, null);
 				}
-			}			
+			}
 		}
 //		System.out.println("ComponentSuspendable.unresume "+Thread.currentThread());
 	}

@@ -53,6 +53,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.component.ComponentXMLReader;
+import jadex.javaparser.javaccimpl.ExpressionNode;
 import jadex.rules.eca.EventType;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -619,16 +620,14 @@ public class BDIXMLReader extends ComponentXMLReader
 					
 					if(mbel.isExported())
 					{
-						// Add default value (from potentially wrong capability) only as description.
-						String	desc	= resolved.getDescription()!=null ? resolved.getDescription()+": "+findBeliefDefaultValue(model, resolved, null) : ""+findBeliefDefaultValue(model, resolved, null);
-						model.addArgument(new Argument(mbel.getName(), desc, resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, null));
+						// Add default value.
+						model.addArgument(new Argument(mbel.getName(), resolved.getDescription(), resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, findBeliefDefaultValue(model, resolved, null)));
 					}
 					
 					if(mbel.isResult())
 					{
-						// Add default value (from potentially wrong capability) only as description.
-						String	desc	= resolved.getDescription()!=null ? resolved.getDescription()+": "+findBeliefDefaultValue(model, resolved, null) : ""+findBeliefDefaultValue(model, resolved, null);
-						model.addResult(new Argument(mbel.getName(), desc, resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, null));
+						// Add default value
+						model.addResult(new Argument(mbel.getName(), resolved.getDescription(), resolved.getClazz()!=null ? resolved.getClazz().getTypeName() : null, findBeliefDefaultValue(model, resolved, null)));
 						
 						model.getCapability().addResultMapping(resolved.getName(), mbel.getName());
 					}
@@ -1421,23 +1420,39 @@ public class BDIXMLReader extends ComponentXMLReader
 		{
 			if(mbel.isMulti(null))
 			{
+				// Todo: facts expression
 				for(UnparsedExpression fact: facts)
 				{
 					if(ret==null)
 					{
-						ret	= "[";
+						ret	= "new Object[]{";
 					}
 					else
 					{
 						ret	+= ", ";
 					}
-					ret	+= fact.getValue();
+					
+					if(fact.getParsed() instanceof ExpressionNode)
+					{						
+						ret	+= ((ExpressionNode)fact.getParsed()).toPlainString();
+					}
+					else
+					{
+						ret	+= fact.getValue();
+					}
 				}
-				ret	+= "]";
+				ret	+= "}";
 			}
 			else if(facts.size()>0)
 			{
-				ret	= facts.get(0).getValue();
+				if(facts.get(0).getParsed() instanceof ExpressionNode)
+				{						
+					ret	= ((ExpressionNode)facts.get(0).getParsed()).toPlainString();
+				}
+				else
+				{
+					ret	= facts.get(0).getValue();
+				}
 			}
 		}
 		

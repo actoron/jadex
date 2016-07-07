@@ -319,6 +319,7 @@ public class HttpReceiver
 					{
 						try
 						{
+//							System.out.println("http get: "+adr);
 							String	curadrs	= transport.getConnectionManager().getServers(adr);
 							if(ret.setResultIfUndone(curadrs))
 							{
@@ -329,6 +330,10 @@ public class HttpReceiver
 						{
 							crl.exceptionOccurred(e);
 						}
+//						finally
+//						{
+//							System.out.println("finished http get: "+adr);
+//						}
 					}
 				}
 			});

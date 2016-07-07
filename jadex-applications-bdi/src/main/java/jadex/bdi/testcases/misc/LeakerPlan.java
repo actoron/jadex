@@ -23,7 +23,24 @@ public class LeakerPlan extends Plan
 		runTests(testno, runs, false);
 		runTests(testno, runs/10, true);	// Hack!!! To reduce execution time to reasonible time use less runs when dispatching
 		
-		waitForEver();
+//		try
+//		{
+			waitForEver();
+//		}
+//		catch(Error e)
+//		{
+//			System.out.println("leaker wait end: "+e);
+//			throw e;
+//		}
+//		catch(RuntimeException e)
+//		{
+//			System.out.println("leaker wait end2: "+e);
+//			throw e;
+//		}
+//		finally
+//		{
+//			System.out.println("leaker wait end3");
+//		}
 	}
 
 	/**

@@ -145,7 +145,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 				int next = exception instanceof PlanAbortedException? 3: 2;
 				
 //				if(next==3)
-//					System.out.println("exe abort of: "+rplan.getId());
+//					System.out.println("exe of: "+rplan.getId()+", "+next);
 				
 				rplan.setException(exception);
 				
@@ -193,6 +193,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 	 */
 	public void abort()
 	{
+//		System.out.println("body.abort "+rplan);
 		if(partfuture!=null)
 		{
 			Future<Object>	fut	= partfuture;

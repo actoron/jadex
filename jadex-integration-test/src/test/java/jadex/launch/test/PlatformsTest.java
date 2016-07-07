@@ -69,15 +69,18 @@ public class PlatformsTest //extends TestCase
 	 */
 	public static void main(String[] args)
 	{
-		System.out.println("guiclass: "+ jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
-		   	jadex.platform.service.library.LibraryService.class.getClassLoader()));
+		IExternalAccess	ea	= Starter.createPlatform("-gui", "false").get();
+		ea.killComponent().get();
 		
-		PlatformsTest test = new PlatformsTest();
-		for(int i=0; i<10000; i++)
-		{
-			System.out.println("Run: "+i);
-			test.testPlatforms();
-		}
+//		System.out.println("guiclass: "+ jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
+//		   	jadex.platform.service.library.LibraryService.class.getClassLoader()));
+//		
+//		PlatformsTest test = new PlatformsTest();
+//		for(int i=0; i<10000; i++)
+//		{
+//			System.out.println("Run: "+i);
+//			test.testPlatforms();
+//		}
 	}
 	
 	/**

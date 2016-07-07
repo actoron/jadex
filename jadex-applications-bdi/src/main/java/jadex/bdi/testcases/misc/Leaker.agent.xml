@@ -82,6 +82,9 @@
 	<properties>
  		<property name="logging.level">java.util.logging.Level.SEVERE</property> 
 		<property name="debugging">false</property>
+		<!-- Property is used when run from component test suite. -->
+		<property name="test.timeout">jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)</property>
+		<property name="termination_timeout">jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)</property>
 	</properties>
 
 	<configurations>
@@ -89,6 +92,10 @@
 			<beliefs>
 				<initialbelief cref="testcap.testcase_cnt">
 					<fact>6</fact>
+				</initialbelief>
+				<!-- Belief is used when run from JCC. -->
+				<initialbelief cref="testcap.timeout">
+					<fact>jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

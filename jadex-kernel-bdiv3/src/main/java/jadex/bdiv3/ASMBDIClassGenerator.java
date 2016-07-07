@@ -620,7 +620,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 * 
 	 */
-	protected void transformConstructor(ClassNode cn, MethodNode mn, BDIModel model, List<String> tododyn)
+	protected void transformConstructor(ClassNode cn, MethodNode mn, BDIModel model, List<String> tododyn, Map<String, ClassNode> others)
 	{
 		InsnList l = mn.instructions;
 		LabelNode begin = null;
@@ -665,17 +665,21 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 					start = start.getPrevious();
 				}
 				
+				// todo: use findBeliefs?!
+//				Set<String> bels = findBeliefs(cn, mn, model, others);
+				
+				// Create new update method for dynamic belief
 				if(tododyn.remove(name))
 				{
 					MBelief mbel = model.getCapability().getBelief(name);
-					Set<String>	bevs	= new LinkedHashSet<String>(mbel.getBeliefEvents());
+					Set<String>	bevs = new LinkedHashSet<String>(mbel.getBeliefEvents());
 					bevs.addAll(evs);
 					mbel.setBeliefEvents(bevs);
 					
 					MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
 						+SUtil.firstToUpperCase(name), Type.getMethodDescriptor(Type.VOID_TYPE), null, null);
 					
-					// First labels are cloned
+					// First labels are cloned 
 					AbstractInsnNode cur = start;
 					Map<LabelNode, LabelNode> labels = new HashMap<LabelNode, LabelNode>();
 					while(!cur.equals(min))
@@ -684,7 +688,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 							labels.put((LabelNode)cur, new LabelNode(new Label()));
 						cur = cur.getNext();
 					}
-					// Then code is cloned
+					// Then code is cloned and uses cloned labels
 					cur = start;
 					while(!cur.equals(min))
 					{

@@ -6,7 +6,6 @@ import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
-import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
@@ -141,7 +140,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	public static class ExtinguishFire
 	{
 		/** The disaster. */
-		@GoalParameter
+//		@GoalParameter
 		protected ISpaceObject disaster;
 
 		/**
@@ -155,7 +154,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		/**
 		 * 
 		 */
-		@GoalTargetCondition(parameters="disaster")	// Todo: auto-detect parameters
+		@GoalTargetCondition(rawevents=@RawEvent(value=ChangeEvent.PARAMETERCHANGED, second="disaster"))//(parameters="disaster")	// Todo: auto-detect parameters
 		public boolean checkTarget()
 		{
 			Integer cnt = (Integer)getDisaster().getProperty("fire");
@@ -194,7 +193,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	public static class ClearChemicals
 	{
 		/** The disaster. */
-		@GoalParameter
+//		@GoalParameter
 		protected ISpaceObject disaster;
 
 		/**
@@ -208,7 +207,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		/**
 		 * 
 		 */
-		@GoalTargetCondition(parameters="disaster")	// Todo: auto-detect parameters
+		@GoalTargetCondition(rawevents=@RawEvent(value=ChangeEvent.PARAMETERCHANGED, second="disaster"))//(parameters="disaster")	// Todo: auto-detect parameters
 		public boolean checkTarget()
 		{
 			Integer cnt = (Integer)getDisaster().getProperty("chemicals");

@@ -2030,6 +2030,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			{
 				public void customResultAvailable(Void result)
 				{
+//					System.out.println(component.getComponentIdentifier()+" body end");
 					String confname = component.getConfiguration();
 					if(confname!=null)
 					{

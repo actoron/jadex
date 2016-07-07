@@ -81,7 +81,6 @@ public void body()
 
 ```
 
-
 ### Starting and testing the agent
 Create a translation agent via the Jadex Control Center and observe the output. You should see it printing the translated word.
 
@@ -128,7 +127,6 @@ Again, copy the agent file from the last lecture and do the following:
 -   Copy the word table field from the inner to the agent class
 -   Copy the init code for the word table to the newly created init method of the agent
 
-
 ```java
 
 @AgentCreated
@@ -139,7 +137,6 @@ public void init()
 
 ```
 
-
 -   Adapt the adoptPlan() method call to 
 ```java
 bdiFeature.adoptPlan("translateEnglishGerman");
@@ -147,7 +144,6 @@ bdiFeature.adoptPlan("translateEnglishGerman");
 
 Instead a plan object we just give the name of the method representing the plan.
 -   Create a method as plan using the following code
-
 
 ```java
 
@@ -158,9 +154,28 @@ public void translateEnglishGerman()
 
 ```
 
-
 -   Then remove the inner plan class completely.
-    
+
+
+### Method Plans with Parameters
+When you create your plans as inner classes, you can just pass parameters as constructor arguments.
+However, it is also possible to have parameterized plans using method plans.
+First, declare a parameter of type *ChangeEvent*:
+```java
+@Plan
+public void translateEnglishGerman(ChangeEvent<Object[]> event)
+{
+    String word = (String)ev.getValue()[0];
+}
+```
+
+Next, pass the parameter when you adopt the plan:
+```java
+bdiFeature.adoptPlan("translateEnglishGerman", "dog");
+```
+
+All parameters passed this way will be available inside the *ChangeEvent.getValue()* array passed to the plan method.
+
 ### Starting and testing the agent
 Test and verify that the agent behavior is the same as in the last exercise.
 

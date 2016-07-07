@@ -253,6 +253,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    		{
 	    			throw (RuntimeException)exception;
 	    		}
+	    		else if(exception instanceof ErrorException)
+	    		{
+	    			// Special case to allow errors being set as exception result and thrown as errors.
+	    			throw ((ErrorException)exception).getError();
+	    		}
 	    		else
 	    		{
 	    			// Nest exception to have both calling and manually set exception stack trace.
@@ -453,17 +458,22 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public void abortGet(ISuspendable caller)
 	{
+//		System.out.println("abort get1");
 		synchronized(this)
 		{
-    	   	if(callers!=null && callers.containsKey(caller))
+//			System.out.println("abort get2");
+			if(callers!=null && callers.containsKey(caller))
     	   	{
-	    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+//				System.out.println("abort get3");
+				Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
 	    		synchronized(mon)
 				{
+//	    			System.out.println("abort get4");
 	    			String state = callers.get(caller);
 	    			if(CALLER_SUSPENDED.equals(state))
 	    			{
 	    				// Only reactivate thread when previously suspended.
+//	    				System.out.println("abort get5");
 	    				caller.resume(this);
 	    			}
 	    			callers.put(caller, CALLER_RESUMED);

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,14 +64,21 @@ public class ServiceCallTestNFClearTest
 		String pid = SUtil.createUniqueId(name.getMethodName(), 3) + "-*";
 
 		platform1 = Starter.createPlatform(
-			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",}).get(timeout);
+			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false", "-logging", "false"}).get(timeout);
 
 		platform2 = Starter.createPlatform(
-			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",}).get(timeout);
+			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false", "-logging", "false"}).get(timeout);
 
 		createProxies(platform1, platform2);
 
 		CallAccess.resetNextInvocation();
+	}
+	
+	@After
+	public void tearDown()
+	{
+		platform1.killComponent().get();
+		platform2.killComponent().get();
 	}
 
 	/**

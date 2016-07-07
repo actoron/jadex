@@ -455,6 +455,58 @@ def configurePomMetadata(Task uploadTask) {
     }
 }
 
+def addEclipseWorkarounds(project) {
+	// detached configuration, so this workaround config does not get added to default build process
+	def conf = project.configurations.detachedConfiguration()
+	
+	def dep = project.dependencies.create(fileTree(dir: new File(project.projectDir, '/libs') , include: '*.jar'))
+	conf.dependencies.add(dep)
+	
+	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android))				
+	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_test))
+	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_support))
+	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_compat))
+	
+	project.apply plugin: 'eclipse'
+//	project.apply plugin: 'com.github.ksoichiro.eclipse.aar'
+	
+	project.eclipse {
+		classpath {
+			plusConfigurations += [
+			conf, 
+			project.configurations.compile, 
+			project.configurations.testCompile
+			]
+		}
+	}
+	
+	project.sourceSets {
+		main {
+			java {
+				srcDir 'src/main/java'
+				srcDir 'gen'
+			}
+		}
+		
+		
+		test {
+			java {
+				srcDir 'src/test/java'
+			}
+		}
+	}
+	
+	
+	// Configure eclipse-aar plugin
+//	project.eclipseAar {
+//	    // See "Configurations" for details
+//	    androidTarget = 'android-21'
+//	    aarDependenciesDir = 'aarDependencies'
+//	    // Set to true if you use Andmore. Default is false
+//	    andmore = true
+//	}
+}
+
 // make functions externally visible
 
 ext {
@@ -475,4 +527,5 @@ ext {
     addJavaDocJarTask = this.&addJavaDocJarTask
     addSourcesJarTask = this.&addSourcesJarTask
     configurePomMetadata = this.&configurePomMetadata
+    addEclipseWorkarounds = this.&addEclipseWorkarounds
 }
