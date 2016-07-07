@@ -9,7 +9,10 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.IFilter;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
  *  The interface for the message service. It is responsible for
@@ -24,13 +27,14 @@ public interface IMessageService extends IService
 	 *  @param sender The sender component identifier.
 	 *  @param rid The resource identifier used by the sending component (i.e. corresponding to classes of objects in the message map).
 	 *  @param realrec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
+	 *  *  @param serializerid ID of the serializer for encoding the message.
 	 *  @param codecids The codecs to use for encoding (if different from default).
 	 *  @param nonfunc The non functional properties that need to be preserved.
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
-	public IFuture<Void> sendMessage(Map<String, Object> message, MessageType msgtype, 
-		IComponentIdentifier sender, IResourceIdentifier rid, IComponentIdentifier realrec, 
-		byte[] codecids);//, Map<String, Object> nonfunc);
+	public IFuture<Void> sendMessage(final Map<String, Object> origmsg, final MessageType type, 
+			final IComponentIdentifier osender, final IResourceIdentifier rid, 
+			final IComponentIdentifier realrec, final Byte serializerid, final byte[] codecids);//, Map<String, Object> nonfunc);
 	
 //	/**
 //	 *  Deliver a message to some components.
@@ -76,17 +80,29 @@ public interface IMessageService extends IService
 	 */
 	public IFuture<Void> removeMessageListener(IMessageListener listener);
 	
-	/**
-	 *  Add message codec type.
-	 *  @param codec The codec type.
+	/** 
+	 *  Adds preprocessors to the encoding stage.
+	 *  @param Preprocessors.
 	 */
-	public IFuture<Void> addMessageCodec(Class codec);
+	IFuture<Void> addPreprocessors(ITraverseProcessor[] processors);
+	
+	/** 
+	 *  Adds postprocessors to the encoding stage.
+	 *  @param Postprocessors.
+	 */
+	IFuture<Void> addPostprocessors(IDecoderHandler[] processors);
 	
 	/**
-	 *  Remove message codec type.
-	 *  @param codec The codec type.
+	 *  Add message codec.
+	 *  @param codec The codec.
 	 */
-	public IFuture<Void> removeMessageCodec(Class codec);
+	public IFuture<Void> addBinaryCodec(IBinaryCodec codec);
+	
+	/**
+	 *  Remove message codec.
+	 *  @param codec The codec.
+	 */
+	public IFuture<Void> removeBinaryCodec(IBinaryCodec codec);
 	
 	/**
 	 *  Announce that addresses of transports might have changed.
@@ -122,14 +138,26 @@ public interface IMessageService extends IService
 	public MessageType getMessageType(String type);
 	
 	/**
+	 *  Get the serializers.
+	 *  @return The serializer.
+	 */
+	public IFuture<Map<Byte, ISerializer>> getAllSerializers();
+	
+	/**
 	 *  Get the codecs with message codecs.
 	 *  @return The codec factory.
 	 */
-	public IFuture<Map<Byte, ICodec>> getAllCodecs();
+	public IFuture<Map<Byte, IBinaryCodec>> getAllCodecs();
+	
+	/**
+	 *  Get the serializers and codecs.
+	 *  @return The serializer and codecs.
+	 */
+	public IFuture<Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>> getAllSerializersAndCodecs();
 	
 	/**
 	 *  Get the default codecs.
 	 *  @return The default codecs.
 	 */
-	public IFuture<ICodec[]> getDefaultCodecs();
+	public IFuture<IBinaryCodec[]> getDefaultCodecs();
 }

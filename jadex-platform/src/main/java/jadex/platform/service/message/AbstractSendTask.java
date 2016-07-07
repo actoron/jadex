@@ -11,8 +11,8 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.MessageFailureException;
-import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.IEncodingContext;
+import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -20,6 +20,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.platform.service.message.transport.ITransport;
 
 /**
@@ -34,16 +35,18 @@ public abstract class AbstractSendTask implements ISendTask
 
 	/** The message prolog. */
 	protected volatile byte[] prolog;
-
+	
+	/** The codecs. */
+	protected ISerializer serializer;
+	
+	/** The preprocessors. */
+	protected ITraverseProcessor[] preprocessors;
 	
 	/** The codecids. */
 	protected byte[] codecids;
 	
 	/** The codecs. */
-	protected ICodec[] codecs;
-	
-	/** The encoding context */
-	protected IEncodingContext encodingcontext;
+	protected IBinaryCodec[] codecs;
 	
 	/** The managed receivers. */
 	protected ITransportComponentIdentifier[] receivers;
@@ -73,9 +76,11 @@ public abstract class AbstractSendTask implements ISendTask
 	 *  Create a new task.
 	 */
 	public AbstractSendTask(ITransportComponentIdentifier[] receivers, 
-		ITransport[] transports, ICodec[] codecs, Map<String, Object> nonfunc)
+		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, IBinaryCodec[] codecs, Map<String, Object> nonfunc)
 	{
-		codecs = codecs==null? new ICodec[0]: codecs;
+		this.serializer = serializer;
+		this.preprocessors = preprocessors;
+		codecs = codecs==null? new IBinaryCodec[0]: codecs;
 
 		for(int i=0; i<receivers.length; i++)
 		{
@@ -374,12 +379,12 @@ public abstract class AbstractSendTask implements ISendTask
 	/**
 	 *  Encode the object with the codecs.
 	 */
-	protected byte[] encode(Object obj, IEncodingContext context)
+	protected byte[] encode(Object obj)
 	{
-		Object enc_msg = obj;
+		Object enc_msg = serializer.encode(obj, getClass().getClassLoader(), null);
 		for(int i=0; i<codecs.length; i++)
 		{
-			enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader(), context);
+			enc_msg	= codecs[i].encode((byte[]) enc_msg);
 		}
 		return (byte[])enc_msg;
 	}

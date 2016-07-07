@@ -45,7 +45,8 @@ import jadex.platform.service.message.transport.ITransport;
 		+ "MessageAgent.createTransports($component, $args),"
 		+ "new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()},"
 		+ "null,"
-		+ "$args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory(),"
+//		+ "$args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory(),"
+		+ "null,"
 		+ "$args.strictcom)",
 		proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))

@@ -6,10 +6,12 @@ import java.util.Map;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.platform.service.message.AbstractSendTask;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
@@ -143,9 +145,9 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 *  Create a new manager send task.
 	 */
 	public StreamSendTask(byte type, Object message, int streamid, ITransportComponentIdentifier[] receivers, 
-		ITransport[] transports, ICodec[] codecs, Integer seqnumber, Map<String, Object> nonfunc)
+		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, IBinaryCodec[] codecs, Integer seqnumber, Map<String, Object> nonfunc)
 	{
-		super(receivers, transports, codecs, nonfunc);
+		super(receivers, transports, preprocessors, serializer, codecs, nonfunc);
 		this.type = type;
 		this.message = message;
 		this.streamid = streamid;
@@ -204,10 +206,10 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 */
 	protected byte[] fetchData()
 	{
-		Object enc_msg = message;
+		Object enc_msg = serializer.encode(message, getClass().getClassLoader(), null);
 		for(int i=0; i<codecs.length; i++)
 		{
-			enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader(), encodingcontext);
+			enc_msg	= codecs[i].encode((byte[]) enc_msg);
 		}
 		return (byte[])enc_msg;
 	}

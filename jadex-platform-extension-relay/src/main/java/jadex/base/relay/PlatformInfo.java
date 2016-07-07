@@ -10,7 +10,7 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -88,7 +88,7 @@ public final class PlatformInfo
 	protected AwarenessInfo	awainfo;
 	
 	/** The preferred codecs (if any). */
-	protected ICodec[] pcodecs;
+	protected IBinaryCodec[] pcodecs;
 	
 	/** The properties (if any). */
 	protected Map<String, String>	properties;
@@ -479,7 +479,7 @@ public final class PlatformInfo
 	 *  The relay server will send awareness infos to the platform using this codecs.
 	 */
 	@Exclude
-	public ICodec[] getPreferredCodecs()
+	public IBinaryCodec[] getPreferredCodecs()
 	{
 		return pcodecs;
 	}
@@ -489,7 +489,7 @@ public final class PlatformInfo
 	 *  The relay server will send awareness infos to the platform using this codecs.
 	 */
 	@Exclude
-	public void setPreferredCodecs(ICodec[] pcodecs)
+	public void setPreferredCodecs(IBinaryCodec[] pcodecs)
 	{
 		this.pcodecs	= pcodecs;
 	}

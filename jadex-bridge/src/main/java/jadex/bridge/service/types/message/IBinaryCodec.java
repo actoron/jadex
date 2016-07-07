@@ -1,11 +1,9 @@
 package jadex.bridge.service.types.message;
 
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
 /**
  *  Encode and decode an object from a string representation.
  */
-public interface ICodec
+public interface IBinaryCodec
 {
 	/** Constant for accessing the codec id. */
 	public static final String CODEC_ID = "CODEC_ID";
@@ -22,7 +20,7 @@ public interface ICodec
 	 *  @return The encoded object.
 	 */
 //	public byte[] encode(Object val, ClassLoader classloader);
-	public Object encode(Object val, ClassLoader classloader, IEncodingContext context);
+	public byte[] encode(byte[] val);
 	
 	/**
 	 *  Decode data with the codec.
@@ -30,6 +28,6 @@ public interface ICodec
 	 *  @return The decoded object or byte array (for intermediate codecs).
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader);
-	public Object decode(Object bytes, ClassLoader classloader, IErrorReporter rep);
+	public byte[] decode(Object bytes);
 	
 }

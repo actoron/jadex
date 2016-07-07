@@ -11,7 +11,7 @@ import java.util.Map;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.platform.service.message.MapSendTask;
-import jadex.platform.service.message.transport.codecs.CodecFactory;
+import jadex.platform.service.message.RemoteMarshalingConfig;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 /**
@@ -262,7 +262,8 @@ public class PeerHandler implements Runnable
 						RelayHandler.getLogger().info("Start DB synchronization with: "+getUrl()+", local="+localstate+", remote="+peerstate);
 						// Fetch update from remote peer
 						byte[]	infos	= handler.getConnectionManager().getDBEntries(getUrl(), peerid, localstate+1, 1000);	// Hack!!! Update (only) 1000 entries per 30 seconds!?
-						PlatformInfo[]	pinfos	= (PlatformInfo[])MapSendTask.decodeMessage(infos, new CodecFactory().getAllCodecs(), getClass().getClassLoader(), null);	// Hack!!! Use codec factory from relay handler?
+						RemoteMarshalingConfig rmc = new RemoteMarshalingConfig();
+						PlatformInfo[]	pinfos	= (PlatformInfo[])MapSendTask.decodeMessage(infos, null, rmc.getAllSerializers(), rmc.getAllCodecs(), getClass().getClassLoader(), null);	// Hack!!! Use codec factory from relay handler?
 						for(PlatformInfo info: pinfos)
 						{
 							handler.getStatisticsDB().save(info);

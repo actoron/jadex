@@ -17,15 +17,18 @@ import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
-import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -115,11 +118,14 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 //	/** The classloader. */
 //	protected ClassLoader classloader;
 	
+	/** The map of all serializers. */
+	protected Map<Byte, ISerializer> allserializers;
+	
 	/** The default codecs. */
-	protected ICodec[] defaultcodecs;
+	protected IBinaryCodec[] defaultcodecs;
 	
 	/** The map of all codecs. */
-	protected Map<Byte, ICodec> allcodecs;
+	protected Map<Byte, IBinaryCodec> allcodecs;
 	
 	//-------- methods --------
 	
@@ -136,16 +142,17 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 //		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
 		
 		final IMessageService msgser = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
+		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IBinaryCodec[], Void>(ret)
 		{
-			public void customResultAvailable(ICodec[] result)
+			public void customResultAvailable(IBinaryCodec[] result)
 			{
 				defaultcodecs = result;
-				msgser.getAllCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<Byte, ICodec>, Void>(ret)
+				msgser.getAllSerializersAndCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>,Map<Byte, IBinaryCodec>>, Void>(ret)
 				{
-					public void customResultAvailable(Map<Byte, ICodec> result)
+					public void customResultAvailable(Tuple2<Map<Byte, ISerializer>,Map<Byte, IBinaryCodec>> result)
 					{
-						allcodecs = result;
+						allserializers = result.getFirstEntity();
+						allcodecs = result.getSecondEntity();
 						ret.setResult(null);
 					}
 				}));
@@ -458,10 +465,10 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  @param object The object.
 	 *  @return The byte array.
 	 */
-	public static byte[] encodeObject(Object object, ICodec[] codecs, ClassLoader classloader)
+	public static byte[] encodeObject(Object object, IBinaryCodec[] codecs, ClassLoader classloader)
 	{
 		// TODO: Hack? The encoding context probably needs to be target-based
-		return MapSendTask.encodeMessage(object, codecs, classloader, null);
+		return MapSendTask.encodeMessage(object, null, null, codecs, classloader);
 //		return GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(object, 
 //			classloader), classloader);
 	}
@@ -471,10 +478,10 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  @param data The byte array.
 	 *  @return The object.
 	 */
-	public static Object decodeObject(byte[] data, Map<Byte, ICodec> codecs, ClassLoader classloader)
+	public static Object decodeObject(byte[] data, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader classloader)
 	{
 //		System.out.println("size: "+data.length);
-		return MapSendTask.decodeMessage(data, codecs, classloader, IErrorReporter.IGNORE);
+		return MapSendTask.decodeMessage(data, null, serializers, codecs, classloader, IErrorReporter.IGNORE);
 //		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 
 //			classloader), classloader);
 //		return Reader.objectFromByteArray(reader, GZIPCodec.decodeBytes(data, 
@@ -497,7 +504,16 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  Get the allcodecs.
 	 *  @return the allcodecs.
 	 */
-	public Map<Byte, ICodec> getAllCodecs()
+	public Map<Byte, ISerializer> getAllSerializers()
+	{
+		return allserializers;
+	}
+	
+	/**
+	 *  Get the allcodecs.
+	 *  @return the allcodecs.
+	 */
+	public Map<Byte, IBinaryCodec> getAllCodecs()
 	{
 		return allcodecs;
 	}
@@ -506,7 +522,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  Get the defaultcodecs.
 	 *  @return the defaultcodecs.
 	 */
-	public ICodec[] getDefaultCodecs()
+	public IBinaryCodec[] getDefaultCodecs()
 	{
 		return defaultcodecs;
 	}

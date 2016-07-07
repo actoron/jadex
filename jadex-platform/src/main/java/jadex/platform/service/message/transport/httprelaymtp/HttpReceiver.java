@@ -20,9 +20,11 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -220,7 +222,7 @@ public class HttpReceiver
 	/**
 	 *  Post a received awareness info to awareness service (if any).
 	 */
-	protected void	postAwarenessInfo(final byte[] data, final int type, final Map<Byte, ICodec> codecs)
+	protected void	postAwarenessInfo(final byte[] data, final int type, final Map<Byte, ISerializer> serializers, final Map<Byte, IBinaryCodec> codecs)
 	{
 		if(shutdown)
 			return;
@@ -232,7 +234,7 @@ public class HttpReceiver
 			{
 				try
 				{
-					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
+					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, null, serializers, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 //					System.out.println("Received awareness info: "+info);
 					awa.addAwarenessInfo(info);
 				}
@@ -432,9 +434,9 @@ public class HttpReceiver
 			public void customResultAvailable(final IMessageService ms)
 			{
 //				System.err.println("getService: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
-				ms.getAllCodecs().addResultListener(new ExceptionDelegationResultListener<Map<Byte,ICodec>, Void>(ret)
+				ms.getAllSerializersAndCodecs().addResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>, Void>(ret)
 				{
-					public void customResultAvailable(final Map<Byte,ICodec> codecs)
+					public void customResultAvailable(final Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>> sercodecs)
 					{
 //						System.err.println("getAllCodecs: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 						transport.getThreadPool().execute(new Runnable()
@@ -486,7 +488,7 @@ public class HttpReceiver
 										else if(b==SRelay.MSGTYPE_AWAINFO)
 										{
 											final byte[] rawmsg = readMessage(in);
-											postAwarenessInfo(rawmsg, b, codecs);
+											postAwarenessInfo(rawmsg, b, sercodecs.getFirstEntity(), sercodecs.getSecondEntity());
 										}
 										else if(b==SRelay.MSGTYPE_DEFAULT)
 										{

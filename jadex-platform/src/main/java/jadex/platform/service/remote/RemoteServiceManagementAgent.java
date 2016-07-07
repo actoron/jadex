@@ -38,6 +38,8 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.STransformation;
+import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
@@ -119,6 +121,9 @@ public class RemoteServiceManagementAgent
 			public void customResultAvailable(TransportAddressBook addresses)
 			{
 				rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
+				IMessageService msgser = SServiceProvider.getLocalService(agent.getComponentIdentifier(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				msgser.addPreprocessors(rms.getBinaryWriteInfo().toArray(new ITraverseProcessor[0])).get();
+				msgser.addPostprocessors(rms.getBinaryReadInfo().toArray(new IDecoderHandler[0])).get();
 				agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 				ret.setResult(null);
 			}

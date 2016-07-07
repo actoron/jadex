@@ -28,6 +28,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
@@ -51,6 +52,7 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
@@ -65,16 +67,17 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.message.EncodingContext;
-import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.IEncodingContext;
+import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.bridge.service.types.message.IMessageListener;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -88,6 +91,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.binaryserializer.SerializerDecodingException;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -104,8 +108,8 @@ import jadex.platform.service.message.streams.OutputConnectionHandler;
 import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.ITransport;
 import jadex.platform.service.message.transport.MessageEnvelope;
-import jadex.platform.service.message.transport.codecs.CodecFactory;
 import jadex.platform.service.remote.RemoteMethodInvocationHandler;
+import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 
 
 /**
@@ -160,9 +164,6 @@ public class MessageService extends BasicService implements IMessageService
 	/** The awareness service. */
 //	protected IAwarenessManagementService ams;
 	
-	/** Release date cache */
-	protected LRU<IComponentIdentifier, Date> releasedatecache = new LRU<IComponentIdentifier, Date>(100);
-	
 	/** The cms. */
 	protected IComponentManagementService cms;
 	
@@ -172,8 +173,8 @@ public class MessageService extends BasicService implements IMessageService
 	/** The target managers (platform id->manager). */
 	protected LRU<IComponentIdentifier, SendManager> managers;
 		
-	/** The codec factory for messages. */
-	protected CodecFactory codecfactory;
+	/** The remote marshaling config for messages. */
+	protected RemoteMarshalingConfig remotemarshalingconfig;
 	
 	/** The delivery handler map. */
 	protected Map<Byte, ICommand> deliveryhandlers;
@@ -208,7 +209,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param platform
 	 */
 	public MessageService(IInternalAccess component, Logger logger, ITransport[] transports, 
-		MessageType[] messagetypes, String deflanguage, CodecFactory codecfactory, boolean strictcom)
+		MessageType[] messagetypes, String deflanguage, RemoteMarshalingConfig rmc, boolean strictcom)
 	{
 		super(component.getComponentIdentifier(), IMessageService.class, null);
 		
@@ -233,7 +234,7 @@ public class MessageService extends BasicService implements IMessageService
 		this.logger = logger;
 		
 		this.managers = new LRU<IComponentIdentifier, SendManager>(800);
-		this.codecfactory = codecfactory!=null? codecfactory: new CodecFactory();
+		this.remotemarshalingconfig = rmc!=null? rmc: new RemoteMarshalingConfig();
 		
 		// The default language for content.
 		this.deflanguage = deflanguage==null? SFipa.JADEX_XML: deflanguage;
@@ -317,12 +318,13 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param sender The sender component identifier.
 	 *  @param rid The resource identifier used by the sending component (i.e. corresponding to classes of objects in the message map).
 	 *  @param realrec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
+	 *  @param serializerid ID of the serializer for encoding the message.
 	 *  @param codecids The codecs to use for encoding (if different from default).
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
 	public IFuture<Void> sendMessage(final Map<String, Object> origmsg, final MessageType type, 
 		final IComponentIdentifier osender, final IResourceIdentifier rid, 
-		final IComponentIdentifier realrec, final byte[] codecids)//, final Map<String, Object> nonfunc)
+		final IComponentIdentifier realrec, final Byte serializerid, final byte[] codecids)//, final Map<String, Object> nonfunc)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -474,46 +476,21 @@ public class MessageService extends BasicService implements IMessageService
 //								});
 				
 //						System.out.println("Getting final release date: " + msg);
-				getReleaseDate(type, msg).addResultListener(new ExceptionDelegationResultListener<Date, Void>(ret)
+				cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
-					public void customResultAvailable(Date result)
+					public void customResultAvailable(IExternalAccess exta)
 					{
-//								System.out.println("Got final release date: " + String.valueOf(result));
-						final Date freleasedate = result;
-//								final Date freleasedate = null;
+//								System.out.println("msgservice calling doSendMessage()");
+//								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 						
-						// External access of sender required for content encoding etc.
-//								SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-//									.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-//								{
-//									public void customResultAvailable(IComponentManagementService cms)
-//									{
-//										String	smsg	= "MessageService.sendMessage("+msg+")";
-//										ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-//										next.setProperty("debugsource", smsg);
-								
-								cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-								{
-									public void customResultAvailable(IExternalAccess exta)
-									{
-//												System.out.println("msgservice calling doSendMessage()");
-//												System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
-										
-//												System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
-										IEncodingContext enccont = new EncodingContext(freleasedate);
-										doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
-									}
-									public void exceptionOccurred(Exception exception)
-									{
-										super.exceptionOccurred(exception);
-									}
-								});
-//									}
-//								});
+//								System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
+						doSendMessage(msg, type, exta, cl, ret, serializerid, codecids);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurred(exception);
 					}
 				});
-//					}
-//				});
 			}
 		});
 		
@@ -538,7 +515,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Extracted method to be callable from listener.
 	 */
 	protected void doSendMessage(Map<String, Object> msg, final MessageType type, IExternalAccess comp, 
-		final ClassLoader cl, Future<Void> ret, byte[] codecids, final IEncodingContext enccontext)
+		final ClassLoader cl, Future<Void> ret, Byte serializerid, byte[] codecids)
 	{
 		final Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
 
@@ -576,7 +553,7 @@ public class MessageService extends BasicService implements IMessageService
 					(Proxy.getInvocationHandler(object) instanceof BasicServiceInvocationHandler
 						|| Proxy.getInvocationHandler(object) instanceof RemoteMethodInvocationHandler);
 			}
-		});
+		});	
 		
 		String[] names = (String[])msgcopy.keySet().toArray(new String[0]);
 		for(int i=0; i<names.length; i++)
@@ -657,8 +634,10 @@ public class MessageService extends BasicService implements IMessageService
 		
 		byte[] cids	= codecids;
 		if(cids==null || cids.length==0)
-			cids = codecfactory.getDefaultCodecIds();
-		final ICodec[] codecs = getMessageCodecs(cids);
+			cids = remotemarshalingconfig.getDefaultCodecIds();
+		final ITraverseProcessor[] preprocessors = remotemarshalingconfig.getPreprocessors();
+		final ISerializer serializer = serializerid!=null?remotemarshalingconfig.getSerializer(serializerid):remotemarshalingconfig.getDefaultSerializer();
+		final IBinaryCodec[] codecs = getBinaryCodecs(cids);
 //		ICodec[] codecs = new ICodec[cids.length];
 //		for(int i=0; i<codecs.length; i++)
 //		{
@@ -670,7 +649,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			final SendManager tm = (SendManager)it.next();
 			ITransportComponentIdentifier[] recs = managers.getCollection(tm).toArray(new ITransportComponentIdentifier[0]);
-			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, enccontext);
+			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), preprocessors, serializer,  codecs, cl);
 			tm.addMessage(task).addResultListener(crl);
 			
 //			addrservice.getTransportComponentIdentifiers(recs).addResultListener(new IResultListener<ITransportComponentIdentifier[]>()
@@ -692,14 +671,14 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	/**
-	 *  Get array of message codecs for codec ids.
+	 *  Get array of binary codecs for codec ids.
 	 */
-	public ICodec[] getMessageCodecs(byte[] codecids)
+	public IBinaryCodec[] getBinaryCodecs(byte[] codecids)
 	{
-		ICodec[] codecs = new ICodec[codecids.length];
+		IBinaryCodec[] codecs = new IBinaryCodec[codecids.length];
 		for(int i=0; i<codecs.length; i++)
 		{
-			codecs[i] = codecfactory.getCodec(codecids[i]);
+			codecs[i] = remotemarshalingconfig.getCodec(codecids[i]);
 		}
 		return codecs;
 	}
@@ -727,15 +706,6 @@ public class MessageService extends BasicService implements IMessageService
 //
 //		return ret;
 //	}
-
-	/**
-	 *  Get the codec factory.
-	 *  @return The codec factory.
-	 */
-	public CodecFactory getCodecFactory()
-	{
-		return codecfactory;
-	}
 	
 //	/**
 //	 *  Get the clock service.
@@ -755,21 +725,40 @@ public class MessageService extends BasicService implements IMessageService
 //	}
 	
 	/**
+	 *  Get the serializers.
+	 *  @return The serializer.
+	 */
+	public IFuture<Map<Byte, ISerializer>> getAllSerializers()
+	{
+		return new Future<Map<Byte, ISerializer>>(remotemarshalingconfig.getAllSerializers());
+	}
+	
+	/**
 	 *  Get the codecs with message codecs.
 	 *  @return The codec factory.
 	 */
-	public IFuture<Map<Byte, ICodec>> getAllCodecs()
+	public IFuture<Map<Byte, IBinaryCodec>> getAllCodecs()
 	{
-		return new Future<Map<Byte, ICodec>>(getCodecFactory().getAllCodecs());
+		return new Future<Map<Byte, IBinaryCodec>>(remotemarshalingconfig.getAllCodecs());
+	}
+	
+	/**
+	 *  Get the serializers and codecs.
+	 *  @return The serializer and codecs.
+	 */
+	public IFuture<Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>> getAllSerializersAndCodecs()
+	{
+		Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>> ret = new Tuple2<Map<Byte,ISerializer>, Map<Byte,IBinaryCodec>>(remotemarshalingconfig.getAllSerializers(), remotemarshalingconfig.getAllCodecs());
+		return new Future<Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>>(ret);
 	}
 	
 	/**
 	 *  Get the default codecs.
 	 *  @return The default codecs.
 	 */
-	public IFuture<ICodec[]> getDefaultCodecs()
+	public IFuture<IBinaryCodec[]> getDefaultCodecs()
 	{
-		return new Future<ICodec[]>(getCodecFactory().getDefaultCodecs());
+		return new Future<IBinaryCodec[]>(remotemarshalingconfig.getDefaultCodecs());
 	}
 	
 	/**
@@ -904,6 +893,11 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		
 		return ret;
+	}
+	
+	public RemoteMarshalingConfig getRemoteMarshalingConfig()
+	{
+		return remotemarshalingconfig;
 	}
 
 	//-------- IPlatformService interface --------
@@ -1162,23 +1156,43 @@ public class MessageService extends BasicService implements IMessageService
 		return IFuture.DONE;
 	}
 	
-	/**
-	 *  Add message codec type.
-	 *  @param codec The codec type.
+	/** 
+	 *  Adds preprocessors to the encoding stage.
+	 *  @param Preprocessors.
 	 */
-	public IFuture<Void> addMessageCodec(Class codec)
+	public IFuture<Void> addPreprocessors(ITraverseProcessor[] processors)
 	{
-		codecfactory.addCodec(codec);
+		remotemarshalingconfig.addPreprocessors(processors);
+		return IFuture.DONE;
+	}
+	
+	/** 
+	 *  Adds postprocessors to the encoding stage.
+	 *  @param Postprocessors.
+	 */
+	public IFuture<Void> addPostprocessors(IDecoderHandler[] processors)
+	{
+		remotemarshalingconfig.addPostprocessors(processors);
 		return IFuture.DONE;
 	}
 	
 	/**
-	 *  Remove message codec type.
-	 *  @param codec The codec type.
+	 *  Add message codec.
+	 *  @param codec The codec.
 	 */
-	public IFuture<Void> removeMessageCodec(Class codec)
+	public IFuture<Void> addBinaryCodec(IBinaryCodec codec)
 	{
-		codecfactory.removeCodec(codec);
+		remotemarshalingconfig.addCodec(codec);
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Remove message codec.
+	 *  @param codec The codec.
+	 */
+	public IFuture<Void> removeBinaryCodec(IBinaryCodec codec)
+	{
+		remotemarshalingconfig.removeCodec(codec);
 		return IFuture.DONE;
 	}
 	
@@ -1696,8 +1710,8 @@ public class MessageService extends BasicService implements IMessageService
 					Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
 					for(int i=codec_ids.length-1; i>-1; i--)
 					{
-						ICodec dec = codecfactory.getCodec(codec_ids[i]);
-						tmp = dec.decode(tmp, classloader, null);
+						IBinaryCodec dec = remotemarshalingconfig.getCodec(codec_ids[i]);
+						tmp = dec.decode(tmp);
 					}
 					data = tmp;
 				}
@@ -1969,7 +1983,7 @@ public class MessageService extends BasicService implements IMessageService
 						errors.add(e);
 					}
 				};
-				me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj, codecfactory.getAllCodecs(), classloader, rep);
+				me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj, remotemarshalingconfig.getPostprocessors(), remotemarshalingconfig.getAllSerializers(), remotemarshalingconfig.getAllCodecs(), classloader, rep);
 				
 				if(!errors.isEmpty())
 				{
@@ -2516,115 +2530,115 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Get the release date from a message.
 	 */
-	protected IFuture<Date> getReleaseDate(MessageType type, final Map<String, Object> msg)
-	{
-		final Future<Date> ret = new Future<Date>();
-		Object tmp = msg.get(type.getReceiverIdentifier());
-		
-		if(tmp instanceof IComponentIdentifier)
-		{
-			tmp = new IComponentIdentifier[] { (IComponentIdentifier) tmp };
-		}
-		
-		if(SReflect.isIterable(tmp))
-		{
-			int size = 0;
-			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
-			{
-				++size;
-				it.next();
-			}
-			
-			final CollectionResultListener<Date> crl = new CollectionResultListener<Date>(size, false, new ExceptionDelegationResultListener<Collection<Date>, Date>(ret)
-			{
-				public void customResultAvailable(Collection<Date> result)
-				{
-					Date releasedate = null;
-					for(Date date : result)
-					{
-						if (date != null && (releasedate == null || releasedate.after(date)))
-						{
-							releasedate = date;
-						}
-					}
-					
-					// Unknown platform date, assume oldest chain.
-					if(releasedate == null)
-					{
-						releasedate = new Date(1);
-					}
-					
-					ret.setResult(releasedate);
-				}
-			});
-			
-			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
-			{
-				final IComponentIdentifier rec = (IComponentIdentifier)it.next();
-				if(rec==null)
-				{
-					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
-				}
-				// Addresses may only null for local messages, i.e. intra platform communication
-				else if((
-					(rec instanceof ITransportComponentIdentifier && ((ITransportComponentIdentifier)rec).getAddresses()==null) 
-					|| !(rec instanceof ITransportComponentIdentifier)) &&
-					!(rec.getPlatformName().equals(component.getComponentIdentifier().getPlatformName())))
-				{
-					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
-				}
-				else if(!releasedatecache.containsKey(rec.getRoot()))
-				{
-					SServiceProvider.getService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false).addResultListener(new IResultListener<IAwarenessManagementService>()
-					{
-						public void resultAvailable(IAwarenessManagementService ams)
-						{
-							ams.getPlatformInfo(rec.getRoot()).addResultListener(new IResultListener<DiscoveryInfo>()
-							{
-								public void resultAvailable(DiscoveryInfo info)
-								{
-									if (info != null)
-									{
-										Map<String, String> props = info.getProperties();
-										String stringdate = props != null? props.get(AwarenessInfo.PROPERTY_JADEXDATE): null;
-										Date date = stringdate != null? new Date(Long.parseLong(stringdate)) : null;
-										releasedatecache.put(rec.getRoot(), date);
-										crl.resultAvailable(date);
-									}
-									else
-									{
-										releasedatecache.put(rec.getRoot(), null);
-										crl.resultAvailable(null);
-									}
-								}
-								
-								public void exceptionOccurred(
-										Exception exception)
-								{
-									releasedatecache.put(rec.getRoot(), null);
-									crl.resultAvailable(null);
-								}
-								
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							releasedatecache.put(rec.getRoot(), null);
-							crl.resultAvailable(null);
-						}
-					});
-				}
-				else
-				{
-					Date date = releasedatecache.get(rec.getRoot());
-					crl.resultAvailable(date);
-				}
-			}
-		}
-		
-		return ret;
-	}
+//	protected IFuture<Date> getReleaseDate(MessageType type, final Map<String, Object> msg)
+//	{
+//		final Future<Date> ret = new Future<Date>();
+//		Object tmp = msg.get(type.getReceiverIdentifier());
+//		
+//		if(tmp instanceof IComponentIdentifier)
+//		{
+//			tmp = new IComponentIdentifier[] { (IComponentIdentifier) tmp };
+//		}
+//		
+//		if(SReflect.isIterable(tmp))
+//		{
+//			int size = 0;
+//			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
+//			{
+//				++size;
+//				it.next();
+//			}
+//			
+//			final CollectionResultListener<Date> crl = new CollectionResultListener<Date>(size, false, new ExceptionDelegationResultListener<Collection<Date>, Date>(ret)
+//			{
+//				public void customResultAvailable(Collection<Date> result)
+//				{
+//					Date releasedate = null;
+//					for(Date date : result)
+//					{
+//						if (date != null && (releasedate == null || releasedate.after(date)))
+//						{
+//							releasedate = date;
+//						}
+//					}
+//					
+//					// Unknown platform date, assume oldest chain.
+//					if(releasedate == null)
+//					{
+//						releasedate = new Date(1);
+//					}
+//					
+//					ret.setResult(releasedate);
+//				}
+//			});
+//			
+//			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
+//			{
+//				final IComponentIdentifier rec = (IComponentIdentifier)it.next();
+//				if(rec==null)
+//				{
+//					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
+//				}
+//				// Addresses may only null for local messages, i.e. intra platform communication
+//				else if((
+//					(rec instanceof ITransportComponentIdentifier && ((ITransportComponentIdentifier)rec).getAddresses()==null) 
+//					|| !(rec instanceof ITransportComponentIdentifier)) &&
+//					!(rec.getPlatformName().equals(component.getComponentIdentifier().getPlatformName())))
+//				{
+//					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
+//				}
+//				else if(!releasedatecache.containsKey(rec.getRoot()))
+//				{
+//					SServiceProvider.getService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false).addResultListener(new IResultListener<IAwarenessManagementService>()
+//					{
+//						public void resultAvailable(IAwarenessManagementService ams)
+//						{
+//							ams.getPlatformInfo(rec.getRoot()).addResultListener(new IResultListener<DiscoveryInfo>()
+//							{
+//								public void resultAvailable(DiscoveryInfo info)
+//								{
+//									if (info != null)
+//									{
+//										Map<String, String> props = info.getProperties();
+//										String stringdate = props != null? props.get(AwarenessInfo.PROPERTY_JADEXDATE): null;
+//										Date date = stringdate != null? new Date(Long.parseLong(stringdate)) : null;
+//										releasedatecache.put(rec.getRoot(), date);
+//										crl.resultAvailable(date);
+//									}
+//									else
+//									{
+//										releasedatecache.put(rec.getRoot(), null);
+//										crl.resultAvailable(null);
+//									}
+//								}
+//								
+//								public void exceptionOccurred(
+//										Exception exception)
+//								{
+//									releasedatecache.put(rec.getRoot(), null);
+//									crl.resultAvailable(null);
+//								}
+//								
+//							});
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							releasedatecache.put(rec.getRoot(), null);
+//							crl.resultAvailable(null);
+//						}
+//					});
+//				}
+//				else
+//				{
+//					Date date = releasedatecache.get(rec.getRoot());
+//					crl.resultAvailable(date);
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
 }
 
 

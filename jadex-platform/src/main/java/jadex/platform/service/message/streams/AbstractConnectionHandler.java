@@ -18,7 +18,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -327,9 +327,9 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 *  Get the codecs. 
 	 *  @return The codecs.
 	 */
-	protected ICodec[] getCodecs()
+	protected IBinaryCodec[] getCodecs()
 	{
-		return ms.getMessageCodecs(ms.getCodecFactory().getDefaultCodecIds());
+		return ms.getBinaryCodecs(ms.getRemoteMarshalingConfig().getDefaultCodecIds());
 	}
 	
 	/**
@@ -338,7 +338,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	protected byte[] getCodecIds()
 	{
-		return ms.getCodecFactory().getDefaultCodecIds();
+		return ms.getRemoteMarshalingConfig().getDefaultCodecIds();
 	}
 	
 	/**
@@ -404,7 +404,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	{
 		return new StreamSendTask(getMessageType(type), content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
 			getConnectionId(), getConnection().isInitiatorSide()? new ITransportComponentIdentifier[]{getConnection().getParticipant()}: new ITransportComponentIdentifier[]{getConnection().getInitiator()}, 
-			getTransports(), usecodecs? getCodecs(): null, seqnumber, nonfunc); 
+			getTransports(), ms.getRemoteMarshalingConfig().getPreprocessors(), ms.getRemoteMarshalingConfig().getDefaultSerializer(), usecodecs? getCodecs(): null, seqnumber, nonfunc); 
 	}
 	
 	/**

@@ -6,20 +6,18 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.IEncodingContext;
+import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 /**
  *  Converts byte[] -> byte[] in both directions.
  */
-public class GZIPCodec implements ICodec
+public class GZIPCodec implements IBinaryCodec
 {
 	//-------- constants --------
 	
 	/** The gzip codec id. */
-	public static final byte CODEC_ID = 5;
+	public static final byte CODEC_ID = 0;
 
 	//-------- methods --------
 	
@@ -44,9 +42,9 @@ public class GZIPCodec implements ICodec
 	 *  @param obj The object.
 	 *  @throws IOException
 	 */
-	public Object encode(Object val, ClassLoader classloader, IEncodingContext context)
+	public byte[] encode(byte[] val)
 	{
-		return encodeBytes((byte[])val, classloader);
+		return encodeBytes(val);
 	}
 	
 	/**
@@ -54,9 +52,9 @@ public class GZIPCodec implements ICodec
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(Object bytes, ClassLoader classloader, IErrorReporter rep)
+	public byte[] decode(Object bytes)
 	{
-		return decodeBytes(bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (ByteArrayInputStream)bytes, classloader);
+		return decodeBytes(bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (ByteArrayInputStream)bytes);
 	}
 	
 	/**
@@ -64,7 +62,7 @@ public class GZIPCodec implements ICodec
 	 *  @param obj The object.
 	 *  @throws IOException
 	 */
-	public static byte[] encodeBytes(byte[] val, ClassLoader classloader)
+	public static byte[] encodeBytes(byte[] val)
 	{
 		byte[] ret = (byte[])val;
 
@@ -90,9 +88,9 @@ public class GZIPCodec implements ICodec
 	 *  @return The decoded bytes.
 	 *  @throws IOException
 	 */
-	public static byte[] decodeBytes(byte[] bytes, ClassLoader classloader)
+	public static byte[] decodeBytes(byte[] bytes)
 	{
-		return decodeBytes(new ByteArrayInputStream(bytes), classloader);
+		return decodeBytes(new ByteArrayInputStream(bytes));
 	}
 	
 	/**
@@ -100,7 +98,7 @@ public class GZIPCodec implements ICodec
 	 *  @return The decoded bytes.
 	 *  @throws IOException
 	 */
-	public static byte[] decodeBytes(ByteArrayInputStream bais, ClassLoader classloader)
+	public static byte[] decodeBytes(ByteArrayInputStream bais)
 	{
 		byte[] ret = null;
 		try

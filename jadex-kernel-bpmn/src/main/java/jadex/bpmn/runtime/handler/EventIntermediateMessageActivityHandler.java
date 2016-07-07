@@ -163,10 +163,11 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		{
 			codecids	= null;
 		}
+		Byte serializer=null;
 		
 		thread.setWaiting(true);
 //		System.out.println("send message to: "+msg.get(ri));
-		ms.sendMessage(msg, mt, instance.getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, codecids)
+		ms.sendMessage(msg, mt, instance.getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, serializer, codecids)
 			.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)

@@ -96,7 +96,7 @@ public abstract class ReceiveHandler
 											{
 												try
 												{
-													AwarenessInfo info = (AwarenessInfo)DiscoveryAgent.decodeObject((byte[])packet[2], agent.getAllCodecs(), agent.getMicroAgent().getClassLoader());
+													AwarenessInfo info = (AwarenessInfo)DiscoveryAgent.decodeObject((byte[])packet[2], agent.getAllSerializers(), agent.getAllCodecs(), agent.getMicroAgent().getClassLoader());
 //													System.out.println("received info: "+info);
 													handleReceivedPacket((InetAddress)packet[0], ((Integer)packet[1]).intValue(), (byte[])packet[2], info);
 												}
