@@ -282,7 +282,7 @@ subprojects
     uploadArchives {
     	if (project.hasProperty('repouser')) {
 	        repositories {
-	        	if (isCommercial(project) && repo_commercial)
+	        	if (isCommercial(project) && repo_commercial) // to commercial
 	        	{
 		            mavenDeployer {
 						beforeDeployment {
@@ -294,7 +294,7 @@ subprojects
 		                uniqueVersion=false
 		            }
 		        }
-		        else if (repo_noncommercial)
+		        else if (!isCommercial(project) && repo_noncommercial) // to noncommercial. if repo is unset, do nothing!
 		        {
 		        	mavenDeployer {
 						beforeDeployment {
