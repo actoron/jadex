@@ -45,22 +45,26 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					FutureFunctionality func = new FutureFunctionality(caller!=null ? caller.getLogger() : (Logger)null)
 					{
+						@Override
 						public void terminate(Exception reason, IResultListener<Void> terminate)
 						{
 							// As termination is done in listener, can use same decoupling code as for listener notification.
 							notifyListener(terminate);
 						}
 						
+						@Override
 						public void sendForwardCommand(Object info, IResultListener<Void> com)
 						{
 							notifyListener(com);
 						}
 						
+						@Override
 						public void sendBackwardCommand(Object info, IResultListener<Void> com)
 						{
 							notifyListener(com);
 						}
 						
+						@Override
 						public void notifyListener(final IResultListener<Void> listener)
 						{
 							// Don't reschedule if already on correct thread.
@@ -134,6 +138,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						/**
 						 *  For intermediate results this method is called.
 						 */
+						@Override
 						public void startScheduledNotifications(IResultListener<Void> notify)
 						{
 							notifyListener(notify);
