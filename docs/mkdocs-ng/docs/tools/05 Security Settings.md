@@ -38,4 +38,12 @@ Network Password Settings
 
 Entering passwords of individual platforms becomes quickly tedious when the number of platforms increases, because if the network should consist of n platforms, in each platform n-1 passwords have to be deposited. In this case, it is more convenient to use a network name and password combination that all platforms of the network share. In this case only entry has to be made in each of the n platforms. Entering a network name and password can be done by using the input fields and pressing the 'Add' button. Removal can again be achieved by using the popup menu (as shown below).
 
+### Setting up a trusted network
+
+To be able to test if it works, reset the password settings by deleting the *<platformname>.settings.xml* file. When you now start the second platform it will generate a different password and also no longers knows about the first platform's password. Therefore chat communication between the two platforms will be disabled.
+
 ![05 Security Settings @network\_rem.png](network_rem.png)
+
+In the text fields at the bottom, enter a network name of your choice and click 'Add'. Add the same network name in the second platform. Instead of having separate passwords for each platform, the security network settings allow establishing a group of platforms that allow access to each other. While not strictly necessary, you can also add a password for the network. You can also add multiple networks for platforms that should be present in more than one group. As long as two platforms share a at least one network name with the same password (or no password for both), they will allow restricted communication.
+
+
