@@ -5,7 +5,9 @@ import java.io.StringWriter;
 
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -115,8 +117,15 @@ public abstract class AbstractPlanBody implements IPlanBody
 					
 					rplan.setFinishing();
 					
-					internalInvokePart(1)
-						.addResultListener(new IResultListener<Object>()
+					// Schedule passed/failed/aborted on separate component step, as it might be triggered inside other plan execution
+					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Object>()
+					{
+						@Override
+						public IFuture<Object> execute(IInternalAccess ia)
+						{
+							return internalInvokePart(1);
+						}
+					}).addResultListener(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -142,7 +151,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 			{
 //				int next = RPlan.PLANLIFECYCLESTATE_ABORTED.equals(rplan.getLifecycleState())? 3: 2; 
 //				int next = rplan.getException() instanceof PlanAbortedException? 3: 2;
-				int next = exception instanceof PlanAbortedException? 3: 2;
+				final int next = exception instanceof PlanAbortedException? 3: 2;
 				
 //				if(next==3)
 //					System.out.println("exe of: "+rplan.getId()+", "+next);
@@ -155,8 +164,15 @@ public abstract class AbstractPlanBody implements IPlanBody
 					rplan.setFinishing();
 				}
 				
-				internalInvokePart(next)
-					.addResultListener(new IResultListener<Object>()
+				// Schedule passed/failed/aborted on separate component step, as it might be triggered inside other plan execution
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Object>()
+				{
+					@Override
+					public IFuture<Object> execute(IInternalAccess ia)
+					{
+						return internalInvokePart(next);
+					}
+				}).addResultListener(new IResultListener<Object>()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -212,7 +228,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 		partfuture	= ret;
 		
 		try
-		{			
+		{
+			assert RPlan.RPLANS.get()==null : RPlan.RPLANS.get()+", "+rplan;
+			RPlan.RPLANS.set(rplan);
 			rplan.setProcessingState(RPlan.PlanProcessingState.RUNNING);
 			Object res = null;
 			if(part==0) 
@@ -301,6 +319,11 @@ public abstract class AbstractPlanBody implements IPlanBody
 		catch(BodyAborted ba)
 		{
 			assert ret.isDone() && ret.getException() instanceof PlanAbortedException;
+		}
+		finally
+		{
+			assert RPlan.RPLANS.get()==rplan : RPlan.RPLANS.get()+", "+rplan;
+			RPlan.RPLANS.set(null);
 		}
 		
 		return ret;

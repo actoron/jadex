@@ -5,6 +5,7 @@ import java.util.Collection;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.runtime.impl.IPlanBody;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
@@ -153,7 +154,7 @@ public class BDIRequiredServicesComponentFeature extends RequiredServicesCompone
 		if(name.indexOf(MElement.CAPABILITY_SEPARATOR)!=-1)
 			return name;
 		
-		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
+		RPlan rplan = RPlan.RPLANS.get();
 		String capa = null;
 		if(rplan!=null)
 		{
