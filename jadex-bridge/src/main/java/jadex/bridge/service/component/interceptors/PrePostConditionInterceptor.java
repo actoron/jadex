@@ -443,6 +443,7 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 						}
 					}
 					
+					@Override
 					public Object addIntermediateResult(Object result)
 					{						
 						RuntimeException ex = checkPostConditions(sic, result, true, ires);
@@ -456,11 +457,13 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 							return result;
 					}
 					
+					@Override
 					public Object addIntermediateResultIfUndone(Object result)
 					{
 						return addIntermediateResult(result);
 					}
 					
+					@Override
 					public void setFinished(Collection<Object> results)
 					{
 						RuntimeException ex = checkPostConditions(sic, results, false, ires);
@@ -468,11 +471,13 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 							throw ex;
 					}
 					
+					@Override
 					public void setFinishedIfUndone(Collection<Object> results)
 					{
 						setFinished(results);
 					}
 					
+					@Override
 					public Object setResult(Object result)
 					{
 						RuntimeException ex = checkPostConditions(sic, result, false, ires);
@@ -482,6 +487,7 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 							return result;
 					}
 					
+					@Override
 					public Object setResultIfUndone(Object result)
 					{
 						return setResult(result);

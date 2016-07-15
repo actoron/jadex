@@ -34,6 +34,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	/**
 	 *  Schedule termination on component thread.
 	 */
+	@Override
 	public void terminate(Exception reason, IResultListener<Void> terminate)
 	{
 		// As termination is done in listener, can use same decoupling code as for listener notification.
@@ -43,6 +44,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	/**
 	 *  Send a foward command.
 	 */
+	@Override
 	public void sendForwardCommand(Object info, IResultListener<Void> com)
 	{
 		notifyListener(com);
@@ -51,6 +53,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	/**
 	 *  Send a backward command.
 	 */
+	@Override
 	public void sendBackwardCommand(Object info, IResultListener<Void> com)
 	{
 		notifyListener(com);
@@ -59,6 +62,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	/**
 	 *  Schedule listener notification on component thread. 
 	 */
+	@Override
 	public void notifyListener(final IResultListener<Void> notify) 
 	{
 		// Hack!!! Notify multiple listeners at once?
@@ -164,6 +168,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	/**
 	 *  Start the notifications.
 	 */
+	@Override
 	public void startScheduledNotifications(IResultListener<Void> notify)
 	{
 		notifyListener(notify);

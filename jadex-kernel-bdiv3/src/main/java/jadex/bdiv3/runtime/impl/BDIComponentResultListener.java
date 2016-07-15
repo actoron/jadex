@@ -3,12 +3,12 @@ package jadex.bdiv3.runtime.impl;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
-import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
@@ -47,7 +47,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 //		Thread.dumpStack();
 		this.listener = listener;
 		this.agent = agent;
-		this.rplan = ExecutePlanStepAction.RPLANS.get();
+		this.rplan = RPlan.RPLANS.get();
 //		if(rplan==null)
 //			System.out.println("ash");
 	}
@@ -171,40 +171,58 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	/**
 	 * 
 	 */
-	protected void doNotify(Exception ex, E result)
+	protected void doNotify(final Exception ex, final E result)
 	{
 		if(rplan!=null)
 		{
-//			System.out.println("plan state was: "+rplan.getProcessingState());
-			rplan.setProcessingState(PlanProcessingState.RUNNING);
-			ExecutePlanStepAction.RPLANS.set(rplan);
-			if(rplan.isFinishing() && rplan.getLifecycleState()==PlanLifecycleState.BODY)
-				ex = new PlanAbortedException();
-			if(ex!=null)
+			// Schedule plan code notification on separate component step, as it might be triggered inside other plan execution
+			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
-				if(undone && listener instanceof IUndoneResultListener)
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(ex);
+					try
+					{
+//						System.out.println("plan state was: "+rplan.getProcessingState());
+						rplan.setProcessingState(PlanProcessingState.RUNNING);
+						assert RPlan.RPLANS.get()==null : RPlan.RPLANS.get()+", "+rplan;
+						RPlan.RPLANS.set(rplan);
+						Exception e	= ex;
+						if(rplan.isFinishing() && rplan.getLifecycleState()==PlanLifecycleState.BODY)
+							e = new PlanAbortedException();
+						if(e!=null)
+						{
+							if(undone && listener instanceof IUndoneResultListener)
+							{
+								((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(e);
+							}
+							else
+							{
+								listener.exceptionOccurred(e);
+							}
+						}
+						else
+						{
+							if(undone && listener instanceof IUndoneResultListener)
+							{
+								((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+							}
+							else
+							{
+								listener.resultAvailable(result);
+							}
+						}
+//						System.out.println("setting to null "+this+" "+Thread.currentThread());
+					}
+					finally
+					{
+						rplan.setProcessingState(PlanProcessingState.WAITING);
+						assert RPlan.RPLANS.get()==rplan : RPlan.RPLANS.get()+", "+rplan;
+						RPlan.RPLANS.set(null);
+					}
+					return IFuture.DONE;
 				}
-				else
-				{
-					listener.exceptionOccurred(ex);
-				}
-			}
-			else
-			{
-				if(undone && listener instanceof IUndoneResultListener)
-				{
-					((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
-				}
-				else
-				{
-					listener.resultAvailable(result);
-				}
-			}
-			rplan.setProcessingState(PlanProcessingState.WAITING);
-//			System.out.println("setting to null "+this+" "+Thread.currentThread());
-			ExecutePlanStepAction.RPLANS.set(null);
+			});
 		}
 		else
 		{

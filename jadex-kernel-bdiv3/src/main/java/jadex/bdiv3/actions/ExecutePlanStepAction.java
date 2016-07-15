@@ -26,9 +26,6 @@ import jadex.commons.future.IResultListener;
  */
 public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 {
-	/** The rplans for plan threads. */
-	public static final ThreadLocal<RPlan>	RPLANS	= new ThreadLocal<RPlan>();
-	
 	/** The plan. */
 	protected RPlan rplan;
 	
@@ -159,33 +156,23 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 						ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().addPlan(rplan);
 						
 						IPlanBody body = rplan.getBody();
-						try
+						body.executePlan().addResultListener(new IResultListener<Void>()
 						{
-							RPLANS.set(rplan);
-							body.executePlan().addResultListener(new IResultListener<Void>()
+							public void resultAvailable(Void result)
 							{
-								public void resultAvailable(Void result)
+								ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().removePlan(rplan);
+								Object reason = rplan.getReason();
+								if(reason instanceof RProcessableElement)
 								{
-									RPLANS.set(null);
-									ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().removePlan(rplan);
-									Object reason = rplan.getReason();
-									if(reason instanceof RProcessableElement)
-									{
-										((RProcessableElement)reason).planFinished(ia, rplan);
-									}
+									((RProcessableElement)reason).planFinished(ia, rplan);
 								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									RPLANS.set(null);
-									resultAvailable(null);
-								}
-							});
-						}
-						finally
-						{
-							RPLANS.set(null);
-						}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								resultAvailable(null);
+							}
+						});
 					}
 					// Only needs to to something for waiting and new plans
 					// Should processing state be set back to ready in case the plan is not within a step?

@@ -189,6 +189,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 		// Drop goal when future is terminated from service caller
 		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null)
 		{
+			@Override
 			public void terminate(Exception reason, IResultListener<Void> terminate)
 			{
 //				System.out.println("terminated call: "+fgoal);
