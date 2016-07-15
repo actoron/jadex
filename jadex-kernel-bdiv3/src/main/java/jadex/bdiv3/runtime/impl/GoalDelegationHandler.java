@@ -187,10 +187,10 @@ public class GoalDelegationHandler  implements InvocationHandler
 		final Object fgoal = goal;
 		
 		// Drop goal when future is terminated from service caller
-		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null)
+		FutureFunctionality	func	= new FutureFunctionality((Logger)null)
 		{
 			@Override
-			public void terminate(Exception reason, IResultListener<Void> terminate)
+			public void handleTerminated(Exception reason)
 			{
 //				System.out.println("terminated call: "+fgoal);
 				IBDIAgentFeature bf = agent.getComponentFeature0(IBDIAgentFeature.class);
@@ -203,9 +203,9 @@ public class GoalDelegationHandler  implements InvocationHandler
 					((IGoal)fgoal).drop();
 				}
 //				((IBDIAgentFeature)bdif).dropGoal(fgoal);
-				super.terminate(reason, terminate);
 			}
-		});
+		};
+		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), func);
 		
 //		System.out.println("gloaldelehandler disp: "+((RGoal)fgoal).getId());
 		

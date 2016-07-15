@@ -8,11 +8,11 @@ import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.ICommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IUndoneResultListener;
 
 /**
  *  The decoupling return interceptor ensures that the result
@@ -46,43 +46,12 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 					FutureFunctionality func = new FutureFunctionality(caller!=null ? caller.getLogger() : (Logger)null)
 					{
 						@Override
-						public void terminate(Exception reason, IResultListener<Void> terminate)
-						{
-							// As termination is done in listener, can use same decoupling code as for listener notification.
-							notifyListener(terminate);
-						}
-						
-						@Override
-						public void sendForwardCommand(Object info, IResultListener<Void> com)
-						{
-							notifyListener(com);
-						}
-						
-						@Override
-						public void sendBackwardCommand(Object info, IResultListener<Void> com)
-						{
-							notifyListener(com);
-						}
-						
-						@Override
-						public void notifyListener(final IResultListener<Void> listener)
+						public void scheduleBackward(final ICommand<Void> com)
 						{
 							// Don't reschedule if already on correct thread.
 							if(caller==null || caller.getComponentFeature(IExecutionFeature.class).isComponentThread())
 							{
-								// Is now done in future resume
-//								CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-//								CallAccess.setLastInvocation(sic.getServiceCall());
-//								CallAccess.resetNextInvocation();
-								
-								if(isUndone() && listener instanceof IUndoneResultListener)
-								{
-									((IUndoneResultListener)listener).resultAvailableIfUndone(null);
-								}
-								else
-								{
-									listener.resultAvailable(null);
-								}
+								com.execute(null);
 							}
 							else
 							{
@@ -90,19 +59,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										// Is now done in future resume
-//										CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-//										CallAccess.setLastInvocation(sic.getServiceCall());
-//										CallAccess.resetNextInvocation();
-										
-										if(isUndone() && listener instanceof IUndoneResultListener)
-										{
-											((IUndoneResultListener)listener).resultAvailableIfUndone(null);
-										}
-										else
-										{
-											listener.resultAvailable(null);
-										}
+										com.execute(null);
 										return IFuture.DONE;
 									}
 								}).addResultListener(new IResultListener<Void>()
@@ -122,7 +79,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 											else
 											{
 												// pass exception back to future functionality as receiver is already dead.
-												listener.exceptionOccurred(exception);
+//												listener.exceptionOccurred(exception);
+												exception.printStackTrace();
 											}
 										}
 										else
@@ -133,15 +91,6 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									}
 								});
 							}
-						}
-						
-						/**
-						 *  For intermediate results this method is called.
-						 */
-						@Override
-						public void startScheduledNotifications(IResultListener<Void> notify)
-						{
-							notifyListener(notify);
 						}
 					};
 					

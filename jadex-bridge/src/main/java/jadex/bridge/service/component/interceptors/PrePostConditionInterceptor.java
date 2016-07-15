@@ -190,10 +190,10 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 	/**
 	 *  Check the postconditions.
 	 */
-	protected RuntimeException checkPostConditions(ServiceInvocationContext context, Object res, 
+	protected Exception checkPostConditions(ServiceInvocationContext context, Object res, 
 		boolean intermediate, List<Object> ires)
 	{
-		RuntimeException ret = null;
+		Exception ret = null;
 
 		Annotation[] annos = context.getMethod().getAnnotations();
 		for(int i=0; ret==null && i<annos.length; i++)
@@ -231,7 +231,7 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 					}
 					catch(Exception e)
 					{
-						ret = e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
+						ret = e;
 					}
 				}
 			}	
@@ -444,9 +444,9 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 					}
 					
 					@Override
-					public Object addIntermediateResult(Object result)
-					{						
-						RuntimeException ex = checkPostConditions(sic, result, true, ires);
+					public Object handleIntermediateResult(Object result) throws Exception
+					{
+						Exception ex = checkPostConditions(sic, result, true, ires);
 						
 						int keep = getKeepForPostConditions(sic);
 						addIntermediateResultToStore(result, keep);
@@ -456,41 +456,23 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 						else
 							return result;
 					}
-					
+
 					@Override
-					public Object addIntermediateResultIfUndone(Object result)
+					public void handleFinished(Collection<Object> results) throws Exception
 					{
-						return addIntermediateResult(result);
-					}
-					
-					@Override
-					public void setFinished(Collection<Object> results)
-					{
-						RuntimeException ex = checkPostConditions(sic, results, false, ires);
+						Exception ex = checkPostConditions(sic, results, false, ires);
 						if(ex!=null)
 							throw ex;
 					}
 					
 					@Override
-					public void setFinishedIfUndone(Collection<Object> results)
+					public Object handleResult(Object result)	throws Exception
 					{
-						setFinished(results);
-					}
-					
-					@Override
-					public Object setResult(Object result)
-					{
-						RuntimeException ex = checkPostConditions(sic, result, false, ires);
+						Exception ex = checkPostConditions(sic, result, false, ires);
 						if(ex!=null)
 							throw ex;
 						else
 							return result;
-					}
-					
-					@Override
-					public Object setResultIfUndone(Object result)
-					{
-						return setResult(result);
 					}
 				};
 				

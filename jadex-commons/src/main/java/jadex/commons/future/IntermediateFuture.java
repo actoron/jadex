@@ -89,27 +89,67 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 */
 	public void	addIntermediateResult(E result)
 	{
-	   	synchronized(this)
-		{
-        	if(resultavailable)
-        	{
-        		if(this.exception!=null)
-        		{
-//        			this.exception.printStackTrace();
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
-        		}
-        		else
-        		{
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
-        		}
-        	}
-	   	
-        	addResult(result);
-        	
-//			if(listener instanceof IIntermediateResultListener)
-//			{
-//				scheduleNotification(listener, true, result);
-//			}
+	   	doAddIntermediateResult(result, false);
+
+	   	resumeIntermediate();
+		startScheduledNotifications();
+	}
+	/**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     *  @return True if result was set.
+     */
+    public boolean	addIntermediateResultIfUndone(E result)
+    {
+    	boolean	ret	= doAddIntermediateResult(result, true);
+
+    	if(ret)
+    	{
+    		resumeIntermediate();
+    		startScheduledNotifications();
+    	}
+    	
+    	return ret;
+    }
+	
+    /**
+     *  Set the result without notifying listeners.
+     */
+    protected synchronized boolean doAddIntermediateResult(E result, boolean undone)
+    {
+    	if(undone)
+    	{
+    		this.undone = true;
+    	}
+
+    	// There is an exception when this is ok.
+    	// In BDI when belief value is a future.
+//    	if(result instanceof IFuture)
+//    	{
+//    		System.out.println("Internal error, future in future.");
+//    		setException(new RuntimeException("Future in future not allowed."));
+//    	}
+    	
+    	if(isDone())
+    	{
+    		if(undone)
+    		{
+    			return false;
+    		}
+    		else if(this.exception!=null)
+    		{
+        		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
+    		}
+    		else
+    		{
+        		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
+    		}
+    	}
+    	else
+    	{
+    		addResult(result);
+			
 			if(listeners!=null)
 			{
 				// Find intermediate listeners to be notified.
@@ -121,12 +161,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 					}
 				}
 			}
-		}
+	    	
+	    	return true;
+    	}
+    }
 
-	   	resumeIntermediate();
-		startScheduledNotifications();
-	}
-	
+    
 	/**
 	 *  Add a result.
 	 *  @param result The result.
@@ -145,113 +185,31 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      *  Set the result. 
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
-     *  @return True if result was set.
      */
-    public boolean	addIntermediateResultIfUndone(E result)
-    {
-    	synchronized(this)
-		{
-        	if(isDone())
-        	{
-        		return false;
-        	}
-        	else
-        	{
-        		undone = true;
-        		addResult(result);
-    			
-    			if(listeners!=null)
-    			{
-    				// Find intermediate listeners to be notified.
-    				for(int i=0; i<listeners.size(); i++)
-    				{
-    					if(listeners.get(i) instanceof IIntermediateResultListener)
-    					{
-    						scheduleNotification(listeners.get(i), true, result);
-    					}
-    				}
-    			}
-    		}
- 		}
-
-	   	resumeIntermediate();
-    	startScheduledNotifications();
-    	return true;
-    }
-	
-	/**
-     *  Set the result. 
-     *  Listener notifications occur on calling thread of this method.
-     *  @param result The result.
-     */
-    public void	setResult(Collection<E> result)
-    {
-//		System.out.println("setResult: "+this+" "+result);
-    	
+	@Override
+	protected synchronized boolean doSetResult(Collection<E> result, boolean undone)
+	{
     	synchronized(this)
 		{
         	if(intermediate)
         	{
-        		throw new RuntimeException("setResult() only allowed without intermediate results:"+results);
+        		throw new RuntimeException("setResult() only allowed without intermediate results: "+results);
         	}
-
-       		super.doSetResult(result, false);
-   			this.results = result;
+       		boolean	ret	= super.doSetResult(result, undone);
+       		if(ret)
+       		{
+       			this.results	= result;
+       		}
+       		return ret;
 		}
+    }
 
-		resume();
-    }
-    
-	/**
-     *  Set the result. 
-     *  Listener notifications occur on calling thread of this method.
-     *  @param result The result.
-     */
-    public boolean	setResultIfUndone(Collection<E> result)
-    {
-		boolean	ret;
-    	synchronized(this)
-		{
-	    	if(intermediate)
-	    	{
-	    		throw new RuntimeException("setResultIfUndone() only allowed without intermediate results: "+results);
-	    	}
-	    	else
-	    	{
-       			ret	= super.doSetResult(result, true);
-       			if(ret)
-       			{
-       				this.results = result;
-       			}
-    		}
-    	}
-    		
-    	if(ret)
-    	{
-    		resume();
-    	}
-   		return ret;
-    }
-    
     /**
      *  Declare that the future is finished.
      */
     public void setFinished()
     {
-//		System.out.println("finished: "+this+" "+result);
-    	
-    	synchronized(this)
-    	{
-        	Collection<E>	res	= getIntermediateResults();
-        	super.doSetResult(res, false);
-        	
-			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
-    		// because getIntermediateResults() returns empty list when results==null.
-    		if(results==null)
-    		{
-    			results	= res;
-    		}
-    	}
+    	doSetFinished(false);
     	
     	resume();
     }
@@ -261,28 +219,33 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public boolean setFinishedIfUndone()
     {
-    	boolean	 ret;
-    	synchronized(this)
-		{
-        	Collection<E>	res	= getIntermediateResults();
-    		ret	= super.doSetResult(res, true);
-    		
-    		if(ret)
-    		{
-    			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
-        		// because getIntermediateResults() returns empty list when results==null.
-        		if(results==null)
-        		{
-        			results	= res;
-        		}
-    		}
-		}
-
+    	boolean	ret	= doSetFinished(true);
     	if(ret)
     	{
     		resume();
     	}
+    	return ret;
+    }
+
+    /**
+     *  Declare that the future is finished.
+     */
+    protected synchronized boolean	doSetFinished(boolean undone)
+    {
+    	boolean	 ret;
     	
+    	Collection<E>	res	= getIntermediateResults();
+    	ret	= super.doSetResult(res, undone);
+		if(ret)
+		{
+			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
+    		// because getIntermediateResults() returns empty list when results==null.
+    		if(results==null)
+    		{
+    			results	= res;
+    		}
+		}
+
     	return ret;
     }
     

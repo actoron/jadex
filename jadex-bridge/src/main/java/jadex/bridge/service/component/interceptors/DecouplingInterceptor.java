@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -26,6 +25,7 @@ import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.TimeoutException;
@@ -35,7 +35,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.traverser.FilterProcessor;
@@ -400,116 +399,65 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				{
 					TimeoutException ex = null;
 					
-					public synchronized Object addIntermediateResult(Object result)
+					@Override
+					public Object handleIntermediateResult(Object result) throws Exception
 					{
 						if(ex!=null)
 							throw ex;
 						return doCopy(copy, deffilter, result);
 					}
 					
-					public synchronized Object addIntermediateResultIfUndone(Object result)
+					@Override
+					public void handleFinished(Collection<Object> results) throws Exception
+					{
+						if(ex!=null)
+							throw ex;
+					}
+
+					@Override
+					public Object handleResult(Object result) throws Exception
 					{
 						if(ex!=null)
 							throw ex;
 						return doCopy(copy, deffilter, result);
 					}
 					
-					public synchronized void setFinished(Collection<Object> results)
-					{
-						if(ex!=null)
-							throw ex;
-					}
+//					public synchronized Exception setException(Exception exception)
+//					{
+//						if(ex!=null)
+//							throw ex;
+//						if(exception instanceof TimeoutException)
+//							ex = (TimeoutException)exception;
+//						return exception;
+//					}
+//					
+//					public synchronized Exception setExceptionIfUndone(Exception exception)
+//					{
+//						if(ex!=null)
+//							throw ex;
+//						if(exception instanceof TimeoutException)
+//							ex = (TimeoutException)exception;
+//						return exception;
+//					}
 					
-					public synchronized void setFinishedIfUndone(Collection<Object> results)
-					{
-						if(ex!=null)
-							throw ex;
-					}
-					
-					public synchronized Object setResult(Object result)
-					{
-						if(ex!=null)
-							throw ex;
-						return doCopy(copy, deffilter, result);
-					}
-					
-					public synchronized Object setResultIfUndone(Object result)
-					{
-						if(ex!=null)
-							throw ex;
-						return doCopy(copy, deffilter, result);
-					}
-					
-					public synchronized Exception setException(Exception exception)
-					{
-						if(ex!=null)
-							throw ex;
-						if(exception instanceof TimeoutException)
-							ex = (TimeoutException)exception;
-						return exception;
-					}
-					
-					public synchronized Exception setExceptionIfUndone(Exception exception)
-					{
-						if(ex!=null)
-							throw ex;
-						if(exception instanceof TimeoutException)
-							ex = (TimeoutException)exception;
-						return exception;
-					}
-					
-					protected void internalNotifyListener(final IResultListener<Void> lis)
+					@Override
+					public void scheduleForward(final ICommand<Void> code)
 					{
 						if(ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
 						{
-							lis.resultAvailable(null);
+							code.execute(null);
 						}
 						else
 						{
-							try
+							ea.scheduleStep(new IComponentStep<Void>()
 							{
-								ea.scheduleStep(new IComponentStep<Void>()
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										lis.resultAvailable(null);
-										return IFuture.DONE;
-									}
-								});
-							}
-							catch(ComponentTerminatedException e)
-							{
-								lis.exceptionOccurred(e);
-							}				
+									code.execute(null);
+									return IFuture.DONE;
+								}
+							});
 						}	
-					}
-					
-					// Switch terminate() calls back to component thread.
-					public void terminate(Exception reason, final IResultListener<Void> terminate)
-					{
-						internalNotifyListener(terminate);			
-					}
-					
-					/**
-					 *  Send a foward command.
-					 */
-					public void sendForwardCommand(Object info, IResultListener<Void> com)
-					{
-						internalNotifyListener(com);	
-					}
-					
-					/**
-					 *  Send a backward command.
-					 */
-					public void sendBackwardCommand(Object info, IResultListener<Void> com)
-					{
-						internalNotifyListener(com);	
-					}
-					
-					// Switch terminate() calls back to component thread.
-					public void pullIntermediateResult(final IResultListener<Void> lis)
-					{
-						internalNotifyListener(lis);							
 					}
 				};
 				
