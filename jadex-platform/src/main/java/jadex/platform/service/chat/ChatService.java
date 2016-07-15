@@ -80,7 +80,7 @@ public class ChatService implements IChatService, IChatGuiService
 //	protected IServiceIdentifier sid;
 	
 	/** The futures of active subscribers. */
-	protected Set<SubscriptionIntermediateFuture<ChatEvent>>	subscribers;
+	protected Set<SubscriptionIntermediateFuture<ChatEvent>> subscribers;
 	
 	/** The local nick name. */
 	protected String nick;
