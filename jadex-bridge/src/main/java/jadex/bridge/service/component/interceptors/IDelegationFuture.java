@@ -17,7 +17,7 @@ public interface IDelegationFuture<E>
 	public boolean	doSetException(Exception exception, boolean undone);
 	
 	/**
-	 *  Overwritten to change exception, if necessary.
+	 *  Overwritten to change result, if necessary.
 	 */
 	public boolean	doSetResult(E result, boolean undone);
 	

@@ -72,6 +72,9 @@ import jadex.rules.eca.Rule;
  */
 public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 {
+	/** The rplans for plan threads. */
+	public static final ThreadLocal<RPlan>	RPLANS	= new ThreadLocal<RPlan>();
+	
 	//-------- plan states --------
 	
 	public static enum PlanProcessingState

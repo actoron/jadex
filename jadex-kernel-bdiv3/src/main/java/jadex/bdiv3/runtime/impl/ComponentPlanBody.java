@@ -64,6 +64,7 @@ public class ComponentPlanBody implements IPlanBody
 		final Future<Void>	ret	= new Future<Void>();
 
 		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
+		// Todo: should also set processing state and RPLANS thread local?
 		
 		IComponentManagementService cms = SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		cms.createComponent(null, component, new CreationInfo(ia.getComponentIdentifier()))

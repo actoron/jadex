@@ -1,6 +1,5 @@
 package jadex.bdiv3.features.impl;
 
-import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -51,7 +50,7 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 	 */
 	protected void beforeBlock()
 	{
-		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
+		RPlan rplan = RPlan.RPLANS.get();
 		if(rplan!=null)
 		{
 			rplan.beforeBlock();
@@ -67,7 +66,7 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 //		{
 //			System.out.println("afterBlock "+Thread.currentThread());
 //		}
-		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
+		RPlan rplan = RPlan.RPLANS.get();
 		if(rplan!=null)
 		{
 //			if(getComponent().toString().indexOf("Leaker")!=-1)

@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import jadex.bdiv3.IBDIClassGenerator;
-import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
@@ -134,7 +133,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 			public IFuture<Void> addEvent(IEvent event) 
 			{
 				// Implement atomic by changing the rule execution mode
-				RPlan rplan = ExecutePlanStepAction.RPLANS.get();
+				RPlan rplan = RPlan.RPLANS.get();
 				
 				boolean	queue	= isQueueEvents();
 				if(rplan!=null && !queue && rplan.isAtomic())

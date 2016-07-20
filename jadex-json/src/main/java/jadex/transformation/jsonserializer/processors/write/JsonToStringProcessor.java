@@ -51,7 +51,8 @@ public class JsonToStringProcessor implements ITraverseProcessor
 			if(object instanceof URI || object instanceof URL)
 				wr.addObject(traversed, object);
 			
-			if(!wr.isWriteClass())// && !wr.isWriteId())
+			// Allow write boolean directly without class
+			if(!wr.isWriteClass() || object instanceof Boolean)// && !wr.isWriteId())
 			{
 				if(object instanceof Number
 					|| object instanceof Boolean)
