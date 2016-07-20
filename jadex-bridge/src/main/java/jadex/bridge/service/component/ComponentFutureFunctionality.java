@@ -8,6 +8,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.ICommand;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Schedule forward future executions (e.g. results) on component thread,
@@ -45,6 +46,20 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 				{
 					command.execute(null);
 					return IFuture.DONE;
+				}
+			}).addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					System.err.println("Unexpected Exception: "+command);
+					exception.printStackTrace();
+				}
+				
+				@Override
+				public void resultAvailable(Void result)
+				{
+					// scheduled ok.
 				}
 			});
 		}

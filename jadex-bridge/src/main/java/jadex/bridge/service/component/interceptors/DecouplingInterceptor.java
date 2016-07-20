@@ -441,7 +441,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //					}
 					
 					@Override
-					public void scheduleForward(final ICommand<Void> code)
+					public void scheduleBackward(final ICommand<Void> code)
 					{
 						if(ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
 						{

@@ -137,8 +137,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
 							rplan.setException(exception);
+							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
 //							if(reason instanceof RProcessableElement)
 //								((RProcessableElement)reason).planFinished(ia, rplan);
 							ret.setException(exception);

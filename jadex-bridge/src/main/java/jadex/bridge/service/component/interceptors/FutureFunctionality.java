@@ -410,7 +410,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		{
 			public void execute(Void result)
 			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(listener);
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
 	}
@@ -437,12 +437,12 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	@Override
 	public void terminate(final Exception reason)
 	{
-		func.handleTerminated(reason);
 		func.scheduleBackward(new ICommand<Void>()
 		{
 			@Override
 			public void execute(Void args)
 			{
+				func.handleTerminated(reason);
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(reason);
 			}	
 		});
@@ -571,7 +571,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		{
 			public void execute(Void result)
 			{
-				DelegatingPullIntermediateDelegationFuture.super.sendForwardCommand(listener);
+				DelegatingPullIntermediateDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
 	}
@@ -599,12 +599,12 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	@Override
 	public void terminate(final Exception reason)
 	{
-		func.handleTerminated(reason);
 		func.scheduleBackward(new ICommand<Void>()
 		{
 			@Override
 			public void execute(Void args)
 			{
+				func.handleTerminated(reason);
 				DelegatingPullIntermediateDelegationFuture.super.terminate(reason);
 			}	
 		});
@@ -733,7 +733,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		{
 			public void execute(Void result)
 			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(listener);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
 	}	
@@ -744,12 +744,12 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	public void terminate(final Exception reason)
 	{
-		func.handleTerminated(reason);
 		func.scheduleBackward(new ICommand<Void>()
 		{
 			@Override
 			public void execute(Void args)
 			{
+				func.handleTerminated(reason);
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
 			}	
 		});
@@ -879,7 +879,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		{
 			public void execute(Void result)
 			{
-				DelegatingTerminableIntermediateDelegationFuture.super.sendForwardCommand(listener);
+				DelegatingTerminableIntermediateDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
 	}
@@ -890,12 +890,12 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	@Override
 	public void terminate(final Exception reason)
 	{
-		func.handleTerminated(reason);
 		func.scheduleBackward(new ICommand<Void>()
 		{
 			@Override
 			public void execute(Void args)
 			{
+				func.handleTerminated(reason);
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
 			}	
 		});
@@ -985,7 +985,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		{
 			public void execute(Void result)
 			{
-				DelegatingTerminableDelegationFuture.super.sendForwardCommand(listener);
+				DelegatingTerminableDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
 	}	
@@ -996,12 +996,12 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	@Override
 	public void terminate(final Exception reason)
 	{
-		func.handleTerminated(reason);
 		func.scheduleBackward(new ICommand<Void>()
 		{
 			@Override
 			public void execute(Void args)
 			{
+				func.handleTerminated(reason);
 				DelegatingTerminableDelegationFuture.super.terminate(reason);
 			}	
 		});
@@ -1117,7 +1117,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		{
 			public void execute(Void result)
 			{
-				DelegatingIntermediateFuture.super.sendForwardCommand(listener);
+				DelegatingIntermediateFuture.super.sendForwardCommand(info);
 			}
 		});
 	}	
@@ -1181,7 +1181,7 @@ class DelegatingFuture extends Future<Object>
 		{
 			public void execute(Void result)
 			{
-				DelegatingFuture.super.sendForwardCommand(listener);
+				DelegatingFuture.super.sendForwardCommand(info);
 			}
 		});
 	}
@@ -1290,7 +1290,7 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		{
 			public void execute(Void result)
 			{
-				DelegatingTupleFuture.super.sendForwardCommand(listener);
+				DelegatingTupleFuture.super.sendForwardCommand(info);
 			}
 		});
 	}	
