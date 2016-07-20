@@ -246,7 +246,7 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
     	}
     	else
     	{
-    		listener.intermediateResultAvailable(result);
+    		super.notifyIntermediateResult(listener, result);
     	}
     }
 }

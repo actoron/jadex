@@ -265,6 +265,7 @@ public class Starter
 		// pass configuration parameters to static fields:
 		MethodInvocationInterceptor.DEBUG = config.getDebugServices();
 		ExecutionComponentFeature.DEBUG = config.getDebugSteps();
+//		Future.NO_STACK_COMPACTION	= true;
 		Future.NO_STACK_COMPACTION	= config.getNoStackCompaction();
 		Future.DEBUG = config.getDebugFutures();
 		
