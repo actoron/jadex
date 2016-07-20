@@ -91,7 +91,7 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 		{
 			if(SReflect.isSupertype(IFuture.class, context.getMethod().getReturnType()))
 			{
-				Future<?>	fut	= SFuture.getFuture(context.getMethod().getReturnType(), true, (IInternalAccess)null);
+				Future<?>	fut	= SFuture.getFuture(context.getMethod().getReturnType());
 				fut.setException(ex);
 				context.setResult(fut);
 				ret.setResult(null);

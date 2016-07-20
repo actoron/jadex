@@ -2,9 +2,24 @@ package jadex.bridge;
 
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IPullIntermediateFuture;
+import jadex.commons.future.IPullSubscriptionIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.PullIntermediateDelegationFuture;
+import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.TerminableDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.Tuple2Future;
 
 /**
  *  Helper class for future aspects.
@@ -181,19 +196,12 @@ public class SFuture
 	 */
 	public static <T> Future<?> getFuture(Class<T> type, boolean timeouts, IInternalAccess ia)
 	{
-		try
-		{
-			Future<?> ret = (Future<?>)type.newInstance();
+		Future<?> ret = getFuture(type);
 			
-			if(!timeouts)
-				avoidCallTimeouts(ret, ia);
-			
-			return ret;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		if(!timeouts)
+			avoidCallTimeouts(ret, ia);
+		
+		return ret;
 	}
 	
 	/**
@@ -204,18 +212,67 @@ public class SFuture
 	 */
 	public static <T> Future<?> getFuture(Class<T> type, boolean timeouts, IExternalAccess ea)
 	{
+		Future<?> ret = getFuture(type);
+		
+		if(!timeouts)
+			avoidCallTimeouts(ret, ea);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the matching future object to a future (interface) type.
+	 */
+	public static Future<?> getFuture(Class<?> clazz)
+	{
+		Future<?> ret = null;
+		
 		try
 		{
-			Future<?> ret = (Future<?>)type.newInstance();
-			
-			if(!timeouts)
-				avoidCallTimeouts(ret, ea);
-			
-			return ret;
+			ret = (Future<?>)clazz.newInstance();
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			if(SReflect.isSupertype(ITuple2Future.class, clazz))
+			{
+				ret = new Tuple2Future();
+			}
+			else if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, clazz))
+			{
+				ret = new PullSubscriptionIntermediateDelegationFuture();
+			}
+			else if(SReflect.isSupertype(IPullIntermediateFuture.class, clazz))
+			{
+				ret = new PullIntermediateDelegationFuture();
+			}
+			else if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, clazz))
+			{
+				ret = new SubscriptionIntermediateDelegationFuture();
+			}
+			else if(SReflect.isSupertype(ITerminableIntermediateFuture.class, clazz))
+			{
+				ret = new TerminableIntermediateDelegationFuture();
+			}
+			else if(SReflect.isSupertype(ITerminableFuture.class, clazz))
+			{
+				ret = new TerminableDelegationFuture();
+			}
+			else if(SReflect.isSupertype(IIntermediateFuture.class, clazz))
+			{
+				ret	= new IntermediateFuture();
+			}
+			else if(SReflect.isSupertype(IFuture.class, clazz))
+			{
+				ret	= new Future();
+			}
+			else
+			{
+				throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+			}
 		}
+		
+		return ret;
 	}
+	
+
 }
