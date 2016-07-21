@@ -9,7 +9,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
- * 
+ *  Agent that provides the example service. 
  */
 @Agent
 @Service
@@ -17,7 +17,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class ProviderAgent implements IExampleService
 {
 	/**
-	 * 
+	 *  An example method.
 	 */
 	public IFuture<String> getInfo()
 	{

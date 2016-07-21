@@ -8,6 +8,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
@@ -195,6 +196,17 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
 	{
 		return delegate.searchServices(type, scope);
+	}
+	
+	/**
+	 *  Add a service query.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type, String scope, IAsyncFilter<T> filter)
+	{
+		return delegate.addQuery(type, scope, filter);
 	}
 	
 	/**

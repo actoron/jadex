@@ -21,6 +21,10 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+
+/**
+ *  The user agent searches services and checks if the results are ok.
+ */
 @Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(
 {
@@ -34,7 +38,7 @@ public class UserAgent
 	protected IInternalAccess agent;
 	
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()

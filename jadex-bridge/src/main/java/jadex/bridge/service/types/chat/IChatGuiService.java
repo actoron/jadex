@@ -85,6 +85,13 @@ public interface IChatGuiService
 	public IFuture<Void>	sendFile(String filename, IComponentIdentifier cid);
 
 	/**
+	 *  Send a file to the target component via bytes.
+	 *  @param filepath	The file path, local to the chat component.
+	 *  @param cid	The id of a remote chat component.
+	 */
+	public IFuture<Void> sendFile(final String fname, final byte[] data, final IComponentIdentifier cid);
+	
+	/**
 	 *  Accept a waiting file transfer.
 	 *  @param id	The transfer id. 
 	 *  @param filename	The location of the file (possibly changed by user). 
