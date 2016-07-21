@@ -13,7 +13,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
 /**
- * 
+ *  Agent that provides a news service.
  */
 @Agent(autoprovide=true)
 public class NewsProviderAgent implements INewsService
@@ -26,7 +26,7 @@ public class NewsProviderAgent implements INewsService
 	protected List<SubscriptionIntermediateFuture<String>> subscriptions = new ArrayList<SubscriptionIntermediateFuture<String>>();
 	
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()

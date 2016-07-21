@@ -17,7 +17,10 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 /**
- * 
+ *  Example for @AgentServiceValue annotation. Automatically maps
+ *  a subscription of a required service to fields. 
+ *  
+ *  // todo: method name, parameters, intervals...
  */
 @Agent
 @RequiredServices(@RequiredService(name="newsser", type=INewsService.class))

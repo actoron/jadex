@@ -14,6 +14,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Timeout;
@@ -125,6 +126,9 @@ public class ComponentTest extends TestCase
 			}, timeout);
 		}
 
+		// Actually not needed, because create component has no timoeut (hack???)
+		 ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
+		
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
 		componentStarted(fut);
 		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
@@ -155,6 +159,7 @@ public class ComponentTest extends TestCase
 		}
 		catch(TimeoutException te)
 		{
+			te.printStackTrace();
 			// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
 			if(triggered[0])
 			{

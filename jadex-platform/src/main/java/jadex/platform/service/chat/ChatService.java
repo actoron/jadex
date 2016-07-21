@@ -1,8 +1,10 @@
 package jadex.platform.service.chat;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1053,7 +1055,76 @@ public class ChatService implements IChatService, IChatGuiService
 				{
 					public void customResultAvailable(IOutputConnection ocon)
 					{
-						doUpload(fi, ocon, cid);
+						try
+						{
+							FileInputStream fis = new FileInputStream(new File(fi.getFilePath()));
+							doUpload(fi, fis, ocon, cid);
+							ret.setResult(null);
+						}
+						catch(Exception e)
+						{
+							ret.setException(e);
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof FutureTerminatedException || TransferInfo.STATE_ABORTED.equals(exception.getMessage())
+							|| TransferInfo.STATE_CANCELLING.equals(fi.getState()))
+						{
+							fi.setState(TransferInfo.STATE_ABORTED);
+						}
+						else if(TransferInfo.STATE_REJECTED.equals(exception.getMessage()))
+						{	
+							fi.setState(TransferInfo.STATE_REJECTED);
+						}
+						else
+						{
+							fi.setState(TransferInfo.STATE_ERROR);
+						}
+						transfers2.remove(fi.getId());
+						publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
+					}
+				});
+
+			}					
+		});
+					
+		return ret;
+	}
+	
+	/**
+	 *  Send a file to the target component via bytes.
+	 *  @param filepath	The file path, local to the chat component.
+	 *  @param cid	The id of a remote chat component.
+	 */
+	public IFuture<Void> sendFile(final String fname, final byte[] data, final IComponentIdentifier cid)
+	{
+		final Future<Void> ret = new Future<Void>();
+
+		IFuture<IChatService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IChatService.class, cid);
+		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
+		{
+			public void customResultAvailable(IChatService cs)
+			{
+				final long size = data.length;
+				
+				// Call chat service of receiver (alternative interface)
+				String filepath = fname.indexOf(".")!=-1? fname.substring(fname.lastIndexOf(".")): null;
+				String name = fname.indexOf(".")!=-1? fname.substring(0, fname.lastIndexOf(".")-1): fname;
+				final TransferInfo fi = new TransferInfo(false, null, name, filepath, cid, size, System.currentTimeMillis() + // Hack!!! assume real time timeout.
+					(cid.getRoot().equals(agent.getComponentIdentifier().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()) : Starter.getRemoteDefaultTimeout(agent.getComponentIdentifier())));	// Todo: actual timeout of method!?
+				fi.setState(TransferInfo.STATE_WAITING);
+				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, name, size, fi.getId());
+				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));
+				publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
+				
+				fut.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, Void>(ret)
+				{
+					public void customResultAvailable(IOutputConnection ocon)
+					{
+						ByteArrayInputStream bis = new ByteArrayInputStream(data);
+						doUpload(fi, bis, ocon, cid);
 						ret.setResult(null);
 					}
 					
@@ -1231,7 +1302,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  Called from file sender.
 	 *  Writes bytes from file input stream to output connection.
 	 */
-	protected void	doUpload(final TransferInfo ti, final IOutputConnection ocon, final IComponentIdentifier receiver)
+	protected void	doUpload(final TransferInfo ti, final InputStream is, final IOutputConnection ocon, final IComponentIdentifier receiver)
 	{
 		assert TransferInfo.STATE_WAITING.equals(ti.getState()) : ti.getState();
 		ti.setState(TransferInfo.STATE_TRANSFERRING);
@@ -1242,8 +1313,9 @@ public class ChatService implements IChatService, IChatGuiService
 		
 		try
 		{
-			final FileInputStream fis = new FileInputStream(new File(ti.getFilePath()));
-			final ISubscriptionIntermediateFuture<Long> fut = ocon.writeFromInputStream(fis, agent.getExternalAccess());
+//			final FileInputStream fis = new FileInputStream(new File(ti.getFilePath()));
+			
+			final ISubscriptionIntermediateFuture<Long> fut = ocon.writeFromInputStream(is, agent.getExternalAccess());
 
 			fut.addResultListener(new IIntermediateResultListener<Long>()
 			{
@@ -1267,7 +1339,7 @@ public class ChatService implements IChatService, IChatGuiService
 				{
 					try
 					{
-						fis.close();
+						is.close();
 					}
 					catch(Exception e)
 					{
@@ -1282,7 +1354,7 @@ public class ChatService implements IChatService, IChatGuiService
 				{
 					try
 					{
-						fis.close();
+						is.close();
 					}
 					catch(Exception e)
 					{
@@ -1304,9 +1376,86 @@ public class ChatService implements IChatService, IChatGuiService
 		}
 	}
 	
+//	/**
+//	 *  Perform an upload.
+//	 *  Called from file sender.
+//	 *  Writes bytes from file input stream to output connection.
+//	 */
+//	protected void	doUpload(final TransferInfo ti, final IOutputConnection ocon, final IComponentIdentifier receiver)
+//	{
+//		assert TransferInfo.STATE_WAITING.equals(ti.getState()) : ti.getState();
+//		ti.setState(TransferInfo.STATE_TRANSFERRING);
+//		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(ti.getId());
+//		if(tup2!=null)
+//			transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, tup2.getSecondEntity(), ocon));
+//		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//		
+//		try
+//		{
+//			final FileInputStream fis = new FileInputStream(new File(ti.getFilePath()));
+//			
+//			final ISubscriptionIntermediateFuture<Long> fut = ocon.writeFromInputStream(fis, agent.getExternalAccess());
+//
+//			fut.addResultListener(new IIntermediateResultListener<Long>()
+//			{
+//				public void resultAvailable(Collection<Long> result)
+//				{
+//					finished();
+//				}
+//				public void intermediateResultAvailable(Long filesize)
+//				{
+//					if(TransferInfo.STATE_ABORTED.equals(ti.getState()))
+//					{
+//						ocon.close();
+//						fut.terminate();
+//					}
+//					if(ti.update(filesize))
+//					{
+//						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//					}
+//				}
+//				public void finished()
+//				{
+//					try
+//					{
+//						fis.close();
+//					}
+//					catch(Exception e)
+//					{
+//					}
+//					ocon.close();
+//					ti.setState(TransferInfo.STATE_COMPLETED);
+//					transfers.remove(ti.getId());
+//					transfers2.remove(ti.getId());
+//					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
+//				}
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					try
+//					{
+//						fis.close();
+//					}
+//					catch(Exception e)
+//					{
+//					}
+//					ocon.close();
+//					ti.setState(TransferInfo.STATE_CANCELLING.equals(ti.getState()) ? TransferInfo.STATE_ABORTED : TransferInfo.STATE_ERROR);
+//					transfers.remove(ti.getId());
+//					transfers2.remove(ti.getId());
+//					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//				}
+//			});
+//		}
+//		catch(Exception e)
+//		{
+//			ti.setState(TransferInfo.STATE_ERROR);
+//			transfers.remove(ti.getId());
+//			transfers2.remove(ti.getId());
+//			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//		}
+//	}
+	
 	//-------- IPropertiesProvider interface --------
-	
-	
 	
 	/**
 	 * 

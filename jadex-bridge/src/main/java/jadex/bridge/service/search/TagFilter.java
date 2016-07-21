@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- *  Tag filter class. Allows for filtering accoring to a collection of tags.
+ *  Tag filter class. Allows for filtering according to a collection of tags.
  *  Includes only services that contain all the tags.
  *  Replaces variables to dynamic values and uses TagProperty.createRuntimeTags() for that.
  */
@@ -54,7 +54,7 @@ public class TagFilter<T> implements IAsyncFilter<T>
 		{
 			public void customResultAvailable(Collection<String> result)
 			{
-				System.out.println("ser tag check: "+result);
+//				System.out.println("ser tag check: "+result);
 				ret.setResult(result!=null && result.containsAll(tags));
 			}
 		});

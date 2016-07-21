@@ -205,7 +205,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	}
 	
 	/**
-	 * 
+	 *  Called when the feature is shutdowned.
 	 */
 	public IFuture<Void> shutdown()
 	{
@@ -263,7 +263,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 			tmp.add(service);
 			
-			// Make all services available immediately, even before start (hack???).
+			// Make service available immediately, even before start (hack???).
 			PlatformServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service);
 		}
 	}

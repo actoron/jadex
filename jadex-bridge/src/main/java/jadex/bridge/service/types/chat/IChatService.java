@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.chat;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.annotation.Security;
@@ -75,7 +76,7 @@ public interface IChatService
 	 *    Exception messages of the returned future correspond to file transfer states (aborted vs. error vs. rejected).
 	 */
 	public ITerminableIntermediateFuture<Long> sendFile(String nick, String filename, long size, String id, IInputConnection con);
-	
+		
 	/**
 	 *  Send a file. Alternative method signature.
 	 *  

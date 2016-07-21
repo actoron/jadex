@@ -8,11 +8,12 @@ import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.ICommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IUndoneResultListener;
+import jadex.commons.future.ITerminableFuture;
 
 /**
  *  The decoupling return interceptor ensures that the result
@@ -46,102 +47,67 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 					FutureFunctionality func = new FutureFunctionality(caller!=null ? caller.getLogger() : (Logger)null)
 					{
 						@Override
-						public void terminate(Exception reason, IResultListener<Void> terminate)
-						{
-							// As termination is done in listener, can use same decoupling code as for listener notification.
-							notifyListener(terminate);
-						}
-						
-						@Override
-						public void sendForwardCommand(Object info, IResultListener<Void> com)
-						{
-							notifyListener(com);
-						}
-						
-						@Override
-						public void sendBackwardCommand(Object info, IResultListener<Void> com)
-						{
-							notifyListener(com);
-						}
-						
-						@Override
-						public void notifyListener(final IResultListener<Void> listener)
+						public void scheduleForward(final ICommand<Void> com)
 						{
 							// Don't reschedule if already on correct thread.
 							if(caller==null || caller.getComponentFeature(IExecutionFeature.class).isComponentThread())
 							{
-								// Is now done in future resume
-//								CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-//								CallAccess.setLastInvocation(sic.getServiceCall());
-//								CallAccess.resetNextInvocation();
-								
-								if(isUndone() && listener instanceof IUndoneResultListener)
-								{
-									((IUndoneResultListener)listener).resultAvailableIfUndone(null);
-								}
-								else
-								{
-									listener.resultAvailable(null);
-								}
+								com.execute(null);
 							}
 							else
 							{
-								caller.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+								try
 								{
-									public IFuture<Void> execute(IInternalAccess ia)
+									caller.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 									{
-										// Is now done in future resume
-//										CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-//										CallAccess.setLastInvocation(sic.getServiceCall());
-//										CallAccess.resetNextInvocation();
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											com.execute(null);
+											return IFuture.DONE;
+										}
+									}).addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result) {}
 										
-										if(isUndone() && listener instanceof IUndoneResultListener)
+										public void exceptionOccurred(Exception exception)
 										{
-											((IUndoneResultListener)listener).resultAvailableIfUndone(null);
-										}
-										else
-										{
-											listener.resultAvailable(null);
-										}
-										return IFuture.DONE;
-									}
-								}).addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result) {}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										// Special case: ignore ComponentTerminatedException when component has called cms.destroyComponent() for itself
-										if(exception instanceof ComponentTerminatedException)
-										{
-											if(sic.getMethod().getName().equals("destroyComponent")
-												&& sic.getArguments().size()==1 && caller!=null && caller.getComponentIdentifier().equals(sic.getArguments().get(0)))
+											// Special case: ignore ComponentTerminatedException when component has called cms.destroyComponent() for itself
+											if(exception instanceof ComponentTerminatedException)
 											{
-												// ignore
+												if(sic.getMethod().getName().equals("destroyComponent")
+													&& sic.getArguments().size()==1 && caller!=null && caller.getComponentIdentifier().equals(sic.getArguments().get(0)))
+												{
+													// ignore
+												}
+												else
+												{
+													// pass exception back to future as receiver is already dead.
+													if(res instanceof ITerminableFuture<?>)
+													{
+														((ITerminableFuture<?>)res).terminate(exception);
+													}
+													else
+													{
+														getLogger().warning("Future receiver already dead: "+exception);
+													}
+												}
 											}
 											else
 											{
-												// pass exception back to future functionality as receiver is already dead.
-												listener.exceptionOccurred(exception);
+												// shouldn't happen?
+												System.err.println("Unexpected Exception");
+												exception.printStackTrace();
 											}
 										}
-										else
-										{
-											// shouldn't happen?
-											exception.printStackTrace();
-										}
-									}
-								});
+									});
+								}
+								catch(Exception e)
+								{
+									// shouldn't happen?
+									System.err.println("Unexpected Exception");
+									e.printStackTrace();
+								}
 							}
-						}
-						
-						/**
-						 *  For intermediate results this method is called.
-						 */
-						@Override
-						public void startScheduledNotifications(IResultListener<Void> notify)
-						{
-							notifyListener(notify);
 						}
 					};
 					

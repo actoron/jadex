@@ -15,6 +15,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -25,14 +26,18 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 
 /**
  *  Local service registry. Is used by component service containers
@@ -43,11 +48,21 @@ import jadex.commons.future.TerminableIntermediateFuture;
  */
 public class PlatformServiceRegistry
 {
+	//-------- attributes --------
+	
 	/** The map of published services sorted by type. */
 	protected Map<ClassInfo, Set<IService>> services;
 	
 	/** The excluded components. */
 	protected Set<IComponentIdentifier> excluded;
+	
+	/** The persistent service queries. */
+	protected Map<ClassInfo, Set<ServiceQueryInfo<?>>> queries;
+	
+	/** The excluded services cache. */
+	protected Map<IComponentIdentifier, Set<IService>> excludedservices;
+	
+	//-------- methods --------
 	
 	/**
 	 *  Add an excluded component. 
@@ -66,12 +81,59 @@ public class PlatformServiceRegistry
 	 *  Remove an excluded component. 
 	 *  @param The component identifier.
 	 */
-	public synchronized void removeExcludedComponent(IComponentIdentifier cid)
+	public synchronized IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
 	{
+		Future<Void> ret = new Future<Void>();
+		CounterResultListener<Void> lis = null;
+		
+//		System.out.println("cache size: "+excludedservices==null? "0":excludedservices.size());
+		
 		if(excluded!=null)
 		{
-			excluded.remove(cid);
+			if(excluded.remove(cid))
+			{
+				Set<IService> exs = excludedservices.remove(cid);
+				
+				// Notify queries that new services are available
+				// Must iterate over all services :-( todo: add index?
+				if(queries!=null && queries.size()>0)
+				{
+					if(excludedservices!=null)
+					{
+						// Get and remove services from cache
+						if(exs!=null)
+						{
+							lis = new CounterResultListener<Void>(exs.size(), 
+								new DelegationResultListener<Void>(ret));
+							for(IService ser: exs)
+							{
+								checkQueries(ser).addResultListener(lis);
+							}
+						}
+					}
+					
+//					bar = new FutureBarrier<Void>();
+//					
+//					for(Set<IService> sers: services.values())
+//					{
+//						for(IService ser: sers)
+//						{
+//							if(ser.getServiceIdentifier().getProviderId().equals(cid))
+//							{
+//								bar.addFuture(checkQueries(ser));
+//							}
+//						}
+//					}
+//					
+//					bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret));;
+				}
+			}
 		}
+		
+		if(lis==null)
+			ret.setResult(null);
+		
+		return ret;
 	}
 	
 	/**
@@ -94,15 +156,13 @@ public class PlatformServiceRegistry
 	 *  Add a service to the registry.
 	 *  @param sid The service id.
 	 */
-	public synchronized void addService(ClassInfo key, IService service)
+	public synchronized IFuture<Void> addService(ClassInfo key, IService service)
 	{
 //		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
 //			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
 		
 		if(services==null)
-		{
 			services = new HashMap<ClassInfo, Set<IService>>();
-		}
 		
 		Set<IService> sers = services.get(key);
 		if(sers==null)
@@ -112,6 +172,23 @@ public class PlatformServiceRegistry
 		}
 		
 		sers.add(service);
+		
+		// If services belongs to excluded component cache them
+		IComponentIdentifier cid = service.getServiceIdentifier().getProviderId();
+		if(excluded!=null && excluded.contains(cid))
+		{
+			if(excludedservices==null)
+				excludedservices = new HashMap<IComponentIdentifier, Set<IService>>();
+			Set<IService> exsers = excludedservices.get(cid);
+			if(exsers==null)
+			{
+				exsers = new HashSet<IService>();
+				excludedservices.put(cid, exsers);
+			}
+			exsers.add(service);
+		}
+		
+		return checkQueries(service);
 	}
 	
 	/**
@@ -138,6 +215,214 @@ public class PlatformServiceRegistry
 		else
 		{
 			System.out.println("Could not remove service from registry: "+key+", "+service.getServiceIdentifier());
+		}
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param query ServiceQuery.
+	 */
+	public synchronized <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
+	{
+		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+		
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				removeQuery(query);
+			}
+		});
+		
+		if(queries==null)
+			queries = new HashMap<ClassInfo, Set<ServiceQueryInfo<?>>>();
+		
+		Set<ServiceQueryInfo<T>> mqs = (Set)queries.get(query.getType());
+		if(mqs==null)
+		{
+			mqs = new HashSet<ServiceQueryInfo<T>>();
+			queries.put(query.getType(), (Set)mqs);
+		}
+		mqs.add(new ServiceQueryInfo(query, ret));
+		
+		// deliver currently available services
+		Set<T> sers = (Set<T>)getServices(query.getType());
+		if(sers!=null)
+		{
+			searchLoopServices(query.getFilter(), sers.iterator(), query.getOwner(), query.getScope())
+				.addIntermediateResultListener(new IIntermediateResultListener<T>()
+			{
+				public void intermediateResultAvailable(T result)
+				{
+					ret.addIntermediateResultIfUndone(result);
+				}
+	
+				public void finished()
+				{
+					// the query is not finished after the status quo is delivered
+				}
+	
+				public void resultAvailable(Collection<T> results)
+				{
+					for(T result: results)
+					{
+						intermediateResultAvailable(result);
+					}
+					// the query is not finished after the status quo is delivered
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// the query is not finished after the status quo is delivered
+					
+				}
+			});
+		}
+	
+		return ret;
+	}
+	
+	/**
+	 *  Remove a service query from the registry.
+	 *  @param query ServiceQuery.
+	 */
+	public synchronized <T> void removeQuery(ServiceQuery<T> query)
+	{
+		if(queries!=null)
+		{
+			Set<ServiceQuery<T>> mqs = (Set)queries.get(query.getType());
+			if(mqs!=null)
+			{
+				mqs.remove(query);
+				if(mqs.size()==0)
+					queries.remove(query.getType());
+			}
+		}
+	}
+	
+	/**
+	 *  Check the persistent queries for a new service.
+	 *  @param ser The service.
+	 */
+	protected synchronized IFuture<Void> checkQueries(IService ser)
+	{
+		Future<Void> ret = new Future<Void>();
+		
+		if(queries!=null)
+		{
+			Set<ServiceQueryInfo<?>> sqis = queries.get(ser.getServiceIdentifier().getServiceType());
+			if(sqis!=null)
+			{
+				checkQueriesLoop(sqis.iterator(), ser).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check the persistent queries against a new service.
+	 *  @param it The queries.
+	 *  @param service the service.
+	 */
+	protected synchronized IFuture<Void> checkQueriesLoop(final Iterator<ServiceQueryInfo<?>> it, final IService service)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(it.hasNext())
+		{
+			final ServiceQueryInfo<?> sqi = it.next();
+			IComponentIdentifier cid = sqi.getQuery().getOwner();
+			String scope = sqi.getQuery().getScope();
+			IAsyncFilter<IService> filter = (IAsyncFilter)sqi.getQuery().getFilter();
+			
+			checkQuery(sqi, service).addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
+			{
+				public void customResultAvailable(Boolean result) throws Exception
+				{
+					if(result.booleanValue())
+						((IntermediateFuture)sqi.getFuture()).addIntermediateResult(service);
+					checkQueriesLoop(it, service).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check a persistent query with one service.
+	 *  @param queryinfo The query.
+	 *  @param service The service.
+	 *  @return True, if services matches to query.
+	 */
+	protected IFuture<Boolean> checkQuery(final ServiceQueryInfo<?> queryinfo, final IService service)
+	{
+		final Future<Boolean> ret = new Future<Boolean>();
+		
+		IComponentIdentifier cid = queryinfo.getQuery().getOwner();
+		String scope = queryinfo.getQuery().getScope();
+		IAsyncFilter<IService> filter = (IAsyncFilter)queryinfo.getQuery().getFilter();
+		if(!checkSearchScope(cid, service, scope) || !checkPublicationScope(cid, service))
+		{
+			ret.setResult(Boolean.FALSE);
+		}
+		else
+		{
+			if(filter==null)
+			{
+				ret.setResult(Boolean.TRUE);
+			}
+			else
+			{
+				filter.filter(service).addResultListener(new IResultListener<Boolean>()
+				{
+					public void resultAvailable(Boolean result)
+					{
+						ret.setResult(result!=null && result.booleanValue()? Boolean.TRUE: Boolean.FALSE);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setResult(Boolean.FALSE);
+					}
+				});
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Remove all service queries of a specific component from the registry.
+	 *  @param owner The query owner.
+	 */
+	public synchronized void removeQueries(IComponentIdentifier owner)
+	{
+		if(queries!=null)
+		{
+			for(Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>> entry: queries.entrySet())
+			{
+				for(ServiceQueryInfo<?> query: entry.getValue())
+				{
+					if(owner.equals(query.getQuery().getOwner()))
+					{
+						entry.getValue().remove(query);
+					}
+				}
+			}
 		}
 	}
 	
@@ -818,19 +1103,32 @@ public class PlatformServiceRegistry
 	}
 	
 	/**
-	 * 
+	 *  Get services per type.
+	 *  @param type The interface type. If type is null all services are returned.
+	 *  @return First matching service or null.
 	 */
 	protected Set<IService> getServices(Class<?> type)
+	{
+		return getServices(new ClassInfo(type));
+	}
+	
+	/**
+	 *  Get services per type.
+	 *  @param type The interface type. If type is null all services are returned.
+	 *  @return First matching service or null.
+	 */
+	protected Set<IService> getServices(ClassInfo type)
 	{
 		Set<IService> ret = Collections.emptySet();
 		if(services!=null)
 		{
 			if(type!=null)
 			{
-				ret = services.get(new ClassInfo(type));
+				ret = services.get(type);
 			}
 			else
 			{
+				// Return all if type is null
 				ret = new HashSet<IService>();
 				for(ClassInfo t: services.keySet())
 				{
@@ -906,5 +1204,62 @@ public class PlatformServiceRegistry
 	public static PlatformServiceRegistry getRegistry(IInternalAccess ia)
 	{
 		return getRegistry(ia.getComponentIdentifier());
+	}
+	
+	/**
+	 *  Info with query and result future.
+	 */
+	protected static class ServiceQueryInfo<T>
+	{
+		/** The query. */
+		protected ServiceQuery<T> query;
+		
+		/** The future. */
+		protected TerminableIntermediateFuture<T> future;
+
+		/**
+		 *  Create a new query info.
+		 */
+		public ServiceQueryInfo(ServiceQuery<T> query, TerminableIntermediateFuture<T> future)
+		{
+			this.query = query;
+			this.future = future;
+		}
+
+		/**
+		 *  Get the query.
+		 *  @return The query
+		 */
+		public ServiceQuery<T> getQuery()
+		{
+			return query;
+		}
+
+		/**
+		 *  Set the query.
+		 *  @param query The query to set
+		 */
+		public void setQuery(ServiceQuery<T> query)
+		{
+			this.query = query;
+		}
+
+		/**
+		 *  Get the future.
+		 *  @return The future
+		 */
+		public TerminableIntermediateFuture<T> getFuture()
+		{
+			return future;
+		}
+
+		/**
+		 *  Set the future.
+		 *  @param future The future to set
+		 */
+		public void setFuture(TerminableIntermediateFuture<T> future)
+		{
+			this.future = future;
+		}
 	}
 }

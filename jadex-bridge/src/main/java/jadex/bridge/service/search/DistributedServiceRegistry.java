@@ -111,7 +111,7 @@ public class DistributedServiceRegistry extends PlatformServiceRegistry
 	}
 
 	@Override
-	public synchronized void addService(final ClassInfo key, final IService service)
+	public synchronized IFuture<Void> addService(final ClassInfo key, final IService service)
 	{
 //		System.out.println("AddService called: " + key.getTypeName());
 		if (!provideOnly || key.getTypeName().startsWith("jadex.bridge.service.types.dht.")) {
@@ -147,7 +147,7 @@ public class DistributedServiceRegistry extends PlatformServiceRegistry
 				}
 			}
 		}
-		super.addService(key, service);
+		return super.addService(key, service);
 	}
 
 	@Override

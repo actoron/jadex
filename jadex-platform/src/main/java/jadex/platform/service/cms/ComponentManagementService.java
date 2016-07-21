@@ -275,7 +275,7 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 //				if(model.toString().indexOf("Feature")!=-1)
 //					System.err.println("createComponent.resultAvailable: "+model+", "+result);
-				ret.setSecondResult(Argument.convertArguments(result));
+				ret.setSecondResultIfUndone(Argument.convertArguments(result));
 			}
 			
 			public void exceptionOccurred(Exception exception) 
@@ -286,7 +286,7 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			public void resultAvailable(IComponentIdentifier result)
 			{
-				ret.setFirstResult(result);
+				ret.setFirstResultIfUndone(result);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -1507,11 +1507,11 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			if(ex!=null)
 			{
-				ret.setException(ex);
+				ret.setExceptionIfUndone(ex);
 			}
 			else
 			{
-				ret.setResult(results);
+				ret.setResultIfUndone(results);
 			}
 		}
 		

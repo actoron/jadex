@@ -1,11 +1,10 @@
 package jadex.bridge.service.component.interceptors;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.logging.Logger;
 
 import jadex.commons.DebugException;
+import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -96,167 +95,58 @@ public class FutureFunctionality
 //		}
 	}
 	
+	//--------  control flow handling --------
+	
 	/**
-	 *  Get the undone.
-	 *  @return The undone.
+	 *  Schedule forward in result direction,
+	 *  i.e. from callee to caller,
+	 *  e.g. update timer to avoid timeouts.
 	 */
-	public boolean isUndone()
+	public void	scheduleForward(ICommand<Void> code)
 	{
-		return undone;
+		code.execute(null);
 	}
-
+	
 	/**
-	 * 
+	 *  Schedule backward in result direction,
+	 *  i.e. from caller to callee,
+	 *  e.g. future termination.
 	 */
-	public Object addIntermediateResult(Object result)
+	public void	scheduleBackward(ICommand<Void> code)
+	{
+		code.execute(null);
+	}
+	
+	//-------- data handling --------
+	
+	/**
+	 *  Optionally alter a result.
+	 */
+	public Object	handleResult(Object result)	throws Exception
 	{
 		return result;
 	}
 	
 	/**
-	 * 
+	 *  Optionally alter a result.
 	 */
-	public Object addIntermediateResultIfUndone(Object result)
-	{
-		undone = true;
-		return result;
-	}
-	
-//	/**
-//	 * 
-//	 */
-//	public Collection<Object> finished(Collection<Object> results)
-//	{
-//		return results;
-//	}
-	
-	/**
-	 * 
-	 */
-	public void setFinished(Collection<Object> results)
-	{
-	}
-	
-	/**
-	 * 
-	 */
-	public void setFinishedIfUndone(Collection<Object> results)
-	{
-		undone = true;
-	}
-	
-	/**
-	 * 
-	 */
-	public Object setResult(Object result)
+	public Object	handleIntermediateResult(Object result)	throws Exception
 	{
 		return result;
 	}
 	
 	/**
-	 * 
+	 *  Optionally alter finished behavior.
 	 */
-	public Object setResultIfUndone(Object result)
+	public void	handleFinished(Collection<Object> results)	throws Exception
 	{
-		undone = true;
-		return result;
 	}
 	
 	/**
-	 * 
+	 *  Optionally augment termination behavior.
 	 */
-	public Exception setException(Exception exception)
+	public void	handleTerminated(Exception reason)
 	{
-		return exception;
-	}
-	
-	/**
-	 * 
-	 */
-	public Exception setExceptionIfUndone(Exception exception)
-	{
-		undone = true;
-		return exception;
-	}
-	
-	/**
-	 *  Terminate the future.
-	 */
-	public void	terminate(Exception reason, IResultListener<Void> terminate)
-	{
-		terminate.resultAvailable(null);
-	}
-	
-	/**
-	 *  Send a foward command.
-	 */
-	public void sendForwardCommand(Object info, IResultListener<Void> com)
-	{
-		com.resultAvailable(null);
-	}
-	
-	/**
-	 *  Send a backward command.
-	 */
-	public void sendBackwardCommand(Object info, IResultListener<Void> com)
-	{
-		com.resultAvailable(null);
-	}
-	
-//	/**
-//	 *  Notify the listener.
-//	 */
-//	public IFuture<Void> notifyListener(final IResultListener<?> listener)
-//	{
-//		return IFuture.DONE;
-//	}
-	
-	/**
-	 *  Notify the listener.
-	 */
-	public void notifyListener(IResultListener<Void> notify)
-	{
-		notify.resultAvailable(null);
-	}
-	
-//	/**
-//	 *  Schedule listener notification on component thread. 
-//	 */
-//	public IFuture<Void> notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
-//	{
-//		return IFuture.DONE;
-//	}
-	
-	/**
-	 *  Start the notifications.
-	 */
-	public void startScheduledNotifications(IResultListener<Void> notify)
-	{
-		notify.resultAvailable(null);
-	}
-	
-	/**
-	 *  Pull an intermediate result.
-	 */
-	public void pullIntermediateResult(IResultListener<Void> notify)
-	{
-		notify.resultAvailable(null);
-	}
-	
-	/**
-	 * 
-	 */
-	public Object setFirstResult(Object result)
-	{
-		return result;
-	}
-	
-	/**
-	 * 
-	 */
-	public Object setSecondResult(Object result)
-	{
-		return result;
 	}
 	
 	/**
@@ -444,254 +334,99 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void	setResult(Collection<Object> result)
+	@Override
+	protected boolean	doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResult(result);
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setResult(res);
+			result = (Collection<Object>)func.handleResult(result);
+			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
+			return doSetException(e, undone);
+		}		
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public boolean	setResultIfUndone(Collection<Object> result)
+	@Override
+	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
-		boolean ret = false;
-		
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
-			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.setResultIfUndone(res);
+			result = func.handleIntermediateResult(result);
+			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
+			return doSetException(e, undone);
+		}		
 	}
-	
+
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void addIntermediateResult(Object result)
+	@Override
+	protected synchronized boolean doSetFinished(boolean undone)
 	{
 		try
 		{
-			Object res = func.addIntermediateResult(result);
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.addIntermediateResult(res);
+			func.handleFinished(getIntermediateResults());
+			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetFinished(undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
+			return doSetException(e, undone);
+		}		
 	}
-	
-	/**
-	 * 
-	 */
-	public boolean addIntermediateResultIfUndone(Object result)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Object res = func.addIntermediateResultIfUndone(result);
-			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.addIntermediateResultIfUndone(res);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	
-	/**
-	 * 
-	 */
-	public void setFinished()
-	{
-		try
-		{
-			func.setFinished((Collection<Object>)getIntermediateResults());
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setFinished();
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setFinishedIfUndone()
-	{
-		boolean ret = false;
-		
-		try
-		{
-			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
-			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.setFinishedIfUndone();
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setException(Exception exception)
-	{
-		try
-		{
-			Exception ex = func.setException(exception);
-			DelegatingPullSubscriptionIntermediateDelegationFuture.super.setException(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setExceptionIfUndone(Exception exception)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Exception ex = func.setExceptionIfUndone(exception);
-			ret = DelegatingPullSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
+
 	/**
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.
      */
-    protected void startScheduledNotifications()
-    {
-    	func.startScheduledNotifications(new IResultListener<Void>()
+	@Override
+    protected void	startScheduledNotifications()
+	{
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void execute(Void result)
 			{
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.startScheduledNotifications();
 			}
+		});
+	}
 	
-			public void exceptionOccurred(Exception exception)
+	/**
+	 *  Send a forward command.
+	 */
+	@Override
+	public void sendForwardCommand(final Object info)
+	{
+		func.scheduleForward(new ICommand<Void>()
+		{
+			public void execute(Void result)
 			{
-				if(!isDone())
-				{
-					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
-    }
-    
+	}
+	
 	/**
 	 *  Pull an intermediate result.
 	 */
+	@Override
 	public void pullIntermediateResult()
 	{
-		func.pullIntermediateResult(new IResultListener<Void>()
+		func.scheduleBackward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			@Override
+			public void execute(Void args)
 			{
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.pullIntermediateResult();
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
 			}
 		});
 	}
@@ -699,78 +434,35 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	/**
 	 *  Terminate the future.
 	 */
+	@Override
 	public void terminate(final Exception reason)
 	{
-		func.terminate(reason, new IResultListener<Void>()
+		func.scheduleBackward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			@Override
+			public void execute(Void args)
 			{
+				func.handleTerminated(reason);
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(reason);
 			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					// Hack!!! maybe wrong thread
-					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(reason);
-				}
-				else
-				{
-					func.logException(exception, reason, true, false, true);
-				}
-			}
 		});
 	}
 	
 	/**
 	 *  Send a backward command.
 	 */
+	@Override
 	public void sendBackwardCommand(final Object info)
 	{
-		func.sendBackwardCommand(info, new IResultListener<Void>()
+		func.scheduleBackward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			@Override
+			public void execute(Void args)
 			{
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
 		});
-	}
-	
-	/**
-	 *  Send a foward command.
-	 */
-	public void sendForwardCommand(final Object info)
-	{
-		func.sendForwardCommand(info, new IResultListener<Void>()
-		{
-			public void resultAvailable(Void v)
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingPullSubscriptionIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
-		});
-	}
+	}	
 };
 
 /**
@@ -801,256 +493,102 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		this.func = func;
 		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
 	}
-	
+
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void	setResult(Collection<Object> result)
+	@Override
+	protected boolean	doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResult(result);
-			DelegatingPullIntermediateDelegationFuture.super.setResult(res);
+			result = (Collection<Object>)func.handleResult(result);
+			return DelegatingPullIntermediateDelegationFuture.super.doSetResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
+			return doSetException(e, undone);
+		}		
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public boolean	setResultIfUndone(Collection<Object> result)
+	@Override
+	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
-		boolean ret = false;
-		
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
-			ret = DelegatingPullIntermediateDelegationFuture.super.setResultIfUndone(res);
+			result = func.handleIntermediateResult(result);
+			return DelegatingPullIntermediateDelegationFuture.super.doAddIntermediateResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
+			return doSetException(e, undone);
+		}		
 	}
-	
+
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void addIntermediateResult(Object result)
+	@Override
+	protected synchronized boolean doSetFinished(boolean undone)
 	{
 		try
 		{
-			Object res = func.addIntermediateResult(result);
-			DelegatingPullIntermediateDelegationFuture.super.addIntermediateResult(res);
+			func.handleFinished(getIntermediateResults());
+			return DelegatingPullIntermediateDelegationFuture.super.doSetFinished(undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
+			return doSetException(e, undone);
+		}		
 	}
-	
-	/**
-	 * 
-	 */
-	public boolean addIntermediateResultIfUndone(Object result)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Object res = func.addIntermediateResultIfUndone(result);
-			ret = DelegatingPullIntermediateDelegationFuture.super.addIntermediateResultIfUndone(res);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	
-	/**
-	 * 
-	 */
-	public void setFinished()
-	{
-		try
-		{
-			func.setFinished((Collection<Object>)getIntermediateResults());
-			DelegatingPullIntermediateDelegationFuture.super.setFinished();
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setFinishedIfUndone()
-	{
-		boolean ret = false;
-		
-		try
-		{
-			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
-			ret = DelegatingPullIntermediateDelegationFuture.super.setFinishedIfUndone();
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setException(Exception exception)
-	{
-		try
-		{
-			Exception ex = func.setException(exception);
-			DelegatingPullIntermediateDelegationFuture.super.setException(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setExceptionIfUndone(Exception exception)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Exception ex = func.setExceptionIfUndone(exception);
-			ret = DelegatingPullIntermediateDelegationFuture.super.setExceptionIfUndone(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingPullIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
+
 	/**
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.
      */
-    protected void startScheduledNotifications()
-    {
-    	func.startScheduledNotifications(new IResultListener<Void>()
+	@Override
+    protected void	startScheduledNotifications()
+	{
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void execute(Void result)
 			{
 				DelegatingPullIntermediateDelegationFuture.super.startScheduledNotifications();
 			}
+		});
+	}
 	
-			public void exceptionOccurred(Exception exception)
+	/**
+	 *  Send a forward command.
+	 */
+	@Override
+	public void sendForwardCommand(final Object info)
+	{
+		func.scheduleForward(new ICommand<Void>()
+		{
+			public void execute(Void result)
 			{
-				if(!isDone())
-				{
-					DelegatingPullIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
+				DelegatingPullIntermediateDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
-    }
-    
+	}
+	
+	
 	/**
 	 *  Pull an intermediate result.
 	 */
+	@Override
 	public void pullIntermediateResult()
 	{
-		func.pullIntermediateResult(new IResultListener<Void>()
+		func.scheduleBackward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			@Override
+			public void execute(Void args)
 			{
 				DelegatingPullIntermediateDelegationFuture.super.pullIntermediateResult();
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingPullIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
 			}
 		});
 	}
@@ -1058,78 +596,35 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	/**
 	 *  Terminate the future.
 	 */
+	@Override
 	public void terminate(final Exception reason)
 	{
-		func.terminate(reason, new IResultListener<Void>()
+		func.scheduleBackward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			@Override
+			public void execute(Void args)
 			{
+				func.handleTerminated(reason);
 				DelegatingPullIntermediateDelegationFuture.super.terminate(reason);
 			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					// Hack!!! maybe wrong thread
-					DelegatingPullIntermediateDelegationFuture.super.terminate(reason);
-				}
-				else
-				{
-					func.logException(exception, reason, true, false, true);
-				}
-			}
 		});
 	}
 	
 	/**
 	 *  Send a backward command.
 	 */
+	@Override
 	public void sendBackwardCommand(final Object info)
 	{
-		func.sendBackwardCommand(info, new IResultListener<Void>()
+		func.scheduleBackward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			@Override
+			public void execute(Void args)
 			{
 				DelegatingPullIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingPullIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
 		});
-	}
-	
-	/**
-	 *  Send a foward command.
-	 */
-	public void sendForwardCommand(final Object info)
-	{
-		func.sendForwardCommand(info, new IResultListener<Void>()
-		{
-			public void resultAvailable(Void v)
-			{
-				DelegatingPullIntermediateDelegationFuture.super.sendForwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingPullIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
-		});
-	}
+	}	
 };
 
 /**
@@ -1162,280 +657,68 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void	setResult(Collection<Object> result)
+	@Override
+	protected boolean	doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResult(result);
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setResult(res);
+			result = (Collection<Object>)func.handleResult(result);
+			return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
+			return doSetException(e, undone);
+		}		
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public boolean	setResultIfUndone(Collection<Object> result)
+	@Override
+	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
-		boolean ret = false;
-		
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
-			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.setResultIfUndone(res);
+			result = func.handleIntermediateResult(result);
+			return DelegatingSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
+			return doSetException(e, undone);
+		}		
 	}
-	
+
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void addIntermediateResult(Object result)
+	@Override
+	protected synchronized boolean doSetFinished(boolean undone)
 	{
 		try
 		{
-			Object res = func.addIntermediateResult(result);
-			DelegatingSubscriptionIntermediateDelegationFuture.super.addIntermediateResult(res);
+			func.handleFinished(getIntermediateResults());
+			return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetFinished(undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
+			return doSetException(e, undone);
+		}		
 	}
-	
-	/**
-	 * 
-	 */
-	public boolean addIntermediateResultIfUndone(Object result)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Object res = func.addIntermediateResultIfUndone(result);
-			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.addIntermediateResultIfUndone(res);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	
-	/**
-	 * 
-	 */
-	public void setFinished()
-	{
-		try
-		{
-			func.setFinished((Collection<Object>)getIntermediateResults());
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setFinished();
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setFinishedIfUndone()
-	{
-		boolean ret = false;
-		
-		try
-		{
-			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
-			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.setFinishedIfUndone();
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setException(Exception exception)
-	{
-		try
-		{
-			Exception ex = func.setException(exception);
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setException(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setExceptionIfUndone(Exception exception)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Exception ex = func.setExceptionIfUndone(exception);
-			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
+
 	/**
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.
      */
-    protected void startScheduledNotifications()
-    {
-    	func.startScheduledNotifications(new IResultListener<Void>()
+	@Override
+    protected void	startScheduledNotifications()
+	{
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void execute(Void result)
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.startScheduledNotifications();
-			}
-	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
-		});
-    }
-    
-	/**
-	 *  Terminate the future.
-	 */
-	public void terminate(final Exception reason)
-	{
-		func.terminate(reason, new IResultListener<Void>()
-		{
-			public void resultAvailable(Void v)
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					// Hack!!! maybe wrong thread
-					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
-				}
-				else
-				{
-					func.logException(exception, reason, true, false, true);
-				}
-			}
-		});
-	}
-	
-	/**
-	 *  Send a backward command.
-	 */
-	public void sendBackwardCommand(final Object info)
-	{
-		func.sendBackwardCommand(info, new IResultListener<Void>()
-		{
-			public void resultAvailable(Void v)
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
 			}
 		});
 	}
@@ -1443,27 +726,50 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/**
 	 *  Send a forward command.
 	 */
+	@Override
 	public void sendForwardCommand(final Object info)
 	{
-		func.sendForwardCommand(info, new IResultListener<Void>()
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			public void execute(Void result)
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
 			}
 		});
+	}	
+	
+	/**
+	 *  Terminate the future.
+	 */
+	@Override
+	public void terminate(final Exception reason)
+	{
+		func.scheduleBackward(new ICommand<Void>()
+		{
+			@Override
+			public void execute(Void args)
+			{
+				func.handleTerminated(reason);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
+			}	
+		});
 	}
+	
+	/**
+	 *  Send a backward command.
+	 */
+	@Override
+	public void sendBackwardCommand(final Object info)
+	{
+		func.scheduleBackward(new ICommand<Void>()
+		{
+			@Override
+			public void execute(Void args)
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}	
+		});
+	}	
 };
 
 
@@ -1497,279 +803,68 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void	setResult(Collection<Object> result)
+	@Override
+	protected boolean	doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResult(result);
-			DelegatingTerminableIntermediateDelegationFuture.super.setResult(res);
+			result = (Collection<Object>)func.handleResult(result);
+			return DelegatingTerminableIntermediateDelegationFuture.super.doSetResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
+			return doSetException(e, undone);
+		}		
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public boolean	setResultIfUndone(Collection<Object> result)
+	@Override
+	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
-		boolean ret = false;
-		
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
-			ret = DelegatingTerminableIntermediateDelegationFuture.super.setResultIfUndone(res);
+			result = func.handleIntermediateResult(result);
+			return DelegatingTerminableIntermediateDelegationFuture.super.doAddIntermediateResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
+			return doSetException(e, undone);
+		}		
 	}
-	
+
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void addIntermediateResult(Object result)
+	@Override
+	protected synchronized boolean doSetFinished(boolean undone)
 	{
 		try
 		{
-			Object res = func.addIntermediateResult(result);
-			DelegatingTerminableIntermediateDelegationFuture.super.addIntermediateResult(res);
+			func.handleFinished(getIntermediateResults());
+			return DelegatingTerminableIntermediateDelegationFuture.super.doSetFinished(undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
+			return doSetException(e, undone);
+		}		
 	}
-	
-	/**
-	 * 
-	 */
-	public boolean addIntermediateResultIfUndone(Object result)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Object res = func.addIntermediateResultIfUndone(result);
-			ret = DelegatingTerminableIntermediateDelegationFuture.super.addIntermediateResultIfUndone(res);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setFinished()
-	{
-		try
-		{
-			func.setFinished((Collection<Object>)getIntermediateResults());
-			DelegatingTerminableIntermediateDelegationFuture.super.setFinished();
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setFinishedIfUndone()
-	{
-		boolean ret = false;
-		
-		try
-		{
-			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
-			ret = DelegatingTerminableIntermediateDelegationFuture.super.setFinishedIfUndone();
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setException(Exception exception)
-	{
-		try
-		{
-			Exception ex = func.setException(exception);
-			DelegatingTerminableIntermediateDelegationFuture.super.setException(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setExceptionIfUndone(Exception exception)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Exception ex = func.setExceptionIfUndone(exception);
-			ret = DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
+
 	/**
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.
      */
+	@Override
     protected void	startScheduledNotifications()
-    {
-    	func.startScheduledNotifications(new IResultListener<Void>()
+	{
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void execute(Void result)
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.startScheduledNotifications();
-			}
-	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
-		});
-    }
-	
-	/**
-	 *  Terminate the future.
-	 */
-	public void terminate(final Exception reason)
-	{
-		func.terminate(reason, new IResultListener<Void>()
-		{
-			public void resultAvailable(Void v)
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					// Hack!!! maybe wrong thread
-					DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
-				}
-				else
-				{
-					func.logException(exception, reason, true, false, true);
-				}
-			}
-		});
-	}
-	
-	/**
-	 *  Send a backward command.
-	 */
-	public void sendBackwardCommand(final Object info)
-	{
-		func.sendBackwardCommand(info, new IResultListener<Void>()
-		{
-			public void resultAvailable(Void v)
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.sendBackwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
 			}
 		});
 	}
@@ -1777,27 +872,50 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	/**
 	 *  Send a forward command.
 	 */
+	@Override
 	public void sendForwardCommand(final Object info)
 	{
-		func.sendForwardCommand(info, new IResultListener<Void>()
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			public void execute(Void result)
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.sendForwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
 			}
 		});
 	}
+	
+	/**
+	 *  Terminate the future.
+	 */
+	@Override
+	public void terminate(final Exception reason)
+	{
+		func.scheduleBackward(new ICommand<Void>()
+		{
+			@Override
+			public void execute(Void args)
+			{
+				func.handleTerminated(reason);
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
+			}	
+		});
+	}
+	
+	/**
+	 *  Send a backward command.
+	 */
+	@Override
+	public void sendBackwardCommand(final Object info)
+	{
+		func.scheduleBackward(new ICommand<Void>()
+		{
+			@Override
+			public void execute(Void args)
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}	
+		});
+	}	
 };
 
 /**
@@ -1826,206 +944,84 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void	setResult(Object result)
+	@Override
+	protected boolean	doSetResult(Object result, boolean undone)
 	{
 		try
 		{
-			Object res = func.setResult(result);
-			DelegatingTerminableDelegationFuture.super.setResult(res);
+			result = func.handleResult(result);
+			return DelegatingTerminableDelegationFuture.super.doSetResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			if(!isDone())
-			{
-				DelegatingTerminableDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean	setResultIfUndone(Object result)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Object res = func.setResultIfUndone(result);
-			ret = DelegatingTerminableDelegationFuture.super.setResultIfUndone(res);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingTerminableDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, null, true, true, false);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setException(Exception exception)
-	{
-		try
-		{
-			Exception ex = func.setException(exception);
-			DelegatingTerminableDelegationFuture.super.setException(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingTerminableDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, false, false);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setExceptionIfUndone(Exception exception)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Exception ex = func.setExceptionIfUndone(exception);
-			ret = DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(ex);
-		}
-		catch(RuntimeException e)
-		{
-			if(!isDone())
-			{
-				DelegatingTerminableDelegationFuture.super.terminate(e);
-			}
-			else
-			{
-				func.logException(e, exception, true, true, false);
-			}
-		}
-		
-		return ret;
+			return doSetException(e, undone);
+		}		
 	}
 	
 	/**
 	 *  Notify the listener.
 	 */
+	@Override
 	protected void notifyListener(final IResultListener<Object> listener)
 	{
-		func.notifyListener(new IResultListener<Void>()
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void execute(Void result)
 			{
 				DelegatingTerminableDelegationFuture.super.notifyListener(listener);
 			}
-
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingTerminableDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
 		});
 	}
+
+	/**
+	 *  Send a forward command.
+	 */
+	@Override
+	public void sendForwardCommand(final Object info)
+	{
+		func.scheduleForward(new ICommand<Void>()
+		{
+			public void execute(Void result)
+			{
+				DelegatingTerminableDelegationFuture.super.sendForwardCommand(info);
+			}
+		});
+	}	
 	
 	/**
 	 *  Terminate the future.
 	 */
+	@Override
 	public void terminate(final Exception reason)
 	{
-		func.terminate(reason, new IResultListener<Void>()
+		func.scheduleBackward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			@Override
+			public void execute(Void args)
 			{
+				func.handleTerminated(reason);
 				DelegatingTerminableDelegationFuture.super.terminate(reason);
 			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					// Hack!!! maybe wrong thread
-					DelegatingTerminableDelegationFuture.super.terminate(reason);
-				}
-				else
-				{
-					func.logException(exception, reason, true, false, true);
-				}
-			}
 		});
 	}
 	
 	/**
 	 *  Send a backward command.
 	 */
+	@Override
 	public void sendBackwardCommand(final Object info)
 	{
-		func.sendBackwardCommand(info, new IResultListener<Void>()
+		func.scheduleBackward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			@Override
+			public void execute(Void args)
 			{
 				DelegatingTerminableDelegationFuture.super.sendBackwardCommand(info);
 			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingTerminableDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
 		});
-	}
-	
-	/**
-	 *  Send a forward command.
-	 */
-	public void sendForwardCommand(final Object info)
-	{
-		func.sendForwardCommand(info, new IResultListener<Void>()
-		{
-			public void resultAvailable(Void v)
-			{
-				DelegatingTerminableDelegationFuture.super.sendForwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!isDone())
-				{
-					DelegatingTerminableDelegationFuture.super.terminate(exception);
-				}
-				else
-				{
-					func.logException(exception, null, true, false, true);
-				}
-			}
-		});
-	}
+	}	
 };
 
 /**
@@ -2045,224 +1041,86 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void	setResult(final Collection<Object> result)
+	@Override
+	protected boolean	doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResult(result);
-			DelegatingIntermediateFuture.super.setResult(res);
+			result = (Collection<Object>)func.handleResult(result);
+			return DelegatingIntermediateFuture.super.doSetResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			func.logException(e, null, true, false, false);
-		}
+			return doSetException(e, undone);
+		}		
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public boolean	setResultIfUndone(Collection<Object> result)
+	@Override
+	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
-		boolean ret = false;
-		
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
-			ret = DelegatingIntermediateFuture.super.setResultIfUndone(res);
+			result = func.handleIntermediateResult(result);
+			return DelegatingIntermediateFuture.super.doAddIntermediateResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			func.logException(e, null, true, true, false);
-		}
-		
-		return ret;
+			return doSetException(e, undone);
+		}		
 	}
-	
+
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void addIntermediateResult(Object result)
-	{
-//		System.out.println("ires: "+result+" "+this);
-		try
-		{
-			Object res = func.addIntermediateResult(result);
-			DelegatingIntermediateFuture.super.addIntermediateResult(res);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, false, false);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean addIntermediateResultIfUndone(Object result)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Object res = func.addIntermediateResultIfUndone(result);
-			ret = DelegatingIntermediateFuture.super.addIntermediateResultIfUndone(res);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, true, false);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setFinished()
-	{
-//		System.out.println("finished: "+result+" "+this);
-		try
-		{
-			func.setFinished((Collection<Object>)getIntermediateResults());
-			DelegatingIntermediateFuture.super.setFinished();
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, false, false);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setFinishedIfUndone()
-	{
-		boolean ret = false;
-		
-		try
-		{
-			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
-			ret = DelegatingIntermediateFuture.super.setFinishedIfUndone();
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, true, false);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setException(Exception exception)
+	@Override
+	protected synchronized boolean doSetFinished(boolean undone)
 	{
 		try
 		{
-			Exception ex = func.setException(exception);
-			DelegatingIntermediateFuture.super.setException(ex);
+			func.handleFinished(getIntermediateResults());
+			return DelegatingIntermediateFuture.super.doSetFinished(undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			func.logException(e, exception, true, false, false);
-		}
+			return doSetException(e, undone);
+		}		
 	}
-	
-	/**
-	 * 
-	 */
-	public boolean setExceptionIfUndone(Exception exception)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Exception ex = func.setExceptionIfUndone(exception);
-			ret = DelegatingIntermediateFuture.super.setExceptionIfUndone(ex);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, exception, true, true, false);
-		}
-		
-		return ret;
-	}
-	
-//	/**
-//	 *  Notify the listener.
-//	 */
-//	protected void notifyListener(final IResultListener<Collection<Object>> listener)
-//	{
-//		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				DelegatingIntermediateFuture.super.notifyListener(listener);
-//			}	
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
-//			}
-//		});
-//	}
-//	
-//	/**
-//	 *  Schedule listener notification on component thread. 
-//	 */
-//	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
-//	{
-//		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void v)
-//			{
-//				DelegatingIntermediateFuture.super.notifyIntermediateResult(listener, result);
-//			}	
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
-//			}
-//		});
-//	}
-	
+
 	/**
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.
      */
+	@Override
     protected void	startScheduledNotifications()
-    {
-    	func.startScheduledNotifications(new IResultListener<Void>()
+	{
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void execute(Void result)
 			{
 				DelegatingIntermediateFuture.super.startScheduledNotifications();
 			}
-	
-			public void exceptionOccurred(Exception exception)
-			{
-				func.logException(exception, null, true, false, true);
-			}
 		});
-    }
-    
+	}
+	
 	/**
 	 *  Send a forward command.
 	 */
+	@Override
 	public void sendForwardCommand(final Object info)
 	{
-		func.sendForwardCommand(info, new IResultListener<Void>()
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			public void execute(Void result)
 			{
 				DelegatingIntermediateFuture.super.sendForwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				func.logException(exception, null, true, false, true);
 			}
 		});
-	}
+	}	
 };
 
 /**
@@ -2282,92 +1140,33 @@ class DelegatingFuture extends Future<Object>
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void	setResult(final Object result)
+	@Override
+	public boolean	doSetResult(Object result, boolean undone)
 	{
 		try
 		{
-			Object res = func.setResult(result);
-			DelegatingFuture.super.setResult(res);
+			result = func.handleResult(result);
+			return DelegatingFuture.super.doSetResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			func.logException(e, null, true, false, false);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setResultIfUndone(Object result)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Object res = func.setResultIfUndone(result);
-			ret = DelegatingFuture.super.setResultIfUndone(res);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, true, false);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setException(Exception exception)
-	{
-		try
-		{
-			Exception ex = func.setException(exception);
-			DelegatingFuture.super.setException(ex);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, exception, true, false, false);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setExceptionIfUndone(Exception exception)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Exception ex = func.setExceptionIfUndone(exception);
-			ret = DelegatingFuture.super.setExceptionIfUndone(ex);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, exception, true, true, false);
-		}
-		
-		return ret;
+			return doSetException(e, undone);
+		}		
 	}
 	
 	/**
 	 *  Notify the listener.
 	 */
+	@Override
 	protected void notifyListener(final IResultListener<Object> listener)
 	{
-		func.notifyListener(new IResultListener<Void>()
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void execute(Void result)
 			{
 				DelegatingFuture.super.notifyListener(listener);
-			}
-	
-			public void exceptionOccurred(Exception exception)
-			{
-				func.logException(exception, null, true, false, true);
 			}
 		});
 	}
@@ -2375,17 +1174,14 @@ class DelegatingFuture extends Future<Object>
 	/**
 	 *  Send a forward command.
 	 */
+	@Override
 	public void sendForwardCommand(final Object info)
 	{
-		func.sendForwardCommand(info, new IResultListener<Void>()
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void v)
+			public void execute(Void result)
 			{
 				DelegatingFuture.super.sendForwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				func.logException(exception, null, true, false, true);
 			}
 		});
 	}
@@ -2417,224 +1213,86 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 	}
 	
 	/**
-     *  Set the result. 
-     *  Listener notifications occur on calling thread of this method.
-     *  @param result The result.
-     */
-    public void	setFirstResult(Object result)
-    {
-    	try
-		{
-			Object res = func.setFirstResult(result);
-			DelegatingTupleFuture.super.setFirstResult(res);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, false, false);
-		}
-    }
-    
-    /**
-     *  Set the result. 
-     *  Listener notifications occur on calling thread of this method.
-     *  @param result The result.
-     */
-    public void	setSecondResult(Object result)
-    {
-    	try
-		{
-			Object res = func.setSecondResult(result);
-			DelegatingTupleFuture.super.setSecondResult(res);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, false, false);
-		}
-    }
-	
-	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void	setResult(Collection<TupleResult> result)
+	@Override
+	protected boolean doSetResult(Collection<TupleResult> result, boolean undone)
 	{
 		try
 		{
-			Collection<TupleResult> res = (Collection<TupleResult>)func.setResult(result);
-			DelegatingTupleFuture.super.setResult(res);
+			result = (Collection<TupleResult>)func.handleResult(result);
+			return DelegatingTupleFuture.super.doSetResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			func.logException(e, null, true, false, false);
-		}
+			return doSetException(e, undone);
+		}		
 	}
 	
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public boolean	setResultIfUndone(Collection<TupleResult> result)
+	@Override
+	protected boolean	doAddIntermediateResult(TupleResult result, boolean undone)
 	{
-		boolean ret = false;
-		
 		try
 		{
-			Collection<TupleResult> res = (Collection<TupleResult>)func.setResultIfUndone(result);
-			ret = DelegatingTupleFuture.super.setResultIfUndone(res);
+			result = (TupleResult)func.handleIntermediateResult(result);
+			return DelegatingTupleFuture.super.doAddIntermediateResult(result, undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			func.logException(e, null, true, true, false);
-		}
-		
-		return ret;
+			return doSetException(e, undone);
+		}		
 	}
-	
+
 	/**
-	 * 
+	 *  Overwritten to change result, if necessary.
 	 */
-	public void addIntermediateResult(TupleResult result)
+	@Override
+	protected synchronized boolean doSetFinished(boolean undone)
 	{
 		try
 		{
-			TupleResult res = (TupleResult)func.addIntermediateResult(result);
-			DelegatingTupleFuture.super.addIntermediateResult(res);
+			Collection<?> results	= getIntermediateResults();
+			func.handleFinished((Collection<Object>)results);
+			return DelegatingTupleFuture.super.doSetFinished(undone);
 		}
-		catch(RuntimeException e)
+		catch(Exception e)
 		{
-			func.logException(e, null, true, false, false);
-		}
+			return doSetException(e, undone);
+		}		
 	}
-	
-	/**
-	 * 
-	 */
-	public boolean addIntermediateResultIfUndone(TupleResult result)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			TupleResult res = (TupleResult)func.addIntermediateResultIfUndone(result);
-			ret = DelegatingTupleFuture.super.addIntermediateResultIfUndone(res);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, true, false);
-		}
-		
-		return ret;
-	}
-	
-	
-	/**
-	 * 
-	 */
-	public void setFinished()
-	{
-		try
-		{
-			Collection col = getIntermediateResults();
-			func.setFinished((Collection<Object>)col);
-			DelegatingTupleFuture.super.setFinished();
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, false, false);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setFinishedIfUndone()
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Collection col = getIntermediateResults();
-			func.setFinishedIfUndone((Collection<Object>)col);
-			ret = DelegatingTupleFuture.super.setFinishedIfUndone();
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, null, true, true, false);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public void setException(Exception exception)
-	{
-		try
-		{
-			Exception ex = func.setException(exception);
-			DelegatingTupleFuture.super.setException(ex);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, exception, true, false, false);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean setExceptionIfUndone(Exception exception)
-	{
-		boolean ret = false;
-		
-		try
-		{
-			Exception ex = func.setExceptionIfUndone(exception);
-			ret = DelegatingTupleFuture.super.setExceptionIfUndone(ex);
-		}
-		catch(RuntimeException e)
-		{
-			func.logException(e, exception, true, true, false);
-		}
-		
-		return ret;
-	}
-	
+
 	/**
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.
      */
-    protected void startScheduledNotifications()
-    {
-    	func.startScheduledNotifications(new IResultListener<Void>()
+	@Override
+    protected void	startScheduledNotifications()
+	{
+		func.scheduleForward(new ICommand<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void execute(Void result)
 			{
 				DelegatingTupleFuture.super.startScheduledNotifications();
 			}
-	
-			public void exceptionOccurred(Exception exception)
-			{
-				func.logException(exception, null, true, false, true);
-			}
-		});
-    }
-    
-    /**
-	 *  Send a forward command.
-	 */
-	public void sendForwardCommand(final Object info)
-	{
-		func.sendForwardCommand(info, new IResultListener<Void>()
-		{
-			public void resultAvailable(Void v)
-			{
-				DelegatingTupleFuture.super.sendForwardCommand(info);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				func.logException(exception, null, true, false, true);
-			}
 		});
 	}
+	
+	/**
+	 *  Send a forward command.
+	 */
+	@Override
+	public void sendForwardCommand(final Object info)
+	{
+		func.scheduleForward(new ICommand<Void>()
+		{
+			public void execute(Void result)
+			{
+				DelegatingTupleFuture.super.sendForwardCommand(info);
+			}
+		});
+	}	
 };
 
