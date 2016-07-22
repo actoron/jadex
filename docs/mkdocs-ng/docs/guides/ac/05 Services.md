@@ -1,5 +1,4 @@
-Chapter 5 - Services
-=================================
+# Services
 
 ![05 Services@servicecontainer.png](servicecontainer.png)  
 *Service container*

@@ -1,4 +1,4 @@
-# Chapter 14. External Interactions
+# External Interactions
 
 In this chapter it is explained how the interaction of Jadex agents with other system components that are not necessarily agents can be done. For this purpose it is shown how agent internals can be accessed from other (non-agent) threads and additionally how agent listeners can be employed to get notified whenever changes within the agent happen (cf. the following two sections respectively).
 

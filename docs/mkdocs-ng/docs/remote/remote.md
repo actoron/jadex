@@ -1,4 +1,4 @@
-# Remote
+# Remote Communication
 Applications built with Jadex Active Components can be easily distributed across platforms, meaning that [service discovery](../services/services/#service-scopes) and [accessing services](../services/services/#accessing-services) works the same way, no matter if the target service is available at a local or remote platform.
 
 However, one additional aspect has to be addressed in the remote case: How can *platforms* discover each other to share services?
