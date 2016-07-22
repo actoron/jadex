@@ -1,4 +1,4 @@
-# Chapter 16. Using Predefined Capabilities
+# Using Predefined Capabilities
 
 The documentation of the predefined capabilities is not yet finished.
 Please also take a look at the [BDI Tutorial (Exercise F4)](../BDI Tutorial/07 Using Events#exercise-f4-a-multi-agent-scenario)

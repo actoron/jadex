@@ -1,5 +1,4 @@
-Chapter 3 - Asynchronous Programming
-=================================================
+# Asynchronous Programming
 
 ![03 Asynchronous Programming@synccall.png](synccall.png)  
 *Synchronous call*

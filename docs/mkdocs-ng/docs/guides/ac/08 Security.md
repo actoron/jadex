@@ -1,5 +1,4 @@
-Chapter 8 - Security
-=================================
+# Security
 
 Regarding security two different levels have to be distinguished: the **platform** and **application** level. The first is concerned with mechanisms for protecting a platform against unauthorized access and the latter deals with security aspects for services.
 

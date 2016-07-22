@@ -1,4 +1,4 @@
-# Chapter 2. Standalone Start of a Platform with EnvSupport
+# Standalone Platform with EnvSupport
 
 ## Exercise 1 - Starting Components from Java
 In many cases, you may want to configure components via Java directly instead of via an .application.xml, for example if their initial values are manually read from an XML file. In this case, the platform needs to be started on its own, the parametrisation should take place and only after this parametrisation the agents should start their real behaviour. 
