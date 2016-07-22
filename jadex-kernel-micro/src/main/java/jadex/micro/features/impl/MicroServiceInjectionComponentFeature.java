@@ -74,6 +74,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		}
 		else
 		{
+			// Fetch all injection names - field and method injections
 			String[] sernames = model.getServiceInjectionNames();
 			
 			if(sernames.length>0)
@@ -103,6 +104,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						if(infos[j] instanceof FieldInfo)
 						{
 							final Field	f	= ((FieldInfo)infos[j]).getField(component.getClassLoader());
+							
+							// todo: what about multi case?
+							// why not add values to a collection as they come?!
+							// currently waits until the search has finised before injecting
+							
+							// Is annotation is at field and field is of type future directly set it
 							if(SReflect.isSupertype(IFuture.class, f.getType()))
 							{
 								try
@@ -146,6 +153,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										}
 										else
 										{
+											// Set empty list on exception (why only list, what about set etc?!)
 											if(SReflect.isSupertype(f.getType(), List.class))
 											{
 												// Call self with empty list as result.
@@ -164,12 +172,15 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						else if(infos[j] instanceof MethodInfo)
 						{
 							final Method	m	= SReflect.getMethod(agent.getClass(), ((MethodInfo)infos[j]).getName(), ((MethodInfo)infos[j]).getParameterTypes(component.getClassLoader()));
+							
+							// 
 							if(info.isMultiple())
 							{
 								lis2.resultAvailable(null);
 								IFuture	tfut	= sfut;
 								final IIntermediateFuture<Object>	ifut	= (IIntermediateFuture<Object>)tfut;
 								
+								// Invokes methods for each intermediate result
 								ifut.addResultListener(new IIntermediateResultListener<Object>()
 								{
 									public void intermediateResultAvailable(final Object result)
@@ -187,7 +198,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 													}
 													catch(Throwable t)
 													{
-														t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
+														t = t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
 														throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 													}
 													return IFuture.DONE;
@@ -203,6 +214,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 									
 									public void finished()
 									{
+										// Inject all values at once if parameter is a collection
 										if(SReflect.isSupertype(m.getParameterTypes()[0], Collection.class))
 										{
 											component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
@@ -243,6 +255,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							}
 							else
 							{
+								// Invoke method once if required service is not multiple
 								sfut.addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(final Object result)

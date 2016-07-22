@@ -869,6 +869,8 @@ public class MicroClassReader
 					{
 						name	= methods[i].getName();
 						name	= name.toLowerCase();
+						
+						// Guess the injection name
 						if(name.startsWith("add"))
 						{
 							name	= name.substring(3);
