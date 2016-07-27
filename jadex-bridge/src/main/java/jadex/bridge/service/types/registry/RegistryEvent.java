@@ -41,9 +41,18 @@ public class RegistryEvent implements IRegistryEvent
 	}
 	
 	/**
+	 *  Get the addedservices.
+	 *  @return the addedservices
+	 */
+	public Map<ClassInfo, Set<IService>> getAddedServices()
+	{
+		return addedservices;
+	}
+	
+	/**
 	 *  Set the added services.
 	 */
-	protected void setAddedServices(Map<ClassInfo, Set<IService>> services)
+	public void setAddedServices(Map<ClassInfo, Set<IService>> services)
 	{
 		this.addedservices = services;
 //		if(services!=null && services.size()>0)
@@ -57,9 +66,18 @@ public class RegistryEvent implements IRegistryEvent
 	}
 	
 	/**
+	 *  Get the removedservices.
+	 *  @return the removedservices
+	 */
+	public Map<ClassInfo, Set<IService>> getRemovedServices()
+	{
+		return removedservices;
+	}
+	
+	/**
 	 *  Set the removed services.
 	 */
-	protected void setRemovedServices(Map<ClassInfo, Set<IService>> services)
+	public void setRemovedServices(Map<ClassInfo, Set<IService>> services)
 	{
 		this.removedservices = services;
 //		if(services!=null && services.size()>0)
@@ -70,24 +88,6 @@ public class RegistryEvent implements IRegistryEvent
 //				removedservices.add(ser.getServiceIdentifier());
 //			}
 //		}
-	}
-
-	/**
-	 *  Get the addedservices.
-	 *  @return the addedservices
-	 */
-	public Map<ClassInfo, Set<IService>> getAddedServices()
-	{
-		return addedservices;
-	}
-
-	/**
-	 *  Get the removedservices.
-	 *  @return the removedservices
-	 */
-	public Map<ClassInfo, Set<IService>> getRemovedServices()
-	{
-		return removedservices;
 	}
 	
 //	/**
