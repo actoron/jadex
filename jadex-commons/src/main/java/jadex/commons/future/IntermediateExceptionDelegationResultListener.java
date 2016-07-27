@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
- * 
+ *  Exception delegation listener for intermediate futures.
  */
 public class IntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>, 
 	IFutureCommandListener, IUndoneIntermediateResultListener<E>
@@ -113,7 +113,8 @@ public class IntermediateExceptionDelegationResultListener<E, T> implements IInt
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public void intermediateResultAvailable(E result) {
+	public void intermediateResultAvailable(E result) 
+	{
 		if(intermediateResultListener != null)
 		{
 			intermediateResultListener.resultAvailable(result);
@@ -127,7 +128,8 @@ public class IntermediateExceptionDelegationResultListener<E, T> implements IInt
 	 *  intermediateResultAvailable method was called for all
 	 *  intermediate results before.
      */
-    public void finished() {
+    public void finished() 
+    {
 		if(finishedListener != null)
 		{
 			finishedListener.resultAvailable(null);
@@ -136,7 +138,7 @@ public class IntermediateExceptionDelegationResultListener<E, T> implements IInt
 	
 	/**
 	 *  Called when the result is available.
-	 * @param result The result.
+	 *  @param result The result.
 	 */
 	public void customResultAvailable(Collection<E> result)
 	{

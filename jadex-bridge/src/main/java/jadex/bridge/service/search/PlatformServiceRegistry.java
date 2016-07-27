@@ -368,7 +368,7 @@ public class PlatformServiceRegistry
 	 *  @param service The service.
 	 *  @return True, if services matches to query.
 	 */
-	protected IFuture<Boolean> checkQuery(final ServiceQueryInfo<?> queryinfo, final IService service)
+	protected synchronized IFuture<Boolean> checkQuery(final ServiceQueryInfo<?> queryinfo, final IService service)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
 		
@@ -937,6 +937,8 @@ public class PlatformServiceRegistry
 			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
 			if(rms!=null)
 			{
+				// Get all proxy agents (represent other platforms)
+				
 				Set<IService> sers = services.get(new ClassInfo(IProxyAgentService.class));
 				if(sers!=null && sers.size()>0)
 				{
@@ -956,6 +958,8 @@ public class PlatformServiceRegistry
 						{
 							public void resultAvailable(ITransportComponentIdentifier rcid)
 							{
+								// User RMS getServiceProxies() to fetch services
+								
 								IFuture<Collection<T>> rsers = rms.getServiceProxies(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 								rsers.addResultListener(new IResultListener<Collection<T>>()
 								{
@@ -1117,7 +1121,7 @@ public class PlatformServiceRegistry
 	 *  @param type The interface type. If type is null all services are returned.
 	 *  @return First matching service or null.
 	 */
-	protected Set<IService> getServices(ClassInfo type)
+	public Set<IService> getServices(ClassInfo type)
 	{
 		Set<IService> ret = Collections.emptySet();
 		if(services!=null)
@@ -1204,62 +1208,5 @@ public class PlatformServiceRegistry
 	public static PlatformServiceRegistry getRegistry(IInternalAccess ia)
 	{
 		return getRegistry(ia.getComponentIdentifier());
-	}
-	
-	/**
-	 *  Info with query and result future.
-	 */
-	protected static class ServiceQueryInfo<T>
-	{
-		/** The query. */
-		protected ServiceQuery<T> query;
-		
-		/** The future. */
-		protected TerminableIntermediateFuture<T> future;
-
-		/**
-		 *  Create a new query info.
-		 */
-		public ServiceQueryInfo(ServiceQuery<T> query, TerminableIntermediateFuture<T> future)
-		{
-			this.query = query;
-			this.future = future;
-		}
-
-		/**
-		 *  Get the query.
-		 *  @return The query
-		 */
-		public ServiceQuery<T> getQuery()
-		{
-			return query;
-		}
-
-		/**
-		 *  Set the query.
-		 *  @param query The query to set
-		 */
-		public void setQuery(ServiceQuery<T> query)
-		{
-			this.query = query;
-		}
-
-		/**
-		 *  Get the future.
-		 *  @return The future
-		 */
-		public TerminableIntermediateFuture<T> getFuture()
-		{
-			return future;
-		}
-
-		/**
-		 *  Set the future.
-		 *  @param future The future to set
-		 */
-		public void setFuture(TerminableIntermediateFuture<T> future)
-		{
-			this.future = future;
-		}
 	}
 }
