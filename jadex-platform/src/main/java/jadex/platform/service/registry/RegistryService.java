@@ -6,12 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
@@ -28,12 +30,12 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 
 /**
- * 
+ *  Registry service for synchronization with remote platforms. 
  */
 public class RegistryService implements IRegistryService
 {
 	/** The component. */
-	@Agent
+	@ServiceComponent
 	protected IInternalAccess component;
 	
 	/** The subscriptions of other platforms (platform cid -> subscription info). */
@@ -49,6 +51,10 @@ public class RegistryService implements IRegistryService
 	public void init()
 	{
 		IAwarenessManagementService awas = SServiceProvider.getLocalService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		
+		// Subscribe to awareness service to get informed when new platforms are discovered
+		// todo: does not work without awareness
+		
 		awas.subscribeToPlatformList(true).addIntermediateResultListener(new IIntermediateResultListener<DiscoveryInfo>()
 		{
 			public void intermediateResultAvailable(DiscoveryInfo dis)
@@ -57,12 +63,14 @@ public class RegistryService implements IRegistryService
 				
 				final IComponentIdentifier cid = dis.getComponentIdentifier();
 				
-				SServiceProvider.getService(component, cid, IRegistryService.class)
+				SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, IRegistryService.class, false)
 					.addResultListener(new IResultListener<IRegistryService>()
 				{
 					public void resultAvailable(IRegistryService regser)
 					{
 						// Subscribe to the new remote registry
+						
+						System.out.println("Found registry service on: "+cid);
 						
 						regser.subscribeToEvents().addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
 						{
@@ -70,7 +78,31 @@ public class RegistryService implements IRegistryService
 							{
 								System.out.println("Received: "+event);
 								
+								PlatformServiceRegistry reg = getRegistry(cid);
 								
+								Map<ClassInfo, Set<IService>> added = event.getAddedServices();
+								if(added!=null)
+								{
+									for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
+									{
+										for(IService ser: entry.getValue())
+										{
+											reg.addService(entry.getKey(), ser);
+										}
+									}
+								}
+								
+								Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
+								if(removed!=null)
+								{
+									for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
+									{
+										for(IService ser: entry.getValue())
+										{
+											reg.removeService(entry.getKey(), ser);
+										}
+									}
+								}
 							}
 							
 							public void resultAvailable(Collection<IRegistryEvent> result)
@@ -92,21 +124,26 @@ public class RegistryService implements IRegistryService
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						System.out.println("Found no registry service on: "+cid);
 					}
 				});
 			}
 			
 			public void resultAvailable(Collection<DiscoveryInfo> result)
 			{
+				// Should not happen
+				System.out.println("Awareness subscription finished unexpectly");
 			}
 			
 			public void finished()
 			{
+				// Should not happen
+				System.out.println("Awareness subscription finished unexpectly");
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println();
+				exception.printStackTrace();
 			}
 		});
 	}
@@ -140,8 +177,7 @@ public class RegistryService implements IRegistryService
 		// Forward current state initially
 		
 		PlatformServiceRegistry reg = PlatformServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot());
-		Set<IService> addedservices = reg.getServices(null);
-		RegistryEvent event = new RegistryEvent(addedservices, null);
+		RegistryEvent event = new RegistryEvent(reg.getServiceMap(), null);
 		ret.addIntermediateResult(event);
 		
 		return ret;
@@ -180,7 +216,12 @@ public class RegistryService implements IRegistryService
 	 */
 	protected PlatformServiceRegistry getRegistry(IComponentIdentifier cid)
 	{
-		return registries!=null? registries.get(cid): null;
+		if(registries==null)
+			registries = new HashMap<IComponentIdentifier, PlatformServiceRegistry>();
+		PlatformServiceRegistry ret = registries.get(cid);
+		if(ret==null)
+			addRegistry(cid, new PlatformServiceRegistry());
+		return ret;
 	}
 	
 	/**

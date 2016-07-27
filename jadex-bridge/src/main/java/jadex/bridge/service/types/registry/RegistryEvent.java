@@ -2,22 +2,25 @@ package jadex.bridge.service.types.registry;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 
 /**
- * 
+ *  Registry event for notifications from the registry.
  */
 public class RegistryEvent implements IRegistryEvent
 {
 	/** The added services. */
-//	protected Set<IService> addedservices;
-	protected Set<IServiceIdentifier> addedservices;
+	protected Map<ClassInfo, Set<IService>> addedservices;
+//	protected Set<IServiceIdentifier> addedservices;
 	
 	/** The removed services. */
-	protected Set<IServiceIdentifier> removedservices;
+	protected Map<ClassInfo, Set<IService>> removedservices;
+//	protected Set<IServiceIdentifier> removedservices;
 
 	/**
 	 *  Create a new registry event.
@@ -31,7 +34,7 @@ public class RegistryEvent implements IRegistryEvent
 	 *  @param addedservices The added services.
 	 *  @param removedservices The removed services.
 	 */
-	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices)
+	public RegistryEvent(Map<ClassInfo, Set<IService>> addedservices, Map<ClassInfo, Set<IService>> removedservices)
 	{
 		setAddedServices(addedservices);
 		setRemovedServices(removedservices);
@@ -40,66 +43,86 @@ public class RegistryEvent implements IRegistryEvent
 	/**
 	 *  Set the added services.
 	 */
-	protected void setAddedServices(Collection<IService> services)
+	protected void setAddedServices(Map<ClassInfo, Set<IService>> services)
 	{
-		if(services!=null && services.size()>0)
-		{
-			addedservices = new HashSet<IServiceIdentifier>();
-			for(IService ser: services)
-			{
-				addedservices.add(ser.getServiceIdentifier());
-			}
-		}
+		this.addedservices = services;
+//		if(services!=null && services.size()>0)
+//		{
+//			addedservices = new HashSet<IServiceIdentifier>();
+//			for(IService ser: services)
+//			{
+//				addedservices.add(ser.getServiceIdentifier());
+//			}
+//		}
 	}
 	
 	/**
 	 *  Set the removed services.
 	 */
-	protected void setRemovedServices(Collection<IService> services)
+	protected void setRemovedServices(Map<ClassInfo, Set<IService>> services)
 	{
-		if(services!=null && services.size()>0)
-		{
-			removedservices = new HashSet<IServiceIdentifier>();
-			for(IService ser: services)
-			{
-				removedservices.add(ser.getServiceIdentifier());
-			}
-		}
+		this.removedservices = services;
+//		if(services!=null && services.size()>0)
+//		{
+//			removedservices = new HashSet<IServiceIdentifier>();
+//			for(IService ser: services)
+//			{
+//				removedservices.add(ser.getServiceIdentifier());
+//			}
+//		}
 	}
 
 	/**
 	 *  Get the addedservices.
-	 *  @return The addedservices
+	 *  @return the addedservices
 	 */
-	public Set<IServiceIdentifier> getAddedServices()
+	public Map<ClassInfo, Set<IService>> getAddedServices()
 	{
 		return addedservices;
 	}
 
 	/**
-	 *  Set the addedservices.
-	 *  @param addedservices The addedservices to set
-	 */
-	public void setAddedServices(Set<IServiceIdentifier> addedservices)
-	{
-		this.addedservices = addedservices;
-	}
-	
-	/**
 	 *  Get the removedservices.
-	 *  @return The removedservices
+	 *  @return the removedservices
 	 */
-	public Set<IServiceIdentifier> getRemovedServices()
+	public Map<ClassInfo, Set<IService>> getRemovedServices()
 	{
 		return removedservices;
 	}
-
-	/**
-	 *  Set the removedservices.
-	 *  @param removedservices The removedservices to set
-	 */
-	public void setRemovedServices(Set<IServiceIdentifier> removedservices)
-	{
-		this.removedservices = removedservices;
-	}
+	
+//	/**
+//	 *  Get the addedservices.
+//	 *  @return The addedservices
+//	 */
+//	public Set<IServiceIdentifier> getAddedServices()
+//	{
+//		return addedservices;
+//	}
+//
+//	/**
+//	 *  Set the addedservices.
+//	 *  @param addedservices The addedservices to set
+//	 */
+//	public void setAddedServices(Set<IServiceIdentifier> addedservices)
+//	{
+//		this.addedservices = addedservices;
+//	}
+//	
+//	/**
+//	 *  Get the removedservices.
+//	 *  @return The removedservices
+//	 */
+//	public Set<IServiceIdentifier> getRemovedServices()
+//	{
+//		return removedservices;
+//	}
+//
+//	/**
+//	 *  Set the removedservices.
+//	 *  @param removedservices The removedservices to set
+//	 */
+//	public void setRemovedServices(Set<IServiceIdentifier> removedservices)
+//	{
+//		this.removedservices = removedservices;
+//	}
 }

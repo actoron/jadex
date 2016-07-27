@@ -1145,6 +1145,14 @@ public class PlatformServiceRegistry
 	}
 	
 	/**
+	 *  Get the service map.
+	 */
+	public Map<ClassInfo, Set<IService>> getServiceMap()
+	{
+		return services;
+	}
+	
+	/**
 	 *  Get the application name. Equals the local component name in case it is a child of the platform.
 	 *  broadcast@awa.plat1 -> awa
 	 *  @return The application name.

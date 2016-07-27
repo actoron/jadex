@@ -1,7 +1,10 @@
 package jadex.bridge.service.types.registry;
 
+import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.ClassInfo;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 
 /**
@@ -13,11 +16,13 @@ public interface IRegistryEvent
 	 *  Get the addedservices.
 	 *  @return The addedservices
 	 */
-	public Set<IServiceIdentifier> getAddedServices();
+	public Map<ClassInfo, Set<IService>> getAddedServices();
+//	public Set<IServiceIdentifier> getAddedServices();
 
 	/**
 	 *  Get the removedservices.
 	 *  @return The removedservices
 	 */
-	public Set<IServiceIdentifier> getRemovedServices();
+	public Map<ClassInfo, Set<IService>> getRemovedServices();
+//	public Set<IServiceIdentifier> getAddedServices();
 }

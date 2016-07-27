@@ -17,6 +17,7 @@ import static jadex.base.RootComponentConfiguration.CONTEXT;
 import static jadex.base.RootComponentConfiguration.CONTEXTSERVICECLASS;
 import static jadex.base.RootComponentConfiguration.DF;
 import static jadex.base.RootComponentConfiguration.DHT_PROVIDE;
+import static jadex.base.RootComponentConfiguration.REGISTRY;
 import static jadex.base.RootComponentConfiguration.FILETRANSFER;
 import static jadex.base.RootComponentConfiguration.GUI;
 import static jadex.base.RootComponentConfiguration.JCCPLATFORMS;
@@ -107,6 +108,7 @@ import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
 import jadex.platform.service.message.MessageAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
+import jadex.platform.service.registry.RegistryAgent;
 import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.settings.SettingsAgent;
@@ -200,7 +202,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=DHT_PROVIDE, clazz=boolean.class, defaultvalue="false")
+	@Argument(name=DHT_PROVIDE, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=REGISTRY, clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
@@ -241,6 +244,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 	@ComponentType(name="distregistry", clazz=DistributedServiceRegistryAgent.class),
+	@ComponentType(name="registry", clazz=RegistryAgent.class),
 })
 
 @ProvidedServices({
@@ -355,6 +359,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.dhtprovide? 1 : 0"),
+		@Component(name="registry", type="registry", daemon=Boolean3.TRUE , number="$args.registry? 1 : 0"),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
@@ -435,6 +440,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.dhtprovide? 1 : 0"),
+		@Component(name="registry", type="registry", daemon=Boolean3.TRUE , number="$args.registry? 1 : 0"),
 	})
 })
 @Agent
