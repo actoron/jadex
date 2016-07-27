@@ -17,6 +17,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.interceptors.CallAccess;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -413,6 +414,11 @@ public class ServiceInvocationContext
 	 */
 	public void setResult(Object result)
 	{
+		if(getMethod()!=null && result!=null && !SReflect.isSupertype(getMethod().getReturnType(), result.getClass()) )
+		{
+			throw new IllegalArgumentException("Incompatible types: "+getMethod()+", "+result.getClass());
+		}
+		
 //		if(getMethod().getName().indexOf("subsc")!=-1)
 //			System.out.println("gotta");
 		this.result.set(used.size()-1, result);

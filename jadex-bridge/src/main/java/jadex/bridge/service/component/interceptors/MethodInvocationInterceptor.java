@@ -3,12 +3,14 @@ package jadex.bridge.service.component.interceptors;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 
+import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.StepAborted;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ErrorException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -173,8 +175,20 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			}
 			else
 			{
-				Exception re = t instanceof Exception ? (Exception)t : new RuntimeException(t);
-				sic.setResult(new Future(re));
+				Future<?>	fut	= SFuture.getFuture(sic.getMethod().getReturnType());
+				if(t instanceof Error)
+				{
+					fut.setException(new ErrorException((Error)t));
+				}
+				else if(t instanceof Exception)
+				{
+					fut.setException((Exception)t);
+				}
+				else
+				{
+					fut.setException(new RuntimeException(t));
+				}				
+				sic.setResult(fut);
 			}
 		}
 		
