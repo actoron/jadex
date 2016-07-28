@@ -2,6 +2,7 @@ package jadex.platform.service.registry;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,9 @@ public class RegistryService implements IRegistryService
 	/** The locally cloned registries of remote platforms. */
 	protected Map<IComponentIdentifier, PlatformServiceRegistry> registries;
 	
+	/** The platforms this registry has subscribed to. */
+	protected Set<IComponentIdentifier> subscribedto;
+	
 	/**
 	 *  Start of the service.
 	 */
@@ -63,70 +67,82 @@ public class RegistryService implements IRegistryService
 				
 				final IComponentIdentifier cid = dis.getComponentIdentifier();
 				
-				SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, IRegistryService.class, false)
-					.addResultListener(new IResultListener<IRegistryService>()
+				if(hasSubscribedTo(cid))
 				{
-					public void resultAvailable(IRegistryService regser)
-					{
-						// Subscribe to the new remote registry
-						
-						System.out.println("Found registry service on: "+cid);
-						
-						regser.subscribeToEvents().addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
-						{
-							public void intermediateResultAvailable(IRegistryEvent event)
-							{
-								System.out.println("Received: "+event);
-								
-								PlatformServiceRegistry reg = getRegistry(cid);
-								
-								Map<ClassInfo, Set<IService>> added = event.getAddedServices();
-								if(added!=null)
-								{
-									for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
-									{
-										for(IService ser: entry.getValue())
-										{
-											reg.addService(entry.getKey(), ser);
-										}
-									}
-								}
-								
-								Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
-								if(removed!=null)
-								{
-									for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
-									{
-										for(IService ser: entry.getValue())
-										{
-											reg.removeService(entry.getKey(), ser);
-										}
-									}
-								}
-							}
-							
-							public void resultAvailable(Collection<IRegistryEvent> result)
-							{
-								System.out.println("Should not happen");
-							}
-							
-							public void finished()
-							{
-								System.out.println("Subscription finbished: "+cid);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-							}
-						});
-					}
+//					System.out.println("Ignoring: already subscribed to: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+				}
+				else
+				{
+					addSubscribedTo(cid);
 					
-					public void exceptionOccurred(Exception exception)
+					SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, IRegistryService.class, false)
+						.addResultListener(new IResultListener<IRegistryService>()
 					{
-						System.out.println("Found no registry service on: "+cid);
-					}
-				});
+						public void resultAvailable(IRegistryService regser)
+						{
+							// Subscribe to the new remote registry
+							
+							System.out.println("Found registry service on: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+							
+							regser.subscribeToEvents().addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
+							{
+								public void intermediateResultAvailable(IRegistryEvent event)
+								{
+									System.out.println("Received: "+event);
+									
+									PlatformServiceRegistry reg = getRegistry(cid);
+									
+									Map<ClassInfo, Set<IService>> added = event.getAddedServices();
+									if(added!=null)
+									{
+										for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
+										{
+											for(IService ser: entry.getValue())
+											{
+												reg.addService(entry.getKey(), ser);
+											}
+										}
+									}
+									
+									Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
+									if(removed!=null)
+									{
+										for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
+										{
+											for(IService ser: entry.getValue())
+											{
+												reg.removeService(entry.getKey(), ser);
+											}
+										}
+									}
+								}
+								
+								public void resultAvailable(Collection<IRegistryEvent> result)
+								{
+									System.out.println("Should not happen");
+								}
+								
+								public void finished()
+								{
+									System.out.println("Subscription finbished: "+cid);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+									removeSubscribedTo(cid);
+								}
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// No registry service on that platform or no access
+							
+	//						System.out.println("Found no registry service on: "+cid);
+						}
+					});
+				}
 			}
 			
 			public void resultAvailable(Collection<DiscoveryInfo> result)
@@ -153,10 +169,16 @@ public class RegistryService implements IRegistryService
 	 */
 	public ISubscriptionIntermediateFuture<IRegistryEvent> subscribeToEvents()
 	{
+		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
+		
+		// If already subscribed reuse existing future
+		if(hasSubscription(cid))
+			return getSubscription(cid);
+		
+		System.out.println("New subscription from: "+cid);
+		
 		final SubscriptionIntermediateFuture<IRegistryEvent> ret = (SubscriptionIntermediateFuture<IRegistryEvent>)
 			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, component);
-		
-		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
 		
 		ITerminationCommand tcom = new ITerminationCommand()
 		{
@@ -182,7 +204,6 @@ public class RegistryService implements IRegistryService
 		
 		return ret;
 	}
-	
 
 	/**
 	 *  Add a new subscription.
@@ -199,6 +220,16 @@ public class RegistryService implements IRegistryService
 	}
 	
 	/**
+	 *  Test if has a subscription.
+	 *  @param future The subscription future.
+	 *  @param si The subscription info.
+	 */
+	protected boolean hasSubscription(IComponentIdentifier cid)
+	{
+		return subscriptions!=null? subscriptions.containsKey(cid): false;
+	}
+	
+	/**
 	 *  Remove an existing subscription.
 	 *  @param cid The component id to remove.
 	 */
@@ -207,6 +238,49 @@ public class RegistryService implements IRegistryService
 		if(subscriptions==null || !subscriptions.containsKey(cid))
 			throw new RuntimeException("Subscriber not known: "+cid);
 		subscriptions.remove(cid);
+	}
+	
+	/**
+	 *  Get a subscription.
+	 *  @param future The subscription future.
+	 *  @param si The subscription info.
+	 */
+	protected ISubscriptionIntermediateFuture<IRegistryEvent> getSubscription(IComponentIdentifier cid)
+	{
+		return subscriptions!=null? subscriptions.get(cid): null;
+	}
+	
+	/**
+	 *  Add a new subscription.
+	 *  @param future The subscription future.
+	 *  @param si The subscription info.
+	 */
+	protected void addSubscribedTo(IComponentIdentifier cid)
+	{
+		if(subscribedto==null)
+			subscribedto = new HashSet<IComponentIdentifier>();
+		subscribedto.add(cid);
+	}
+	
+	/**
+	 *  Test if has a subscription.
+	 *  @param future The subscription future.
+	 *  @param si The subscription info.
+	 */
+	protected boolean hasSubscribedTo(IComponentIdentifier cid)
+	{
+		return subscribedto!=null? subscribedto.contains(cid): false;
+	}
+	
+	/**
+	 *  Remove an existing subscription.
+	 *  @param cid The component id to remove.
+	 */
+	protected void removeSubscribedTo(IComponentIdentifier cid)
+	{
+		if(subscribedto==null || !subscribedto.contains(cid))
+			throw new RuntimeException("SubscribedTo not known: "+cid);
+		subscribedto.remove(cid);
 	}
 	
 	/**
@@ -220,7 +294,10 @@ public class RegistryService implements IRegistryService
 			registries = new HashMap<IComponentIdentifier, PlatformServiceRegistry>();
 		PlatformServiceRegistry ret = registries.get(cid);
 		if(ret==null)
-			addRegistry(cid, new PlatformServiceRegistry());
+		{
+			ret = new PlatformServiceRegistry();
+			addRegistry(cid, ret);
+		}
 		return ret;
 	}
 	
