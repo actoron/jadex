@@ -414,10 +414,7 @@ public class ServiceInvocationContext
 	 */
 	public void setResult(Object result)
 	{
-		if(getMethod()!=null && result!=null && !SReflect.isSupertype(getMethod().getReturnType(), result.getClass()) )
-		{
-			throw new IllegalArgumentException("Incompatible types: "+getMethod()+", "+result.getClass());
-		}
+		assert getMethod()==null || result==null || SReflect.isSupertype(getMethod().getReturnType(), result.getClass()) : "Incompatible types: "+getMethod()+", "+result.getClass();
 		
 //		if(getMethod().getName().indexOf("subsc")!=-1)
 //			System.out.println("gotta");
