@@ -126,7 +126,7 @@ public abstract class AbstractSendTask implements ISendTask
 	 *  Get the message.
 	 *  @return the message.
 	 */
-	public abstract Object getMessage();
+//	public abstract Object getMessage();
 	
 	/**
 	 *  Get the receivers.

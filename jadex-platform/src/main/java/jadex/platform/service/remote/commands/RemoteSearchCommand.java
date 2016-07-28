@@ -252,16 +252,20 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 											int cnt = 0;	
 											public void intermediateResultAvailable(IService result)
 											{
-				//								System.out.println("result command of search: "+callid+" "+result);
-												ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, result, callid, 
-													false, null, false, getNonFunctionalProperties(), ret, cnt++));
+//												System.out.println("result command of search: "+callid+" "+result);
+//												ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, result, callid, 
+//													false, null, false, getNonFunctionalProperties(), ret, cnt++));
+												ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, getSender(), result, callid, 
+														false, null, false, getNonFunctionalProperties(), ret, cnt++));
 											}
 											
 											public void finished()
 											{
-				//								System.out.println("result command of search fini: "+callid);
-												ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, null, callid, 
-													false, null, true, getNonFunctionalProperties(), ret, cnt++));
+//												System.out.println("result command of search fini: "+callid);
+												ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, getSender(), null, callid, 
+														false, null, true, getNonFunctionalProperties(), ret, cnt++));
+//												ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, null, callid, 
+//													false, null, true, getNonFunctionalProperties(), ret, cnt++));
 												ret.setFinishedIfUndone();
 											}
 											
@@ -292,7 +296,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 				//								}
 												
 				//								ret.setResult(new RemoteResultCommand(content, null , callid, false));
-												ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, content, null, callid, 
+												ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, getSender(), content, null, callid, 
 													false, null, getNonFunctionalProperties()));
 												ret.setFinishedIfUndone();
 											}
@@ -300,7 +304,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 											public void exceptionOccurred(Exception exception)
 											{
 				//								ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-												ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
+												ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, getSender(), null, exception, callid, 
 													false, null, getNonFunctionalProperties()));
 												ret.setFinishedIfUndone();
 											}
@@ -342,7 +346,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 					public void exceptionOccurred(Exception exception)
 					{
 //						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-						ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
+						ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, getSender(), null, exception, callid, 
 							false, null, getNonFunctionalProperties()));
 						ret.setFinishedIfUndone();
 					}
@@ -352,7 +356,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 			public void exceptionOccurred(Exception exception)
 			{
 //				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-				ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
+				ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, getSender(), null, exception, callid, 
 					false, null, getNonFunctionalProperties()));
 				ret.setFinishedIfUndone();
 			}
@@ -442,6 +446,23 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	public String getCallId()
 	{
 		return callid;
+	}
+
+	/**
+	 * @return the caller
+	 */
+	public IComponentIdentifier getCaller()
+	{
+		return caller;
+	}
+
+	/**
+	 *  Sets the caller.
+	 *  @param caller The caller to set
+	 */
+	public void setCaller(IComponentIdentifier caller)
+	{
+		this.caller = caller;
 	}
 
 	/**

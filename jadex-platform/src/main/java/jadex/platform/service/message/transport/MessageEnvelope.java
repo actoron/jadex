@@ -1,11 +1,10 @@
 package jadex.platform.service.message.transport;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -15,19 +14,24 @@ import jadex.commons.transformation.annotations.Alias;
  *  The message envelope holding the native message,
  *  the receivers and the message type.
  */
-@Alias("jadex.base.service.message.transport.MessageEnvelope")
 public class MessageEnvelope
 {
 	//-------- attributes --------
-
-	/** The message. */
-	protected Map<String, Object> message;
+	
+	/** Optional message type defining the structure, e.g. "fipa". */
+	protected String messagetype;
 	
 	/** The receivers. */
-	protected Collection<ITransportComponentIdentifier> receivers;
+	protected ITransportComponentIdentifier[] receivers;
 	
-	/** The message type. */
-	protected String message_type;
+	/** The receivers. */
+	protected IComponentIdentifier servicerec;
+	
+	/** The rid for decoding if specified. */
+	protected IResourceIdentifier rid;
+	
+	/** Extension properties. */
+	protected Map<String, Object> properties;
 	
 	//-------- constructors --------
 
@@ -42,56 +46,30 @@ public class MessageEnvelope
 	/**
 	 *  Create a new message envelope.
 	 */
-	public MessageEnvelope(Map<String, Object> message, Collection<ITransportComponentIdentifier> receivers, String message_type)
+	public MessageEnvelope(ITransportComponentIdentifier[] receivers, IComponentIdentifier servicerec, IResourceIdentifier rid, String messagetype, byte messagetypeid)
 	{
-		this.message = message;
 		this.receivers = receivers;
-		this.message_type = message_type;
-	}
-
-	//-------- methods --------
-
-	/**
-	 *  Get native message.
-	 *  @return The native message.
-	 */
-	public Map<String, Object> getMessage()
-	{
-		return message;
-	}
-	
-	/**
-	 *  Set native message.
-	 *  @param message The native message.
-	 */
-	public void setMessage(Map<String, Object> message)
-	{
-		this.message = message;
+		this.messagetype = messagetype;
+		this.servicerec = servicerec;
+		this.rid = rid;
 	}
 	
 	/**
 	 * Get the receivers.
 	 */
 	// Legacy compatibility hack. Should be ITransportComponentIdentifier
-	public IComponentIdentifier[] getReceivers()
+	public ITransportComponentIdentifier[] getReceivers()
 	{
-		return receivers==null? new ComponentIdentifier[0]: receivers.toArray(new ComponentIdentifier[receivers.size()]);
+		return receivers==null? new ITransportComponentIdentifier[0]: receivers;
 	}
 	
 	/**
 	 * Get the receivers.
 	 */
 	// Legacy compatibility hack. Should be ITransportComponentIdentifier
-	public void setReceivers(IComponentIdentifier[] receivers)
+	public void setReceivers(ITransportComponentIdentifier[] receivers)
 	{
-		this.receivers = new ArrayList<ITransportComponentIdentifier>();
-		if(receivers!=null)
-		{
-			for(int i=0; i<receivers.length; i++)
-			{
-				this.receivers.add((ITransportComponentIdentifier)receivers[i]);
-			}
-		}
+		this.receivers = receivers;
 	}
 	
 	/**
@@ -100,9 +78,51 @@ public class MessageEnvelope
 	public void addReceiver(ITransportComponentIdentifier receiver)
 	{
 		if(receivers==null)
-			receivers = new ArrayList<ITransportComponentIdentifier>();
-		receivers.add(receiver);
+			receivers = new ITransportComponentIdentifier[1];
+		else
+		{
+			ITransportComponentIdentifier[] tmp = new ITransportComponentIdentifier[receivers.length + 1];
+			System.arraycopy(receivers, 0, tmp, 0, receivers.length);
+			receivers = tmp;
+		}
+		receivers[receivers.length - 1] = receiver;
 	}
+	
+	/**
+	 * @return the rid
+	 */
+	public IResourceIdentifier getRid()
+	{
+		return rid;
+	}
+
+	/**
+	 *  Sets the rid.
+	 *  @param rid The rid to set
+	 */
+	public void setRid(IResourceIdentifier rid)
+	{
+		this.rid = rid;
+	}
+
+	/**
+	 * @return the servicerec
+	 */
+	public IComponentIdentifier getServiceRec()
+	{
+		return servicerec;
+	}
+
+	/**
+	 *  Sets the servicerec.
+	 *  @param servicerec The servicerec to set
+	 */
+	public void setServiceRec(IComponentIdentifier servicerec)
+	{
+		this.servicerec = servicerec;
+	}
+	
+	
 
 	/**
 	 *  Set the type (e.g. "fipa").
@@ -110,7 +130,7 @@ public class MessageEnvelope
 	 */
 	public void setTypeName(String messagetypename)
 	{
-		message_type = messagetypename;
+		messagetype = messagetypename;
 	}
 
 	/**
@@ -118,7 +138,43 @@ public class MessageEnvelope
 	 */
 	public String getTypeName()
 	{
-		return message_type;
+		return messagetype;
+	}
+	
+	/**
+	 *  Adds a property to the envelope.
+	 * @param name Property name.
+	 * @param value Property value.
+	 */
+	public void addProperty(String name, Object value)
+	{
+		if (properties == null)
+			properties = new HashMap<String, Object>();
+		properties.put(name, value);
+	}
+	
+	/**
+	 *  Removes a property from the envelope.
+	 *  @param name Property name.
+	 *  @return The property value if found, null otherwise.
+	 */
+	public Object removeProperty(String name)
+	{
+		if (properties != null)
+			return properties.remove(name);
+		return null;
+	}
+	
+	/**
+	 *  Gets a property from the envelope.
+	 *  @param name Property name.
+	 *  @return The property value if found, null otherwise.
+	 */
+	public Object getProperty(String name)
+	{
+		if (properties != null)
+			return properties.get(name);
+		return null;
 	}
 	
 	/**
@@ -131,8 +187,8 @@ public class MessageEnvelope
 		sb.append(SReflect.getInnerClassName(this.getClass())+"(");
 		//sb.append("sender: "+getSender()+", ");
 		sb.append("receivers: "+SUtil.arrayToString(getReceivers())+", ");
-		sb.append("message type: "+message_type);
-		sb.append("raw values: "+message);
+		sb.append("message type: "+messagetype);
+//		sb.append("raw values: "+message);
 //		sb.append(super.toString());
 		sb.append(")");
 		return sb.toString();

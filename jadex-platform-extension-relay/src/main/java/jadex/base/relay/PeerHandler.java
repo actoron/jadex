@@ -1,5 +1,6 @@
 package jadex.base.relay;
 
+import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -10,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
 import jadex.platform.service.message.MapSendTask;
 import jadex.platform.service.message.RemoteMarshalingConfig;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
@@ -263,7 +265,8 @@ public class PeerHandler implements Runnable
 						// Fetch update from remote peer
 						byte[]	infos	= handler.getConnectionManager().getDBEntries(getUrl(), peerid, localstate+1, 1000);	// Hack!!! Update (only) 1000 entries per 30 seconds!?
 						RemoteMarshalingConfig rmc = new RemoteMarshalingConfig();
-						PlatformInfo[]	pinfos	= (PlatformInfo[])MapSendTask.decodeMessage(infos, null, rmc.getAllSerializers(), rmc.getAllCodecs(), getClass().getClassLoader(), null);	// Hack!!! Use codec factory from relay handler?
+//						PlatformInfo[]	pinfos	= (PlatformInfo[])MapSendTask.decodeMessage(infos, null, rmc.getAllSerializers(), rmc.getAllCodecs(), getClass().getClassLoader(), null);	// Hack!!! Use codec factory from relay handler?
+						PlatformInfo[]	pinfos	= (PlatformInfo[]) SBinarySerializer2.readObjectFromStream(new ByteArrayInputStream(infos), null, null, getClass().getClassLoader(), null);
 						for(PlatformInfo info: pinfos)
 						{
 							handler.getStatisticsDB().save(info);
@@ -408,7 +411,7 @@ public class PeerHandler implements Runnable
 			{
 				AwarenessInfo	awainfo	= info.getAwarenessInfo();
 				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-				handler.sendAwarenessInfos(awainfo, null, false, false);
+				handler.sendAwarenessInfos(awainfo, false, false);
 			}
 		}
 	}

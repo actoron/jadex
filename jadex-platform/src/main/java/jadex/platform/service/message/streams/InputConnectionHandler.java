@@ -145,7 +145,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 						}
 						
 						public void exceptionOccurred(Exception exception)
-						{
+						{exception.printStackTrace();
 							System.out.println("no close ack: "+exception);
 							// Todo: what about already received data!?
 							scheduleStep(new IComponentStep<Void>()

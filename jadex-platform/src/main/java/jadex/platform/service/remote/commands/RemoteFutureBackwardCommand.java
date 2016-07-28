@@ -100,7 +100,7 @@ public class RemoteFutureBackwardCommand extends AbstractRemoteCommand
 			System.err.println("Cannot send backward command to incompatible future: "+tfut+", "+callid+", "+cmdcallid+", "+info);
 		}
 		
-		ret.addIntermediateResult(new RemoteResultCommand(null, null, null, callid, 
+		ret.addIntermediateResult(new RemoteResultCommand(null, getSender(), null, null, callid, 
 			false, null, getNonFunctionalProperties()));
 		ret.setFinished();
 		return ret;

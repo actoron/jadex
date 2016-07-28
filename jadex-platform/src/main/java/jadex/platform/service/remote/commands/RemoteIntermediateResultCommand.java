@@ -44,10 +44,10 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
-	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref, 
+	public RemoteIntermediateResultCommand(IComponentIdentifier sender, IComponentIdentifier realrec, Object result, String callid, boolean isref, 
 		String methodname, boolean finished, Map<String, Object> nonfunc, IFuture<?> orig, int cnt)
 	{
-		super(realreceiver, result, null, callid, isref, methodname, nonfunc);
+		super(sender, realrec, result, null, callid, isref, methodname, nonfunc);
 //		if(result!=null && result.getClass().getName().indexOf("Bunch")!=-1)
 //			System.out.println("ires com: "+result);
 		this.finished = finished;

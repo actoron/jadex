@@ -71,7 +71,7 @@ public class RemoteDGCRemoveReferenceCommand extends AbstractRemoteCommand
 		{
 			rsms.getRemoteReferenceModule().removeRemoteReference(rr, holder);
 //			ret.setResult(new RemoteResultCommand(null, null, callid, false));
-			ret.addIntermediateResult(new RemoteResultCommand(null, null, null, callid, 
+			ret.addIntermediateResult(new RemoteResultCommand(null, null, null, null, callid, 
 				false, null, getNonFunctionalProperties()));
 			ret.setFinished();
 		}

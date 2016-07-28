@@ -201,7 +201,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 								InetAddress address = SUtil.getInetAddress();
 //								AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
 //								byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
-								byte[] data = DiscoveryAgent.encodeObject(info, getDefaultCodecs(), getMicroAgent().getClassLoader());
+								byte[] data = DiscoveryAgent.encodeObject(info, getMicroAgent().getClassLoader());
 								((BroadcastSendHandler)sender).send(data, address, port);
 //								System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
 								getMicroAgent().getLogger().info("local slave at: "+SUtil.getInetAddress()+" "+socket.getLocalPort());

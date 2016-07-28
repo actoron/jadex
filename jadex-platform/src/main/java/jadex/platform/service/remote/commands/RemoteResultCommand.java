@@ -29,6 +29,9 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	/** The sending component. */
 	protected IComponentIdentifier sender;
 	
+	/** The eventual receiver of the command. */
+	protected IComponentIdentifier realrec;
+	
 	/** The result. */
 	protected Object result;
 
@@ -64,7 +67,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	/**
 	 *  Create a new remote result command.
 	 */
-	public RemoteResultCommand(IComponentIdentifier sender, Object result, Exception exception, String callid, 
+	public RemoteResultCommand(IComponentIdentifier sender, IComponentIdentifier realrec, Object result, Exception exception, String callid, 
 		boolean isref, String methodname, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
@@ -73,6 +76,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		
 		this.result = result;
 		this.sender = sender;
+		this.realrec = realrec;
 		this.exception = exception;
 		this.callid = callid;
 		this.isref = isref;
@@ -288,6 +292,24 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	public void setSender(IComponentIdentifier sender)
 	{
 		this.sender = sender;
+	}
+	
+	/**
+	 *  Get the eventual receiver.
+	 *  @return the eventual receiver.
+	 */
+	public IComponentIdentifier getRealReceiver()
+	{
+		return realrec;
+	}
+
+	/**
+	 *  Set the eventual receiver.
+	 *  @param sender The eventual receiver to set.
+	 */
+	public void setRealReceiver(IComponentIdentifier sender)
+	{
+		this.realrec = sender;
 	}
 
 	/**

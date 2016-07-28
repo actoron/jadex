@@ -44,6 +44,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.ServiceTerminatedException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -168,7 +169,7 @@ public class MessageService extends BasicService implements IMessageService
 	protected IComponentManagementService cms;
 	
 	/** The class loader of the message service (only for envelope en/decoding, content is handled by receiver class loader). */
-	protected ClassLoader classloader;
+	protected ClassLoader msgsrvcl;
 	
 	/** The target managers (platform id->manager). */
 	protected LRU<IComponentIdentifier, SendManager> managers;
@@ -177,7 +178,7 @@ public class MessageService extends BasicService implements IMessageService
 	protected RemoteMarshalingConfig remotemarshalingconfig;
 	
 	/** The delivery handler map. */
-	protected Map<Byte, ICommand> deliveryhandlers;
+	protected Map<Byte, ICommand<byte[]>> deliveryhandlers;
 	
 	
 	/** The initiator connections. */
@@ -214,7 +215,7 @@ public class MessageService extends BasicService implements IMessageService
 		super(component.getComponentIdentifier(), IMessageService.class, null);
 		
 		// Register communication classes with aliases
-		STransformation.registerClass(MessageEnvelope.class);
+//		STransformation.registerClass(MessageEnvelope.class);
 		STransformation.registerClass(AckInfo.class);
 		STransformation.registerClass(InitInfo.class);
 
@@ -239,7 +240,7 @@ public class MessageService extends BasicService implements IMessageService
 		// The default language for content.
 		this.deflanguage = deflanguage==null? SFipa.JADEX_XML: deflanguage;
 		
-		this.deliveryhandlers = new HashMap<Byte, ICommand>();
+		this.deliveryhandlers = new HashMap<Byte, ICommand<byte[]>>();
 		deliveryhandlers.put(MapSendTask.MESSAGE_TYPE_MAP, new MapDeliveryHandler());
 		deliveryhandlers.put(StreamSendTask.MESSAGE_TYPE_STREAM, new StreamDeliveryHandler());
 		
@@ -317,14 +318,14 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param msgtype The message type.
 	 *  @param sender The sender component identifier.
 	 *  @param rid The resource identifier used by the sending component (i.e. corresponding to classes of objects in the message map).
-	 *  @param realrec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
+	 *  @param servicerec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
 	 *  @param serializerid ID of the serializer for encoding the message.
 	 *  @param codecids The codecs to use for encoding (if different from default).
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
 	public IFuture<Void> sendMessage(final Map<String, Object> origmsg, final MessageType type, 
 		final IComponentIdentifier osender, final IResourceIdentifier rid, 
-		final IComponentIdentifier realrec, final Byte serializerid, final byte[] codecids)//, final Map<String, Object> nonfunc)
+		final IComponentIdentifier servicerec, final Byte serializerid, final byte[] codecids)//, final Map<String, Object> nonfunc)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -484,7 +485,7 @@ public class MessageService extends BasicService implements IMessageService
 //								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 						
 //								System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
-						doSendMessage(msg, type, exta, cl, ret, serializerid, codecids);
+						doSendMessage(msg, type, servicerec, rid, exta, cl, ret, serializerid, codecids);
 					}
 					public void exceptionOccurred(Exception exception)
 					{
@@ -494,27 +495,13 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		});
 		
-		
-//	
-
-//		ret.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("ex msg send: "+exception);
-//			}
-//		});
-		
 		return ret;
 	}
 
 	/**
 	 *  Extracted method to be callable from listener.
 	 */
-	protected void doSendMessage(Map<String, Object> msg, final MessageType type, IExternalAccess comp, 
+	protected void doSendMessage(Map<String, Object> msg, final MessageType type, IComponentIdentifier servicerec, IResourceIdentifier rid, IExternalAccess comp, 
 		final ClassLoader cl, Future<Void> ret, Byte serializerid, byte[] codecids)
 	{
 		final Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
@@ -649,7 +636,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			final SendManager tm = (SendManager)it.next();
 			ITransportComponentIdentifier[] recs = managers.getCollection(tm).toArray(new ITransportComponentIdentifier[0]);
-			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), preprocessors, serializer,  codecs, cl);
+			MapSendTask task = new MapSendTask(msgcopy, type, recs, servicerec, rid, getTransports(), preprocessors, serializer,  codecs, cl);
 			tm.addMessage(task).addResultListener(crl);
 			
 //			addrservice.getTransportComponentIdentifiers(recs).addResultListener(new IResultListener<ITransportComponentIdentifier[]>()
@@ -766,7 +753,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param message The native message. 
 	 *  (Synchronized because can be called from concurrently executing transports)
 	 */
-	public void deliverMessage(Object msg)
+	public void deliverMessage(byte[] msg)
 	{
 		delivermsg.addMessage(msg);
 	}
@@ -1019,7 +1006,7 @@ public class MessageService extends BasicService implements IMessageService
 												{
 													public void customResultAvailable(ClassLoader result)
 													{
-														classloader = result;
+														msgsrvcl = result;
 														startStreamSendAliveBehavior();
 														startStreamCheckAliveBehavior();
 //														ams	= SServiceProvider.getLocalService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
@@ -1338,33 +1325,91 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Deliver a message to the receivers.
 	 */
-	protected void internalDeliverMessage(Object obj)
+	protected void internalDeliverMessage(byte[] rawmsg)
 	{
-		MessageEnvelope	me	= null;
 		try
 		{
-			ICommand handler;
-			if(obj instanceof MessageEnvelope)
-			{
-				me	= (MessageEnvelope)obj;
-				handler = deliveryhandlers.get(MapSendTask.MESSAGE_TYPE_MAP);
-			}
-			else
-			{
-				byte[]	rawmsg	= (byte[])obj;
-				int	idx	= 0;
-				byte rmt = rawmsg[idx++];
-				handler = deliveryhandlers.get(rmt);
-			}
+			ICommand<byte[]> handler;
+			
+			byte rmt = rawmsg[0];
+			
+			handler = deliveryhandlers.get(rmt);
 			if(handler==null)
 				throw new RuntimeException("Corrupt message, unknown delivery handler code.");
-			handler.execute(obj);
+			handler.execute(rawmsg);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			MessageEnvelope me = null;
+			try
+			{
+				me = MapSendTask.decodeMessageEnvelope(rawmsg, remotemarshalingconfig.getAllSerializers(), remotemarshalingconfig.getAllCodecs(), msgsrvcl, null);
+			}
+			catch(Exception e1)
+			{
+			}
 			logger.warning("Message could not be delivered to receivers: "+(me!=null ? me.getReceivers() : "unknown") +", "+e);
 		}
+	}
+	
+	/**
+	 *  Gets the classloader for the receivers.
+	 *  @param rid Explicitly defined global RID.
+	 *  @param servicerec Targeted received in case of services.
+	 *  @param receivers The receivers.
+	 *  @return The classloader.
+	 */
+	protected IFuture<ClassLoader> getRIDClassLoader(IResourceIdentifier rid, IComponentIdentifier servicerec, IComponentIdentifier[] receivers)
+	{
+		final Future<ClassLoader> ret = new Future<ClassLoader>();
+		//TODO: Enable when global RIDs work properly
+//		if (rid != null && [valid global ID])
+//		{
+//			getRIDClassLoader(rid).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+//		}
+//		else if (servicerec != null)
+		if (servicerec != null)
+		{
+			cms.getComponentDescription(servicerec).addResultListener(new ExceptionDelegationResultListener<IComponentDescription, ClassLoader>(ret)
+			{
+				public void customResultAvailable(IComponentDescription desc) throws Exception
+				{
+					getRIDClassLoader(desc.getResourceIdentifier()).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+				}
+			});
+		}
+		else
+		{
+			//TODO: Include identity checks
+			cms.getComponentDescription(receivers[0]).addResultListener(new ExceptionDelegationResultListener<IComponentDescription, ClassLoader>(ret)
+			{
+				public void customResultAvailable(IComponentDescription desc) throws Exception
+				{
+					getRIDClassLoader(desc.getResourceIdentifier()).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Gets the classloader for the rid.
+	 *  @param rid The rid.
+	 *  @return The classloader.
+	 */
+	protected IFuture<ClassLoader> getRIDClassLoader(IResourceIdentifier rid)
+	{
+		final Future<ClassLoader> ret = new Future<ClassLoader>();
+		libservice.getClassLoader(rid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, ClassLoader>(ret)
+		{
+			public void customResultAvailable(ClassLoader result) throws Exception
+			{
+				ret.setResult(result);
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -1604,7 +1649,7 @@ public class MessageService extends BasicService implements IMessageService
 		//-------- attributes --------
 		
 		/** The list of messages to send. */
-		protected List<Object> messages;
+		protected List<byte[]> messages;
 		
 		//-------- constructors --------
 		
@@ -1613,7 +1658,7 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public DeliverMessage()
 		{
-			this.messages = new ArrayList<Object>();
+			this.messages = new ArrayList<byte[]>();
 		}
 		
 		//-------- methods --------
@@ -1623,7 +1668,7 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public boolean execute()
 		{
-			Object tmp = null;
+			byte[] tmp = null;
 			boolean isempty;
 			
 			synchronized(this)
@@ -1644,7 +1689,7 @@ public class MessageService extends BasicService implements IMessageService
 		/**
 		 *  Add a message to be delivered.
 		 */
-		public void addMessage(Object msg)
+		public void addMessage(byte[] msg)
 		{
 			synchronized(this)
 			{
@@ -1655,65 +1700,79 @@ public class MessageService extends BasicService implements IMessageService
 		}
 	}
 	
-	int cnt;
-	
 	/**
 	 *  Handle stream messages.
 	 */
-	class StreamDeliveryHandler implements ICommand
+	class StreamDeliveryHandler implements ICommand<byte[]>
 	{
 		/**
 		 *  Execute the command.
 		 */
-		public void execute(Object obj)
+		public void execute(byte[] obj)
 		{
 			try
 			{
 				byte[] rawmsg = (byte[])obj;
-				int mycnt = cnt++;
 //				System.out.println("aaaa: "+mycnt+" "+getComponent().getComponentIdentifier());
 //				System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
 				int idx = 1;
 				byte type = rawmsg[idx++];
 				
+				byte serializerid = rawmsg[idx++];
 				byte[] codec_ids = new byte[rawmsg[idx++]];
-				byte[] bconid = new byte[4];
-				for(int i=0; i<codec_ids.length; i++)
-				{
-					codec_ids[i] = rawmsg[idx++];
-				}
-				for(int i=0; i<4; i++)
-				{
-					bconid[i] = rawmsg[idx++];
-				}
-				final int conid = SUtil.bytesToInt(bconid);
+//				byte[] bconid = new byte[4];
+//				for(int i=0; i<codec_ids.length; i++)
+//				{
+//					codec_ids[i] = rawmsg[idx++];
+//				}
+				System.arraycopy(rawmsg, idx, codec_ids, 0, codec_ids.length);
+				idx+= codec_ids.length;
+//				for(int i=0; i<4; i++)
+//				{
+//					bconid[i] = rawmsg[idx++];
+//				}
+//				final int conid = SUtil.bytesToInt(bconid);
+				final int conid = SUtil.bytesToInt(rawmsg, idx);
+				idx+=4;
 				
 				int seqnumber = -1;
 				if(type==StreamSendTask.DATA_OUTPUT_INITIATOR || type==StreamSendTask.DATA_INPUT_PARTICIPANT)
 				{
-					for(int i=0; i<4; i++)
-					{
-						bconid[i] = rawmsg[idx++];
-					}
-					seqnumber = SUtil.bytesToInt(bconid);
+//					for(int i=0; i<4; i++)
+//					{
+//						bconid[i] = rawmsg[idx++];
+//					}
+//					seqnumber = SUtil.bytesToInt(bconid);
+					seqnumber = SUtil.bytesToInt(rawmsg, idx);
+					idx+=4;
 	//				System.out.println("seqnr: "+seqnumber);
 				}
 				
 				final Object data;
-				if(codec_ids.length==0)
+				if(serializerid==-1)
 				{
-					data = new byte[rawmsg.length-idx];
-					System.arraycopy(rawmsg, idx, data, 0, rawmsg.length-idx);
+					byte[] tdata = new byte[rawmsg.length-idx];
+					System.arraycopy(rawmsg, idx, tdata, 0, rawmsg.length-idx);
+					for(int i=codec_ids.length-1; i>-1; i--)
+					{
+						IBinaryCodec dec = remotemarshalingconfig.getCodec(codec_ids[i]);
+						tdata = dec.decode(tdata);
+					}
+					data = tdata;
 				}
 				else
 				{
-					Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
+//					Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
+					byte[] tmp = new byte[rawmsg.length - idx];
+					System.arraycopy(rawmsg, idx, tmp, 0, tmp.length);
+					
 					for(int i=codec_ids.length-1; i>-1; i--)
 					{
 						IBinaryCodec dec = remotemarshalingconfig.getCodec(codec_ids[i]);
 						tmp = dec.decode(tmp);
 					}
-					data = tmp;
+					data = remotemarshalingconfig.getAllSerializers().get(serializerid).decode(tmp, getClass().getClassLoader(), null, null);
+//					data = tmp;
 				}
 	
 				// Handle output connection participant side
@@ -1944,7 +2003,7 @@ public class MessageService extends BasicService implements IMessageService
 //			catch(Throwable e)
 			catch(final Exception e)
 			{
-//				e.printStackTrace();
+				e.printStackTrace();
 				getComponent().scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -1960,73 +2019,60 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Handle map messages, i.e. normal text messages.
 	 */
-	class MapDeliveryHandler implements ICommand
+	class MapDeliveryHandler implements ICommand<byte[]>
 	{
 		/**
 		 *  Execute the command.
 		 */
-		public void execute(Object obj)
+		public void execute(final byte[] obj)
 		{
-			MessageEnvelope me;
-			if(obj instanceof MessageEnvelope)
+			
+			final List<Exception>	errors	= new ArrayList<Exception>();
+			final IErrorReporter	rep	= strictcom ? null :new IErrorReporter()
 			{
-				me	= (MessageEnvelope)obj;
-			}
-			else
+				public void exceptionOccurred(Exception e)
+				{
+					e.printStackTrace();
+					errors.add(e);
+				}
+			};
+			MessageEnvelope me = MapSendTask.decodeMessageEnvelope(obj,
+																	remotemarshalingconfig.getAllSerializers(),
+																	remotemarshalingconfig.getAllCodecs(),
+																	msgsrvcl, null);
+//			me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj, remotemarshalingconfig.getPostprocessors(), remotemarshalingconfig.getAllSerializers(), remotemarshalingconfig.getAllCodecs(), classloader, rep);
+			
+			if(!errors.isEmpty())
 			{
-				final List<Exception>	errors	= new ArrayList<Exception>();
-				IErrorReporter	rep	= strictcom ? null :new IErrorReporter()
-				{
-					public void exceptionOccurred(Exception e)
-					{
-						e.printStackTrace();
-						errors.add(e);
-					}
-				};
-				me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj, remotemarshalingconfig.getPostprocessors(), remotemarshalingconfig.getAllSerializers(), remotemarshalingconfig.getAllCodecs(), classloader, rep);
-				
-				if(!errors.isEmpty())
-				{
-					logger.warning("Ignored errors during message decoding: "+errors);
+				logger.warning("Ignored errors during message decoding: "+errors);
 //					for(Exception e: errors)
 //					{
 //						e.printStackTrace();
 //					}
-				}
-//				byte[]	rawmsg	= (byte[])obj;
-//				int	idx	= 0;
-//				byte rmt = rawmsg[idx++];
-//				byte[] codec_ids = new byte[rawmsg[idx++]];
-//				for(int i=0; i<codec_ids.length; i++)
-//				{
-//					codec_ids[i] = rawmsg[idx++];
-//				}
-//		
-//				Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
-//				for(int i=codec_ids.length-1; i>-1; i--)
-//				{
-//					ICodec dec = codecfactory.getCodec(codec_ids[i]);
-//					tmp = dec.decode(tmp, classloader);
-//				}
-//				me	= (MessageEnvelope)tmp;
 			}
+//			byte[]	rawmsg	= (byte[])obj;
+//			int	idx	= 0;
+//			byte rmt = rawmsg[idx++];
+//			byte[] codec_ids = new byte[rawmsg[idx++]];
+//			for(int i=0; i<codec_ids.length; i++)
+//			{
+//				codec_ids[i] = rawmsg[idx++];
+//			}
+//	
+//			Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
+//			for(int i=codec_ids.length-1; i>-1; i--)
+//			{
+//			ICodec dec = codecfactory.getCodec(codec_ids[i]);
+//				tmp = dec.decode(tmp, classloader);
+//			}
+//			me	= (MessageEnvelope)tmp;
+			
 		
-			final Map<String, Object> msg	= me.getMessage();
+//			final Map<String, Object> msg	= me.getMessage();
 			final String type	= me.getTypeName();
 			final IComponentIdentifier[] receivers	= me.getReceivers();
 //			System.out.println("Received message: "+SUtil.arrayToString(receivers));
 			final MessageType	messagetype	= getMessageType(type);
-			
-//			if(msg.get(SFipa.X_NONFUNCTIONAL)!=null
-//				&& ((Map)msg.get(SFipa.X_NONFUNCTIONAL)).get("cause") instanceof String)
-//			{
-//				System.out.println("sdklvugi: "+msg.get(SFipa.SENDER));
-//			}
-			
-			// Announce receiver to message awareness
-			ITransportComponentIdentifier sender = (ITransportComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
-			announceComponentIdentifier(sender);
-			addrservice.addPlatformAddresses(sender);
 			
 			// Content decoding works as follows:
 			// Find correct classloader for each receiver by
@@ -2045,12 +2091,23 @@ public class MessageService extends BasicService implements IMessageService
 //					exception.printStackTrace();
 //				}
 //			});
-			
-			getRIDClassLoader(msg, getMessageType(type))
-				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+			getRIDClassLoader(me.getRid(), me.getServiceRec(), me.getReceivers()).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 			{
 				public void customResultAvailable(final ClassLoader classloader)
 				{
+					@SuppressWarnings("unchecked")
+					final Map<String, Object> msg = (Map<String, Object>)
+							MapSendTask.decodeMessage(obj,
+													  remotemarshalingconfig.getPostprocessors(),
+													  remotemarshalingconfig.getAllSerializers(),
+													  remotemarshalingconfig.getAllCodecs(),
+													  classloader, rep);
+					
+					// Announce receiver to message awareness
+					ITransportComponentIdentifier sender = (ITransportComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
+					announceComponentIdentifier(sender);
+					addrservice.addPlatformAddresses(sender);
+					
 					SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
@@ -2527,118 +2584,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 	}
 	
-	/**
-	 *  Get the release date from a message.
-	 */
-//	protected IFuture<Date> getReleaseDate(MessageType type, final Map<String, Object> msg)
-//	{
-//		final Future<Date> ret = new Future<Date>();
-//		Object tmp = msg.get(type.getReceiverIdentifier());
-//		
-//		if(tmp instanceof IComponentIdentifier)
-//		{
-//			tmp = new IComponentIdentifier[] { (IComponentIdentifier) tmp };
-//		}
-//		
-//		if(SReflect.isIterable(tmp))
-//		{
-//			int size = 0;
-//			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
-//			{
-//				++size;
-//				it.next();
-//			}
-//			
-//			final CollectionResultListener<Date> crl = new CollectionResultListener<Date>(size, false, new ExceptionDelegationResultListener<Collection<Date>, Date>(ret)
-//			{
-//				public void customResultAvailable(Collection<Date> result)
-//				{
-//					Date releasedate = null;
-//					for(Date date : result)
-//					{
-//						if (date != null && (releasedate == null || releasedate.after(date)))
-//						{
-//							releasedate = date;
-//						}
-//					}
-//					
-//					// Unknown platform date, assume oldest chain.
-//					if(releasedate == null)
-//					{
-//						releasedate = new Date(1);
-//					}
-//					
-//					ret.setResult(releasedate);
-//				}
-//			});
-//			
-//			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
-//			{
-//				final IComponentIdentifier rec = (IComponentIdentifier)it.next();
-//				if(rec==null)
-//				{
-//					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
-//				}
-//				// Addresses may only null for local messages, i.e. intra platform communication
-//				else if((
-//					(rec instanceof ITransportComponentIdentifier && ((ITransportComponentIdentifier)rec).getAddresses()==null) 
-//					|| !(rec instanceof ITransportComponentIdentifier)) &&
-//					!(rec.getPlatformName().equals(component.getComponentIdentifier().getPlatformName())))
-//				{
-//					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
-//				}
-//				else if(!releasedatecache.containsKey(rec.getRoot()))
-//				{
-//					SServiceProvider.getService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false).addResultListener(new IResultListener<IAwarenessManagementService>()
-//					{
-//						public void resultAvailable(IAwarenessManagementService ams)
-//						{
-//							ams.getPlatformInfo(rec.getRoot()).addResultListener(new IResultListener<DiscoveryInfo>()
-//							{
-//								public void resultAvailable(DiscoveryInfo info)
-//								{
-//									if (info != null)
-//									{
-//										Map<String, String> props = info.getProperties();
-//										String stringdate = props != null? props.get(AwarenessInfo.PROPERTY_JADEXDATE): null;
-//										Date date = stringdate != null? new Date(Long.parseLong(stringdate)) : null;
-//										releasedatecache.put(rec.getRoot(), date);
-//										crl.resultAvailable(date);
-//									}
-//									else
-//									{
-//										releasedatecache.put(rec.getRoot(), null);
-//										crl.resultAvailable(null);
-//									}
-//								}
-//								
-//								public void exceptionOccurred(
-//										Exception exception)
-//								{
-//									releasedatecache.put(rec.getRoot(), null);
-//									crl.resultAvailable(null);
-//								}
-//								
-//							});
-//						}
-//						
-//						public void exceptionOccurred(Exception exception)
-//						{
-//							releasedatecache.put(rec.getRoot(), null);
-//							crl.resultAvailable(null);
-//						}
-//					});
-//				}
-//				else
-//				{
-//					Date date = releasedatecache.get(rec.getRoot());
-//					crl.resultAvailable(date);
-//				}
-//			}
-//		}
-//		
-//		return ret;
-//	}
+	
 }
 
 

@@ -70,7 +70,7 @@ public class RemoteDGCAddReferenceCommand extends AbstractRemoteCommand
 		try
 		{
 			rsms.getRemoteReferenceModule().addRemoteReference(rr, holder);
-			ret.addIntermediateResult(new RemoteResultCommand(null, null, null, 
+			ret.addIntermediateResult(new RemoteResultCommand(null, null, null, null, 
 				callid, false, null, getNonFunctionalProperties()));
 			ret.setFinished();
 //			ret.setResult(new RemoteResultCommand(null, null, callid, false));

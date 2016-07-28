@@ -45,7 +45,7 @@ public interface IMessageService extends IService
 	 *  Deliver a raw message to some components.
 	 *  @param msg	Byte array containing a message in the form {prolog}{data}.
 	 */
-	public void deliverMessage(Object msg);
+	public void deliverMessage(byte[] msg);
 	
 //	/**
 //	 *  Create a virtual output connection.

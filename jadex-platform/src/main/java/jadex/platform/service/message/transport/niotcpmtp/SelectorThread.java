@@ -453,7 +453,7 @@ public class SelectorThread implements Runnable
 				// Read as much messages as available (if any).
 				for(byte[] msg=con.read(); msg!=null; msg=con.read())
 				{
-	//				System.out.println("Read message from: "+con);
+//					System.out.println("Read message from: "+con);
 					msgservice.deliverMessage(msg);
 				}
 			}

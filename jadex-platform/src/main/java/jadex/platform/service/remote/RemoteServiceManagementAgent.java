@@ -122,8 +122,8 @@ public class RemoteServiceManagementAgent
 			{
 				rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
 				IMessageService msgser = SServiceProvider.getLocalService(agent.getComponentIdentifier(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				msgser.addPreprocessors(rms.getBinaryWriteInfo().toArray(new ITraverseProcessor[0])).get();
-				msgser.addPostprocessors(rms.getBinaryReadInfo().toArray(new IDecoderHandler[0])).get();
+				msgser.addPreprocessors(rms.getPostprocessors().toArray(new ITraverseProcessor[0])).get();
+				msgser.addPostprocessors(rms.getPreprocessors().toArray(new IDecoderHandler[0])).get();
 				agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 				ret.setResult(null);
 			}
@@ -306,7 +306,7 @@ public class RemoteServiceManagementAgent
 								if(!(exception instanceof ComponentTerminatedException))
 								{
 									agent.getLogger().info("RMS rejected unauthorized command: "+msg.get(SFipa.SENDER)+", "+com);
-									reply.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false, null, nonfunc));
+									reply.addIntermediateResult(new RemoteResultCommand(null, null, null, exception, callid, false, null, nonfunc));
 									reply.setFinished();
 								}
 							}
@@ -323,14 +323,14 @@ public class RemoteServiceManagementAgent
 						}
 						else
 						{
-							reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received broken message content: "+content), callid, false, null, null));
+							reply.addIntermediateResult(new RemoteResultCommand(null, null, null, new RuntimeException("RMS received broken message content: "+content), callid, false, null, null));
 							reply.setFinished();
 						}
 					}
 					else
 					{
 						agent.getLogger().info("RMS received unexpected message content: "+msg.get(SFipa.SENDER)+", "+content);
-						reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received unexpected message content: "+content), callid, false, null, null));
+						reply.addIntermediateResult(new RemoteResultCommand(null, null, null, new RuntimeException("RMS received unexpected message content: "+content), callid, false, null, null));
 						reply.setFinished();
 					}
 
@@ -395,7 +395,9 @@ public class RemoteServiceManagementAgent
 //											System.out.println("RMS sending: "+System.currentTimeMillis()+", "+reply);
 //										}
 
-										agent.getComponentFeature(IMessageFeature.class).sendMessage(reply, mt, null).addResultListener(new IResultListener<Void>()
+//										agent.getComponentFeature(IMessageFeature.class).sendMessage(reply, mt, null).addResultListener(new IResultListener<Void>()
+										IMessageService ms = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+										ms.sendMessage(reply, SFipa.FIPA_MESSAGE_TYPE, agent.getComponentIdentifier(), rid[0], ((AbstractRemoteCommand)result).getRealReceiver(), null, null).addResultListener(new IResultListener<Void>()
 										{
 											public void resultAvailable(Void res)
 											{

@@ -1,5 +1,6 @@
 package jadex.platform.service.message.transport.httprelaymtp;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -31,6 +32,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
 import jadex.micro.annotation.Binding;
 import jadex.platform.service.message.MapSendTask;
 
@@ -234,7 +236,8 @@ public class HttpReceiver
 			{
 				try
 				{
-					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, null, serializers, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
+					AwarenessInfo	info = (AwarenessInfo) SBinarySerializer2.readObjectFromStream(new ByteArrayInputStream(data), getClass().getClassLoader());
+//					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, null, serializers, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 //					System.out.println("Received awareness info: "+info);
 					awa.addAwarenessInfo(info);
 				}

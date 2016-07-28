@@ -206,7 +206,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 */
 	protected byte[] fetchData()
 	{
-		Object enc_msg = serializer.encode(message, getClass().getClassLoader(), null);
+		Object enc_msg = serializer!=null?serializer.encode(message, getClass().getClassLoader(), null):message;
 		for(int i=0; i<codecs.length; i++)
 		{
 			enc_msg	= codecs[i].encode((byte[]) enc_msg);
@@ -222,19 +222,22 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 */
 	protected byte[] fetchProlog()
 	{
-		byte[]	prolog = new byte[7+codecids.length+(seqnumber==null? 0: 4)];
+		byte[]	prolog = new byte[8+codecids.length+(seqnumber==null? 0: 4)];
 		prolog[0] = MESSAGE_TYPE_STREAM;
 		prolog[1] = type;
-		prolog[2] = (byte)codecids.length;
-		System.arraycopy(codecids, 0, prolog, 3, codecids.length);
-		byte[] strid = SUtil.intToBytes(streamid);
-		for(int i=0; i<4; i++)
-			prolog[i+3+codecids.length] = strid[i];
+		prolog[2] = serializer!=null?serializer.getSerializerId():-1;
+		prolog[3] = (byte)codecids.length;
+		System.arraycopy(codecids, 0, prolog, 4, codecids.length);
+		SUtil.intIntoBytes(streamid, prolog, 4 + codecids.length);
+//		byte[] strid = SUtil.intToBytes(streamid);
+//		for(int i=0; i<4; i++)
+//			prolog[i+4+codecids.length] = strid[i];
 		if(seqnumber!=null)
 		{
-			byte[] seqnum = SUtil.intToBytes(seqnumber.intValue());
-			for(int i=0; i<4; i++)
-				prolog[i+7+codecids.length] = seqnum[i];
+//			byte[] seqnum = SUtil.intToBytes(seqnumber.intValue());
+//			for(int i=0; i<4; i++)
+//				prolog[i+8+codecids.length] = seqnum[i];
+			SUtil.intIntoBytes(seqnumber.intValue(), prolog, 8 + codecids.length);
 		}
 		return prolog;
 	}

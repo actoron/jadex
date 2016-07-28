@@ -102,7 +102,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 			System.err.println("Cannot terminate incompatible future: "+tfut+", "+callid+", "+terminatecallid+", "+exception);
 		}
 		
-		ret.addIntermediateResult(new RemoteResultCommand(null, null, null, callid, 
+		ret.addIntermediateResult(new RemoteResultCommand(null, getSender(), null, null, callid, 
 			false, null, getNonFunctionalProperties()));
 		ret.setFinished();
 		return ret;

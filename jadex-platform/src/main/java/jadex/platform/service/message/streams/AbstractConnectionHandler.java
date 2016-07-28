@@ -400,11 +400,11 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 *  @param seqnumber The sequence number.
 	 *  @return The task for sending the message.
 	 */
-	protected AbstractSendTask createTask(String type, Object content, boolean usecodecs, Integer seqnumber, Map<String, Object> nonfunc)
+	protected AbstractSendTask createTask(String type, Object content, boolean useserializer, Integer seqnumber, Map<String, Object> nonfunc)
 	{
 		return new StreamSendTask(getMessageType(type), content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
 			getConnectionId(), getConnection().isInitiatorSide()? new ITransportComponentIdentifier[]{getConnection().getParticipant()}: new ITransportComponentIdentifier[]{getConnection().getInitiator()}, 
-			getTransports(), ms.getRemoteMarshalingConfig().getPreprocessors(), ms.getRemoteMarshalingConfig().getDefaultSerializer(), usecodecs? getCodecs(): null, seqnumber, nonfunc); 
+			getTransports(), ms.getRemoteMarshalingConfig().getPreprocessors(), useserializer?ms.getRemoteMarshalingConfig().getDefaultSerializer():null, getCodecs(), seqnumber, nonfunc); 
 	}
 	
 	/**

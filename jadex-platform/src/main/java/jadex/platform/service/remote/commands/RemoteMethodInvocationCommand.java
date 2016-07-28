@@ -407,7 +407,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			{
 				exception	= (Exception)((InvocationTargetException)exception).getTargetException();
 			}
-			ret.addIntermediateResult(new RemoteResultCommand(ridcom, null, exception, callid, 
+			ret.addIntermediateResult(new RemoteResultCommand(ridcom, getSender(), null, exception, callid, 
 				false, methodname, getNonFunctionalProperties()));
 			ret.setFinished();
 			rsms.removeProcessingCall(callid);
@@ -609,14 +609,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				public void intermediateResultAvailable(Object result)
 				{
 //					System.out.println("inter: "+result);
-					ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, result, callid, 
+					ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, getSender(), result, callid, 
 						returnisref, methodname, false, getNFProps(true), (IFuture<?>)res, cnt++));
 				}
 				
 				public void finished()
 				{
 //					System.out.println("fin");
-					ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, null, callid, 
+					ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, getSender(), null, callid, 
 						returnisref, methodname, true, getNFProps(false), (IFuture<?>)res, cnt));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
@@ -625,7 +625,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				public void resultAvailable(Object result)
 				{
 //					System.out.println("ra");
-					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
+					ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), result, null, callid, 
 						returnisref, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
@@ -634,7 +634,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				public void resultAvailable(Collection result)
 				{
 //					System.out.println("ra");
-					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
+					ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), result, null, callid, 
 						returnisref, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
@@ -643,7 +643,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				public void exceptionOccurred(Exception exception)
 				{
 //					System.out.println("ex: "+exception);
-					ret.addIntermediateResult(new RemoteResultCommand(rec, null, exception, callid, 
+					ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), null, exception, callid, 
 						false, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
@@ -651,7 +651,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				
 				public void commandAvailable(Object command)
 				{
-					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, command, callid, 
+					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, getSender(), command, callid, 
 						returnisref, methodname, getNFProps(true)));
 				}
 			});
@@ -662,7 +662,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			{
 				public void resultAvailable(Object result)
 				{
-					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
+					ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), result, null, callid, 
 						returnisref, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
@@ -670,7 +670,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					ret.addIntermediateResult(new RemoteResultCommand(rec, null, exception, callid, 
+					ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), null, exception, callid, 
 						false, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
@@ -678,14 +678,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				
 				public void commandAvailable(Object command)
 				{
-					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, command, callid, 
+					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, getSender(), command, callid, 
 						returnisref, methodname, getNFProps(true)));
 				}
 			});
 		}
 		else
 		{
-			ret.addIntermediateResult(new RemoteResultCommand(rec, res, null, callid, 
+			ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), res, null, callid, 
 				returnisref, methodname, getNFProps(false)));
 			ret.setFinished();
 			rsms.removeProcessingCall(callid);

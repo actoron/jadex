@@ -233,8 +233,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 //			System.out.println("invoke: "+method.getName());
 //			if(method.getName().equals("getResult"))
 //				System.out.println("sending invoke");
-			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-				null, content, callid, to, future, nonfunc, sic);
+			IComponentIdentifier servicecid = null;
+			if (pr.getRemoteReference().getTargetIdentifier() instanceof IComponentIdentifier)
+				servicecid = (IComponentIdentifier) pr.getRemoteReference().getTargetIdentifier();
+			else if (pr.getRemoteReference().getTargetIdentifier() instanceof IServiceIdentifier)
+				servicecid = ((IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier()).getProviderId();
+			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(),
+				servicecid, content, callid, to, future, nonfunc, sic);
 			
 			// Provide alternative immediate future result, if method is asynchronous.
 			if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))

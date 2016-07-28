@@ -26,10 +26,10 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
-	public RemoteFutureSourceCommand(IComponentIdentifier realreceiver, Object cmd, String callid, boolean isref, 
+	public RemoteFutureSourceCommand(IComponentIdentifier sender,  IComponentIdentifier realrec, Object cmd, String callid, boolean isref, 
 		String methodname, Map<String, Object> nonfunc)
 	{
-		super(realreceiver, cmd, null, callid, isref, methodname, nonfunc);
+		super(sender, realrec, cmd, null, callid, isref, methodname, nonfunc);
 //		System.out.println("RFSC: "+realreceiver+", "+System.currentTimeMillis()); 
 	}
 	

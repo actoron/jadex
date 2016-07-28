@@ -2449,10 +2449,18 @@ public class SUtil
 	{
 		byte[] buffer = new byte[2];
 
-		buffer[0] = (byte)((val >>> 8) & 0xFF);
-		buffer[1] = (byte)(val & 0xFF);
+		shortIntoBytes(val, buffer, 0);
 
 		return buffer;
+	}
+	
+	/**
+	 *  Convert a short into byte array.
+	 */
+	public static void shortIntoBytes(int val, byte[] buffer, int offset)
+	{
+		buffer[offset] = (byte)((val >>> 8) & 0xFF);
+		buffer[offset+1] = (byte)(val & 0xFF);
 	}
 
 	/**
@@ -2465,12 +2473,20 @@ public class SUtil
 //		{
 //			throw new IllegalArgumentException("buffer length must be 4 bytes!");
 //		}
-
-		int value = (0xFF & buffer[0]) << 24;
-		value |= (0xFF & buffer[1]) << 16;
-		value |= (0xFF & buffer[2]) << 8;
-		value |= (0xFF & buffer[3]);
-
+		
+		return bytesToInt(buffer, 0);
+	}
+	
+	/**
+	 *  Convert bytes to an integer.
+	 */
+	public static int bytesToInt(byte[] buffer, int offset)
+	{
+		int value = (0xFF & buffer[offset]) << 24;
+		value |= (0xFF & buffer[offset+1]) << 16;
+		value |= (0xFF & buffer[offset+2]) << 8;
+		value |= (0xFF & buffer[offset+3]);
+		
 		return value;
 	}
 
@@ -2480,13 +2496,21 @@ public class SUtil
 	public static byte[] intToBytes(int val)
 	{
 		byte[] buffer = new byte[4];
-
-		buffer[0] = (byte)((val >>> 24) & 0xFF);
-		buffer[1] = (byte)((val >>> 16) & 0xFF);
-		buffer[2] = (byte)((val >>> 8) & 0xFF);
-		buffer[3] = (byte)(val & 0xFF);
+		
+		intIntoBytes(val, buffer, 0);
 
 		return buffer;
+	}
+	
+	/**
+	 *  Convert an integer into a byte array.
+	 */
+	public static void intIntoBytes(int val, byte[] buffer, int offset)
+	{
+		buffer[offset] = (byte)((val >>> 24) & 0xFF);
+		buffer[offset+1] = (byte)((val >>> 16) & 0xFF);
+		buffer[offset+2] = (byte)((val >>> 8) & 0xFF);
+		buffer[offset+3] = (byte)(val & 0xFF);
 	}
 	
 //	/**
@@ -3908,6 +3932,30 @@ public class SUtil
 		buf.flush();
 
 		return buf.toByteArray();
+	}
+	
+	/**
+	 *  Reads a set number of bytes from input stream.
+	 *  
+	 * 	@param is The InputStream.
+	 *  @param buffer The buffer to write into.
+	 *  @param offset Buffer offset
+	 *  @param len Number of bytes to read, buffer.length-offset is used when negative.
+	 */
+	public static void readStream(InputStream is, byte[] buffer, int offset, int len)
+	{
+		len = len < 0? buffer.length:len + offset;
+		try
+		{
+			while(offset<len) 
+			{
+				offset += is.read(buffer, offset, len-offset);
+			}
+		}
+		catch (IOException e)
+		{
+			rethrowAsUnchecked(e);
+		}
 	}
 	
 	/**

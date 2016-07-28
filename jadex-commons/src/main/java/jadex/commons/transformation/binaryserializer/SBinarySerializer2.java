@@ -249,6 +249,19 @@ public class SBinarySerializer2
 	 *  @param errorreporter The error reporter, may be null in which case the default reporter is used.
 	 *  @return The decoded object.
 	 */
+	public static Object readObjectFromStream(InputStream is, ClassLoader classloader)
+	{
+		return readObjectFromStream(is, null, null, classloader, null);
+	}
+	
+	/**
+	 *  Convert a byte array to an object.
+	 *  @param val The byte array.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader.
+	 *  @param errorreporter The error reporter, may be null in which case the default reporter is used.
+	 *  @return The decoded object.
+	 */
 	public static Object readObjectFromStream(InputStream is, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
 		try

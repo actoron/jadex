@@ -114,12 +114,7 @@ public class GZIPCodec implements IBinaryCodec
 			int len = SUtil.bytesToInt(buf);
 			ret = new byte[len];
 			GZIPInputStream gzis = new GZIPInputStream(bais);
-			// read method only reads up to length of bytes :-(
-			int sum = 0;
-			while((len = gzis.read(ret, sum, ret.length-sum))>0) 
-			{
-				sum += len;
-			}
+			SUtil.readStream(gzis, ret, 0, -1);
 		}
 		catch(Exception e) 
 		{

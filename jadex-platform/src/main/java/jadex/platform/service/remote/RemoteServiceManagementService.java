@@ -71,10 +71,11 @@ import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.message.MessageService;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.OutputConnection;
-import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
+import jadex.platform.service.remote.commands.RemoteIntermediateResultCommand;
+import jadex.platform.service.remote.commands.RemoteResultCommand;
 import jadex.platform.service.remote.commands.RemoteSearchCommand;
 import jadex.platform.service.remote.xml.RMIPostProcessor;
 import jadex.platform.service.remote.xml.RMIPreProcessor;
@@ -151,12 +152,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	
 	/** The rmi xml to object reader. */
 	protected AReader reader;
-	
-	/** Preprocessors for binary encoding. */
-	protected List<ITraverseProcessor> binpreprocs;
-	
-	/** Postprocessors for binary decoding. */
-	protected List<IDecoderHandler> binpostprocs;
 	
 	/** The timer. */
 	protected Timer	timer;
@@ -369,13 +364,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public <T> IFuture<T> getServiceProxy(IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, String scope, IAsyncFilter<T> filter)
 	{
-		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
+//		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
 		getServiceProxies(caller, cid, service, scope, false, filter).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
 		{
 			public void customResultAvailable(Collection<T> result)
 			{
-				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
+//				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
 				if(result!=null && !result.isEmpty())
 				{
 					T o = result.iterator().next();
@@ -857,7 +852,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //		{
 //			System.out.println("RMS sending: "+System.currentTimeMillis()+", "+content+" "+receiver);
 //		}
-		
 		try
 		{
 			component.scheduleStep(new IComponentStep<Void>()
@@ -1288,236 +1282,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		}
 	}
 	
-	
-	/**
-	 *  Get the specific xml read info for rms.
-	 */
-	protected Tuple2<TypeInfoPathManager, IObjectReaderHandler> getXMLReadInfo()
-	{
-		// Reader that supports conversion of proxyinfo to proxy.
-		Set<TypeInfo> typeinfosread = JavaReader.getTypeInfos();
-		
-		// Proxy reference -> proxy object
-		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
-		TypeInfo ti_rr = new TypeInfo(new XMLInfo(pr), 
-			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)), 
-			new MappingInfo(null, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo("proxyInfo")),
-				new SubobjectInfo(new AccessInfo("remoteReference")),
-				new SubobjectInfo(new AccessInfo("cache"))}));
-		typeinfosread.add(ti_rr);
-
-		// ServiceInputConnectionProxy -> real input connection
-		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge.service.types.remote", "ServiceInputConnectionProxy")};
-		TypeInfo ti_icp = new TypeInfo(new XMLInfo(icp), 
-			new ObjectInfo(ServiceInputConnectionProxy.class, new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
-			{
-				try
-				{
-					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
-					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), 
-						icp.getInitiator(), icp.getParticipant(), icp.getNonFunctionalProperties());
-					return icon;
-				}
-				catch(RuntimeException e)
-				{
-					e.printStackTrace();
-					throw e;
-				}
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		}));
-		typeinfosread.add(ti_icp);
-		
-		// ServiceOutputConnectionProxy -> real output connection
-		QName[] ocp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge.service.types.remote", "ServiceOutputConnectionProxy")};
-		TypeInfo ti_ocp = new TypeInfo(new XMLInfo(ocp), 
-			new ObjectInfo(ServiceOutputConnectionProxy.class, new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
-			{
-				try
-				{
-					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
-					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), 
-						ocp.getInitiator(), ocp.getParticipant(), ocp.getNonFunctionalProperties());
-					return ocon;
-				}
-				catch(RuntimeException e)
-				{
-					e.printStackTrace();
-					throw e;
-				}
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		}));
-		typeinfosread.add(ti_ocp);
-		
-		return new Tuple2<TypeInfoPathManager, IObjectReaderHandler>(new TypeInfoPathManager(typeinfosread), new BeanObjectReaderHandler(typeinfosread));
-	}
-	
 	/**
 	 * 
 	 */
-	protected IObjectWriterHandler getXMLWriteInfo()
-	{
-		final RMIPreProcessor preproc = new RMIPreProcessor(rrm);
-		
-//		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, preproc), 
-//			new ObjectInfo(IRemotable.class));
-//		typeinfoswrite.add(ti_proxyable);
-		
-		Set<TypeInfo> typeinfoswrite = JavaWriter.getTypeInfos();
-		
-		// Component identifier enhancement now done in MessageService sendMessage
-		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "TransportComponentIdentifier")};
-		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
-		IPreProcessor cidpp = new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				try
-				{
-					IComponentIdentifier src = (IComponentIdentifier)object;
-					BasicComponentIdentifier ret = null;
-					if(src.getPlatformName().equals(root.getLocalName()))
-					{
-						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
-						ret = new ComponentIdentifier(src.getName(), addresses);
-//						System.out.println("Rewritten cid: "+ret);
-					}
-					
-					return ret==null? src: ret;
-				}
-				catch(RuntimeException e)
-				{
-					e.printStackTrace();
-					throw e;
-				}
-			}
-		};
-		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, cidpp), new ObjectInfo(IComponentIdentifier.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("name"))},
-			new SubobjectInfo[]{new SubobjectInfo(new AccessInfo("addresses"))}));
-		typeinfoswrite.add(ti_cids);
-		
-		BeanObjectWriterHandler wh = new BeanObjectWriterHandler(typeinfoswrite, true);
-		
-		// Add pre processor thst maps pojo services to underlying service proxies 
-		// (have to be processed further with RMIPreprocessor)
-		wh.addPreProcessor(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-				return obj!=null && !(obj instanceof BasicService) && obj.getClass().isAnnotationPresent(Service.class);
-			}
-		}, new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				try
-				{
-					return BasicServiceInvocationHandler.getPojoServiceProxy(object);
-				}
-				catch(RuntimeException e)
-				{
-					e.printStackTrace();
-					throw e;
-				}
-			}
-		});
-		
-		// Add preprocessor that tests if is remote reference and replaces with proxy reference
-		wh.addPreProcessor(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-//				if(marshal.isRemoteReference(obj))
-//					System.out.println("rr: "+obj);
-				return marshal.isRemoteReference(obj);
-			}
-		}, preproc);
-		
-		// Streams
-		
-		// ServiceInputConnectionProxy -> ServiceInputConnectionProxy with real connection
-		wh.addPreProcessor(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-//				System.out.println("obj: "+obj);
-				return obj instanceof ServiceInputConnectionProxy;
-			}
-		}, new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				try
-				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)context.getRootObject();
-					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
-					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(
-						RemoteServiceManagementService.this.component.getComponentIdentifier(), 
-						com.getReceiver(), com.getNonFunctionalProperties());
-					con.setConnectionId(ocon.getConnectionId());
-					con.setOutputConnection(ocon);
-					return con;
-				}
-				catch(RuntimeException e)
-				{
-					e.printStackTrace();
-					throw e;
-				}
-			}
-		});
-		
-		// ServiceOutputConnectionProxy -> ServiceOutputConnectionProxy with real connection
-		wh.addPreProcessor(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-//				System.out.println("obj: "+obj);
-				return obj instanceof ServiceOutputConnectionProxy;
-			}
-		}, new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				try
-				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)context.getRootObject();
-					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
-					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(
-						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
-					con.setConnectionId(icon.getConnectionId());
-					con.setInputConnection(icon);
-					return con;
-				}
-				catch(RuntimeException e)
-				{
-					e.printStackTrace();
-					throw e;
-				}
-			}
-		});
-		
-		return wh;
-	}
-	
-	/**
-	 * 
-	 */
-	protected List<IDecoderHandler> getBinaryReadInfo()
+	protected List<IDecoderHandler> getPreprocessors()
 	{
 		// Equivalent pre- and postprocessors for binary mode.
 		List<IDecoderHandler> procs = new ArrayList<IDecoderHandler>();
@@ -1599,7 +1367,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 * 
 	 */
-	protected List<ITraverseProcessor> getBinaryWriteInfo()
+	protected List<ITraverseProcessor> getPostprocessors()
 	{
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
 		
@@ -1748,9 +1516,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		return procs;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected static AbstractRemoteCommand getRCFromContext(Object ec)
 	{
-		return ((AbstractRemoteCommand)((MessageEnvelope)((IEncodingContext)ec).getRootObject()).getMessage().get(SFipa.CONTENT));
+		return ((AbstractRemoteCommand)((Map<String, Object>)((IEncodingContext)ec).getRootObject()).get(SFipa.CONTENT));
+//		return ((AbstractRemoteCommand)((MessageEnvelope)((IEncodingContext)ec).getRootObject()).getMessage().get(SFipa.CONTENT));
 	}
 
 	/**

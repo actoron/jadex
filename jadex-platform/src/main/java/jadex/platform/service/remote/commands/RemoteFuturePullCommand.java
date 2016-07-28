@@ -105,7 +105,7 @@ public class RemoteFuturePullCommand extends AbstractRemoteCommand
 			});
 		}
 		
-		ret.addIntermediateResult(new RemoteResultCommand(null, null, null, callid, 
+		ret.addIntermediateResult(new RemoteResultCommand(null, getSender(), null, null, callid, 
 			false, null, getNonFunctionalProperties()));
 		ret.setFinished();
 		return ret;

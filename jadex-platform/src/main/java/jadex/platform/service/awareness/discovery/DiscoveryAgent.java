@@ -1,5 +1,7 @@
 package jadex.platform.service.awareness.discovery;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +30,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -465,10 +468,13 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  @param object The object.
 	 *  @return The byte array.
 	 */
-	public static byte[] encodeObject(Object object, IBinaryCodec[] codecs, ClassLoader classloader)
+	public static byte[] encodeObject(Object object, ClassLoader classloader)
 	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		SBinarySerializer2.writeObjectToStream(baos, object, classloader);
+		return baos.toByteArray();
 		// TODO: Hack? The encoding context probably needs to be target-based
-		return MapSendTask.encodeMessage(object, null, null, codecs, classloader);
+//		return MapSendTask.encodeMessage(object, null, null, codecs, classloader);
 //		return GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(object, 
 //			classloader), classloader);
 	}
@@ -478,10 +484,11 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  @param data The byte array.
 	 *  @return The object.
 	 */
-	public static Object decodeObject(byte[] data, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader classloader)
+	public static Object decodeObject(byte[] data, ClassLoader classloader)
 	{
+		return SBinarySerializer2.readObjectFromStream(new ByteArrayInputStream(data), null, null, classloader, null);
 //		System.out.println("size: "+data.length);
-		return MapSendTask.decodeMessage(data, null, serializers, codecs, classloader, IErrorReporter.IGNORE);
+//		return MapSendTask.decodeMessage(data, null, serializers, codecs, classloader, IErrorReporter.IGNORE);
 //		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 
 //			classloader), classloader);
 //		return Reader.objectFromByteArray(reader, GZIPCodec.decodeBytes(data, 

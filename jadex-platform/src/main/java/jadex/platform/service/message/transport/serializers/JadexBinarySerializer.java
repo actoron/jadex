@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
@@ -77,7 +78,8 @@ public class JadexBinarySerializer implements ISerializer
 	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		SBinarySerializer2.writeObjectToStream(baos, val, Arrays.asList(preprocs), null, null, classloader);
+		SBinarySerializer2.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, null, null, classloader);
+		
 		byte[] ret = baos.toByteArray();
 		
 		if(DEBUG)
@@ -111,7 +113,7 @@ public class JadexBinarySerializer implements ISerializer
 			is = (InputStream) bytes;
 		}
 		
-		Object ret = SBinarySerializer2.readObjectFromStream(is, Arrays.asList(postprocs), null, classloader, null);
+		Object ret = SBinarySerializer2.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, null, classloader, null);
 		
 		try
 		{

@@ -126,7 +126,7 @@ public class LocalTransport implements ITransport
 //				System.out.println("Sent with local transport: "+task.getReceivers()[0]);
 				
 //				msgservice.deliverMessage(task.getMessage(), task.getMessageType().getName(), task.getReceivers());
-				msgservice.deliverMessage(task.getMessage());
+				msgservice.deliverMessage((byte[]) task.getMessage());
 				return IFuture.DONE;
 			}
 		};
