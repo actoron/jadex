@@ -438,7 +438,9 @@ public class RootComponentConfiguration
 	/** Flag if dht storage ring should be provided. **/
 	public static final String	DHT_PROVIDE			= PlatformConfiguration.DHT_PROVIDE;		// class:
 																								// boolean
-																								// default:
+	/** Flag if dht storage ring should be provided. **/
+	public static final String	REGISTRY			= PlatformConfiguration.REGISTRY;		// class:
+																							// default:
 																								// false
 
 	private IModelInfo			model;

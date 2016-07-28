@@ -1,5 +1,4 @@
-Chapter 4 - Component Specification
-================================================
+# Component Specification
 
 In Jadex all component types (e.g. micro agents, BDI agents, BPMN workflows) share the same active component characteristics. Depending on the type of the component the definition is based on Java annotations or XML elements. The following explanations make extensive use of XML-based structure diagrams, but they are valid for annotations as well.  \
 As can be seen in the figure below an active component specification is composed of *imports*, *arguments*, *componenttypes*, *services*, *properties*, *configurations* and *extensiontypes*. These elements will be explained in detail in the next subsections.

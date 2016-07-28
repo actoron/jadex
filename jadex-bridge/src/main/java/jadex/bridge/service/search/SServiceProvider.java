@@ -570,6 +570,19 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(final IInternalAccess component, final IComponentIdentifier cid, final Class<T> type, final boolean proxy)
 	{
+		return getService(component, cid, RequiredServiceInfo.SCOPE_LOCAL, type, proxy);
+	}
+	
+	/**
+	 *  Get a service from a specific component.
+//	 *  (Returns required service proxy).
+	 *  @param component The component.
+	 *  @param cid The target component identifier.
+	 *  @param type The service type.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(final IInternalAccess component, final IComponentIdentifier cid, final String scope, final Class<T> type, final boolean proxy)
+	{
 		final Future<T> ret = new Future<T>();
 		
 		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
@@ -630,7 +643,7 @@ public class SServiceProvider
 					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
 					
 					IRemoteServiceManagementService rms	= SServiceProvider.getLocalService(component, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-					rms.getServiceProxy(component.getComponentIdentifier(), cid, type, RequiredServiceInfo.SCOPE_LOCAL, null)
+					rms.getServiceProxy(component.getComponentIdentifier(), cid, type, scope, null)
 						.addResultListener(new ComponentResultListener<T>(lis, component));
 				}
 			}
@@ -909,19 +922,39 @@ public class SServiceProvider
 	
 	/**
 	 *  Get a service from a specific component.
-	 *  @param provider A service provider.
+	 *  @param access The external access.
 	 *  @param cid The target component identifier.
 	 *  @param type The service type.
 	 *  @return The corresponding service.
 	 */
-	public static <T> IFuture<T> getService(IExternalAccess provider, final IComponentIdentifier cid, final Class<T> type)
+	public static <T> IFuture<T> getService(IExternalAccess access, final IComponentIdentifier cid, final Class<T> type)
 	{
-		return provider.scheduleStep(new ImmediateComponentStep<T>()
+		return access.scheduleStep(new ImmediateComponentStep<T>()
 		{
 			@Classname("getService(IExternalAccess provider, final IComponentIdentifier cid, final Class<T> type)")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				return getService(ia, cid, type, false);
+			}
+		});
+	}
+	
+	/**
+	 *  Get a service from a specific component with defined scope.
+	 *  @param access The external access.
+	 *  @param cid The target component identifier.
+	 *  @param scope The search scope.
+	 *  @param type The service type.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IExternalAccess access, final IComponentIdentifier cid, final String scope, final Class<T> type)
+	{
+		return access.scheduleStep(new ImmediateComponentStep<T>()
+		{
+			@Classname("getService(IExternalAccess provider, final IComponentIdentifier cid, final String scope, final Class<T> type)")
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return getService(ia, cid, scope, type, false);
 			}
 		});
 	}

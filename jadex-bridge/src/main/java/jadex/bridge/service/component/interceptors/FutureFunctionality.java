@@ -276,6 +276,8 @@ public class FutureFunctionality
 		}
 		else if(target instanceof ISubscriptionIntermediateFuture)
 		{
+			if(source instanceof DelegatingFuture)
+				System.out.println("hhhhhhhh");
 			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
 				(TerminableIntermediateDelegationFuture)target, (ISubscriptionIntermediateFuture)source);
 			source.addResultListener(lis);

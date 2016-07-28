@@ -1,3 +1,5 @@
+# Beliefs
+
 Beliefs represent the agent's knowledge about its enviroment and itself. In Jadex the beliefs can be any Java objects. They are stored in a belief base and can be referenced in expressions, as well as accessed and modified from plans using the beliefbase interface.
 
 # Defining Beliefs in the ADF

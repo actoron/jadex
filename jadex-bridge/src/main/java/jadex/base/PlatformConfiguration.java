@@ -108,6 +108,9 @@ public class PlatformConfiguration
 	/** Flag to enable or disable dht providing features (service discovery). **/
 	public static final String DHT_PROVIDE = "dhtprovide";
 	
+	/** Flag to enable or disable registry service (for distributed registry management). **/
+	public static final String REGISTRY = "registry";
+	
 	/** The reserved platform parameters. Those are (usually) not handled by the root component. */
 	public static final Set<String> RESERVED;
 	
