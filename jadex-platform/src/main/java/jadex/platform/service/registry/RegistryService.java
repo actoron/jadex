@@ -16,6 +16,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -28,7 +29,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.annotation.Agent;
 
 /**
  *  Registry service for synchronization with remote platforms. 
@@ -43,7 +43,7 @@ public class RegistryService implements IRegistryService
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
 	/** The locally cloned registries of remote platforms. */
-	protected Map<IComponentIdentifier, PlatformServiceRegistry> registries;
+	protected Map<IComponentIdentifier, LocalServiceRegistry> registries;
 	
 	/** The platforms this registry has subscribed to. */
 	protected Set<IComponentIdentifier> subscribedto;
@@ -90,7 +90,7 @@ public class RegistryService implements IRegistryService
 								{
 									System.out.println("Received: "+event);
 									
-									PlatformServiceRegistry reg = getRegistry(cid);
+									LocalServiceRegistry reg = getRegistry(cid);
 									
 									Map<ClassInfo, Set<IService>> added = event.getAddedServices();
 									if(added!=null)
@@ -288,11 +288,11 @@ public class RegistryService implements IRegistryService
 	 *  @param cid The component identifier.
 	 *  @return The registry.
 	 */
-	protected PlatformServiceRegistry getRegistry(IComponentIdentifier cid)
+	protected LocalServiceRegistry getRegistry(IComponentIdentifier cid)
 	{
 		if(registries==null)
-			registries = new HashMap<IComponentIdentifier, PlatformServiceRegistry>();
-		PlatformServiceRegistry ret = registries.get(cid);
+			registries = new HashMap<IComponentIdentifier, LocalServiceRegistry>();
+		LocalServiceRegistry ret = registries.get(cid);
 		if(ret==null)
 		{
 			ret = new PlatformServiceRegistry();
@@ -305,10 +305,10 @@ public class RegistryService implements IRegistryService
 	 *  Add a new registry.
 	 *  @param registry The registry.
 	 */
-	protected void addRegistry(IComponentIdentifier cid, PlatformServiceRegistry registry)
+	protected void addRegistry(IComponentIdentifier cid, LocalServiceRegistry registry)
 	{
 		if(registries==null)
-			registries = new HashMap<IComponentIdentifier, PlatformServiceRegistry>();
+			registries = new HashMap<IComponentIdentifier, LocalServiceRegistry>();
 		if(registries.containsKey(cid))
 			throw new RuntimeException("Registry already contained: "+cid);
 		registries.put(cid, registry);
