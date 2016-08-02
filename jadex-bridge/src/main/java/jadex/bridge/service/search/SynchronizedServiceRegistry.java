@@ -407,7 +407,10 @@ public class SynchronizedServiceRegistry extends ServiceRegistry
 				Iterator<IService> sers = getServices(IProxyAgentService.class);
 				if(sers!=null && sers.hasNext())
 				{
-					final CounterResultListener<Void> clis = new CounterResultListener<Void>(getServiceMap().get(IProxyAgentService.class).size(),
+					Set<IService> smap = getServiceMap().get(IProxyAgentService.class);
+					int size = smap==null? 0: smap.size();
+					
+					final CounterResultListener<Void> clis = new CounterResultListener<Void>(size,
 						new ExceptionDelegationResultListener<Void, T>(ret)
 					{
 						public void customResultAvailable(Void result)
