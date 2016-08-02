@@ -23,7 +23,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
-import jadex.bridge.service.search.PlatformServiceRegistry;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -144,7 +144,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public IFuture<Void> shutdown()
 	{
 		// Remove the persistent queries
-		PlatformServiceRegistry.getRegistry(component).removeQueries(getId());
+		SynchronizedServiceRegistry.getRegistry(component).removeQueries(getId());
 		return IFuture.DONE;
 	}
 	
@@ -661,6 +661,6 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type, String scope, IAsyncFilter<T> filter)
 	{
 		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, getComponent().getComponentIdentifier());
-		return PlatformServiceRegistry.getRegistry(getComponent()).addQuery(query);
+		return SynchronizedServiceRegistry.getRegistry(getComponent()).addQuery(query);
 	}
 }

@@ -11,6 +11,7 @@ import java.util.Set;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.collection.MultiIterator;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -18,7 +19,8 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
- * 
+ *  Service registry that holds copies of multiple other platform
+ *  registries. Search methods operate transparently on all subregistries.
  */
 public class MultiServiceRegistry extends AbstractServiceRegistry
 {
@@ -56,7 +58,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
 		IComponentIdentifier cid = service.getServiceIdentifier().getProviderId().getRoot();
-		AbstractServiceRegistry reg = getRegistry(cid);
+		AbstractServiceRegistry reg = internalGetRegistry(cid);
 		return reg.addService(key, service);
 	}
 	
@@ -67,7 +69,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	public void removeService(ClassInfo key, IService service)
 	{
 		IComponentIdentifier cid = service.getServiceIdentifier().getProviderId().getRoot();
-		AbstractServiceRegistry reg = getRegistry(cid);
+		AbstractServiceRegistry reg = internalGetRegistry(cid);
 		reg.removeService(key, service);
 	}
 	
@@ -149,6 +151,36 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	}
 	
 	/**
+	 *  Remove all service queries of a specific component from the registry.
+	 *  @param owner The query owner.
+	 */
+	public void removeQueries(IComponentIdentifier owner)
+	{
+		if(queries!=null)
+		{
+			// removeQueryOnAllRegistries
+			if(registries!=null)
+			{
+				for(AbstractServiceRegistry reg: registries.values())
+				{
+					reg.removeQueries(owner);
+				}
+			}
+			
+			for(Map.Entry<ClassInfo, Set<ServiceQuery<?>>> entry: queries.entrySet())
+			{
+				for(ServiceQuery<?> query: entry.getValue())
+				{
+					if(owner.equals(query.getOwner()))
+					{
+						entry.getValue().remove(query);
+					}
+				}
+			}
+		}
+	}
+	
+	/**
 	 *  Get queries per type.
 	 *  @param type The interface type. If type is null all services are returned.
 	 *  @return The queries.
@@ -164,14 +196,14 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 *  @param cid The component identifier.
 	 *  @return The registry.
 	 */
-	protected AbstractServiceRegistry getRegistry(IComponentIdentifier cid)
+	protected AbstractServiceRegistry internalGetRegistry(IComponentIdentifier cid)
 	{
 		if(registries==null)
 			registries = new HashMap<IComponentIdentifier, AbstractServiceRegistry>();
 		AbstractServiceRegistry ret = registries.get(cid);
 		if(ret==null)
 		{
-			ret = new LocalServiceRegistry();
+			ret = new ServiceRegistry();
 			System.out.println("Created registry for: "+cid);
 			addRegistry(cid, ret);
 		}

@@ -25,4 +25,10 @@ public interface IRegistryEvent
 	 */
 	public Map<ClassInfo, Set<IService>> getRemovedServices();
 //	public Set<IServiceIdentifier> getAddedServices();
+	
+	/**
+	 *  Get the size of the event in terms of the number of subevents.
+	 *  @return The sumber of contained changes.
+	 */
+	public int size();
 }

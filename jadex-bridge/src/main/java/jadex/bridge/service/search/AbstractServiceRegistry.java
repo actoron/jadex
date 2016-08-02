@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.ClassInfo;
@@ -28,13 +29,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
  */
 public abstract class AbstractServiceRegistry
 {
-//	/**
-//	 *  Get a service per type.
-//	 *  @param type The interface type.
-//	 *  @return First matching service or null.
-//	 */
-//	protected abstract <T> T getService(Class<T> type);
-//	
 	/**
 	 *  Get services per type.
 	 *  @param type The interface type. If type is null all services are returned.
@@ -65,6 +59,12 @@ public abstract class AbstractServiceRegistry
 	 *  @param query ServiceQuery.
 	 */
 	public abstract <T> void removeQuery(ServiceQuery<T> query);
+	
+	/**
+	 *  Remove all service queries of a specific component from the registry.
+	 *  @param owner The query owner.
+	 */
+	public abstract void removeQueries(IComponentIdentifier owner);
 	
 	/**
 	 *  Get queries per type.
