@@ -33,7 +33,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.PlatformServiceRegistry;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -264,7 +264,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			tmp.add(service);
 			
 			// Make service available immediately, even before start (hack???).
-			PlatformServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service);
+			SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service);
 		}
 	}
 	
@@ -297,7 +297,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 		}
 
-		PlatformServiceRegistry	registry	= PlatformServiceRegistry.getRegistry(component.getComponentIdentifier());
+		SynchronizedServiceRegistry	registry	= SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier());
 		if(registry!=null) // Maybe null on rescue thread (todo: why remove() on rescue thread?)
 		{
 			for(Class<?> servicetype: types)

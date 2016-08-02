@@ -33,7 +33,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
 
-public class DistributedServiceRegistry extends PlatformServiceRegistry
+public class DistributedServiceRegistry extends SynchronizedServiceRegistry
 {
 
 	private static final int	PUBLISH_DELAY	= ServiceRegistration.LEASE_TIME;

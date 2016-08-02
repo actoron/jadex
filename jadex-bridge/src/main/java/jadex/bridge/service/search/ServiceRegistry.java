@@ -1,16 +1,20 @@
 package jadex.bridge.service.search;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.types.registry.IRegistryListener;
+import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -26,7 +30,7 @@ import jadex.commons.future.TerminationCommand;
  *  - Search fetches services by types and excludes some according to the scope. 
  *  - Allows for adding persistent queries.
  */
-public class LocalServiceRegistry extends AbstractServiceRegistry
+public class ServiceRegistry extends AbstractServiceRegistry
 {
 	//-------- attributes --------
 	
@@ -41,6 +45,9 @@ public class LocalServiceRegistry extends AbstractServiceRegistry
 	
 	/** The excluded services cache. */
 	protected Map<IComponentIdentifier, Set<IService>> excludedservices;
+	
+	/** The registry listeners. */
+	protected List<IRegistryListener> listeners;
 	
 	//-------- methods --------
 	
@@ -62,7 +69,8 @@ public class LocalServiceRegistry extends AbstractServiceRegistry
 	 */
 	public Iterator<IService> getServices(ClassInfo type)
 	{
-		Set<IService> ret = Collections.emptySet();
+		Set<IService> ret = null;
+		
 		if(services!=null)
 		{
 			if(type!=null)
@@ -80,7 +88,7 @@ public class LocalServiceRegistry extends AbstractServiceRegistry
 			}
 		}
 		
-		return ret.iterator();
+		return ret==null? null: ret.iterator();
 	}
 	
 	/**
@@ -205,6 +213,8 @@ public class LocalServiceRegistry extends AbstractServiceRegistry
 			exsers.add(service);
 		}
 		
+		notifyListeners(new RegistryListenerEvent(RegistryListenerEvent.Type.ADDED, key, service));
+		
 		return checkQueries(service);
 	}
 	
@@ -223,6 +233,8 @@ public class LocalServiceRegistry extends AbstractServiceRegistry
 			if(sers!=null)
 			{
 				sers.remove(service);
+				
+				notifyListeners(new RegistryListenerEvent(RegistryListenerEvent.Type.REMOVED, key, service));
 			}
 			else
 			{
@@ -370,5 +382,40 @@ public class LocalServiceRegistry extends AbstractServiceRegistry
 		}
 	}
 
+	/**
+	 *  Notify the event listeners (if any).
+	 *  @param event The event.
+	 */
+	protected void notifyListeners(RegistryListenerEvent event)
+	{
+		if(listeners!=null)
+		{
+			for(IRegistryListener listener: listeners)
+			{
+				listener.registryChanged(event);
+			}
+		}
+	}
+	
+	/**
+	 *  Add an event listener.
+	 *  @param listener The listener.
+	 */
+	public void addEventListener(IRegistryListener listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList<IRegistryListener>();
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Remove an event listener.
+	 *  @param listener The listener.
+	 */
+	public void removeEventListener(IRegistryListener listener)
+	{
+		if(listeners!=null)
+			listeners.remove(listener);
+	}
 	
 }

@@ -91,7 +91,7 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(IComponentIdentifier component, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
-		return PlatformServiceRegistry.getRegistry(component.getRoot()).searchService(type, component, scope, filter);
+		return SynchronizedServiceRegistry.getRegistry(component.getRoot()).searchService(type, component, scope, filter);
 	}
 	
 	/**
@@ -206,7 +206,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		T ret = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
+		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
 		if(ret==null)
 			throw new ServiceNotFoundException(type.getName());
 		return proxy? createRequiredProxy(component, ret, type): ret;
@@ -223,7 +223,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		T ret = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
+		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
 		return proxy && ret!=null? createRequiredProxy(component, ret, type): ret;
 	}
 	
@@ -238,7 +238,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 
-		T ret = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
 		{
 			public boolean filter(T obj) 
 			{
@@ -283,7 +283,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 
-		Collection<T> ret = PlatformServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter);
+		Collection<T> ret = SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter);
 		
 		// Fixing the bug by changing createRequiredProxy -> createRequiredProxies leads to not compiling the main class
 		return proxy? createRequiredProxies(component, ret, type): ret;
@@ -453,7 +453,7 @@ public class SServiceProvider
 				{
 					if(filter==null)
 					{
-						PlatformServiceRegistry reg = PlatformServiceRegistry.getRegistry(component);
+						SynchronizedServiceRegistry reg = SynchronizedServiceRegistry.getRegistry(component);
 						T ser = reg==null? null: reg.searchService(type, component.getComponentIdentifier(), scope);
 //						T ser = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope);
 						if(ser!=null)
@@ -489,14 +489,14 @@ public class SServiceProvider
 					else
 					{
 						IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
-						PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter)
+						SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter)
 							.addResultListener(new ComponentResultListener<T>(lis, component));
 					}
 				}
 				else
 				{
 					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
-					PlatformServiceRegistry.getRegistry(component).searchGlobalService(type, component.getComponentIdentifier(), filter)
+					SynchronizedServiceRegistry.getRegistry(component).searchGlobalService(type, component.getComponentIdentifier(), filter)
 						.addResultListener(new ComponentResultListener<T>(lis, component));
 				}
 			}
@@ -784,7 +784,7 @@ public class SServiceProvider
 				{
 					if(filter==null)
 					{
-						Collection<T> sers = PlatformServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope);
+						Collection<T> sers = SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope);
 						if(proxy)
 							sers = createRequiredProxies(component, sers, type);
 						ret.setResult(sers==null? Collections.EMPTY_SET: sers);
@@ -792,14 +792,14 @@ public class SServiceProvider
 					else
 					{
 						IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret); 
-						PlatformServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter)
+						SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter)
 							.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
 					}
 				}
 				else
 				{
 					IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret); 
-					PlatformServiceRegistry.getRegistry(component).searchGlobalServices(type, component.getComponentIdentifier(), filter).addResultListener(
+					SynchronizedServiceRegistry.getRegistry(component).searchGlobalServices(type, component.getComponentIdentifier(), filter).addResultListener(
 						new IntermediateComponentResultListener<T>(lis, component));
 				}
 			}

@@ -49,7 +49,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.PlatformServiceRegistry;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.IClockService;
@@ -599,7 +599,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
-																	PlatformServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
+																	SynchronizedServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
@@ -708,7 +708,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Started component: "+cid.getName());
 
-																			PlatformServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																			SynchronizedServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
 																			
 		//																	System.out.println("created: "+ad);
 																			
@@ -812,7 +812,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Starting component failed: "+cid+", "+exception);
 																			
-																			PlatformServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																			SynchronizedServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
 																			
 //																			System.err.println("Starting component failed: "+cid+", "+exception);
 //																			exception.printStackTrace();
