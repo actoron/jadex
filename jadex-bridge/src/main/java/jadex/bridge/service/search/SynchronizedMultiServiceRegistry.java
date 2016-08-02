@@ -12,6 +12,7 @@ import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  *  Synchronized version of the multi service registry.
@@ -161,6 +162,22 @@ public class SynchronizedMultiServiceRegistry extends MultiServiceRegistry
 	protected synchronized <T> ISubscriptionIntermediateFuture<T> searchLoopServices(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
 	{
 		return super.searchLoopServices(filter, it, cid, scope);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	{
+		return super.searchGlobalService(type, cid, filter);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	{
+		return super.searchGlobalServices(type, cid, filter);
 	}
 	
 	/**

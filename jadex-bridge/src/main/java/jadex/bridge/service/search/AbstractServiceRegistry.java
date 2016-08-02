@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
@@ -20,6 +23,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -35,6 +39,12 @@ public abstract class AbstractServiceRegistry
 	 *  @return First matching service or null.
 	 */
 	protected abstract Iterator<IService> getServices(ClassInfo type);
+	
+	/**
+	 *  Get the service map.
+	 *  @return The full service map.
+	 */
+	public abstract Map<ClassInfo, Set<IService>> getServiceMap();
 
 	/**
 	 *  Add a service to the registry.
@@ -72,6 +82,47 @@ public abstract class AbstractServiceRegistry
 	 *  @return The queries.
 	 */
 	public abstract <T> Set<ServiceQueryInfo<T>> getQueries(ClassInfo type);
+	
+	/**
+	 *  Search for services.
+	 */
+	public abstract <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter);
+	
+	/**
+	 *  Search for services.
+	 */
+	public abstract <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter);
+	
+	/**
+	 *  Add an excluded component. 
+	 *  @param The component identifier.
+	 */
+	public abstract void addExcludedComponent(IComponentIdentifier cid);
+	
+	/**
+	 *  Remove an excluded component. 
+	 *  @param The component identifier.
+	 */
+	public abstract IFuture<Void> removeExcludedComponent(IComponentIdentifier cid);
+	
+	/**
+	 *  Add an event listener.
+	 *  @param listener The listener.
+	 */
+	public abstract void addEventListener(IRegistryListener listener);
+	
+	/**
+	 *  Remove an event listener.
+	 *  @param listener The listener.
+	 */
+	public abstract void removeEventListener(IRegistryListener listener);
+	
+	/**
+	 *  Get a subregistry.
+	 *  @param cid The platform id.
+	 *  @return The registry.
+	 */
+	public abstract AbstractServiceRegistry getSubregistry(IComponentIdentifier cid);
 	
 	/**
 	 *  Get services per type.
@@ -501,9 +552,14 @@ public abstract class AbstractServiceRegistry
 			scope = RequiredServiceInfo.SCOPE_APPLICATION;
 		}
 		
-		if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope) || RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
 			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		{
+			// Test if searcher and service are on same platform
+			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
 		}
 		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 		{
@@ -655,5 +711,21 @@ public abstract class AbstractServiceRegistry
 	{
 		return cid.getName().replace('@', '.');
 //		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
+	}
+	
+	/**
+	 *  Get the registry from a component.
+	 */
+	public static AbstractServiceRegistry getRegistry(IComponentIdentifier platform)
+	{
+		return (AbstractServiceRegistry)PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_SERVICEREGISTRY);
+	}
+	
+	/**
+	 *  Get the registry from a component.
+	 */
+	public static AbstractServiceRegistry getRegistry(IInternalAccess ia)
+	{
+		return getRegistry(ia.getComponentIdentifier());
 	}
 }

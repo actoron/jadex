@@ -86,11 +86,11 @@ public class MultiIterator<T> implements Iterator<T>
      */
     protected Iterator<T> getCurrentIterator()
     {
-    	if(curit==null)
+    	if(curit==null && its!=null)
     	{
     		curit = its.get(collcnt);
     	}
-    	else if(!curit.hasNext() && collcnt+1<its.size())
+    	else if(curit!=null && its!=null && !curit.hasNext() && collcnt+1<its.size())
     	{
     		curit = its.get(++collcnt);
     	}

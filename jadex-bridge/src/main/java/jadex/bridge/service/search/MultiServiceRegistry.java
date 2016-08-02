@@ -11,12 +11,22 @@ import java.util.Set;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.collection.MultiIterator;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 /**
  *  Service registry that holds copies of multiple other platform
@@ -29,6 +39,15 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	
 	/** The queries. */
 	protected Map<ClassInfo, Set<ServiceQuery<?>>> queries;
+	
+	/**
+	 *  Get the service map.
+	 *  @return The full service map.
+	 */
+	public Map<ClassInfo, Set<IService>> getServiceMap()
+	{
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 *  Get services per type.
@@ -57,8 +76,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 */
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
-		IComponentIdentifier cid = service.getServiceIdentifier().getProviderId().getRoot();
-		AbstractServiceRegistry reg = internalGetRegistry(cid);
+		AbstractServiceRegistry reg = getSubregistry(service.getServiceIdentifier().getProviderId());
 		return reg.addService(key, service);
 	}
 	
@@ -68,9 +86,28 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 */
 	public void removeService(ClassInfo key, IService service)
 	{
-		IComponentIdentifier cid = service.getServiceIdentifier().getProviderId().getRoot();
-		AbstractServiceRegistry reg = internalGetRegistry(cid);
+		AbstractServiceRegistry reg = getSubregistry(service.getServiceIdentifier().getProviderId());
 		reg.removeService(key, service);
+	}
+	
+	/**
+	 *  Add an excluded component. 
+	 *  @param The component identifier.
+	 */
+	public void addExcludedComponent(IComponentIdentifier cid)
+	{
+		AbstractServiceRegistry reg = getSubregistry(cid);
+		reg.addExcludedComponent(cid);
+	}
+	
+	/**
+	 *  Remove an excluded component. 
+	 *  @param The component identifier.
+	 */
+	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
+	{
+		AbstractServiceRegistry reg = getSubregistry(cid);
+		return reg.removeExcludedComponent(cid);
 	}
 	
 	/**
@@ -190,14 +227,49 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 		return queries==null? Collections.EMPTY_SET: queries.get(type); 
 	}
 	
+	/**
+	 *  Search for services.
+	 */
+	public  <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	{
+		return searchService(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
+	}
 	
 	/**
-	 *  Get the registry per platform identifier.
-	 *  @param cid The component identifier.
+	 *  Search for services.
+	 */
+	public <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	{
+		return searchServices(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
+	}
+	
+	/**
+	 *  Add an event listener.
+	 *  @param listener The listener.
+	 */
+	public void addEventListener(IRegistryListener listener)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Remove an event listener.
+	 *  @param listener The listener.
+	 */
+	public void removeEventListener(IRegistryListener listener)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get a subregistry.
+	 *  @param cid The platform id.
 	 *  @return The registry.
 	 */
-	protected AbstractServiceRegistry internalGetRegistry(IComponentIdentifier cid)
+	public AbstractServiceRegistry getSubregistry(IComponentIdentifier cid)
 	{
+		if(cid!=null)
+			cid = cid.getRoot();
 		if(registries==null)
 			registries = new HashMap<IComponentIdentifier, AbstractServiceRegistry>();
 		AbstractServiceRegistry ret = registries.get(cid);

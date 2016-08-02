@@ -453,7 +453,7 @@ public class SServiceProvider
 				{
 					if(filter==null)
 					{
-						SynchronizedServiceRegistry reg = SynchronizedServiceRegistry.getRegistry(component);
+						AbstractServiceRegistry reg = AbstractServiceRegistry.getRegistry(component);
 						T ser = reg==null? null: reg.searchService(type, component.getComponentIdentifier(), scope);
 //						T ser = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope);
 						if(ser!=null)

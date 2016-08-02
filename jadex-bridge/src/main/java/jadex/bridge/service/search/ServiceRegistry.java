@@ -12,16 +12,26 @@ import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.bridge.service.types.registry.RegistryListenerEvent;
+import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 
 /**
@@ -214,6 +224,8 @@ public class ServiceRegistry extends AbstractServiceRegistry
 		}
 		
 		notifyListeners(new RegistryListenerEvent(RegistryListenerEvent.Type.ADDED, key, service));
+
+//		System.out.println("sers: "+services.size());
 		
 		return checkQueries(service);
 	}
@@ -357,6 +369,276 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	public <T> Set<ServiceQueryInfo<T>> getQueries(ClassInfo type)
 	{
 		return queries==null? Collections.EMPTY_SET: queries.get(type);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	{
+		final Future<T> ret = new Future<T>();
+		final IComponentIdentifier	lcid	= IComponentIdentifier.LOCAL.get();
+		
+		searchService(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IResultListener<T>()
+		{
+			public void resultAvailable(T result)
+			{
+				ret.setResult(result);
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				searchRemoteService(lcid, type, filter).addResultListener(new DelegationResultListener<T>(ret));						
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	{
+//		System.out.println("Search global services: "+type);
+		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+		
+		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, true, new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				ret.setFinished();
+			}
+		});
+		
+		searchServices(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IntermediateDefaultResultListener<T>()
+		{
+			public void intermediateResultAvailable(T result)
+			{
+				ret.addIntermediateResult(result);
+			}
+			
+			public void finished()
+			{
+				lis.resultAvailable(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				lis.resultAvailable(null);
+			}
+		});
+		
+		searchRemoteServices(IComponentIdentifier.LOCAL.get(), type, filter).addResultListener(new IntermediateDefaultResultListener<T>()
+		{
+			public void intermediateResultAvailable(T result)
+			{
+				ret.addIntermediateResult(result);
+			}
+			
+			public void finished()
+			{
+				lis.resultAvailable(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				lis.resultAvailable(null);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Search for services on remote platforms.
+	 *  @param caller	The component that started the search.
+	 *  @param type The type.
+	 *  @param filter The filter.
+	 */
+	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final IComponentIdentifier caller, final Class<T> type, final IAsyncFilter<T> filter)
+	{
+		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+		// Must not find services twice (e.g. having two proxies for the same platform)
+		final Set<T> founds = new HashSet<T>();
+		
+		if(services!=null)
+		{
+			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
+			if(rms!=null)
+			{
+				// Get all proxy agents (represent other platforms)
+				
+				Set<IService> sers = services.get(new ClassInfo(IProxyAgentService.class));
+				if(sers!=null && sers.size()>0)
+				{
+					final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+							ret.setFinished();
+						}
+					});
+					
+					for(IService ser: sers)
+					{
+						IProxyAgentService ps = (IProxyAgentService)ser;
+						
+						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
+						{
+							public void resultAvailable(ITransportComponentIdentifier rcid)
+							{
+								// User RMS getServiceProxies() to fetch services
+								
+								IFuture<Collection<T>> rsers = rms.getServiceProxies(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+								rsers.addResultListener(new IResultListener<Collection<T>>()
+								{
+									public void resultAvailable(Collection<T> result)
+									{
+										for(T t: result)
+										{
+											if(!founds.contains(t))
+											{
+												ret.addIntermediateResult(t);
+											}
+											founds.add(t);
+										}
+										clis.resultAvailable(null);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										clis.resultAvailable(null);
+									}
+								});
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								clis.resultAvailable(null);
+							}
+						});
+					}
+				}
+				else
+				{
+					ret.setFinished();					
+				}
+			}
+			else
+			{
+				ret.setFinished();
+			}
+		}
+		else
+		{
+			ret.setFinished();
+		}
+		
+//		ret.addResultListener(new IntermediateDefaultResultListener<T>()
+//		{
+//			public void intermediateResultAvailable(T result)
+//			{
+//				System.out.println("found: "+result);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Search for services on remote platforms.
+	 *  @param type The type.
+	 *  @param scope The scope.
+	 */
+	protected <T> IFuture<T> searchRemoteService(final IComponentIdentifier caller, final Class<T> type, final IAsyncFilter<T> filter)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		if(services!=null)
+		{
+			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
+			if(rms!=null)
+			{
+				Iterator<IService> sers = getServices(IProxyAgentService.class);
+				if(sers!=null && sers.hasNext())
+				{
+					Set<IService> smap = getServiceMap().get(IProxyAgentService.class);
+					int size = smap==null? 0: smap.size();
+					
+					final CounterResultListener<Void> clis = new CounterResultListener<Void>(size,
+						new ExceptionDelegationResultListener<Void, T>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+							ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+						}
+					});
+					
+					while(sers.hasNext())
+					{
+						IService ser = sers.next();
+						
+						IProxyAgentService ps = (IProxyAgentService)ser;
+						
+						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
+						{
+							public void resultAvailable(ITransportComponentIdentifier rcid)
+							{
+								IFuture<T> rsers = rms.getServiceProxy(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+								rsers.addResultListener(new IResultListener<T>()
+								{
+									public void resultAvailable(T result)
+									{
+										ret.setResultIfUndone(result);
+										clis.resultAvailable(null);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										clis.resultAvailable(null);
+									}
+								});
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								clis.resultAvailable(null);
+							}
+						});
+					}
+				}
+				else
+				{
+					ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+				}
+			}
+			else
+			{
+				ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+			}
+		}
+		else
+		{
+			ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a subregistry.
+	 *  @param cid The platform id.
+	 *  @return The registry.
+	 */
+	public AbstractServiceRegistry getSubregistry(IComponentIdentifier cid)
+	{
+		return null;
 	}
 	
 	/**
