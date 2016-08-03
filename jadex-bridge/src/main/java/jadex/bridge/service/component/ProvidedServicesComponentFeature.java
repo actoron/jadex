@@ -33,9 +33,10 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
+import jadex.bridge.service.search.AbstractServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -297,7 +298,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 		}
 
-		SynchronizedServiceRegistry	registry	= SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier());
+		AbstractServiceRegistry	registry	= AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
 		if(registry!=null) // Maybe null on rescue thread (todo: why remove() on rescue thread?)
 		{
 			for(Class<?> servicetype: types)

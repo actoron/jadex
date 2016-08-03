@@ -1,7 +1,6 @@
 package jadex.platform.service.registry;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,9 +20,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.search.MultiServiceRegistry;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
+import jadex.bridge.service.search.AbstractServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -53,11 +50,9 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	/** The subscriptions of other platforms (platform cid -> subscription info). */
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
-	/** The multi registry. */
-	protected MultiServiceRegistry registry;
-	
-	/** The platforms this registry has subscribed to. */
-	protected Set<IComponentIdentifier> subscribedto;
+//	/** The platforms this registry has subscribed to. */
+//	protected Set<IComponentIdentifier> subscribedto;
+	protected Set<IComponentIdentifier> knownplatforms;
 	
 	/** The current registry event (is accumulated). */
 	protected RegistryEvent registryevent;
@@ -92,21 +87,21 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	
 //				System.out.println("Found platform: "+cid+" (I am: "+component.getComponentIdentifier()+")");
 				
-				if(hasSubscribedTo(cid))
+				if(isKnownPlatform(cid))
 				{
 //					System.out.println("Ignoring: already subscribed to: "+cid+" (I am: "+component.getComponentIdentifier()+")");
 				}
 				else
 				{
-					addSubscribedTo(cid);
+					addKnownPlatform(cid);
 					
 					searchRegistryService(cid, 0, 3, 10000).addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
 					{
 						public void intermediateResultAvailable(IRegistryEvent event)
 						{
-							System.out.println("Received an update event from: "+cid+", size="+event.size());
+							System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode());
 							
-							MultiServiceRegistry reg = getRegistry();
+							AbstractServiceRegistry reg = getRegistry();
 							
 							Map<ClassInfo, Set<IService>> added = event.getAddedServices();
 							if(added!=null)
@@ -152,8 +147,9 @@ public class RegistryService implements IRegistryService, IRegistryListener
 							else
 							{
 								System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+								exception.printStackTrace();
+								removeKnownPlatforms(cid);
 							}
-							removeSubscribedTo(cid);
 						}
 					});
 				}
@@ -178,9 +174,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		});
 		
 		// Subscribe to changes of the local registry to inform other platforms
-		
-		SynchronizedServiceRegistry reg = SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot());
-		reg.addEventListener(this);
+		getRegistry().getSubregistry(component.getComponentIdentifier()).addEventListener(this);
 		
 		// Set up event notification timer
 		
@@ -274,9 +268,8 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	{
 		// Remove listener on local registry
 		
-		SynchronizedServiceRegistry reg = SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot());
-		reg.removeEventListener(this);
-		
+		AbstractServiceRegistry reg = AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
+		reg.getSubregistry(component.getComponentIdentifier()).removeEventListener(this);
 		
 		// Remove this platform from all subscriptions on other platforms
 		
@@ -335,9 +328,8 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		addSubscription(cid, ret);
 		
 		// Forward current state initially
-		
-		SynchronizedServiceRegistry reg = SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot());
-		RegistryEvent event = new RegistryEvent(reg.getServiceMap(), null, eventslimit, timelimit);
+		AbstractServiceRegistry reg = AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
+		RegistryEvent event = new RegistryEvent(reg.getSubregistry(component.getComponentIdentifier()).getServiceMap(), null, eventslimit, timelimit);
 		ret.addIntermediateResult(event);
 		
 		return ret;
@@ -388,16 +380,49 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		return subscriptions!=null? subscriptions.get(cid): null;
 	}
 	
+//	/**
+//	 *  Add a new subscription.
+//	 *  @param future The subscription future.
+//	 *  @param si The subscription info.
+//	 */
+//	protected void addSubscribedTo(IComponentIdentifier cid)
+//	{
+//		if(subscribedto==null)
+//			subscribedto = new HashSet<IComponentIdentifier>();
+//		subscribedto.add(cid);
+//	}
+//	
+//	/**
+//	 *  Test if has a subscription.
+//	 *  @param future The subscription future.
+//	 *  @param si The subscription info.
+//	 */
+//	protected boolean hasSubscribedTo(IComponentIdentifier cid)
+//	{
+//		return subscribedto!=null? subscribedto.contains(cid): false;
+//	}
+//	
+//	/**
+//	 *  Remove an existing subscription.
+//	 *  @param cid The component id to remove.
+//	 */
+//	protected void removeSubscribedTo(IComponentIdentifier cid)
+//	{
+//		if(subscribedto==null || !subscribedto.contains(cid))
+//			throw new RuntimeException("SubscribedTo not known: "+cid);
+//		subscribedto.remove(cid);
+//	}
+	
 	/**
-	 *  Add a new subscription.
+	 *  Add a known platform.
 	 *  @param future The subscription future.
 	 *  @param si The subscription info.
 	 */
-	protected void addSubscribedTo(IComponentIdentifier cid)
+	protected void addKnownPlatform(IComponentIdentifier cid)
 	{
-		if(subscribedto==null)
-			subscribedto = new HashSet<IComponentIdentifier>();
-		subscribedto.add(cid);
+		if(knownplatforms==null)
+			knownplatforms = new HashSet<IComponentIdentifier>();
+		knownplatforms.add(cid);
 	}
 	
 	/**
@@ -405,30 +430,28 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	 *  @param future The subscription future.
 	 *  @param si The subscription info.
 	 */
-	protected boolean hasSubscribedTo(IComponentIdentifier cid)
+	protected boolean isKnownPlatform(IComponentIdentifier cid)
 	{
-		return subscribedto!=null? subscribedto.contains(cid): false;
+		return knownplatforms!=null? knownplatforms.contains(cid): false;
 	}
 	
 	/**
 	 *  Remove an existing subscription.
 	 *  @param cid The component id to remove.
 	 */
-	protected void removeSubscribedTo(IComponentIdentifier cid)
+	protected void removeKnownPlatforms(IComponentIdentifier cid)
 	{
-		if(subscribedto==null || !subscribedto.contains(cid))
-			throw new RuntimeException("SubscribedTo not known: "+cid);
-		subscribedto.remove(cid);
+		if(knownplatforms==null || !knownplatforms.contains(cid))
+			throw new RuntimeException("platform not known: "+cid);
+		knownplatforms.remove(cid);
 	}
 	
 	/**
 	 *  Get the registry.
 	 *  @return The registry.
 	 */
-	protected MultiServiceRegistry getRegistry()
+	protected AbstractServiceRegistry getRegistry()
 	{
-		if(registry==null)
-			registry = new MultiServiceRegistry();
-		return registry;
+		return AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
 	}
 }
