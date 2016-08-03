@@ -50,8 +50,8 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	/** The subscriptions of other platforms (platform cid -> subscription info). */
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
-//	/** The platforms this registry has subscribed to. */
-//	protected Set<IComponentIdentifier> subscribedto;
+	/** The platforms this registry has subscribed to. */
+	protected Set<ISubscriptionIntermediateFuture<IRegistryEvent>> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
 	
 	/** The current registry event (is accumulated). */
@@ -95,7 +95,10 @@ public class RegistryService implements IRegistryService, IRegistryListener
 				{
 					addKnownPlatform(cid);
 					
-					searchRegistryService(cid, 0, 3, 10000).addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
+					final ISubscriptionIntermediateFuture<IRegistryEvent> fut = searchRegistryService(cid, 0, 3, 10000);
+					addSubscribedTo(fut);
+					
+					fut.addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
 					{
 						public void intermediateResultAvailable(IRegistryEvent event)
 						{
@@ -130,12 +133,14 @@ public class RegistryService implements IRegistryService, IRegistryListener
 						
 						public void resultAvailable(Collection<IRegistryEvent> result)
 						{
-							System.out.println("Should not happen");
+							finished();
 						}
 						
 						public void finished()
 						{
 							System.out.println("Subscription finbished: "+cid);
+							removeKnownPlatforms(cid);
+							removeSubscribedTo(fut);
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -149,6 +154,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 								System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
 								exception.printStackTrace();
 								removeKnownPlatforms(cid);
+								removeSubscribedTo(fut);
 							}
 						}
 					});
@@ -273,11 +279,23 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		
 		// Remove this platform from all subscriptions on other platforms
 		
-		// todo
+		if(subscribedto!=null)
+		{
+			for(ISubscriptionIntermediateFuture<IRegistryEvent> fut: subscribedto)
+			{
+				fut.terminate();
+			}
+		}
 		
 		// Finish subscriptions of other platforms 
 	
-		// todo
+		if(subscriptions!=null)
+		{
+			for(SubscriptionIntermediateFuture<IRegistryEvent> fut: subscriptions.values())
+			{
+				fut.setFinished();
+			}
+		}
 	}
 	
 	/**
@@ -380,38 +398,28 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		return subscriptions!=null? subscriptions.get(cid): null;
 	}
 	
-//	/**
-//	 *  Add a new subscription.
-//	 *  @param future The subscription future.
-//	 *  @param si The subscription info.
-//	 */
-//	protected void addSubscribedTo(IComponentIdentifier cid)
-//	{
-//		if(subscribedto==null)
-//			subscribedto = new HashSet<IComponentIdentifier>();
-//		subscribedto.add(cid);
-//	}
-//	
-//	/**
-//	 *  Test if has a subscription.
-//	 *  @param future The subscription future.
-//	 *  @param si The subscription info.
-//	 */
-//	protected boolean hasSubscribedTo(IComponentIdentifier cid)
-//	{
-//		return subscribedto!=null? subscribedto.contains(cid): false;
-//	}
-//	
-//	/**
-//	 *  Remove an existing subscription.
-//	 *  @param cid The component id to remove.
-//	 */
-//	protected void removeSubscribedTo(IComponentIdentifier cid)
-//	{
-//		if(subscribedto==null || !subscribedto.contains(cid))
-//			throw new RuntimeException("SubscribedTo not known: "+cid);
-//		subscribedto.remove(cid);
-//	}
+	/**
+	 *  Add a new subscription.
+	 *  @param future The subscription future.
+	 *  @param si The subscription info.
+	 */
+	protected void addSubscribedTo(ISubscriptionIntermediateFuture<IRegistryEvent> fut)
+	{
+		if(subscribedto==null)
+			subscribedto = new HashSet<ISubscriptionIntermediateFuture<IRegistryEvent>>();
+		subscribedto.add(fut);
+	}
+	
+	/**
+	 *  Remove an existing subscription.
+	 *  @param cid The component id to remove.
+	 */
+	protected void removeSubscribedTo(ISubscriptionIntermediateFuture<IRegistryEvent> fut)
+	{
+		if(subscribedto==null || !subscribedto.contains(fut))
+			throw new RuntimeException("SubscribedTo not known: "+fut);
+		subscribedto.remove(fut);
+	}
 	
 	/**
 	 *  Add a known platform.
