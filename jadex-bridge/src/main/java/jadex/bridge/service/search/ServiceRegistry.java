@@ -20,6 +20,7 @@ import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
+import jadex.commons.IFilter;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -257,6 +258,66 @@ public class ServiceRegistry extends AbstractServiceRegistry
 		{
 			System.out.println("Could not remove service from registry: "+key+", "+service.getServiceIdentifier());
 		}
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+		return super.searchService(type, cid, scope);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalServices has to be used.");
+		return super.searchServices(type, cid, scope);
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+		return super.searchService(type, cid, scope, filter);
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+		return super.searchServices(type, cid, scope, filter);
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+		return super.searchService(type, cid, scope, filter);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+		return super.searchServices(type, cid, scope, filter);
 	}
 	
 	/**

@@ -139,9 +139,6 @@ public abstract class AbstractServiceRegistry
 	 */
 	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		
 		T ret = null;
 		Iterator<IService> sers = getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
@@ -165,9 +162,6 @@ public abstract class AbstractServiceRegistry
 	 */
 	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalServices has to be used.");
-		
 		Set<T> ret = null;
 		Iterator<IService> sers = getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
@@ -191,9 +185,6 @@ public abstract class AbstractServiceRegistry
 	 */
 	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		
 		T ret = null;
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
@@ -228,9 +219,6 @@ public abstract class AbstractServiceRegistry
 	 */
 	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		
 		List<T> ret = new ArrayList<T>();
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
@@ -266,24 +254,18 @@ public abstract class AbstractServiceRegistry
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		Iterator<T> sers = (Iterator<T>)getServices(type);
+		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
-			ret.setException(new IllegalArgumentException("For global searches searchGlobalService has to be used."));
+			// filter checks in loop are possibly performed outside of synchronized block
+//				Iterator<T> it = new HashSet<T>(sers).iterator();
+			searchLoopService(filter, sers, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
 		}
 		else
 		{
-			Iterator<T> sers = (Iterator<T>)getServices(type);
-			if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
-			{
-				// filter checks in loop are possibly performed outside of synchronized block
-//				Iterator<T> it = new HashSet<T>(sers).iterator();
-				searchLoopService(filter, sers, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
-			}
-			else
-			{
-				ret.setException(new ServiceNotFoundException(type.getName()));
-			}
+			ret.setException(new ServiceNotFoundException(type.getName()));
 		}
+		
 		return ret;
 	}
 	
@@ -349,30 +331,15 @@ public abstract class AbstractServiceRegistry
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		Iterator<T> sers = (Iterator<T>)getServices(type);
+		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
-			ret.setException(new IllegalArgumentException("For global searches searchGlobalServices has to be used."));
+			// filter checks in loop are possibly performed outside of synchornized block
+			searchLoopServices(filter, sers, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 		}
 		else
 		{
-//			if(services!=null)
-//			{
-				Iterator<T> sers = (Iterator<T>)getServices(type);
-				if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
-				{
-					// filter checks in loop are possibly performed outside of synchornized block
-//					Iterator<T> it = new HashSet<T>(sers).iterator();
-					searchLoopServices(filter, sers, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
-				}
-				else
-				{
-					ret.setFinished();
-				}
-//			}
-//			else
-//			{
-//				ret.setFinished();
-//			}
+			ret.setFinished();
 		}
 		return ret;
 	}
