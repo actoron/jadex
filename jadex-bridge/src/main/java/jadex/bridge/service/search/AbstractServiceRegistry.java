@@ -38,42 +38,49 @@ public abstract class AbstractServiceRegistry
 	 *  @param type The interface type. If type is null all services are returned.
 	 *  @return First matching service or null.
 	 */
+	// read
 	protected abstract Iterator<IService> getServices(ClassInfo type);
 	
 	/**
 	 *  Get the service map.
 	 *  @return The full service map.
 	 */
+	// read
 	public abstract Map<ClassInfo, Set<IService>> getServiceMap();
 
 	/**
 	 *  Add a service to the registry.
 	 *  @param sid The service id.
 	 */
+	// write
 	public abstract IFuture<Void> addService(ClassInfo key, IService service);
 	
 	/**
 	 *  Remove a service from the registry.
 	 *  @param sid The service id.
 	 */
+	// write
 	public abstract void removeService(ClassInfo key, IService service);
 	
 	/**
 	 *  Add a service query to the registry.
 	 *  @param query ServiceQuery.
 	 */
+	// write
 	public abstract <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query);
 	
 	/**
 	 *  Remove a service query from the registry.
 	 *  @param query ServiceQuery.
 	 */
+	// write
 	public abstract <T> void removeQuery(ServiceQuery<T> query);
 	
 	/**
 	 *  Remove all service queries of a specific component from the registry.
 	 *  @param owner The query owner.
 	 */
+	// write
 	public abstract void removeQueries(IComponentIdentifier owner);
 	
 	/**
@@ -81,29 +88,42 @@ public abstract class AbstractServiceRegistry
 	 *  @param type The interface type. If type is null all services are returned.
 	 *  @return The queries.
 	 */
+	// read
 	public abstract <T> Set<ServiceQueryInfo<T>> getQueries(ClassInfo type);
 	
 	/**
 	 *  Search for services.
 	 */
+	// read
 	public abstract <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter);
 	
 	/**
 	 *  Search for services.
 	 */
+	// read
 	public abstract <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter);
 	
 	/**
 	 *  Add an excluded component. 
 	 *  @param The component identifier.
 	 */
+	// write
 	public abstract void addExcludedComponent(IComponentIdentifier cid);
 	
 	/**
 	 *  Remove an excluded component. 
 	 *  @param The component identifier.
 	 */
+	// write
 	public abstract IFuture<Void> removeExcludedComponent(IComponentIdentifier cid);
+	
+	/**
+	 *  Test if a service is included.
+	 *  @param ser The service.
+	 *  @return True if is included.
+	 */
+	// read
+	public abstract boolean isIncluded(IComponentIdentifier cid, IService ser);
 	
 	/**
 	 *  Add an event listener.
@@ -122,6 +142,7 @@ public abstract class AbstractServiceRegistry
 	 *  @param cid The platform id.
 	 *  @return The registry.
 	 */
+	// read
 	public abstract AbstractServiceRegistry getSubregistry(IComponentIdentifier cid);
 	
 	/**
@@ -129,6 +150,7 @@ public abstract class AbstractServiceRegistry
 	 *  @param type The interface type. If type is null all services are returned.
 	 *  @return First matching service or null.
 	 */
+	// read
 	protected Iterator<IService> getServices(Class<?> type)
 	{
 		return getServices(new ClassInfo(type));
@@ -137,6 +159,7 @@ public abstract class AbstractServiceRegistry
 	/**
 	 *  Search for services.
 	 */
+	// read
 	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
 	{
 		T ret = null;
@@ -160,6 +183,7 @@ public abstract class AbstractServiceRegistry
 	/**
 	 *  Search for services.
 	 */
+	// read
 	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
 	{
 		Set<T> ret = null;
@@ -183,6 +207,7 @@ public abstract class AbstractServiceRegistry
 	/**
 	 *  Search for service.
 	 */
+	// read
 	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		T ret = null;
@@ -217,6 +242,7 @@ public abstract class AbstractServiceRegistry
 	/**
 	 *  Search for service.
 	 */
+	// read
 	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		List<T> ret = new ArrayList<T>();
@@ -250,6 +276,7 @@ public abstract class AbstractServiceRegistry
 	/**
 	 *  Search for service.
 	 */
+	// read
 	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
@@ -275,6 +302,7 @@ public abstract class AbstractServiceRegistry
 	 * @param it
 	 * @return
 	 */
+	// read
 	protected <T> IFuture<T> searchLoopService(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
 	{
 		final Future<T> ret = new Future<T>();
@@ -327,6 +355,7 @@ public abstract class AbstractServiceRegistry
 	/**
 	 *  Search for services.
 	 */
+	// read
 	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
@@ -350,9 +379,12 @@ public abstract class AbstractServiceRegistry
 	 * @param it
 	 * @return
 	 */
+	// read
 	protected <T> ISubscriptionIntermediateFuture<T> searchLoopServices(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+		
+//		System.out.println("searchLoopStart");
 		
 		if(it.hasNext())
 		{
@@ -391,6 +423,7 @@ public abstract class AbstractServiceRegistry
 		}
 		else
 		{
+//			System.out.println("searchLoopEnd");
 			ret.setFinished();
 		}
 		
@@ -401,6 +434,7 @@ public abstract class AbstractServiceRegistry
 	 *  Check the persistent queries for a new service.
 	 *  @param ser The service.
 	 */
+	// read
 	protected IFuture<Void> checkQueries(IService ser)
 	{
 		Future<Void> ret = new Future<Void>();
@@ -430,6 +464,7 @@ public abstract class AbstractServiceRegistry
 	 *  @param it The queries.
 	 *  @param service the service.
 	 */
+	// read
 	protected IFuture<Void> checkQueriesLoop(final Iterator<ServiceQueryInfo<?>> it, final IService service)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -465,6 +500,7 @@ public abstract class AbstractServiceRegistry
 	 *  @param service The service.
 	 *  @return True, if services matches to query.
 	 */
+	// read
 	protected IFuture<Boolean> checkQuery(final ServiceQueryInfo<?> queryinfo, final IService service)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
@@ -509,10 +545,10 @@ public abstract class AbstractServiceRegistry
 	{
 		boolean ret = false;
 		
-//		if(!isIncluded(cid, ser))
-//		{
-//			return ret;
-//		}
+		if(!isIncluded(cid, ser))
+		{
+			return ret;
+		}
 		
 		if(scope==null)
 		{

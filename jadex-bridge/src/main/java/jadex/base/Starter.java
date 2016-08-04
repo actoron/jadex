@@ -30,6 +30,7 @@ import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.DistributedServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.SynchronizedMultiServiceRegistry;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CMSComponentDescription;

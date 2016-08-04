@@ -15,18 +15,11 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.collection.MultiIterator;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateFuture;
 
 /**
  *  Service registry that holds copies of multiple other platform
@@ -57,6 +50,9 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	public Iterator<IService> getServices(ClassInfo type)
 	{
 		MultiIterator<IService> ret = new MultiIterator<IService>();
+		
+//		if(type.getTypeName().indexOf("ComponentFac")!=-1)
+//			System.out.println("hhhhhhhhhhhhheere");
 		
 		if(registries!=null)
 		{
@@ -109,6 +105,18 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 		AbstractServiceRegistry reg = getSubregistry(cid);
 		return reg.removeExcludedComponent(cid);
 	}
+	
+	/**
+	 *  Test if a service is included.
+	 *  @param ser The service.
+	 *  @return True if is included.
+	 */
+	public boolean isIncluded(IComponentIdentifier cid, IService ser)
+	{
+		AbstractServiceRegistry reg = getSubregistry(cid);
+		return reg.isIncluded(cid, ser);
+	}
+	
 	
 	/**
 	 *  Add a service query to the registry.

@@ -20,6 +20,7 @@ import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -135,49 +136,31 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	 */
 	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
 	{
-		Future<Void> ret = new Future<Void>();
-		CounterResultListener<Void> lis = null;
-		
 //		System.out.println("cache size: "+excludedservices==null? "0":excludedservices.size());
+		
+		Future<Void> ret = new Future<Void>();
+		IResultListener<Void> lis = null;
 		
 		if(excluded!=null)
 		{
 			if(excluded.remove(cid))
 			{
-				Set<IService> exs = excludedservices.remove(cid);
-				
-				// Notify queries that new services are available
-				// Must iterate over all services :-( todo: add index?
-				if(queries!=null && queries.size()>0)
+				if(excludedservices!=null)
 				{
-					if(excludedservices!=null)
+					Set<IService> exs = excludedservices.remove(cid);
+					
+					if(queries!=null && queries.size()>0)
 					{
 						// Get and remove services from cache
 						if(exs!=null)
 						{
-							lis = new CounterResultListener<Void>(exs.size(), 
-								new DelegationResultListener<Void>(ret));
+							lis = new CounterResultListener<Void>(exs.size(), new DelegationResultListener<Void>(ret));
 							for(IService ser: exs)
 							{
 								checkQueries(ser).addResultListener(lis);
 							}
 						}
 					}
-					
-//					bar = new FutureBarrier<Void>();
-//					
-//					for(Set<IService> sers: services.values())
-//					{
-//						for(IService ser: sers)
-//						{
-//							if(ser.getServiceIdentifier().getProviderId().equals(cid))
-//							{
-//								bar.addFuture(checkQueries(ser));
-//							}
-//						}
-//					}
-//					
-//					bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret));;
 				}
 			}
 		}
@@ -348,10 +331,10 @@ public class ServiceRegistry extends AbstractServiceRegistry
 		mqs.add(new ServiceQueryInfo(query, ret));
 		
 		// deliver currently available services
-		Set<T> sers = (Set<T>)getServices(query.getType());
+		Iterator<T> sers = (Iterator<T>)getServices(query.getType());
 		if(sers!=null)
 		{
-			searchLoopServices(query.getFilter(), sers.iterator(), query.getOwner(), query.getScope())
+			searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
 				.addIntermediateResultListener(new IIntermediateResultListener<T>()
 			{
 				public void intermediateResultAvailable(T result)

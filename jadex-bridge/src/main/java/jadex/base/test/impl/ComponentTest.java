@@ -58,7 +58,8 @@ public class ComponentTest extends TestCase
 	
 	//-------- constructors --------
 	
-	public ComponentTest() {
+	public ComponentTest() 
+	{
 		Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
 	}
 	

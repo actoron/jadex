@@ -50,6 +50,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SynchronizedServiceRegistry;
+import jadex.bridge.service.search.AbstractServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.IClockService;
@@ -401,7 +402,7 @@ public class ComponentManagementService implements IComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + name + " : Modelname must not be null."));
 
-//		if(name!=null && name.indexOf("rspub")!=-1)
+//		if(name!=null && name.toLowerCase().indexOf("broken")!=-1)
 //			System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
@@ -812,7 +813,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Starting component failed: "+cid+", "+exception);
 																			
-																			SynchronizedServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																			AbstractServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
 																			
 //																			System.err.println("Starting component failed: "+cid+", "+exception);
 //																			exception.printStackTrace();
@@ -1099,6 +1100,9 @@ public class ComponentManagementService implements IComponentManagementService
 		final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
 	{
 //		System.out.println("select factory: "+model+", "+SUtil.arrayToString(factories));
+		
+//		if(model.indexOf("boken")!=-1)
+//			System.out.println("sdfsdf");
 		
 		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
