@@ -23,13 +23,12 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
- * 
+ *  Base class for service registries.
  */
 public abstract class AbstractServiceRegistry
 {
@@ -41,7 +40,9 @@ public abstract class AbstractServiceRegistry
 	// read
 	protected abstract Iterator<IService> getServices(ClassInfo type);
 	
+	
 	/**
+	 *  todo: WARNING: dangerous method that exposes the internal data structure
 	 *  Get the service map.
 	 *  @return The full service map.
 	 */
@@ -101,7 +102,7 @@ public abstract class AbstractServiceRegistry
 	 *  Search for services.
 	 */
 	// read
-	public abstract <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter);
+	public abstract <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter);
 	
 	/**
 	 *  Add an excluded component. 
@@ -247,6 +248,9 @@ public abstract class AbstractServiceRegistry
 	{
 		List<T> ret = new ArrayList<T>();
 		
+		if(type!=null && type.toString().indexOf("Factory")!=-1)
+			System.out.println("sdfsdf");
+		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
@@ -280,7 +284,7 @@ public abstract class AbstractServiceRegistry
 	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
-		
+				
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
@@ -384,7 +388,7 @@ public abstract class AbstractServiceRegistry
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
-//		System.out.println("searchLoopStart");
+//		System.out.println("searchLoopStart: "+it.hashCode());
 		
 		if(it.hasNext())
 		{

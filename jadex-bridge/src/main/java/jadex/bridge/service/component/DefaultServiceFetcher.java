@@ -44,6 +44,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureFinishChecker;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -352,6 +353,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					else
 					{
 						// Search service using search specification.
+//						if(type.toString().indexOf("Test")!=-1)
+//							System.out.println("result: "+result);
+
 						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), ffilter, false);
 						ifut.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, ia, info, binding)
 						{
@@ -1089,8 +1093,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		{
 			final Future<T> ret = new Future<T>();
 			checker.addTask(ret);
-			
-//			System.out.println("result: "+result);
+
+//			if(((IService)result).getServiceIdentifier().getServiceType().getTypeName().indexOf("Test")!=-1)
+//				System.out.println("result: "+result);
 			final Object res = result;
 			IFuture<T> fut = createProxy((IService)res, info, binding);
 			fut.addResultListener(new IResultListener<T>()

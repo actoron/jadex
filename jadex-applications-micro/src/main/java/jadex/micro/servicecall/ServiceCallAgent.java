@@ -34,8 +34,7 @@ import jadex.micro.testcases.TestAgent;
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 @Agent
-@Arguments(replace=false,
-	value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
+@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
 public class ServiceCallAgent	extends TestAgent
 {
 	//-------- attributes --------
@@ -72,6 +71,7 @@ public class ServiceCallAgent	extends TestAgent
 						{
 							public void customResultAvailable(Void result)
 							{
+								System.out.println("XXXXXXXXXXXXXXXXXXX: "+local);
 								ret.setResult(new TestReport("#1", "test", true, null));
 							}
 						});
@@ -91,43 +91,55 @@ public class ServiceCallAgent	extends TestAgent
 		final Future<Void> ret	= new Future<Void>();
 		CreationInfo	ci	= ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
 			? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+		
 		cms.createComponent(null, agentname, ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
-				final Future<Void>	ret2	= new Future<Void>();
-				performSingleTest("raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(5000).addResultListener(new IResultListener<Void>()
 				{
-					public void customResultAvailable(Void result)
+					public void resultAvailable(Void result)
 					{
-						performSingleTest("direct", 2*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+						final Future<Void>	ret2 = new Future<Void>();
+						performSingleTest("raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 						{
 							public void customResultAvailable(Void result)
 							{
-								performSingleTest("decoupled", 1*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
+								performSingleTest("direct", 2*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+								{
+									public void customResultAvailable(Void result)
+									{
+										performSingleTest("decoupled", 1*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
+									}
+								}));
 							}
 						}));
-					}
-				}));
-				
-				ret2.addResultListener(new IResultListener<Void>()
-				{
-					public void exceptionOccurred(Exception exception)
-					{
-						cms.destroyComponent(cid);
-						ret.setException(exception);
-					}
-					
-					public void resultAvailable(Void result)
-					{
-						cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+						
+						ret2.addResultListener(new IResultListener<Void>()
 						{
-							public void customResultAvailable(Map<String, Object> result)
+							public void exceptionOccurred(Exception exception)
 							{
-								ret.setResult(null);
+								cms.destroyComponent(cid);
+								ret.setException(exception);
+							}
+							
+							public void resultAvailable(Void result)
+							{
+								cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+								{
+									public void customResultAvailable(Map<String, Object> result)
+									{
+										ret.setResult(null);
+									}
+								});
 							}
 						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
 					}
 				});
 			}
@@ -149,8 +161,8 @@ public class ServiceCallAgent	extends TestAgent
 			{
 				IResultListener<Void>	lis	= new DelegationResultListener<Void>(ret)
 				{
-					int	count	= max*factor;
-					long	start	= System.currentTimeMillis();
+					int	count = max*factor;
+					long start = System.currentTimeMillis();
 					
 					public void customResultAvailable(Void result)
 					{

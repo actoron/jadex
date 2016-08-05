@@ -109,13 +109,13 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	synchronized(this)
 		{
 			first = storeforfirst;
-			storeforfirst	= false;
+			storeforfirst = false;
 		}
     	super.addResultListener(listener);
     	
 		if(first)
 		{
-			results=null;
+			results = null;
 		}
     }
     

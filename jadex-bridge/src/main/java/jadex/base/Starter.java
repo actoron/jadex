@@ -28,8 +28,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.DistributedServiceRegistry;
+import jadex.bridge.service.search.MultiServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.SynchronizedMultiServiceRegistry;
+import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
@@ -58,7 +60,6 @@ import jadex.javaparser.SJavaParser;
 public class Starter
 {
 
-	
 //	/** The shutdown in progress flag. */
 //	protected static boolean	shutdown;
 	
@@ -388,8 +389,8 @@ public class Starter
 					} 
 					else 
 					{
-//						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry());
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedMultiServiceRegistry());
+//						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(new ServiceRegistry()));
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(new MultiServiceRegistry()));
 					}
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());
 

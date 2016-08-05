@@ -289,7 +289,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+			return new Future<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
 		return super.searchService(type, cid, scope, filter);
 	}
 	
@@ -299,7 +299,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+			return new SubscriptionIntermediateFuture<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
 		return super.searchServices(type, cid, scope, filter);
 	}
 	
@@ -442,10 +442,9 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
-	{
-//		System.out.println("Search global services: "+type);
-		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	{		
+		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, true, new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
 		{
@@ -604,6 +603,9 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	{
 		final Future<T> ret = new Future<T>();
 		
+		if(type.toString().indexOf("IServiceCall")!=-1)
+			System.out.println("Search global services: "+type);
+		
 		if(services!=null)
 		{
 			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
@@ -612,7 +614,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 				Iterator<IService> sers = getServices(IProxyAgentService.class);
 				if(sers!=null && sers.hasNext())
 				{
-					Set<IService> smap = getServiceMap().get(IProxyAgentService.class);
+					Set<IService> smap = getServiceMap().get(new ClassInfo(IProxyAgentService.class));
 					int size = smap==null? 0: smap.size();
 					
 					final CounterResultListener<Void> clis = new CounterResultListener<Void>(size,

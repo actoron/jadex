@@ -18,7 +18,6 @@ import jadex.commons.collection.MultiIterator;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
@@ -51,7 +50,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	{
 		MultiIterator<IService> ret = new MultiIterator<IService>();
 		
-//		if(type.getTypeName().indexOf("ComponentFac")!=-1)
+//		if(type.getTypeName().indexOf("Fact")!=-1)
 //			System.out.println("hhhhhhhhhhhhheere");
 		
 		if(registries!=null)
@@ -59,7 +58,9 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 			for(Map.Entry<IComponentIdentifier, AbstractServiceRegistry> entry: registries.entrySet())
 			{
 				AbstractServiceRegistry reg = entry.getValue();
-				ret.addIterator(reg.getServices(type));
+				Iterator<IService> it = reg.getServices(type);
+				if(it!=null)
+					ret.addIterator(it);
 			}
 		}
 		
@@ -246,7 +247,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
 	{
 		return searchServices(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
 	}
@@ -284,7 +285,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 		if(ret==null)
 		{
 			ret = new ServiceRegistry();
-			System.out.println("Created registry for: "+cid);
+//			System.out.println("Created registry for: "+cid);
 			addRegistry(cid, ret);
 		}
 		return ret;
@@ -333,4 +334,14 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 			}
 		}
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "MultiServiceRegistry [registries=" + registries.keySet()+"]";
+	}
+	
+	
 }
