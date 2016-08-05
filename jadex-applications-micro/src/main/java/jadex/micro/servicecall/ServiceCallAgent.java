@@ -4,6 +4,7 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
@@ -97,49 +98,38 @@ public class ServiceCallAgent	extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(5000).addResultListener(new IResultListener<Void>()
+				final Future<Void>	ret2 = new Future<Void>();
+				performSingleTest("raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 				{
-					public void resultAvailable(Void result)
+					public void customResultAvailable(Void result)
 					{
-						final Future<Void>	ret2 = new Future<Void>();
-						performSingleTest("raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+						performSingleTest("direct", 2*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 						{
 							public void customResultAvailable(Void result)
 							{
-								performSingleTest("direct", 2*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
-								{
-									public void customResultAvailable(Void result)
-									{
-										performSingleTest("decoupled", 1*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
-									}
-								}));
+								performSingleTest("decoupled", 1*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
 							}
 						}));
-						
-						ret2.addResultListener(new IResultListener<Void>()
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-								cms.destroyComponent(cid);
-								ret.setException(exception);
-							}
-							
-							public void resultAvailable(Void result)
-							{
-								cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
-								{
-									public void customResultAvailable(Map<String, Object> result)
-									{
-										ret.setResult(null);
-									}
-								});
-							}
-						});
 					}
-					
+				}));
+				
+				ret2.addResultListener(new IResultListener<Void>()
+				{
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+						cms.destroyComponent(cid);
+						ret.setException(exception);
+					}
+					
+					public void resultAvailable(Void result)
+					{
+						cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+						{
+							public void customResultAvailable(Map<String, Object> result)
+							{
+								ret.setResult(null);
+							}
+						});
 					}
 				});
 			}
@@ -154,7 +144,7 @@ public class ServiceCallAgent	extends TestAgent
 	protected IFuture<Void>	performSingleTest(final String servicename, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		IFuture<IServiceCallService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+		IFuture<IServiceCallService>	fut	= getServiceCallService(servicename, 0, 2, 3000);
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{
 			public void customResultAvailable(final IServiceCallService service)
@@ -185,6 +175,47 @@ public class ServiceCallAgent	extends TestAgent
 				service.call().addResultListener(lis);
 			}
 		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
+	protected IFuture<IServiceCallService> getServiceCallService(final String servicename, final int cnt, final int max, final int delay)
+	{
+		final Future<IServiceCallService> ret = new Future<IServiceCallService>();
+		
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				final IFuture<IServiceCallService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+
+				fut.addResultListener(new DelegationResultListener<IServiceCallService>(ret)
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						if(cnt<max)
+						{
+							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, true).addResultListener(new ExceptionDelegationResultListener<Void, IServiceCallService>(ret)
+							{
+								public void customResultAvailable(Void result)
+								{
+									getServiceCallService(servicename, cnt+1, max, delay).addResultListener(new DelegationResultListener<IServiceCallService>(ret));
+								}
+							});
+						}
+						else
+						{
+							ret.setException(exception);
+						}
+					}
+				});
+				
+				return IFuture.DONE;
+			}
+		}, true);
 		
 		return ret;
 	}

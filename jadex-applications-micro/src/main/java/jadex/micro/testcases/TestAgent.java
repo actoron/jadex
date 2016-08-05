@@ -233,7 +233,7 @@ public abstract class TestAgent
 							"-welcome", "false",
 							"-autoshutdown", "false",
 							"-awareness", "false",
-							"-gui", "false",
+							"-gui", "true",
 							"-cli", "false",
 							"-simulation", "false",
 							"-printpass", "false"

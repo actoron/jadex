@@ -32,6 +32,7 @@ import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -167,6 +168,9 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		});
 	}
 	
+	/**
+	 *  Called when a new platform was found.
+	 */
 	protected void newPlatformFound(final IComponentIdentifier cid)
 	{
 //		System.out.println("Found platform: "+cid+" (I am: "+component.getComponentIdentifier()+")");
@@ -193,29 +197,26 @@ public class RegistryService implements IRegistryService, IRegistryListener
 					AbstractServiceRegistry reg = getRegistry();
 					
 					// Only add if registry is multi type
-					if(reg instanceof MultiServiceRegistry)
+					Map<ClassInfo, Set<IService>> added = event.getAddedServices();
+					if(added!=null)
 					{
-						Map<ClassInfo, Set<IService>> added = event.getAddedServices();
-						if(added!=null)
+						for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
 						{
-							for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
+							for(IService ser: entry.getValue())
 							{
-								for(IService ser: entry.getValue())
-								{
-									reg.addService(entry.getKey(), ser);
-								}
+								reg.addService(entry.getKey(), ser);
 							}
 						}
-						
-						Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
-						if(removed!=null)
+					}
+					
+					Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
+					if(removed!=null)
+					{
+						for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
 						{
-							for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
+							for(IService ser: entry.getValue())
 							{
-								for(IService ser: entry.getValue())
-								{
-									reg.removeService(entry.getKey(), ser);
-								}
+								reg.removeService(entry.getKey(), ser);
 							}
 						}
 					}
@@ -241,8 +242,11 @@ public class RegistryService implements IRegistryService, IRegistryListener
 					}
 					else
 					{
-						System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
-						exception.printStackTrace();
+						if(!(exception instanceof FutureTerminatedException)) // ignore terminate
+						{
+							System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+							exception.printStackTrace();
+						}
 						removeKnownPlatforms(cid);
 						removeSubscribedTo(fut);
 					}
@@ -266,7 +270,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		}
 		else if(event.getType().equals(RegistryListenerEvent.Type.REMOVED))
 		{
-			registryevent.addAddedService(event.getClassInfo(), event.getService());
+			registryevent.addRemovedService(event.getClassInfo(), event.getService());
 		}
 		
 		if(registryevent.isDue())

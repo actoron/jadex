@@ -1,8 +1,6 @@
 package jadex.micro.servicecall;
 
-import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -16,12 +14,12 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 public class RawServiceAgent
 {
-	@Agent
-	protected IInternalAccess agent;
-	
-	@AgentKilled
-	public void killed()
-	{
-		System.out.println("killing: "+agent.getComponentIdentifier());
-	}
+//	@Agent
+//	protected IInternalAccess agent;
+//	
+//	@AgentKilled
+//	public void killed()
+//	{
+//		System.out.println("killing: "+agent.getComponentIdentifier());
+//	}
 }

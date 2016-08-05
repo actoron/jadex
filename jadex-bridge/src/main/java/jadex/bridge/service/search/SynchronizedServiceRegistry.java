@@ -476,11 +476,10 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 		// Write actions need to perform the writes synchroneously
 		// If the methods are async only notifications/checks are allowed async
 		
-		for(IResultCommand<IFuture<Void>, Void> action: writeactions)
+		while(writeactions.size()>0)
 		{
-			action.execute(null);
+			writeactions.remove(0).execute(null);
 		}
-		writeactions.clear();
 	}
 	
 	/**

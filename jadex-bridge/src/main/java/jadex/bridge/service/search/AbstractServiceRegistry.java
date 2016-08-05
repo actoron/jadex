@@ -40,7 +40,6 @@ public abstract class AbstractServiceRegistry
 	// read
 	protected abstract Iterator<IService> getServices(ClassInfo type);
 	
-	
 	/**
 	 *  todo: WARNING: dangerous method that exposes the internal data structure
 	 *  Get the service map.
@@ -285,6 +284,9 @@ public abstract class AbstractServiceRegistry
 	{
 		final Future<T> ret = new Future<T>();
 				
+//		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+//			System.out.println("global search");
+		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
