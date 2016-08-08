@@ -72,7 +72,7 @@ public class RegistrySearchFunctionality
 	// read
 	protected Iterator<IService> getServices(Class<?> type)
 	{
-		return getServices(new ClassInfo(type));
+		return getServices(type==null? null: new ClassInfo(type));
 	}
 	
 	/**
