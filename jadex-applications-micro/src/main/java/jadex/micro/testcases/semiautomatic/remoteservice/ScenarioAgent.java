@@ -6,7 +6,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -29,15 +31,20 @@ public class ScenarioAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class).addResultListener(new DefaultResultListener()
+//		ILibraryService ls = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		System.out.println("ls:"+ls);
+		
+		IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class);
+		fut.addResultListener(new DefaultResultListener<ILibraryService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(ILibraryService libservice)
 			{
-				ILibraryService libservice = (ILibraryService)result;
 //				libservice.getURLStrings().addResultListener(createResultListener(new DefaultResultListener()
-				libservice.getAllResourceIdentifiers().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+				libservice.getAllResourceIdentifiers().addResultListener(agent.getComponentFeature(IExecutionFeature.class)
+					.createResultListener(new DefaultResultListener<List<IResourceIdentifier>>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(List<IResourceIdentifier> result)
 					{
 						List<IResourceIdentifier> libs = (List<IResourceIdentifier>)result;
 						String[] libpaths = new String[libs.size()];
@@ -60,6 +67,11 @@ public class ScenarioAgent
 					}
 				}));
 			}
+			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				super.exceptionOccurred(exception);
+//			}
 		});
 		
 		return new Future<Void>(); // never kill?!

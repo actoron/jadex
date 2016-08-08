@@ -1,10 +1,7 @@
 package jadex.commons.future;
 
-
 import java.util.Collection;
 import java.util.logging.Logger;
-
-
 
 /**
  *  Intermediate version of the delegation result listener.

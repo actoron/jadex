@@ -11,9 +11,9 @@ public class ServiceNotFoundException extends RuntimeException
 	public ServiceNotFoundException(String message)
 	{
 		super(message);
-//		if(message!=null && message.indexOf("ITestService")!=-1)
+		if(message!=null && message.indexOf("IMessageQueue")!=-1)
 //		{
-//			Thread.dumpStack();
+			Thread.dumpStack();
 //		}
 	}
 	

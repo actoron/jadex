@@ -516,6 +516,12 @@ public class MarshalService extends BasicService implements IMarshalService
 			}
 		}
 		
+		for(Class cls: ret)
+		{
+			if(cls==null)
+				throw new RuntimeException("An interface could not be resolved: "+ret);
+		}
+		
 		return (Class[])ret.toArray(new Class[ret.size()]);
 	}
 }

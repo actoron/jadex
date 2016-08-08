@@ -14,4 +14,12 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 public class RawServiceAgent
 {
+//	@Agent
+//	protected IInternalAccess agent;
+//	
+//	@AgentKilled
+//	public void killed()
+//	{
+//		System.out.println("killing: "+agent.getComponentIdentifier());
+//	}
 }

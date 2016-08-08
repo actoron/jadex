@@ -4,6 +4,7 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
@@ -34,8 +35,7 @@ import jadex.micro.testcases.TestAgent;
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 @Agent
-@Arguments(replace=false,
-	value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
+@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
 public class ServiceCallAgent	extends TestAgent
 {
 	//-------- attributes --------
@@ -72,6 +72,7 @@ public class ServiceCallAgent	extends TestAgent
 						{
 							public void customResultAvailable(Void result)
 							{
+								System.out.println("XXXXXXXXXXXXXXXXXXX: "+local);
 								ret.setResult(new TestReport("#1", "test", true, null));
 							}
 						});
@@ -91,12 +92,13 @@ public class ServiceCallAgent	extends TestAgent
 		final Future<Void> ret	= new Future<Void>();
 		CreationInfo	ci	= ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
 			? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+		
 		cms.createComponent(null, agentname, ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
-				final Future<Void>	ret2	= new Future<Void>();
+				final Future<Void>	ret2 = new Future<Void>();
 				performSingleTest("raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 				{
 					public void customResultAvailable(Void result)
@@ -142,15 +144,15 @@ public class ServiceCallAgent	extends TestAgent
 	protected IFuture<Void>	performSingleTest(final String servicename, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		IFuture<IServiceCallService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+		IFuture<IServiceCallService>	fut	= getServiceCallService(servicename, 0, 2, 3000);
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{
 			public void customResultAvailable(final IServiceCallService service)
 			{
 				IResultListener<Void>	lis	= new DelegationResultListener<Void>(ret)
 				{
-					int	count	= max*factor;
-					long	start	= System.currentTimeMillis();
+					int	count = max*factor;
+					long start = System.currentTimeMillis();
 					
 					public void customResultAvailable(Void result)
 					{
@@ -173,6 +175,47 @@ public class ServiceCallAgent	extends TestAgent
 				service.call().addResultListener(lis);
 			}
 		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
+	protected IFuture<IServiceCallService> getServiceCallService(final String servicename, final int cnt, final int max, final int delay)
+	{
+		final Future<IServiceCallService> ret = new Future<IServiceCallService>();
+		
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(300, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				final IFuture<IServiceCallService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+
+				fut.addResultListener(new DelegationResultListener<IServiceCallService>(ret)
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						if(cnt<max)
+						{
+							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, true).addResultListener(new ExceptionDelegationResultListener<Void, IServiceCallService>(ret)
+							{
+								public void customResultAvailable(Void result)
+								{
+									getServiceCallService(servicename, cnt+1, max, delay).addResultListener(new DelegationResultListener<IServiceCallService>(ret));
+								}
+							});
+						}
+						else
+						{
+							ret.setException(exception);
+						}
+					}
+				});
+				
+				return IFuture.DONE;
+			}
+		}, true);
 		
 		return ret;
 	}

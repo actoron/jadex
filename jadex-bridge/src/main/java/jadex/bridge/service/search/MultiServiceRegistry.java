@@ -14,32 +14,36 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.commons.IAsyncFilter;
+import jadex.commons.IFilter;
 import jadex.commons.collection.MultiIterator;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateFuture;
 
 /**
  *  Service registry that holds copies of multiple other platform
  *  registries. Search methods operate transparently on all subregistries.
  */
-public class MultiServiceRegistry extends AbstractServiceRegistry
+public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProvider//extends IServiceRegistry
 {
 	/** The locally cloned registries of remote platforms. */
-	protected Map<IComponentIdentifier, AbstractServiceRegistry> registries;
+	protected Map<IComponentIdentifier, IServiceRegistry> registries;
 	
 	/** The queries. */
 	protected Map<ClassInfo, Set<ServiceQuery<?>>> queries;
 	
+	/** The default search functionality. */
+	protected RegistrySearchFunctionality searchfunc;
+	
+	/**
+	 *  Create a new registry.
+	 */
+	public MultiServiceRegistry()//RegistrySearchFunctionality searchfunc)
+	{
+		this.searchfunc = new RegistrySearchFunctionality(this);
+	}
+
 	/**
 	 *  Get the service map.
 	 *  @return The full service map.
@@ -58,12 +62,17 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	{
 		MultiIterator<IService> ret = new MultiIterator<IService>();
 		
+//		if(type.getTypeName().indexOf("Fact")!=-1)
+//			System.out.println("hhhhhhhhhhhhheere");
+		
 		if(registries!=null)
 		{
-			for(Map.Entry<IComponentIdentifier, AbstractServiceRegistry> entry: registries.entrySet())
+			for(Map.Entry<IComponentIdentifier, IServiceRegistry> entry: registries.entrySet())
 			{
-				AbstractServiceRegistry reg = entry.getValue();
-				ret.addIterator(reg.getServices(type));
+				IServiceRegistry reg = entry.getValue();
+				Iterator<IService> it = reg.getServices(type);
+				if(it!=null)
+					ret.addIterator(it);
 			}
 		}
 		
@@ -76,7 +85,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 */
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
-		AbstractServiceRegistry reg = getSubregistry(service.getServiceIdentifier().getProviderId());
+		IServiceRegistry reg = getSubregistry(service.getServiceIdentifier().getProviderId());
 		return reg.addService(key, service);
 	}
 	
@@ -86,7 +95,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 */
 	public void removeService(ClassInfo key, IService service)
 	{
-		AbstractServiceRegistry reg = getSubregistry(service.getServiceIdentifier().getProviderId());
+		IServiceRegistry reg = getSubregistry(service.getServiceIdentifier().getProviderId());
 		reg.removeService(key, service);
 	}
 	
@@ -96,7 +105,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 */
 	public void addExcludedComponent(IComponentIdentifier cid)
 	{
-		AbstractServiceRegistry reg = getSubregistry(cid);
+		IServiceRegistry reg = getSubregistry(cid);
 		reg.addExcludedComponent(cid);
 	}
 	
@@ -106,9 +115,21 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 */
 	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
 	{
-		AbstractServiceRegistry reg = getSubregistry(cid);
+		IServiceRegistry reg = getSubregistry(cid);
 		return reg.removeExcludedComponent(cid);
 	}
+	
+	/**
+	 *  Test if a service is included.
+	 *  @param ser The service.
+	 *  @return True if is included.
+	 */
+	public boolean isIncluded(IComponentIdentifier cid, IService ser)
+	{
+		IServiceRegistry reg = getSubregistry(cid);
+		return reg.isIncluded(cid, ser);
+	}
+	
 	
 	/**
 	 *  Add a service query to the registry.
@@ -132,7 +153,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 		// addQueryOnAllRegistries
 		if(registries!=null)
 		{
-			for(final AbstractServiceRegistry reg: registries.values())
+			for(final IServiceRegistry reg: registries.values())
 			{
 				ISubscriptionIntermediateFuture<T> fut = reg.addQuery(query);
 				fut.addIntermediateResultListener(new IIntermediateResultListener<T>()
@@ -179,7 +200,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 			// removeQueryOnAllRegistries
 			if(registries!=null)
 			{
-				for(AbstractServiceRegistry reg: registries.values())
+				for(IServiceRegistry reg: registries.values())
 				{
 					reg.removeQuery(query);
 				}
@@ -198,7 +219,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 			// removeQueryOnAllRegistries
 			if(registries!=null)
 			{
-				for(AbstractServiceRegistry reg: registries.values())
+				for(IServiceRegistry reg: registries.values())
 				{
 					reg.removeQueries(owner);
 				}
@@ -230,17 +251,67 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public  <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	// read
+	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
 	{
-		return searchService(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
+		return searchfunc.searchService(type, cid, scope);
 	}
 	
 	/**
 	 *  Search for services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	// read
+	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
 	{
-		return searchServices(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
+		return searchfunc.searchServices(type, cid, scope);
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	{
+		return searchfunc.searchService(type, cid, scope, filter);
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	{
+		return searchfunc.searchServices(type, cid, scope, filter);
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	{
+		return searchfunc.searchService(type, cid, scope, filter);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	{
+		return searchfunc.searchServices(type, cid, scope, filter);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public  <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	{
+		return searchfunc.searchService(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	{
+		return searchfunc.searchServices(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
 	}
 	
 	/**
@@ -266,17 +337,17 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 *  @param cid The platform id.
 	 *  @return The registry.
 	 */
-	public AbstractServiceRegistry getSubregistry(IComponentIdentifier cid)
+	public IServiceRegistry getSubregistry(IComponentIdentifier cid)
 	{
 		if(cid!=null)
 			cid = cid.getRoot();
 		if(registries==null)
-			registries = new HashMap<IComponentIdentifier, AbstractServiceRegistry>();
-		AbstractServiceRegistry ret = registries.get(cid);
+			registries = new HashMap<IComponentIdentifier, IServiceRegistry>();
+		IServiceRegistry ret = registries.get(cid);
 		if(ret==null)
 		{
 			ret = new ServiceRegistry();
-			System.out.println("Created registry for: "+cid);
+//			System.out.println("Created registry for: "+cid);
 			addRegistry(cid, ret);
 		}
 		return ret;
@@ -286,10 +357,10 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	 *  Add a new registry.
 	 *  @param registry The registry.
 	 */
-	protected void addRegistry(IComponentIdentifier cid, AbstractServiceRegistry registry)
+	protected void addRegistry(IComponentIdentifier cid, IServiceRegistry registry)
 	{
 		if(registries==null)
-			registries = new HashMap<IComponentIdentifier, AbstractServiceRegistry>();
+			registries = new HashMap<IComponentIdentifier, IServiceRegistry>();
 		if(registries.containsKey(cid))
 			throw new RuntimeException("Registry already contained: "+cid);
 		registries.put(cid, registry);
@@ -311,7 +382,7 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 	/**
 	 *  Called when a new registry was added.
 	 */
-	protected void registryAdded(AbstractServiceRegistry registry)
+	protected void registryAdded(IServiceRegistry registry)
 	{
 		// Add existing queries on the new registry
 		if(queries!=null && registries!=null)
@@ -325,4 +396,14 @@ public class MultiServiceRegistry extends AbstractServiceRegistry
 			}
 		}
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "MultiServiceRegistry [registries=" + registries.keySet()+"]";
+	}
+	
+	
 }

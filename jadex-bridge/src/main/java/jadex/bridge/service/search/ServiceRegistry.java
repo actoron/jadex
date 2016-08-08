@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -41,7 +43,7 @@ import jadex.commons.future.TerminationCommand;
  *  - Search fetches services by types and excludes some according to the scope. 
  *  - Allows for adding persistent queries.
  */
-public class ServiceRegistry extends AbstractServiceRegistry
+public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider // extends AbstractServiceRegistry
 {
 	//-------- attributes --------
 	
@@ -60,7 +62,17 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	/** The registry listeners. */
 	protected List<IRegistryListener> listeners;
 	
+	protected RegistrySearchFunctionality searchfunc;
+	
 	//-------- methods --------
+	
+	/**
+	 *  Create a new registry.
+	 */
+	public ServiceRegistry()//RegistrySearchFunctionality searchfunc)
+	{
+		this.searchfunc = new RegistrySearchFunctionality(this);
+	}
 	
 	/**
 	 *  Get a service per type.
@@ -113,7 +125,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 		if(excluded!=null && excluded.contains(ser.getServiceIdentifier().getProviderId()) && cid!=null)
 		{
 			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			ret = getDotName(cid).endsWith(getDotName(target));
+			ret = RegistrySearchFunctionality.getDotName(cid).endsWith(RegistrySearchFunctionality.getDotName(target));
 		}
 		return ret;
 	}
@@ -135,49 +147,31 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	 */
 	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
 	{
-		Future<Void> ret = new Future<Void>();
-		CounterResultListener<Void> lis = null;
-		
 //		System.out.println("cache size: "+excludedservices==null? "0":excludedservices.size());
+		
+		Future<Void> ret = new Future<Void>();
+		IResultListener<Void> lis = null;
 		
 		if(excluded!=null)
 		{
 			if(excluded.remove(cid))
 			{
-				Set<IService> exs = excludedservices.remove(cid);
-				
-				// Notify queries that new services are available
-				// Must iterate over all services :-( todo: add index?
-				if(queries!=null && queries.size()>0)
+				if(excludedservices!=null)
 				{
-					if(excludedservices!=null)
+					Set<IService> exs = excludedservices.remove(cid);
+					
+					if(queries!=null && queries.size()>0)
 					{
 						// Get and remove services from cache
 						if(exs!=null)
 						{
-							lis = new CounterResultListener<Void>(exs.size(), 
-								new DelegationResultListener<Void>(ret));
+							lis = new CounterResultListener<Void>(exs.size(), new DelegationResultListener<Void>(ret));
 							for(IService ser: exs)
 							{
-								checkQueries(ser).addResultListener(lis);
+								searchfunc.checkQueries(ser).addResultListener(lis);
 							}
 						}
 					}
-					
-//					bar = new FutureBarrier<Void>();
-//					
-//					for(Set<IService> sers: services.values())
-//					{
-//						for(IService ser: sers)
-//						{
-//							if(ser.getServiceIdentifier().getProviderId().equals(cid))
-//							{
-//								bar.addFuture(checkQueries(ser));
-//							}
-//						}
-//					}
-//					
-//					bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret));;
 				}
 			}
 		}
@@ -194,8 +188,8 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	 */
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
-//			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
+		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageQueue")!=-1)
+			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
 		
 		if(services==null)
 			services = new HashMap<ClassInfo, Set<IService>>();
@@ -228,7 +222,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 
 //		System.out.println("sers: "+services.size());
 		
-		return checkQueries(service);
+		return searchfunc.checkQueries(service);
 	}
 	
 	/**
@@ -267,7 +261,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return super.searchService(type, cid, scope);
+		return searchfunc.searchService(type, cid, scope);
 	}
 	
 	/**
@@ -277,7 +271,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			throw new IllegalArgumentException("For global searches async method searchGlobalServices has to be used.");
-		return super.searchServices(type, cid, scope);
+		return searchfunc.searchServices(type, cid, scope);
 	}
 	
 	/**
@@ -287,7 +281,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return super.searchService(type, cid, scope, filter);
+		return searchfunc.searchService(type, cid, scope, filter);
 	}
 	
 	/**
@@ -297,7 +291,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return super.searchServices(type, cid, scope, filter);
+		return searchfunc.searchServices(type, cid, scope, filter);
 	}
 	
 	/**
@@ -306,8 +300,8 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return super.searchService(type, cid, scope, filter);
+			return new Future<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
+		return searchfunc.searchService(type, cid, scope, filter);
 	}
 	
 	/**
@@ -316,8 +310,8 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return super.searchServices(type, cid, scope, filter);
+			return new SubscriptionIntermediateFuture<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
+		return searchfunc.searchServices(type, cid, scope, filter);
 	}
 	
 	/**
@@ -348,10 +342,10 @@ public class ServiceRegistry extends AbstractServiceRegistry
 		mqs.add(new ServiceQueryInfo(query, ret));
 		
 		// deliver currently available services
-		Set<T> sers = (Set<T>)getServices(query.getType());
+		Iterator<T> sers = (Iterator<T>)getServices(query.getType());
 		if(sers!=null)
 		{
-			searchLoopServices(query.getFilter(), sers.iterator(), query.getOwner(), query.getScope())
+			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
 				.addIntermediateResultListener(new IIntermediateResultListener<T>()
 			{
 				public void intermediateResultAvailable(T result)
@@ -459,10 +453,9 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
-	{
-//		System.out.println("Search global services: "+type);
-		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	{		
+		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, true, new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
 		{
@@ -621,15 +614,18 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	{
 		final Future<T> ret = new Future<T>();
 		
+		if(type.toString().indexOf("IServiceCall")!=-1)
+			System.out.println("Search global services: "+type);
+		
 		if(services!=null)
 		{
 			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
 			if(rms!=null)
 			{
-				Iterator<IService> sers = getServices(IProxyAgentService.class);
+				Iterator<IService> sers = getServices(new ClassInfo(IProxyAgentService.class));
 				if(sers!=null && sers.hasNext())
 				{
-					Set<IService> smap = getServiceMap().get(IProxyAgentService.class);
+					Set<IService> smap = getServiceMap().get(new ClassInfo(IProxyAgentService.class));
 					int size = smap==null? 0: smap.size();
 					
 					final CounterResultListener<Void> clis = new CounterResultListener<Void>(size,
@@ -697,7 +693,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	 *  @param cid The platform id.
 	 *  @return The registry.
 	 */
-	public AbstractServiceRegistry getSubregistry(IComponentIdentifier cid)
+	public IServiceRegistry getSubregistry(IComponentIdentifier cid)
 	{
 		return null;
 	}
@@ -721,7 +717,7 @@ public class ServiceRegistry extends AbstractServiceRegistry
 		}
 		else
 		{
-			return super.checkSearchScope(cid, ser, scope);
+			return searchfunc.checkSearchScope(cid, ser, scope);
 		}
 	}
 
@@ -759,6 +755,22 @@ public class ServiceRegistry extends AbstractServiceRegistry
 	{
 		if(listeners!=null)
 			listeners.remove(listener);
+	}
+	
+	/**
+	 *  Get the registry from a component.
+	 */
+	public static IServiceRegistry getRegistry(IComponentIdentifier platform)
+	{
+		return (IServiceRegistry)PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_SERVICEREGISTRY);
+	}
+	
+	/**
+	 *  Get the registry from a component.
+	 */
+	public static IServiceRegistry getRegistry(IInternalAccess ia)
+	{
+		return getRegistry(ia.getComponentIdentifier());
 	}
 	
 }

@@ -6,12 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.management.ServiceNotFoundException;
-
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
@@ -20,8 +19,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.AbstractServiceRegistry;
+import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.registry.IRegistryEvent;
@@ -29,7 +30,9 @@ import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.bridge.service.types.registry.IRegistryService;
 import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.bridge.service.types.registry.RegistryListenerEvent;
+import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -69,118 +72,86 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	@ServiceStart
 	public void init()
 	{
-		this.eventslimit = 50;
+		this.eventslimit = 1;
 		this.timelimit = 5000;
 		
 		// Subscribe to awareness service to get informed when new platforms are discovered
 		// todo: does not work without awareness
 		
-		IAwarenessManagementService awas = SServiceProvider.getLocalService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		
-		awas.subscribeToPlatformList(true).addIntermediateResultListener(new IIntermediateResultListener<DiscoveryInfo>()
+		try
 		{
-			public void intermediateResultAvailable(DiscoveryInfo dis)
+			IAwarenessManagementService awas = SServiceProvider.getLocalService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			
+			awas.subscribeToPlatformList(true).addIntermediateResultListener(new IIntermediateResultListener<DiscoveryInfo>()
 			{
-				// Found a new platform -> search registry service and subscribe
-				
-				final IComponentIdentifier cid = dis.getComponentIdentifier();
-	
-//				System.out.println("Found platform: "+cid+" (I am: "+component.getComponentIdentifier()+")");
-				
-				if(isKnownPlatform(cid))
+				public void intermediateResultAvailable(DiscoveryInfo dis)
 				{
-//					System.out.println("Ignoring: already subscribed to: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+					// Found a new platform -> search registry service and subscribe
+					
+					final IComponentIdentifier cid = dis.getComponentIdentifier();
+					
+					newPlatformFound(cid);
 				}
-				else
+				
+				public void resultAvailable(Collection<DiscoveryInfo> result)
 				{
-					addKnownPlatform(cid);
-					
-					final ISubscriptionIntermediateFuture<IRegistryEvent> fut = searchRegistryService(cid, 0, 3, 10000);
-					addSubscribedTo(fut);
-					
-					fut.addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
+					// Should not happen
+					System.out.println("Awareness subscription finished unexpectly");
+				}
+				
+				public void finished()
+				{
+					// Should not happen
+					System.out.println("Awareness subscription finished unexpectly");
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+				}
+			});
+		}
+		catch(ServiceNotFoundException e)
+		{
+			System.out.println("Cannot subscribe at local awareness service (not found - using proxy agent approach)");
+			
+			component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					Collection<IProxyAgentService> sers = SServiceProvider.getLocalServices(component, IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+
+					if(sers!=null && sers.size()>0)
 					{
-						public void intermediateResultAvailable(IRegistryEvent event)
+						for(IProxyAgentService ser: sers)
 						{
-							System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode());
-							
-							AbstractServiceRegistry reg = getRegistry();
-							
-							Map<ClassInfo, Set<IService>> added = event.getAddedServices();
-							if(added!=null)
+							ser.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
 							{
-								for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
+								public void resultAvailable(ITransportComponentIdentifier rcid)
 								{
-									for(IService ser: entry.getValue())
-									{
-										reg.addService(entry.getKey(), ser);
-									}
+									newPlatformFound(rcid);
 								}
-							}
-							
-							Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
-							if(removed!=null)
-							{
-								for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
+								
+								public void exceptionOccurred(Exception exception)
 								{
-									for(IService ser: entry.getValue())
-									{
-										reg.removeService(entry.getKey(), ser);
-									}
+									exception.printStackTrace();
 								}
-							}
+							});
 						}
-						
-						public void resultAvailable(Collection<IRegistryEvent> result)
-						{
-							finished();
-						}
-						
-						public void finished()
-						{
-							System.out.println("Subscription finbished: "+cid);
-							removeKnownPlatforms(cid);
-							removeSubscribedTo(fut);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							if(exception instanceof ServiceNotFoundException)
-							{
-								System.out.println("No registry service found, giving up: "+cid+" (I am: "+component.getComponentIdentifier()+")");
-							}
-							else
-							{
-								System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
-								exception.printStackTrace();
-								removeKnownPlatforms(cid);
-								removeSubscribedTo(fut);
-							}
-						}
-					});
+					}
+					
+					component.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, this);
+					
+					return IFuture.DONE;
 				}
-			}
-			
-			public void resultAvailable(Collection<DiscoveryInfo> result)
-			{
-				// Should not happen
-				System.out.println("Awareness subscription finished unexpectly");
-			}
-			
-			public void finished()
-			{
-				// Should not happen
-				System.out.println("Awareness subscription finished unexpectly");
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
+			});
+		}
 		
 		// Subscribe to changes of the local registry to inform other platforms
-		getRegistry().getSubregistry(component.getComponentIdentifier()).addEventListener(this);
+		IServiceRegistry reg = getRegistry().getSubregistry(component.getComponentIdentifier());
+		if(reg==null)
+			reg = getRegistry();
+		reg.addEventListener(this);
 		
 		// Set up event notification timer
 		
@@ -195,6 +166,94 @@ public class RegistryService implements IRegistryService, IRegistryListener
 				return IFuture.DONE;
 			}
 		});
+	}
+	
+	/**
+	 *  Called when a new platform was found.
+	 */
+	protected void newPlatformFound(final IComponentIdentifier cid)
+	{
+//		System.out.println("Found platform: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+		
+//		System.out.println(getRegistry());
+			
+		if(isKnownPlatform(cid))
+		{
+//			System.out.println("Ignoring: already subscribed to: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+		}
+		else
+		{
+			addKnownPlatform(cid);
+			
+			final ISubscriptionIntermediateFuture<IRegistryEvent> fut = searchRegistryService(cid, 0, 3, 10000);
+			addSubscribedTo(fut);
+			
+			fut.addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
+			{
+				public void intermediateResultAvailable(IRegistryEvent event)
+				{
+					System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode());
+					
+					IServiceRegistry reg = getRegistry();
+					
+					// Only add if registry is multi type
+					Map<ClassInfo, Set<IService>> added = event.getAddedServices();
+					if(added!=null)
+					{
+						for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
+						{
+							for(IService ser: entry.getValue())
+							{
+								reg.addService(entry.getKey(), ser);
+							}
+						}
+					}
+					
+					Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
+					if(removed!=null)
+					{
+						for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
+						{
+							for(IService ser: entry.getValue())
+							{
+								reg.removeService(entry.getKey(), ser);
+							}
+						}
+					}
+				}
+				
+				public void resultAvailable(Collection<IRegistryEvent> result)
+				{
+					finished();
+				}
+				
+				public void finished()
+				{
+					System.out.println("Subscription finbished: "+cid);
+					removeKnownPlatforms(cid);
+					removeSubscribedTo(fut);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof ServiceNotFoundException)
+					{
+//						System.out.println("No registry service found, giving up: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+					}
+					else
+					{
+						if(!(exception instanceof FutureTerminatedException)) // ignore terminate
+						{
+							System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+							exception.printStackTrace();
+						}
+						removeKnownPlatforms(cid);
+						removeSubscribedTo(fut);
+					}
+				}
+			});
+		}
+		
 	}
 		
 	/**
@@ -211,7 +270,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		}
 		else if(event.getType().equals(RegistryListenerEvent.Type.REMOVED))
 		{
-			registryevent.addAddedService(event.getClassInfo(), event.getService());
+			registryevent.addRemovedService(event.getClassInfo(), event.getService());
 		}
 		
 		if(registryevent.isDue())
@@ -257,7 +316,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 					else
 					{
 //						System.out.println("Found no registry service on: "+cid+" ("+(num+1)+"/"+max+")");
-						ret.setException(new ServiceNotFoundException());
+						ret.setException(new ServiceNotFoundException("Registry service not found on: "+cid));
 					}
 				}
 			});
@@ -274,7 +333,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	{
 		// Remove listener on local registry
 		
-		AbstractServiceRegistry reg = AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
+		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier());
 		reg.getSubregistry(component.getComponentIdentifier()).removeEventListener(this);
 		
 		// Remove this platform from all subscriptions on other platforms
@@ -346,9 +405,13 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		addSubscription(cid, ret);
 		
 		// Forward current state initially
-		AbstractServiceRegistry reg = AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
-		RegistryEvent event = new RegistryEvent(reg.getSubregistry(component.getComponentIdentifier()).getServiceMap(), null, eventslimit, timelimit);
-		ret.addIntermediateResult(event);
+		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		IServiceRegistry subreg = reg.getSubregistry(component.getComponentIdentifier());
+		if(subreg!=null)
+		{
+			RegistryEvent event = new RegistryEvent(subreg.getServiceMap(), null, eventslimit, timelimit);
+			ret.addIntermediateResult(event);
+		}
 		
 		return ret;
 	}
@@ -458,8 +521,8 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	 *  Get the registry.
 	 *  @return The registry.
 	 */
-	protected AbstractServiceRegistry getRegistry()
+	protected IServiceRegistry getRegistry()
 	{
-		return AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier());
 	}
 }
