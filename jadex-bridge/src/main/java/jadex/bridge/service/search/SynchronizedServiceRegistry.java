@@ -18,6 +18,7 @@ import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -28,30 +29,45 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
- *  Synchronized version of the multi service registry.
+ *  Synchronization for service registries.
+ *  
+ *  The syncglobal allows allows to state whether calls to the
+ *  global search methods should hold the read lock or not.
+ *  
+ *  In case of the old search based registry this is not allowed
+ *  because the registry them might block writes changes up to the
+ *  deftimeout of the platform.
+ *  
+ *  In case of the new synchronization based registry the lock
+ *  should be held.
  */
-public class SynchronizedServiceRegistry extends AbstractServiceRegistry
+public class SynchronizedServiceRegistry implements IServiceRegistry
 {
 	/** The reader count. */
 	protected int readercnt; 
+//	protected Map<Integer, String> readers = new HashMap<Integer, String>();
 	
 	/** Flag that a writer is performing updates. */
 	protected ReentrantLock lock = new ReentrantLock();
 	
 	/** The scheduled write actions (deferred when readers are currrently reading). */
-	protected List<IResultCommand<IFuture<Void>, Void>> writeactions = new ArrayList<IResultCommand<IFuture<Void>,Void>>();
+	protected List<Tuple2<IResultCommand<IFuture<Void>, Void>, Future<Void>>> writeactions = new ArrayList<Tuple2<IResultCommand<IFuture<Void>,Void>, Future<Void>>>();
 	
 	/** The service registry calls are delegated to. */
-	protected AbstractServiceRegistry delegate;
+	protected IServiceRegistry delegate;
+	
+	/** Flag if global searches should be synchronized. */
+	protected boolean syncglobal;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new SynchronizedMultiServiceRegistry.
 	 */
-	public SynchronizedServiceRegistry(AbstractServiceRegistry delegate)
+	public SynchronizedServiceRegistry(boolean syncglobal, IServiceRegistry delegate)
 	{
 		this.delegate = delegate;
+		this.syncglobal = syncglobal;
 	}
 	
 	//-------- methods --------
@@ -81,38 +97,141 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	}
 
 	/**
+	 * 
+	 * @param command
+	 * @return
+	 */
+	protected IFuture<Void> writeAction(IResultCommand<IFuture<Void>, Void> command)
+	{
+		final Future<Void> ret = new Future<Void>();
+
+		try
+		{
+			lock();
+			
+			if(readercnt==0)
+			{
+				command.execute(null).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				// schedule
+				writeactions.add(new Tuple2<IResultCommand<IFuture<Void>, Void>, Future<Void>>(command, ret));
+//				System.out.println("scheduled write due to lock used: "+command);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			// Unlock write lock after synchronous end of method (all modifications are done synchronously)
+			// Will require a read lock for checks notifications (async part)
+			unlock();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 * @param command
+	 * @return
+	 */
+	protected IFuture<Object> readActionAsync(final IResultCommand<IFuture<Object>, Void> command, final String op)
+	{
+		IFuture<Object> ret = null;
+		boolean done = false;
+		try
+		{
+			readerInc(op);
+			
+			ret = command.execute(null);
+			done = ret.isDone();
+			if(!done)
+			{
+				if(ret instanceof ISubscriptionIntermediateFuture)
+				{
+					((ISubscriptionIntermediateFuture)ret).addQuietListener(new IntermediateReaderDecListener());
+				}
+				else
+				{
+					ret.addResultListener(new ReadDecListener<Object>());
+				}
+				
+				// for debugging if all readers will evetually leave
+//				Timer t = new Timer();
+//				final IFuture<Object> fret = ret;
+//				t.schedule(new TimerTask()
+//				{
+//					public void run()
+//					{
+//						if(!fret.isDone())
+//							System.out.println("not done: "+op);
+//					}
+//				}, 5000);
+				
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(ret==null || done)
+				readerDec();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 * @param command
+	 * @return
+	 */
+	protected Object readActionSync(IResultCommand<Object, Void> command, String op)
+	{
+		Object ret = null;
+		try
+		{
+			readerInc(op);
+			
+			ret = command.execute(null);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			readerDec();
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Add a service to the registry.
 	 *  @param sid The service id.
 	 */
 	public IFuture<Void> addService(final ClassInfo key, final IService service)
 	{
-		final Future<Void> ret = new Future<Void>();
-
-		lock();
-		
-		if(readercnt==0)
+		return writeAction(new IResultCommand<IFuture<Void>, Void>()
 		{
-			delegate.addService(key, service).addResultListener(new DelegationResultListener<Void>(ret));
-		}
-		else
-		{
-			// schedule
-			writeactions.add(new IResultCommand<IFuture<Void>, Void>()
+			public IFuture<Void> execute(Void args)
 			{
-				public IFuture<Void> execute(Void args)
-				{
-					IFuture<Void> fut = delegate.addService(key, service);
-					fut.addResultListener(new DelegationResultListener<Void>(ret));
-					return fut;
-				}
-			});
-		}
-		
-		// Unlock write lock after synchronous end of method (all modifications are done synchronously)
-		// Will require a read lock for checks notifications (async part)
-		unlock();
-		
-		return ret;
+				return delegate.addService(key, service);
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "addServiceStep: "+service.getServiceIdentifier().getServiceType().getTypeName()+" "+readercnt;
+			}
+		});
 	}
 	
 	/**
@@ -121,28 +240,14 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 */
 	public void removeService(final ClassInfo key, final IService service)
 	{
-		lock();
-
-		if(readercnt==0)
+		writeAction(new IResultCommand<IFuture<Void>, Void>()
 		{
-			delegate.removeService(key, service);
-		}
-		else
-		{
-			// schedule
-			writeactions.add(new IResultCommand<IFuture<Void>, Void>()
+			public IFuture<Void> execute(Void args)
 			{
-				public IFuture<Void> execute(Void args)
-				{
-					delegate.removeService(key, service);
-					return IFuture.DONE;
-				}
-			});
-		}
-			
-		// Unlock write lock after synchronous end of method (all modifications are done synchronously)
-		// Will require a read lock for checks notifications (async part)
-		unlock();
+				delegate.removeService(key, service);
+				return IFuture.DONE;
+			}
+		});
 	}
 	
 	/**
@@ -153,48 +258,36 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
-		lock();
-
-		if(readercnt==0)
+		writeAction(new IResultCommand<IFuture<Void>, Void>()
 		{
-			delegate.addQuery(query).addIntermediateResultListener(new IntermediateDelegationResultListener<T>(ret));
-		}
-		else
-		{
-			// schedule
-			writeactions.add(new IResultCommand<IFuture<Void>, Void>()
+			public IFuture<Void> execute(Void args)
 			{
-				public IFuture<Void> execute(Void args)
+				ISubscriptionIntermediateFuture<T> fut = delegate.addQuery(query);
+				fut.addIntermediateResultListener(new IntermediateDelegationResultListener<T>(ret));
+				
+				final Future<Void> myret = new Future<Void>();
+				fut.addIntermediateResultListener(new IIntermediateResultListener<T>()
 				{
-					ISubscriptionIntermediateFuture<T> fut = delegate.addQuery(query);
-					fut.addIntermediateResultListener(new IntermediateDelegationResultListener<T>(ret));
-					
-					final Future<Void> myret = new Future<Void>();
-					fut.addIntermediateResultListener(new IIntermediateResultListener<T>()
+					public void finished()
 					{
-						public void finished()
-						{
-							myret.setResult(null);
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-							myret.setException(exception);
-						}
-						public void intermediateResultAvailable(T result)
-						{
-						}
-						public void resultAvailable(Collection<T> result)
-						{
-							finished();
-						}
-					});
-					
-					return myret;
-				}
-			});
-		}
-		
-		unlock();
+						myret.setResult(null);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						myret.setException(exception);
+					}
+					public void intermediateResultAvailable(T result)
+					{
+					}
+					public void resultAvailable(Collection<T> result)
+					{
+						finished();
+					}
+				});
+				
+				return myret;
+			}
+		});
 		
 		return ret;
 	}
@@ -205,65 +298,14 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 */
 	public <T> void removeQuery(final ServiceQuery<T> query)
 	{
-		lock();
-			
-		if(readercnt==0)
+		writeAction(new IResultCommand<IFuture<Void>, Void>()
 		{
-			delegate.removeQuery(query);
-		}
-		else
-		{
-			writeactions.add(new IResultCommand<IFuture<Void>, Void>()
+			public IFuture<Void> execute(Void args)
 			{
-				public IFuture<Void> execute(Void args)
-				{
-					delegate.removeQuery(query);
-					return IFuture.DONE;
-				}
-			});
-		}
-		
-		// Unlock write lock after synchronous end of method (all modifications are done synchronously)
-		// Will require a read lock for checks notifications (async part)
-		unlock();
-	}
-	
-	/**
-	 *  Check the persistent queries for a new service.
-	 *  @param ser The service.
-	 */
-	protected IFuture<Void> checkQueries(IService ser)
-	{
-		readerInc();
-			
-//		lock("checkQuery");
-		IFuture<Void> ret = super.checkQueries(ser);
-		ret.addResultListener(new ReadDecListener<Void>());
-		
-		readerDec();
-		
-		return ret;
-	}
-	
-//	/**
-//	 *  Check the persistent queries against a new service.
-//	 *  @param it The queries.
-//	 *  @param service the service.
-//	 */
-//	protected IFuture<Void> checkQueriesLoop(final Iterator<ServiceQueryInfo<?>> it, final IService service)
-//	{
-//		return super.checkQueriesLoop(it, service);
-//	}
-	
-	/**
-	 *  Check a persistent query with one service.
-	 *  @param queryinfo The query.
-	 *  @param service The service.
-	 *  @return True, if services matches to query.
-	 */
-	protected IFuture<Boolean> checkQuery(final ServiceQueryInfo<?> queryinfo, final IService service)
-	{
-		return super.checkQuery(queryinfo, service);
+				delegate.removeQuery(query);
+				return IFuture.DONE;
+			}
+		});
 	}
 	
 	/**
@@ -272,156 +314,147 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 */
 	public void removeQueries(final IComponentIdentifier owner)
 	{
-		lock();
-		
-		if(readercnt==0)
+		writeAction(new IResultCommand<IFuture<Void>, Void>()
 		{
-			delegate.removeQueries(owner);
+			public IFuture<Void> execute(Void args)
+			{
+				delegate.removeQueries(owner);
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> T searchService(final Class<T> type, final IComponentIdentifier cid, final String scope)
+	{
+		return (T)readActionSync(new IResultCommand<Object, Void>()
+		{
+			public Object execute(Void args)
+			{
+				return delegate.searchService(type, cid, scope);
+			}
+		}, "searchService");
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> Collection<T> searchServices(final Class<T> type, final IComponentIdentifier cid, final String scope)
+	{
+		return (Collection<T>)readActionSync(new IResultCommand<Object, Void>()
+		{
+			public Object execute(Void args)
+			{
+				return delegate.searchServices(type, cid, scope);
+			}
+		}, "searchServices");
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> T searchService(final Class<T> type, final IComponentIdentifier cid, final String scope, final IFilter<T> filter)
+	{
+		return (T)readActionSync(new IResultCommand<Object, Void>()
+		{
+			public Object execute(Void args)
+			{
+				return delegate.searchService(type, cid, scope, filter);
+			}
+		}, "searchService2");
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> Collection<T> searchServices(final Class<T> type, final IComponentIdentifier cid, final String scope, final IFilter<T> filter)
+	{
+		return (Collection<T>)readActionSync(new IResultCommand<Object, Void>()
+		{
+			public Object execute(Void args)
+			{
+				return delegate.searchServices(type, cid, scope, filter);
+			}
+		}, "searchServices2");
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public <T> IFuture<T> searchService(final Class<T> type, final IComponentIdentifier cid, final String scope, final IAsyncFilter<T> filter)
+	{
+		return (IFuture<T>)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+		{
+			public IFuture<Object> execute(Void args)
+			{
+				return (IFuture<Object>)delegate.searchService(type, cid, scope, filter);
+			}
+		}, "searchService2");
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(final Class<T> type, final IComponentIdentifier cid, final String scope, final IAsyncFilter<T> filter)
+	{
+		try
+		{
+		return (ISubscriptionIntermediateFuture)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+		{
+			public IFuture<Object> execute(Void args)
+			{
+				return (IFuture)delegate.searchServices(type, cid, scope, filter);
+			}
+		}, "searchServices3");
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> IFuture<T> searchGlobalService(final Class<T> type, final IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	{
+		if(syncglobal)
+		{
+			return (IFuture<T>)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+			{
+				public IFuture<Object> execute(Void args)
+				{
+					return (IFuture<Object>)delegate.searchGlobalService(type, cid, filter);
+				}
+			}, "searchGlobalServices");
 		}
 		else
 		{
-			// schedule
-			writeactions.add(new IResultCommand<IFuture<Void>, Void>()
-			{
-				public IFuture<Void> execute(Void args)
-				{
-					delegate.removeQueries(owner);
-					return IFuture.DONE;
-				}
-			});
+			return delegate.searchGlobalService(type, cid, filter);
 		}
-			
-		// Unlock write lock after synchronous end of method (all modifications are done synchronously)
-		// Will require a read lock for checks notifications (async part)
-		unlock();
 	}
 	
 	/**
 	 *  Search for services.
 	 */
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(final Class<T> type, final IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
-		readerInc();
-		
-		T ret = super.searchService(type, cid, scope);
-	
-		readerDec();
-		
-		return ret;
-	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
-	{
-		readerInc();
-		
-		Collection<T> ret = super.searchServices(type, cid, scope);
-	
-		readerDec();
-		
-		return ret;
-	}
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
-	{
-		readerInc();
-		
-		T ret = super.searchService(type, cid, scope, filter);
-	
-		readerDec();
-		
-		return ret;
-	}
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
-	{
-		readerInc();
-		
-		Collection<T> ret = super.searchServices(type, cid, scope, filter);
-	
-		readerDec();
-		
-		return ret;
-	}
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
-	{
-		readerInc();
-		
-		IFuture<T> ret = super.searchService(type, cid, scope, filter);
-		ret.addResultListener(new ReadDecListener<T>());
-		
-		return ret;
-	}
-	
-//	/**
-//	 *  Perform the search in a loop.
-//	 *  @param filter The filter.
-//	 *  @param it The iterator.
-//	 *  @param cid The component id.
-//	 *  @param scope The scope.
-//	 */
-//	protected <T> IFuture<T> searchLoopService(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
-//	{
-//		return super.searchLoopService(filter, it, cid, scope);
-//	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
-	{
-		readerInc();
-		
-		ISubscriptionIntermediateFuture<T> ret = super.searchServices(type, cid, scope, filter);
-		ret.addQuietListener(new IntermediateReaderDecListener<T>());
-			
-		return ret;
-	}
-	
-//	/**
-//	 *  Perform the search in a loop.
-//	 */
-//	protected <T> ISubscriptionIntermediateFuture<T> searchLoopServices(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
-//	{
-//		return super.searchLoopServices(filter, it, cid, scope);
-//	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
-	{
-		readerInc();
-		
-		IFuture<T> ret = delegate.searchGlobalService(type, cid, filter);
-		ret.addResultListener(new ReadDecListener<T>());
-		
-		return ret;
-	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
-	{
-		readerInc();
-		
-		ISubscriptionIntermediateFuture<T> ret = delegate.searchGlobalServices(type, cid, filter);
-		ret.addQuietListener(new IntermediateReaderDecListener<T>());
-		
-		return ret;
+		if(syncglobal)
+		{
+			return (ISubscriptionIntermediateFuture)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+			{
+				public IFuture<Object> execute(Void args)
+				{
+					return (IFuture)delegate.searchGlobalServices(type, cid, filter);
+				}
+			}, "searchGlobalServices");
+		}
+		else
+		{
+			return delegate.searchGlobalServices(type, cid, filter);
+		}
 	}
 	
 	/**
@@ -441,44 +474,51 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	}
 	
 	/**
-	 * 
+	 *  Get the lock and increment the readers variable.
 	 */
-	protected void readerInc()
+	protected void readerInc(String op)
 	{
 //		System.out.println("readerInc: "+lock.isLocked()+" "+readercnt);
 		
 		// let readers wait until no write operation is performed
 		lock();
+//		readers.put(readercnt, op+": "+System.currentTimeMillis());
 		readercnt++;
 		unlock();
 	}
 	
 	/**
-	 * 
+	 *  Get the lock and decrement the readers variable.
 	 */
 	protected void readerDec()
 	{
 		// let readers wait until no write operation is performed
 		lock();
+//		readers.remove(readercnt);
 		readercnt--;
 		
 		if(readercnt==0)
 			performWrites();
+//		else if(readercnt>1)
+//			System.out.println("readers: "+readercnt+" "+readers);
 		
 		unlock();
 	}
 	
 	/**
-	 * 
+	 *  Perform the scheduled write actions.
 	 */
 	protected void performWrites()
 	{
 		// Write actions need to perform the writes synchroneously
 		// If the methods are async only notifications/checks are allowed async
-		
+	
+//		if(writeactions.size()>0)
+//			System.out.println("performed writes: "+writeactions.size());
 		while(writeactions.size()>0)
 		{
-			writeactions.remove(0).execute(null);
+			Tuple2<IResultCommand<IFuture<Void>, Void>, Future<Void>> tup = writeactions.remove(0);
+			tup.getFirstEntity().execute(null).addResultListener(new DelegationResultListener<Void>(tup.getSecondEntity()));
 		}
 	}
 	
@@ -531,7 +571,7 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 *  @param type The type.
 	 *  @return Iterator with services.
 	 */
-	protected Iterator<IService> getServices(ClassInfo type)
+	public Iterator<IService> getServices(ClassInfo type)
 	{
 		return delegate.getServices(type);
 	}
@@ -540,23 +580,32 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 *  Add an excluded component. 
 	 *  @param The component identifier.
 	 */
-	public void addExcludedComponent(IComponentIdentifier cid)
+	public void addExcludedComponent(final IComponentIdentifier cid)
 	{
-		lock();
-		delegate.addExcludedComponent(cid);
-		unlock();
+		writeAction(new IResultCommand<IFuture<Void>, Void>()
+		{
+			public IFuture<Void> execute(Void args)
+			{
+				delegate.addExcludedComponent(cid);
+				return IFuture.DONE;
+			}
+		});
 	}
 
 	/**
 	 *  Remove an excluded component. 
 	 *  @param The component identifier.
 	 */
-	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
+	public IFuture<Void> removeExcludedComponent(final IComponentIdentifier cid)
 	{
-		lock();
-		IFuture<Void> ret = delegate.removeExcludedComponent(cid);
-		unlock();
-		return ret;
+		return writeAction(new IResultCommand<IFuture<Void>, Void>()
+		{
+			public IFuture<Void> execute(Void args)
+			{
+				IFuture<Void> ret = delegate.removeExcludedComponent(cid);
+				return ret;
+			}
+		});
 	}
 
 	/**
@@ -564,12 +613,16 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 *  @param ser The service.
 	 *  @return True if is included.
 	 */
-	public boolean isIncluded(IComponentIdentifier cid, IService ser)
+	public boolean isIncluded(final IComponentIdentifier cid, final IService ser)
 	{
-		lock();
-		boolean ret = delegate.isIncluded(cid, ser);
-		unlock();
-		return ret;
+		return (Boolean)readActionSync(new IResultCommand<Object, Void>()
+		{
+			public Object execute(Void args)
+			{
+				boolean ret = delegate.isIncluded(cid, ser);
+				return ret;
+			}
+		}, "isIncluded");
 	}
 	
 	/**
@@ -579,10 +632,14 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 */
 	public Map<ClassInfo, Set<IService>> getServiceMap()
 	{
-		lock();
-		Map<ClassInfo, Set<IService>> ret = delegate.getServiceMap();
-		unlock();
-		return ret;
+		return (Map<ClassInfo, Set<IService>>)readActionSync(new IResultCommand<Object, Void>()
+		{
+			public Object execute(Void args)
+			{
+				Map<ClassInfo, Set<IService>> ret = delegate.getServiceMap();
+				return ret;
+			}
+		}, "getServiceMap");
 	}
 
 	/**
@@ -590,34 +647,48 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 *  @param type The interface type. If type is null all services are returned.
 	 *  @return The queries.
 	 */
-	public <T> Set<ServiceQueryInfo<T>> getQueries(ClassInfo type)
+	public <T> Set<ServiceQueryInfo<T>> getQueries(final ClassInfo type)
 	{
-		lock();
-		Set<ServiceQueryInfo<T>> ret = delegate.getQueries(type);
-		unlock();
-		return ret;
+		return (Set<ServiceQueryInfo<T>>)readActionSync(new IResultCommand<Object, Void>()
+		{
+			public Object execute(Void args)
+			{
+				Set<ServiceQueryInfo<T>> ret = delegate.getQueries(type);
+				return ret;
+			}
+		}, "getQueries");
 	}
 
 	/**
 	 *  Add an event listener.
 	 *  @param listener The listener.
 	 */
-	public void addEventListener(IRegistryListener listener)
+	public void addEventListener(final IRegistryListener listener)
 	{
-		lock();
-		delegate.addEventListener(listener);
-		unlock();
+		writeAction(new IResultCommand<IFuture<Void>, Void>()
+		{
+			public IFuture<Void> execute(Void args)
+			{
+				delegate.addEventListener(listener);
+				return IFuture.DONE;
+			}
+		});
 	}
 
 	/**
 	 *  Remove an event listener.
 	 *  @param listener The listener.
 	 */
-	public void removeEventListener(IRegistryListener listener)
+	public void removeEventListener(final IRegistryListener listener)
 	{
-		lock();
-		delegate.removeEventListener(listener);
-		unlock();
+		writeAction(new IResultCommand<IFuture<Void>, Void>()
+		{
+			public IFuture<Void> execute(Void args)
+			{
+				delegate.removeEventListener(listener);
+				return IFuture.DONE;
+			}
+		});
 	}
 
 	/**
@@ -625,11 +696,15 @@ public class SynchronizedServiceRegistry extends AbstractServiceRegistry
 	 *  @param cid The platform id.
 	 *  @return The registry.
 	 */
-	public AbstractServiceRegistry getSubregistry(IComponentIdentifier cid)
+	public IServiceRegistry getSubregistry(final IComponentIdentifier cid)
 	{
-		lock();
-		AbstractServiceRegistry ret = delegate.getSubregistry(cid);
-		unlock();
-		return ret;
+		return (IServiceRegistry)readActionSync(new IResultCommand<Object, Void>()
+		{
+			public Object execute(Void args)
+			{
+				IServiceRegistry ret = delegate.getSubregistry(cid);
+				return ret;
+			}
+		}, "getSubregistry");
 	}
 }

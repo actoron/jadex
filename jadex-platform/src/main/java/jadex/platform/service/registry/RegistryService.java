@@ -19,10 +19,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.AbstractServiceRegistry;
-import jadex.bridge.service.search.MultiServiceRegistry;
+import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.registry.IRegistryEvent;
@@ -148,7 +148,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		}
 		
 		// Subscribe to changes of the local registry to inform other platforms
-		AbstractServiceRegistry reg = getRegistry().getSubregistry(component.getComponentIdentifier());
+		IServiceRegistry reg = getRegistry().getSubregistry(component.getComponentIdentifier());
 		if(reg==null)
 			reg = getRegistry();
 		reg.addEventListener(this);
@@ -194,7 +194,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 				{
 					System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode());
 					
-					AbstractServiceRegistry reg = getRegistry();
+					IServiceRegistry reg = getRegistry();
 					
 					// Only add if registry is multi type
 					Map<ClassInfo, Set<IService>> added = event.getAddedServices();
@@ -333,7 +333,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	{
 		// Remove listener on local registry
 		
-		AbstractServiceRegistry reg = AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
+		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier());
 		reg.getSubregistry(component.getComponentIdentifier()).removeEventListener(this);
 		
 		// Remove this platform from all subscriptions on other platforms
@@ -405,8 +405,8 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		addSubscription(cid, ret);
 		
 		// Forward current state initially
-		AbstractServiceRegistry reg = AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
-		AbstractServiceRegistry subreg = reg.getSubregistry(component.getComponentIdentifier());
+		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		IServiceRegistry subreg = reg.getSubregistry(component.getComponentIdentifier());
 		if(subreg!=null)
 		{
 			RegistryEvent event = new RegistryEvent(subreg.getServiceMap(), null, eventslimit, timelimit);
@@ -521,8 +521,8 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	 *  Get the registry.
 	 *  @return The registry.
 	 */
-	protected AbstractServiceRegistry getRegistry()
+	protected IServiceRegistry getRegistry()
 	{
-		return AbstractServiceRegistry.getRegistry(component.getComponentIdentifier());
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier());
 	}
 }

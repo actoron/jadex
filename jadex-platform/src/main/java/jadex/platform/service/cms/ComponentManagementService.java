@@ -49,10 +49,10 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
-import jadex.bridge.service.search.AbstractServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -813,7 +813,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Starting component failed: "+cid+", "+exception);
 																			
-																			AbstractServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																			ServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
 																			
 //																			System.err.println("Starting component failed: "+cid+", "+exception);
 //																			exception.printStackTrace();

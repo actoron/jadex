@@ -186,7 +186,7 @@ public class ServiceCallAgent	extends TestAgent
 	{
 		final Future<IServiceCallService> ret = new Future<IServiceCallService>();
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(300, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
