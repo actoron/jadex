@@ -347,7 +347,11 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		Iterator<T> sers = (Iterator<T>)getServices(query.getType());
 		if(sers!=null)
 		{
-			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
+			// Creates a new collection so that filter check must NOT be locked
+			Collection<T> ssers = searchfunc.checkScope(sers, query.getOwner(), query.getScope(), false);
+			
+//			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
+			searchfunc.checkAsyncFilters(query.getFilter(), ssers.iterator())
 				.addIntermediateResultListener(new IIntermediateResultListener<T>()
 			{
 				public void intermediateResultAvailable(T result)

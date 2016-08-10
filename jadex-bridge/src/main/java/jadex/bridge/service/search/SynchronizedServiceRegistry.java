@@ -2,13 +2,10 @@ package jadex.bridge.service.search;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -26,7 +23,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -43,12 +39,20 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
  *  
  *  In case of the new synchronization based registry the lock
  *  should be held.
+ *  
+ *  Note: Readers will NOT be tracked asynchronously, i.e. the readercnt
+ *  variable is made +1 at start of method and -1 at the end of the method.
+ *  Thus, all async code must operate on safe copy state.
+ *  
+ *  (Holding the readercnt in async code leads to log running readers.
+ *  These methods will hinder the writer to update the registry - can
+ *  only update when the last reader has left).
  */
 public class SynchronizedServiceRegistry implements IServiceRegistry
 {
 	/** The reader count. */
 	protected int readercnt; 
-	protected Map<Integer, String> readers = new HashMap<Integer, String>();
+//	protected Map<Integer, String> readers = new HashMap<Integer, String>();
 	
 	/** Flag that a writer is performing updates. */
 	protected ReentrantLock lock = new ReentrantLock();
@@ -155,7 +159,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 				// schedule
 				writeactions.add(new Tuple2<IResultCommand<IFuture<Void>, Void>, Future<Void>>(command, ret));
 				
-				System.out.println("scheduled write due to lock used: "+command);
+//				System.out.println("scheduled write due to lock used: "+command);
 			}
 		}
 		catch(Exception e)
@@ -172,58 +176,58 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 		return ret;
 	}
 	
-	/**
-	 * 
-	 * @param command
-	 * @return
-	 */
-	protected IFuture<Object> readActionAsync(final IResultCommand<IFuture<Object>, Void> command, final String op)
-	{
-		IFuture<Object> ret = null;
-		boolean done = false;
-		try
-		{
-			readerInc(op);
-			
-			ret = command.execute(null);
-			done = ret.isDone();
-			if(!done)
-			{
-				if(ret instanceof ISubscriptionIntermediateFuture)
-				{
-					((ISubscriptionIntermediateFuture)ret).addQuietListener(new IntermediateReaderDecListener());
-				}
-				else
-				{
-					ret.addResultListener(new ReadDecListener<Object>());
-				}
-				
-				// for debugging if all readers will evetually leave
-				Timer t = new Timer();
-				final IFuture<Object> fret = ret;
-				t.schedule(new TimerTask()
-				{
-					public void run()
-					{
-						if(!fret.isDone())
-							System.out.println("not done: "+op);
-					}
-				}, 1000);
-				
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(ret==null || done)
-				readerDec();
-		}
-		
-		return ret;
-	}
+//	/**
+//	 * 
+//	 * @param command
+//	 * @return
+//	 */
+//	protected IFuture<Object> readActionAsync(final IResultCommand<IFuture<Object>, Void> command, final String op)
+//	{
+//		IFuture<Object> ret = null;
+//		boolean done = false;
+//		try
+//		{
+//			readerInc(op);
+//			
+//			ret = command.execute(null);
+//			done = ret.isDone();
+//			if(!done)
+//			{
+//				if(ret instanceof ISubscriptionIntermediateFuture)
+//				{
+//					((ISubscriptionIntermediateFuture)ret).addQuietListener(new IntermediateReaderDecListener());
+//				}
+//				else
+//				{
+//					ret.addResultListener(new ReadDecListener<Object>());
+//				}
+//				
+//				// for debugging if all readers will evetually leave
+//				Timer t = new Timer();
+//				final IFuture<Object> fret = ret;
+//				t.schedule(new TimerTask()
+//				{
+//					public void run()
+//					{
+//						if(!fret.isDone())
+//							System.out.println("not done: "+op);
+//					}
+//				}, 1000);
+//				
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//		finally
+//		{
+//			if(ret==null || done)
+//				readerDec();
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 * 
@@ -462,11 +466,24 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	 */
 	public <T> IFuture<T> searchService(final Class<T> type, final IComponentIdentifier cid, final String scope, final IAsyncFilter<T> filter)
 	{
-		return (IFuture<T>)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+//		return (IFuture<T>)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+//		{
+//			public IFuture<Object> execute(Void args)
+//			{
+//				return (IFuture<Object>)delegate.searchService(type, cid, scope, filter);
+//			}
+//			
+//			public String toString()
+//			{
+//				return "searchService3Step: "+type+" "+readercnt;
+//			}
+//		}, "searchService3");
+		
+		return (IFuture<T>)readActionSync(new IResultCommand<Object, Void>()
 		{
-			public IFuture<Object> execute(Void args)
+			public Object execute(Void args)
 			{
-				return (IFuture<Object>)delegate.searchService(type, cid, scope, filter);
+				return delegate.searchService(type, cid, scope, filter);
 			}
 			
 			public String toString()
@@ -481,11 +498,24 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> searchServices(final Class<T> type, final IComponentIdentifier cid, final String scope, final IAsyncFilter<T> filter)
 	{
-		if(filter!=null)
-			System.out.println("filter: "+filter.getClass());
-		return (ISubscriptionIntermediateFuture)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+//		if(filter!=null)
+//			System.out.println("filter: "+filter.getClass());
+//		return (ISubscriptionIntermediateFuture)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+//		{
+//			public IFuture<Object> execute(Void args)
+//			{
+//				return (IFuture)delegate.searchServices(type, cid, scope, filter);
+//			}
+//			
+//			public String toString()
+//			{
+//				return "searchServices3Step: "+type+" "+readercnt;
+//			}
+//		}, "searchServices3");
+		
+		return (ISubscriptionIntermediateFuture)readActionSync(new IResultCommand<Object, Void>()
 		{
-			public IFuture<Object> execute(Void args)
+			public Object execute(Void args)
 			{
 				return (IFuture)delegate.searchServices(type, cid, scope, filter);
 			}
@@ -504,9 +534,22 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	{
 		if(syncglobal)
 		{
-			return (IFuture<T>)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+//			return (IFuture<T>)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+//			{
+//				public IFuture<Object> execute(Void args)
+//				{
+//					return (IFuture<Object>)delegate.searchGlobalService(type, cid, filter);
+//				}
+//				
+//				public String toString()
+//				{
+//					return "searchGlobalServiceStep: "+type+" "+readercnt;
+//				}
+//			}, "searchGlobalService");
+			
+			return (IFuture<T>)readActionSync(new IResultCommand<Object, Void>()
 			{
-				public IFuture<Object> execute(Void args)
+				public Object execute(Void args)
 				{
 					return (IFuture<Object>)delegate.searchGlobalService(type, cid, filter);
 				}
@@ -530,9 +573,22 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	{
 		if(syncglobal)
 		{
-			return (ISubscriptionIntermediateFuture)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+//			return (ISubscriptionIntermediateFuture)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
+//			{
+//				public IFuture<Object> execute(Void args)
+//				{
+//					return (IFuture)delegate.searchGlobalServices(type, cid, filter);
+//				}
+//				
+//				public String toString()
+//				{
+//					return "searchGlobalServiceStep: "+type+" "+readercnt;
+//				}
+//			}, "searchGlobalServices");
+			
+			return (ISubscriptionIntermediateFuture)readActionSync(new IResultCommand<Object, Void>()
 			{
-				public IFuture<Object> execute(Void args)
+				public Object execute(Void args)
 				{
 					return (IFuture)delegate.searchGlobalServices(type, cid, filter);
 				}
@@ -578,7 +634,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 //		lock2();
 //		System.out.println("reader enters: "+readercnt+" "+writeactions.size());
 		
-		readers.put(readercnt, op+": "+System.currentTimeMillis());
+//		readers.put(readercnt, op+": "+System.currentTimeMillis());
 		readercnt++;
 		
 //		unlock2();
@@ -593,13 +649,13 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	{
 		// let readers wait until no write operation is performed
 		lock();
-		readers.remove(readercnt);
+//		readers.remove(readercnt);
 		readercnt--;
 		
 		if(readercnt==0)
 			performWrites();
 //		else if(readercnt>1)
-//			System.out.println("readers: "+readercnt+" "+readers);
+//			System.out.println("readers: "+readercnt);//+" "+readers);
 		
 		unlock();
 	}
@@ -613,8 +669,8 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 		// If the methods are async only notifications/checks are allowed async
 	
 		boolean write = writeactions.size()>0;
-		if(write)
-			System.out.println("performed writes: "+writeactions.size());
+//		if(write)
+//			System.out.println("performed writes: "+writeactions.size());
 		
 		while(writeactions.size()>0)
 		{
@@ -629,48 +685,48 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 //		}
 	}
 	
-	/**
-	 *  Listener to decrement the reader cnt.
-	 */
-	protected class ReadDecListener<T> implements IResultListener<T>
-	{
-		public void resultAvailable(T result)
-		{
-			readerDec();
-		}
-		
-		public void exceptionOccurred(Exception exception)
-		{
-			readerDec();
-		}
-	}
-	
-	/**
-	 *  Listener to decrement the reader cnt.
-	 */
-	protected class IntermediateReaderDecListener<T> implements IIntermediateResultListener<T>
-	{
-		public void intermediateResultAvailable(T result)
-		{
-//			System.out.println("got ires: "+result);
-		}
-		
-		public void finished()
-		{
-//			System.out.println("fini");
-			readerDec();
-		}
-		
-		public void exceptionOccurred(Exception exception)
-		{
-			readerDec();
-		}
-		
-		public void resultAvailable(Collection<T> result)
-		{
-			readerDec();
-		}
-	}
+//	/**
+//	 *  Listener to decrement the reader cnt.
+//	 */
+//	protected class ReadDecListener<T> implements IResultListener<T>
+//	{
+//		public void resultAvailable(T result)
+//		{
+//			readerDec();
+//		}
+//		
+//		public void exceptionOccurred(Exception exception)
+//		{
+//			readerDec();
+//		}
+//	}
+//	
+//	/**
+//	 *  Listener to decrement the reader cnt.
+//	 */
+//	protected class IntermediateReaderDecListener<T> implements IIntermediateResultListener<T>
+//	{
+//		public void intermediateResultAvailable(T result)
+//		{
+////			System.out.println("got ires: "+result);
+//		}
+//		
+//		public void finished()
+//		{
+////			System.out.println("fini");
+//			readerDec();
+//		}
+//		
+//		public void exceptionOccurred(Exception exception)
+//		{
+//			readerDec();
+//		}
+//		
+//		public void resultAvailable(Collection<T> result)
+//		{
+//			readerDec();
+//		}
+//	}
 	
 	/**
 	 *  Get the services per type.

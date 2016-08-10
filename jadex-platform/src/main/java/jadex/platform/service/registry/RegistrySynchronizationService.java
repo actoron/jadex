@@ -27,7 +27,7 @@ import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.registry.IRegistryEvent;
 import jadex.bridge.service.types.registry.IRegistryListener;
-import jadex.bridge.service.types.registry.IRegistryService;
+import jadex.bridge.service.types.registry.IRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -44,7 +44,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 /**
  *  Registry service for synchronization with remote platforms. 
  */
-public class RegistryService implements IRegistryService, IRegistryListener
+public class RegistrySynchronizationService implements IRegistrySynchronizationService, IRegistryListener
 {
 	/** The component. */
 	@ServiceComponent
@@ -56,6 +56,7 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	/** The platforms this registry has subscribed to. */
 	protected Set<ISubscriptionIntermediateFuture<IRegistryEvent>> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
+	
 	
 	/** The current registry event (is accumulated). */
 	protected RegistryEvent registryevent;
@@ -72,6 +73,12 @@ public class RegistryService implements IRegistryService, IRegistryListener
 	@ServiceStart
 	public void init()
 	{
+		// Subscribe to changes of the local registry to inform other platforms
+		IServiceRegistry reg = getRegistry().getSubregistry(component.getComponentIdentifier());
+		if(reg==null)
+			throw new IllegalArgumentException("Registry synchronization requires multi service registy to store results");
+		reg.addEventListener(this);
+		
 		this.eventslimit = 1;
 		this.timelimit = 5000;
 		
@@ -146,12 +153,6 @@ public class RegistryService implements IRegistryService, IRegistryListener
 				}
 			});
 		}
-		
-		// Subscribe to changes of the local registry to inform other platforms
-		IServiceRegistry reg = getRegistry().getSubregistry(component.getComponentIdentifier());
-		if(reg==null)
-			reg = getRegistry();
-		reg.addEventListener(this);
 		
 		// Set up event notification timer
 		
@@ -286,10 +287,10 @@ public class RegistryService implements IRegistryService, IRegistryListener
 		
 		if(num<max)
 		{
-			SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, IRegistryService.class, false)
-				.addResultListener(new IResultListener<IRegistryService>()
+			SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, IRegistrySynchronizationService.class, false)
+				.addResultListener(new IResultListener<IRegistrySynchronizationService>()
 			{
-				public void resultAvailable(IRegistryService regser)
+				public void resultAvailable(IRegistrySynchronizationService regser)
 				{
 					// Subscribe to the new remote registry
 					

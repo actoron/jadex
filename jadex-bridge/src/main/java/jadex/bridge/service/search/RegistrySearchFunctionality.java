@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -199,7 +201,7 @@ public class RegistrySearchFunctionality
 	 *  Search for service.
 	 */
 	// read
-	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchService(final Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 				
@@ -209,9 +211,38 @@ public class RegistrySearchFunctionality
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
+			Collection<T> ssers = checkScope(sers, cid, scope, true);
+			
+			checkAsyncFilters(filter, ssers.iterator()).addResultListener(new IIntermediateResultListener<T>()
+			{
+				public void intermediateResultAvailable(T result)
+				{
+					ret.setResult(result);
+				}
+				
+				public void finished()
+				{
+					ret.setExceptionIfUndone(new ServiceNotFoundException(type.toString()));
+				}
+				
+				public void resultAvailable(Collection<T> result)
+				{
+					for(T t: result)
+					{
+						intermediateResultAvailable(t);
+					}
+					finished();
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+			
 			// filter checks in loop are possibly performed outside of synchronized block
 //				Iterator<T> it = new HashSet<T>(sers).iterator();
-			searchLoopService(filter, sers, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
+//			searchLoopService(filter, sers, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
 		}
 		else
 		{
@@ -221,61 +252,61 @@ public class RegistrySearchFunctionality
 		return ret;
 	}
 	
-	/**
-	 * 
-	 * @param filter
-	 * @param it
-	 * @return
-	 */
-	// read
-	protected <T> IFuture<T> searchLoopService(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
-	{
-		final Future<T> ret = new Future<T>();
-		
-		if(it.hasNext())
-		{
-			final T ser = it.next();
-			if(!checkSearchScope(cid, (IService)ser, scope) || !checkPublicationScope(cid, (IService)ser))
-			{
-				searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
-			}
-			else
-			{
-				if(filter==null)
-				{
-					ret.setResult(ser);
-				}
-				else
-				{
-					filter.filter(ser).addResultListener(new IResultListener<Boolean>()
-					{
-						public void resultAvailable(Boolean result)
-						{
-							if(result!=null && result.booleanValue())
-							{
-								ret.setResult(ser);
-							}
-							else
-							{
-								searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
-							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
-						}
-					});
-				}
-			}
-		}
-		else
-		{
-			ret.setException(new ServiceNotFoundException("No service that fits filter: "+filter));
-		}
-		
-		return ret;
-	}
+//	/**
+//	 * 
+//	 * @param filter
+//	 * @param it
+//	 * @return
+//	 */
+//	// read
+//	protected <T> IFuture<T> searchLoopService(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
+//	{
+//		final Future<T> ret = new Future<T>();
+//		
+//		if(it.hasNext())
+//		{
+//			final T ser = it.next();
+//			if(!checkSearchScope(cid, (IService)ser, scope) || !checkPublicationScope(cid, (IService)ser))
+//			{
+//				searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
+//			}
+//			else
+//			{
+//				if(filter==null)
+//				{
+//					ret.setResult(ser);
+//				}
+//				else
+//				{
+//					filter.filter(ser).addResultListener(new IResultListener<Boolean>()
+//					{
+//						public void resultAvailable(Boolean result)
+//						{
+//							if(result!=null && result.booleanValue())
+//							{
+//								ret.setResult(ser);
+//							}
+//							else
+//							{
+//								searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
+//							}
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
+//						}
+//					});
+//				}
+//			}
+//		}
+//		else
+//		{
+//			ret.setException(new ServiceNotFoundException("No service that fits filter: "+filter));
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Search for services.
@@ -288,8 +319,12 @@ public class RegistrySearchFunctionality
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
+			Collection<T> ssers = checkScope(sers, cid, scope, false);
+			
+			checkAsyncFilters(filter, ssers.iterator()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+			
 			// filter checks in loop are possibly performed outside of synchornized block
-			searchLoopServices(filter, sers, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+//			searchLoopServices(filter, sers, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 		}
 		else
 		{
@@ -298,52 +333,126 @@ public class RegistrySearchFunctionality
 		return ret;
 	}
 	
+//	/**
+//	 * 
+//	 * @param filter
+//	 * @param it
+//	 * @return
+//	 */
+//	// read
+//	protected <T> ISubscriptionIntermediateFuture<T> searchLoopServices(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
+//	{
+//		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+//		
+////		System.out.println("searchLoopStart: "+it.hashCode());
+//		
+//		if(it.hasNext())
+//		{
+//			final T ser = it.next();
+//			if(!checkSearchScope(cid, (IService)ser, scope) || !checkPublicationScope(cid, (IService)ser))
+//			{
+//				searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+//			}
+//			else
+//			{
+//				if(filter==null)
+//				{
+//					ret.addIntermediateResult(ser);
+//					searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+//				}
+//				else
+//				{
+//					filter.filter(ser).addResultListener(new IResultListener<Boolean>()
+//					{
+//						public void resultAvailable(Boolean result)
+//						{
+//							if(result!=null && result.booleanValue())
+//							{
+//								ret.addIntermediateResult(ser);
+//							}
+//							searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+//						}
+//					});
+//				}
+//			}
+//		}
+//		else
+//		{
+////			System.out.println("searchLoopEnd");
+//			ret.setFinished();
+//		}
+//		
+//		return ret;
+//	}
+	
 	/**
-	 * 
-	 * @param filter
-	 * @param it
-	 * @return
+	 *  Check the services according the the scope.
+	 *  @param it The services.
+	 *  @param cid The component id.
+	 *  @param scope The scope.
+	 *  @return The services that fit to the scope.
 	 */
 	// read
-	protected <T> ISubscriptionIntermediateFuture<T> searchLoopServices(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
+	protected <T> Collection<T> checkScope(final Iterator<T> it, final IComponentIdentifier cid, final String scope, boolean oneresult)
+	{
+		Collection<T> ret = new LinkedHashSet<T>();
+		
+		while(it.hasNext())
+		{
+			final T ser = it.next();
+			if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+			{
+				ret.add(ser);
+				if(oneresult)
+					break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check the async filter.
+	 *  @param filter The filter
+	 *  @param it The services.
+	 *  @return The services that pass the filter.
+	 */
+	// read -> Async is error prone when lock is held longer time spans
+	protected  <T> ISubscriptionIntermediateFuture<T> checkAsyncFilters(final IAsyncFilter<T> filter, final Iterator<T> it)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
-//		System.out.println("searchLoopStart: "+it.hashCode());
 		
 		if(it.hasNext())
 		{
 			final T ser = it.next();
-			if(!checkSearchScope(cid, (IService)ser, scope) || !checkPublicationScope(cid, (IService)ser))
+			if(filter==null)
 			{
-				searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				ret.addIntermediateResult(ser);
+				checkAsyncFilters(filter, it).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 			}
 			else
 			{
-				if(filter==null)
+				filter.filter(ser).addResultListener(new IResultListener<Boolean>()
 				{
-					ret.addIntermediateResult(ser);
-					searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
-				}
-				else
-				{
-					filter.filter(ser).addResultListener(new IResultListener<Boolean>()
+					public void resultAvailable(Boolean result)
 					{
-						public void resultAvailable(Boolean result)
+						if(result!=null && result.booleanValue())
 						{
-							if(result!=null && result.booleanValue())
-							{
-								ret.addIntermediateResult(ser);
-							}
-							searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+							ret.addIntermediateResult(ser);
 						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
-						}
-					});
-				}
+						checkAsyncFilters(filter, it).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						checkAsyncFilters(filter, it).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+					}
+				});
 			}
 		}
 		else
@@ -367,9 +476,13 @@ public class RegistrySearchFunctionality
 //		if(queries!=null)
 //		{
 			Set<ServiceQueryInfo<?>> sqis = (Set)getQueries(ser.getServiceIdentifier().getServiceType());
+			
 			if(sqis!=null)
 			{
-				checkQueriesLoop(sqis.iterator(), ser).addResultListener(new DelegationResultListener<Void>(ret));
+				// Clone the data to not need to synchronize async
+				Set<ServiceQueryInfo<?>> clone = new HashSet<ServiceQueryInfo<?>>(sqis);
+				
+				checkQueriesLoop(clone.iterator(), ser).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else
 			{
