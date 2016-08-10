@@ -72,6 +72,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public ServiceRegistry()//RegistrySearchFunctionality searchfunc)
 	{
 		this.searchfunc = new RegistrySearchFunctionality(this);
+		this.excluded = new HashSet<IComponentIdentifier>();
 	}
 	
 	/**
@@ -125,7 +126,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		if(excluded!=null && excluded.contains(ser.getServiceIdentifier().getProviderId()) && cid!=null)
 		{
 			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			ret = RegistrySearchFunctionality.getDotName(cid).endsWith(RegistrySearchFunctionality.getDotName(target));
+			if(target!=null)
+				ret = RegistrySearchFunctionality.getDotName(cid).endsWith(RegistrySearchFunctionality.getDotName(target));
 		}
 		return ret;
 	}
@@ -136,8 +138,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public void addExcludedComponent(IComponentIdentifier cid)
 	{
-		if(excluded==null)
-			excluded = new HashSet<IComponentIdentifier>();
+//		if(excluded==null)
+//			excluded = new HashSet<IComponentIdentifier>();
 		excluded.add(cid);
 	}
 	
@@ -152,8 +154,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		Future<Void> ret = new Future<Void>();
 		IResultListener<Void> lis = null;
 		
-		if(excluded!=null)
-		{
+//		if(excluded!=null)
+//		{
 			if(excluded.remove(cid))
 			{
 				if(excludedservices!=null)
@@ -174,7 +176,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 					}
 				}
 			}
-		}
+//		}
 		
 		if(lis==null)
 			ret.setResult(null);
@@ -188,8 +190,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
-		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageQueue")!=-1)
-			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageQueue")!=-1)
+//			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
 		
 		if(services==null)
 			services = new HashMap<ClassInfo, Set<IService>>();

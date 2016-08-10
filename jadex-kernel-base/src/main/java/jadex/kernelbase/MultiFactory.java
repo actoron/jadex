@@ -1415,7 +1415,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								if(exts!=null)
 								{
 									for (int i = 0; i < exts.length; ++i)
+									{
 										kernellocs.put(exts[i], modelinfo.getFilename());
+										System.out.println("fac candidate: "+modelinfo.getFilename()+" "+exts[i]);
+									}
 								}
 								kernelCounter.resultAvailable(result);
 							}
