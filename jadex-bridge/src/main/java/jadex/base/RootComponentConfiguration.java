@@ -438,8 +438,8 @@ public class RootComponentConfiguration
 	/** Flag if dht storage ring should be provided. **/
 	public static final String	DHT_PROVIDE			= PlatformConfiguration.DHT_PROVIDE;		// class:
 																								// boolean
-	/** Flag if dht storage ring should be provided. **/
-	public static final String	REGISTRY			= PlatformConfiguration.REGISTRY;		// class:
+	/** Flag if registry synchronization should be used. **/
+	public static final String	REGISTRY_SYNC			= PlatformConfiguration.REGISTRY_SYNC;		// class:
 																							// default:
 																								// false
 

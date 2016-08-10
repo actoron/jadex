@@ -109,7 +109,7 @@ public class PlatformConfiguration
 	public static final String DHT_PROVIDE = "dhtprovide";
 	
 	/** Flag to enable or disable registry service (for distributed registry management). **/
-	public static final String REGISTRY = "registry";
+	public static final String REGISTRY_SYNC = "registrysync";
 	
 	/** The reserved platform parameters. Those are (usually) not handled by the root component. */
 	public static final Set<String> RESERVED;
@@ -557,14 +557,16 @@ public class PlatformConfiguration
 	 * Set the monitoring level.
 	 * @param level
 	 */
-	public void setMonitoring(PublishEventLevel level) {
+	public void setMonitoring(PublishEventLevel level) 
+	{
 		setValue(MONITORING, level);
 	}
 	/**
 	 * Get the monitoring level.
 	 * @return
 	 */
-	public PublishEventLevel getMonitoring() {
+	public PublishEventLevel getMonitoring() 
+	{
 		return (PublishEventLevel)getValue(MONITORING);
 	}
 	
@@ -572,14 +574,16 @@ public class PlatformConfiguration
 	 * Set the persist flag.
 	 * @param value
 	 */
-	public void setPersist(boolean value) {
+	public void setPersist(boolean value) 
+	{
 		setValue(PERSIST, value);
 	}
 	/**
 	 * Get the persist flag.
 	 * @return boolean
 	 */
-	public boolean getPersist() {
+	public boolean getPersist() 
+	{
 		return (Boolean)getValue(PERSIST);
 	}
 	
@@ -587,14 +591,17 @@ public class PlatformConfiguration
 	 * Set the debug futures flag.
 	 * @param value
 	 */
-	public void setDebugFutures(boolean value) {
+	public void setDebugFutures(boolean value) 
+	{
 		setValue(DEBUGFUTURES, value);
 	}
+	
 	/**
 	 * Get the debug futures flag.
 	 * @return
 	 */
-	public boolean getDebugFutures() {
+	public boolean getDebugFutures() 
+	{
 		return Boolean.TRUE.equals(getValue(DEBUGFUTURES));
 	}
 	
@@ -602,14 +609,16 @@ public class PlatformConfiguration
 	 * Set the debug services flag.
 	 * @param value
 	 */
-	public void setDebugServices(boolean value) {
+	public void setDebugServices(boolean value) 
+	{
 		setValue(DEBUGSERVICES, value);
 	}
 	/**
 	 * Get the debug services flag.
 	 * @return
 	 */
-	public boolean getDebugServices() {
+	public boolean getDebugServices() 
+	{
 		return Boolean.TRUE.equals(getValue(DEBUGSERVICES));
 	}
 	
@@ -617,14 +626,17 @@ public class PlatformConfiguration
 	 * Set the debug steps flag.
 	 * @param value
 	 */
-	public void setDebugSteps(boolean value) {
+	public void setDebugSteps(boolean value) 
+	{
 		setValue(DEBUGSTEPS, value);
 	}
+	
 	/**
 	 * Get the debug steps flag.
 	 * @return
 	 */
-	public boolean getDebugSteps() {
+	public boolean getDebugSteps() 
+	{
 		return Boolean.TRUE.equals(getValue(DEBUGSTEPS));
 	}
 	
@@ -632,15 +644,26 @@ public class PlatformConfiguration
 	 * Set the no stack compaction flag.
 	 * @param value
 	 */
-	public void setNoStackCompaction(boolean value) {
+	public void setNoStackCompaction(boolean value) 
+	{
 		setValue(NOSTACKCOMPACTION, value);
 	}
+	
 	/**
 	 * Get the no stack compaction flag.
-	 * @return
+	 * @return True if no stack compaction.
 	 */
-	public boolean getNoStackCompaction() {
+	public boolean getNoStackCompaction() 
+	{
 		return Boolean.TRUE.equals(getValue(NOSTACKCOMPACTION));
+	}
+	
+	/**
+	 *  Get the boolean value of a flag.
+	 */
+	public boolean getBooleanValue(String key) 
+	{
+		return Boolean.TRUE.equals(getValue(key));
 	}
 	
 	/**
@@ -666,7 +689,8 @@ public class PlatformConfiguration
 	 * Get the OPENGL flag.
 	 * @return
 	 */
-	public boolean getOpenGl() {
+	public boolean getOpenGl() 
+	{
 		return Boolean.TRUE.equals(getValue(OPENGL));
 	}
 	
@@ -674,14 +698,17 @@ public class PlatformConfiguration
 	 * Set the DHT flag.
 	 * @param value
 	 */
-	public void setDht(boolean value) {
+	public void setDht(boolean value) 
+	{
 		setValue(DHT, value);
 	}
+	
 	/**
 	 * Get the DHT flag.
 	 * @return
 	 */
-	public boolean getDht() {
+	public boolean getDht() 
+	{
 		return Boolean.TRUE.equals(getValue(DHT));
 	}
 	
@@ -689,7 +716,8 @@ public class PlatformConfiguration
 	 * Set the provide DHT flag.
 	 * @param value
 	 */
-	public void setDhtProvide(boolean value) {
+	public void setDhtProvide(boolean value) 
+	{
 //		setValue(DHT_PROVIDE, value);
 		rootconfig.setDhtProvide(value);
 	}
@@ -697,7 +725,8 @@ public class PlatformConfiguration
 	 * Get the provide DHT flag.
 	 * @return
 	 */
-	public boolean getDhtProvide() {
+	public boolean getDhtProvide() 
+	{
 //		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
 		return rootconfig.getDhtProvide();
 	}

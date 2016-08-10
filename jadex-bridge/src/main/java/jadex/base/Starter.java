@@ -32,7 +32,6 @@ import jadex.bridge.service.search.MultiServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.search.SynchronizedServiceRegistry;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -387,11 +386,15 @@ public class Starter
 						boolean providedhtonly = !config.getDht();
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess(), providedhtonly));						
 					} 
-					else 
+					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
+					{
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(true, new MultiServiceRegistry()));
+					}
+					else
 					{
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(false, new ServiceRegistry()));
-//						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(new MultiServiceRegistry()));
 					}
+					
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());
 
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
