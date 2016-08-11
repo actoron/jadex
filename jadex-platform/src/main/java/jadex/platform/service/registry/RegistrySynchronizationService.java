@@ -341,7 +341,8 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		
 		if(subscribedto!=null)
 		{
-			for(ISubscriptionIntermediateFuture<IRegistryEvent> fut: subscribedto)
+			ISubscriptionIntermediateFuture<IRegistryEvent>[] evs = subscribedto.toArray(new ISubscriptionIntermediateFuture[subscribedto.size()]);
+			for(ISubscriptionIntermediateFuture<IRegistryEvent> fut: evs)
 			{
 				fut.terminate();
 			}
@@ -351,7 +352,8 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	
 		if(subscriptions!=null)
 		{
-			for(SubscriptionIntermediateFuture<IRegistryEvent> fut: subscriptions.values())
+			SubscriptionIntermediateFuture<IRegistryEvent>[] evs = subscriptions.values().toArray(new SubscriptionIntermediateFuture[subscriptions.size()]);
+			for(SubscriptionIntermediateFuture<IRegistryEvent> fut: evs)
 			{
 				fut.setFinished();
 			}

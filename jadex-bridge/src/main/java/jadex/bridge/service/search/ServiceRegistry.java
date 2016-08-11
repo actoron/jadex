@@ -62,6 +62,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/** The registry listeners. */
 	protected List<IRegistryListener> listeners;
 	
+	/** The search functionality. */
 	protected RegistrySearchFunctionality searchfunc;
 	
 	//-------- methods --------
@@ -94,6 +95,9 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public Iterator<IService> getServices(ClassInfo type)
 	{
 		Set<IService> ret = null;
+		
+//		if(type!=null && type.getTypeName().indexOf("IRegistrySer")!=-1)
+//			System.out.println("search: "+type.getTypeName());
 		
 		if(services!=null)
 		{
@@ -190,9 +194,9 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageQueue")!=-1)
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IRegistrySer")!=-1)
 //			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
-		
+			
 		if(services==null)
 			services = new HashMap<ClassInfo, Set<IService>>();
 		
@@ -233,7 +237,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public void removeService(ClassInfo key, IService service)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IRegistrySer")!=-1)
 //			System.out.println("removed: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
 		
 		if(services!=null)
@@ -242,6 +246,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 			if(sers!=null)
 			{
 				sers.remove(service);
+				if(sers.size()==0)
+					services.remove(key);
 				
 				notifyListeners(new RegistryListenerEvent(RegistryListenerEvent.Type.REMOVED, key, service));
 			}
@@ -620,8 +626,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(type.toString().indexOf("IServiceCall")!=-1)
-			System.out.println("Search global services: "+type);
+//		if(type.toString().indexOf("IServiceCall")!=-1)
+//			System.out.println("Search global services: "+type);
 		
 		if(services!=null)
 		{
@@ -705,11 +711,30 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	}
 	
 	/**
-	 *  Get the service map.
+	 *  Get the service map. (The original map cannot be used because 
+	 *  registry is accessed concurrently and other threads could change the map
+	 *  even in between of onging operations such as serialization)
+	 *  @return A clone of the service map.
 	 */
 	public Map<ClassInfo, Set<IService>> getServiceMap()
 	{
-		return services;
+		// Does not work because the contained services are cloned also 
+//		return services==null? null: (Map<ClassInfo, Set<IService>>)Traverser.traverseObject(services, Traverser.getDefaultProcessors(), true, null);
+	
+		// Needs a deep clone except the services
+		
+		Map<ClassInfo, Set<IService>> ret = null;
+		
+		if(services!=null)
+		{
+			ret = new HashMap<ClassInfo, Set<IService>>();
+			for(Map.Entry<ClassInfo, Set<IService>> entry: services.entrySet())
+			{
+				ret.put(entry.getKey(), new HashSet<IService>(entry.getValue()));
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**

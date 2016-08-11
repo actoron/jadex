@@ -23,13 +23,16 @@ public class WakeupPlan extends Plan
 			wakeup.add(Calendar.MINUTE, 1);
 		}
 
-		while (true)
+		while(true)
 		{
 			// Wait until next full minute
+			long delay = wakeup.getTime().getTime() - getTime();
+//			System.out.println("Waiting for: "+delay+" ms");
 			waitFor(wakeup.getTime().getTime() - getTime());
 
 			// Do the action...
 			getLogger().info("Time is now: "+new Date(getTime()));
+//			System.out.println("Time is now: "+new Date(getTime()));
 
 			// Increment wakeup time one day.
 			wakeup.add(Calendar.MINUTE, 1);

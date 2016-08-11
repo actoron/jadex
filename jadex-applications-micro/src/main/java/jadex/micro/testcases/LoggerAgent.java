@@ -38,7 +38,7 @@ import jadex.micro.testcases.LoggerAgent.TestLogHandler;
 @Description("Tests the logger.")
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 @RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))})
+	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))})
 @Properties({
 	@NameValue(name="logging.level", value="Level.FINEST"),
 //	@NameValue(name="logging.useParentHandlers", value="true"),

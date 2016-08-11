@@ -108,10 +108,16 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	}
 	
 	/**
-	 * 
+	 *  Create the subcomponents.
 	 */
 	protected IFuture<List<IComponentIdentifier>> createComponents(final ComponentInstanceInfo[] components)
 	{
+//		System.out.println("create subcompos: ");
+//		for(ComponentInstanceInfo cii: components)
+//		{
+//			System.out.println(cii.getName()+" "+cii.getTypeName());
+//		}
+		
 		final Future<Void> res = new Future<Void>();
 		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
 		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)

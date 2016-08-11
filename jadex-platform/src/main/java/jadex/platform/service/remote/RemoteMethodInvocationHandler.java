@@ -105,9 +105,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		
 		final ProxyInfo pi = pr.getProxyInfo();
 		
-		if (pi.isExcluded(method)) {
+		if(pi.isExcluded(method)) 
 			throw new UnsupportedOperationException("The method is excluded for remote: " + method);
-		}
 		
 		// Determine if call goes to
 		// a) cached method
@@ -769,7 +768,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 //	}
 	
 	/**
-	 * 
+	 *  Create a return future of suitable type for a method call.
 	 */
 	protected Future<Object> createReturnFuture(final IComponentIdentifier compid, final String callid, 
 		final Method method, final Class<?> type, final long to, final Map<String, Object> nonfunc, final ServiceInvocationContext sic)

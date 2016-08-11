@@ -47,6 +47,7 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
@@ -132,6 +133,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				sermap.put(key, newpsi);
 			}
 			
+			FutureBarrier<Void> bar = new FutureBarrier<Void>();
+			
 			// Instantiate service objects
 			for(ProvidedServiceInfo info: sermap.values())
 			{
@@ -147,7 +150,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 					final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getComponentIdentifier()));
 					
-					addService(service, info);
+					bar.addFuture(addService(service, info));
 				}
 				else
 				{
@@ -182,25 +185,31 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 							component, ser, info.getName(), type, info.getImplementation().getProxytype(), ics, 
 							moni, info, info.getScope());
 						
-						addService(proxy, info);
+						bar.addFuture(addService(proxy, info));
 					}
 				}
 			}
 			
-			// Start the services.
-			Collection<IInternalService>	allservices	= getAllServices();
-			if(!allservices.isEmpty())
+			bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
-			}
-			else
-			{
-				ret.setResult(null);
-			}
+				public void customResultAvailable(Void result)
+				{
+					// Start the services.
+					Collection<IInternalService>	allservices	= getAllServices();
+					if(!allservices.isEmpty())
+					{
+						initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+				}
+			});
 		}
 		catch(Exception e)
 		{
-			ret.setException(e);
+			ret.setExceptionIfUndone(e);
 		}
 		
 		return ret;
@@ -233,7 +242,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param service	The service object.
 	 *  @param info	 The service info.
 	 */
-	protected void	addService(IInternalService service, ProvidedServiceInfo info)
+	protected IFuture<Void> addService(IInternalService service, ProvidedServiceInfo info)
 	{
 		if(serviceinfos==null)
 			serviceinfos = new HashMap<IServiceIdentifier, ProvidedServiceInfo>();
@@ -255,6 +264,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		if(services==null)
 			services = Collections.synchronizedMap(new LinkedHashMap<Class<?>, Collection<IInternalService>>());
 		
+		FutureBarrier<Void> bar = new FutureBarrier<Void>();
+		
 		for(Class<?> servicetype: types)
 		{
 			Collection<IInternalService> tmp = services.get(servicetype);
@@ -266,8 +277,10 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			tmp.add(service);
 			
 			// Make service available immediately, even before start (hack???).
-			SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service);
+			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
 		}
+		
+		return bar.waitFor();
 	}
 	
 	/**
@@ -1044,6 +1057,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	public IFuture<Void> addService(final String name, final Class<?> type, final String proxytype, 
 		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info, String scope)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 //		System.out.println("addS:"+service);
 
 		PublishEventLevel elm = getComponent().getComponentDescription().getMonitoring()!=null? getComponent().getComponentDescription().getMonitoring(): null;
@@ -1055,9 +1070,15 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			getComponent(), service, name, type, proxytype, ics, moni, 
 			info, scope!=null ? scope : info!=null? info.getScope(): null);
 		
-		addService(proxy, info);
+		addService(proxy, info).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				initService(proxy).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
 				
-		return initService(proxy);
+		return ret;
 	}
 	
 	/**

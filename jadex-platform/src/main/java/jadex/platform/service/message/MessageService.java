@@ -74,6 +74,7 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
@@ -360,12 +361,26 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+//		final RuntimeException e = new RuntimeException();
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				if(exception instanceof IOException)
+//				{
+//					System.out.println("io");
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+		
 //		IResultListener<DiscoveryInfo> disclistener = new IResultListener<DiscoveryInfo>()
 //		{
 //			public void resultAvailable(final DiscoveryInfo discoveryinfo)
 //			{
-//				
-//				
 //			}
 //			
 //			public void exceptionOccurred(Exception exception)

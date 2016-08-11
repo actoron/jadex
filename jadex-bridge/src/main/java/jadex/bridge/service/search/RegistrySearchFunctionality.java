@@ -83,6 +83,9 @@ public class RegistrySearchFunctionality
 	// read
 	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
 	{
+		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
+			System.out.println("search: "+type+" - "+cid);
+		
 		T ret = null;
 		Iterator<IService> sers = getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
@@ -92,6 +95,9 @@ public class RegistrySearchFunctionality
 				IService ser = sers.next();
 				if(checkSearchScope(cid, ser, scope) && checkPublicationScope(cid, ser))
 				{
+//					if(ret!=null)
+//						System.out.println("found another: "+ser.getServiceIdentifier());
+					
 					ret = (T)ser;
 					break;
 				}
@@ -133,6 +139,9 @@ public class RegistrySearchFunctionality
 	{
 		T ret = null;
 		
+		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
+			System.out.println("search: "+type+" - "+cid);
+		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
@@ -145,8 +154,11 @@ public class RegistrySearchFunctionality
 					{
 						if(filter==null || filter.filter(ser))
 						{
+							if(ret!=null)
+								System.out.println("found another: "+((IService)ser).getServiceIdentifier());
+							
 							ret = ser;
-							break;
+							//break;
 						}
 					}
 					catch(Exception e)
@@ -205,6 +217,9 @@ public class RegistrySearchFunctionality
 	{
 		final Future<T> ret = new Future<T>();
 				
+		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
+			System.out.println("search: "+type+" - "+cid);
+		
 //		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 //			System.out.println("global search");
 		
@@ -314,6 +329,8 @@ public class RegistrySearchFunctionality
 	// read
 	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
+		try
+		{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
@@ -331,6 +348,12 @@ public class RegistrySearchFunctionality
 			ret.setFinished();
 		}
 		return ret;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 //	/**

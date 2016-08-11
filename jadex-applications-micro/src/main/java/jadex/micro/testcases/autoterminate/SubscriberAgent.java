@@ -1,7 +1,12 @@
 package jadex.micro.testcases.autoterminate;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.IResultCommand;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -28,9 +33,13 @@ public class SubscriberAgent
 {
 	//-------- attributes --------
 	
-	/** The service. */
-	@AgentService
-	protected IAutoTerminateService	sub;
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
+//	/** The service. */
+//	@AgentService
+//	protected IAutoTerminateService	sub;
 
 	/** The cms. */
 	@AgentService
@@ -46,23 +55,42 @@ public class SubscriberAgent
 	{
 //		System.out.println("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
-		sub.subscribe().addResultListener(new IntermediateDefaultResultListener<String>()
+		SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IAutoTerminateService>, Void>()
 		{
-			public void intermediateResultAvailable(String result)
+			public IFuture<IAutoTerminateService> execute(Void args)
 			{
-//				System.out.println("subscribed "+agent.getComponentIdentifier());
-				
-				if("platform".equals(agent.getConfiguration()))
+				return SServiceProvider.getService(agent, IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+			}
+		}, 3, 2000).addResultListener(new IResultListener<IAutoTerminateService>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				throw new RuntimeException(exception);
+			}
+			
+			public void resultAvailable(IAutoTerminateService sub)
+			{
+				sub.subscribe().addResultListener(new IntermediateDefaultResultListener<String>()
 				{
-//					System.out.println("destroy platform: "+agent.getComponentIdentifier().getRoot());
-					cms.destroyComponent(agent.getComponentIdentifier().getRoot());
-				}
-				else
-				{
-//					System.out.println("destroy comp: "+agent.getComponentIdentifier());
-					agent.killComponent();
-				}
+					public void intermediateResultAvailable(String result)
+					{
+//						System.out.println("subscribed "+agent.getComponentIdentifier());
+						
+						if("platform".equals(agent.getConfiguration()))
+						{
+//							System.out.println("destroy platform: "+agent.getComponentIdentifier().getRoot());
+							cms.destroyComponent(agent.getComponentIdentifier().getRoot());
+						}
+						else
+						{
+//							System.out.println("destroy comp: "+agent.getComponentIdentifier());
+							agent.killComponent();
+						}
+					}
+				});
 			}
 		});
+		
+		
 	}
 }

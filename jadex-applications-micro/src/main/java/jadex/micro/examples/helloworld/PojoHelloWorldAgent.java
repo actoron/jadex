@@ -3,6 +3,9 @@ package jadex.micro.examples.helloworld;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -39,6 +42,10 @@ public class PojoHelloWorldAgent
 	public void executeBody()
 	{
 //		System.out.println(agent.getComponentFeature(IArgumentsFeature.class).getArgument("welcome text"));
+		
+		IClockService cl = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		System.out.println("clockservice: "+cl);
+		
 		System.out.println(text);
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{			
