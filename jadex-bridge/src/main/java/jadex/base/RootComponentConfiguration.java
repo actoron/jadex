@@ -1237,6 +1237,16 @@ public class RootComponentConfiguration
 	{
 		setValue(DHT_PROVIDE, value);
 	}
+	
+	public boolean getRegistrySync()
+	{
+		return Boolean.TRUE.equals(getValue(REGISTRY_SYNC));
+	}
+
+	public void setRegistrySync(boolean value)
+	{
+		setValue(REGISTRY_SYNC, value);
+	}
 
 	/**
 	 * Enhance this config with given other config. Will overwrite all values
