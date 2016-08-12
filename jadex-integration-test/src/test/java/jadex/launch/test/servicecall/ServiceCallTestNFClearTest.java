@@ -22,6 +22,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
@@ -247,7 +248,7 @@ public class ServiceCallTestNFClearTest
 		exta.scheduleStep(new IComponentStep<Void>()
 		{
 			@Override
-			public IFuture<Void> execute(IInternalAccess ia)
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				IServiceCallService service;
 				if(useProvided)
@@ -261,7 +262,15 @@ public class ServiceCallTestNFClearTest
 				}
 				else
 				{
-					service = (IServiceCallService)ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName).get();
+//					service = (IServiceCallService)ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName).get();
+					service = SServiceProvider.waitForService(ia, new IResultCommand<IFuture<IServiceCallService>, Void>()
+					{
+						public jadex.commons.future.IFuture<IServiceCallService> execute(Void args) 
+						{
+							return ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName);
+						}
+					}, 7, 1500).get();
+						
 				}
 				assertServiceCallResetsServiceInvocation(service);
 				return Future.DONE;
@@ -310,7 +319,9 @@ public class ServiceCallTestNFClearTest
 		// wait for creation
 		IComponentIdentifier identifier = future.get();
 
-		return cms.getExternalAccess(identifier).get();
+		IExternalAccess ret = cms.getExternalAccess(identifier).get();
+	
+		return ret;
 	}
 
 	private void createProxies(IExternalAccess... platforms)

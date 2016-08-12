@@ -1335,6 +1335,20 @@ public class SServiceProvider
 	/**
 	 *  Get the service call service with delay.
 	 */
+	public static <T> IFuture<T> waitForService(final IExternalAccess agent, final IResultCommand<IFuture<T>, Void> searchcmd, final int max, final int delay)
+	{
+		return agent.scheduleStep(new IComponentStep<T>()
+		{
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return waitForService(ia, searchcmd, 0, max, delay);
+			}
+		});
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
 	public static <T> IFuture<T> waitForService(final IInternalAccess agent, final IResultCommand<IFuture<T>, Void> searchcmd, final int max, final int delay)
 	{
 		return waitForService(agent, searchcmd, 0, max, delay);
@@ -1360,13 +1374,7 @@ public class SServiceProvider
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, true).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
-							{
-								public void customResultAvailable(Void result)
-								{
-									waitForService(agent, searchcmd, cnt+1, max, delay).addResultListener(new DelegationResultListener<T>(ret));
-								}
-							});
+							waitForService(agent, searchcmd, cnt+1, max, delay).addResultListener(new DelegationResultListener<T>(ret));
 							
 							return IFuture.DONE;
 						}

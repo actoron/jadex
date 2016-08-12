@@ -16,6 +16,8 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -203,11 +205,19 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Call the service methods.
 	 */
-	protected IIntermediateFuture<TestReport> callServices(IComponentIdentifier cid, int testno, final long to)
+	protected IIntermediateFuture<TestReport> callServices(final IComponentIdentifier cid, int testno, final long to)
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
+//		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
+		
+		IFuture<ITestService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<ITestService>, Void>()
+		{
+			public IFuture<ITestService> execute(Void args)
+			{
+				return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
+			}
+		}, 7, 1500);
 		
 //		fut.addResultListener(new IResultListener()
 //		{

@@ -402,7 +402,7 @@ public class ComponentManagementService implements IComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + name + " : Modelname must not be null."));
 
-//		System.out.println("create: "+name+" "+modelname+" "+agent.getComponentIdentifier());
+		System.out.println("create: "+name+" "+modelname+" "+agent.getComponentIdentifier());
 		
 //		if(name!=null && name.toLowerCase().indexOf("broken")!=-1)
 //			System.out.println("create compo: "+modelname+" "+info);
@@ -1247,7 +1247,7 @@ public class ComponentManagementService implements IComponentManagementService
 //		System.out.println("Terminating component: "+cid.getName());
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
-//		System.out.println("kill compo: "+cid);//+" "+(sc!=null? sc.getCaller(): "null"));
+		System.out.println("kill compo: "+cid);//+" "+(sc!=null? sc.getCaller(): "null"));
 		
 //		if(cid.toString().indexOf("MegaParallel")!=-1)
 //			System.out.println("destroy: "+cid.getName());
@@ -2178,20 +2178,22 @@ public class ComponentManagementService implements IComponentManagementService
 			
 		}
 		
-//		ret.addResultListener(new IResultListener<IExternalAccess>()
-//		{
-//			public void resultAvailable(IExternalAccess result)
-//			{
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				if(cid.getName().toLowerCase().indexOf("chate")!=-1)
-//				{
-//					System.out.println("getExternalAccess: "+agent.getComponentIdentifier()+", "+cid);
-////					getExternalAccess(cid);
-//				}
-//			}
-//		});
+		ret.addResultListener(new IResultListener<IExternalAccess>()
+		{
+			public void resultAvailable(IExternalAccess result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if(cid.getName().toLowerCase().indexOf("directservice")!=-1
+					|| cid.getName().toLowerCase().indexOf("rawservice")!=-1
+					|| cid.getName().toLowerCase().indexOf("decoupledservice")!=-1)
+				{
+					System.out.println("getExternalAccess: "+agent.getComponentIdentifier()+", "+cid);
+//					getExternalAccess(cid);
+				}
+			}
+		});
 		
 		return ret;
 	}

@@ -7,6 +7,8 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.IResultCommand;
+import jadex.commons.future.IFuture;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.
@@ -24,7 +26,7 @@ public class RemoteReferenceTest //extends TestCase
 		long timeout = Starter.getLocalDefaultTimeout(null);
 		
 		// Start platform1 with local service. (underscore in name assures both platforms use same password)
-		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
+		final IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false",
 			"-gui", "false",
 //			"-logging", "true",
@@ -47,8 +49,15 @@ public class RemoteReferenceTest //extends TestCase
 		Starter.createProxy(platform2, platform1).get(timeout);
 		
 		// Search for remote search service from local platform
-		ISearchService	search	= SServiceProvider
-			.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
+		ISearchService	search = SServiceProvider.waitForService(platform1, new IResultCommand<IFuture<ISearchService>, Void>()
+		{
+			public IFuture<ISearchService> execute(Void args)
+			{
+				return SServiceProvider.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+			}
+		}, 4, 1500).get();
+
+//		ISearchService	search	= SServiceProvider.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 		// Invoke service to obtain reference to local service.
 		ILocalService	service2	= search.searchService("dummy").get(timeout);
 		

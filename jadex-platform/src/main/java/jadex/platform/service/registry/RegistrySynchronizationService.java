@@ -79,7 +79,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 			throw new IllegalArgumentException("Registry synchronization requires multi service registy to store results");
 		reg.addEventListener(this);
 		
-		this.eventslimit = 1;
+		this.eventslimit = 50;
 		this.timelimit = 5000;
 		
 		// Subscribe to awareness service to get informed when new platforms are discovered
