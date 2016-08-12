@@ -31,14 +31,13 @@ import jadex.bridge.service.types.registry.IRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
-import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
@@ -54,7 +53,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
 	/** The platforms this registry has subscribed to. */
-	protected Set<ISubscriptionIntermediateFuture<IRegistryEvent>> subscribedto;
+	protected Set<SubscriptionInfo> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
 	
 	
@@ -186,75 +185,99 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		{
 			addKnownPlatform(cid);
 			
-			final ISubscriptionIntermediateFuture<IRegistryEvent> fut = searchRegistryService(cid, 0, 3, 10000);
-			addSubscribedTo(fut);
-			
-			fut.addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
+			SServiceProvider.waitForService(component, new IResultCommand<IFuture<IRegistrySynchronizationService>, Void>()
 			{
-				public void intermediateResultAvailable(IRegistryEvent event)
+				public IFuture<IRegistrySynchronizationService> execute(Void args)
 				{
-					System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode());
+					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, IRegistrySynchronizationService.class, false);
+				}
+			}, 3, 10000).addResultListener(new IResultListener<IRegistrySynchronizationService>()
+			{
+				public void resultAvailable(IRegistrySynchronizationService regser)
+				{
+					// Subscribe to the new remote registry
 					
-					IServiceRegistry reg = getRegistry();
+					System.out.println("Found registry service on: "+cid+" (I am: "+component.getComponentIdentifier()+")");
 					
-					// Only add if registry is multi type
-					Map<ClassInfo, Set<IService>> added = event.getAddedServices();
-					if(added!=null)
+					ISubscriptionIntermediateFuture<IRegistryEvent> fut = regser.subscribeToEvents();
+					final SubscriptionInfo info = new SubscriptionInfo(fut);
+					
+					addSubscribedTo(info);
+										
+					fut.addIntermediateResultListener(new IIntermediateResultListener<IRegistryEvent>()
 					{
-						for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
+						public void intermediateResultAvailable(IRegistryEvent event)
 						{
-							for(IService ser: entry.getValue())
+							System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode());
+							
+							IServiceRegistry reg = getRegistry();
+							
+							info.setTimestamp(System.currentTimeMillis());
+							
+							// Only add if registry is multi type
+							Map<ClassInfo, Set<IService>> added = event.getAddedServices();
+							if(added!=null)
 							{
-								reg.addService(entry.getKey(), ser);
+								for(Map.Entry<ClassInfo, Set<IService>> entry: added.entrySet())
+								{
+									for(IService ser: entry.getValue())
+									{
+										reg.addService(entry.getKey(), ser);
+									}
+								}
+							}
+							
+							Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
+							if(removed!=null)
+							{
+								for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
+								{
+									for(IService ser: entry.getValue())
+									{
+										reg.removeService(entry.getKey(), ser);
+									}
+								}
 							}
 						}
-					}
-					
-					Map<ClassInfo, Set<IService>> removed = event.getRemovedServices();
-					if(removed!=null)
-					{
-						for(Map.Entry<ClassInfo, Set<IService>> entry: removed.entrySet())
+						
+						public void resultAvailable(Collection<IRegistryEvent> result)
 						{
-							for(IService ser: entry.getValue())
+							finished();
+						}
+						
+						public void finished()
+						{
+							System.out.println("Subscription finbished: "+cid);
+							removeKnownPlatforms(cid);
+							removeSubscribedTo(info);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(exception instanceof ServiceNotFoundException)
 							{
-								reg.removeService(entry.getKey(), ser);
+//								System.out.println("No registry service found, giving up: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+							}
+							else
+							{
+								if(!(exception instanceof FutureTerminatedException)) // ignore terminate
+								{
+									System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+									exception.printStackTrace();
+								}
+								removeKnownPlatforms(cid);
+								removeSubscribedTo(info);
 							}
 						}
-					}
-				}
-				
-				public void resultAvailable(Collection<IRegistryEvent> result)
-				{
-					finished();
-				}
-				
-				public void finished()
-				{
-					System.out.println("Subscription finbished: "+cid);
-					removeKnownPlatforms(cid);
-					removeSubscribedTo(fut);
+					});
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					if(exception instanceof ServiceNotFoundException)
-					{
-//						System.out.println("No registry service found, giving up: "+cid+" (I am: "+component.getComponentIdentifier()+")");
-					}
-					else
-					{
-						if(!(exception instanceof FutureTerminatedException)) // ignore terminate
-						{
-							System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
-							exception.printStackTrace();
-						}
-						removeKnownPlatforms(cid);
-						removeSubscribedTo(fut);
-					}
+					System.out.println("Found no registry service on: "+cid);
 				}
 			});
 		}
-		
 	}
 		
 	/**
@@ -276,54 +299,6 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		
 		if(registryevent.isDue())
 			notifySubscribers();
-	}
-	
-	/**
-	 * 
-	 */
-	protected ISubscriptionIntermediateFuture<IRegistryEvent> searchRegistryService(final IComponentIdentifier cid, final int num, final int max, final long delay)
-	{
-		final SubscriptionIntermediateFuture<IRegistryEvent> ret = new SubscriptionIntermediateFuture<IRegistryEvent>();
-		
-		if(num<max)
-		{
-			SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, IRegistrySynchronizationService.class, false)
-				.addResultListener(new IResultListener<IRegistrySynchronizationService>()
-			{
-				public void resultAvailable(IRegistrySynchronizationService regser)
-				{
-					// Subscribe to the new remote registry
-					
-					System.out.println("Found registry service on: "+cid+" (I am: "+component.getComponentIdentifier()+")");
-					
-					regser.subscribeToEvents().addIntermediateResultListener(new IntermediateDelegationResultListener<IRegistryEvent>(ret));
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					// No registry service on that platform or no access
-					
-					if(num+1<max)
-					{
-						component.getComponentFeature(IExecutionFeature.class).waitForDelay(delay)
-							.addResultListener(new ExceptionDelegationResultListener<Void, Collection<IRegistryEvent>>(ret)
-						{
-							public void customResultAvailable(Void result) throws Exception
-							{
-								searchRegistryService(cid, num+1, max, delay).addResultListener(new IntermediateDelegationResultListener<IRegistryEvent>(ret));
-							}
-						});
-					}
-					else
-					{
-//						System.out.println("Found no registry service on: "+cid+" ("+(num+1)+"/"+max+")");
-						ret.setException(new ServiceNotFoundException("Registry service not found on: "+cid));
-					}
-				}
-			});
-		}
-		
-		return ret;
 	}
 	
 	/**
@@ -466,25 +441,24 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	
 	/**
 	 *  Add a new subscription.
-	 *  @param future The subscription future.
-	 *  @param si The subscription info.
+	 *  @param future The subscription info.
 	 */
-	protected void addSubscribedTo(ISubscriptionIntermediateFuture<IRegistryEvent> fut)
+	protected void addSubscribedTo(SubscriptionInfo info)
 	{
 		if(subscribedto==null)
-			subscribedto = new HashSet<ISubscriptionIntermediateFuture<IRegistryEvent>>();
-		subscribedto.add(fut);
+			subscribedto = new HashSet<SubscriptionInfo>();
+		subscribedto.add(info);
 	}
 	
 	/**
 	 *  Remove an existing subscription.
 	 *  @param cid The component id to remove.
 	 */
-	protected void removeSubscribedTo(ISubscriptionIntermediateFuture<IRegistryEvent> fut)
+	protected void removeSubscribedTo(SubscriptionInfo info)
 	{
-		if(subscribedto==null || !subscribedto.contains(fut))
-			throw new RuntimeException("SubscribedTo not known: "+fut);
-		subscribedto.remove(fut);
+		if(subscribedto==null || !subscribedto.contains(info))
+			throw new RuntimeException("SubscribedTo not known: "+info);
+		subscribedto.remove(info);
 	}
 	
 	/**
@@ -527,5 +501,70 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	protected IServiceRegistry getRegistry()
 	{
 		return ServiceRegistry.getRegistry(component.getComponentIdentifier());
+	}
+	
+	/**
+	 *  Info struct for subscriptions.
+	 */
+	public static class SubscriptionInfo
+	{
+		/** The subscription. */
+		protected ISubscriptionIntermediateFuture<IRegistryEvent> subscription;
+	
+		/** The timestamp of the last received message. */
+		protected long timestamp;
+
+		/**
+		 * Create a new RegistrySynchronizationService.
+		 */
+		public SubscriptionInfo(ISubscriptionIntermediateFuture<IRegistryEvent> subscription)
+		{
+			this.subscription = subscription;
+		}
+
+		/**
+		 *  Get the subscription.
+		 *  @return the subscription
+		 */
+		public ISubscriptionIntermediateFuture<IRegistryEvent> getSubscription()
+		{
+			return subscription;
+		}
+
+		/**
+		 *  Set the subscription.
+		 *  @param subscription The subscription to set
+		 */
+		public void setSubscription(ISubscriptionIntermediateFuture<IRegistryEvent> subscription)
+		{
+			this.subscription = subscription;
+		}
+
+		/**
+		 *  Get the timestamp.
+		 *  @return the timestamp
+		 */
+		public long getTimestamp()
+		{
+			return timestamp;
+		}
+
+		/**
+		 *  Set the timestamp.
+		 *  @param timestamp The timestamp to set
+		 */
+		public void setTimestamp(long timestamp)
+		{
+			this.timestamp = timestamp;
+		}
+		
+//		/**
+//		 *  Check if this 
+//		 *  @param True, if the event is due and should be sent.
+//		 */
+//		public boolean isLeaseTimeOk()
+//		{
+//			return System.currentTimeMillis()-timestamp>timelimit;
+//		}
 	}
 }
