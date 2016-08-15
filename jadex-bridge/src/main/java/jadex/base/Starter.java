@@ -386,7 +386,8 @@ public class Starter
 						boolean providedhtonly = !config.getDht();
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess(), providedhtonly));						
 					} 
-					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
+//					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
+					else if(config.getRegistrySync())
 					{
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(true, new MultiServiceRegistry()));
 					}

@@ -103,6 +103,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		{
 			if(type!=null)
 			{
+				// todo: clone?! is only internal method
 				ret = services.get(type);
 			}
 			else
@@ -708,6 +709,15 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public IServiceRegistry getSubregistry(IComponentIdentifier cid)
 	{
 		return null;
+	}
+	
+	/**
+	 *  Remove a subregistry.
+	 *  @param cid The platform id.
+	 */
+	// write
+	public void removeSubregistry(IComponentIdentifier cid)
+	{
 	}
 	
 	/**

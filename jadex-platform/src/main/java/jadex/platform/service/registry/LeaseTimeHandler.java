@@ -5,18 +5,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.platform.service.awareness.discovery.DiscoveryEntry;
-import jadex.platform.service.awareness.discovery.LeaseTimeHandler;
 
 /**
  *  Used to a list of entries that is automatically
@@ -28,7 +23,7 @@ import jadex.platform.service.awareness.discovery.LeaseTimeHandler;
  *  to perform actions whenever an entry
  *  was deleted.
  */
-public class Handler<T>
+public class LeaseTimeHandler<T>
 {
 	//-------- attributes --------
 	
@@ -36,13 +31,10 @@ public class Handler<T>
 	protected IInternalAccess agent;
 	
 	/** The entries. */
-	protected Map<T, Long> entries;
+	protected Map<T, Entry> entries;
 	
 	/** The delay. */
 	protected long delay;
-	
-//	/** The timer. */
-//	protected Timer	timer;
 	
 	/** The timeout factor. */
 	protected double factor;
@@ -52,7 +44,7 @@ public class Handler<T>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public Handler(IInternalAccess agent)
+	public LeaseTimeHandler(IInternalAccess agent)
 	{
 		this(agent, 2.2, 5000);
 	}
@@ -60,7 +52,7 @@ public class Handler<T>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public Handler(IInternalAccess agent, double factor, long delay)
+	public LeaseTimeHandler(IInternalAccess agent, double factor, long delay)
 	{
 		this.agent = agent;
 		this.factor = factor;
@@ -77,67 +69,53 @@ public class Handler<T>
 	 */
 	public boolean addOrUpdateEntry(T entry)
 	{
-//		System.out.println("add: "+entry);
+//		System.out.println("refresh: "+entry);
+		boolean ret = false;
 		
 		if(entries == null)
-			entries = new HashMap<T, Long>();
+			entries = new HashMap<T, Entry>();
 		
 		// If already contained update old entry (to not loose fixed entries like master flag).
 		
-//		entries.get
-//		if(entries.containsKey(entry))
-//		{
-//			T old = entries.remove(entry);
-//			entries.put(entry, getClockTime());
-//		}
-//		else
-//		{
-//			entries.put(entry, getClockTime());
-//		}
-//		
-//		DiscoveryEntry oldentry = entries.get(entry.getInfo().getSender());
-//		if(oldentry!=null)
-//		{
-//			oldentry.setInfo(entry.getInfo());
-//			oldentry.setTime(getClockTime());
-//			oldentry.setEntry(entry.getEntry());
-//		}
-//		else
-//		{
-//			entries.put(entry.getInfo().getSender(), entry);
-//		}
-//		
-//		return oldentry==null;
-	
-		return false;
+		Entry old = entries.get(entry);
+		
+		if(old!=null)
+		{
+			old.setEntry(entry);
+			old.setTimestamp(getClockTime());
+		}
+		else
+		{
+			entries.put(entry, new Entry(entry, getClockTime()));
+			ret = true;
+		}
+		
+		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Get an existing entry.
 	 */
+	public T getEntry(T old)
+	{
+		return entries!=null && entries.containsKey(old)? entries.get(old).getEntry(): null;
+	}
 	
+	/**
+	 *  Remove an entry.
+	 */
+	public boolean removeEntry(T entry)
+	{
+		return entries==null? false: entries.remove(entry)!=null;
+	}
 	
-//	/**
-//	 *  Add a new entry or update an existing entry.
-//	 *  @param entry The entry.
-//	 */
-//	public synchronized void updateEntry(DiscoveryEntry entry)
-//	{
-//		if(entries==null)
-//			entries = new LinkedHashMap();
-//		
-//		// If already contained update old entry (to not loose fixed entries like master flag).
-//		DiscoveryEntry oldentry = (DiscoveryEntry)entries.get(entry.getInfo().getSender());
-//		if(oldentry!=null)
-//		{
-//			oldentry.setInfo(entry.getInfo());
-//			oldentry.setTime(getClockTime());
-//		}
-//		else
-//		{
-//			throw new RuntimeException("Entry not contained: "+entry.getInfo().getSender());
-//		}
-//	}
+	/**
+	 *  Test if contains an entry.
+	 */
+	public boolean containsEntry(T entry)
+	{
+		return entries!=null? entries.containsKey(entry): false;
+	}
 	
 	/**
 	 *  Get all entries.
@@ -145,8 +123,23 @@ public class Handler<T>
 	 */
 	public T[] getEntries()
 	{
-		return (T[])(entries==null? SUtil.EMPTY_OBJECT_ARRAY:
-			entries.keySet().toArray(new Object[entries.size()]));
+		T[] ret = null;
+		
+		if(entries!=null)
+		{
+			ret = (T[])new Object[entries.size()];
+			int i=0;
+			for(Entry entry: entries.values())
+			{
+				ret[i++] = entry.getEntry();
+			}
+		}
+		else
+		{
+			ret = (T[])SUtil.EMPTY_OBJECT_ARRAY;
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -164,14 +157,16 @@ public class Handler<T>
 				
 				if(entries!=null)
 				{
-					for(Iterator<Map.Entry<T, Long>> it=entries.entrySet().iterator(); it.hasNext();)
+					for(Iterator<Map.Entry<T, Entry>> it=entries.entrySet().iterator(); it.hasNext();)
 					{
-						Map.Entry<T, Long> entry = it.next();
+						Map.Entry<T, Entry> entry = it.next();
+						
+//						System.out.println("Entry: "+entry.getValue().getTimestamp()+" "+entry.getKey());
 						
 						// Have some time buffer before delete
-						if(time>entry.getValue()+delay*factor)
+						if(time>entry.getValue().getTimestamp()+delay*factor)
 						{
-//								System.out.println("Removing: "+entry);
+//							System.out.println("Removing: "+entry);
 							it.remove();
 							todel.add(entry.getKey());
 						}
@@ -196,7 +191,7 @@ public class Handler<T>
 	/**
 	 *  Get the current time.
 	 */
-	protected long getClockTime()
+	public long getClockTime()
 	{
 //		return clock.getTime();
 		return System.currentTimeMillis();
@@ -207,5 +202,64 @@ public class Handler<T>
 	 */
 	public void entryDeleted(T entry)
 	{
+	}
+	
+	/**
+	 *  Entry struct.
+	 */
+	public class Entry
+	{
+		/** The real entry. */
+		protected T entry;
+		
+		/** The timestamp. */
+		protected long timestamp;
+		
+		/**
+		 *  Create a new entry.
+		 *  @param entry The entry.
+		 *  @param timestamp The timestamp.
+		 */
+		public Entry(T entry, long timestamp)
+		{
+			this.entry = entry;
+			this.timestamp = timestamp;
+		}
+
+		/**
+		 *  Get the entry.
+		 *  @return The entry
+		 */
+		public T getEntry()
+		{
+			return entry;
+		}
+
+		/**
+		 *  Set the entry.
+		 *  @param entry The entry to set
+		 */
+		public void setEntry(T entry)
+		{
+			this.entry = entry;
+		}
+
+		/**
+		 *  Get the timestamp.
+		 *  @return The timestamp
+		 */
+		public long getTimestamp()
+		{
+			return timestamp;
+		}
+
+		/**
+		 *  Set the timestamp.
+		 *  @param timestamp The timestamp to set
+		 */
+		public void setTimestamp(long timestamp)
+		{
+			this.timestamp = timestamp;
+		}
 	}
 }

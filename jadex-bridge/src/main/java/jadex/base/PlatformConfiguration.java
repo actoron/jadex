@@ -161,6 +161,7 @@ public class PlatformConfiguration
 		RESERVED.add(DEFTIMEOUT);
 		RESERVED.add(DHT);
 		RESERVED.add(DHT_PROVIDE);
+//		RESERVED.add(REGISTRY_SYNC);
 	}
 
 	/** Command line arguments. **/
@@ -256,6 +257,7 @@ public class PlatformConfiguration
 		rootConfig.setContext(true);
 		rootConfig.setAddress(true);
 		rootConfig.setDhtProvide(false);
+//		rootConfig.setRegistrySync(false);
 		return config;
 	}
 
@@ -338,7 +340,8 @@ public class PlatformConfiguration
 	/**
 	 * Copy constructor.
 	 */
-	public PlatformConfiguration(PlatformConfiguration source) {
+	public PlatformConfiguration(PlatformConfiguration source) 
+	{
 		this.cmdargs = new HashMap<String, Object>(cmdargs);
 		this.rootconfig = new RootComponentConfiguration(source.rootconfig);
 		this.components = new ArrayList<String>(source.components);
@@ -380,7 +383,8 @@ public class PlatformConfiguration
 	 * @param key
 	 * @param value
 	 */
-	public void setValue(String key, Object value) {
+	public void setValue(String key, Object value) 
+	{
 		this.cmdargs.put(key, value);
 	}
 	
@@ -670,7 +674,8 @@ public class PlatformConfiguration
 	 * Set the OPENGL flag.
 	 * @param value
 	 */
-	public void setOpenGl(boolean value) {
+	public void setOpenGl(boolean value) 
+	{
 		setValue(OPENGL, value);
 		Class<?> p2d = SReflect.classForName0("jadex.extension.envsupport.observer.perspective.Perspective2D", Starter.class.getClassLoader());
 		if(p2d!=null)
@@ -729,6 +734,25 @@ public class PlatformConfiguration
 	{
 //		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
 		return rootconfig.getDhtProvide();
+	}
+	
+	/**
+	 * Set the provide DHT flag.
+	 * @param value
+	 */
+	public void setRegistrySync(boolean value) 
+	{
+//		setValue(DHT_PROVIDE, value);
+		rootconfig.setRegistrySync(value);
+	}
+	/**
+	 * Get the provide DHT flag.
+	 * @return
+	 */
+	public boolean getRegistrySync() 
+	{
+//		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
+		return rootconfig.getRegistrySync();
 	}
 	
 	/**
@@ -1056,7 +1080,7 @@ public class PlatformConfiguration
 		{
 			config.setOpenGl(false);
 		}
-		else if (MONITORING.equals(key)) 
+		else if(MONITORING.equals(key)) 
 		{
 			Object tmpmoni = config.getValue(PlatformConfiguration.MONITORING);
 			PublishEventLevel moni = PublishEventLevel.OFF;
@@ -1086,8 +1110,10 @@ public class PlatformConfiguration
 
 		Set<Map.Entry<String, Object>> entries = cmdargs.entrySet();
 
-		for (Map.Entry<String, Object> arg: entries) {
-			if (!(arg.getValue() == null || arg.getValue().equals(false))) {
+		for (Map.Entry<String, Object> arg: entries) 
+		{
+			if (!(arg.getValue() == null || arg.getValue().equals(false))) 
+			{
 				sb.append(arg.getKey());
 				sb.append(": ");
 				sb.append(arg.getValue());
@@ -1097,8 +1123,10 @@ public class PlatformConfiguration
 
 		entries = rootconfig.getArgs().entrySet();
 
-		for (Map.Entry<String, Object> arg: entries) {
-			if (!(arg.getValue() == null || arg.getValue().equals(false))) {
+		for (Map.Entry<String, Object> arg: entries) 
+		{
+			if (!(arg.getValue() == null || arg.getValue().equals(false))) 
+			{
 				sb.append(arg.getKey());
 				sb.append(": ");
 				sb.append(arg.getValue());
@@ -1115,8 +1143,10 @@ public class PlatformConfiguration
 	 * Will overwrite all values that are set in the other config.
 	 * @param other
 	 */
-	public void enhanceWith(PlatformConfiguration other) {
-		for (Map.Entry<String, Object> entry : other.cmdargs.entrySet()) {
+	public void enhanceWith(PlatformConfiguration other) 
+	{
+		for (Map.Entry<String, Object> entry : other.cmdargs.entrySet()) 
+		{
 			this.setValue(entry.getKey(), entry.getValue());
 		}
 		rootconfig.enhanceWith(other.rootconfig);
@@ -1125,7 +1155,8 @@ public class PlatformConfiguration
 	/**
 	 * Checks this configuration for consistency errors.
 	 */
-	protected void checkConsistency() {
+	protected void checkConsistency() 
+	{
 		rootconfig.checkConsistency();
 	}
 }

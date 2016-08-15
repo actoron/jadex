@@ -203,7 +203,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=DHT_PROVIDE, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=REGISTRY_SYNC, clazz=boolean.class, defaultvalue="true")
+	@Argument(name=REGISTRY_SYNC, clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({

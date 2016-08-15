@@ -164,5 +164,12 @@ public interface IServiceRegistry
 	 */
 	// read
 	public IServiceRegistry getSubregistry(IComponentIdentifier cid);
+	
+	/**
+	 *  Remove a subregistry.
+	 *  @param cid The platform id.
+	 */
+	// write
+	public void removeSubregistry(IComponentIdentifier cid);
 
 }

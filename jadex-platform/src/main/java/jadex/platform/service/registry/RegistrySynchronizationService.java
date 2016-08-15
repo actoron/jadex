@@ -53,7 +53,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
 	/** The platforms this registry has subscribed to. */
-	protected Set<SubscriptionInfo> subscribedto;
+	protected LeaseTimeHandler<SubscriptionInfo> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
 	
 	
@@ -80,6 +80,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		
 		this.eventslimit = 50;
 		this.timelimit = 5000;
+		this.registryevent = new RegistryEvent();
 		
 		// Subscribe to awareness service to get informed when new platforms are discovered
 		// todo: does not work without awareness
@@ -200,7 +201,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 					System.out.println("Found registry service on: "+cid+" (I am: "+component.getComponentIdentifier()+")");
 					
 					ISubscriptionIntermediateFuture<IRegistryEvent> fut = regser.subscribeToEvents();
-					final SubscriptionInfo info = new SubscriptionInfo(fut);
+					final SubscriptionInfo info = new SubscriptionInfo(cid, fut);
 					
 					addSubscribedTo(info);
 										
@@ -208,11 +209,14 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 					{
 						public void intermediateResultAvailable(IRegistryEvent event)
 						{
-							System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode());
+							if(event.size()>0)
+								System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode()
+									+" at: "+System.currentTimeMillis()+"(I am: "+component.getComponentIdentifier()+")");
 							
 							IServiceRegistry reg = getRegistry();
 							
 							info.setTimestamp(System.currentTimeMillis());
+							subscribedto.addOrUpdateEntry(info);
 							
 							// Only add if registry is multi type
 							Map<ClassInfo, Set<IService>> added = event.getAddedServices();
@@ -262,8 +266,8 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 							{
 								if(!(exception instanceof FutureTerminatedException)) // ignore terminate
 								{
-									System.out.println("Exception in subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
-									exception.printStackTrace();
+									System.out.println("Exception in my subscription with: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+//									exception.printStackTrace();
 								}
 								removeKnownPlatforms(cid);
 								removeSubscribedTo(info);
@@ -274,7 +278,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("Found no registry service on: "+cid);
+//					System.out.println("Found no registry service on: "+cid);
 				}
 			});
 		}
@@ -316,10 +320,11 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		
 		if(subscribedto!=null)
 		{
-			ISubscriptionIntermediateFuture<IRegistryEvent>[] evs = subscribedto.toArray(new ISubscriptionIntermediateFuture[subscribedto.size()]);
-			for(ISubscriptionIntermediateFuture<IRegistryEvent> fut: evs)
+//			ISubscriptionIntermediateFuture<IRegistryEvent>[] evs = subscribedto.toArray(new ISubscriptionIntermediateFuture[subscribedto.size()]);
+			SubscriptionInfo[] evs = subscribedto.getEntries();
+			for(SubscriptionInfo info: evs)
 			{
-				fut.terminate();
+				info.getSubscription().terminate();
 			}
 		}
 		
@@ -346,8 +351,9 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 			{
 				fut.addIntermediateResult(registryevent);
 			}
-			registryevent = null;
+			//registryevent = null;
 		}
+		registryevent = new RegistryEvent();
 	}
 	
 	/**
@@ -446,8 +452,17 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	protected void addSubscribedTo(SubscriptionInfo info)
 	{
 		if(subscribedto==null)
-			subscribedto = new HashSet<SubscriptionInfo>();
-		subscribedto.add(info);
+		{
+			subscribedto = new LeaseTimeHandler<SubscriptionInfo>(component, 2.2, timelimit)
+			{
+				public void entryDeleted(SubscriptionInfo entry)
+				{
+					System.out.println("Remove subscription of: "+entry.getPlatformId());
+					getRegistry().removeSubregistry(entry.getPlatformId());
+				}
+			};
+		}
+		subscribedto.addOrUpdateEntry(info);
 	}
 	
 	/**
@@ -456,9 +471,9 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	 */
 	protected void removeSubscribedTo(SubscriptionInfo info)
 	{
-		if(subscribedto==null || !subscribedto.contains(info))
+		if(subscribedto==null || !subscribedto.containsEntry(info))
 			throw new RuntimeException("SubscribedTo not known: "+info);
-		subscribedto.remove(info);
+		subscribedto.removeEntry(info);
 	}
 	
 	/**
@@ -510,6 +525,9 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	{
 		/** The subscription. */
 		protected ISubscriptionIntermediateFuture<IRegistryEvent> subscription;
+		
+		/** The component identifier of the platform. */
+		protected IComponentIdentifier platformid;
 	
 		/** The timestamp of the last received message. */
 		protected long timestamp;
@@ -517,8 +535,9 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		/**
 		 * Create a new RegistrySynchronizationService.
 		 */
-		public SubscriptionInfo(ISubscriptionIntermediateFuture<IRegistryEvent> subscription)
+		public SubscriptionInfo(IComponentIdentifier platformid, ISubscriptionIntermediateFuture<IRegistryEvent> subscription)
 		{
+			this.platformid = platformid;
 			this.subscription = subscription;
 		}
 
@@ -557,6 +576,24 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		{
 			this.timestamp = timestamp;
 		}
+
+		/**
+		 *  Get the platformId.
+		 *  @return The platformId
+		 */
+		public IComponentIdentifier getPlatformId()
+		{
+			return platformid;
+		}
+
+		/**
+		 *  Set the platformId.
+		 *  @param platformId The platformId to set
+		 */
+		public void setPlatformId(IComponentIdentifier platformId)
+		{
+			this.platformid = platformId;
+		}
 		
 //		/**
 //		 *  Check if this 
@@ -566,5 +603,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 //		{
 //			return System.currentTimeMillis()-timestamp>timelimit;
 //		}
+		
+		
 	}
 }

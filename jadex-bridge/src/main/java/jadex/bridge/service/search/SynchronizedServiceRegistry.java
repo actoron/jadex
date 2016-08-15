@@ -901,4 +901,25 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 			}
 		}, "getSubregistry");
 	}
+	
+	/**
+	 *  Remove an existing registry.
+	 *  @param cid The component id to remove.
+	 */
+	public void removeSubregistry(final IComponentIdentifier cid)
+	{
+		writeAction(new IResultCommand<IFuture<Void>, Void>()
+		{
+			public IFuture<Void> execute(Void args)
+			{
+				delegate.removeSubregistry(cid);
+				return IFuture.DONE;
+			}
+			
+			public String toString()
+			{
+				return "removeSubregistryStep: "+readercnt;
+			}
+		});
+	}
 }

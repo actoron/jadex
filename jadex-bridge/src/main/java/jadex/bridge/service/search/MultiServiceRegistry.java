@@ -348,7 +348,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 		{
 			ret = new ServiceRegistry();
 //			System.out.println("Created registry for: "+cid);
-			addRegistry(cid, ret);
+			addSubregistry(cid, ret);
 		}
 		return ret;
 	}
@@ -357,7 +357,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	 *  Add a new registry.
 	 *  @param registry The registry.
 	 */
-	protected void addRegistry(IComponentIdentifier cid, IServiceRegistry registry)
+	public void addSubregistry(IComponentIdentifier cid, IServiceRegistry registry)
 	{
 		if(registries==null)
 			registries = new HashMap<IComponentIdentifier, IServiceRegistry>();
@@ -372,10 +372,25 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	 *  Remove an existing registry.
 	 *  @param cid The component id to remove.
 	 */
-	protected void removeRegistry(IComponentIdentifier cid)
+	public void removeSubregistry(IComponentIdentifier cid)
 	{
 		if(registries==null || !registries.containsKey(cid))
 			throw new RuntimeException("Registry not contained: "+cid);
+		
+		// Remove all services to trigger removed events
+		IServiceRegistry reg = registries.get(cid);
+		Map<ClassInfo, Set<IService>> sers = reg.getServiceMap();
+		if(sers!=null)
+		{
+			for(Map.Entry<ClassInfo, Set<IService>> entry: sers.entrySet())
+			{
+				for(IService ser: entry.getValue())
+				{
+					reg.removeService(entry.getKey(), ser);
+				}
+			}
+		}
+		
 		registries.remove(cid);
 	}
 	
