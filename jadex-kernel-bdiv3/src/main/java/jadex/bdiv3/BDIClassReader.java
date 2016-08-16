@@ -43,6 +43,8 @@ import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.ServiceTrigger;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.exceptions.JadexBDIGenerationException;
+import jadex.bdiv3.exceptions.JadexBDIGenerationRuntimeException;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.ConstructorInfo;
@@ -122,7 +124,7 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 *  Load a  model.
 	 *  @param model The model (e.g. file name).
-	 *  @param The imports (if any).
+	 *  @param imports (if any).
 	 *  @return The loaded model.
 	 */
 	@Override
@@ -563,7 +565,11 @@ public class BDIClassReader extends MicroClassReader
 		for(Class<?> agcl: agtcls)
 		{
 //			Class<?> acl =
-			gen.generateBDIClass(agcl.getName(), bdimodel, cl);
+			try {
+				gen.generateBDIClass(agcl.getName(), bdimodel, cl);
+			} catch (JadexBDIGenerationException e) {
+				throw new JadexBDIGenerationRuntimeException("Could not read bdi agent: " + agcl, e);
+			}
 //			System.out.println("genclazz: "+agcl.getName()+" "+agcl.hashCode()+" "+agcl.getClassLoader());
 		}
 		
