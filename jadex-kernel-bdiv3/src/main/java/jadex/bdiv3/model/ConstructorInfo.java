@@ -45,7 +45,7 @@ public class ConstructorInfo
 		this.parametertypes = new String[ptypes.length];
 		for(int i=0; i<parametertypes.length; i++)
 		{
-			parametertypes[i] = ptypes[i].getName();
+			parametertypes[i] = SReflect.getClassName(ptypes[i]);
 		}
 	}
 	
