@@ -31,7 +31,10 @@ import jadex.bridge.service.types.registry.IRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
+import jadex.commons.collection.ILeaseTimeCollection;
+import jadex.commons.collection.LeaseTimeCollection;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -53,7 +56,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
 	/** The platforms this registry has subscribed to. */
-	protected LeaseTimeHandler<SubscriptionInfo> subscribedto;
+	protected ILeaseTimeCollection<SubscriptionInfo> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
 	
 	
@@ -216,7 +219,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 							IServiceRegistry reg = getRegistry();
 							
 							info.setTimestamp(System.currentTimeMillis());
-							subscribedto.addOrUpdateEntry(info);
+							subscribedto.update(info);
 							
 							// Only add if registry is multi type
 							Map<ClassInfo, Set<IService>> added = event.getAddedServices();
@@ -226,6 +229,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 								{
 									for(IService ser: entry.getValue())
 									{
+//										System.out.println("added ser: "+entry.getKey());
 										reg.addService(entry.getKey(), ser);
 									}
 								}
@@ -238,6 +242,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 								{
 									for(IService ser: entry.getValue())
 									{
+//										System.out.println("removed ser: "+entry.getKey());
 										reg.removeService(entry.getKey(), ser);
 									}
 								}
@@ -278,7 +283,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 				
 				public void exceptionOccurred(Exception exception)
 				{
-//					System.out.println("Found no registry service on: "+cid);
+					System.out.println("Found no registry service on: "+cid);
 				}
 			});
 		}
@@ -321,7 +326,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		if(subscribedto!=null)
 		{
 //			ISubscriptionIntermediateFuture<IRegistryEvent>[] evs = subscribedto.toArray(new ISubscriptionIntermediateFuture[subscribedto.size()]);
-			SubscriptionInfo[] evs = subscribedto.getEntries();
+			SubscriptionInfo[] evs = subscribedto.toArray(new SubscriptionInfo[subscribedto.size()]);
 			for(SubscriptionInfo info: evs)
 			{
 				info.getSubscription().terminate();
@@ -453,16 +458,17 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	{
 		if(subscribedto==null)
 		{
-			subscribedto = new LeaseTimeHandler<SubscriptionInfo>(component, 2.2, timelimit)
+			subscribedto = LeaseTimeCollection.createLeaseTimeCollection((long)(2.2*timelimit), new ICommand<SubscriptionInfo>()
 			{
-				public void entryDeleted(SubscriptionInfo entry)
+				public void execute(SubscriptionInfo entry) 
 				{
 					System.out.println("Remove subscription of: "+entry.getPlatformId());
 					getRegistry().removeSubregistry(entry.getPlatformId());
 				}
-			};
+			}, new AgentDelayRunner(component), false);
 		}
-		subscribedto.addOrUpdateEntry(info);
+		
+		subscribedto.update(info);
 	}
 	
 	/**
@@ -471,9 +477,9 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	 */
 	protected void removeSubscribedTo(SubscriptionInfo info)
 	{
-		if(subscribedto==null || !subscribedto.containsEntry(info))
+		if(subscribedto==null || !subscribedto.contains(info))
 			throw new RuntimeException("SubscribedTo not known: "+info);
-		subscribedto.removeEntry(info);
+		subscribedto.remove(info);
 	}
 	
 	/**

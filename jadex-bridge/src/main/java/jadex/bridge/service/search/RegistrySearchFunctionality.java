@@ -217,8 +217,8 @@ public class RegistrySearchFunctionality
 	{
 		final Future<T> ret = new Future<T>();
 				
-		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
-			System.out.println("search: "+type+" - "+cid);
+//		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
+//			System.out.println("search: "+type+" - "+cid);
 		
 //		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 //			System.out.println("global search");
@@ -251,7 +251,7 @@ public class RegistrySearchFunctionality
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					ret.setException(exception);
+					ret.setExceptionIfUndone(exception);
 				}
 			});
 			
