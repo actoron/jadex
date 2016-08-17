@@ -18,6 +18,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -192,6 +193,19 @@ public class ProxyAgent	implements IProxyAgentService
 	public IFuture<State> getConnectionState()
 	{
 		final Future<State> ret = new Future<State>();
+
+//		ret.addResultListener(new IResultListener<IProxyAgentService.State>()
+//		{
+//			public void resultAvailable(State result)
+//			{
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				if(exception instanceof TimeoutException)
+//					System.out.println("setting to: "+exception);
+//			}
+//		});
 		
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
@@ -223,7 +237,7 @@ public class ProxyAgent	implements IProxyAgentService
 				});
 			}
 		});
-		
+
 		return ret;
 	}
 	

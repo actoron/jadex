@@ -1,20 +1,21 @@
 package jadex.commons.collection;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import jadex.commons.ICommand;
 
 /**
  *  Collection that remove elements after a lease time automatically.
  */
-public class LeaseTimeCollection<E> implements Collection<E>
+public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 {
 	/** Constant for no leasetime. */
 	public static final long NONE = -1;
@@ -59,7 +60,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	protected Map<E, Long> times = new HashMap<E, Long>();
 	
 	/** The timer. */
-	protected Timer	timer;
+	protected IDelayRunner	timer;
 	
 	/** The leasetime. */
 	protected long leasetime;
@@ -75,14 +76,15 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public LeaseTimeCollection()
+	protected LeaseTimeCollection()
 	{
+		this(5000);
 	}
 	
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public LeaseTimeCollection(long leasetime)
+	protected LeaseTimeCollection(long leasetime)
 	{
 		this(leasetime, null);
 //		this.leasetime = leasetime;
@@ -91,7 +93,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public LeaseTimeCollection(ICommand<E> removecmd)
+	protected LeaseTimeCollection(ICommand<E> removecmd)
 	{
 		// per default no general leasetime
 		this(UNSET, removecmd);
@@ -100,52 +102,85 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public LeaseTimeCollection(long leasetime, ICommand<E> removecmd)
+	protected LeaseTimeCollection(long leasetime, ICommand<E> removecmd)
+	{
+		this(leasetime, removecmd, null);
+	}
+	
+	/**
+	 *  Create a new lease time handling object.
+	 */
+	protected LeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer)
 	{
 		this.leasetime = leasetime;
 		this.removecmd = removecmd;
+		this.timer = timer!=null? timer: new TimerDelayRunner();
+	}
+	
+	/**
+	 *  Create a lease time collection with java util timer.
+	 */
+	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime)
+	{
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime));
+	}
+	
+	/**
+	 *  Create a lease time collection with java util timer.
+	 */
+	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd)
+	{
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime, removecmd));
+	}
+	
+	/**
+	 *  Create a lease time collection with java util timer.
+	 */
+	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer, boolean sync)
+	{
+		return sync? new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime, removecmd, timer)): new LeaseTimeCollection(leasetime, removecmd, timer);
 	}
 	
 	//-------- methods --------
 
-    public synchronized int size()
+    public int size()
     {
     	return entries.size();
     }
 
-    public synchronized boolean isEmpty()
+    public boolean isEmpty()
     {
     	return entries.isEmpty();
     }
 
-    public synchronized boolean contains(Object o)
+    public boolean contains(Object o)
     {
     	return entries.contains(o);
     }
 
-    public synchronized Iterator<E> iterator()
+    public Iterator<E> iterator()
     {
     	return entries.iterator();
     }
 
-    public synchronized Object[] toArray()
+    public Object[] toArray()
     {
     	return entries.toArray();
     }
 
-    public synchronized <T> T[] toArray(T[] a)
+    public <T> T[] toArray(T[] a)
     {
     	return entries.toArray(a);
     }
 
     // Modification Operations
 
-    public synchronized boolean add(E e)
+    public boolean add(E e)
     {
     	return add(e, getLeaseTime());
     }
     
-    public synchronized boolean add(E e, long leasetime)
+    public boolean add(E e, long leasetime)
     {
     	times.put(e, getExpirationTime(leasetime));
     	boolean ret = entries.add(e);
@@ -156,7 +191,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
     	return ret;
     }
 
-    public synchronized boolean remove(Object o)
+    public boolean remove(Object o)
     {
     	times.remove(o);
     	boolean ret = entries.remove(o);
@@ -169,12 +204,12 @@ public class LeaseTimeCollection<E> implements Collection<E>
 
     // Bulk Operations
 
-    public synchronized boolean containsAll(Collection<?> c)
+    public boolean containsAll(Collection<?> c)
     {
     	return entries.containsAll(c);
     }
 
-    public synchronized boolean addAll(Collection<? extends E> c)
+    public boolean addAll(Collection<? extends E> c)
     {
     	boolean changed = false;
     	for(E entry: c)
@@ -188,7 +223,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
     	return changed;
     }
 
-    public synchronized boolean removeAll(Collection<?> c)
+    public boolean removeAll(Collection<?> c)
     {
     	boolean changed = false;
     	for(Object entry: c)
@@ -202,7 +237,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
     	return changed;
     }
 
-    public synchronized boolean retainAll(Collection<?> c)
+    public boolean retainAll(Collection<?> c)
     {
 //    	return entries.retainAll(c);
     	boolean changed = false;
@@ -221,7 +256,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
     	return changed;
     }
 
-    public synchronized void clear()
+    public void clear()
     {
     	times.clear();
     	entries.clear();
@@ -230,13 +265,13 @@ public class LeaseTimeCollection<E> implements Collection<E>
 
     // Comparison and hashing
 
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
     	return entries.equals(o);
     }
 
     /**
-     * 
+     *  Get the hashcode.
      */
     public int hashCode()
     {
@@ -248,7 +283,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 *  @param entry The entry.
 	 *  @return True, if new entry.
 	 */
-	public synchronized boolean update(E e)
+	public boolean update(E e)
 	{
 		return update(e, getLeaseTime());
 	}
@@ -258,7 +293,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 *  @param entry The entry.
 	 *  @return True, if new entry.
 	 */
-	public synchronized boolean update(E e, long leasetime)
+	public boolean update(E e, long leasetime)
 	{
 		boolean ret = !remove(e);
 		
@@ -271,7 +306,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 *  Update the timestamp of e.
 	 *  @param entry The entry.
 	 */
-	public synchronized void touch(E e)
+	public void touch(E e)
 	{
 		touch(e, getLeaseTime());
 	}
@@ -280,7 +315,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	 *  Update the timestamp of e.
 	 *  @param entry The entry.
 	 */
-	public synchronized void touch(E e, long leasetime)
+	public void touch(E e, long leasetime)
 	{
 	   	times.put(e, getExpirationTime(leasetime));
 		// Does only reorder when element is added again :-(
@@ -331,28 +366,30 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	/**
 	 *  Overriden wait for to not use platform clock.
 	 */
-	protected synchronized Runnable doWaitFor(long delay, final Runnable step)
+	public Runnable doWaitFor(long delay, final Runnable step)
 	{
-		if(timer==null)
-			timer	= new Timer(true);
+		return timer.waitForDelay(delay, step);
 		
-		final TimerTask tt = new TimerTask()
-		{
-			public void run()
-			{
-				step.run();
-			}
-		};
-		
-		timer.schedule(tt, delay);
-		
-		return new Runnable()
-		{
-			public void run()
-			{
-				tt.cancel();
-			}
-		};
+//		if(timer==null)
+//			timer = new Timer(true);
+//		
+//		final TimerTask tt = new TimerTask()
+//		{
+//			public void run()
+//			{
+//				step.run();
+//			}
+//		};
+//		
+//		timer.schedule(tt, delay);
+//		
+//		return new Runnable()
+//		{
+//			public void run()
+//			{
+//				tt.cancel();
+//			}
+//		};
 	}
 	
 	/**
@@ -401,14 +438,14 @@ public class LeaseTimeCollection<E> implements Collection<E>
 	}
 	
 	/**
-	 * 
+	 *  The checker for removing entries.
 	 */
 	public class Checker implements Runnable
 	{
 		Runnable cancel = null;
 
 		/**
-		 * 
+		 *  The run method.
 		 */
 		public void run()
 		{
@@ -470,7 +507,7 @@ public class LeaseTimeCollection<E> implements Collection<E>
 		}
 		
 		/**
-		 * 
+		 *  Cancel the current wait.
 		 */
 		public void cancel()
 		{
@@ -478,13 +515,151 @@ public class LeaseTimeCollection<E> implements Collection<E>
 				cancel.run();
 		}
 	}
+
+	/**
+	 *  Synchronized lease time collection.
+	 */
+    public static class SynchronizedLeaseTimeCollection<E> implements ILeaseTimeCollection<E>, Serializable 
+    {
+        final ILeaseTimeCollection<E> c;  // Backing Collection
+        final Object mutex;     // Object on which to synchronize
+
+        public SynchronizedLeaseTimeCollection(ILeaseTimeCollection<E> c) 
+        {
+            if (c==null)
+                throw new NullPointerException();
+            this.c = c;
+            mutex = this;
+        }
+        
+        public SynchronizedLeaseTimeCollection(ILeaseTimeCollection<E> c, Object mutex) 
+        {
+            this.c = c;
+            this.mutex = mutex;
+        }
+
+        public int size() 
+        {
+            synchronized (mutex) {return c.size();}
+        }
+        
+        public boolean isEmpty() 
+        {
+            synchronized (mutex) {return c.isEmpty();}
+        }
+        
+        public boolean contains(Object o) 
+        {
+            synchronized (mutex) {return c.contains(o);}
+        }
+        
+        public Object[] toArray() 
+        {
+            synchronized (mutex) {return c.toArray();}
+        }
+        
+        public <T> T[] toArray(T[] a) 
+        {
+            synchronized (mutex) {return c.toArray(a);}
+        }
+
+        public Iterator<E> iterator() 
+        {
+            return c.iterator(); // Must be manually synched by user!
+        }
+
+        public boolean add(E e) 
+        {
+            synchronized (mutex) {return c.add(e);}
+        }
+        
+        public boolean remove(Object o) 
+        {
+            synchronized (mutex) {return c.remove(o);}
+        }
+
+        public boolean containsAll(Collection<?> coll) 
+        {
+            synchronized (mutex) {return c.containsAll(coll);}
+        }
+        
+        public boolean addAll(Collection<? extends E> coll) 
+        {
+            synchronized (mutex) {return c.addAll(coll);}
+        }
+        
+        public boolean removeAll(Collection<?> coll) 
+        {
+            synchronized (mutex) {return c.removeAll(coll);}
+        }
+        
+        public boolean retainAll(Collection<?> coll) 
+        {
+            synchronized (mutex) {return c.retainAll(coll);}
+        }
+        
+        public void clear() 
+        {
+            synchronized (mutex) {c.clear();}
+        }
+        
+        public String toString() 
+        {
+            synchronized (mutex) {return c.toString();}
+        }
+        
+        private void writeObject(ObjectOutputStream s) throws IOException 
+        {
+            synchronized (mutex) {s.defaultWriteObject();}
+        }
+        
+
+        public boolean add(E e, long leasetime)
+        {
+        	 synchronized(mutex) {return c.add(e, leasetime);}
+        }
+    	
+    	public boolean update(E e)
+    	{
+    		 synchronized(mutex) {return c.update(e);}
+    	}
+    	
+    	/**
+    	 *  Add a new entry or update an existing entry.
+    	 *  @param entry The entry.
+    	 *  @return True, if new entry.
+    	 */
+    	public boolean update(E e, long leasetime)
+    	{
+    		 synchronized(mutex) {return c.update(e, leasetime);}
+    	}
+    	
+    	/**
+    	 *  Update the timestamp of e.
+    	 *  @param entry The entry.
+    	 */
+    	public void touch(E e)
+    	{
+    		 synchronized(mutex) {c.touch(e);}
+    	}
+    	
+    	/**
+    	 *  Update the timestamp of e.
+    	 *  @param entry The entry.
+    	 */
+    	public void touch(E e, long leasetime)
+    	{
+    		 synchronized(mutex) {c.touch(e, leasetime);}
+    	}
+    }
 	
 	/**
 	 *  Main for testing.
 	 */
 	public static void main(String[] args)
 	{
-		LeaseTimeCollection<Integer> col = new LeaseTimeCollection<Integer>(3000);
+//		LeaseTimeCollection<Integer> col = new LeaseTimeCollection<Integer>(3000);
+		ILeaseTimeCollection<Integer> col = createLeaseTimeCollection(3000);
 		
 //		col.add(1);
 //		col.add(2);
@@ -529,6 +704,5 @@ public class LeaseTimeCollection<E> implements Collection<E>
 				e.printStackTrace();
 			}
 		}
-		
 	}
 }
