@@ -29,6 +29,7 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bdiv3.runtime.impl.BodyAborted;
+import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.PlanAbortedException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
@@ -170,6 +171,10 @@ public abstract class Plan
 		try
 		{
 			ret.get(timeout);
+		}
+		catch(GoalDroppedException e)
+		{
+			throw e;
 		}
 		catch(GoalFailureException e)
 		{

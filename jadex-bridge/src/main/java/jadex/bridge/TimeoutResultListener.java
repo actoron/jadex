@@ -9,8 +9,10 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.commons.DebugException;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
@@ -185,7 +187,8 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 	{
 		// Initialize timeout
 		final Object mon = this;
-//		final Exception ex	= new TimeoutException();
+		final Exception ex	= Future.DEBUG ? new DebugException() : null;
+		
 		
 		exta.scheduleStep(new ImmediateComponentStep<Void>()
 		{
@@ -227,13 +230,15 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
+														Exception	te	= new TimeoutException("Timeout was: "+timeout+" "+message, ex);
+														
 														if(undone && listener instanceof IUndoneResultListener)
 														{
-															((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(new TimeoutException("Timeout was: "+timeout+" "+message));
+															((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(te);
 														}
 														else
 														{
-															listener.exceptionOccurred(new TimeoutException("Timeout was: "+timeout+" "+message));
+															listener.exceptionOccurred(te);
 														}
 														return IFuture.DONE;
 													}
