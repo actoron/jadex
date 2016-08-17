@@ -379,8 +379,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 			final Object	res	= sic.getResult();
 			
-			if(sic.getMethod().getName().equals("getSecureInputStream"))
-				System.out.println("decoupling: "+sic.getArguments());
+//			if(sic.getMethod().getName().equals("getSecureInputStream"))
+//				System.out.println("decoupling: "+sic.getArguments());
 			
 			if(res instanceof IFuture)
 			{
