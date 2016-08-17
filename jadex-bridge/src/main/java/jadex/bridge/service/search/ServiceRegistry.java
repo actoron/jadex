@@ -442,7 +442,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		final IComponentIdentifier	lcid	= IComponentIdentifier.LOCAL.get();
