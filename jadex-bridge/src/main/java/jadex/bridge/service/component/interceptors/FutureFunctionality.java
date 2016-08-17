@@ -120,6 +120,14 @@ public class FutureFunctionality
 	//-------- data handling --------
 	
 	/**
+	 *  Optionally alter the undone flag.
+	 */
+	public boolean	isUndone(boolean undone)
+	{
+		return undone;
+	}
+	
+	/**
 	 *  Optionally alter a result.
 	 */
 	public Object	handleResult(Object result)	throws Exception
@@ -344,11 +352,11 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		try
 		{
 			result = (Collection<Object>)func.handleResult(result);
-			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetResult(result, undone);
+			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 	
@@ -361,11 +369,11 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, undone);
+			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -378,11 +386,11 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		try
 		{
 			func.handleFinished(getIntermediateResults());
-			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetFinished(undone);
+			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -505,11 +513,11 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		try
 		{
 			result = (Collection<Object>)func.handleResult(result);
-			return DelegatingPullIntermediateDelegationFuture.super.doSetResult(result, undone);
+			return DelegatingPullIntermediateDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 	
@@ -522,11 +530,11 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingPullIntermediateDelegationFuture.super.doAddIntermediateResult(result, undone);
+			return DelegatingPullIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -539,11 +547,11 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		try
 		{
 			func.handleFinished(getIntermediateResults());
-			return DelegatingPullIntermediateDelegationFuture.super.doSetFinished(undone);
+			return DelegatingPullIntermediateDelegationFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -667,11 +675,11 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		try
 		{
 			result = (Collection<Object>)func.handleResult(result);
-			return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetResult(result, undone);
+			return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 	
@@ -684,11 +692,11 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, undone);
+			return DelegatingSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -701,11 +709,11 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		try
 		{
 			func.handleFinished(getIntermediateResults());
-			return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetFinished(undone);
+			return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -813,11 +821,11 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		try
 		{
 			result = (Collection<Object>)func.handleResult(result);
-			return DelegatingTerminableIntermediateDelegationFuture.super.doSetResult(result, undone);
+			return DelegatingTerminableIntermediateDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 	
@@ -830,11 +838,11 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingTerminableIntermediateDelegationFuture.super.doAddIntermediateResult(result, undone);
+			return DelegatingTerminableIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -847,11 +855,11 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		try
 		{
 			func.handleFinished(getIntermediateResults());
-			return DelegatingTerminableIntermediateDelegationFuture.super.doSetFinished(undone);
+			return DelegatingTerminableIntermediateDelegationFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -954,11 +962,11 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		try
 		{
 			result = func.handleResult(result);
-			return DelegatingTerminableDelegationFuture.super.doSetResult(result, undone);
+			return DelegatingTerminableDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 	
@@ -1051,11 +1059,11 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		try
 		{
 			result = (Collection<Object>)func.handleResult(result);
-			return DelegatingIntermediateFuture.super.doSetResult(result, undone);
+			return DelegatingIntermediateFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 	
@@ -1068,11 +1076,11 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingIntermediateFuture.super.doAddIntermediateResult(result, undone);
+			return DelegatingIntermediateFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -1085,11 +1093,11 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		try
 		{
 			func.handleFinished(getIntermediateResults());
-			return DelegatingIntermediateFuture.super.doSetFinished(undone);
+			return DelegatingIntermediateFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -1150,11 +1158,11 @@ class DelegatingFuture extends Future<Object>
 		try
 		{
 			result = func.handleResult(result);
-			return DelegatingFuture.super.doSetResult(result, undone);
+			return DelegatingFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 	
@@ -1223,11 +1231,11 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		try
 		{
 			result = (Collection<TupleResult>)func.handleResult(result);
-			return DelegatingTupleFuture.super.doSetResult(result, undone);
+			return DelegatingTupleFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 	
@@ -1240,11 +1248,11 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		try
 		{
 			result = (TupleResult)func.handleIntermediateResult(result);
-			return DelegatingTupleFuture.super.doAddIntermediateResult(result, undone);
+			return DelegatingTupleFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
@@ -1258,11 +1266,11 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		{
 			Collection<?> results	= getIntermediateResults();
 			func.handleFinished((Collection<Object>)results);
-			return DelegatingTupleFuture.super.doSetFinished(undone);
+			return DelegatingTupleFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
-			return doSetException(e, undone);
+			return doSetException(e, func.isUndone(undone));
 		}		
 	}
 
