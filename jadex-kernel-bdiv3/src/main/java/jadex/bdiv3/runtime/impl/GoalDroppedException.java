@@ -1,12 +1,10 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.runtime.BDIFailureException;
-
 /**
  *  An exception that indicates an aborted goal i.e. neither failed nor succeeded.
  *  Note: This exception will only be logged at level info by the logger.
  */
-public class GoalDroppedException	extends BDIFailureException
+public class GoalDroppedException	extends GoalFailureException
 {
 	//-------- constructors --------
 
