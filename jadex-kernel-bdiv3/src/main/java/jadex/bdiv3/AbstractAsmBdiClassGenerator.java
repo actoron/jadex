@@ -24,6 +24,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import jadex.bdiv3.exceptions.JadexBDIGenerationException;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
@@ -49,7 +50,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	
 	protected NodeHelper nodehelper = NodeHelper.getInstance();
 	
-	public abstract List<Class<?>> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
+	public abstract List<Class<?>> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl) throws JadexBDIGenerationException;
 
 	/**
 	 *  Store which beliefs are accessed in a method.

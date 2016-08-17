@@ -2,6 +2,7 @@ package jadex.bdiv3;
 
 import java.util.List;
 
+import jadex.bdiv3.exceptions.JadexBDIGenerationException;
 import jadex.bdiv3.model.BDIModel;
 
 /**
@@ -27,5 +28,5 @@ public interface IBDIClassGenerator
 	 *  Generate class, including inner classes.
 	 *  @return the List of classes generated.
 	 */
-	public List<Class<?>> generateBDIClass(String clname, BDIModel micromodel, ClassLoader dummycl);
+	public List<Class<?>> generateBDIClass(String clname, BDIModel micromodel, ClassLoader dummycl) throws JadexBDIGenerationException;
 }

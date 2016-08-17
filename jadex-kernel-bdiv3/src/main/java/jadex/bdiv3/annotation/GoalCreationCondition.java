@@ -6,7 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * A method annotated with this Annotation should return a boolean indicating whether the condition is met.
  *
+ * Used on a constructor, this annotation contains the condition:
+ * if the specified belief is not null / does contain elements, the value will be injected into the constructor
+ * and the goal will be instantiated.
  */
 @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.RUNTIME)

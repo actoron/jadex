@@ -6,7 +6,8 @@ import jadex.bdiv3.KernelBDIV3Agent
 import jadex.bdiv3.MavenBDIModelLoader
 import jadex.bdiv3.model.BDIModel
 import jadex.bridge.ResourceIdentifier
-import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.nonfunctional.annotation.NameValue
+import jadex.gradle.exceptions.BDIEnhanceException;
 import jadex.maven.ResourceUtils
 
 import org.apache.commons.io.FileUtils
@@ -67,8 +68,8 @@ class BDIEnhanceExec {
         logger.info(msg);
     }
 
-    public void exec() {
-        log("executing enhance...");
+    public void exec() throws BDIEnhanceException {
+        log("executing enhance");
         Collection<File> allBDIFiles = FileUtils.listFiles(inputDir, bdiFileFilter, TrueFileFilter.INSTANCE);
         String[] imports = getImportPath(allBDIFiles, inputDir);
         ResourceIdentifier rid = new ResourceIdentifier();
@@ -110,25 +111,21 @@ class BDIEnhanceExec {
                 {
                     model = (BDIModel) modelLoader.loadModel(relativePath, imports, inputCl, inputCl, [rid, null, null] as Object[]);
                 }
-                catch (Throwable t)
+                catch (Exception t)
                 {
-                    // if error during model building, just dont enhance this file.
-                    String message = t.getMessage();
-                    if (message == null)  {
-                        message = t.toString();
-                    }
-                    logger.error("Error loading model: " + agentClassName + ", exception was: " + t.toString());
-                    throw new GradleScriptException("Error loading model: " + agentClassName, t)
+                    // fail early
+                    throw new BDIEnhanceException(t, agentClassName);
+
                     // just copy file
-                    if (!inputDir.equals(outputDir))
-                    {
-                        File newFile = new File(outputDir, relativePath);
-                        if (!newFile.exists())
-                        {
-                            newFile.getParentFile().mkdirs();
-                            FileUtils.copyFile(bdiFile, newFile);
-                        }
-                    }
+//                    if (!inputDir.equals(outputDir))
+//                    {
+//                        File newFile = new File(outputDir, relativePath);
+//                        if (!newFile.exists())
+//                        {
+//                            newFile.getParentFile().mkdirs();
+//                            FileUtils.copyFile(bdiFile, newFile);
+//                        }
+//                    }
                     continue;
                 }
 

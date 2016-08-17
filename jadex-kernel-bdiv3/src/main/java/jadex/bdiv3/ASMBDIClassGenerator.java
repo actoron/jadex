@@ -40,6 +40,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifier;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import jadex.bdiv3.exceptions.JadexBDIGenerationException;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MGoal;
@@ -81,8 +82,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public List<Class<?>> generateBDIClass(String clname, BDIModel model, ClassLoader dummycl)
-	{
+	public List<Class<?>> generateBDIClass(String clname, BDIModel model, ClassLoader dummycl) throws JadexBDIGenerationException {
 		return generateBDIClass(clname, model, dummycl, new HashMap<String, ClassNode>());
 	}
 	
@@ -90,8 +90,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	 *  Generate class.
 	 */
 	public List<Class<?>> generateBDIClass(final String clname, final BDIModel model, 
-		ClassLoader dummycl, final Map<String, ClassNode> done)
-	{
+		ClassLoader dummycl, final Map<String, ClassNode> done) throws JadexBDIGenerationException {
 		List<Class<?>> ret = new ArrayList<Class<?>>();
 		final ClassLoader cl = ((DummyClassLoader)dummycl).getOriginal();
 		
@@ -367,7 +366,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				throw new JadexBDIGenerationException("Could not generate BDI Class: " + clname,e);
 			}
 			finally
 			{
@@ -389,7 +388,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		}
 		catch(Throwable e)
 		{
-			e.printStackTrace();
+			throw new JadexBDIGenerationException("Error generating BDI class:" + clname, e);
 		}
 		
 		return ret;
