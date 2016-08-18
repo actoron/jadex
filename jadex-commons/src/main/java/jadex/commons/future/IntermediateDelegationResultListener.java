@@ -18,48 +18,60 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	protected boolean undone;
 
 	/** Custom functional result listener */
-	protected IFunctionalResultListener<E>	customIntermediateResultListener;
-	
+	protected IIntermediateResultListener<E>	delegate;
+
 	//-------- constructors --------
-	
 
-	/**
-	 * Create a new listener.
-	 * 
-	 * @param future The delegation target.
-	 * @param undone use undone methods.
-	 * @param customResultListener Custom result listener that overwrites the
-	 *        delegation behaviour.
-	 */
-	public IntermediateDelegationResultListener(IntermediateFuture<E> future, IFunctionalResultListener<E> customIntermediateResultListener)
-	{
-		this(future, false, customIntermediateResultListener);
-	}
+//	public IntermediateDelegationResultListener(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener, final IFunctionalExceptionListener exceptionListener) {
+//		this(new IntermediateDefaultResultListener<E>() {
+//			public void exceptionOccurred(Exception exception) {
+//				exceptionListener.exceptionOccurred(exception);
+//			}
+//
+//			public void intermediateResultAvailable(E result) {
+//				intermediateListener.resultAvailable(result);
+//			}
+//
+//			public void finished() {
+//				finishedListener.resultAvailable(null);
+//			}
+//		});
+//	}
 
-	/**
-	 * Create a new listener.
-	 * 
-	 * @param future The delegation target.
-	 * @param undone use undone methods.
-	 * @param customResultListener Custom result listener that overwrites the
-	 *        delegation behaviour. Can be null
-	 */
-	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone, IFunctionalResultListener<E> customIntermediateResultListener)
-	{
-		this(future, undone);
-		this.customIntermediateResultListener = customIntermediateResultListener;
-	}
-	
 	/**
 	 *  Create a new listener.
+	 * @param delegate The delegation target.
+	 */
+	public IntermediateDelegationResultListener(IIntermediateResultListener<E> delegate)
+	{
+		this(delegate, false);
+	}
+
+	/**
+	 *  Create a new listener.
+	 * @param delegate The delegation target.
+	 * @param undone use undone methods.
+	 */
+	public IntermediateDelegationResultListener(IIntermediateResultListener<E> delegate, boolean undone)
+	{
+		this.delegate = delegate;
+		this.undone = undone;
+	}
+
+	/**
+	 * Create a new listener.
+	 *
+	 * @param future The delegation target.
 	 */
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future)
 	{
 		this(future, false);
 	}
-	
+
 	/**
 	 *  Create a new listener.
+	 * @param future The delegation target.
+	 * @param undone use undone methods.
 	 */
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone)
 	{
@@ -136,13 +148,21 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
      */
     public void finished()
     {
-    	if(undone)
+		if(delegate != null)
 		{
-			future.setFinishedIfUndone();
-		}
-		else
-		{
-			future.setFinished();
+			if (undone && delegate instanceof  IUndoneIntermediateResultListener) {
+				((IUndoneIntermediateResultListener) delegate).finishedIfUndone();
+			}
+			else
+			{
+				delegate.finished();
+			}
+		} else {
+			if (undone) {
+				future.setFinishedIfUndone();
+			} else {
+				future.setFinished();
+			}
 		}
     }
 	
@@ -152,13 +172,24 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customResultAvailable(Collection<E> result)
 	{
-		if(undone)
+		if(delegate != null)
 		{
-			future.setResultIfUndone(result);
-		}
-		else
-		{
-			future.setResult(result);
+			if (undone && delegate instanceof  IUndoneIntermediateResultListener) {
+				((IUndoneIntermediateResultListener) delegate).resultAvailableIfUndone(result);
+			}
+			else
+			{
+				delegate.resultAvailable(result);
+			}
+		} else {
+			if(undone)
+			{
+				future.setResultIfUndone(result);
+			}
+			else
+			{
+				future.setResult(result);
+			}
 		}
 	}
 
@@ -168,13 +199,21 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void exceptionOccurred(Exception exception)
 	{
-		if(undone)
+		if(delegate != null)
 		{
-			future.setExceptionIfUndone(exception);
-		}
-		else
-		{
-			future.setException(exception);
+			if (undone && delegate instanceof  IUndoneIntermediateResultListener) {
+				((IUndoneIntermediateResultListener) delegate).exceptionOccurredIfUndone(exception);
+			}
+			else
+			{
+				delegate.exceptionOccurred(exception);
+			}
+		} else {
+			if (undone) {
+				future.setExceptionIfUndone(exception);
+			} else {
+				future.setException(exception);
+			}
 		}
 	}
 	
@@ -184,9 +223,15 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{
-		if(customIntermediateResultListener != null)
+		if(delegate != null)
 		{
-			customIntermediateResultListener.resultAvailable(result);
+			if (undone && delegate instanceof  IUndoneIntermediateResultListener) {
+				((IUndoneIntermediateResultListener) delegate).intermediateResultAvailableIfUndone(result);
+			}
+			else
+			{
+				delegate.intermediateResultAvailable(result);
+			}
 		}
 		else
 		{
@@ -206,6 +251,9 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void commandAvailable(Object command)
 	{
+		if (delegate instanceof IFutureCommandListener) {
+			((IFutureCommandListener) delegate).commandAvailable(command);
+		}
 		if(future instanceof IForwardCommandFuture)
 		{
 			((IForwardCommandFuture)future).sendForwardCommand(command);
