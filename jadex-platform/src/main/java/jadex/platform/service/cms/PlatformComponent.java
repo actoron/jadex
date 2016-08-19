@@ -253,6 +253,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 							@Override
 							public void resultAvailable(Void result)
 							{
+								System.out.println("shutdown component features timeout: "+getComponentIdentifier());
 								executeKillOnFeatures(ifeatures!=null ? ifeatures : lfeatures);
 								ret.setExceptionIfUndone(new TimeoutException("Timeout during component cleanup."));
 							}
@@ -411,7 +412,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				getLogger().info(sw.toString());
 			}
 //			if(getComponentIdentifier().getName().indexOf("Leaker")!=-1)
-//				System.out.println("feature shutdown start: "+getComponentIdentifier()+" "+features.get(features.size()-1));
+//				System.out.println("feature shutdown start: "+getComponentIdentifier()+" "+features);
 			
 			fut	= features.get(features.size()-1).shutdown();
 			sync	= fut.isDone();
