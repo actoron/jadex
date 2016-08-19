@@ -7,23 +7,25 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.micro.testcases.TestAgent;
 
 
 /**
@@ -36,21 +38,23 @@ import jadex.micro.annotation.Results;
 	//@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class UserAgent 
+public class UserAgent extends TestAgent
 {
+	//-------- attributes --------
+	
+	/** The agent. */
 	@Agent
-	protected IInternalAccess agent;
+	protected IInternalAccess	agent;
+	
+	//-------- methods --------
 	
 	/**
-	 *  The agent body.
+	 *  Perform tests.
 	 */
-	@AgentBody
-	public void body()
+	protected IFuture<TestReport> test(final IComponentManagementService cms, final boolean local)
 	{
-		final Testcase tc = new Testcase();
-		tc.setTestCount(1);
+		final Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 		IRequiredServicesFeature rsf = agent.getComponentFeature(IRequiredServicesFeature.class);
 		
 		// Create user as subcomponent -> should be able to find the service with publication scope application
@@ -59,8 +63,8 @@ public class UserAgent
 		final TestReport tr = new TestReport("#1", "Test if ");
 		try
 		{
-			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(IExampleService.class, RequiredServiceInfo.SCOPE_PLATFORM, null);
-			queryfut.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
+			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(IExampleService.class, local? RequiredServiceInfo.SCOPE_PLATFORM: RequiredServiceInfo.SCOPE_GLOBAL, null);
+			queryfut.addIntermediateResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IExampleService>()
 			{
 				int num = 0;
 				public void exceptionOccurred(Exception exception)
@@ -79,8 +83,15 @@ public class UserAgent
 				
 				public void intermediateResultAvailable(IExampleService result)
 				{
-					System.out.println("received: "+result);
-					num++;
+					System.out.println("received: "+result+" "+cms.getRootIdentifier().get()+" "+((IService)result).getServiceIdentifier().getProviderId().getRoot());
+					if(cms.getRootIdentifier().get().equals(((IService)result).getServiceIdentifier().getProviderId().getRoot()))
+					{
+						num++;
+					}
+					else
+					{
+						System.out.println("Found service that does not come from target platform: "+result);
+					}
 				}
 				
 				public void finished()
@@ -94,17 +105,23 @@ public class UserAgent
 						tr.setFailed("Wrong number of results: "+cnt);
 					}
 				}
-			});
-			
+			}));
+
+			// The creation info is important to be able to resolve the class/model
+			CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
+				? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+
 			for(int i=0; i<cnt; i++)
 			{
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getComponentIdentifier()));
+				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", ci);
 				cids[i] = fut.getFirstResult();
 			}
 			
 			// Wait some time and then terminate query
 			
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000).get();
+			long start = System.currentTimeMillis();
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).get();
+			System.out.println("wait dur: "+(System.currentTimeMillis()-start));
 			
 			queryfut.terminate();
 			
@@ -114,7 +131,7 @@ public class UserAgent
 		{
 //			System.out.println("Problem: could not find service");
 			tr.setFailed("Problem: could not find service: "+e);
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 		finally
 		{
@@ -129,8 +146,10 @@ public class UserAgent
 			{
 			}
 		}
-		tc.addReport(tr);
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+		ret.setResult(tr);
+		
+		return ret;
 	}
 }
+

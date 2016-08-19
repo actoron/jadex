@@ -784,6 +784,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			// Flag to check if unblocked before timeout
 			final boolean[]	unblocked	= new boolean[1];
+			final Exception ex	= Future.DEBUG ? new DebugException() : null;
 			
 			if(timeout!=Timeout.NONE)
 			{
@@ -794,7 +795,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					{
 						if(!unblocked[0])
 						{
-							unblock(monitor, new TimeoutException());
+							unblock(monitor, new TimeoutException(null, ex));
 						}
 					}
 					

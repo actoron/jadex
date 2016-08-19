@@ -349,7 +349,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 			mqs = new HashSet<ServiceQueryInfo<T>>();
 			queries.put(query.getType(), (Set)mqs);
 		}
-		mqs.add(new ServiceQueryInfo(query, ret));
+		mqs.add(new ServiceQueryInfo<T>(query, ret));
 		
 		// deliver currently available services
 		Iterator<T> sers = (Iterator<T>)getServices(query.getType());
@@ -374,10 +374,18 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	{
 		if(queries!=null)
 		{
-			Set<ServiceQuery<T>> mqs = (Set)queries.get(query.getType());
+			Set<ServiceQueryInfo<T>> mqs = (Set)queries.get(query.getType());
 			if(mqs!=null)
 			{
-				mqs.remove(query);
+				for(ServiceQueryInfo<T> sqi: mqs)
+				{
+					if(sqi.getQuery().equals(query))
+					{
+						sqi.getFuture().terminate();
+						mqs.remove(sqi);
+						break;
+					}
+				}
 				if(mqs.size()==0)
 					queries.remove(query.getType());
 			}
@@ -394,29 +402,16 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		{
 			for(Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>> entry: queries.entrySet())
 			{
-				for(ServiceQueryInfo<?> query: entry.getValue())
+				for(ServiceQueryInfo<?> query: entry.getValue().toArray(new ServiceQueryInfo<?>[entry.getValue().size()]))
 				{
 					if(owner.equals(query.getQuery().getOwner()))
 					{
-						entry.getValue().remove(query);
+						removeQuery(query.getQuery());
+//						entry.getValue().remove(query);
 					}
 				}
 			}
 		}
-	}
-	
-	/**
-	 * 
-	 */
-	protected boolean containsQuery()
-	{
-		boolean ret = false;
-		if(queries!=null)
-		{
-			
-		}
-		return ret;
-		return queries!=null && queries.containsKey(key);
 	}
 	
 	/**

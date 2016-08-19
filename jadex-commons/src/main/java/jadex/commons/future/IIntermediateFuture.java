@@ -80,7 +80,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 */
-	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener);
+	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener);
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
@@ -91,7 +91,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
 	 */
-	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener);
+	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener);
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
@@ -103,7 +103,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 * @param exceptionListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
 	 */
-    public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener, IFunctionalExceptionListener exceptionListener);
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener, IFunctionalExceptionListener exceptionListener);
 
     //-------- java 8 extensions --------
     

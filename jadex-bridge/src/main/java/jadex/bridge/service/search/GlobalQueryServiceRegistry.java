@@ -1,35 +1,38 @@
 package jadex.bridge.service.search;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.SUtil;
-import jadex.commons.collection.BloomFilter;
-import jadex.commons.future.IFunctionalResultListener;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.DuplicateRemovalIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
 /**
  *  Registry that allows for adding global queries with local registry.
- *  Uses search to emulate the persistent query.
+ *  Uses remote searches to emulate the persistent query.
  */
 public class GlobalQueryServiceRegistry extends ServiceRegistry
 {
-	/** The agent. */
-	protected IInternalAccess agent;
+//	/** The agent. */
+//	protected IInternalAccess agent;
+	
+	/** The timer. */
+	protected Timer timer;
 	
 	/** The global query delay. */
 	protected long delay;
-	
+
+	/**
+	 *  Create a new GlobalQueryServiceRegistry.
+	 */
+	public GlobalQueryServiceRegistry(long delay)
+	{
+		this.delay = delay;
+	}
+
 	/**
 	 *  Add a service query to the registry.
 	 *  @param query ServiceQuery.
@@ -43,20 +46,25 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 		// Emulate persistent query by searching periodically
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+			final DuplicateRemovalIntermediateResultListener<T> lis = new DuplicateRemovalIntermediateResultListener<T>(new UnlimitedIntermediateDelegationResultListener<T>(ret))
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				public byte[] objectToByteArray(Object service)
+				{
+					return super.objectToByteArray(((IService)service).getServiceIdentifier());
+				}
+			};
+			
+			waitForDelay(delay, new Runnable()
+			{
+				public void run()
 				{
 					Class<T> mytype = query.getType()==null? null: (Class<T>)query.getType().getType0();
-					searchRemoteServices(query.getOwner(), mytype, query.getFilter())
-						.addIntermediateResultListener(new UnlimitedIntermediateDelegationResultListener<T>(ret));
+					searchRemoteServices(query.getOwner(), mytype, query.getFilter()).addIntermediateResultListener(lis);
 					
-					DuplicateRemovalIntermediateResultListener<T> lis = new DuplicateRemovalIntermediateResultListener<T>(new UnlimitedIntermediateDelegationResultListener<T>(ret));
-					
-					if(!ret.isDone() && containsQuery())
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
-					
-					return IFuture.DONE;
+					if(!ret.isDone())
+						waitForDelay(delay, this);
+					else
+						System.out.println("stopping global query polling: "+query);
 				}
 			});
 		}
@@ -65,118 +73,18 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 	}
 	
 	/**
-	 *  Remove a service query from the registry.
-	 *  @param query ServiceQuery.
+	 *  Wait for delay and execute runnable.
 	 */
-	public <T> void removeQuery(ServiceQuery<T> query)
+	protected void waitForDelay(long delay, final Runnable run)
 	{
-		
-		
-		super.removeQuery(query);
-	}
-	
-	
-	/**
-	 *  A result listener that filters duplicates.
-	 */
-	public static class DuplicateRemovalIntermediateResultListener<E> extends IntermediateDelegationResultListener<E>
-	{
-		/** The bloom filter. */
-		protected BloomFilter filter;
-		
-		/**
-		 *  Create a new listener.
-		 *  @param future The delegation target.
-		 *  @param undone use undone methods.
-		 *  @param customResultListener Custom result listener that overwrites the
-		 *        delegation behaviour.
-		 */
-		public DuplicateRemovalIntermediateResultListener(IntermediateFuture<E> future, IFunctionalResultListener<E> customIntermediateResultListener)
+		if(timer==null)
+			timer = new Timer(true);
+		timer.schedule(new TimerTask()
 		{
-			this(future, false, customIntermediateResultListener);
-		}
-
-		/**
-		 *  Create a new listener.
-		 *  @param future The delegation target.
-		 *  @param undone use undone methods.
-		 *  @param customResultListener Custom result listener that overwrites the
-		 *        delegation behaviour. Can be null
-		 */
-		public DuplicateRemovalIntermediateResultListener(IntermediateFuture<E> future, boolean undone, IFunctionalResultListener<E> customIntermediateResultListener)
-		{
-			this(future, undone);
-			this.customIntermediateResultListener = customIntermediateResultListener;
-		}
-		
-		/**
-		 *  Create a new listener.
-		 */
-		public DuplicateRemovalIntermediateResultListener(IntermediateFuture<E> future)
-		{
-			this(future, false);
-		}
-		
-		/**
-		 *  Create a new listener.
-		 */
-		public DuplicateRemovalIntermediateResultListener(IntermediateFuture<E> future, boolean undone)
-		{
-			super(future, undone);
-		}
-		
-		/**
-		 *  Check results before sending them further.
-		 */
-		public void customIntermediateResultAvailable(E result)
-		{
-			if(!filter.add(objectToByteArray(result)))
+			public void run()
 			{
-				super.customIntermediateResultAvailable(result);
+				run.run();
 			}
-			else
-			{
-				System.out.println("Filtered out duplicate: "+result);
-			}
-		}
-		
-		/**
-		 *  Convert a value to a byte array. 
-		 *  @param value The value.
-		 *  @return The byte array.
-		 */
-		protected byte[] objectToByteArray(E value)
-		{
-			byte[] ret = null;
-			if(value instanceof Serializable)
-			{
-				ByteArrayOutputStream bos = null;
-				ObjectOutputStream out = null;
-				try
-				{
-					bos = new ByteArrayOutputStream();
-					out = new ObjectOutputStream(bos);
-					out.writeObject(value);
-					ret = bos.toByteArray();
-				}
-				catch(Exception e)
-				{
-					SUtil.rethrowAsUnchecked(e);
-				}
-				finally
-				{
-					if(bos!=null)
-						try{bos.close();}catch(Exception e){SUtil.rethrowAsUnchecked(e);}
-					if(out!=null)
-						try{out.close();}catch(Exception e){SUtil.rethrowAsUnchecked(e);}
-				}
-			}	
-			else 
-			{
-				BinarySerializer.objectToByteArray(value, null);
-			}
-			
-			return ret;
-		}
+		}, delay);
 	}
 }

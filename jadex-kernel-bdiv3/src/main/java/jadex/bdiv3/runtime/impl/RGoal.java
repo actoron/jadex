@@ -480,14 +480,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				if(!isFinished())
 				{
 					setProcessingState(GoalProcessingState.FAILED);
-					setException(new GoalDroppedException(this.toString())
-					{
-						public void printStackTrace()
-						{
-							Thread.dumpStack();
-							super.printStackTrace();
-						}
-					});
+					setException(new GoalDroppedException(this.toString()));
 				}
 				super.notifyListeners();
 			}
