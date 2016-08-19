@@ -31,7 +31,7 @@ public class EndStateAbortWorkerPlan extends Plan
 		}
 		finally
 		{
-			System.out.println("no more wait");
+			System.out.println("finally wait");
 			EndStateAbortPlan.TERMINATED.add(getComponentIdentifier());
 		}
 	}

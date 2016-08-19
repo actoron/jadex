@@ -17,6 +17,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -35,6 +36,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -47,6 +49,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -61,6 +64,11 @@ import jadex.kernelbase.ExternalAccess;
  */
 public class PlatformComponent implements IPlatformComponentAccess, IInternalAccess
 {	
+	//-------- constants --------
+	
+	/** Property name for timeout after which component long running cleanup is forcefully aborted. */
+	public static final String	PROPERTY_TERMINATION_TIMEOUT	= "termination_timeout";
+	
 	//-------- attributes --------
 	
 	/** The creation info. */
@@ -176,7 +184,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				
 //				if(getComponentIdentifier().getName().indexOf("Leaker")!=-1)
 //					System.out.println("shutdown component features start: "+getComponentIdentifier()+", "+ifeatures +", "+ lfeatures);
-				executeShutdownOnFeatures(ifeatures!=null ? ifeatures : lfeatures, 0)
+				executeShutdownOnFeatures(ifeatures!=null ? ifeatures : lfeatures)
 					.addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
@@ -201,23 +209,23 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 							MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
 								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
 							event.setProperty("details", getComponentDescription());
-							getComponentFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret)
+							getComponentFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL).addResultListener(new IResultListener<Void>()
 							{
-								public void customResultAvailable(Void result)
+								public void resultAvailable(Void result)
 								{
 //									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 //										System.out.println("shutdown component features end2: "+getComponentIdentifier()+", "+ex);
 									if(ex!=null)
-										ret.setException(ex);
+										ret.setExceptionIfUndone(ex);
 									else
-										ret.setResult(null);
+										ret.setResultIfUndone(null);
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
 //									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 //										System.out.println("shutdown component features end3: "+getComponentIdentifier()+", "+ex);
-									ret.setException(exception);
+									ret.setExceptionIfUndone(exception);
 								}
 							});
 						}
@@ -225,11 +233,43 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 						{
 //							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 //								System.out.println("shutdown component features end4: "+getComponentIdentifier()+", "+ex);
-							ret.setResult(null);
+							if(ex!=null)
+								ret.setExceptionIfUndone(ex);
+							else
+								ret.setResultIfUndone(null);
 						}
 					}
 				});
 				
+				// Add timeout in case cleanup takes too long.
+				Number	timeout	= (Number)getModel().getProperty(PROPERTY_TERMINATION_TIMEOUT, getClassLoader());
+				if(timeout==null || timeout.longValue()!=Timeout.NONE)
+				{
+					if(getComponentFeature0(IExecutionFeature.class)!=null)
+					{
+						getComponentFeature(IExecutionFeature.class).waitForDelay(timeout!=null ? timeout.longValue() : Starter.getLocalDefaultTimeout(getComponentIdentifier()), true)
+							.addResultListener(new IResultListener<Void>()
+						{
+							@Override
+							public void resultAvailable(Void result)
+							{
+								executeKillOnFeatures(ifeatures!=null ? ifeatures : lfeatures);
+								ret.setExceptionIfUndone(new TimeoutException("Timeout during component cleanup."));
+							}
+							
+							@Override
+							public void exceptionOccurred(Exception exception)
+							{
+								// ignore (e.g. ComponentTerminatedException when cleanup successful)
+							}
+						});
+					}
+					else
+					{
+						System.err.println("No execution feature for timeout: "+getComponentIdentifier());
+					}
+				}
+
 				return ret;
 			}
 		});
@@ -355,11 +395,12 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/**
 	 *  Recursively shutdown the features in inverse order.
 	 */
-	protected IFuture<Void>	executeShutdownOnFeatures(final List<IComponentFeature> features, int cnt)
+	protected IFuture<Void>	executeShutdownOnFeatures(final List<IComponentFeature> features)
 	{
 		// Try synchronous shutdown.
 		IFuture<Void>	fut	= IFuture.DONE;
-		while(fut.isDone() && cnt<features.size())
+		boolean sync	= true;
+		while(sync && !features.isEmpty())
 		{
 			// On exception -> print but continue shutdown with next feature
 			if(fut.getException()!=null)
@@ -370,22 +411,25 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				getLogger().info(sw.toString());
 			}
 //			if(getComponentIdentifier().getName().indexOf("Leaker")!=-1)
-//				System.out.println("feature shutdown start: "+getComponentIdentifier()+" "+features.get(features.size()-cnt-1));
+//				System.out.println("feature shutdown start: "+getComponentIdentifier()+" "+features.get(features.size()-1));
 			
-			fut	= features.get(features.size()-cnt-1).shutdown();
-			cnt++;
+			fut	= features.get(features.size()-1).shutdown();
+			sync	= fut.isDone();
+			if(sync)
+			{
+				features.remove(features.size()-1);
+			}
 		}
 		
-		// Wait for future but also check features, as future might have become done since check in loop.
-		if(!fut.isDone() || cnt<features.size())
+		// Recurse once for current async feature
+		if(!sync)
 		{
-			final int	fcnt	= cnt;
 			final Future<Void>	ret	= new Future<Void>();
 			fut.addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
-					executeShutdownOnFeatures(features, fcnt).addResultListener(new DelegationResultListener<Void>(ret));
+					proceed();
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -394,8 +438,17 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					exception.printStackTrace(new PrintWriter(sw));
 					getLogger().warning("Exception during component cleanup of "+getComponentIdentifier()+": "+exception);
 					getLogger().info(sw.toString());
-					
-					executeShutdownOnFeatures(features, fcnt).addResultListener(new DelegationResultListener<Void>(ret));
+
+					proceed();
+				}
+				
+				protected void proceed()
+				{
+					if(!features.isEmpty())	// Happens, when killed due to termination timeput
+					{
+						features.remove(features.size()-1);
+						executeShutdownOnFeatures(features).addResultListener(new DelegationResultListener<Void>(ret));
+					}
 				}
 			});
 			return ret;
@@ -405,7 +458,19 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			return IFuture.DONE;
 		}
 	}
-	
+
+	/**
+	 *  Kill the features in inverse order.
+	 *  Kill is invoked, when shutdown does not return due to timeout.
+	 */
+	protected void	executeKillOnFeatures(List<IComponentFeature> features)
+	{
+		while(!features.isEmpty())
+		{
+			features.remove(features.size()-1).kill();
+		}
+	}
+
 	/**
 	 *  Get the user view of this platform component.
 	 *  

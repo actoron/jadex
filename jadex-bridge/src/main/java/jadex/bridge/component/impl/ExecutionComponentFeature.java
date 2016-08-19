@@ -159,23 +159,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("shutdown end: "+getComponent().getComponentIdentifier());
-				
-				// Should not wake up all blocked threads at the same time?!
-				// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
-//				if(blocked!=null && blocked.size()>0)
-//					System.out.println("blocked: "+blocked.size());
-				while(blocked!=null && !blocked.isEmpty())
-				{
-					// Unblock throwing thread death as component already has been terminated.
-					unblock(blocked.keySet().iterator().next(), new StepAborted());
-//					unblock(blocked.keySet().iterator().next(), null);
-				}
-//				
-				if(parenta!=null)
-				{
-					parenta.removeSubcomponent(ExecutionComponentFeature.this);
-				}
+				doCleanup(new StepAborted());
 				
 				super.customResultAvailable(result);
 			}
@@ -186,6 +170,40 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		return ret;
 //		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Kill is only invoked, when shutdown does not return due to timeout.
+	 *  The feature should do any kind of possible cleanup, but no asynchronous operations.
+	 */
+	@Override
+	public void kill()
+	{
+		doCleanup(new ThreadDeath());
+	}
+	
+	/**
+	 *  Shared cleanup code for shutdown and kill.
+	 */
+	protected void doCleanup(Error e)
+	{
+//		System.out.println("shutdown end: "+getComponent().getComponentIdentifier());
+		
+		// Should not wake up all blocked threads at the same time?!
+		// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
+//		if(blocked!=null && blocked.size()>0)
+//			System.out.println("blocked: "+blocked.size());
+		while(blocked!=null && !blocked.isEmpty())
+		{
+			// Unblock throwing thread death as component already has been terminated.
+			unblock(blocked.keySet().iterator().next(), e);
+//			unblock(blocked.keySet().iterator().next(), null);
+		}
+//		
+		if(parenta!=null)
+		{
+			parenta.removeSubcomponent(ExecutionComponentFeature.this);
+		}
 	}
 	
 	//-------- IComponentFeature interface --------
@@ -883,6 +901,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	protected void	beforeBlock()
 	{
+//		System.out.println("beforeBlock: "+(ComponentSuspendable)ISuspendable.SUSPENDABLE.get()+", "+((ComponentSuspendable)ISuspendable.SUSPENDABLE.get()).getFuture());
 	}
 	
 	/**
@@ -890,6 +909,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	protected void	afterBlock()
 	{
+//		System.out.println("afterBlock: "+(ComponentSuspendable)ISuspendable.SUSPENDABLE.get()+", "+((ComponentSuspendable)ISuspendable.SUSPENDABLE.get()).getFuture());
 	}
 	
 	//-------- IExecutable interface --------
@@ -1171,6 +1191,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
 					ex	= new ComponentTerminatedException(component.getComponentIdentifier());
+				}
+				else if(ex instanceof ThreadDeath)
+				{
+					// Hard cleanup during kill.
+					throw (ThreadDeath)ex;
 				}
 				step.getFuture().setExceptionIfUndone(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
 
