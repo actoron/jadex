@@ -150,7 +150,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 						}
 					}
 					
-					component.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, this);
+					component.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, this, true);
 					
 					return IFuture.DONE;
 				}
@@ -166,10 +166,10 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 			{
 				if(registryevent!=null && registryevent.isDue())
 					notifySubscribers();
-				component.getComponentFeature(IExecutionFeature.class).waitForDelay(timelimit, this);
+				component.getComponentFeature(IExecutionFeature.class).waitForDelay(timelimit, this, true);
 				return IFuture.DONE;
 			}
-		});
+		}, true);
 	}
 	
 	/**
@@ -212,9 +212,9 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 					{
 						public void intermediateResultAvailable(IRegistryEvent event)
 						{
-							if(event.size()>0)
-								System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode()
-									+" at: "+System.currentTimeMillis()+"(I am: "+component.getComponentIdentifier()+")");
+//							if(event.size()>0)
+//								System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode()
+//									+" at: "+System.currentTimeMillis()+"(I am: "+component.getComponentIdentifier()+")");
 							
 							IServiceRegistry reg = getRegistry();
 							

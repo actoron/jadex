@@ -24,11 +24,10 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	
 
 	/**
-	 * Create a new listener.
-	 * 
-	 * @param future The delegation target.
-	 * @param undone use undone methods.
-	 * @param customResultListener Custom result listener that overwrites the
+	 *  Create a new listener.
+	 *  @param future The delegation target.
+	 *  @param undone use undone methods.
+	 *  @param customResultListener Custom result listener that overwrites the
 	 *        delegation behaviour.
 	 */
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future, IFunctionalResultListener<E> customIntermediateResultListener)
@@ -37,11 +36,10 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	}
 
 	/**
-	 * Create a new listener.
-	 * 
-	 * @param future The delegation target.
-	 * @param undone use undone methods.
-	 * @param customResultListener Custom result listener that overwrites the
+	 *  Create a new listener.
+	 *  @param future The delegation target.
+	 *  @param undone use undone methods.
+	 *  @param customResultListener Custom result listener that overwrites the
 	 *        delegation behaviour. Can be null
 	 */
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone, IFunctionalResultListener<E> customIntermediateResultListener)
@@ -180,7 +178,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	
 	/**
 	 *  Called when an intermediate result is available.
-	 * @param result The result.
+	 *  @param result The result.
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{

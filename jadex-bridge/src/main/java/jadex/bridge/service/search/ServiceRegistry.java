@@ -33,6 +33,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -359,32 +360,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 			
 //			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
 			searchfunc.checkAsyncFilters(query.getFilter(), ssers.iterator())
-				.addIntermediateResultListener(new IIntermediateResultListener<T>()
-			{
-				public void intermediateResultAvailable(T result)
-				{
-					ret.addIntermediateResultIfUndone(result);
-				}
-	
-				public void finished()
-				{
-					// the query is not finished after the status quo is delivered
-				}
-	
-				public void resultAvailable(Collection<T> results)
-				{
-					for(T result: results)
-					{
-						intermediateResultAvailable(result);
-					}
-					// the query is not finished after the status quo is delivered
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					// the query is not finished after the status quo is delivered
-				}
-			});
+				.addIntermediateResultListener(new UnlimitedIntermediateDelegationResultListener<T>(ret));
 		}
 	
 		return ret;
@@ -427,6 +403,20 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean containsQuery()
+	{
+		boolean ret = false;
+		if(queries!=null)
+		{
+			
+		}
+		return ret;
+		return queries!=null && queries.containsKey(key);
 	}
 	
 	/**
@@ -812,6 +802,44 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public static IServiceRegistry getRegistry(IInternalAccess ia)
 	{
 		return getRegistry(ia.getComponentIdentifier());
+	}
+	
+	/**
+	 *  Listener that forwards only results and ignores finished / exception.
+	 */
+	public static class UnlimitedIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
+	{
+		/** The delegate future. */
+		protected IntermediateFuture<E> delegate;
+		
+		public UnlimitedIntermediateDelegationResultListener(IntermediateFuture<E> delegate)
+		{
+			this.delegate = delegate;
+		}
+		
+		public void intermediateResultAvailable(E result)
+		{
+			delegate.addIntermediateResultIfUndone(result);
+		}
+
+		public void finished()
+		{
+			// the query is not finished after the status quo is delivered
+		}
+
+		public void resultAvailable(Collection<E> results)
+		{
+			for(E result: results)
+			{
+				intermediateResultAvailable(result);
+			}
+			// the query is not finished after the status quo is delivered
+		}
+		
+		public void exceptionOccurred(Exception exception)
+		{
+			// the query is not finished after the status quo is delivered
+		}
 	}
 	
 }
