@@ -307,9 +307,11 @@ subprojects
 		            }
 		        }
 	        }
-			configurePomMetadata(uploadArchives)
 	    }
     }
+	if (repositories.hasProperty('mavenDeployer')) { // deployer maybe unset if no repo is set
+		configurePomMetadata(uploadArchives)
+	}
 }
 
 // Hack, helper to generate dep-tree
