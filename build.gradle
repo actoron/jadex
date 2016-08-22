@@ -293,6 +293,7 @@ subprojects
 		                }
 		                uniqueVersion=false
 		            }
+					configurePomMetadata(uploadArchives)
 		        }
 		        else if (!isCommercial(project) && repo_noncommercial) // to noncommercial. if repo is unset, do nothing!
 		        {
@@ -305,13 +306,11 @@ subprojects
 		                }
 		                uniqueVersion=false
 		            }
+					configurePomMetadata(uploadArchives)
 		        }
 	        }
 	    }
     }
-	if (repositories.hasProperty('mavenDeployer')) { // deployer maybe unset if no repo is set
-		configurePomMetadata(uploadArchives)
-	}
 }
 
 // Hack, helper to generate dep-tree
