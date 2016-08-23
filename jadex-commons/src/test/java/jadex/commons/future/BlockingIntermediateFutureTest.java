@@ -121,7 +121,7 @@ public class BlockingIntermediateFutureTest //extends TestCase
 					public void suspend(Future<?> future, long timeout)
 					{
 						suspended	= true;
-						super.suspend(future, timeout);
+						super.suspend(future, timeout, false);
 					}
 				});
 				
@@ -217,7 +217,7 @@ public class BlockingIntermediateFutureTest //extends TestCase
 					public void suspend(Future<?> future, long timeout)
 					{
 						suspended	= true;
-						super.suspend(future, timeout);
+						super.suspend(future, timeout, false);
 					}
 				});
 				Iterator<String>	it	= new IntermediateFutureIterator<String>(fut);

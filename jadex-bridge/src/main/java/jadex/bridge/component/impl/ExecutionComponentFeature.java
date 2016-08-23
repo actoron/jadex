@@ -747,8 +747,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.
+	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
 	 */
-	public void	block(final Object monitor, long timeout)
+	public void	block(final Object monitor, long timeout, boolean realtime)
 	{
 		if(!isComponentThread())
 		{
@@ -757,7 +758,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(parenta!=null)
 		{
-			parenta.block(monitor, timeout);
+			parenta.block(monitor, timeout, realtime);
 		}
 		else
 		{
@@ -788,7 +789,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			if(timeout!=Timeout.NONE)
 			{
-				waitForDelay(timeout)
+				waitForDelay(timeout, realtime)
 					.addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)

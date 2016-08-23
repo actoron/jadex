@@ -1712,12 +1712,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									desc.setName(cid);
 									desc.setLocalType(compotype);
 									setOwner(ret.getId(), desc);
+									System.out.println("env create: "+cid);
 									IFuture	future	= cms.createComponent(cid.getLocalName(), filename,
 										new CreationInfo(null, null, getExternalAccess().getComponentIdentifier(), false, getExternalAccess().getModel().getAllImports()), null);
 									future.addResultListener(new IResultListener()
 									{
 										public void resultAvailable(Object result)
 										{
+											System.out.println("env created: "+result);
 //											setOwner(ret.getId(), (IComponentIdentifier)result);
 										}
 										

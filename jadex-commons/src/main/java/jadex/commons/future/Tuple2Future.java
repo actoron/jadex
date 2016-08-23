@@ -49,7 +49,7 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
      */
     public E getFirstResult(ThreadSuspendable sus)
     {
-    	return (E)getXResult(0);
+    	return (E)getFirstResult(UNSET);
     }
 	
 	/**
@@ -59,7 +59,7 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
      */
     public E getFirstResult()
     {
-    	return (E)getXResult(0);
+    	return (E)getFirstResult(UNSET);
     }
     
     /**
@@ -69,7 +69,53 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
      */
     public F getSecondResult()
     {
-    	return (F)getXResult(1);
+    	return (F)getSecondResult(UNSET);
+    }
+    
+    /**
+     *  Get the first result.
+     *  @param timeout The timeout in millis.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getFirstResult(long timeout)
+    {
+    	return getFirstResult(timeout, false);
+    }
+    
+    /**
+     *  Get the second result.
+     *  @param timeout The timeout in millis.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public F getSecondResult(long timeout)
+    {
+    	return (F)getSecondResult(UNSET, false);
+    }
+    
+    /**
+     *  Get the first result.
+     *  @param timeout The timeout in millis.
+     *  @param realtime Flag if wait should be realtime (in contrast to simulation time).
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getFirstResult(long timeout, boolean realtime)
+    {
+    	return (E)getXResult(0, timeout, realtime);
+    }
+    
+    /**
+     *  Get the second result.
+     *  @param timeout The timeout in millis.
+     *  @param realtime Flag if wait should be realtime (in contrast to simulation time).
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public F getSecondResult(long timeout, boolean realtime)
+    {
+    	return (F)getXResult(1, timeout, realtime);
     }
     
 	/**
@@ -182,7 +228,7 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
 	 *  @return	The next intermediate result.
 	 *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
 	 */
-    protected Object getXResult(int idx)
+    protected Object getXResult(int idx, long timeout, boolean realtime)
     {
     	TupleResult res = null;
     	for(int i=0; i<getMax() && res==null; i++)
@@ -190,7 +236,7 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
     		res = findResult(idx);
     		if(res==null)
     		{
-    			res = getNextIntermediateResult();
+    			res = getNextIntermediateResult(timeout, realtime);
     			if(res.getNum()!=idx)
     				res = null;
     		}

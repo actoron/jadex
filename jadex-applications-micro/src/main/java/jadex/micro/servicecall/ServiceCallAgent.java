@@ -52,7 +52,7 @@ public class ServiceCallAgent	extends TestAgent
 	
 	/** The invocation count. */
 	@AgentArgument
-	protected int	max;
+	protected int max;
 	
 	//-------- methods --------
 	
@@ -62,6 +62,8 @@ public class ServiceCallAgent	extends TestAgent
 	protected IFuture<TestReport>	test(final IComponentManagementService cms, final boolean local)
 	{
 		final Future<TestReport>	ret	= new Future<TestReport>();
+		
+		System.out.println("Service call test on: "+agent.getComponentIdentifier());
 		
 		performTests(cms, RawServiceAgent.class.getName()+".class", local ? 2000 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 		{

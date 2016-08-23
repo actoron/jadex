@@ -454,16 +454,21 @@ public class Starter
 			}
 		}
 
-		if (printExceptions) {
-			ret.addResultListener(new IResultListener<IExternalAccess>() {
-				public void exceptionOccurred(Exception exception) {
+		if(printExceptions) 
+		{
+			ret.addResultListener(new IResultListener<IExternalAccess>() 
+			{
+				public void exceptionOccurred(Exception exception) 
+				{
 					System.out.println(exception.getMessage());
-					if (Future.DEBUG) {
+					if(Future.DEBUG) 
+					{
 						exception.printStackTrace();
 					}
 				}
 
-				public void resultAvailable(IExternalAccess result) {
+				public void resultAvailable(IExternalAccess result) 
+				{
 				}
 			});
 		}

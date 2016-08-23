@@ -17,8 +17,9 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 	/**
 	 *  Suspend the execution of the suspendable.
 	 *  @param timeout The timeout.
+	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
 	 */
-	public void suspend(Future<?> future, long timeout)
+	public void suspend(Future<?> future, long timeout, boolean realtime)
 	{
 		if(timeout==-2)//Timeout.UNSET)
 			timeout = getDefaultTimeout();

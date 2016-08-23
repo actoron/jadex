@@ -114,17 +114,13 @@
 	</componenttypes>
 	
 	<configurations>	
-		<configuration name="15x15 and 500 flies, kd-tree enabled">
+		<configuration name="15x15 and 100 flies">
 			<arguments>
-				<argument name="number">500</argument>
-				<argument name="flashes_to_reset">6</argument>
-				<argument name="flash_length">3</argument>
-				<argument name="cycle_length">12</argument>
+				<argument name="number">100</argument>
 			</arguments>
 			
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
-					
 					<env:dataproviders>
 						<env:dataprovider name="flashes">
 							<env:source name="$flies" objecttype="firefly" aggregate="true">
@@ -165,14 +161,18 @@
 				<component name="&quot;Firefly#&quot;+$n" type="Firefly" number="$args.number"/>
 			</components>
 		</configuration>
-		
-		<configuration name="15x15 and 100 flies">
+	
+		<configuration name="15x15 and 500 flies, kd-tree enabled">
 			<arguments>
-				<argument name="number">100</argument>
+				<argument name="number">500</argument>
+				<argument name="flashes_to_reset">6</argument>
+				<argument name="flash_length">3</argument>
+				<argument name="cycle_length">12</argument>
 			</arguments>
 			
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
+					
 					<env:dataproviders>
 						<env:dataprovider name="flashes">
 							<env:source name="$flies" objecttype="firefly" aggregate="true">

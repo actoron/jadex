@@ -75,13 +75,16 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 		fetcher.setValue("$object", this);
 	}
 	
-	/**
-	 *  Bean constructor.
-	 */
-	public SpaceObject()
-	{
-		super(null, new Object());
-	}
+	// HACK constructor!!!
+	// For what purpose space objects must be sent via service calls?
+	// Makes it easy to create 'wrong' space objects
+//	/**
+//	 *  Bean constructor.
+//	 */
+//	public SpaceObject()
+//	{
+//		super(null, new Object());
+//	}
 	
 	//-------- methods --------
 	

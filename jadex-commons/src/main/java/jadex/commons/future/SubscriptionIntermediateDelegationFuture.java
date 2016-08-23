@@ -178,7 +178,8 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, UNSET);
+    	    		// todo: realtime as method parameter?!
+    				caller.suspend(this, UNSET, false);
     	    	   	icallers.remove(caller);
     		    	ret	= hasNextIntermediateResult();
     			}
@@ -262,7 +263,8 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, UNSET);
+    	    		// todo: realtime as method parameter?!
+    				caller.suspend(this, UNSET, false);
     	    	   	icallers.remove(caller);
     		    	ret	= doGetNextIntermediateResult(index);
     			}

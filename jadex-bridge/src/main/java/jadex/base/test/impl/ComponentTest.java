@@ -86,6 +86,7 @@ public class ComponentTest extends TestCase
 			this.timeout	= Starter.getLocalDefaultTimeout(((IService)cms).getServiceIdentifier().getProviderId());
 		}
 		this.suite	= suite;
+		
 	}
 	
 	//-------- methods --------
@@ -113,15 +114,21 @@ public class ComponentTest extends TestCase
 		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
 		Timer	t	= null;
 		final boolean[]	triggered	= new boolean[1];	
+		
 		if(timeout!=Timeout.NONE)
 		{
 			t	= new Timer(true);
+			
+//			System.out.println("Using test timeout: "+timeout+" "+System.currentTimeMillis()+" "+filename);
+			
 			t.schedule(new TimerTask()
 			{
 				public void run()
 				{
-					triggered[0]	= true;
-					boolean	b	= finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
+//					System.out.println("TIMEOUT: "+System.currentTimeMillis()+" "+filename);
+
+					triggered[0] = true;
+					boolean	b = finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
 					if(b && cid[0]!=null)
 					{
 						cms.destroyComponent(cid[0]);

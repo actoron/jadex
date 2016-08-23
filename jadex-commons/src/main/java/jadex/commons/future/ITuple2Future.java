@@ -33,6 +33,40 @@ public interface ITuple2Future<E, F> extends IIntermediateFuture<TupleResult>
     public F getSecondResult();
     
     /**
+     *  Get the first result.
+     *  @param timeout The timeout in millis.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getFirstResult(long timeout);
+    
+    /**
+     *  Get the second result.
+     *  @param timeout The timeout in millis.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public F getSecondResult(long timeout);
+    
+    /**
+     *  Get the first result.
+     *  @param timeout The timeout in millis.
+     *  @param realtime Flag if wait should be realtime (in contrast to simulation time).
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getFirstResult(long timeout, boolean realtime);
+    
+    /**
+     *  Get the second result.
+     *  @param timeout The timeout in millis.
+     *  @param realtime Flag if wait should be realtime (in contrast to simulation time).
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public F getSecondResult(long timeout, boolean realtime);
+    
+    /**
      * Uses two functional result listeners to create a Tuple2ResultListener and add it.
      * The first listener is called upon reception of the first result, the second is called
      * for the second result.
