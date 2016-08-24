@@ -34,6 +34,9 @@ public class RequiredServiceInfo
 	/** Global scope. */
 	public static final String SCOPE_GLOBAL = "global";
 	
+	/** Global Application scope. */
+	public static final String SCOPE_GLOABL_APPLICATION = "global_application";
+	
 //	/** Upwards scope. */
 //	public static final String SCOPE_UPWARDS = "upwards";
 	

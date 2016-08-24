@@ -16,7 +16,8 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 /**
- * 
+ *  Example queue user that registers at the queue with a topic and
+ *  publishes a number of topics before terminating.
  */
 @Agent
 @RequiredServices(@RequiredService(name="mq", type=IMessageQueueService.class))

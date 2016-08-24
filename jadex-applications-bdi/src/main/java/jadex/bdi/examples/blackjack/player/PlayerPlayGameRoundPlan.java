@@ -34,7 +34,7 @@ public class PlayerPlayGameRoundPlan extends Plan
 	 */
 	public void body()
 	{
-		getLogger().info("created: " + this);
+//		getLogger().info("created: " + this);
 		if(getBeliefbase().containsBelief("gui"))
 		{
 			Object	gui	= getBeliefbase().getBelief("gui").getFact();
@@ -42,6 +42,7 @@ public class PlayerPlayGameRoundPlan extends Plan
 			{
 				gui	= ((GuiCreator)gui).getGui();
 				getBeliefbase().getBelief("gui").setFact(gui);	// Hack!!!
+				// Must replace belief because it uses property change events on the humaninterface gui!
 			}
 			hpi = (HumanPlayerInterface)gui;
 		}
