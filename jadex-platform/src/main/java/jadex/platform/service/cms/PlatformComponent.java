@@ -253,7 +253,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 							@Override
 							public void resultAvailable(Void result)
 							{
-								System.out.println("shutdown component features timeout: "+getComponentIdentifier());
+//								System.out.println("shutdown component features timeout: "+getComponentIdentifier());
 								executeKillOnFeatures(ifeatures!=null ? ifeatures : lfeatures);
 								ret.setExceptionIfUndone(new TimeoutException("Timeout during component cleanup: "+timeout));
 							}

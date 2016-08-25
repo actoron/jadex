@@ -81,19 +81,19 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		final Future<Void>	ret	= new Future<Void>();
 		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
 		
-		System.out.println("shutdown start: "+component);
+//		System.out.println("shutdown start: "+component);
 		createEndBehavior().startEndBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability())
 			.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				System.out.println("shutdown end: "+component);
+//				System.out.println("shutdown end: "+component);
 				BDIXLifecycleAgentFeature.super.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("shutdown ex: "+component+", "+exception);
+//				System.out.println("shutdown ex: "+component+", "+exception);
 //				exception.printStackTrace();
 				BDIXLifecycleAgentFeature.super.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
 			}

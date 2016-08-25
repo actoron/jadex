@@ -2012,55 +2012,55 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			// Abort running goals.
 			Collection<RGoal> goals = bdif.getCapability().getGoals();
-			System.out.println(component.getComponentIdentifier()+" dropping body goals: "+goals);
+//			System.out.println(component.getComponentIdentifier()+" dropping body goals: "+goals);
 			for(final RGoal goal: goals)
 			{
 				IFuture<Void>	fut	= goal.drop();
 				bodyend.addFuture(fut);
-				fut.addResultListener(new IResultListener<Void>()
-				{
-					@Override
-					public void resultAvailable(Void result)
-					{
-						System.out.println(component.getComponentIdentifier()+" dropped body goal: "+goal);
-					}
-					
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						System.out.println(component.getComponentIdentifier()+" dropped body goal: "+goal+", "+exception);
-					}
-				});
+//				fut.addResultListener(new IResultListener<Void>()
+//				{
+//					@Override
+//					public void resultAvailable(Void result)
+//					{
+//						System.out.println(component.getComponentIdentifier()+" dropped body goal: "+goal);
+//					}
+//					
+//					@Override
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println(component.getComponentIdentifier()+" dropped body goal: "+goal+", "+exception);
+//					}
+//				});
 			}
 			
 			// Abort running plans.
 			Collection<RPlan> plans = bdif.getCapability().getPlans();
-			System.out.println(component.getComponentIdentifier()+" dropping body plans: "+plans);
+//			System.out.println(component.getComponentIdentifier()+" dropping body plans: "+plans);
 			for(final RPlan plan: plans)
 			{
 				IFuture<Void>	fut	= plan.abort();
 				bodyend.addFuture(fut);
-				fut.addResultListener(new IResultListener<Void>()
-				{
-					@Override
-					public void resultAvailable(Void result)
-					{
-						System.out.println(component.getComponentIdentifier()+" dropped body plan: "+plan);
-					}
-					
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						System.out.println(component.getComponentIdentifier()+" dropped body plan: "+plan+", "+exception);
-					}
-				});
+//				fut.addResultListener(new IResultListener<Void>()
+//				{
+//					@Override
+//					public void resultAvailable(Void result)
+//					{
+//						System.out.println(component.getComponentIdentifier()+" dropped body plan: "+plan);
+//					}
+//					
+//					@Override
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println(component.getComponentIdentifier()+" dropped body plan: "+plan+", "+exception);
+//					}
+//				});
 			}
 			
 			bodyend.waitFor().addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					System.out.println(component.getComponentIdentifier()+" body end");
+//					System.out.println(component.getComponentIdentifier()+" body end");
 					String confname = component.getConfiguration();
 					if(confname!=null)
 					{
