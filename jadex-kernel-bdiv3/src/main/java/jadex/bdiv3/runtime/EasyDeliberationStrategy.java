@@ -57,6 +57,10 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 		{
 //			if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
 //				&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
+			
+//			if(goal!=other && other.getModelElement().equals(goal.getModelElement()) && goal.getModelElement().getName().toLowerCase().indexOf("achievecleanup")!=-1)
+//				System.out.println("achievecleanup");
+			
 			if(!isInhibitedBy(other, goal) && inhibits(other, goal))
 			{
 //				if(goal.getModelElement().getName().indexOf("achievecleanup")!=-1)
@@ -273,12 +277,12 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 			MDeliberation delib = goal.getMGoal().getDeliberation();
 			if(delib!=null)
 			{
-				if(delib.isCardinalityOne() && other.getMGoal().equals(goal.getMGoal()))
-				{
-					ret = true;
-				}
-				else
-				{
+//				if(delib.isCardinalityOne() && other.getMGoal().equals(goal.getMGoal()))
+//				{
+//					ret = true;
+//				}
+//				else
+//				{
 //					Set<MGoal> minh = delib.getInhibitions();
 					Set<MGoal> minh = delib.getInhibitions(goal.getMCapability());
 					MGoal mother = other.getMGoal();
@@ -321,6 +325,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 								try
 								{
 									ret = ((Boolean)SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(fet)).booleanValue();
+//									System.out.println("exp val: "+ret+" "+uexp);
 								}
 								catch(Exception e)
 								{
@@ -329,7 +334,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 								}
 							}
 						}
-					}
+//					}
 				}
 			}
 		}
