@@ -80,7 +80,7 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	}
 	
 	/**
-	 *  Kill is only invoked, when shutdown does not return due to timeout.
+	 *  Kill is only invoked, when shutdown of some (e.g. other) feature does not return due to timeout.
 	 *  The feature should do any kind of possible cleanup, but no asynchronous operations.
 	 */
 	public void kill()

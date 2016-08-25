@@ -242,7 +242,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				});
 				
 				// Add timeout in case cleanup takes too long.
-				Number	timeout	= (Number)getModel().getProperty(PROPERTY_TERMINATION_TIMEOUT, getClassLoader());
+				final Number	timeout	= (Number)getModel().getProperty(PROPERTY_TERMINATION_TIMEOUT, getClassLoader());
 				if(timeout==null || timeout.longValue()!=Timeout.NONE)
 				{
 					if(getComponentFeature0(IExecutionFeature.class)!=null)
@@ -255,7 +255,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 							{
 								System.out.println("shutdown component features timeout: "+getComponentIdentifier());
 								executeKillOnFeatures(ifeatures!=null ? ifeatures : lfeatures);
-								ret.setExceptionIfUndone(new TimeoutException("Timeout during component cleanup."));
+								ret.setExceptionIfUndone(new TimeoutException("Timeout during component cleanup: "+timeout));
 							}
 							
 							@Override

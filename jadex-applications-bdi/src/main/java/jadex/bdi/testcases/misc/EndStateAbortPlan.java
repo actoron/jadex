@@ -30,12 +30,17 @@ public class EndStateAbortPlan extends Plan
 			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		IComponentIdentifier	worker	= cms.createComponent("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml",
 			new CreationInfo(getComponentIdentifier())).getFirstResult();
+		
+		// Wait to allow worker to start plan
+		waitFor(100);
 
 		// Kill worker and wait for result.
 		TestReport	report	= new TestReport("termination", "Test if the worker agent terminates with timeout.");
 		try
 		{
+			System.out.println("destroying worker: "+worker);
 			cms.destroyComponent(worker).get();
+			System.out.println("destroyed worker: "+worker);
 			report.setFailed("Worker agent terminated without timeout.");
 		}
 		catch(TimeoutException e)
@@ -43,6 +48,11 @@ public class EndStateAbortPlan extends Plan
 			report.setSucceeded(true);
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		
+		// Wait to allow worker to exit plan passed()
+		System.out.println("waiting for worker exit: "+worker);
+		waitFor(100);
+		System.out.println("waited for worker exit: "+worker);
 		
 		// Check if worker agent thread has been correctly removed.
 		report	= new TestReport("cleanup", "Test if the worker agent thread has been terminated");

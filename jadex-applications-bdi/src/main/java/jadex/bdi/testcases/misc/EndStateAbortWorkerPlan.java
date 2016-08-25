@@ -22,12 +22,9 @@ public class EndStateAbortWorkerPlan extends Plan
 	{
 		try
 		{
-			while(true)
-			{
-				System.out.println("before wait");
-				waitFor(100);
-				System.out.println("after wait");
-			}
+			System.out.println("before wait");
+			waitForEver();
+			System.out.println("after wait");
 		}
 		finally
 		{
