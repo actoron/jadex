@@ -4465,7 +4465,7 @@ public class SUtil
 	 *  @param e The exception.
 	 *  @return The exception stacktrace.
 	 */
-	public static String getExceptionStacktrace(Exception e)
+	public static String getExceptionStacktrace(Throwable e)
 	{
 		StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
