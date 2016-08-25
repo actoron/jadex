@@ -945,12 +945,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				return false;	// Component already failed: tell executor not to call again. (can happen during failed init)
 //			}
 	
-			// Remember execution thread.
-			this.componentthread	= Thread.currentThread();
-			IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
-			IInternalExecutionFeature.LOCAL.set(getComponent());
-			ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
-			Thread.currentThread().setContextClassLoader(component.getClassLoader());
+			ClassLoader cl = setExecutionState();
 			
 			// Process listener notifications from old component thread.
 //			boolean notifexecuted	= false;
@@ -1195,6 +1190,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				else if(ex instanceof ThreadDeath)
 				{
 					// Hard cleanup during kill.
+					resetExecutionState(cl);
 					throw (ThreadDeath)ex;
 				}
 				step.getFuture().setExceptionIfUndone(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
@@ -1412,17 +1408,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			stepfut.setResult(null);
 		}
-				
-		// Reset execution state.
-		IComponentIdentifier.LOCAL.set(null);
-		IInternalExecutionFeature.LOCAL.set(null);
-		// Must reset service call settings when thread retreats from components
-		CallAccess.resetCurrentInvocation();
-		CallAccess.resetNextInvocation();
-		Thread.currentThread().setContextClassLoader(cl);
-		this.componentthread = null;
-		executing	= false;
-		ISuspendable.SUSPENDABLE.set(null);
+
+		resetExecutionState(cl);
 
 		// Execute the subcomponents
 		boolean ret = hasstep || cycle;
@@ -1467,7 +1454,40 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		return ret;
 	}
+
+	/**
+	 *  Set flags when entering thread.
+	 *  @return	The previous context class loader.
+	 */
+	protected ClassLoader setExecutionState()
+	{
+		// Remember execution thread.
+		this.componentthread	= Thread.currentThread();
+		IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
+		IInternalExecutionFeature.LOCAL.set(getComponent());
+		ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(component.getClassLoader());
+		return cl;
+	}
 	
+	/**
+	 *  Reset flags when exiting thread.
+	 *  @param cl	The previous context class loader.
+	 */
+	protected void resetExecutionState(ClassLoader cl)
+	{
+		// Reset execution state.
+		IComponentIdentifier.LOCAL.set(null);
+		IInternalExecutionFeature.LOCAL.set(null);
+		// Must reset service call settings when thread retreats from components
+		CallAccess.resetCurrentInvocation();
+		CallAccess.resetNextInvocation();
+		Thread.currentThread().setContextClassLoader(cl);
+		this.componentthread = null;
+		executing	= false;
+		ISuspendable.SUSPENDABLE.set(null);
+	}
+
 	/**
 	 *  Components with autonomous behavior may override this method
 	 *  to implement a recurring execution cycle.
