@@ -83,8 +83,8 @@ public class RegistrySearchFunctionality
 	// read
 	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
 	{
-		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
-			System.out.println("search: "+type+" - "+cid);
+//		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
+//			System.out.println("search: "+type+" - "+cid);
 		
 		T ret = null;
 		Iterator<IService> sers = getServices(type);
@@ -180,8 +180,8 @@ public class RegistrySearchFunctionality
 	{
 		List<T> ret = new ArrayList<T>();
 		
-		if(type!=null && type.toString().indexOf("Factory")!=-1)
-			System.out.println("sdfsdf");
+//		if(type!=null && type.toString().indexOf("Factory")!=-1)
+//			System.out.println("sdfsdf");
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))

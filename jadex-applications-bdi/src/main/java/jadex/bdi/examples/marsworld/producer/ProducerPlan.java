@@ -4,6 +4,7 @@ import jadex.application.EnvironmentService;
 import jadex.bdi.examples.marsworld.RequestCarry;
 import jadex.bdi.examples.marsworld.RequestProduction;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
@@ -31,23 +32,30 @@ public class ProducerPlan extends Plan
 	{
 		getLogger().info("Created: "+this);
 		
-		while(true)
+		try
 		{
-			// Wait for a request.
-			IMessageEvent req = waitForMessageEvent("request_production");
-
-			ISpaceObject ot = ((RequestProduction)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
-			IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-			ISpaceObject target = env.getSpaceObject(ot.getId());
-
-			// Producing ore here.
-			IGoal produce_ore = createGoal("produce_ore");
-			produce_ore.getParameter("target").setValue(target);
-			dispatchSubgoalAndWait(produce_ore);
-
-			//System.out.println("Production of ore has finished....");
-			//System.out.println("Calling Carry Agent....");
-			callCarryAgent(target);
+			while(true)
+			{
+				// Wait for a request.
+				IMessageEvent req = waitForMessageEvent("request_production");
+	
+				ISpaceObject ot = ((RequestProduction)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
+				IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
+				ISpaceObject target = env.getSpaceObject(ot.getId());
+	
+				// Producing ore here.
+				IGoal produce_ore = createGoal("produce_ore");
+				produce_ore.getParameter("target").setValue(target);
+				dispatchSubgoalAndWait(produce_ore);
+	
+				//System.out.println("Production of ore has finished....");
+				//System.out.println("Calling Carry Agent....");
+				callCarryAgent(target);
+			}
+		}
+		catch(GoalDroppedException e)
+		{
+			// nop terminating
 		}
 	}
 

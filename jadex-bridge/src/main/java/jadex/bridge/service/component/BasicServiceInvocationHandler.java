@@ -25,6 +25,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
@@ -43,6 +44,7 @@ import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -76,11 +78,17 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/** The internal access. */
 	protected IInternalAccess comp;
 	
+	// The proxy can be equipped with 
+	// a) the IService Object
+	// b) a service info object (for pojo services that separate basic service object and pojo service)
+	// c) a service identifier that can be used to relay a call to another service
+	
 	/** The service identifier. */
 	protected IServiceIdentifier sid;
 	
 	/** The service. */
 	protected Object service;
+		
 
 	/** The logger for errors/warnings. */
 	protected Logger logger;
@@ -90,9 +98,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 
 	/** The list of interceptors. */
 	protected List<IServiceInvocationInterceptor> interceptors;
-	
-	/** The pojo service map (pojo -> proxy). */
-	protected static Map<Object, IService>	pojoproxies;
 	
 	/** The root cause that was given at creation time. */
 	protected Cause cause;
@@ -105,6 +110,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	
 	/** The flag if a switchcall should be done. */
 	protected boolean switchcall;
+	
+	
+	/** The pojo service map (pojo -> proxy). */
+	protected static Map<Object, IService>	pojoproxies;
+
 	
 	//-------- constructors --------
 	
@@ -156,6 +166,22 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		this.switchcall = false; // called for provided proxy which must not switch (is the object that is asked in the req proxy)
 //		this.callid = new AtomicLong();
 	}
+	
+//	/**
+//	 *  Create a new invocation handler.
+//	 */
+//	public BasicServiceInvocationHandler(IInternalAccess comp, IResultCommand<IFuture<Object>, Void> searchcmd, Logger logger, Cause cause)
+//	{
+//		assert cause!=null;
+//		this.comp = comp;
+//		this.searchcmd = searchcmd;
+////		this.sid = service.getManagementService().getServiceIdentifier();
+//		this.logger	= logger;
+////		this.realtime	= realtime;
+//		this.cause = cause;
+//		this.switchcall = false; // called for provided proxy which must not switch (is the object that is asked in the req proxy)
+////		this.callid = new AtomicLong();
+//	}
 	
 	//-------- methods --------
 	

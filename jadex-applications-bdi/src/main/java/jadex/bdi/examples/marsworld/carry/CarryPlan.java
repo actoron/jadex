@@ -2,6 +2,7 @@ package jadex.bdi.examples.marsworld.carry;
 
 import jadex.bdi.examples.marsworld.RequestCarry;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
@@ -24,19 +25,26 @@ public class CarryPlan extends Plan
 	{
 		getLogger().info("Created: "+this);
 		
-		while(true)
+		try
 		{
-			// Wait for a request.
-			IMessageEvent req = waitForMessageEvent("request_carry");
-
-			ISpaceObject ot = ((RequestCarry)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
-			IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-			ISpaceObject target = env.getSpaceObject(ot.getId());
-
-			// Producing ore here.
-			IGoal carry_ore = createGoal("carry_ore");
-			carry_ore.getParameter("target").setValue(target);
-			dispatchSubgoalAndWait(carry_ore);
+			while(true)
+			{
+				// Wait for a request.
+				IMessageEvent req = waitForMessageEvent("request_carry");
+	
+				ISpaceObject ot = ((RequestCarry)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
+				IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
+				ISpaceObject target = env.getSpaceObject(ot.getId());
+	
+				// Producing ore here.
+				IGoal carry_ore = createGoal("carry_ore");
+				carry_ore.getParameter("target").setValue(target);
+				dispatchSubgoalAndWait(carry_ore);
+			}
+		}
+		catch(GoalDroppedException e)
+		{
+			// nop terminating
 		}
 	}
 }

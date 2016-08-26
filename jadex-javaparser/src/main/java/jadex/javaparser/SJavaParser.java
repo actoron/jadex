@@ -104,4 +104,42 @@ public class SJavaParser
 		}
 		return value;
 	}
+	
+	/**
+	 *  Evaluate a string that is possiby an expression.
+	 *  Expressions must use %{}
+	 *  @param text The expression text.
+	 *  @param imports The imports.
+	 *  @param fetcher The fetcher.
+	 *  @param cl The classloader.
+	 *  @return The evaluated expression or the text.
+	 */
+	public static Object evaluateExpressionPotentially(String text, String[] imports, IValueFetcher fetcher, ClassLoader cl)
+	{
+		Object ret = text;
+		
+		if(text!=null && isExpressionString(text))
+		{
+			try
+			{
+				ret = (String)SJavaParser.evaluateExpression(text.substring(2, text.length()-1), imports, fetcher, cl);
+			}
+			catch(Exception e)
+			{
+				ret = text;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check if string is an expression.
+	 *  @param text The expression text.
+	 *  @return True, if is expression.
+	 */
+	public static boolean isExpressionString(String text)
+	{
+		return text.startsWith("%{");
+	}
 }
