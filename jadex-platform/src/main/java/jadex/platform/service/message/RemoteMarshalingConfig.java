@@ -154,7 +154,7 @@ public class RemoteMarshalingConfig
 		}
 		else
 		{
-			default_sid = JadexJsonSerializer.SERIALIZER_ID;
+			default_sid = JadexBinarySerializer.SERIALIZER_ID;
 		}
 		
 		if(default_codecs!=null && default_codecs.length>0)

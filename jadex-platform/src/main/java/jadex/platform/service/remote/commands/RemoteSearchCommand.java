@@ -92,8 +92,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	{
 //		if(type==null)
 //			System.out.println("type is null");
-		if (caller instanceof ITransportComponentIdentifier)
-			caller = new BasicComponentIdentifier(caller);
+//		if (caller instanceof ITransportComponentIdentifier)
+//			caller = new BasicComponentIdentifier(caller);
 		this.providerid = providerid;
 		this.type = new ClassInfo(type);
 		this.multiple = multiple;
@@ -465,8 +465,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 */
 	public void setCaller(IComponentIdentifier caller)
 	{
-		if (caller instanceof ITransportComponentIdentifier)
-			caller = new BasicComponentIdentifier(caller);
+//		if (caller instanceof ITransportComponentIdentifier)
+//			caller = new BasicComponentIdentifier(caller);
 		this.caller = caller;
 	}
 

@@ -105,8 +105,8 @@ public class JsonBeanProcessor implements ITraverseProcessor
 					{
 						Object val = prop.getPropertyValue(object);
 						
-						if (val != null && val.getClass().toString().contains("jadex.bridge.ComponentIdentifier"))
-							System.out.println("Contains addresses: " + object.getClass() + " " + object);
+//						if (val != null && val.getClass().toString().contains("jadex.bridge.ComponentIdentifier"))
+//							System.out.println("Contains addresses: " + object.getClass() + " " + object);
 						
 						if(val!=null) 
 						{
