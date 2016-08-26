@@ -11,7 +11,6 @@ import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
-import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
@@ -90,7 +89,7 @@ public interface IMessageService extends IService
 	 *  Adds postprocessors to the encoding stage.
 	 *  @param Postprocessors.
 	 */
-	IFuture<Void> addPostprocessors(IDecoderHandler[] processors);
+	IFuture<Void> addPostprocessors(ITraverseProcessor[] processors);
 	
 	/**
 	 *  Add message codec.

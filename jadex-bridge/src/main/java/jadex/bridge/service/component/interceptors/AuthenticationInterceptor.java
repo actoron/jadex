@@ -17,7 +17,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 
 /**
  *  Interceptor that can be used to realize authenticated end-to-end communication.
@@ -120,7 +120,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		String methodname = context.getMethod().getName();
 		Object[] args = context.getArgumentArray();
 		Object[] t = new Object[]{context.getCaller().getPlatformPrefix(), classname, methodname, args};
-		final byte[] content = BinarySerializer.objectToByteArray(t, null);
+		final byte[] content = SBinarySerializer.writeObjectToByteArray(t, null);
 		
 		SServiceProvider.getService(getComponent(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
@@ -242,7 +242,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		String methodname = context.getMethod().getName();
 		Object[] args = context.getArgumentArray();
 		Object[] t = new Object[]{callername, classname, methodname, args};
-		final byte[] content = BinarySerializer.objectToByteArray(t, null);
+		final byte[] content = SBinarySerializer.writeObjectToByteArray(t, null);
 		
 		SServiceProvider.getService(ia, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)

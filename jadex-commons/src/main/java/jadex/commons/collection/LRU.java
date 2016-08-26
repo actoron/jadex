@@ -46,6 +46,12 @@ public class LRU<K, V> extends LinkedHashMap<K, V>
 		this.max = max;
 		this.cleaner = cleaner;
 	}
+	
+	@Override
+	public V put(K key, V value)
+	{
+		return super.put(key, value);
+	}
 
 	//-------- methods --------
 

@@ -30,7 +30,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -471,7 +471,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	public static byte[] encodeObject(Object object, ClassLoader classloader)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		SBinarySerializer2.writeObjectToStream(baos, object, classloader);
+		SBinarySerializer.writeObjectToStream(baos, object, classloader);
 		return baos.toByteArray();
 		// TODO: Hack? The encoding context probably needs to be target-based
 //		return MapSendTask.encodeMessage(object, null, null, codecs, classloader);
@@ -486,7 +486,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 */
 	public static Object decodeObject(byte[] data, ClassLoader classloader)
 	{
-		return SBinarySerializer2.readObjectFromStream(new ByteArrayInputStream(data), null, null, classloader, null);
+		return SBinarySerializer.readObjectFromStream(new ByteArrayInputStream(data), null, null, classloader, null, null);
 //		System.out.println("size: "+data.length);
 //		return MapSendTask.decodeMessage(data, null, serializers, codecs, classloader, IErrorReporter.IGNORE);
 //		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 

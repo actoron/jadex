@@ -32,7 +32,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.micro.annotation.Binding;
 import jadex.platform.service.message.MapSendTask;
 
@@ -236,7 +236,7 @@ public class HttpReceiver
 			{
 				try
 				{
-					AwarenessInfo	info = (AwarenessInfo) SBinarySerializer2.readObjectFromStream(new ByteArrayInputStream(data), getClass().getClassLoader());
+					AwarenessInfo	info = (AwarenessInfo) SBinarySerializer.readObjectFromStream(new ByteArrayInputStream(data), getClass().getClassLoader());
 //					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, null, serializers, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 //					System.out.println("Received awareness info: "+info);
 					awa.addAwarenessInfo(info);

@@ -2,16 +2,24 @@ package jadex.platform.service.message.transport.localmtp;
 
 import java.util.Map;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.IResultCommand;
+import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.message.ISendTask;
+import jadex.platform.service.message.MapSendTask;
+import jadex.platform.service.message.MessageService;
+import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.ITransport;
+import jadex.platform.service.message.transport.MessageEnvelope;
 
 
 /**
@@ -28,7 +36,7 @@ public class LocalTransport implements ITransport
 	//-------- attributes --------
 	
 	/** The message service. */
-	protected IMessageService msgservice;
+	protected MessageService msgservice;
 	
 	/** The addresses. */
 	protected String[] addresses;
@@ -52,17 +60,35 @@ public class LocalTransport implements ITransport
 	 */
 	public IFuture<Void> start()
 	{
-		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+		return component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
-			public void customResultAvailable(IMessageService result)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				msgservice = result;
-				ret.setResult(null);
+				
+				Object rawms;
+				try
+				{
+					rawms = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(IMessageService.class);
+				}
+				catch (Exception e)
+				{
+					rawms = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IMessageService.class);
+				}
+				msgservice=(MessageService) rawms;
+				return IFuture.DONE;
 			}
 		});
-		return ret;
+//		final Future<Void> ret = new Future<Void>();
+//		SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+//		{
+//			public void customResultAvailable(IMessageService result)
+//			{
+//				msgservice = result;
+//				ret.setResult(null);
+//			}
+//		});
+//		return ret;
 	}
 	
 	/**
@@ -126,7 +152,19 @@ public class LocalTransport implements ITransport
 //				System.out.println("Sent with local transport: "+task.getReceivers()[0]);
 				
 //				msgservice.deliverMessage(task.getMessage(), task.getMessageType().getName(), task.getReceivers());
-				msgservice.deliverMessage((byte[]) task.getMessage());
+				if (task instanceof MapSendTask || task instanceof StreamSendTask)
+				{
+					msgservice.deliverMessageLocally(task);
+				}
+				else
+				{
+					byte[] prolog = task.getProlog();
+					byte[] data = task.getData();
+					byte[] msg = new byte[prolog.length+data.length];
+					System.arraycopy(prolog, 0, msg, 0, prolog.length);
+					System.arraycopy(data, 0, msg, prolog.length, data.length);
+					msgservice.deliverMessage(msg);
+				}
 				return IFuture.DONE;
 			}
 		};

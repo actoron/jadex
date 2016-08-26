@@ -12,6 +12,7 @@ import java.util.Set;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Codec for encoding and decoding collections.
@@ -79,7 +80,7 @@ public class CollectionCodec extends AbstractCodec
 		int length = (int) context.readVarInt();
 		for (int i = 0; i < length; ++i)
 		{
-			Object element = BinarySerializer.decodeObject(context);
+			Object element = SBinarySerializer.decodeObject(context);
 			coll.add(element);
 		}
 		return coll;
@@ -97,12 +98,11 @@ public class CollectionCodec extends AbstractCodec
 //		Class<?> clazz = SReflect.getClass(type);
 //		return SReflect.isSupertype(Collection.class, clazz);
 //	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		ec.writeVarInt(((Collection) object).size());
 		
@@ -116,11 +116,11 @@ public class CollectionCodec extends AbstractCodec
 				if (val != null)
 				{
 					Class valclazz = val.getClass();
-					traverser.doTraverse(val, valclazz, traversed, processors, clone, null, ec);
+					traverser.doTraverse(val, valclazz, preprocessors, processors, mode, targetcl, ec);
 				}
 				else
 				{
-					ec.writeClassname(BinarySerializer.NULL_MARKER);
+					ec.writeClassname(SBinarySerializer.NULL_MARKER);
 				}
 			}
 		}

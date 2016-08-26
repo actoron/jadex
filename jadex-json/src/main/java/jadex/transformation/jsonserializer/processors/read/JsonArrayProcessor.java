@@ -3,7 +3,6 @@ package jadex.transformation.jsonserializer.processors.read;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -12,6 +11,7 @@ import com.eclipsesource.json.JsonValue;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -26,7 +26,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 
@@ -37,12 +37,11 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		
@@ -62,7 +61,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 			idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
 		}
 			
-		Object ret = getReturnObject(array, compclazz, clone, targetcl);
+		Object ret = getReturnObject(array, compclazz, targetcl);
 //		traversed.put(object, ret);
 		
 		if(idx!=null)
@@ -73,8 +72,8 @@ public class JsonArrayProcessor implements ITraverseProcessor
 		for(int i=0; i<array.size(); i++)
 		{
 			Object val = array.get(i);
-			Object newval = traverser.doTraverse(val, ccl, traversed, processors, clone, targetcl, context);
-			if(newval != Traverser.IGNORE_RESULT && (clone || newval!=val))
+			Object newval = traverser.doTraverse(val, ccl, conversionprocessors, processors, mode, targetcl, context);
+			if(newval != Traverser.IGNORE_RESULT && newval!=val)
 			{
 				Array.set(ret, i, JsonBeanProcessor.convertBasicType(newval, clazz));	
 			}
@@ -86,7 +85,7 @@ public class JsonArrayProcessor implements ITraverseProcessor
 	/**
 	 * 
 	 */
-	public Object getReturnObject(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public Object getReturnObject(Object object, Class<?> clazz, ClassLoader targetcl)
 	{
 		if(clazz!=null && targetcl!=null)
 			clazz = SReflect.classForName0(SReflect.getClassName(clazz), targetcl);

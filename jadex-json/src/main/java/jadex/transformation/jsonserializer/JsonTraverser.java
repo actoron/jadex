@@ -2,6 +2,8 @@ package jadex.transformation.jsonserializer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,8 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.binaryserializer.DefaultErrorReporter;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -34,8 +38,8 @@ public class JsonTraverser extends Traverser
 	protected static Traverser writetraverser;
 	protected static JsonTraverser readtraverser;
 
-	protected static List<ITraverseProcessor> writeprocs;
-	protected static List<ITraverseProcessor> readprocs;
+	public static List<ITraverseProcessor> writeprocs;
+	public static List<ITraverseProcessor> readprocs;
 	
 	static
 	{
@@ -66,7 +70,7 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
 		
 		readprocs = new ArrayList<ITraverseProcessor>();
-		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonReferenceProcessor());
+//		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonReferenceProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonRectangleProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonImageProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonColorProcessor());
@@ -80,11 +84,11 @@ public class JsonTraverser extends Traverser
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMultiCollectionProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonEnumProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCertificateProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonStackTraceElementProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonThrowableProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCalendarProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor());
-		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURIProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURLProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassProcessor());
@@ -101,9 +105,9 @@ public class JsonTraverser extends Traverser
 	 *  @param object The object.
 	 *  @return The objects class.
 	 */
-	protected Class<?> findClazz(Object object, ClassLoader targetcl)
+	public Class<?> findClazz(Object object, ClassLoader targetcl)
 	{
-		return object instanceof JsonObject? findClazzOfJsonObject((JsonObject)object, targetcl): null;
+		return object instanceof JsonObject? findClazzOfJsonObject((JsonObject)object, targetcl): object instanceof JsonValue?null:object!=null?object.getClass():null;
 	}
 	
 	/**
@@ -115,6 +119,7 @@ public class JsonTraverser extends Traverser
 	{
 		Class<?> ret = null;
 		String clname = object.getString(CLASSNAME_MARKER, null);
+		clname = STransformation.getClassname(clname);
 		if(clname!=null)
 			ret = SReflect.classForName0(clname, targetcl);
 		return ret;
@@ -130,21 +135,30 @@ public class JsonTraverser extends Traverser
 		{
 			writetraverser = new Traverser()
 			{
-				public Object handleNull(Class<?> clazz, List<ITraverseProcessor> processors, boolean clone, Object context) 
+				public Object preemptProcessing(Object inputobject, Type inputtype, Object context)
 				{
 					JsonWriteContext wr = (JsonWriteContext)context;
-					wr.write("null");
-					return null;
+					wr.setCurrentInputObject(inputobject);
+					Object ret = null;
+					
+					Integer ref = wr.getObjectId(inputobject);
+					if (ref != null)
+					{
+						wr.write("{");
+						wr.writeNameValue(REFERENCE_MARKER, ref);
+						wr.write("}");
+						ret = inputobject;
+					}
+					return ret;
 				}
 				
-				public void handleDuplicate(Object object, Class<?> clazz, Object match,
-					List<ITraverseProcessor> processors, boolean clone, Object context)
+				public void finalizeProcessing(Object inputobject, Object outputobject, ITraverseProcessor convproc, ITraverseProcessor proc, Object context)
 				{
-					JsonWriteContext wr = (JsonWriteContext)context;
-					wr.write("{");
-					int ref = ((Integer)match).intValue();
-					wr.writeNameValue(REFERENCE_MARKER, ref);
-					wr.write("}");
+					if (outputobject == null)
+					{
+						JsonWriteContext wr = (JsonWriteContext)context;
+						wr.write("null");
+					}
 				}
 			};
 		}
@@ -158,7 +172,35 @@ public class JsonTraverser extends Traverser
 	protected static synchronized JsonTraverser getReadTraverser()
 	{
 		if(readtraverser==null)
-			readtraverser = new JsonTraverser();
+			readtraverser = new JsonTraverser()
+			{
+				public Object preemptProcessing(Object inputobject, Type inputtype, Object context)
+				{
+					JsonReadContext jrc = (JsonReadContext) context;
+					Object ret = null;
+					if (inputobject instanceof JsonObject && ((JsonObject)inputobject).get(JsonTraverser.REFERENCE_MARKER)!=null)
+					{
+						JsonObject obj = (JsonObject)inputobject;
+						int num = obj.getInt(JsonTraverser.REFERENCE_MARKER, 0);
+						
+						ret = jrc.getKnownObject(num);
+					}
+					
+					jrc.pushIdStack();
+					return ret;
+				}
+				
+				public void finalizeProcessing(Object inputobject, Object outputobject, ITraverseProcessor convproc, ITraverseProcessor proc, Object context)
+				{
+					JsonReadContext jrc = (JsonReadContext) context;
+					Integer idx = jrc.popIdStack();
+					if (convproc != null)
+					{
+						if (idx != null)
+							jrc.setKnownObject(idx, outputobject);
+					}
+				}
+			};
 		return readtraverser;
 	}
 	
@@ -199,14 +241,22 @@ public class JsonTraverser extends Traverser
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
 	{
+		return objectToByteArray(val, classloader, enc, writeclass, excludes, null, processors);
+	}
+	
+	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors)
+	{
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
 		
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			traverser.traverse(val, null, processors!=null? processors: writeprocs, classloader, wr);
-			byte[] ret = enc==null? wr.getString().getBytes(): wr.getString().getBytes(enc);
+			traverser.traverse(val, null, preprocessors, processors!=null? processors: writeprocs, Traverser.MODE.PREPROCESS, classloader, wr);
+			byte[] ret = enc==null? wr.getString().getBytes(SUtil.UTF8): wr.getString().getBytes(enc);
 			bos.close();
 			return ret;
 		}
@@ -251,13 +301,21 @@ public class JsonTraverser extends Traverser
 	 */
 	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
 	{
+		return objectToString(val, classloader, writeclass, excludes, null, processors);
+	}
+	
+	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors)
+	{
 		String ret = null;
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
 		
 		try
 		{
-			traverser.traverse(val, null, processors, classloader, wr);
+			traverser.traverse(val, null, preprocessors, processors, Traverser.MODE.PREPROCESS, classloader, wr);
 			ret = wr.getString();
 			return ret;
 		}
@@ -314,9 +372,20 @@ public class JsonTraverser extends Traverser
 	 */
 	public static <T> T objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep, String enc, Class<T> clazz)
 	{
+		return objectFromByteArray(val, classloader, rep, enc, clazz, null, null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static <T> T objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep, String enc, Class<T> clazz,  List<ITraverseProcessor> procs, List<ITraverseProcessor> postprocs)
+	{
 		try
 		{
-			return objectFromString(enc==null? new String(val): new String(val, enc), classloader, rep, clazz);
+			return objectFromString(enc==null? new String(val, SUtil.UTF8): new String(val, enc), classloader, rep, clazz, procs, postprocs);
 		}
 		catch(UnsupportedEncodingException e)
 		{
@@ -354,6 +423,18 @@ public class JsonTraverser extends Traverser
 	 */
 	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz, List<ITraverseProcessor> processors)
 	{
+		return objectFromString(val, classloader, rep, clazz, processors, null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz, List<ITraverseProcessor> processors, List<ITraverseProcessor> postprocessors)
+	{
 		rep = rep==null? DefaultErrorReporter.DEFAULT_ERROR_REPORTER: rep;
 		
 		try
@@ -361,19 +442,14 @@ public class JsonTraverser extends Traverser
 			JsonValue value = Json.parse(val);
 			JsonTraverser traverser = getReadTraverser();
 			JsonReadContext rc = new JsonReadContext();
-			Object ret = traverser.traverse(value, clazz, processors!=null? processors: readprocs, classloader, rc);
+			Object ret = traverser.traverse(value, clazz, postprocessors, processors!=null? processors: readprocs, Traverser.MODE.POSTPROCESS, classloader, rc);
+//			Object ret = traverser.traverse(value, clazz, null, processors!=null? processors: readprocs, postprocessors, classloader, rc);
 	//		System.out.println("rc: "+rc.knownobjects);
 			return (T)ret;
 		}
-		catch(RuntimeException e)
-		{
-			throw e;
-		}
 		catch (Exception e)
 		{
-//			e.printStackTrace();
-			// System.out.println("Exception writing: "+val);
-			throw new RuntimeException(e);
+			throw SUtil.convertToRuntimeException(e);
 		}
 	}
 	

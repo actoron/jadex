@@ -2,7 +2,8 @@ package jadex.commons.transformation.traverser;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
+
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Interface for traverse processors.
@@ -17,7 +18,7 @@ public interface ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl);
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context);
 	
 	/**
 	 *  Process an object.
@@ -26,6 +27,5 @@ public interface ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context);
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context);
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Processor that traverses Java beans.
@@ -25,32 +26,42 @@ public class BeanProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		return true;
 	}
 	
 	/**
+	 *  Allow adding the object to the traversed state.
+	 * 	@param orig Original object.
+	 * 	@param preprocessed Preprocessed object.
+	 * 	@param traversed Traversed state.
+	 */
+	public void addToTraversedState(Object orig, Object preprocessed, Map<Object, Object> traversed)
+	{
+		
+	}
+	
+	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 //		System.out.println("fp: "+object);
 		Class<?> clazz = SReflect.getClass(type);
-		Object ret = getReturnObject(object, clazz, clone, targetcl);
-		traversed.put(object, ret);
+		Object ret = getReturnObject(object, clazz, targetcl, context);
+		TraversedObjectsContext.put(context, object, ret);
 		
 		try
 		{
 //			System.out.println("cloned: "+object.getClass());
 //			ret = object.getClass().newInstance();
 			
-			traverseProperties(object, traversed, processors, traverser, clone, targetcl, ret, context);
+			traverseProperties(object, conversionprocessors, processors, mode, traverser, targetcl, ret, context);
 		}
 		catch(Exception e)
 		{
@@ -63,8 +74,7 @@ public class BeanProcessor implements ITraverseProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected void traverseProperties(Object object, Map<Object, Object> cloned, 
-			List<ITraverseProcessor> processors, Traverser traverser, boolean clone, ClassLoader targetcl, Object ret, Object context)
+	protected void traverseProperties(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, Object ret, Object context)
 	{
 		Class clazz = object.getClass();
 			
@@ -85,7 +95,7 @@ public class BeanProcessor implements ITraverseProcessor
 						Object val = prop.getPropertyValue(object);//getGetter().invoke(object, new Object[0]);
 						if(val!=null) 
 						{
-							Object newval = traverser.doTraverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
+							Object newval = traverser.doTraverse(val, prop.getType(), conversionprocessors, processors, mode, targetcl, context);
 							if(newval != Traverser.IGNORE_RESULT && (object!=ret || val!=newval))
 								prop.setPropertyValue(ret, newval);
 	//							prop.getSetter().invoke(ret, new Object[]{newval});
@@ -104,10 +114,10 @@ public class BeanProcessor implements ITraverseProcessor
 	/**
 	 *  Get the object that is returned.
 	 */
-	public Object getReturnObject(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+	public Object getReturnObject(Object object, Class<?> clazz, ClassLoader targetcl, Object context)
 	{
 		Object ret = object;
-		if(clone || targetcl!=null && !clazz.equals(SReflect.classForName0(clazz.getName(), targetcl)))
+		if(SCloner.isCloneContext(context) || targetcl!=null && !clazz.equals(SReflect.classForName0(clazz.getName(), targetcl)))
 		{
 			if(targetcl!=null)
 				clazz	= SReflect.classForName0(clazz.getName(), targetcl);

@@ -9,16 +9,17 @@ import java.util.Set;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Codec for encoding and decoding numbers (short, integer, float, etc.),
  *  boolean values and char values.
  *
  */
-public class NumberCodec2 extends AbstractCodec
+public class NumberCodec extends AbstractCodec
 {
 	/** Default Instance */
-	public static final NumberCodec2 INSTANCE = new NumberCodec2();
+	public static final NumberCodec INSTANCE = new NumberCodec();
 	
 	/** The types this processor can handle. */
 	protected static final Set<Class<?>> TYPES;
@@ -122,24 +123,11 @@ public class NumberCodec2 extends AbstractCodec
 		//if (!(object instanceof Boolean || object instanceof Byte))
 			//super.recordKnownDecodedObject(object, context);
 	}
-	
-	/**
-	 *  Test if the processor is applicable.
-	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
-	 *    e.g. by cloning the object using the class loaded from the target class loader.
-	 *  @return True, if is applicable. 
-	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-	{
-		return isApplicable(clazz);
-	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		if (object instanceof Byte)
 			ec.write(new byte[] {(Byte) object});

@@ -18,18 +18,14 @@ import java.util.logging.Logger;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.collection.IBlockingQueue.ClosedException;
 import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.transformation.STransformation;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
-import jadex.platform.service.message.MapSendTask;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.platform.service.message.RemoteMarshalingConfig;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 import jadex.platform.service.message.transport.httprelaymtp.SRelay;
@@ -387,7 +383,7 @@ public class RelayHandler
 		// Read message and extract awareness info content.
 		byte[] buffer = readData(in, length-1);
 //		MessageEnvelope	msg	= (MessageEnvelope)MapSendTask.decodeMessage(buffer, null, rmc.getAllSerializers(), rmc.getAllCodecs(), getClass().getClassLoader(), null);//IErrorReporter.IGNORE);
-		Map<String, Object>	msg	= (Map<String, Object>) SBinarySerializer2.readObjectFromStream(new ByteArrayInputStream(buffer), null, null, getClass().getClassLoader(), null);
+		Map<String, Object>	msg	= (Map<String, Object>) SBinarySerializer.readObjectFromStream(new ByteArrayInputStream(buffer), null, null, getClass().getClassLoader(), null, null);
 //		IBinaryCodec[]	pcodecs	= MapSendTask.getCodecs(buffer, rmc.getAllCodecs());
 		AwarenessInfo	info;
 		if(SFipa.JADEX_RAW.equals(msg.get(SFipa.LANGUAGE)))
@@ -400,7 +396,7 @@ public class RelayHandler
 		}
 		else //if(SFipa.JADEX_BINARY.equals(msg.getMessage().get(SFipa.LANGUAGE)))
 		{
-			info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.get(SFipa.CONTENT), null, null, getClass().getClassLoader(), null);
+			info = (AwarenessInfo)SBinarySerializer.readObjectFromByteArray((byte[])msg.get(SFipa.CONTENT), null, null, getClass().getClassLoader(), null);
 		}
 		
 		// Update platform awareness info.
@@ -494,7 +490,7 @@ public class RelayHandler
 		// Read message and extract platform info content.
 		byte[] buffer = readData(in, length-1);
 		
-		PlatformInfo	info	= (PlatformInfo) SBinarySerializer2.readObjectFromStream(new ByteArrayInputStream(buffer), getClass().getClassLoader());
+		PlatformInfo	info	= (PlatformInfo) SBinarySerializer.readObjectFromStream(new ByteArrayInputStream(buffer), getClass().getClassLoader());
 //		PlatformInfo	info	= (PlatformInfo)MapSendTask.decodeMessage(buffer, null, rmc.getAllSerializers(), rmc.getAllCodecs(), getClass().getClassLoader(), IErrorReporter.IGNORE);
 //		IBinaryCodec[]	pcodecs	= MapSendTask.getCodecs(buffer, rmc.getAllCodecs());
 		
@@ -521,7 +517,7 @@ public class RelayHandler
 		
 		// Read message and extract platform info content.
 		byte[] buffer = readData(in, length-1);
-		PlatformInfo[]	infos	= (PlatformInfo[]) SBinarySerializer2.readObjectFromStream(new ByteArrayInputStream(buffer), getClass().getClassLoader());
+		PlatformInfo[]	infos	= (PlatformInfo[]) SBinarySerializer.readObjectFromStream(new ByteArrayInputStream(buffer), getClass().getClassLoader());
 //		PlatformInfo[]	infos	= (PlatformInfo[])MapSendTask.decodeMessage(buffer, null, rmc.getAllSerializers(), rmc.getAllCodecs(), getClass().getClassLoader(), IErrorReporter.IGNORE);
 //		IBinaryCodec[]	pcodecs	= MapSendTask.getCodecs(buffer, rmc.getAllCodecs());
 		
@@ -566,7 +562,7 @@ public class RelayHandler
 		PlatformInfo[]	pi	= getStatisticsDB().getPlatformInfosForSync(peerid, startid, cnt);
 //		byte[]	entries	= MapSendTask.encodeMessage(pi, null, rmc.getDefaultSerializer(), rmc.getDefaultCodecs(), getClass().getClassLoader());
 //		out.write(entries);
-		SBinarySerializer2.writeObjectToStream(out, pi, getClass().getClassLoader());
+		SBinarySerializer.writeObjectToStream(out, pi, getClass().getClassLoader());
 	}
 
 	/**
@@ -633,7 +629,7 @@ public class RelayHandler
 					if(peerinfo==null)
 					{
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						SBinarySerializer2.writeObjectToStream(baos, info, getClass().getClassLoader());
+						SBinarySerializer.writeObjectToStream(baos, info, getClass().getClassLoader());
 						peerinfo	= baos.toByteArray();
 //						peerinfo	= MapSendTask.encodeMessage(info, null, rmc.getDefaultSerializer(), rmc.getDefaultCodecs(), getClass().getClassLoader());
 					}
@@ -665,7 +661,7 @@ public class RelayHandler
 		{
 			peer.addDebugText(3, "Sending platform infos to peer: "+infos.length);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			SBinarySerializer2.writeObjectToStream(baos, infos, getClass().getClassLoader());
+			SBinarySerializer.writeObjectToStream(baos, infos, getClass().getClassLoader());
 			byte[]	peerinfo	= baos.toByteArray();
 //			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, null, rmc.getDefaultSerializer(), rmc.getDefaultCodecs(), getClass().getClassLoader());
 			conman.postMessage(RelayConnectionManager.httpAddress(peer.getUrl())+"platforminfos", new BasicComponentIdentifier(settings.getUrl()), new byte[][]{peerinfo});
@@ -721,7 +717,7 @@ public class RelayHandler
 							}
 							
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
-							SBinarySerializer2.writeObjectToStream(baos, awanoprop, getClass().getClassLoader());
+							SBinarySerializer.writeObjectToStream(baos, awanoprop, getClass().getClassLoader());
 							byte[]	data	= baos.toByteArray();
 //							byte[]	data	= MapSendTask.encodeMessage(awanoprop, null, rmc.getDefaultSerializer(), getClass().getClassLoader());
 							nopropinfo	= new byte[data.length+4];
@@ -737,7 +733,7 @@ public class RelayHandler
 						else if(awainfo2.getProperties()!=null && propinfo==null)
 						{
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
-							SBinarySerializer2.writeObjectToStream(baos, awainfo, getClass().getClassLoader());
+							SBinarySerializer.writeObjectToStream(baos, awainfo, getClass().getClassLoader());
 							byte[]	data	= baos.toByteArray();
 //							byte[]	data	= MapSendTask.encodeMessage(awainfo, null, rmc.getDefaultSerializer(), getClass().getClassLoader());
 							propinfo	= new byte[data.length+4];
@@ -771,7 +767,7 @@ public class RelayHandler
 						}
 						
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						SBinarySerializer2.writeObjectToStream(baos, awainfo2, getClass().getClassLoader());
+						SBinarySerializer.writeObjectToStream(baos, awainfo2, getClass().getClassLoader());
 						byte[]	data2	= baos.toByteArray();
 //						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, null, rmc.getDefaultSerializer(), pcodecs, getClass().getClassLoader());
 						byte[]	info2	= new byte[data2.length+4];
@@ -814,7 +810,7 @@ public class RelayHandler
 								}
 								
 								ByteArrayOutputStream baos = new ByteArrayOutputStream();
-								SBinarySerializer2.writeObjectToStream(baos, awainfo2, getClass().getClassLoader());
+								SBinarySerializer.writeObjectToStream(baos, awainfo2, getClass().getClassLoader());
 								byte[]	data2	= baos.toByteArray();
 //								byte[]	data2	= MapSendTask.encodeMessage(awainfo2, null, rmc.getDefaultSerializer(), platform.getPreferredCodecs(), getClass().getClassLoader());
 								byte[]	info2	= new byte[data2.length+4];

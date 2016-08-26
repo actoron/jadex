@@ -191,7 +191,22 @@ public class ProxyAgent	implements IProxyAgentService
 	 */
 	public IFuture<State> getConnectionState()
 	{
+		System.out.println("ConnState for " + rcid);
 		final Future<State> ret = new Future<State>();
+		ret.addResultListener(new IResultListener<IProxyAgentService.State>()
+		{
+			@Override
+			public void resultAvailable(State result)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
 		
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
@@ -210,7 +225,7 @@ public class ProxyAgent	implements IProxyAgentService
 					
 					public void exceptionOccurred(Exception exception)
 					{
-//						exception.printStackTrace();
+						exception.printStackTrace();
 						if(exception instanceof SecurityException)
 						{
 							ret.setResult(State.LOCKED);

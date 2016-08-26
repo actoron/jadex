@@ -1,8 +1,8 @@
 package jadex.bridge.service.types.message;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
 
-import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
@@ -21,18 +21,6 @@ public interface ISerializer
 	public byte getSerializerId();
 	
 	/**
-	 *  Configures the preprocessor stage of the encoding.
-	 *  @param processors The preprocessors.
-	 */
-	public void setPreprocessors(ITraverseProcessor[] processors);
-	
-	/**
-	 *  Configures the postprocessor stage of the encoding.
-	 *  @param processors The postprocessors.
-	 */
-	public void setPostprocessors(ITraverseProcessor[] processors);
-	
-	/**
 	 *  Encode data with the serializer.
 	 *  @param val The value.
 	 *  @param classloader The classloader.
@@ -47,6 +35,13 @@ public interface ISerializer
 	 *  @return The decoded object.
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader);
-	public Object decode(Object bytes, ClassLoader classloader, IDecoderHandler[] postprocs, IErrorReporter rep);
+	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep);
+	
+	/**
+	 *  Decode an object.
+	 *  @return The decoded object.
+	 *  @throws IOException
+	 */
+	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep);
 	
 }

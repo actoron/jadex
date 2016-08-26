@@ -163,7 +163,7 @@ public class Car
 		
 		JsonValue value = Json.parse(str);
 		JsonTraverser traverser = new JsonTraverser();
-		Object ret = traverser.traverse(value, null, procs, null, null);
+		Object ret = traverser.traverse(value, null, null, procs, null, null, null);
 	
 		System.out.println(str);
 		System.out.println(ret);

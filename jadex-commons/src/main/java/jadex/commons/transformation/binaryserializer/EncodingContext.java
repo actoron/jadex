@@ -1,12 +1,17 @@
 package jadex.commons.transformation.binaryserializer;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
@@ -15,12 +20,12 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
  *
  */
 public class EncodingContext extends AbstractEncodingContext
-{	
+{
 	/** Cache for class names. */
 	protected Map<Class<?>, String> classnamecache = new HashMap<Class<?>, String>();
 	
 	/** The binary output */
-	protected GrowableByteBuffer buffer;
+	protected OutputStream os;
 		
 	/** The string pool. */
 	protected Map<String, Integer> stringpool;
@@ -32,13 +37,7 @@ public class EncodingContext extends AbstractEncodingContext
 	protected Map<String, Integer> classnamepool;
 	
 	/** The package fragment pool. */
-	protected Map<String, Integer> pkgpool;
-	
-	/** The current bit position within the bitfield */
-	protected byte bitpos;
-	
-	/** The current bitfield position in the buffer*/
-	protected int bitfieldpos;
+	protected Map<String, Integer> fragpool;
 	
 	/**
 	 *  Creates an encoding context.
@@ -46,27 +45,16 @@ public class EncodingContext extends AbstractEncodingContext
 	 *  @param preprocessors The preprocessors.
 	 *  @param classloader The classloader.
 	 */
-	public EncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
+	public EncodingContext(OutputStream os, Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader, SerializationConfig config)
 	{
 		super(rootobject, usercontext, preprocessors, classloader);
-		buffer = new GrowableByteBuffer();
+		this.os = os;
 		classidcache = new HashMap<Class<?>, Integer>();
-		stringpool = new HashMap<String, Integer>();
+		stringpool = config==null?new HashMap<String, Integer>():config.createEncodingStringPool();
 		//for (int i = 0; i < BinarySerializer.DEFAULT_STRINGS.size(); ++i)
 			//stringpool.put(BinarySerializer.DEFAULT_STRINGS.get(i), i);
-		classnamepool = new HashMap<String, Integer>();
-		pkgpool = new HashMap<String, Integer>();
-		bitpos = 0;
-		bitfieldpos = -1;
-	}
-	
-	/**
-	 *  Returns the encoded bytes.
-	 *  @return The bytes.
-	 */
-	public byte[] getBytes()
-	{
-		return buffer.toByteArray();
+		classnamepool = config==null?new HashMap<String, Integer>():config.createEncodingClassnamePool();
+		fragpool = config==null?new HashMap<String, Integer>():config.createEncodingFragPool();
 	}
 	
 	/**
@@ -75,7 +63,14 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public void writeByte(byte b)
 	{
-		buffer.write(b);
+		try
+		{
+			os.write(b);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -84,16 +79,14 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public void write(byte[] b)
 	{
-		buffer.write(b);
-	}
-	
-	/**
-	 *  Reserves a byte buffer on the stream.
-	 *  
-	 */
-	public ByteBuffer getByteBuffer(int length)
-	{
-		return buffer.getByteBuffer(length);
+		try
+		{
+			os.write(b);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -102,22 +95,14 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public void writeBoolean(boolean bool)
 	{
-		//byte val = (byte) ((Boolean.TRUE.equals(bool))? 1 : 0);
-		byte val = (byte) (bool? 1 : 0);
-		if (bitfieldpos < 0)
+		try
 		{
-			bitfieldpos = buffer.getPosition();
-			buffer.reserveSpace(1);
+			os.write(bool? 1 : 0);
 		}
-		if (bitpos > 7)
+		catch (IOException e)
 		{
-			//buffer.writeTo(bitfieldpos, bitfield);
-			bitpos = 0;
-			bitfieldpos = buffer.getPosition();
-			buffer.reserveSpace(1);
+			throw new RuntimeException(e);
 		}
-		buffer.getBufferAccess()[bitfieldpos] |= (byte) (val << bitpos);
-		++bitpos;
 	}
 	
 	/**
@@ -152,18 +137,52 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public int writeClassname(String name)
 	{
+//		synchronized(cstat)
+//		{
+//			Long val = cstat.get(name);
+//			if (val==null)
+//				val = (long) name.length();
+//			else
+//				val+=name.length();
+//			cstat.put(name, val);
+//			
+//			Tuple2<String, Long>[] stats = new Tuple2[cstat.size()];
+//			int count=0;
+//			for (Map.Entry<String, Long> entry : cstat.entrySet())
+//			{
+//				stats[count++] = new Tuple2<String, Long>(entry.getKey(), entry.getValue());
+//			}
+//			Arrays.sort(stats, new Comparator<Tuple2<String, Long>>()
+//			{
+//				public int compare(Tuple2<String, Long> o1, Tuple2<String, Long> o2)
+//				{
+//					return (int)(o1.getSecondEntity() - o2.getSecondEntity());
+//				}
+//			});
+//			if (Math.random() < 0.1)
+//			{
+//				System.out.println("AAAAAAAAA");
+//				for (int i = 0; i < stats.length; ++i)
+//				{
+//					if (stats[i].getSecondEntity() > 20)
+//						System.out.println(stats[i].getFirstEntity() + "|" + stats[i].getSecondEntity());
+//				}
+//				System.out.println("ZZZZZZZZZ");
+//			}
+//		}
+		
 		Integer classid = classnamepool.get(name);
 		if (classid == null)
 		{
 			classid = classnamepool.size();
 			classnamepool.put(name, classid);
-			writeVarInt(classid);
+			writeVarInt(classid.intValue());
 			
 			int lppos = name.lastIndexOf('.');
 			if (lppos < 0)
 			{
 				writeVarInt(0);
-				writeString(name);
+				pooledWrite(fragpool, name);
 			}
 			else
 			{
@@ -175,30 +194,10 @@ public class EncodingContext extends AbstractEncodingContext
 				while (tok.hasMoreElements())
 				{
 					String frag = tok.nextToken();
-					Integer pkgfragid = pkgpool.get(frag);
-					if (pkgfragid == null)
-					{
-						pkgfragid = pkgpool.size();
-						pkgpool.put(frag, pkgfragid);
-						writeVarInt(pkgfragid);
-						writeString(frag);
-						
-					}
-					else
-					{
-						writeVarInt(pkgfragid);
-					}
+					pooledWrite(fragpool, frag);
 				}
-				writeString(classname);
+				pooledWrite(fragpool, classname);
 			}
-			
-			/*String classname = classnamecache.get(clazz);
-			if (classname == null)
-			{
-				classname = SReflect.getClassName(clazz);
-				classnamecache.put(clazz, classname);
-			}
-			writeString(classname);*/
 		}
 		else
 		{
@@ -209,34 +208,48 @@ public class EncodingContext extends AbstractEncodingContext
 		return classid.intValue();
 	}
 	
+//	static final Map<String, Long> cstat = new HashMap<String, Long>();
+	
 	/**
 	 * 
 	 * @param string
 	 */
 	public void writeString(String string)
 	{
-		Integer sid = stringpool.get(string);
-		if(sid == null)
-		{
-			sid = stringpool.size();
-			stringpool.put(string, sid);
-			writeVarInt(sid);
-			try
-			{
-				byte[] encodedString = string.getBytes("UTF-8");
-				
-				writeVarInt(encodedString.length);
-				buffer.write(encodedString);
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-		else
-		{
-			writeVarInt(sid);
-		}
+//		synchronized(cstat)
+//		{
+//			Long val = cstat.get(string);
+//			if (val==null)
+//				val = (long) string.length();
+//			else
+//				val+=string.length();
+//			cstat.put(string, val);
+//			
+//			Tuple2<String, Long>[] stats = new Tuple2[cstat.size()];
+//			int count=0;
+//			for (Map.Entry<String, Long> entry : cstat.entrySet())
+//			{
+//				stats[count++] = new Tuple2<String, Long>(entry.getKey(), entry.getValue());
+//			}
+//			Arrays.sort(stats, new Comparator<Tuple2<String, Long>>()
+//			{
+//				public int compare(Tuple2<String, Long> o1, Tuple2<String, Long> o2)
+//				{
+//					return (int)(o1.getSecondEntity() - o2.getSecondEntity());
+//				}
+//			});
+//			if (Math.random() < 0.1)
+//			{
+//				System.out.println("AAAAAAAAA");
+//				for (int i = 0; i < stats.length; ++i)
+//				{
+//					if (stats[i].getSecondEntity() > 20)
+//						System.out.println(stats[i].getFirstEntity() + "|" + stats[i].getSecondEntity());
+//				}
+//				System.out.println("ZZZZZZZZZ");
+//			}
+//		}
+		pooledWrite(stringpool, string);
 	}
 	
 	/**
@@ -245,10 +258,14 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public void writeVarInt(long value)
 	{
-		int size = VarInt.getEncodedSize(value);
-		int pos = buffer.getPosition();
-		buffer.reserveSpace(size);
-		VarInt.encode(value, buffer.getBufferAccess(), pos, size);
+		try
+		{
+		write(VarInt.encode(value));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -258,7 +275,37 @@ public class EncodingContext extends AbstractEncodingContext
 	public void writeSignedVarInt(long value)
 	{
 		boolean neg = value < 0;
-		writeBoolean(neg);
-		writeVarInt(Math.abs(value));
+		value = Math.abs(value);
+		long mask = Long.highestOneBit(value) << 2;
+		if (neg)
+		{
+			mask |= mask >> 1;
+		}
+		value = value | (mask);
+		writeVarInt(value);
+	}
+	
+	/**
+	 * Writes a string using a pool.
+	 * 
+	 * @param string
+	 */
+	protected void pooledWrite(Map<String, Integer> pool, String string)
+	{
+		Integer sid = pool.get(string);
+		if(sid == null)
+		{
+			sid = pool.size();
+			pool.put(string, sid);
+			writeVarInt(sid);
+			byte[] encodedString = string.getBytes(SUtil.UTF8);
+			
+			writeVarInt(encodedString.length);
+			write(encodedString);
+		}
+		else
+		{
+			writeVarInt(sid);
+		}
 	}
 }

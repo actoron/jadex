@@ -5,6 +5,7 @@ dependencies
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')
 	compile project(':jadex-commons:jadex-commons-security')
+	compile project(':jadex-json')
 	compile project(':jadex-xml')
 	compile project(':jadex-bridge')
 	compile project(':jadex-kernel-base')
@@ -12,5 +13,6 @@ dependencies
 	compile project(':jadex-javaparser')
 	
 	compileNoAndroidRuntime 'javax.mail:mail:1.4.5'
+	compile group: 'org.tukaani', name: 'xz', version: '1.5'
 }
 

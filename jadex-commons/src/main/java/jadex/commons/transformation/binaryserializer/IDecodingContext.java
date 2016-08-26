@@ -3,6 +3,8 @@ package jadex.commons.transformation.binaryserializer;
 import java.util.List;
 import java.util.Map;
 
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+
 /**
  *  Decoding context interface.
  *
@@ -28,10 +30,42 @@ public interface IDecodingContext
 	public void setLastObject(Object lastobject);
 	
 	/**
-	 *  Returns the known objects.
-	 *  @return Known objects.
+	 *  Sets the format version.
+	 *  @param version The version.
 	 */
-	public Map<Integer, Object> getKnownObjects();
+	public void setVersion(int version);
+	
+	/**
+	 *  Creates ID for an object.
+	 *  
+	 *  @param object The object
+	 *  @return The ID.
+	 */
+	public long createObjectId(Object object);
+	
+	/**
+	 *  Gets a known object by ID.
+	 *  
+	 *  @param id The ID.
+	 *  @return The object or null.
+	 */
+	public Object getObjectForId(long id);
+	
+	/**
+	 *  Sets a known object by ID.
+	 *  
+	 *  @param id The ID.
+	 *  @param object The object..
+	 */
+	public void setObjectForId(long id, Object object);
+	
+	/**
+	 *  Gets the ID of a known object.
+	 *  
+	 *  @param object The object
+	 *  @return The ID.
+	 */
+	public Long getObjectId(Object object);
 	
 	/**
 	 * Gets the classloader.
@@ -56,7 +90,7 @@ public interface IDecodingContext
 	 *  Returns the handlers used for post-processing.
 	 *  @return Post-processing handlers.
 	 */
-	public List<IDecoderHandler> getPostProcessors();
+	public List<ITraverseProcessor> getPostProcessors();
 	
 	/**
 	 *  Reads a byte from the buffer.

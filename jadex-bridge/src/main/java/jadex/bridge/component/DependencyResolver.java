@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.commons.transformation.traverser.SCloner;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
@@ -93,7 +94,8 @@ public class DependencyResolver<T>
 	{
 		List<T> ret = new ArrayList<T>();
 		
-		DependencyResolver<T> dr2 = !keep? null: (DependencyResolver<T>)Traverser.traverseObject(this, Traverser.getDefaultProcessors(), true, null);
+		DependencyResolver<T> dr2 = !keep? null: (DependencyResolver<T>)SCloner.clone(this);
+//		DependencyResolver<T> dr2 = !keep? null: (DependencyResolver<T>)Traverser.traverseObject(this, null, Traverser.getDefaultProcessors(), null, true, null);
 		
 		while(!nodes.isEmpty())
 		{

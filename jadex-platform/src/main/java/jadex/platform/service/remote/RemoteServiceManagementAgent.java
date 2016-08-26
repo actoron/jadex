@@ -10,6 +10,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
@@ -38,7 +39,6 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.STransformation;
-import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -122,8 +122,8 @@ public class RemoteServiceManagementAgent
 			{
 				rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
 				IMessageService msgser = SServiceProvider.getLocalService(agent.getComponentIdentifier(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				msgser.addPreprocessors(rms.getPostprocessors().toArray(new ITraverseProcessor[0])).get();
-				msgser.addPostprocessors(rms.getPreprocessors().toArray(new IDecoderHandler[0])).get();
+				msgser.addPreprocessors(rms.getPreprocessors().toArray(new ITraverseProcessor[0])).get();
+				msgser.addPostprocessors(rms.getPostprocessors().toArray(new ITraverseProcessor[0])).get();
 				agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 				ret.setResult(null);
 			}
@@ -226,7 +226,6 @@ public class RemoteServiceManagementAgent
 //							System.out.println("result of command1: "+com);
 						
 //								System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
-						
 						// Post-process.
 						final IFuture<Void>	post	= com instanceof AbstractRemoteCommand? 
 							((AbstractRemoteCommand)com).postprocessCommand(agent, rms.getRemoteReferenceModule(), agent.getComponentIdentifier()) : IFuture.DONE;

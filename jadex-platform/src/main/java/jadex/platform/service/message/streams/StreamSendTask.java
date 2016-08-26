@@ -173,7 +173,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 *  Get the message.
 	 *  @return the message.
 	 */
-	public Object getMessage()
+	public byte[] getEncodedMessage()
 	{
 		byte[] prolog = getProlog();
 		byte[] data = getData();
@@ -182,7 +182,24 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		System.arraycopy(data, 0, msg, prolog.length, data.length);
 		return msg;
 	}
-
+	
+	/**
+	 *  Get the message.
+	 *  @return the message.
+	 */
+	public Object getRawMessage()
+	{
+		return message;
+	}
+	
+	/**
+	 *  Set the message.
+	 */
+	public void setRawMessage(Object msg)
+	{
+		message = msg;
+	}
+	
 	/**
 	 *  Get the messagetype.
 	 *  @return the messagetype.
@@ -199,6 +216,24 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	public Integer getSequenceNumber()
 	{
 		return seqnumber;
+	}
+	
+	/**
+	 *  Get the stream id.
+	 *  @return the stream id.
+	 */
+	public int getStreamId()
+	{
+		return streamid;
+	}
+	
+	/**
+	 *  Get the stream id.
+	 *  @return the stream id.
+	 */
+	public byte getStreamMessageType()
+	{
+		return type;
 	}
 
 	/**

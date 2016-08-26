@@ -8,6 +8,7 @@ import java.util.Vector;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  An enumeration processor allows for traversing enumerations.
@@ -47,30 +48,17 @@ public class EnumerationCodec extends AbstractCodec
 				vec.add(null);
 				++count;
 			}
-			Object element = BinarySerializer.decodeObject(context);
+			Object element = SBinarySerializer.decodeObject(context);
 			vec.add(element);
 			++count;
 		}
 		return vec.elements();
 	}
-	
-	/**
-	 *  Test if the processor is applicable.
-	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
-	 *    e.g. by cloning the object using the class loaded from the target class loader.
-	 *  @return True, if is applicable. 
-	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-	{
-		return isApplicable(clazz);
-	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		Enumeration en = (Enumeration)object;
 		
@@ -92,7 +80,7 @@ public class EnumerationCodec extends AbstractCodec
 			{
 				ec.writeVarInt(count);
 				Class valclazz = val.getClass();
-				traverser.doTraverse(val, valclazz, traversed, processors, clone, null, ec);
+				traverser.doTraverse(val, valclazz, preprocessors, processors, null, null, ec);
 			}
 			++count;
 		}

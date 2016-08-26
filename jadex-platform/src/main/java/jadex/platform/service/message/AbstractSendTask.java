@@ -260,7 +260,7 @@ public abstract class AbstractSendTask implements ISendTask
 //				System.out.println(hashCode()+": No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+SUtil.arrayToString(getTransports()));
 //			}
 
-			getFuture().setException(new MessageFailureException(getMessage(), getMessageType(), receivers, 
+			getFuture().setException(new MessageFailureException(getRawMessage(), getMessageType(), receivers, 
 				"No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+SUtil.arrayToString(getTransports())));								
 		}
 		else

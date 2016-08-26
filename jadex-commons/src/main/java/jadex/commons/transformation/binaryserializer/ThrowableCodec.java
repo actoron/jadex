@@ -2,12 +2,12 @@ package jadex.commons.transformation.binaryserializer;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Codec for encoding and decoding exception objects.
@@ -37,8 +37,8 @@ public class ThrowableCodec extends AbstractCodec
 	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		Object ret = null;
-		String msg = (String)BinarySerializer.decodeObject(context);
-		Throwable cause = (Throwable)BinarySerializer.decodeObject(context);
+		String msg = (String)SBinarySerializer.decodeObject(context);
+		Throwable cause = (Throwable)SBinarySerializer.decodeObject(context);
 
 		try
 		{
@@ -129,22 +129,20 @@ public class ThrowableCodec extends AbstractCodec
 	{
 		return isApplicable(clazz);
 	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		Throwable t = (Throwable)object;
 		
-		traverser.doTraverse(t.getMessage(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
+		traverser.doTraverse(t.getMessage(), String.class, preprocessors, processors, mode, ec.getClassLoader(), ec);
 	
 		Object val = t.getCause();
-		traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, 
-			traversed, processors, clone, null, ec);
+		traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, preprocessors, processors, mode, targetcl, ec);
 
-		BeanCodec.writeBeanProperties(object, clazz, processors, traverser, traversed, clone, ec, intro);
+		BeanCodec.writeBeanProperties(object, clazz, preprocessors, processors, traverser, mode, ec, intro);
 		
 		return object;
 	}

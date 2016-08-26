@@ -54,7 +54,17 @@ public class GZIPCodec implements IBinaryCodec
 	 */
 	public byte[] decode(Object bytes)
 	{
-		return decodeBytes(bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (ByteArrayInputStream)bytes);
+		return decodeBytes((ByteArrayInputStream)bytes);
+	}
+	
+	/**
+	 *  Decode bytes.
+	 *  @return The decoded bytes.
+	 *  @throws IOException
+	 */
+	public byte[] decode(byte[] bytes, int offset, int length)
+	{
+		return decodeBytes(bytes, offset, length);
 	}
 	
 	/**
@@ -88,9 +98,9 @@ public class GZIPCodec implements IBinaryCodec
 	 *  @return The decoded bytes.
 	 *  @throws IOException
 	 */
-	public static byte[] decodeBytes(byte[] bytes)
+	public static byte[] decodeBytes(byte[] bytes, int offset, int length)
 	{
-		return decodeBytes(new ByteArrayInputStream(bytes));
+		return decodeBytes(new ByteArrayInputStream(bytes, offset, length));
 	}
 	
 	/**

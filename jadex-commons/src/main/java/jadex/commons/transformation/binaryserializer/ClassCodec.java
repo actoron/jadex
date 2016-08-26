@@ -6,6 +6,7 @@ import java.util.Map;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Codec for encoding and decoding Class objects.
@@ -56,7 +57,7 @@ public class ClassCodec extends AbstractCodec
 //		Class<?> clazz = SReflect.getClass(type);
 //		return Class.class.equals(clazz);
 //	}
-	
+
 	/**
 	 *  Process an object.
 	 *  @param object The object.
@@ -65,8 +66,7 @@ public class ClassCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		//ec.writeString(SReflect.getClassName((Class) object));
 		ec.writeClass((Class<?>)object);

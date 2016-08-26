@@ -7,6 +7,7 @@ import java.util.Map;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Codec for encoding and decoding enum objects.
@@ -37,26 +38,11 @@ public class EnumCodec extends AbstractCodec
 		Enum ret = Enum.valueOf((Class<Enum>)clazz, context.readString());
 		return ret;
 	}
-	
-	/**
-	 *  Test if the processor is applicable.
-	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
-	 *    e.g. by cloning the object using the class loaded from the target class loader.
-	 *  @return True, if is applicable. 
-	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
-	{
-		Class<?> clazz = SReflect.getClass(type);
-		return isApplicable(clazz);
-	}
-	
 	/**
 	 *  Encode the object.
 	 */
 	@SuppressWarnings("rawtypes")
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		ec.writeString(((Enum) object).name());
 		

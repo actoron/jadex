@@ -8,8 +8,11 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -24,7 +27,7 @@ public class JsonPrimitiveObjectProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		boolean ret = false;
 		if(object instanceof JsonObject)
@@ -39,12 +42,11 @@ public class JsonPrimitiveObjectProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Object ret = null;
 		
@@ -124,7 +126,7 @@ public class JsonPrimitiveObjectProcessor implements ITraverseProcessor
 			throw new RuntimeException("Unknown primitive type");
 		}
 		
-		traversed.put(object, ret);
+//		traversed.put(object, ret);
 		
 		return ret;
 	}
@@ -136,6 +138,7 @@ public class JsonPrimitiveObjectProcessor implements ITraverseProcessor
 	{
 		Class<?> ret = null;
 		String clname = (String)((JsonObject)object).getString(JsonTraverser.CLASSNAME_MARKER, null);
+		clname = STransformation.getClassname(clname);
 		if(clname!=null)
 		{
 			try
@@ -144,7 +147,7 @@ public class JsonPrimitiveObjectProcessor implements ITraverseProcessor
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				SUtil.rethrowAsUnchecked(e);
 			}
 		}
 		return ret;

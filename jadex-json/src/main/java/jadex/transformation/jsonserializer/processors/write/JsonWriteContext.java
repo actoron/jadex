@@ -1,17 +1,18 @@
 package jadex.transformation.jsonserializer.processors.write;
 
-import jadex.bridge.ClassInfo;
-import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.Traverser;
-import jadex.transformation.jsonserializer.JsonTraverser;
-
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import jadex.commons.SReflect;
+import jadex.commons.transformation.STransformation;
+import jadex.commons.transformation.traverser.IRootObjectContext;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  * 
  */
-public class JsonWriteContext
+public class JsonWriteContext implements IRootObjectContext
 {
 	protected StringBuffer buffer = new StringBuffer();
 	
@@ -22,6 +23,21 @@ public class JsonWriteContext
 	protected Map<Class<?>, Set<String>> excludes;
 	
 	protected int objectcnt = 0;
+	
+	protected Map<Object, Integer> knownobjects = new IdentityHashMap<Object, Integer>();
+	
+	protected Object rootobject;
+	
+	protected Object currentinputobject;
+	
+	/**
+	 *  Get the rootobject.
+	 *  @return the rootobject.
+	 */
+	public Object getRootObject()
+	{
+		return rootobject;
+	}
 	
 	/**
 	 *  Create a new write context.
@@ -132,7 +148,8 @@ public class JsonWriteContext
 	{
 		write("\"").write(JsonTraverser.CLASSNAME_MARKER).write("\"");
 		write(":");
-		write("\"").write(SReflect.getClassName(clazz)).write("\"");
+//		write("\"").write(SReflect.getClassName(clazz)).write("\"");
+		write("\"").write(STransformation.registerClass(clazz)).write("\"");
 	}
 	
 	/**
@@ -178,10 +195,18 @@ public class JsonWriteContext
 	/**
 	 * 
 	 */
-	public void addObject(Map<Object, Object> traversed, Object obj)
+	public void addObject(Object obj)
 	{
-		traversed.put(obj, new Integer(objectcnt++));
+		if (rootobject == null)
+			rootobject = obj;
+		knownobjects.put(obj, new Integer(objectcnt++));
+//		traversed.put(obj, new Integer(objectcnt++));
 //		System.out.println("obs: "+traversed);
+	}
+	
+	public Integer getObjectId(Object object)
+	{
+		return knownobjects.get(object);
 	}
 	
 	/**
@@ -206,6 +231,25 @@ public class JsonWriteContext
 		return ret;
 	}
 	
+	
+	
+	/**
+	 * @return the currentinputobject
+	 */
+	public Object getCurrentInputObject()
+	{
+		return currentinputobject;
+	}
+
+	/**
+	 *  Sets the currentinputobject.
+	 *  @param currentinputobject The currentinputobject to set
+	 */
+	public void setCurrentInputObject(Object currentinputobject)
+	{
+		this.currentinputobject = currentinputobject;
+	}
+
 	/**
 	 * 
 	 */

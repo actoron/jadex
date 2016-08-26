@@ -7,12 +7,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -30,7 +28,6 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -46,10 +43,7 @@ import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IAsyncFilter;
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -58,48 +52,26 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.binaryserializer.IDecoderHandler;
-import jadex.commons.transformation.binaryserializer.IDecodingContext;
-import jadex.commons.transformation.binaryserializer.IEncodingContext;
+import jadex.commons.transformation.traverser.IRootObjectContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.platform.service.message.MessageService;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.OutputConnection;
 import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
-import jadex.platform.service.remote.commands.RemoteIntermediateResultCommand;
 import jadex.platform.service.remote.commands.RemoteResultCommand;
 import jadex.platform.service.remote.commands.RemoteSearchCommand;
-import jadex.platform.service.remote.xml.RMIPostProcessor;
-import jadex.platform.service.remote.xml.RMIPreProcessor;
-import jadex.xml.AccessInfo;
-import jadex.xml.AttributeInfo;
-import jadex.xml.IContext;
-import jadex.xml.IPostProcessor;
-import jadex.xml.IPreProcessor;
-import jadex.xml.MappingInfo;
-import jadex.xml.ObjectInfo;
-import jadex.xml.SXML;
-import jadex.xml.SubobjectInfo;
-import jadex.xml.TypeInfo;
-import jadex.xml.TypeInfoPathManager;
-import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanObjectReaderHandler;
-import jadex.xml.bean.BeanObjectWriterHandler;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.AReader;
-import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.stax.QName;
 import jadex.xml.writer.AWriter;
-import jadex.xml.writer.IObjectWriterHandler;
 
 
 /**
@@ -1285,24 +1257,25 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 * 
 	 */
-	protected List<IDecoderHandler> getPreprocessors()
+	protected List<ITraverseProcessor> getPostprocessors()
 	{
 		// Equivalent pre- and postprocessors for binary mode.
-		List<IDecoderHandler> procs = new ArrayList<IDecoderHandler>();
+		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
 		
 		// Proxy reference -> proxy object
-		IDecoderHandler rmipostproc = new IDecoderHandler()
+		ITraverseProcessor rmipostproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Class<?> clazz)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
-				return ProxyReference.class.equals(clazz);
+				return ProxyReference.class.equals(type);
 			}
 			
-			public Object decode(Class<?> clazz, IDecodingContext context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
-					return rrm.getProxy((ProxyReference)context.getLastObject(), context.getClassloader());
+					Object ret= rrm.getProxy((ProxyReference)object, targetcl);
+					return ret;
 				}
 				catch(Exception e)
 				{
@@ -1313,18 +1286,18 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		};
 		procs.add(rmipostproc);
 		
-		procs.add(new IDecoderHandler()
+		procs.add(new ITraverseProcessor()
 		{
-			public boolean isApplicable(Class<?> clazz)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
-				return ServiceInputConnectionProxy.class.equals(clazz);
+				return ServiceInputConnectionProxy.class.equals(type);
 			}
 			
-			public Object decode(Class<?> clazz, IDecodingContext context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
-					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)context.getLastObject();
+					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
 					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), 
 						icp.getInitiator(), icp.getParticipant(), icp.getNonFunctionalProperties());
 					return icon;
@@ -1337,18 +1310,18 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			}
 		});
 				
-		procs.add(new IDecoderHandler()
+		procs.add(new ITraverseProcessor()
 		{
-			public boolean isApplicable(Class<?> clazz)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
-				return ServiceOutputConnectionProxy.class.equals(clazz);
+				return ServiceOutputConnectionProxy.class.equals(type);
 			}
 			
-			public Object decode(Class<?> clazz, IDecodingContext context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
-					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)context.getLastObject();
+					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
 					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), 
 						ocp.getInitiator(), ocp.getParticipant(), ocp.getNonFunctionalProperties());
 					return ocon;
@@ -1367,53 +1340,52 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 * 
 	 */
-	protected List<ITraverseProcessor> getPostprocessors()
+	protected List<ITraverseProcessor> getPreprocessors()
 	{
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
 		
 		// Update component identifiers with addresses
-		ITraverseProcessor bpreproc = new ITraverseProcessor()
-		{
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
-			{
-				Class<?> clazz = SReflect.getClass(type);
-				return ComponentIdentifier.class.equals(clazz);
-			}
-			
-			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
-			{
-				try
-				{
-					IComponentIdentifier src = (IComponentIdentifier)object;
-					BasicComponentIdentifier ret = null;
-					if(src.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
-					{
-						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
-						ret = new ComponentIdentifier(src.getName(), addresses);
-					}
-					
-					return ret==null? src: ret;
-				}
-				catch(RuntimeException e)
-				{
-					e.printStackTrace();
-					throw e;
-				}
-			}
-		};
-		procs.add(bpreproc);
+//		ITraverseProcessor bpreproc = new ITraverseProcessor()
+//		{
+//			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+//			{
+//				Class<?> clazz = SReflect.getClass(type);
+//				return ComponentIdentifier.class.equals(clazz);
+//			}
+//			
+//			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser,
+//				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+//			{
+//				try
+//				{
+//					IComponentIdentifier src = (IComponentIdentifier)object;
+//					BasicComponentIdentifier ret = null;
+//					if(src.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
+//					{
+//						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
+//						ret = new ComponentIdentifier(src.getName(), addresses);
+//					}
+//					
+//					return ret==null? src: ret;
+//				}
+//				catch(RuntimeException e)
+//				{
+//					e.printStackTrace();
+//					throw e;
+//				}
+//			}
+//		};
+//		procs.add(bpreproc);
 		
 		// Handle pojo services
-		bpreproc = new ITraverseProcessor()
+		ITraverseProcessor bpreproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
 			}
 			
-			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -1431,20 +1403,21 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// Handle remote references
 		bpreproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 //				if(marshal.isRemoteReference(object))
 //					System.out.println("rr: "+object);
 				return marshal.isRemoteReference(object);
 			}
 			
-			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
 					IComponentIdentifier receiver = getRCFromContext(context).getReceiver();
-					return rrm.getProxyReference(object, receiver, ((IEncodingContext)context).getClassLoader());
+					Object ret = rrm.getProxyReference(object, receiver, targetcl);
+					return ret;
+//					return rrm.getProxyReference(object, receiver, ((IEncodingContext)context).getClassLoader());
 				}
 				catch(Exception e)
 				{
@@ -1458,8 +1431,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// output connection as result of call
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Type type, List<ITraverseProcessor> processors,
-				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -1478,7 +1450,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 			}
 			
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				return object instanceof ServiceInputConnectionProxy;
 			}
@@ -1487,12 +1459,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// input connection proxy as result of call
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Type type, List<ITraverseProcessor> processors,
-				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)((IEncodingContext)context).getRootObject();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((IRootObjectContext)context).getRootObject();
 					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
 					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(
 						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
@@ -1507,7 +1478,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 			}
 			
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				return object instanceof ServiceOutputConnectionProxy;
 			}
@@ -1519,7 +1490,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	@SuppressWarnings("unchecked")
 	protected static AbstractRemoteCommand getRCFromContext(Object ec)
 	{
-		return ((AbstractRemoteCommand)((Map<String, Object>)((IEncodingContext)ec).getRootObject()).get(SFipa.CONTENT));
+		return ((AbstractRemoteCommand)((Map<String, Object>)((IRootObjectContext)ec).getRootObject()).get(SFipa.CONTENT));
 //		return ((AbstractRemoteCommand)((MessageEnvelope)((IEncodingContext)ec).getRootObject()).getMessage().get(SFipa.CONTENT));
 	}
 

@@ -1,14 +1,10 @@
 package jadex.platform.service.message.transport;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.transformation.annotations.Alias;
 
 /**
  *  The message envelope holding the native message,
@@ -22,16 +18,19 @@ public class MessageEnvelope
 	protected String messagetype;
 	
 	/** The receivers. */
-	protected ITransportComponentIdentifier[] receivers;
+	protected IComponentIdentifier[] receivers;
 	
 	/** The receivers. */
-	protected IComponentIdentifier servicerec;
+	protected IComponentIdentifier realrec;
 	
 	/** The rid for decoding if specified. */
 	protected IResourceIdentifier rid;
 	
-	/** Extension properties. */
-	protected Map<String, Object> properties;
+	/** Content data. */
+	protected byte[] contentdata;
+	
+	/** Serializer ID field, only used during decode, not transmitted. */
+	public byte serializerid;
 	
 	//-------- constructors --------
 
@@ -46,19 +45,21 @@ public class MessageEnvelope
 	/**
 	 *  Create a new message envelope.
 	 */
-	public MessageEnvelope(ITransportComponentIdentifier[] receivers, IComponentIdentifier servicerec, IResourceIdentifier rid, String messagetype, byte messagetypeid)
+	public MessageEnvelope(IComponentIdentifier[] receivers, IComponentIdentifier realrec, IResourceIdentifier rid, String messagetype, byte messagetypeid)
 	{
-		this.receivers = receivers;
+		this.receivers = new IComponentIdentifier[receivers.length];
+		System.arraycopy(receivers, 0, this.receivers, 0, receivers.length);
 		this.messagetype = messagetype;
-		this.servicerec = servicerec;
-		this.rid = rid;
+		this.realrec = realrec;
+		if (rid != null && rid.getGlobalIdentifier() != null)
+			this.rid = rid;
 	}
 	
 	/**
 	 * Get the receivers.
 	 */
 	// Legacy compatibility hack. Should be ITransportComponentIdentifier
-	public ITransportComponentIdentifier[] getReceivers()
+	public IComponentIdentifier[] getReceivers()
 	{
 		return receivers==null? new ITransportComponentIdentifier[0]: receivers;
 	}
@@ -67,7 +68,7 @@ public class MessageEnvelope
 	 * Get the receivers.
 	 */
 	// Legacy compatibility hack. Should be ITransportComponentIdentifier
-	public void setReceivers(ITransportComponentIdentifier[] receivers)
+	public void setReceivers(IComponentIdentifier[] receivers)
 	{
 		this.receivers = receivers;
 	}
@@ -106,24 +107,21 @@ public class MessageEnvelope
 	}
 
 	/**
-	 * @return the servicerec
+	 * @return the real receiver
 	 */
-	public IComponentIdentifier getServiceRec()
+	public IComponentIdentifier getRealRec()
 	{
-		return servicerec;
+		return realrec;
 	}
 
 	/**
-	 *  Sets the servicerec.
-	 *  @param servicerec The servicerec to set
+	 *  Sets the real receiver.
+	 *  @param servicerec The real receiver to set
 	 */
-	public void setServiceRec(IComponentIdentifier servicerec)
+	public void setServiceRec(IComponentIdentifier realrec)
 	{
-		this.servicerec = servicerec;
+		this.realrec = realrec;
 	}
-	
-	
-
 	/**
 	 *  Set the type (e.g. "fipa").
 	 * @param messagetypename 
@@ -141,42 +139,25 @@ public class MessageEnvelope
 		return messagetype;
 	}
 	
-	/**
-	 *  Adds a property to the envelope.
-	 * @param name Property name.
-	 * @param value Property value.
-	 */
-	public void addProperty(String name, Object value)
-	{
-		if (properties == null)
-			properties = new HashMap<String, Object>();
-		properties.put(name, value);
-	}
+	
 	
 	/**
-	 *  Removes a property from the envelope.
-	 *  @param name Property name.
-	 *  @return The property value if found, null otherwise.
+	 * @return the contentdata
 	 */
-	public Object removeProperty(String name)
+	public byte[] getContentData()
 	{
-		if (properties != null)
-			return properties.remove(name);
-		return null;
+		return contentdata;
 	}
-	
+
 	/**
-	 *  Gets a property from the envelope.
-	 *  @param name Property name.
-	 *  @return The property value if found, null otherwise.
+	 *  Sets the contentdata.
+	 *  @param contentdata The contentdata to set
 	 */
-	public Object getProperty(String name)
+	public void setContentData(byte[] contentdata)
 	{
-		if (properties != null)
-			return properties.get(name);
-		return null;
+		this.contentdata = contentdata;
 	}
-	
+
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

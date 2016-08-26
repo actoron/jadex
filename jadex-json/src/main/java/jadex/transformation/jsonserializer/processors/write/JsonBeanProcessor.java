@@ -5,11 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import jadex.commons.SUtil;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  * 
@@ -26,7 +28,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		return true;
 	}
@@ -34,16 +36,15 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 //		System.out.println("fp: "+object);
 		JsonWriteContext wr = (JsonWriteContext)context;
-		wr.addObject(traversed, object);
+		wr.addObject(wr.getCurrentInputObject());
 		
 		wr.write("{");
 		
@@ -67,11 +68,11 @@ public class JsonBeanProcessor implements ITraverseProcessor
 //			System.out.println("cloned: "+object.getClass());
 //			ret = object.getClass().newInstance();
 			
-			traverseProperties(object, traversed, processors, traverser, clone, targetcl, context, intro, !wr.isWriteClass() && !wr.isWriteId());
+			traverseProperties(object, conversionprocessors, processors, mode, traverser, targetcl, context, intro, !wr.isWriteClass() && !wr.isWriteId());
 		}
 		catch(Exception e)
 		{
-			throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+			SUtil.rethrowAsUnchecked(e);
 		}
 		
 		wr.write("}");
@@ -82,8 +83,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected static void traverseProperties(Object object, Map<Object, Object> cloned, 
-		List<ITraverseProcessor> processors, Traverser traverser, boolean clone, 
+	protected static void traverseProperties(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, 
 		ClassLoader targetcl, Object context, IBeanIntrospector intro, boolean first)
 	{
 		Class<?> clazz = object.getClass();
@@ -104,6 +104,10 @@ public class JsonBeanProcessor implements ITraverseProcessor
 					if(prop.isReadable() && prop.isWritable())
 					{
 						Object val = prop.getPropertyValue(object);
+						
+						if (val != null && val.getClass().toString().contains("jadex.bridge.ComponentIdentifier"))
+							System.out.println("Contains addresses: " + object.getClass() + " " + object);
+						
 						if(val!=null) 
 						{
 							if(!first)
@@ -112,7 +116,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 							wr.writeString(name);
 							wr.write(":");
 							
-							traverser.doTraverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
+							traverser.doTraverse(val, prop.getType(), conversionprocessors, processors, mode, targetcl, context);
 						}
 					}
 				}

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,10 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.SCloner;
+import jadex.commons.transformation.traverser.TraversedObjectsContext;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.javaparser.SJavaParser;
 
 
@@ -1731,10 +1733,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		final IdGenerator idgen = new IdGenerator();
 		Traverser trav = new Traverser()
 		{
-			public Object doTraverse(Object object, Class<?> clazz, Map<Object, Object> traversed, List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
+			public Object doTraverse(Object object, Type type, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
-				boolean istraversed = traversed.containsKey(object);
-				Object ret = super.doTraverse(object, clazz, traversed, processors, clone, targetcl, context);
+				boolean istraversed = ((TraversedObjectsContext) context).get(object) != null;
+				Object ret = super.doTraverse(object, type, conversionprocessors, processors, mode, targetcl, context);
 				if (!istraversed && object != ret && ret instanceof MIdElement)
 				{
 					String oldid = ((MIdElement) ret).getId();
@@ -1747,12 +1749,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				return Traverser.IGNORE_RESULT;
 			}
 			
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				boolean ret = false;
 				if (object instanceof MEdge)
@@ -1769,12 +1771,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		});
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Type type, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				return object;
 			}
 			
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				return object instanceof MPool ||
 						object instanceof MLane ||
@@ -1784,7 +1786,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		procs.addAll(Traverser.getDefaultProcessors());
 		
 		List<MIdElement> mclone = new ArrayList<MIdElement>(originals);
-		mclone = (List<MIdElement>) trav.traverse(mclone, null, new IdentityHashMap<Object, Object>(), procs, true, null, null);
+		mclone = (List<MIdElement>) SCloner.clone(mclone, trav, procs, null);
+//		mclone = (List<MIdElement>) trav.traverse(mclone, null, new IdentityHashMap<Object, Object>(), null, procs, null, true, null, null);
 		
 		clearCaches();
 		return new Tuple2<BiHashMap<String,String>, List<MIdElement>>(idmap, mclone);

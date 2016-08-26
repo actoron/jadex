@@ -39,6 +39,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.traverser.FilterProcessor;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.SCloner;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
@@ -179,7 +180,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						
 						List<ITraverseProcessor> procs = marshal.getCloneProcessors();
 						procs.add(procs.size()-2, new FilterProcessor(filter));
-						copyargs.add(Traverser.traverseObject(args[i], procs, true, null));
+						copyargs.add(SCloner.clone(args[i], procs));
+//						copyargs.add(Traverser.traverseObject(args[i], null, procs, null, true, null));
 //						copyargs.add(Traverser.traverseObject(args[i], marshal.getCloneProcessors(), filter));
 					}
 					else
@@ -290,7 +292,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				} : deffilter;
 				List<ITraverseProcessor> procs = marshal.getCloneProcessors();
 				procs.add(procs.size()-1, new FilterProcessor(filter));
-				res = Traverser.traverseObject(value, procs, true, null);
+				res = SCloner.clone(value, procs);
+//				res = Traverser.traverseObject(value, null, procs, null, true, null);
 //				res = Traverser.deepCloneObject(value, marshal.getCloneProcessors(), filter);
 			}
 		}

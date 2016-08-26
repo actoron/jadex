@@ -16,7 +16,19 @@ public interface ISendTask
 	 *  Get the message.
 	 *  @return the message.
 	 */
-	public Object getMessage();
+//	public Object getMesssage();
+	
+	/**
+	 *  Get the encoded message.
+	 *  @return the encoded message.
+	 */
+	public byte[] getEncodedMessage();
+	
+	/**
+	 *  Get the raw message.
+	 *  @return the raw message, implementation-dependent.
+	 */
+	public Object getRawMessage();
 
 //	/**
 //	 *  Get the message type.

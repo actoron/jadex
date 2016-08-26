@@ -12,15 +12,20 @@ import java.util.Set;
 public class BiHashMap<K, V> implements Map<K, V>
 {
 	/** The forward map. */
-	protected HashMap<K, V> forward;
+	protected Map<K, V> forward;
 
 	/** The reverse map. */
-	protected HashMap<V, K> reverse;
+	protected Map<V, K> reverse;
 	
 	public BiHashMap()
 	{
-		forward = new HashMap<K, V>();
-		reverse = new HashMap<V, K>();
+		this(new HashMap<K, V>(), new HashMap<V, K>());
+	}
+	
+	public BiHashMap(Map<K, V> forward, Map<V, K> reverse)
+	{
+		this.forward = forward;
+		this.reverse = reverse;
 	}
 	
 	/**

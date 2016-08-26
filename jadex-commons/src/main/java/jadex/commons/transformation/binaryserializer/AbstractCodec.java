@@ -7,6 +7,7 @@ import java.util.Map;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  * 
@@ -18,46 +19,48 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param object The object.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		IEncodingContext ec = (IEncodingContext) context;
 		Class<?> clazz = SReflect.getClass(type);
 		
+//		if(canReference(orig, clazz, ec))
+//			ec.createObjectId(object);
 		if(canReference(object, clazz, ec))
-			traversed.put(object, traversed.size());
+			ec.createObjectId();
 		
-		object = runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
+//		object = runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
 		if (clazz == null || !clazz.equals(object.getClass()))
 			clazz = object == null? null : object.getClass();
 		
 		ec.writeClass(clazz);
 		
-		object = encode(object, clazz, processors, traverser, traversed, clone, ec);
+		object = encode(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ec);
 		
 		return object;
 	}
 	
+	// Moved to Traverser.
 	/**
 	 *  Runs the preprocessors.
 	 */
-	protected Object runPreProcessors(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
-	{
-		List<ITraverseProcessor> preprocessors = ((IEncodingContext) context).getPreprocessors();
-		//System.out.println(preprocessors);
-		if (preprocessors != null)
-		{
-			for (ITraverseProcessor preproc : preprocessors)
-			{
-				if (preproc.isApplicable(object, clazz, clone, null))
-				{
-					object = preproc.process(object, clazz, processors, traverser, traversed, clone, null, context);
-				}
-			}
-		}
-		return object;
-	}
+//	protected Object runPreProcessors(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+//		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+//	{
+//		List<ITraverseProcessor> preprocessors = ((IEncodingContext) context).getPreprocessors();
+//		//System.out.println(preprocessors);
+//		if (preprocessors != null)
+//		{
+//			for (ITraverseProcessor preproc : preprocessors)
+//			{
+//				if (preproc.isApplicable(object, clazz, clone, null))
+//				{
+//					object = preproc.process(object, clazz, processors, traverser, traversed, clone, null, context);
+//				}
+//			}
+//		}
+//		return object;
+//	}
 	
 	/**
 	 *  Test if the codec allows referencing.
@@ -99,8 +102,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	/**
 	 *  Encode the object.
 	 */
-	public abstract Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec);
+	public abstract Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec);
 	
 	/**
 	 *  Decodes an object.
@@ -135,7 +137,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 */
 	public void recordKnownDecodedObject(Object object, IDecodingContext context)
 	{
-		context.getKnownObjects().put(context.getKnownObjects().size(), object);
+		context.createObjectId(object);
 	}
 	
 	/**
@@ -158,7 +160,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return isApplicable(clazz);

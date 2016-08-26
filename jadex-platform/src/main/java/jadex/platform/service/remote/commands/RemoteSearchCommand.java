@@ -6,11 +6,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Security;
@@ -90,7 +92,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	{
 //		if(type==null)
 //			System.out.println("type is null");
-		
+		if (caller instanceof ITransportComponentIdentifier)
+			caller = new BasicComponentIdentifier(caller);
 		this.providerid = providerid;
 		this.type = new ClassInfo(type);
 		this.multiple = multiple;
@@ -462,6 +465,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 */
 	public void setCaller(IComponentIdentifier caller)
 	{
+		if (caller instanceof ITransportComponentIdentifier)
+			caller = new BasicComponentIdentifier(caller);
 		this.caller = caller;
 	}
 

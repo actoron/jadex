@@ -125,8 +125,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		
-		if(methodname!=null && methodname.equals("getInputStream"))
-			System.out.println("callid of getResult result: "+callid);
+//		if(methodname!=null && methodname.equals("getInputStream"))
+//			System.out.println("callid of getResult result: "+callid);
 		
 		WaitingCallInfo wci = rsms.getWaitingCall(callid);
 		

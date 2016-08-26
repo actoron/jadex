@@ -39,6 +39,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.LocalInputConnectionHandler;
 import jadex.platform.service.message.streams.LocalOutputConnectionHandler;
@@ -121,15 +122,13 @@ public class MarshalService extends BasicService implements IMarshalService
 		// Insert before FieldProcessor that is always applicable
 		processors.add(processors.size()-1, new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				return object!=null && !(object instanceof BasicService) 
 					&& object.getClass().isAnnotationPresent(Service.class);
 			}
 			
-			public Object process(Object object, Type type,
-				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
 			}
@@ -138,7 +137,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		// Add processor for streams
 		processors.add(processors.size()-1, new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				boolean ret = false;
 				if(object instanceof ServiceInputConnectionProxy)
@@ -154,9 +153,7 @@ public class MarshalService extends BasicService implements IMarshalService
 				return ret;
 			}
 			
-			public Object process(Object object, Type type,
-				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				ServiceInputConnectionProxy sicp = (ServiceInputConnectionProxy)object;
 				
@@ -176,7 +173,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		// Add processor for streams
 		processors.add(processors.size()-1, new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				boolean ret = false;
 				if(object instanceof ServiceOutputConnectionProxy)
@@ -192,9 +189,7 @@ public class MarshalService extends BasicService implements IMarshalService
 				return ret;
 			}
 			
-			public Object process(Object object, Type type,
-				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 			{
 				ServiceOutputConnectionProxy socp = (ServiceOutputConnectionProxy)object;
 				

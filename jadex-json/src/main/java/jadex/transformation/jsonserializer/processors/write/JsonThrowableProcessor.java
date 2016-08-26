@@ -2,13 +2,13 @@ package jadex.transformation.jsonserializer.processors.write;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  * 
@@ -25,7 +25,7 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(Throwable.class, clazz);
@@ -34,30 +34,32 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
-		wr.addObject(traversed, object);
+		wr.addObject(wr.getCurrentInputObject());
 		
 		Throwable t = (Throwable)object;
 		
 		wr.write("{");
 		
-		if(wr.isWriteClass())
-			wr.writeClass(object.getClass());
-		
 		boolean first = true;
+		if(wr.isWriteClass())
+		{
+			wr.writeClass(object.getClass());
+			first = false;
+		}
+		
 		if(t.getMessage()!=null)
 		{
-			if(wr.isWriteClass())
+			if(!first)
 				wr.write(",");
 			wr.write("\"msg\":");
-			traverser.doTraverse(t.getMessage(), String.class, traversed, processors, clone, targetcl, context);
+			traverser.doTraverse(t.getMessage(), String.class, conversionprocessors, processors, mode, targetcl, context);
 			first = false;
 		}
 		if(t.getCause()!=null)
@@ -66,12 +68,11 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 				wr.write(",");
 			wr.write("\"cause\":");
 			Object val = t.getCause();
-			traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, 
-				traversed, processors, clone, targetcl, context);
+			traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, conversionprocessors, processors, mode, targetcl, context);
 			first = false;
 		}
 		
-		JsonBeanProcessor.traverseProperties(object, traversed, processors, traverser, clone, targetcl, context, intro, first);
+		JsonBeanProcessor.traverseProperties(object, conversionprocessors, processors, mode, traverser, targetcl, context, intro, first);
 		
 		wr.write("}");
 		

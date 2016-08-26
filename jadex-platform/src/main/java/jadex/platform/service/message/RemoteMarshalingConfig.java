@@ -10,13 +10,12 @@ import java.util.Map;
 import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.IFuture;
-import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.platform.service.message.transport.codecs.GZIPCodec;
+import jadex.platform.service.message.transport.codecs.XZCodec;
 import jadex.platform.service.message.transport.serializers.JadexBinarySerializer;
+import jadex.platform.service.message.transport.serializers.JadexJsonSerializer;
 
 /**
  *  Configuration providing the tools for marshalling messages (previously CodecFactory).
@@ -38,7 +37,7 @@ public class RemoteMarshalingConfig
 	protected List<ITraverseProcessor> preprocessors;
 	
 	/** Serialization postprocessors. */
-	protected List<IDecoderHandler> postprocessors;
+	protected List<ITraverseProcessor> postprocessors;
 	
 	/** The default serializer id. */
 	protected byte default_sid;
@@ -82,7 +81,7 @@ public class RemoteMarshalingConfig
 	public RemoteMarshalingConfig(Class<?>[] serializers, Class<?> defaultserializer, Class<?>[] codecs, Class<?>[] default_codecs)
 	{
 		preprocessors = new ArrayList<ITraverseProcessor>();
-		postprocessors = new ArrayList<IDecoderHandler>();
+		postprocessors = new ArrayList<ITraverseProcessor>();
 		this.codecs = SCollection.createHashMap();
 		this.serializers = SCollection.createHashMap();
 		
@@ -91,17 +90,19 @@ public class RemoteMarshalingConfig
 			if (SReflect.isAndroid())
 			{
 				// Hard-code classes for Android since scanning may not work.
-				codecs = new Class[] {GZIPCodec.class};
-				serializers= new Class[] {JadexBinarySerializer.class};
+				codecs = new Class[] {GZIPCodec.class, XZCodec.class};
+				serializers= new Class[] {JadexBinarySerializer.class, JadexJsonSerializer.class};
 			}
 			else
 			{
 				// TODO: Implement scan for available serializers and codecs, use hard-coding for now
-				codecs = new Class[] {GZIPCodec.class};
+//				codecs = new Class[] {GZIPCodec.class};
+				codecs = new Class[] {GZIPCodec.class, XZCodec.class};
 				
 				String[] classnames = new String[]
 				{
 					"jadex.platform.service.message.transport.serializers.JadexBinarySerializer",
+					"jadex.platform.service.message.transport.serializers.JadexJsonSerializer"
 				};
 				
 				List<Class<?>> serlist = new ArrayList<Class<?>>();
@@ -153,7 +154,7 @@ public class RemoteMarshalingConfig
 		}
 		else
 		{
-			default_sid = JadexBinarySerializer.SERIALIZER_ID;
+			default_sid = JadexJsonSerializer.SERIALIZER_ID;
 		}
 		
 		if(default_codecs!=null && default_codecs.length>0)
@@ -164,39 +165,6 @@ public class RemoteMarshalingConfig
 		{
 			default_ids = new byte[]{GZIPCodec.CODEC_ID};
 		}
-		
-//		if(codecs==null)
-//		{
-//			codecs = new Class[]{ GZIPCodec.class };
-			// dynamically decide if JadexXMLCodec is available
-//			codecs = !SReflect.isAndroid()
-//				? new Class[]{SerialCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class, JadexBinaryCodec2.class,}
-//				: SUtil.androidUtils().hasXmlSupport()
-//						? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec2.class, JadexBinaryCodec.class, JadexXMLCodec.class}
-//						: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec2.class, JadexBinaryCodec.class};
-//			codecs = !SReflect.isAndroid()
-//					? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
-//					: SUtil.androidUtils().hasXmlSupport()
-//							? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class, JadexXMLCodec.class}
-//							: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
-//		}
-//		for(int i=0; i<codecs.length; i++)
-//		{
-//			// Add codec classes
-//			addCodec(codecs[i]);
-//		}
-//		
-//		if(default_codecs!=null && default_codecs.length>0)
-//		{
-//			default_ids = getIds(default_codecs);
-//		}
-//		else
-//		{
-//			default_ids = !SReflect.isAndroid()
-//					? new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID}
-//					: new byte[]{JadexBinaryCodec.CODEC_ID, GZIPCodec.CODEC_ID};
-//			default_ids = new byte[]{GZIPCodec.CODEC_ID};
-//		}
 	}
 	
 	/**
@@ -212,9 +180,9 @@ public class RemoteMarshalingConfig
 	 *  Returns the current set of postprocessors.
 	 *  @return The current set of postprocessors.
 	 */
-	public IDecoderHandler[] getPostprocessors()
+	public ITraverseProcessor[] getPostprocessors()
 	{
-		return postprocessors.toArray(new IDecoderHandler[postprocessors.size()]);
+		return postprocessors.toArray(new ITraverseProcessor[postprocessors.size()]);
 	}
 	
 	/**
@@ -254,7 +222,7 @@ public class RemoteMarshalingConfig
 	 *  Adds postprocessors to the encoding stage.
 	 *  @param Postprocessors.
 	 */
-	public void addPostprocessors(IDecoderHandler[] processors)
+	public void addPostprocessors(ITraverseProcessor[] processors)
 	{
 		postprocessors.addAll(Arrays.asList(processors));
 	}

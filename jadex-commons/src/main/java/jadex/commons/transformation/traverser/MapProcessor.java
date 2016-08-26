@@ -9,6 +9,7 @@ import java.util.Set;
 import jadex.commons.SReflect;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  A map processor allows for traversing maps.
@@ -29,7 +30,7 @@ public class MapProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(Map.class, clazz);
@@ -38,18 +39,16 @@ public class MapProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		Map ret = (Map)getReturnObject(object, clazz, clone);
+		Map ret = (Map)getReturnObject(object, clazz, context);
 		Map map = (Map)object;
-		
-		traversed.put(object, ret);
+		TraversedObjectsContext.put(context, object, ret);
 		
 		if (object instanceof LRU)
 		{
@@ -57,7 +56,7 @@ public class MapProcessor implements ITraverseProcessor
 			ILRUEntryCleaner cleaner = ((LRU) object).getCleaner();
 			if (cleaner != null)
 			{
-				((LRU) ret).setCleaner((ILRUEntryCleaner) traverser.doTraverse(cleaner, cleaner.getClass(), traversed, processors, clone, targetcl, context));
+				((LRU) ret).setCleaner((ILRUEntryCleaner) traverser.doTraverse(cleaner, cleaner.getClass(), conversionprocessors, processors, mode, targetcl, context));
 			}
 		}
 		
@@ -69,12 +68,12 @@ public class MapProcessor implements ITraverseProcessor
 			Class<?> valclazz = val!=null? val.getClass(): null;
 			Object key = keys[i];
 			Class<?> keyclazz = key != null? key.getClass() : null;
-			Object newkey = traverser.doTraverse(key, keyclazz, traversed, processors, clone, targetcl, context);
-			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+			Object newkey = traverser.doTraverse(key, keyclazz, conversionprocessors, processors, mode, targetcl, context);
+			Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, context);
 			
 			if (newkey != Traverser.IGNORE_RESULT && newval != Traverser.IGNORE_RESULT)
 			{
-				if(clone || newval!=val)
+				if(SCloner.isCloneContext(context) || newval!=val)
 					ret.put(newkey, newval);
 			}
 		}
@@ -85,11 +84,11 @@ public class MapProcessor implements ITraverseProcessor
 	/**
 	 * 
 	 */
-	public Object getReturnObject(Object object, Class clazz, boolean clone)
+	public Object getReturnObject(Object object, Class clazz, Object context)
 	{
 		Object ret = object;
 		
-		if(clone)
+		if(SCloner.isCloneContext(context))
 		{
 			try
 			{

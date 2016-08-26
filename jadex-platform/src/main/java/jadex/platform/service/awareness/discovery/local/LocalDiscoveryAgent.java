@@ -27,7 +27,7 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
@@ -251,7 +251,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 		ITransportComponentIdentifier root = fut2.get();
 		long leasetime = (Long) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");
 		AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
-		byte[] data = BinarySerializer.objectToByteArray(info, null, null, null, agent.getClassLoader());
+		byte[] data = SBinarySerializer.writeObjectToByteArray(info, agent.getClassLoader());
 		long deadline = leasetime + System.currentTimeMillis();
 		String outfilepath = DISCOVERY_DIR + File.separator + agent.getComponentIdentifier().getRoot().getLocalName() + "_" + String.valueOf(deadline) + ".awa";
 		File outfile = new File(outfilepath);
@@ -309,7 +309,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					else
 					{
 						byte[] awadata = SUtil.readFile(file);
-						final AwarenessInfo awainfo = (AwarenessInfo) BinarySerializer.objectFromByteArray(awadata, null, null, agent.getClassLoader(), null);
+						final AwarenessInfo awainfo = (AwarenessInfo) SBinarySerializer.readObjectFromByteArray(awadata, null, null, agent.getClassLoader(), null);
 						if(!awainfo.getSender().equals(agent.getComponentIdentifier().getRoot()))
 						{
 							IFuture<IAwarenessManagementService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("management");

@@ -2,7 +2,6 @@ package jadex.commons.transformation.binaryserializer;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
@@ -10,6 +9,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Codec for encoding and decoding URL objects.
@@ -61,7 +61,7 @@ public class TupleCodec extends AbstractCodec
 	 */
 	public Object decodeSubObjects(Object object, Class<?> clazz, IDecodingContext context)
 	{
-		Object[] entities = (Object[])BinarySerializer.decodeObject(context);
+		Object[] entities = (Object[])SBinarySerializer.decodeObject(context);
 		try
 		{
 			Field fentities = SReflect.getField(object.getClass(), "entities");
@@ -74,27 +74,14 @@ public class TupleCodec extends AbstractCodec
 		}
 		return object;
 	}
-	
-	/**
-	 *  Test if the processor is applicable.
-	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
-	 *    e.g. by cloning the object using the class loaded from the target class loader.
-	 *  @return True, if is applicable. 
-	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-	{
-		return isApplicable(clazz);
-	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		Object[] entities = ((Tuple)object).getEntities();
-		traverser.doTraverse(entities, entities.getClass(), traversed, processors, clone, null, ec);
+		traverser.doTraverse(entities, entities.getClass(), preprocessors, processors, mode, targetcl, ec);
 		return object;
 	}
 }

@@ -15,6 +15,7 @@ import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  * Codec for encoding and decoding Java Beans.
@@ -154,7 +155,7 @@ public class BeanCodec extends AbstractCodec
 			for (int i = 0; i < size; ++i)
 			{
 				context.readString();
-				BinarySerializer.decodeObject(context);
+				SBinarySerializer.decodeObject(context);
 			}
 		}
 		
@@ -172,12 +173,11 @@ public class BeanCodec extends AbstractCodec
 	{
 		return object != null;
 	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		if (!ec.getNonInnerClassCache().contains(clazz))
 		{
@@ -206,7 +206,7 @@ public class BeanCodec extends AbstractCodec
 			ec.writeBoolean(false);
 		}
 		
-		writeBeanProperties(object, clazz, processors, traverser, traversed, clone, ec, intro);
+		writeBeanProperties(object, clazz, preprocessors, processors, traverser, mode, ec, intro);
 		
 //		Map props = intro.getBeanProperties(clazz, true, false);
 //		
@@ -267,8 +267,7 @@ public class BeanCodec extends AbstractCodec
 	/**
 	 * 
 	 */
-	public static void writeBeanProperties(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec, IBeanIntrospector intro)
+	public static void writeBeanProperties(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, Traverser traverser, MODE mode, IEncodingContext ec, IBeanIntrospector intro)
 	{
 		Map props = intro.getBeanProperties(clazz, true, false);
 		
@@ -295,7 +294,7 @@ public class BeanCodec extends AbstractCodec
 		{
 			ec.writeString(names.get(i));
 			Object val = values.get(i);
-			traverser.doTraverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
+			traverser.doTraverse(val, clazzes.get(i), preprocessors, processors, mode, ec.getClassLoader(), ec);
 		}
 	}
 	
@@ -310,7 +309,7 @@ public class BeanCodec extends AbstractCodec
 		{
 			String name = context.readString();
 			Object val = null;
-			val = BinarySerializer.decodeObject(context);
+			val = SBinarySerializer.decodeObject(context);
 			if(val!=null)
 			{
 				try
