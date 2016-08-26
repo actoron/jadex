@@ -256,13 +256,13 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			// Recurse for asynchronous feature.
 			final Future<Void>	fut	= new Future<Void>();
-			ret.addResultListener(new DelegationResultListener<Void>(fut)
+			ret.addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(fut)
 			{
 				public void customResultAvailable(Void result)
 				{
 					executeInitOnFeatures(features).addResultListener(new DelegationResultListener<Void>(fut));
 				}
-			});
+			}));
 			ret	= fut;
 		}
 		

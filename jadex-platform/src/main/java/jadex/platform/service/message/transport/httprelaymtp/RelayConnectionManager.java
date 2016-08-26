@@ -314,6 +314,7 @@ public class RelayConnectionManager	extends HttpConnectionManager
 			
 			if(code!=HttpURLConnection.HTTP_OK)
 			{
+//				Thread.dumpStack();
 				throw new IOException(" " +con.getURL() + " " + "HTTP code "+code+": "+con.getResponseMessage()+" target="+targetid);
 			}
 			while(con.getInputStream().read(RESPONSE_BUF)!=-1)

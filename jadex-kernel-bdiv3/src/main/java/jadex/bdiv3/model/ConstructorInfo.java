@@ -3,6 +3,7 @@ package jadex.bdiv3.model;
 
 import java.lang.reflect.Constructor;
 
+import jadex.bdiv3.exceptions.JadexBDIGenerationRuntimeException;
 import jadex.commons.SReflect;
 
 /**
@@ -44,7 +45,7 @@ public class ConstructorInfo
 		this.parametertypes = new String[ptypes.length];
 		for(int i=0; i<parametertypes.length; i++)
 		{
-			parametertypes[i] = ptypes[i].getName();
+			parametertypes[i] = SReflect.getClassName(ptypes[i]);
 		}
 	}
 	
@@ -79,13 +80,8 @@ public class ConstructorInfo
 			}
 			return method;
 		}
-		catch(RuntimeException e)
-		{
-			throw e;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
+		catch(Exception e) {
+			throw new JadexBDIGenerationRuntimeException("Could not find Constructor for class: " + classname, e);
 		}
 	}
 	

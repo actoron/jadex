@@ -33,6 +33,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -62,6 +63,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/** The registry listeners. */
 	protected List<IRegistryListener> listeners;
 	
+	/** The search functionality. */
 	protected RegistrySearchFunctionality searchfunc;
 	
 	//-------- methods --------
@@ -72,6 +74,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public ServiceRegistry()//RegistrySearchFunctionality searchfunc)
 	{
 		this.searchfunc = new RegistrySearchFunctionality(this);
+		this.excluded = new HashSet<IComponentIdentifier>();
 	}
 	
 	/**
@@ -94,10 +97,14 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	{
 		Set<IService> ret = null;
 		
+//		if(type!=null && type.getTypeName().indexOf("IRegistrySer")!=-1)
+//			System.out.println("search: "+type.getTypeName());
+		
 		if(services!=null)
 		{
 			if(type!=null)
 			{
+				// todo: clone?! is only internal method
 				ret = services.get(type);
 			}
 			else
@@ -125,7 +132,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		if(excluded!=null && excluded.contains(ser.getServiceIdentifier().getProviderId()) && cid!=null)
 		{
 			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			ret = RegistrySearchFunctionality.getDotName(cid).endsWith(RegistrySearchFunctionality.getDotName(target));
+			if(target!=null)
+				ret = RegistrySearchFunctionality.getDotName(cid).endsWith(RegistrySearchFunctionality.getDotName(target));
 		}
 		return ret;
 	}
@@ -136,8 +144,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public void addExcludedComponent(IComponentIdentifier cid)
 	{
-		if(excluded==null)
-			excluded = new HashSet<IComponentIdentifier>();
+//		if(excluded==null)
+//			excluded = new HashSet<IComponentIdentifier>();
 		excluded.add(cid);
 	}
 	
@@ -152,8 +160,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		Future<Void> ret = new Future<Void>();
 		IResultListener<Void> lis = null;
 		
-		if(excluded!=null)
-		{
+//		if(excluded!=null)
+//		{
 			if(excluded.remove(cid))
 			{
 				if(excludedservices!=null)
@@ -174,7 +182,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 					}
 				}
 			}
-		}
+//		}
 		
 		if(lis==null)
 			ret.setResult(null);
@@ -188,9 +196,9 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
-		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageQueue")!=-1)
-			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
-		
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IRegistrySer")!=-1)
+//			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
+			
 		if(services==null)
 			services = new HashMap<ClassInfo, Set<IService>>();
 		
@@ -231,7 +239,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public void removeService(ClassInfo key, IService service)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IRegistrySer")!=-1)
 //			System.out.println("removed: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
 		
 		if(services!=null)
@@ -240,6 +248,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 			if(sers!=null)
 			{
 				sers.remove(service);
+				if(sers.size()==0)
+					services.remove(key);
 				
 				notifyListeners(new RegistryListenerEvent(RegistryListenerEvent.Type.REMOVED, key, service));
 			}
@@ -339,39 +349,18 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 			mqs = new HashSet<ServiceQueryInfo<T>>();
 			queries.put(query.getType(), (Set)mqs);
 		}
-		mqs.add(new ServiceQueryInfo(query, ret));
+		mqs.add(new ServiceQueryInfo<T>(query, ret));
 		
 		// deliver currently available services
 		Iterator<T> sers = (Iterator<T>)getServices(query.getType());
 		if(sers!=null)
 		{
-			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
-				.addIntermediateResultListener(new IIntermediateResultListener<T>()
-			{
-				public void intermediateResultAvailable(T result)
-				{
-					ret.addIntermediateResultIfUndone(result);
-				}
-	
-				public void finished()
-				{
-					// the query is not finished after the status quo is delivered
-				}
-	
-				public void resultAvailable(Collection<T> results)
-				{
-					for(T result: results)
-					{
-						intermediateResultAvailable(result);
-					}
-					// the query is not finished after the status quo is delivered
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					// the query is not finished after the status quo is delivered
-				}
-			});
+			// Creates a new collection so that filter check must NOT be locked
+			Collection<T> ssers = searchfunc.checkScope(sers, query.getOwner(), query.getScope(), false);
+			
+//			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
+			searchfunc.checkAsyncFilters(query.getFilter(), ssers.iterator())
+				.addIntermediateResultListener(new UnlimitedIntermediateDelegationResultListener<T>(ret));
 		}
 	
 		return ret;
@@ -385,10 +374,18 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	{
 		if(queries!=null)
 		{
-			Set<ServiceQuery<T>> mqs = (Set)queries.get(query.getType());
+			Set<ServiceQueryInfo<T>> mqs = (Set)queries.get(query.getType());
 			if(mqs!=null)
 			{
-				mqs.remove(query);
+				for(ServiceQueryInfo<T> sqi: mqs)
+				{
+					if(sqi.getQuery().equals(query))
+					{
+						sqi.getFuture().terminate();
+						mqs.remove(sqi);
+						break;
+					}
+				}
 				if(mqs.size()==0)
 					queries.remove(query.getType());
 			}
@@ -405,11 +402,12 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		{
 			for(Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>> entry: queries.entrySet())
 			{
-				for(ServiceQueryInfo<?> query: entry.getValue())
+				for(ServiceQueryInfo<?> query: entry.getValue().toArray(new ServiceQueryInfo<?>[entry.getValue().size()]))
 				{
 					if(owner.equals(query.getQuery().getOwner()))
 					{
-						entry.getValue().remove(query);
+						removeQuery(query.getQuery());
+//						entry.getValue().remove(query);
 					}
 				}
 			}
@@ -429,7 +427,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		final IComponentIdentifier	lcid	= IComponentIdentifier.LOCAL.get();
@@ -614,8 +612,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(type.toString().indexOf("IServiceCall")!=-1)
-			System.out.println("Search global services: "+type);
+//		if(type.toString().indexOf("IServiceCall")!=-1)
+//			System.out.println("Search global services: "+type);
 		
 		if(services!=null)
 		{
@@ -699,11 +697,39 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	}
 	
 	/**
-	 *  Get the service map.
+	 *  Remove a subregistry.
+	 *  @param cid The platform id.
+	 */
+	// write
+	public void removeSubregistry(IComponentIdentifier cid)
+	{
+	}
+	
+	/**
+	 *  Get the service map. (The original map cannot be used because 
+	 *  registry is accessed concurrently and other threads could change the map
+	 *  even in between of onging operations such as serialization)
+	 *  @return A clone of the service map.
 	 */
 	public Map<ClassInfo, Set<IService>> getServiceMap()
 	{
-		return services;
+		// Does not work because the contained services are cloned also 
+//		return services==null? null: (Map<ClassInfo, Set<IService>>)Traverser.traverseObject(services, Traverser.getDefaultProcessors(), true, null);
+	
+		// Needs a deep clone except the services
+		
+		Map<ClassInfo, Set<IService>> ret = null;
+		
+		if(services!=null)
+		{
+			ret = new HashMap<ClassInfo, Set<IService>>();
+			for(Map.Entry<ClassInfo, Set<IService>> entry: services.entrySet())
+			{
+				ret.put(entry.getKey(), new HashSet<IService>(entry.getValue()));
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -771,6 +797,44 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public static IServiceRegistry getRegistry(IInternalAccess ia)
 	{
 		return getRegistry(ia.getComponentIdentifier());
+	}
+	
+	/**
+	 *  Listener that forwards only results and ignores finished / exception.
+	 */
+	public static class UnlimitedIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
+	{
+		/** The delegate future. */
+		protected IntermediateFuture<E> delegate;
+		
+		public UnlimitedIntermediateDelegationResultListener(IntermediateFuture<E> delegate)
+		{
+			this.delegate = delegate;
+		}
+		
+		public void intermediateResultAvailable(E result)
+		{
+			delegate.addIntermediateResultIfUndone(result);
+		}
+
+		public void finished()
+		{
+			// the query is not finished after the status quo is delivered
+		}
+
+		public void resultAvailable(Collection<E> results)
+		{
+			for(E result: results)
+			{
+				intermediateResultAvailable(result);
+			}
+			// the query is not finished after the status quo is delivered
+		}
+		
+		public void exceptionOccurred(Exception exception)
+		{
+			// the query is not finished after the status quo is delivered
+		}
 	}
 	
 }

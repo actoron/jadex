@@ -438,8 +438,8 @@ public class RootComponentConfiguration
 	/** Flag if dht storage ring should be provided. **/
 	public static final String	DHT_PROVIDE			= PlatformConfiguration.DHT_PROVIDE;		// class:
 																								// boolean
-	/** Flag if dht storage ring should be provided. **/
-	public static final String	REGISTRY			= PlatformConfiguration.REGISTRY;		// class:
+	/** Flag if registry synchronization should be used. **/
+	public static final String	REGISTRY_SYNC			= PlatformConfiguration.REGISTRY_SYNC;		// class:
 																							// default:
 																								// false
 
@@ -456,7 +456,7 @@ public class RootComponentConfiguration
 			PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT, NIOTCPTRANSPORT, RELAYTRANSPORT,
 			RELAYSECURITY, RELAYAWAONLY, SSLTCPTRANSPORT, WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
 			MONITORINGCOMP, SENSORS, DF, CLOCK, MESSAGE, SIMUL, FILETRANSFER, MARSHAL, SECURITY,
-			LIBRARY, SETTINGS, CONTEXT, ADDRESS, DHT_PROVIDE
+			LIBRARY, SETTINGS, CONTEXT, ADDRESS, DHT_PROVIDE, REGISTRY_SYNC
 	};
 
 //	private static final String[] OTHER_ARGS = {
@@ -1236,6 +1236,16 @@ public class RootComponentConfiguration
 	public void setDhtProvide(boolean value)
 	{
 		setValue(DHT_PROVIDE, value);
+	}
+	
+	public boolean getRegistrySync()
+	{
+		return Boolean.TRUE.equals(getValue(REGISTRY_SYNC));
+	}
+
+	public void setRegistrySync(boolean value)
+	{
+		setValue(REGISTRY_SYNC, value);
 	}
 
 	/**

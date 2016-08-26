@@ -18,6 +18,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -191,23 +192,19 @@ public class ProxyAgent	implements IProxyAgentService
 	 */
 	public IFuture<State> getConnectionState()
 	{
-		System.out.println("ConnState for " + rcid);
-		final Future<State> ret = new Future<State>();
-		ret.addResultListener(new IResultListener<IProxyAgentService.State>()
+		final Future<State> ret = new Future<State>()
 		{
-			@Override
-			public void resultAvailable(State result)
+			public void setException(Exception exception)
 			{
-				// TODO Auto-generated method stub
-				
+				super.setException(exception);
 			}
-			@Override
-			public void exceptionOccurred(Exception exception)
+			
+			public boolean setExceptionIfUndone(Exception exception)
 			{
-				exception.printStackTrace();
+				return super.setExceptionIfUndone(exception);
 			}
-		});
-		
+		};
+
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
 		{
@@ -225,7 +222,7 @@ public class ProxyAgent	implements IProxyAgentService
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+//						exception.printStackTrace();
 						if(exception instanceof SecurityException)
 						{
 							ret.setResult(State.LOCKED);
@@ -238,7 +235,7 @@ public class ProxyAgent	implements IProxyAgentService
 				});
 			}
 		});
-		
+
 		return ret;
 	}
 	

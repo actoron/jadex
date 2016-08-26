@@ -9,8 +9,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.TagFilter;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -90,8 +93,12 @@ public class ServiceCallAgent	extends TestAgent
 	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		CreationInfo	ci	= ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
+		CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
 			? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+		
+		String an = agentname.toLowerCase();
+		final String tag = an.indexOf("raw")!=-1? "raw": an.indexOf("direct")!=-1? "direct": an.indexOf("decoupled")!=-1? "decoupled": null;	
+		System.out.println("Tag is: "+tag+" "+agentname);	
 		
 		cms.createComponent(null, agentname, ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
@@ -99,15 +106,15 @@ public class ServiceCallAgent	extends TestAgent
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
 				final Future<Void>	ret2 = new Future<Void>();
-				performSingleTest("raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+				performSingleTest(tag, "raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 				{
 					public void customResultAvailable(Void result)
 					{
-						performSingleTest("direct", 2*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+						performSingleTest(tag, "direct", 2*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 						{
 							public void customResultAvailable(Void result)
 							{
-								performSingleTest("decoupled", 1*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
+								performSingleTest(tag, "decoupled", 1*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
 							}
 						}));
 					}
@@ -141,10 +148,20 @@ public class ServiceCallAgent	extends TestAgent
 	/**
 	 *  Perform a number of calls on one required service.
 	 */
-	protected IFuture<Void>	performSingleTest(final String servicename, final int factor)
+	protected IFuture<Void>	performSingleTest(final String tag, final String servicename, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		IFuture<IServiceCallService>	fut	= getServiceCallService(servicename, 0, 2, 3000);
+//		IFuture<IServiceCallService> fut = getServiceCallService(servicename, 0, 2, 3000);
+		IFuture<IServiceCallService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IServiceCallService>, Void>()
+		{
+			public IFuture<IServiceCallService> execute(Void args)
+			{
+//				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename, true, 
+					new TagFilter<IServiceCallService>(agent.getExternalAccess(), tag));
+			}
+		}, 7, 1500);
+		
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{
 			public void customResultAvailable(final IServiceCallService service)
@@ -171,51 +188,20 @@ public class ServiceCallAgent	extends TestAgent
 							service.call().addResultListener(this);
 						}
 					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurred(exception);
+					}
 				};
 				service.call().addResultListener(lis);
 			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get the service call service with delay.
-	 */
-	protected IFuture<IServiceCallService> getServiceCallService(final String servicename, final int cnt, final int max, final int delay)
-	{
-		final Future<IServiceCallService> ret = new Future<IServiceCallService>();
-		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(300, new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			
+			public void exceptionOccurred(Exception exception)
 			{
-				final IFuture<IServiceCallService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
-
-				fut.addResultListener(new DelegationResultListener<IServiceCallService>(ret)
-				{
-					public void exceptionOccurred(Exception exception)
-					{
-						if(cnt<max)
-						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, true).addResultListener(new ExceptionDelegationResultListener<Void, IServiceCallService>(ret)
-							{
-								public void customResultAvailable(Void result)
-								{
-									getServiceCallService(servicename, cnt+1, max, delay).addResultListener(new DelegationResultListener<IServiceCallService>(ret));
-								}
-							});
-						}
-						else
-						{
-							ret.setException(exception);
-						}
-					}
-				});
-				
-				return IFuture.DONE;
+				super.exceptionOccurred(exception);
 			}
-		}, true);
+		});
 		
 		return ret;
 	}

@@ -171,7 +171,12 @@ public class RegistryEvent implements IRegistryEvent
 	public boolean isDue()
 	{
 		int size = size();
-		return size>=eventslimit || (System.currentTimeMillis()-timestamp>timelimit && size>0);
+		// Send event if more than eventlimit events have been collected
+		// OR
+		// timeout has been reached (AND and at least one event has been collected)
+		// The last aspect is not used because lease times are used
+		// so an empty event at least renews the lease
+		return size>=eventslimit || (System.currentTimeMillis()-timestamp>timelimit);// && size>0);
 	}
 	
 //	/**

@@ -26,7 +26,8 @@ import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
 /**
- *  Test if the platforms can be started and terminate correctly.
+ *  Test if the platforms can be started and terminate correctly
+ *  and if the different platform models are equal.
  */
 public class PlatformsTest //extends TestCase
 {

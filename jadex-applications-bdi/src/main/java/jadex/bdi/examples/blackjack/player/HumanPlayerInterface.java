@@ -223,7 +223,7 @@ public class HumanPlayerInterface extends GameStateFrame
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					//System.out.println("Human player chose to draw another card");
+//					System.out.println("Human player chose to draw another card");
 					setDrawCard(true);
 				}
 			});

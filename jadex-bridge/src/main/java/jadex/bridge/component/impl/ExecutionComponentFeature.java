@@ -787,6 +787,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			if(timeout!=Timeout.NONE)
 			{
+				final Exception ex	= Future.DEBUG ? new DebugException("Timeout: "+timeout) : null;
 				waitForDelay(timeout)
 					.addResultListener(new IResultListener<Void>()
 				{
@@ -794,7 +795,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					{
 						if(!unblocked[0])
 						{
-							unblock(monitor, new TimeoutException());
+							unblock(monitor, new TimeoutException(null, ex));
 						}
 					}
 					

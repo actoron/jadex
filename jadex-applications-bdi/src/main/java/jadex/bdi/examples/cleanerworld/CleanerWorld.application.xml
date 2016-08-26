@@ -159,16 +159,17 @@
 					
 					<env:drawable objecttype="cleaner" width="0.1" height="0.1">
 						<env:property name="size" dynamic="true">new Vector2Double($object.chargestate, 0.2)</env:property>
+						<env:property name="charge" dynamic="true">Math.round($object.chargestate*100)</env:property>
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*20)</env:property>
 						<env:property name="text" dynamic="true">$object.owner.getName().getLocalName()</env:property>
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld/images/cleaner.png" />
-						<env:text layer="4" halign="center" y="-0.6" color="black" text="$text$" size="8"/>
+						<env:text layer="4" halign="center" y="-0.6" color="black" text="$text$ $charge$%" size="8"/>
 						<env:ellipse layer="-1" size="vision_size" color="#ffff007f" />
 						<env:texturedrectangle layer="0" x="0.3" y="0.4" width="0.3" height="0.3" imagepath="jadex/bdi/examples/cleanerworld/images/waste.png">
 							<env:drawcondition>$object.waste!=null</env:drawcondition>
 						</env:texturedrectangle>
-						<env:rectangle layer="2" size="size" color="green"/>
-						<env:rectangle layer="1" width="1" height="0.2" x="0.1" y="0.1" color="white"/>
+						<!-- <env:rectangle layer="2" size="size" color="green"/>
+						<env:rectangle layer="1" width="1" height="0.2" x="0.1" y="0.1" color="white"/>-->
 					</env:drawable>
 					
 					<env:drawable objecttype="truck" width="0.2" height="0.15">

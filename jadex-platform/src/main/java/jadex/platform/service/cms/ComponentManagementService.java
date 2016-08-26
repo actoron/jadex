@@ -308,7 +308,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  @return The status events of the components. Consists of CMSCreatedEvent, (CMSIntermediateResultEvent)*, CMSTerminatedEvent
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponent(CreationInfo info, String name, String model)
-	{
+	{		
 		final SubscriptionIntermediateFuture<CMSStatusEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 		
 		final IComponentIdentifier[] mycid = new IComponentIdentifier[1];
@@ -402,7 +402,9 @@ public class ComponentManagementService implements IComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + name + " : Modelname must not be null."));
 
-//		if(name!=null && name.toLowerCase().indexOf("broken")!=-1)
+//		System.out.println("create: "+name+" "+modelname+" "+agent.getComponentIdentifier());
+		
+//		if(name!=null && name.toLowerCase().indexOf("provider")!=-1)
 //			System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
@@ -1331,6 +1333,8 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected void destroyComponent(final IComponentIdentifier cid,	final Future<Map<String, Object>> ret)
 	{
+//		System.out.println("kill: "+cid);
+		
 		if(isRemoteComponent(cid))
 		{
 			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
@@ -2067,6 +2071,8 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal)
 	{
+//		System.out.println("getExta: "+cid);
+		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 //		ret.addResultListener(new IResultListener<IExternalAccess>()
@@ -2092,10 +2098,6 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		if(isRemoteComponent(cid))
 		{
-			if(cid.getName().indexOf("chat")!=-1)
-			{
-				System.out.println("getExternalAccess: "+this+", "+cid+", "+ServiceCall.getCurrentInvocation().getCaller());
-			}
 //			System.out.println("getExternalAccess: remote");
 			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IExternalAccess>(ret)
@@ -2175,6 +2177,23 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			
 		}
+		
+		ret.addResultListener(new IResultListener<IExternalAccess>()
+		{
+			public void resultAvailable(IExternalAccess result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if(cid.getName().toLowerCase().indexOf("directservice")!=-1
+					|| cid.getName().toLowerCase().indexOf("rawservice")!=-1
+					|| cid.getName().toLowerCase().indexOf("decoupledservice")!=-1)
+				{
+					System.out.println("getExternalAccess: "+agent.getComponentIdentifier()+", "+cid);
+//					getExternalAccess(cid);
+				}
+			}
+		});
 		
 		return ret;
 	}

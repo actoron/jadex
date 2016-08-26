@@ -6,7 +6,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -27,7 +29,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 /**
- *  Chat micro agent with a . 
+ *  Chat micro agent. 
  */
 @Description("This agent provides a basic chat service.")
 @Agent
@@ -59,6 +61,7 @@ public class ChatE3Agent
 	public IFuture<Void> init()
 	{
 		final Future<Void> ret = new Future<Void>();
+		
 		IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IRegistryServiceE3, Void>(ret)
 		{
@@ -66,6 +69,14 @@ public class ChatE3Agent
 			{
 				regservice = rs;
 				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("exception, could not find appreg service: "+exception);
+//				IRegistryServiceE3 reg = SServiceProvider.getLocalService(agent, IRegistryServiceE3.class);
+				IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+				super.exceptionOccurred(exception);
 			}
 		});
 		return ret;

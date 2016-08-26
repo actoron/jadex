@@ -12,12 +12,12 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.ServiceRegistry.UnlimitedIntermediateDelegationResultListener;
 import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.collection.MultiIterator;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
@@ -30,8 +30,8 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	/** The locally cloned registries of remote platforms. */
 	protected Map<IComponentIdentifier, IServiceRegistry> registries;
 	
-	/** The queries. */
-	protected Map<ClassInfo, Set<ServiceQuery<?>>> queries;
+	/** The persistent service queries. */
+	protected Map<ClassInfo, Set<ServiceQueryInfo<?>>> queries;
 	
 	/** The default search functionality. */
 	protected RegistrySearchFunctionality searchfunc;
@@ -140,15 +140,15 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		if(queries==null)
-			queries = new HashMap<ClassInfo, Set<ServiceQuery<?>>>();
+			queries = new HashMap<ClassInfo, Set<ServiceQueryInfo<?>>>();
 		
-		Set<ServiceQuery<T>> mqs = (Set)queries.get(query.getType());
+		Set<ServiceQueryInfo<T>> mqs = (Set)queries.get(query.getType());
 		if(mqs==null)
 		{
-			mqs = new HashSet<ServiceQuery<T>>();
+			mqs = new HashSet<ServiceQueryInfo<T>>();
 			queries.put(query.getType(), (Set)mqs);
 		}
-		mqs.add(query);
+		mqs.add(new ServiceQueryInfo<T>(query, ret));
 		
 		// addQueryOnAllRegistries
 		if(registries!=null)
@@ -156,31 +156,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 			for(final IServiceRegistry reg: registries.values())
 			{
 				ISubscriptionIntermediateFuture<T> fut = reg.addQuery(query);
-				fut.addIntermediateResultListener(new IIntermediateResultListener<T>()
-				{
-					public void intermediateResultAvailable(T result)
-					{
-						ret.addIntermediateResult(result);
-					}
-					
-					public void finished()
-					{
-						// Ignore when single queries terminate
-						System.out.println("Query finished on a registry: "+reg);
-					}
-					
-					public void resultAvailable(Collection<T> result)
-					{
-						// Ignore when single queries finished
-						System.out.println("Query finished on a registry: "+reg);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// Ignore when single queries finished
-						System.out.println("Query exception on a registry: "+reg+" "+exception.getMessage());
-					}
-				});
+				fut.addIntermediateResultListener(new UnlimitedIntermediateDelegationResultListener<T>(ret));
 			}
 		}
 		
@@ -195,14 +171,28 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	{
 		if(queries!=null)
 		{
-			queries.remove(query);
-			
-			// removeQueryOnAllRegistries
-			if(registries!=null)
+			Set<ServiceQueryInfo<T>> mqs = (Set)queries.get(query.getType());
+			if(mqs!=null)
 			{
-				for(IServiceRegistry reg: registries.values())
+				for(ServiceQueryInfo<T> sqi: mqs)
 				{
-					reg.removeQuery(query);
+					if(sqi.getQuery().equals(query))
+					{
+						sqi.getFuture().terminate();
+						mqs.remove(sqi);
+						break;
+					}
+				}
+				if(mqs.size()==0)
+					queries.remove(query.getType());
+				
+				// removeQueryOnAllRegistries
+				if(registries!=null)
+				{
+					for(IServiceRegistry reg: registries.values())
+					{
+						reg.removeQuery(query);
+					}
 				}
 			}
 		}
@@ -225,13 +215,14 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 				}
 			}
 			
-			for(Map.Entry<ClassInfo, Set<ServiceQuery<?>>> entry: queries.entrySet())
+			for(Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>> entry: queries.entrySet())
 			{
-				for(ServiceQuery<?> query: entry.getValue())
+				for(ServiceQueryInfo<?> query: entry.getValue().toArray(new ServiceQueryInfo<?>[entry.getValue().size()]))
 				{
-					if(owner.equals(query.getOwner()))
+					if(owner.equals(query.getQuery().getOwner()))
 					{
-						entry.getValue().remove(query);
+						removeQuery(query.getQuery());
+//						entry.getValue().remove(query);
 					}
 				}
 			}
@@ -348,7 +339,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 		{
 			ret = new ServiceRegistry();
 //			System.out.println("Created registry for: "+cid);
-			addRegistry(cid, ret);
+			addSubregistry(cid, ret);
 		}
 		return ret;
 	}
@@ -357,7 +348,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	 *  Add a new registry.
 	 *  @param registry The registry.
 	 */
-	protected void addRegistry(IComponentIdentifier cid, IServiceRegistry registry)
+	public void addSubregistry(IComponentIdentifier cid, IServiceRegistry registry)
 	{
 		if(registries==null)
 			registries = new HashMap<IComponentIdentifier, IServiceRegistry>();
@@ -372,10 +363,25 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	 *  Remove an existing registry.
 	 *  @param cid The component id to remove.
 	 */
-	protected void removeRegistry(IComponentIdentifier cid)
+	public void removeSubregistry(IComponentIdentifier cid)
 	{
 		if(registries==null || !registries.containsKey(cid))
 			throw new RuntimeException("Registry not contained: "+cid);
+		
+		// Remove all services to trigger removed events
+		IServiceRegistry reg = registries.get(cid);
+		Map<ClassInfo, Set<IService>> sers = reg.getServiceMap();
+		if(sers!=null)
+		{
+			for(Map.Entry<ClassInfo, Set<IService>> entry: sers.entrySet())
+			{
+				for(IService ser: entry.getValue())
+				{
+					reg.removeService(entry.getKey(), ser);
+				}
+			}
+		}
+		
 		registries.remove(cid);
 	}
 	
@@ -387,11 +393,12 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 		// Add existing queries on the new registry
 		if(queries!=null && registries!=null)
 		{
-			for(Set<ServiceQuery<?>> queries: queries.values())
+			for(Set<ServiceQueryInfo<?>> queries: queries.values().toArray(new Set[queries.size()]))
 			{
-				for(ServiceQuery<?> query: queries)
+				for(ServiceQueryInfo<?> query: queries)
 				{
-					registry.addQuery(query);
+					registry.addQuery(query.getQuery()).addIntermediateResultListener(
+						new UnlimitedIntermediateDelegationResultListener(query.getFuture()));
 				}
 			}
 		}

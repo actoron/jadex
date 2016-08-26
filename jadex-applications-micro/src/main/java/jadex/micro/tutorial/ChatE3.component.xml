@@ -22,7 +22,7 @@
 						<argument name="nickname">"Hans"</argument>
 					</arguments>
 					<requiredservices>
-						<binding name="regservice" componentname="reg" scope="parent"/>
+						<binding name="regservice" componentname="reg" scope="parent" dynamic="true"/>
 					</requiredservices>
 				</component>
 				<component name="chatter2" type="chatagent">
@@ -30,7 +30,7 @@
 						<argument name="nickname">"Franz"</argument>
 					</arguments>
 					<requiredservices>
-						<binding name="regservice" componentname="reg" scope="parent"/>
+						<binding name="regservice" componentname="reg" scope="parent" dynamic="true"/>
 					</requiredservices>
 				</component>
 			</components>

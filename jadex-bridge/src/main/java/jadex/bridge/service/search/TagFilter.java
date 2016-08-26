@@ -29,7 +29,7 @@ public class TagFilter<T> implements IAsyncFilter<T>
 	/**
 	 *  Create a new tag filter.
 	 */
-	public TagFilter(IExternalAccess component, String[] tags)
+	public TagFilter(IExternalAccess component, String... tags)
 	{
 		this(component, tags==null? Collections.EMPTY_LIST: Arrays.asList(tags));
 	}

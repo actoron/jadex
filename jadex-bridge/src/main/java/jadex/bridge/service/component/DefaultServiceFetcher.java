@@ -147,8 +147,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							}
 //							public void exceptionOccurred(Exception exception)
 //							{
-//								System.out.println("not found: "+binding.getComponentName()+" "+exception);
+//								System.out.println("not found: "+binding.getComponentName()+" "+exception+" "+ia.getComponentIdentifier());
 //								super.exceptionOccurred(exception);
+//								getExternalAccessByName(ia, info, binding);
 //							}
 						});
 					}
@@ -302,7 +303,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										}
 									});
 									
-//									SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//									SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //										.addResultListener(new DelegationResultListener(future)
 //									{
 //										public void customResultAvailable(Object result)
@@ -538,7 +539,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		
 		if(RequiredServiceInfo.SCOPE_PARENT.equals(binding.getScope()))
 		{
-			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 			{
 				public void customResultAvailable(final IComponentManagementService cms)
@@ -576,7 +577,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 		
-		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL, false)
+		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -659,7 +660,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL, false)
+		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -685,9 +686,15 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 */
 	protected IFuture<IExternalAccess> getExternalAccess(final IInternalAccess provider, final IComponentIdentifier cid)
 	{
+//		if(cid.getName().indexOf("reg@ChatE3")!=-1)
+//		{
+//			System.out.println("getExternalAccess: "+cid);
+//			Thread.dumpStack();
+//		}
+		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
-		IFuture<IComponentManagementService> fut = SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL, false);
+		IFuture<IComponentManagementService> fut = SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -706,12 +713,21 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
+		final Exception e = new Exception();
+		
 		createComponentIdentifier(provider, name, parent)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
 				final IComponentIdentifier cid = (IComponentIdentifier)result;
+				
+//				if(cid.getName().indexOf("reg@ChatE3")!=-1)
+//				{
+//					System.out.println("getExternalAccess: "+cid);
+//					e.printStackTrace();
+//				}
+				
 				getExternalAccess(provider, cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 			}
 		});
@@ -734,7 +750,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				public void customResultAvailable(final IExternalAccess exta)
 				{
-					SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL, false)
+					SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(IComponentManagementService cms)
@@ -826,7 +842,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			getExternalAccess(provider, provider.getComponentIdentifier().getParent())
 				.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 			
-//			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService cms)
@@ -999,7 +1015,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				}
 			});
 			
-//			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				.addResultListener(new DelegationResultListener(future)
 //			{
 //				public void customResultAvailable(Object result)
@@ -1119,7 +1135,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				}
 			});
 
-//			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				.addResultListener(new DelegationResultListener(future)
 //			{
 //				public void customResultAvailable(Object result)
@@ -1159,7 +1175,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			finished();
 			
 //			final Object res = result;
-//			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				.addResultListener(new DelegationResultListener(future)
 //			{
 //				public void customResultAvailable(Object result)

@@ -30,6 +30,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
@@ -1328,6 +1329,64 @@ public class SServiceProvider
 				ret.setResult(null);
 			}
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
+	public static <T> IFuture<T> waitForService(final IExternalAccess agent, final IResultCommand<IFuture<T>, Void> searchcmd, final int max, final int delay)
+	{
+		return agent.scheduleStep(new IComponentStep<T>()
+		{
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return waitForService(ia, searchcmd, 0, max, delay);
+			}
+		});
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
+	public static <T> IFuture<T> waitForService(final IInternalAccess agent, final IResultCommand<IFuture<T>, Void> searchcmd, final int max, final int delay)
+	{
+		return waitForService(agent, searchcmd, 0, max, delay);
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
+	protected static <T> IFuture<T> waitForService(final IInternalAccess agent, final IResultCommand<IFuture<T>, Void> searchcmd, final int cnt, final int max, final int delay)
+	{
+		final Future<T> ret = new Future<T>();
+		
+//		final IFuture<T> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+		final IFuture<T> fut = searchcmd.execute(null);
+		
+		fut.addResultListener(new DelegationResultListener<T>(ret)
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				if(cnt<max)
+				{
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							waitForService(agent, searchcmd, cnt+1, max, delay).addResultListener(new DelegationResultListener<T>(ret));
+							
+							return IFuture.DONE;
+						}
+					}, true);
+				}
+				else
+				{
+					ret.setException(exception);
+				}
+			}
+		});
+		
 		return ret;
 	}
 }

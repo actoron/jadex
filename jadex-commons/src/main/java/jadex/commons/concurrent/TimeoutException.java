@@ -22,4 +22,18 @@ public class TimeoutException	extends RuntimeException
 	{
 		super(message);
 	}
+	
+	/**
+	 *  Create a timeout exception.
+	 */
+	public TimeoutException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+	
+	@Override
+	public void printStackTrace()
+	{
+		super.printStackTrace();
+	}
 }

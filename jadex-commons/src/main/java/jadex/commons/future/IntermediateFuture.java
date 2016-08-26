@@ -251,7 +251,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     
     /**
      *  Add a result listener.
-     *  @param listsner The listener.
+     *  @param listener The listener.
      */
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
@@ -319,7 +319,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 */
-	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener)
+	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener)
 	{
 		addIntermediateResultListener(intermediateListener, null);
 	}
@@ -333,7 +333,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
 	 */
-	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener)
+	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener)
 	{
 		addIntermediateResultListener(intermediateListener, finishedListener, null);
 	}
@@ -345,10 +345,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 * @param finishedListener The finished listener, called when no more
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
-	 * @param exListener The listener that is called on exceptions. Passing
+	 * @param exceptionListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
 	 */
-	public void addIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener,
+	public void addIntermediateResultListener(final IFunctionalIntermediateResultListener<E> intermediateListener, final IFunctionalIntermediateFinishedListener<Void> finishedListener,
 		IFunctionalExceptionListener exceptionListener)
 	{
 		final IFunctionalExceptionListener innerExceptionListener = (exceptionListener == null) ? SResultListener.printExceptions(): exceptionListener;
@@ -356,13 +356,13 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		{
 			public void intermediateResultAvailable(E result)
 			{
-				intermediateListener.resultAvailable(result);
+				intermediateListener.intermediateResultAvailable(result);
 			}
 
 			public void finished()
 			{
 				if (finishedListener != null) {
-					finishedListener.resultAvailable(null);
+					finishedListener.finished();
 				}
 			}
 

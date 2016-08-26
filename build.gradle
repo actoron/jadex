@@ -293,6 +293,7 @@ subprojects
 		                }
 		                uniqueVersion=false
 		            }
+					configurePomMetadata(uploadArchives)
 		        }
 		        else if (!isCommercial(project) && repo_noncommercial) // to noncommercial. if repo is unset, do nothing!
 		        {
@@ -305,9 +306,9 @@ subprojects
 		                }
 		                uniqueVersion=false
 		            }
+					configurePomMetadata(uploadArchives)
 		        }
 	        }
-			configurePomMetadata(uploadArchives)
 	    }
     }
 }

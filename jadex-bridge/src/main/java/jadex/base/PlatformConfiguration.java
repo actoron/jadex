@@ -109,7 +109,7 @@ public class PlatformConfiguration
 	public static final String DHT_PROVIDE = "dhtprovide";
 	
 	/** Flag to enable or disable registry service (for distributed registry management). **/
-	public static final String REGISTRY = "registry";
+	public static final String REGISTRY_SYNC = "registrysync";
 	
 	/** The reserved platform parameters. Those are (usually) not handled by the root component. */
 	public static final Set<String> RESERVED;
@@ -161,6 +161,7 @@ public class PlatformConfiguration
 		RESERVED.add(DEFTIMEOUT);
 		RESERVED.add(DHT);
 		RESERVED.add(DHT_PROVIDE);
+//		RESERVED.add(REGISTRY_SYNC);
 	}
 
 	/** Command line arguments. **/
@@ -256,6 +257,7 @@ public class PlatformConfiguration
 		rootConfig.setContext(true);
 		rootConfig.setAddress(true);
 		rootConfig.setDhtProvide(false);
+//		rootConfig.setRegistrySync(false);
 		return config;
 	}
 
@@ -338,7 +340,8 @@ public class PlatformConfiguration
 	/**
 	 * Copy constructor.
 	 */
-	public PlatformConfiguration(PlatformConfiguration source) {
+	public PlatformConfiguration(PlatformConfiguration source) 
+	{
 		this.cmdargs = new HashMap<String, Object>(cmdargs);
 		this.rootconfig = new RootComponentConfiguration(source.rootconfig);
 		this.components = new ArrayList<String>(source.components);
@@ -380,7 +383,8 @@ public class PlatformConfiguration
 	 * @param key
 	 * @param value
 	 */
-	public void setValue(String key, Object value) {
+	public void setValue(String key, Object value) 
+	{
 		this.cmdargs.put(key, value);
 	}
 	
@@ -557,14 +561,16 @@ public class PlatformConfiguration
 	 * Set the monitoring level.
 	 * @param level
 	 */
-	public void setMonitoring(PublishEventLevel level) {
+	public void setMonitoring(PublishEventLevel level) 
+	{
 		setValue(MONITORING, level);
 	}
 	/**
 	 * Get the monitoring level.
 	 * @return
 	 */
-	public PublishEventLevel getMonitoring() {
+	public PublishEventLevel getMonitoring() 
+	{
 		return (PublishEventLevel)getValue(MONITORING);
 	}
 	
@@ -572,14 +578,16 @@ public class PlatformConfiguration
 	 * Set the persist flag.
 	 * @param value
 	 */
-	public void setPersist(boolean value) {
+	public void setPersist(boolean value) 
+	{
 		setValue(PERSIST, value);
 	}
 	/**
 	 * Get the persist flag.
 	 * @return boolean
 	 */
-	public boolean getPersist() {
+	public boolean getPersist() 
+	{
 		return (Boolean)getValue(PERSIST);
 	}
 	
@@ -587,14 +595,17 @@ public class PlatformConfiguration
 	 * Set the debug futures flag.
 	 * @param value
 	 */
-	public void setDebugFutures(boolean value) {
+	public void setDebugFutures(boolean value) 
+	{
 		setValue(DEBUGFUTURES, value);
 	}
+	
 	/**
 	 * Get the debug futures flag.
 	 * @return
 	 */
-	public boolean getDebugFutures() {
+	public boolean getDebugFutures() 
+	{
 		return Boolean.TRUE.equals(getValue(DEBUGFUTURES));
 	}
 	
@@ -602,14 +613,16 @@ public class PlatformConfiguration
 	 * Set the debug services flag.
 	 * @param value
 	 */
-	public void setDebugServices(boolean value) {
+	public void setDebugServices(boolean value) 
+	{
 		setValue(DEBUGSERVICES, value);
 	}
 	/**
 	 * Get the debug services flag.
 	 * @return
 	 */
-	public boolean getDebugServices() {
+	public boolean getDebugServices() 
+	{
 		return Boolean.TRUE.equals(getValue(DEBUGSERVICES));
 	}
 	
@@ -617,14 +630,17 @@ public class PlatformConfiguration
 	 * Set the debug steps flag.
 	 * @param value
 	 */
-	public void setDebugSteps(boolean value) {
+	public void setDebugSteps(boolean value) 
+	{
 		setValue(DEBUGSTEPS, value);
 	}
+	
 	/**
 	 * Get the debug steps flag.
 	 * @return
 	 */
-	public boolean getDebugSteps() {
+	public boolean getDebugSteps() 
+	{
 		return Boolean.TRUE.equals(getValue(DEBUGSTEPS));
 	}
 	
@@ -632,22 +648,34 @@ public class PlatformConfiguration
 	 * Set the no stack compaction flag.
 	 * @param value
 	 */
-	public void setNoStackCompaction(boolean value) {
+	public void setNoStackCompaction(boolean value) 
+	{
 		setValue(NOSTACKCOMPACTION, value);
 	}
+	
 	/**
 	 * Get the no stack compaction flag.
-	 * @return
+	 * @return True if no stack compaction.
 	 */
-	public boolean getNoStackCompaction() {
+	public boolean getNoStackCompaction() 
+	{
 		return Boolean.TRUE.equals(getValue(NOSTACKCOMPACTION));
+	}
+	
+	/**
+	 *  Get the boolean value of a flag.
+	 */
+	public boolean getBooleanValue(String key) 
+	{
+		return Boolean.TRUE.equals(getValue(key));
 	}
 	
 	/**
 	 * Set the OPENGL flag.
 	 * @param value
 	 */
-	public void setOpenGl(boolean value) {
+	public void setOpenGl(boolean value) 
+	{
 		setValue(OPENGL, value);
 		Class<?> p2d = SReflect.classForName0("jadex.extension.envsupport.observer.perspective.Perspective2D", Starter.class.getClassLoader());
 		if(p2d!=null)
@@ -666,7 +694,8 @@ public class PlatformConfiguration
 	 * Get the OPENGL flag.
 	 * @return
 	 */
-	public boolean getOpenGl() {
+	public boolean getOpenGl() 
+	{
 		return Boolean.TRUE.equals(getValue(OPENGL));
 	}
 	
@@ -674,14 +703,17 @@ public class PlatformConfiguration
 	 * Set the DHT flag.
 	 * @param value
 	 */
-	public void setDht(boolean value) {
+	public void setDht(boolean value) 
+	{
 		setValue(DHT, value);
 	}
+	
 	/**
 	 * Get the DHT flag.
 	 * @return
 	 */
-	public boolean getDht() {
+	public boolean getDht() 
+	{
 		return Boolean.TRUE.equals(getValue(DHT));
 	}
 	
@@ -689,7 +721,8 @@ public class PlatformConfiguration
 	 * Set the provide DHT flag.
 	 * @param value
 	 */
-	public void setDhtProvide(boolean value) {
+	public void setDhtProvide(boolean value) 
+	{
 //		setValue(DHT_PROVIDE, value);
 		rootconfig.setDhtProvide(value);
 	}
@@ -697,9 +730,29 @@ public class PlatformConfiguration
 	 * Get the provide DHT flag.
 	 * @return
 	 */
-	public boolean getDhtProvide() {
+	public boolean getDhtProvide() 
+	{
 //		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
 		return rootconfig.getDhtProvide();
+	}
+	
+	/**
+	 * Set the provide DHT flag.
+	 * @param value
+	 */
+	public void setRegistrySync(boolean value) 
+	{
+//		setValue(DHT_PROVIDE, value);
+		rootconfig.setRegistrySync(value);
+	}
+	/**
+	 * Get the provide DHT flag.
+	 * @return
+	 */
+	public boolean getRegistrySync() 
+	{
+//		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
+		return rootconfig.getRegistrySync();
 	}
 	
 	/**
@@ -1027,7 +1080,7 @@ public class PlatformConfiguration
 		{
 			config.setOpenGl(false);
 		}
-		else if (MONITORING.equals(key)) 
+		else if(MONITORING.equals(key)) 
 		{
 			Object tmpmoni = config.getValue(PlatformConfiguration.MONITORING);
 			PublishEventLevel moni = PublishEventLevel.OFF;
@@ -1057,8 +1110,10 @@ public class PlatformConfiguration
 
 		Set<Map.Entry<String, Object>> entries = cmdargs.entrySet();
 
-		for (Map.Entry<String, Object> arg: entries) {
-			if (!(arg.getValue() == null || arg.getValue().equals(false))) {
+		for (Map.Entry<String, Object> arg: entries) 
+		{
+			if (!(arg.getValue() == null || arg.getValue().equals(false))) 
+			{
 				sb.append(arg.getKey());
 				sb.append(": ");
 				sb.append(arg.getValue());
@@ -1068,8 +1123,10 @@ public class PlatformConfiguration
 
 		entries = rootconfig.getArgs().entrySet();
 
-		for (Map.Entry<String, Object> arg: entries) {
-			if (!(arg.getValue() == null || arg.getValue().equals(false))) {
+		for (Map.Entry<String, Object> arg: entries) 
+		{
+			if (!(arg.getValue() == null || arg.getValue().equals(false))) 
+			{
 				sb.append(arg.getKey());
 				sb.append(": ");
 				sb.append(arg.getValue());
@@ -1086,8 +1143,10 @@ public class PlatformConfiguration
 	 * Will overwrite all values that are set in the other config.
 	 * @param other
 	 */
-	public void enhanceWith(PlatformConfiguration other) {
-		for (Map.Entry<String, Object> entry : other.cmdargs.entrySet()) {
+	public void enhanceWith(PlatformConfiguration other) 
+	{
+		for (Map.Entry<String, Object> entry : other.cmdargs.entrySet()) 
+		{
 			this.setValue(entry.getKey(), entry.getValue());
 		}
 		rootconfig.enhanceWith(other.rootconfig);
@@ -1096,7 +1155,8 @@ public class PlatformConfiguration
 	/**
 	 * Checks this configuration for consistency errors.
 	 */
-	protected void checkConsistency() {
+	protected void checkConsistency() 
+	{
 		rootconfig.checkConsistency();
 	}
 }

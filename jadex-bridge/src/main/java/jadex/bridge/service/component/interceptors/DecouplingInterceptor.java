@@ -382,8 +382,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 			final Object	res	= sic.getResult();
 			
-			if(sic.getMethod().getName().equals("getSecureInputStream"))
-				System.out.println("decoupling: "+sic.getArguments());
+//			if(sic.getMethod().getName().equals("getSecureInputStream"))
+//				System.out.println("decoupling: "+sic.getArguments());
 			
 			if(res instanceof IFuture)
 			{
@@ -397,7 +397,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return marshal.isLocalReference(object);
 					}
 				};
-				
+				final long timeout = sic.getNextServiceCall().getTimeout();
+
 				FutureFunctionality func = new FutureFunctionality(ia.getLogger())
 				{
 					TimeoutException ex = null;
@@ -423,6 +424,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						if(ex!=null)
 							throw ex;
 						return doCopy(copy, deffilter, result);
+					}
+					
+					@Override
+					public boolean isUndone(boolean undone)
+					{
+						// Always undone when (potentially) timeout exception.
+						return undone || timeout>=0;
 					}
 					
 //					public synchronized Exception setException(Exception exception)
@@ -469,7 +477,6 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				// Add timeout handling for local case.
 				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())
 				{
-					long timeout = sic.getNextServiceCall().getTimeout();
 					boolean	realtime = sic.getNextServiceCall().getRealtime();
 					
 					if(timeout>=0)

@@ -59,7 +59,7 @@ public class ComponentNotFoundException	extends RuntimeException
 	
 	public void printStackTrace()
 	{
-//		Thread.dumpStack();
+		Thread.dumpStack();
 		super.printStackTrace();
 	}
 }
