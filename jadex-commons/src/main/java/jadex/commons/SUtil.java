@@ -31,6 +31,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.text.DateFormat;
@@ -71,7 +72,7 @@ import java.util.zip.ZipOutputStream;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
@@ -110,6 +111,12 @@ public class SUtil
 
 	/** A Null value. */
 	public static final String		NULL					= "NULL";
+	
+	/** ASCII charset. */
+	public static final Charset ASCII = Charset.forName("US-ASCII");
+	
+	/** UTF-8 charset. */
+	public static final Charset UTF8 = Charset.forName("UTF-8");
 	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
@@ -2330,6 +2337,22 @@ public class SUtil
 	}
 	
 	/**
+	 *  Converts an exception to RuntimeException, returns original
+	 *  if already a RuntimeException.
+	 *  
+	 *  @param e The throwable to be returned as RuntimeException
+	 *  @return RuntimeException.
+	 */
+	public static final RuntimeException convertToRuntimeException(Throwable e)
+	{
+		if (e instanceof RuntimeException)
+		{
+			return ((RuntimeException) e);
+		}
+		return new RuntimeException(e);
+	}
+	
+	/**
 	 *  Re-throws a throwable as a RuntimeException.
 	 *  If the throwable is already a RuntimeException,
 	 *  the exception itself is thrown, otherwise it is
@@ -2339,11 +2362,7 @@ public class SUtil
 	 */
 	public static final void rethrowAsUnchecked(Throwable e)
 	{
-		if (e instanceof RuntimeException)
-		{
-			throw ((RuntimeException) e);
-		}
-		throw new RuntimeException(e);
+		throw convertToRuntimeException(e);
 	}
 
 	/**
@@ -2435,9 +2454,17 @@ public class SUtil
 	public static short bytesToShort(byte[] buffer)
 	{
 		assert buffer.length == 2;
-
-		short value = (short)((0xFF & buffer[0]) << 8);
-		value |= (0xFF & buffer[1]);
+		
+		return bytesToShort(buffer, 0);
+	}
+	
+	/**
+	 *  Convert bytes to a short.
+	 */
+	public static short bytesToShort(byte[] buffer, int offset)
+	{
+		short value = (short)((0xFF & buffer[offset]) << 8);
+		value |= (0xFF & buffer[offset + 1]);
 
 		return value;
 	}
@@ -4702,17 +4729,17 @@ public class SUtil
 		LRU<String, Tuple2<Long, String>>	ret	= null;
 		
 		File	cache	= new File(JADEXDIR, "hash.cache");
-		if(cache.exists())
-		{
-			try
-			{
-				FileInputStream	fis	= new FileInputStream(cache);
-				ret	= (LRU<String, Tuple2<Long, String>>)SBinarySerializer2.readObjectFromStream(fis, null, null, null, null);
-			}
-			catch(Exception e)
-			{
-			}
-		}
+//		if(cache.exists())
+//		{
+//			try
+//			{
+//				FileInputStream	fis	= new FileInputStream(cache);
+//				ret	= (LRU<String, Tuple2<Long, String>>)SBinarySerializer.readObjectFromStream(fis, null, null, null, null, null);
+//			}
+//			catch(Exception e)
+//			{
+//			}
+//		}
 
 		return ret!=null ? ret : new LRU<String, Tuple2<Long,String>>(1000);
 	}
@@ -4727,7 +4754,7 @@ public class SUtil
 		{
 			cache.getParentFile().mkdirs();
 			FileOutputStream	fos	= new FileOutputStream(cache);
-			SBinarySerializer2.writeObjectToStream(fos, HASHES, null);
+			SBinarySerializer.writeObjectToStream(fos, HASHES, null);
 		}
 		catch(Exception e)
 		{
