@@ -8,7 +8,6 @@ import java.util.List;
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SUtil;
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
@@ -58,12 +57,23 @@ public class SingleTest extends	ComponentTestSuite
 //				"jadex.micro.testcases.threading.Initiator"
 //		);
 		
-		return new TestCase(SingleTest.class.getName()+"(dummy)")
+		TestSuite	ts	= new TestSuite();
+		ts.addTest(new Test()
 		{
 			@Override
-			public void runBare() throws Throwable
+			public int countTestCases()
 			{
+				return 1;
 			}
-		};
+			
+			@Override
+			public void run(TestResult result)
+			{
+				result.startTest(this);
+				result.endTest(this);
+			}
+		});
+		
+		return ts;
 	}
 }
