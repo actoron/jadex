@@ -79,15 +79,15 @@ public class MicroTest	extends ComponentTestSuite
 		super("jadex-applications-micro", EXCLUDES);
 	}
 	
-	/**
-	 *  Constructor called by JadexInstrumentor for Android tests.
-	 */
-	public MicroTest(File cproot)	throws Exception
-	{
-		// Use micro application classes directory as classpath root,
-		super(new File[]{new File("jadex.micro.testcases")}, new File[]{cproot}, EXCLUDES);
-	}
-	
+//	/**
+//	 *  Constructor called by JadexInstrumentor for Android tests.
+//	 */
+//	public MicroTest(File cproot)	throws Exception
+//	{
+//		// Use micro application classes directory as classpath root,
+//		super(new File[]{new File("jadex.micro.testcases")}, new File[]{cproot}, EXCLUDES);
+//	}
+
 	/**
 	 *  Static method called by eclipse JUnit runner.
 	 */
