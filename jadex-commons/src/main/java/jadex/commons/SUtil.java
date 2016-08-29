@@ -2362,6 +2362,8 @@ public class SUtil
 	 */
 	public static final void rethrowAsUnchecked(Throwable e)
 	{
+		if (e instanceof Error)
+			throw ((Error)e);
 		throw convertToRuntimeException(e);
 	}
 
