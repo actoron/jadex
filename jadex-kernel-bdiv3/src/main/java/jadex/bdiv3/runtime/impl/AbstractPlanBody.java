@@ -313,7 +313,10 @@ public abstract class AbstractPlanBody implements IPlanBody
 			{
 				partfuture	= null;
 			}
-			ia.getLogger().warning("Plan '"+getBody()+"' threw exception: "+SUtil.getExceptionStacktrace(e));
+			if(!(e instanceof ThreadDeath))
+			{
+				ia.getLogger().warning("Plan '"+getBody()+"' threw exception: "+SUtil.getExceptionStacktrace(e));
+			}
 			ret.setExceptionIfUndone(e instanceof Exception ? (Exception)e : new ErrorException((Error)e));
 		}
 		finally
