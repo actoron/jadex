@@ -27,10 +27,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
@@ -47,7 +45,6 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -72,7 +69,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -99,11 +95,6 @@ import jadex.kernelbase.IBootstrapFactory;
 @Service
 public class ComponentManagementService implements IComponentManagementService
 {
-	//-------- constants --------
-	
-	/** Property name for timeout after which component long running cleanup is forcefully aborted. */
-	public static final String	PROPERTY_TERMINATION_TIMEOUT	= "termination_timeout";
-	
 	//-------- attributes --------
 	
 	/** Flag to avoid double initialization. */
@@ -1417,40 +1408,7 @@ public class ComponentManagementService implements IComponentManagementService
 								cc	= new CleanupCommand(cid);
 								ccs.put(cid, cc);
 								logger.info("Terminating component: "+cid.getName());
-								fut = comp.shutdown();
-								
-								// Add timeout in case cleanup takes too long.
-								Number	timeout	= (Number)comp.getInternalAccess().getModel().getProperty(PROPERTY_TERMINATION_TIMEOUT, comp.getInternalAccess().getClassLoader());
-								if(timeout==null || timeout.longValue()!=Timeout.NONE)
-								{
-									fut.addResultListener(new TimeoutResultListener<Void>(
-										timeout!=null ? timeout.longValue() : Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()),
-										agent.getExternalAccess(), true, "Timeout during component cleanup.", new IResultListener<Void>()
-									{
-										@Override
-										public void resultAvailable(Void result)
-										{
-										}
-										
-										@Override
-										public void exceptionOccurred(Exception exception)
-										{
-											if(exception instanceof TimeoutException)
-											{
-												CleanupCommand	cc = (CleanupCommand)ccs.get(cid);
-												if(cc!=null)
-												{
-													IComponentFeature	arf	= (IComponentFeature)comp.getInternalAccess().getComponentFeature0(IArgumentsResultsFeature.class);
-													if(arf!=null)
-													{
-														arf.shutdown(); // hack??? otherwise no notification of termination to component listeners.
-													}
-													cc.exceptionOccurred(exception);
-												}
-											}
-										}
-									}));
-								}
+								fut = comp.shutdown();								
 							}
 							else
 							{
