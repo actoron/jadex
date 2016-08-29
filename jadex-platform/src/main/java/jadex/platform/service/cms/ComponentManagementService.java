@@ -395,7 +395,7 @@ public class ComponentManagementService implements IComponentManagementService
 
 //		System.out.println("create: "+name+" "+modelname+" "+agent.getComponentIdentifier());
 		
-//		if(name!=null && name.toLowerCase().indexOf("broken")!=-1)
+//		if(name!=null && name.toLowerCase().indexOf("provider")!=-1)
 //			System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();

@@ -70,7 +70,7 @@ public class ClientAgent
 		IIntermediateFuture<ICountdownService> searchServices = access.getComponentFeature(IRequiredServicesFeature.class).searchServices(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 		searchServices.addIntermediateResultListener(cdService -> {
 			subscription.addIntermediateResult(cdService);
-		}, finished -> {
+		}, () -> {
 			System.out.println("Search finished. Re-scheduling search.");
 
 			access.getExternalAccess().scheduleStep(new IComponentStep<Void>()

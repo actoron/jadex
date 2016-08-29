@@ -33,6 +33,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -348,7 +349,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 			mqs = new HashSet<ServiceQueryInfo<T>>();
 			queries.put(query.getType(), (Set)mqs);
 		}
-		mqs.add(new ServiceQueryInfo(query, ret));
+		mqs.add(new ServiceQueryInfo<T>(query, ret));
 		
 		// deliver currently available services
 		Iterator<T> sers = (Iterator<T>)getServices(query.getType());
@@ -359,32 +360,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 			
 //			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
 			searchfunc.checkAsyncFilters(query.getFilter(), ssers.iterator())
-				.addIntermediateResultListener(new IIntermediateResultListener<T>()
-			{
-				public void intermediateResultAvailable(T result)
-				{
-					ret.addIntermediateResultIfUndone(result);
-				}
-	
-				public void finished()
-				{
-					// the query is not finished after the status quo is delivered
-				}
-	
-				public void resultAvailable(Collection<T> results)
-				{
-					for(T result: results)
-					{
-						intermediateResultAvailable(result);
-					}
-					// the query is not finished after the status quo is delivered
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					// the query is not finished after the status quo is delivered
-				}
-			});
+				.addIntermediateResultListener(new UnlimitedIntermediateDelegationResultListener<T>(ret));
 		}
 	
 		return ret;
@@ -398,10 +374,18 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	{
 		if(queries!=null)
 		{
-			Set<ServiceQuery<T>> mqs = (Set)queries.get(query.getType());
+			Set<ServiceQueryInfo<T>> mqs = (Set)queries.get(query.getType());
 			if(mqs!=null)
 			{
-				mqs.remove(query);
+				for(ServiceQueryInfo<T> sqi: mqs)
+				{
+					if(sqi.getQuery().equals(query))
+					{
+						sqi.getFuture().terminate();
+						mqs.remove(sqi);
+						break;
+					}
+				}
 				if(mqs.size()==0)
 					queries.remove(query.getType());
 			}
@@ -418,11 +402,12 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		{
 			for(Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>> entry: queries.entrySet())
 			{
-				for(ServiceQueryInfo<?> query: entry.getValue())
+				for(ServiceQueryInfo<?> query: entry.getValue().toArray(new ServiceQueryInfo<?>[entry.getValue().size()]))
 				{
 					if(owner.equals(query.getQuery().getOwner()))
 					{
-						entry.getValue().remove(query);
+						removeQuery(query.getQuery());
+//						entry.getValue().remove(query);
 					}
 				}
 			}
@@ -812,6 +797,44 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public static IServiceRegistry getRegistry(IInternalAccess ia)
 	{
 		return getRegistry(ia.getComponentIdentifier());
+	}
+	
+	/**
+	 *  Listener that forwards only results and ignores finished / exception.
+	 */
+	public static class UnlimitedIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
+	{
+		/** The delegate future. */
+		protected IntermediateFuture<E> delegate;
+		
+		public UnlimitedIntermediateDelegationResultListener(IntermediateFuture<E> delegate)
+		{
+			this.delegate = delegate;
+		}
+		
+		public void intermediateResultAvailable(E result)
+		{
+			delegate.addIntermediateResultIfUndone(result);
+		}
+
+		public void finished()
+		{
+			// the query is not finished after the status quo is delivered
+		}
+
+		public void resultAvailable(Collection<E> results)
+		{
+			for(E result: results)
+			{
+				intermediateResultAvailable(result);
+			}
+			// the query is not finished after the status quo is delivered
+		}
+		
+		public void exceptionOccurred(Exception exception)
+		{
+			// the query is not finished after the status quo is delivered
+		}
 	}
 	
 }

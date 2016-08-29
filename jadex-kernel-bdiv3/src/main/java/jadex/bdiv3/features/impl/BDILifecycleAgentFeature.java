@@ -358,7 +358,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		}
 		
 		/**
-		 * 
+		 *  Dispatch the configuration plans.
 		 */
 		protected IFuture<Void> dispatchConfigPlans(final IInternalAccess component, List<MConfigParameterElement> cplans, IBDIModel bdimodel)
 		{
@@ -409,7 +409,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		}
 		
 		/**
-		 * 
+		 *  Dispatch the configuration goals.
 		 */
 		protected IFuture<Void> dispatchConfigGoals(final IInternalAccess component, List<MConfigParameterElement> cgoals, IBDIModel bdimodel)
 		{
@@ -584,7 +584,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		}
 		
 		/**
-		 * 
+		 *  Dispatch the configuration events.
 		 */
 		protected IFuture<Void> dispatchConfigEvents(IInternalAccess component, List<MConfigParameterElement> cevents, IBDIModel bdimodel)
 		{

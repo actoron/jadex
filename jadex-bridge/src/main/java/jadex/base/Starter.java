@@ -28,6 +28,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.DistributedServiceRegistry;
+import jadex.bridge.service.search.GlobalQueryServiceRegistry;
 import jadex.bridge.service.search.MultiServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -393,7 +394,8 @@ public class Starter
 					}
 					else
 					{
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(false, new ServiceRegistry()));
+						// ServiceRegistry cannot handle backport for polling in case of global queries
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(false, new GlobalQueryServiceRegistry(5000))); 
 					}
 					
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());

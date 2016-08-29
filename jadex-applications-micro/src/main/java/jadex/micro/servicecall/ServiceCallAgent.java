@@ -93,7 +93,7 @@ public class ServiceCallAgent	extends TestAgent
 	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		CreationInfo	ci	= ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
+		CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
 			? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 		
 		String an = agentname.toLowerCase();

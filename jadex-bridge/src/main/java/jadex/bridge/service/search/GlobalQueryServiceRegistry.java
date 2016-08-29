@@ -1,44 +1,70 @@
 package jadex.bridge.service.search;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.DuplicateRemovalIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
- * 
+ *  Registry that allows for adding global queries with local registry.
+ *  Uses remote searches to emulate the persistent query.
  */
 public class GlobalQueryServiceRegistry extends ServiceRegistry
 {
-	/** The agent. */
-	protected IInternalAccess agent;
+//	/** The agent. */
+//	protected IInternalAccess agent;
+	
+	/** The timer. */
+	protected Timer timer;
 	
 	/** The global query delay. */
 	protected long delay;
-	
+
+	/**
+	 *  Create a new GlobalQueryServiceRegistry.
+	 */
+	public GlobalQueryServiceRegistry(long delay)
+	{
+		this.delay = delay;
+	}
+
 	/**
 	 *  Add a service query to the registry.
 	 *  @param query ServiceQuery.
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
 	{
-		final ISubscriptionIntermediateFuture<T> ret = super.addQuery(query);
-	
+		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+		
+		super.addQuery(query).addIntermediateResultListener(new IntermediateDelegationResultListener<T>(ret));
+			
 		// Emulate persistent query by searching periodically
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+			final DuplicateRemovalIntermediateResultListener<T> lis = new DuplicateRemovalIntermediateResultListener<T>(new UnlimitedIntermediateDelegationResultListener<T>(ret))
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				public byte[] objectToByteArray(Object service)
 				{
-					
+					return super.objectToByteArray(((IService)service).getServiceIdentifier());
+				}
+			};
+			
+			waitForDelay(delay, new Runnable()
+			{
+				public void run()
+				{
+					Class<T> mytype = query.getType()==null? null: (Class<T>)query.getType().getType0();
+					searchRemoteServices(query.getOwner(), mytype, query.getFilter()).addIntermediateResultListener(lis);
 					
 					if(!ret.isDone())
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
-					
-					return IFuture.DONE;
+						waitForDelay(delay, this);
+					else
+						System.out.println("stopping global query polling: "+query);
 				}
 			});
 		}
@@ -47,13 +73,18 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 	}
 	
 	/**
-	 *  Remove a service query from the registry.
-	 *  @param query ServiceQuery.
+	 *  Wait for delay and execute runnable.
 	 */
-	public <T> void removeQuery(ServiceQuery<T> query)
+	protected void waitForDelay(long delay, final Runnable run)
 	{
-		super.removeQuery(query);
-		
-		
+		if(timer==null)
+			timer = new Timer(true);
+		timer.schedule(new TimerTask()
+		{
+			public void run()
+			{
+				run.run();
+			}
+		}, delay);
 	}
 }

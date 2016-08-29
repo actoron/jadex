@@ -192,21 +192,19 @@ public class ProxyAgent	implements IProxyAgentService
 	 */
 	public IFuture<State> getConnectionState()
 	{
-		final Future<State> ret = new Future<State>();
+		final Future<State> ret = new Future<State>()
+		{
+			public void setException(Exception exception)
+			{
+				super.setException(exception);
+			}
+			
+			public boolean setExceptionIfUndone(Exception exception)
+			{
+				return super.setExceptionIfUndone(exception);
+			}
+		};
 
-//		ret.addResultListener(new IResultListener<IProxyAgentService.State>()
-//		{
-//			public void resultAvailable(State result)
-//			{
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				if(exception instanceof TimeoutException)
-//					System.out.println("setting to: "+exception);
-//			}
-//		});
-		
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
 		{
