@@ -3,13 +3,13 @@ package jadex.launch.test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SUtil;
 import junit.framework.Test;
 import junit.framework.TestResult;
-import junit.framework.TestSuite;
 
 
 /**
@@ -17,16 +17,13 @@ import junit.framework.TestSuite;
  */
 public class SingleTest extends	ComponentTestSuite
 {
-	private static final String NOEXCLUDE = "__noexclude__";
-
-
 	/**
 	 *  Constructor called by Maven JUnit runner.
 	 * @param tests
 	 */
 	public SingleTest(String... tests) throws Exception
 	{
-		super(findOutputDirs("jadex-applications-bdi", "jadex-applications-micro"), tests, new String[0]);
+		super(findOutputDirs("jadex-applications-bdi", "jadex-applications-bdiv3", "jadex-applications-micro", "jadex-applications-bpmn"), tests, new String[0]);
 	}
 
 	private static File[] findOutputDirs(String... projects) {
@@ -37,43 +34,45 @@ public class SingleTest extends	ComponentTestSuite
 		return list.toArray(new File[list.size()]);
 	}
 
-	/**
-	 *  Static method called by eclipse JUnit runner.
-	 */
-	public static Test suite() throws Exception
-	{
-//		jadex.base.test.impl.ComponentTest.jadex.micro.servicecall.ServiceCall
-//		jadex.base.test.impl.ComponentTest.jadex.micro.testcases.threading.Initiator
-//		jadex.base.test.impl.ComponentTest.jadex.micro.testcases.servicequeries.User
-//		jadex.bdi.testcases.semiautomatic.Wakeup
 
-//		return new SingleTest("jadex.bdiv3.examples.puzzle.BenchmarkBDI");
-//		return new SingleTest("jadex.bdi.testcases.semiautomatic.Wakeup",
+	/**
+	 * Implement this to adjust this SingleTest to your needs.
+	 * @return
+     */
+	public static SingleTest getSingleTest() throws Exception {
+		SingleTest test = null;
+//		test = new SingleTest("jadex.bdiv3.examples.puzzle.BenchmarkBDI");
+//		test = new SingleTest("jadex.bdi.testcases.semiautomatic.Wakeup",
 //				"jadex.micro.testcases.servicequeries.User",
 //				"jadex.micro.testcases.threading.Initiator",
 //				"jadex.micro.servicecall.ServiceCall");
 
-//		return new SingleTest(
+//		test = new SingleTest(
 //				"jadex.micro.testcases.threading.Initiator"
 //		);
-		
-		TestSuite	ts	= new TestSuite();
-		ts.addTest(new Test()
-		{
-			@Override
-			public int countTestCases()
-			{
-				return 1;
-			}
-			
-			@Override
-			public void run(TestResult result)
-			{
-				result.startTest(this);
-				result.endTest(this);
-			}
-		});
-		
-		return ts;
+
+		return test;
+	}
+
+	/**
+	 * Static method called by eclipse (and gradle?) JUnit runner.
+	 */
+	public static Test suite() throws Exception {
+		SingleTest test = getSingleTest();
+		if (test == null) {
+			test = new SingleTest() {
+				@Override
+				public void run(TestResult result) {
+					result.startTest(this);
+					result.endTest(this);
+				}
+
+				@Override
+				protected List<String> getAllFiles(File root) {
+					return Collections.emptyList();
+				}
+			};
+		}
+		return test;
 	}
 }

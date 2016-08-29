@@ -400,7 +400,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		}
 	}
 
-	private List<String> getAllFiles(File root)
+	protected List<String> getAllFiles(File root)
 	{
 		List<String> result = new ArrayList<String>();
 		
