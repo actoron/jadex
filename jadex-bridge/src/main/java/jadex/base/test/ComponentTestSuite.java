@@ -64,7 +64,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		"-logging", "true",
 //		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 //		"-logging_level", "java.util.logging.Level.WARNING",
-		"-debugfutures", "true",
+//		"-debugfutures", "true",
 //		"-nostackcompaction", "true",
 		"-gui", "false",
 		"-awareness", "false",
