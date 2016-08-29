@@ -56,7 +56,7 @@ public @interface Binding
 	public String proxytype() default PROXYTYPE_DECOUPLED;
 	
 	/**
-	 *  The argument name.
+	 *  The binding name.
 	 */
 	public String name() default "";
 	

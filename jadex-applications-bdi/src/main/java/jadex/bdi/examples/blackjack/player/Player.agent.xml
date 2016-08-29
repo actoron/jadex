@@ -45,7 +45,7 @@
 		</belief>
 
 		<!-- The human player interface. -->
-		<belief name="gui" class="HumanPlayerInterface">
+		<belief name="gui" class="Object"><!-- "jadex.commons.gui.GuiCreator"> belief must be replaced with original gui -->
 		 	<fact>
 				$beliefbase.myself.getStrategyName().equals(AbstractStrategy.HUMAN_PLAYER)
  				? new jadex.commons.gui.GuiCreator(HumanPlayerInterface.class, new Class[]{Player.class, GameState.class, jadex.bridge.IExternalAccess.class}, 
@@ -271,8 +271,8 @@
 	     the scenes
 	 -->
 	<properties>
-		<!-- <property name="logging.level">Level.INFO</property> -->
-		<property name="debugging">false</property>
+		<property name="logging.level">Level.INFO</property>
+		<property name="debugging">true</property>
 	</properties>
 
 	<configurations>

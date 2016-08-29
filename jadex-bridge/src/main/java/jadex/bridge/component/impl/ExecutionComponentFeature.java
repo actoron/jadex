@@ -744,12 +744,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 	}
 	
+	
 	/**
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.
 	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
 	 */
-	public void	block(final Object monitor, long timeout, boolean realtime)
+ 	public void	block(final Object monitor, long timeout, boolean realtime)
 	{
 		if(!isComponentThread())
 		{
@@ -785,10 +786,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			// Flag to check if unblocked before timeout
 			final boolean[]	unblocked	= new boolean[1];
-			final Exception ex	= Future.DEBUG ? new DebugException() : null;
 			
 			if(timeout!=Timeout.NONE)
 			{
+				final Exception ex	= Future.DEBUG ? new DebugException("Timeout: "+timeout) : null;
 				waitForDelay(timeout, realtime)
 					.addResultListener(new IResultListener<Void>()
 				{
