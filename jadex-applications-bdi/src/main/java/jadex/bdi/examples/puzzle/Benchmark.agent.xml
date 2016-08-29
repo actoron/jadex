@@ -20,6 +20,7 @@
 
 	<properties>
 		<property name="test.timeout">100000</property>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 	</properties>
 
 	<beliefs>
@@ -102,10 +103,6 @@
 			</trigger>
 		</plan>
 	</plans>
-
-	<properties>
-		<property name="logging.level">java.util.logging.Level.SEVERE</property>
-	</properties>
 
 	<configurations>
 		<configuration name="none">
