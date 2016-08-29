@@ -18,6 +18,10 @@
 		<import>jadex.bdiv3x.runtime.*</import>
 	</imports>
 
+	<properties>
+		<property name="test.timeout">100000</property>
+	</properties>
+
 	<beliefs>
 		<!-- The game board offers possibilities to make moves,
 			take back moves and keep track of the game history. -->
