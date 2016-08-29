@@ -159,23 +159,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("shutdown end: "+getComponent().getComponentIdentifier());
-				
-				// Should not wake up all blocked threads at the same time?!
-				// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
-//				if(blocked!=null && blocked.size()>0)
-//					System.out.println("blocked: "+blocked.size());
-				while(blocked!=null && !blocked.isEmpty())
-				{
-					// Unblock throwing thread death as component already has been terminated.
-					unblock(blocked.keySet().iterator().next(), new StepAborted());
-//					unblock(blocked.keySet().iterator().next(), null);
-				}
-//				
-				if(parenta!=null)
-				{
-					parenta.removeSubcomponent(ExecutionComponentFeature.this);
-				}
+				doCleanup(new StepAborted());
 				
 				super.customResultAvailable(result);
 			}
@@ -186,6 +170,40 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		return ret;
 //		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Kill is only invoked, when shutdown of some (e.g. other) feature does not return due to timeout.
+	 *  The feature should do any kind of possible cleanup, but no asynchronous operations.
+	 */
+	@Override
+	public void kill()
+	{
+		doCleanup(new ThreadDeath());
+	}
+	
+	/**
+	 *  Shared cleanup code for shutdown and kill.
+	 */
+	protected void doCleanup(Error e)
+	{
+//		System.out.println("shutdown end: "+getComponent().getComponentIdentifier());
+		
+		// Should not wake up all blocked threads at the same time?!
+		// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
+//		if(blocked!=null && blocked.size()>0)
+//			System.out.println("blocked: "+blocked.size());
+		while(blocked!=null && !blocked.isEmpty())
+		{
+			// Unblock throwing thread death as component already has been terminated.
+			unblock(blocked.keySet().iterator().next(), e);
+//			unblock(blocked.keySet().iterator().next(), null);
+		}
+//		
+		if(parenta!=null)
+		{
+			parenta.removeSubcomponent(ExecutionComponentFeature.this);
+		}
 	}
 	
 	//-------- IComponentFeature interface --------
@@ -884,6 +902,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	protected void	beforeBlock()
 	{
+//		System.out.println("beforeBlock: "+(ComponentSuspendable)ISuspendable.SUSPENDABLE.get()+", "+((ComponentSuspendable)ISuspendable.SUSPENDABLE.get()).getFuture());
 	}
 	
 	/**
@@ -891,6 +910,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	protected void	afterBlock()
 	{
+//		System.out.println("afterBlock: "+(ComponentSuspendable)ISuspendable.SUSPENDABLE.get()+", "+((ComponentSuspendable)ISuspendable.SUSPENDABLE.get()).getFuture());
 	}
 	
 	//-------- IExecutable interface --------
@@ -926,12 +946,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				return false;	// Component already failed: tell executor not to call again. (can happen during failed init)
 //			}
 	
-			// Remember execution thread.
-			this.componentthread	= Thread.currentThread();
-			IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
-			IInternalExecutionFeature.LOCAL.set(getComponent());
-			ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
-			Thread.currentThread().setContextClassLoader(component.getClassLoader());
+			ClassLoader cl = setExecutionState();
 			
 			// Process listener notifications from old component thread.
 //			boolean notifexecuted	= false;
@@ -1173,6 +1188,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
 					ex	= new ComponentTerminatedException(component.getComponentIdentifier());
 				}
+				else if(ex instanceof ThreadDeath)
+				{
+					// Hard cleanup during kill.
+					resetExecutionState(cl);
+					throw (ThreadDeath)ex;
+				}
 				step.getFuture().setExceptionIfUndone(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
 
 				// If no listener, print failed step to console for developer.
@@ -1388,17 +1409,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			stepfut.setResult(null);
 		}
-				
-		// Reset execution state.
-		IComponentIdentifier.LOCAL.set(null);
-		IInternalExecutionFeature.LOCAL.set(null);
-		// Must reset service call settings when thread retreats from components
-		CallAccess.resetCurrentInvocation();
-		CallAccess.resetNextInvocation();
-		Thread.currentThread().setContextClassLoader(cl);
-		this.componentthread = null;
-		executing	= false;
-		ISuspendable.SUSPENDABLE.set(null);
+
+		resetExecutionState(cl);
 
 		// Execute the subcomponents
 		boolean ret = hasstep || cycle;
@@ -1443,7 +1455,40 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		return ret;
 	}
+
+	/**
+	 *  Set flags when entering thread.
+	 *  @return	The previous context class loader.
+	 */
+	protected ClassLoader setExecutionState()
+	{
+		// Remember execution thread.
+		this.componentthread	= Thread.currentThread();
+		IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
+		IInternalExecutionFeature.LOCAL.set(getComponent());
+		ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(component.getClassLoader());
+		return cl;
+	}
 	
+	/**
+	 *  Reset flags when exiting thread.
+	 *  @param cl	The previous context class loader.
+	 */
+	protected void resetExecutionState(ClassLoader cl)
+	{
+		// Reset execution state.
+		IComponentIdentifier.LOCAL.set(null);
+		IInternalExecutionFeature.LOCAL.set(null);
+		// Must reset service call settings when thread retreats from components
+		CallAccess.resetCurrentInvocation();
+		CallAccess.resetNextInvocation();
+		Thread.currentThread().setContextClassLoader(cl);
+		this.componentthread = null;
+		executing	= false;
+		ISuspendable.SUSPENDABLE.set(null);
+	}
+
 	/**
 	 *  Components with autonomous behavior may override this method
 	 *  to implement a recurring execution cycle.

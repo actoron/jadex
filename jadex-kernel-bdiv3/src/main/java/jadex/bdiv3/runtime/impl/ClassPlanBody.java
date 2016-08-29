@@ -293,7 +293,7 @@ public class ClassPlanBody extends AbstractPlanBody
 			{
 				throw new PlanFailureException("Could not create plan "+getRPlan(), t);
 			}
-			if(t instanceof Error)
+			else if(t instanceof Error)
 			{
 				throw (Error)t;
 			}
@@ -307,7 +307,7 @@ public class ClassPlanBody extends AbstractPlanBody
 			}
 		}
 	}
-	
+
 	/**
 	 *  Invoke the plan passed method.
 	 */
@@ -321,10 +321,21 @@ public class ClassPlanBody extends AbstractPlanBody
 				passedmethod.setAccessible(true);
 				ret = passedmethod.invoke(plan, params);			
 			}
-			catch(Exception e)
+			catch(Throwable t)
 			{
-				Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-				throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+				t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
+				if(t instanceof Error)
+				{
+					throw (Error)t;
+				}
+				else if(t instanceof RuntimeException)
+				{
+					throw (RuntimeException)t;
+				}
+				else
+				{
+					throw new RuntimeException(t);
+				}
 			}
 		}
 		return ret;
@@ -343,10 +354,21 @@ public class ClassPlanBody extends AbstractPlanBody
 				failedmethod.setAccessible(true);
 				ret = failedmethod.invoke(plan, params);			
 			}
-			catch(Exception e)
+			catch(Throwable t)
 			{
-				Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-				throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+				t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
+				if(t instanceof Error)
+				{
+					throw (Error)t;
+				}
+				else if(t instanceof RuntimeException)
+				{
+					throw (RuntimeException)t;
+				}
+				else
+				{
+					throw new RuntimeException(t);
+				}
 			}
 		}
 		return ret;
@@ -365,10 +387,21 @@ public class ClassPlanBody extends AbstractPlanBody
 				abortedmethod.setAccessible(true);
 				ret = abortedmethod.invoke(plan, params);			
 			}
-			catch(Exception e)
+			catch(Throwable t)
 			{
-				Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-				throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+				t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
+				if(t instanceof Error)
+				{
+					throw (Error)t;
+				}
+				else if(t instanceof RuntimeException)
+				{
+					throw (RuntimeException)t;
+				}
+				else
+				{
+					throw new RuntimeException(t);
+				}
 			}
 		}
 		return ret;

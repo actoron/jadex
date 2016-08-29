@@ -854,6 +854,12 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							}
 						}
 					
+						@Override
+						public String toString()
+						{
+							return "updateBelief("+mbel.getName()+"@"+component.getComponentIdentifier()+")";
+						}
+						
 //						public void exceptionOccurred(Exception exception)
 //						{
 //							component.getLogger().severe("Cannot update belief "+mbel.getName()+": "+exception);
@@ -2013,9 +2019,24 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			// Abort running goals.
 			Collection<RGoal> goals = bdif.getCapability().getGoals();
 //			System.out.println(component.getComponentIdentifier()+" dropping body goals: "+goals);
-			for(RGoal goal: goals)
+			for(final RGoal goal: goals)
 			{
-				bodyend.addFuture(goal.drop());
+				IFuture<Void>	fut	= goal.drop();
+				bodyend.addFuture(fut);
+//				fut.addResultListener(new IResultListener<Void>()
+//				{
+//					@Override
+//					public void resultAvailable(Void result)
+//					{
+//						System.out.println(component.getComponentIdentifier()+" dropped body goal: "+goal);
+//					}
+//					
+//					@Override
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println(component.getComponentIdentifier()+" dropped body goal: "+goal+", "+exception);
+//					}
+//				});
 			}
 			
 			// Abort running plans.
@@ -2023,7 +2044,22 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //			System.out.println(component.getComponentIdentifier()+" dropping body plans: "+plans);
 			for(final RPlan plan: plans)
 			{
-				bodyend.addFuture(plan.abort());
+				IFuture<Void>	fut	= plan.abort();
+				bodyend.addFuture(fut);
+//				fut.addResultListener(new IResultListener<Void>()
+//				{
+//					@Override
+//					public void resultAvailable(Void result)
+//					{
+//						System.out.println(component.getComponentIdentifier()+" dropped body plan: "+plan);
+//					}
+//					
+//					@Override
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println(component.getComponentIdentifier()+" dropped body plan: "+plan+", "+exception);
+//					}
+//				});
 			}
 			
 			bodyend.waitFor().addResultListener(new DelegationResultListener<Void>(ret)

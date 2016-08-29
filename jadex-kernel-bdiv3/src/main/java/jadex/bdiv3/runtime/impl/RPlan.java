@@ -1699,21 +1699,21 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		if(isFinishing() && PlanLifecycleState.BODY.equals(getLifecycleState()))
 		{
 			BodyAborted	ba	= new BodyAborted();
-			try
-			{
-				if(agent.toString().indexOf("Leaker")!=-1)
-				{
-					System.out.println("before throw BodyAborted: "+Runtime.getRuntime().freeMemory());
-				}
+//			try
+//			{
+//				if(agent.toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("before throw BodyAborted: "+Runtime.getRuntime().freeMemory());
+//				}
 				throw ba;
-			}
-			finally
-			{
-				if(agent.toString().indexOf("Leaker")!=-1)
-				{
-					System.out.println("after throw BodyAborted: "+Runtime.getRuntime().freeMemory());
-				}
-			}
+//			}
+//			finally
+//			{
+//				if(agent.toString().indexOf("Leaker")!=-1)
+//				{
+//					System.out.println("after throw BodyAborted: "+Runtime.getRuntime().freeMemory());
+//				}
+//			}
 		}
 	}
 

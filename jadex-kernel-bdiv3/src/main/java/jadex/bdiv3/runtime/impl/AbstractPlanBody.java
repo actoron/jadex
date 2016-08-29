@@ -1,13 +1,12 @@
 package jadex.bdiv3.runtime.impl;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.SUtil;
+import jadex.commons.future.ErrorException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -304,21 +303,27 @@ public abstract class AbstractPlanBody implements IPlanBody
 			}
 			ret.setExceptionIfUndone(e);
 		}
-		catch(Exception e)
+		catch(BodyAborted ba)
+		{
+			assert ret.isDone() && ret.getException() instanceof PlanAbortedException;
+		}
+		catch(Throwable e)
 		{
 			if(partfuture==ret)
 			{
 				partfuture	= null;
 			}
-//			e.printStackTrace();
-			StringWriter	sw	= new StringWriter();
-			e.printStackTrace(new PrintWriter(sw));
-			ia.getLogger().warning("Plan '"+getBody()+"' threw exception: "+sw);
-			ret.setExceptionIfUndone(e);
-		}
-		catch(BodyAborted ba)
-		{
-			assert ret.isDone() && ret.getException() instanceof PlanAbortedException;
+			
+			if(e instanceof ThreadDeath)
+			{
+				// Thread death is used to exit user code -> ignore.
+				ret.setResult(null);
+			}
+			else
+			{
+				ia.getLogger().warning("Plan '"+getBody()+"' threw exception: "+SUtil.getExceptionStacktrace(e));
+				ret.setExceptionIfUndone(e instanceof Exception ? (Exception)e : new ErrorException((Error)e));
+			}
 		}
 		finally
 		{

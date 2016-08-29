@@ -24,7 +24,13 @@ public interface IComponentFeature
 	 *  Shutdown the feature.
 	 */
 	public IFuture<Void>	shutdown();
-	
+
+	/**
+	 *  Kill is only invoked, when shutdown does not return due to timeout.
+	 *  The feature should do any kind of possible cleanup, but no asynchronous operations.
+	 */
+	public void kill();
+
 	/**
 	 *  The feature can inject parameters for expression evaluation
 	 *  by providing an optional value fetcher. The fetch order is the reverse
@@ -38,4 +44,5 @@ public interface IComponentFeature
 	 *  init order, i.e., later features can override values from earlier features.
 	 */
 	public IParameterGuesser	getParameterGuesser();
+
 }

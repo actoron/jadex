@@ -1,16 +1,16 @@
 package jadex.launch.test;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 
 
 /**
@@ -57,18 +57,13 @@ public class SingleTest extends	ComponentTestSuite
 //		return new SingleTest(
 //				"jadex.micro.testcases.threading.Initiator"
 //		);
-		return new Test() {
+		
+		return new TestCase(SingleTest.class.getName()+"(dummy)")
+		{
 			@Override
-			public int countTestCases() {
-				return 0;
-			}
-
-			@Override
-			public void run(TestResult result) {
-
+			public void runBare() throws Throwable
+			{
 			}
 		};
 	}
-
-
 }
