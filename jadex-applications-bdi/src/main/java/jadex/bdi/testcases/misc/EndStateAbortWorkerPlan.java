@@ -22,13 +22,13 @@ public class EndStateAbortWorkerPlan extends Plan
 	{
 		try
 		{
-			System.out.println("before wait");
+//			System.out.println("before wait");
 			waitForEver();
-			System.out.println("after wait");
+//			System.out.println("after wait");
 		}
 		finally
 		{
-			System.out.println("finally wait");
+//			System.out.println("finally wait");
 			EndStateAbortPlan.TERMINATED.add(getComponentIdentifier());
 		}
 	}

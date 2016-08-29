@@ -9,6 +9,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -103,7 +104,15 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 						runningexes.put(task, this);
 					}
 					
-					super.run();
+					try
+					{
+						super.run();
+					}
+					catch(Throwable e)
+					{
+						// Shouldn't happen. If it does, it will break simulation time.
+						System.err.println("Uncatched exception in executable "+executable+": "+SUtil.getExceptionStacktrace(e));
+					}
 					
 					Future<Void> idf = null;
 					

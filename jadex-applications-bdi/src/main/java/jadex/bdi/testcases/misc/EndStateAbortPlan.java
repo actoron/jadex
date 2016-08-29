@@ -38,21 +38,37 @@ public class EndStateAbortPlan extends Plan
 		TestReport	report	= new TestReport("termination", "Test if the worker agent terminates with timeout.");
 		try
 		{
-			System.out.println("destroying worker: "+worker);
+//			System.out.println("destroying worker: "+worker);
 			cms.destroyComponent(worker).get();
-			System.out.println("destroyed worker: "+worker);
+//			System.out.println("destroyed worker: "+worker);
 			report.setFailed("Worker agent terminated without timeout.");
 		}
 		catch(TimeoutException e)
 		{
+//			report.setFailed("Worker agent terminated with timeout.");
 			report.setSucceeded(true);
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
 		// Wait to allow worker to exit plan passed()
-		System.out.println("waiting for worker exit: "+worker);
-		waitFor(100);
-		System.out.println("waited for worker exit: "+worker);
+//		try
+//		{
+//			System.out.println("waiting for worker exit: "+worker);
+			waitFor(100);
+//			System.out.println("waited for worker exit: "+worker);
+//		}
+//		catch(RuntimeException e)
+//		{
+//			System.out.println("failed waiting for worker exit: "+worker+", "+e);
+//			e.printStackTrace();
+//			throw e;
+//		}
+//		catch(Error e)
+//		{
+//			System.out.println("failed waiting for worker exit: "+worker+", "+e);
+//			e.printStackTrace();
+//			throw e;
+//		}
 		
 		// Check if worker agent thread has been correctly removed.
 		report	= new TestReport("cleanup", "Test if the worker agent thread has been terminated");

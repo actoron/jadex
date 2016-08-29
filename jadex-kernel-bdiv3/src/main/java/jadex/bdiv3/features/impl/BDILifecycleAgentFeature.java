@@ -854,6 +854,12 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							}
 						}
 					
+						@Override
+						public String toString()
+						{
+							return "updateBelief("+mbel.getName()+"@"+component.getComponentIdentifier()+")";
+						}
+						
 //						public void exceptionOccurred(Exception exception)
 //						{
 //							component.getLogger().severe("Cannot update belief "+mbel.getName()+": "+exception);

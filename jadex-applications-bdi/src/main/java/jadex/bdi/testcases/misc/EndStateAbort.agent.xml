@@ -22,7 +22,7 @@
 	</imports>
 	
 	<capabilities>
-		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test" />
 	</capabilities>
 	
 	<beliefs>
@@ -42,6 +42,10 @@
 
 	<configurations>
 		<configuration name="default">
+			<capabilities>
+				<!-- No test timeout, because simulation test timeout conflicts with real-time termination timeout.  -->
+				<initialcapability ref="testcap" configuration="off"/>
+			</capabilities>
 			<beliefs>
 				<initialbelief cref="testcap.testcase_cnt">
 					<fact>2</fact>
