@@ -243,7 +243,7 @@ public class JsonTraverser extends Traverser
 	 */
 	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes)
 	{
-		return objectToString(val, classloader, writeclass, null, null);
+		return objectToString(val, classloader, writeclass, excludes, null);
 	}
 	
 	/**
@@ -254,10 +254,10 @@ public class JsonTraverser extends Traverser
 		String ret = null;
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
-		
+
 		try
 		{
-			traverser.traverse(val, null, processors, classloader, wr);
+			traverser.traverse(val, null, processors == null ? writeprocs : processors, classloader, wr);
 			ret = wr.getString();
 			return ret;
 		}
@@ -343,7 +343,7 @@ public class JsonTraverser extends Traverser
 	 */
 	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz)
 	{
-		return objectFromString(val, classloader, null, clazz, null);
+		return objectFromString(val, classloader, rep, clazz, null);
 	}
 	
 	/**
