@@ -21,4 +21,11 @@ public @interface AgentService
 	 *  Fail at startup if no service is found?
 	 */
 	public boolean required() default true;
+	
+	/**
+	 *  If is lazy the service search will happen on first call.
+	 *  This can go wrong if first call is a synchronous message.
+	 *  If lazy is false, the agent might block when search takes time.
+	 */
+	public boolean lazy() default true;
 }

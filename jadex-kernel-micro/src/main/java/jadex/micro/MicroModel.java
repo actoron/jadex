@@ -171,11 +171,11 @@ public class MicroModel extends CacheableKernelModel
 	 *  @param name The name.
 	 *  @param field The field. 
 	 */
-	public void addServiceInjection(String name, FieldInfo field)
+	public void addServiceInjection(String name, FieldInfo field, boolean lazy)
 	{
 		if(serviceinjections==null)
 			serviceinjections = new MultiCollection<String, Object>();
-		serviceinjections.add(name, field);
+		serviceinjections.add(name, new Tuple2<FieldInfo, Boolean>(field, lazy));
 	}
 	
 	/**

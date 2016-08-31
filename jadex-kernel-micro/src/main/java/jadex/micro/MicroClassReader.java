@@ -819,7 +819,8 @@ public class MicroClassReader
 				{
 					AgentService ser = getAnnotation(fields[i], AgentService.class, cl);
 					String name = ser.name().length()>0? ser.name(): fields[i].getName();
-					micromodel.addServiceInjection(name, new FieldInfo(fields[i]));
+					
+					micromodel.addServiceInjection(name, new FieldInfo(fields[i]), ser.lazy());
 				}
 				else if(isAnnotationPresent(fields[i], AgentFeature.class, cl))
 				{

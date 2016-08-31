@@ -27,6 +27,7 @@ import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -110,9 +111,10 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										
 					for(int j=0; j<infos.length; j++)
 					{
-						if(infos[j] instanceof FieldInfo)
+						if(infos[j] instanceof Tuple2)
 						{
-							final Field	f	= ((FieldInfo)infos[j]).getField(component.getClassLoader());
+							Tuple2<FieldInfo, Boolean> tup = (Tuple2<FieldInfo, Boolean>)infos[j];
+							final Field	f	= tup.getFirstEntity().getField(component.getClassLoader());
 							
 							// todo: what about multi case?
 							// why not add values to a collection as they come?!
@@ -153,7 +155,8 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										lis2.exceptionOccurred(e);
 									}	
 								}
-								else if(!(info.isMultiple() || ft.isArray() || SReflect.isSupertype(Collection.class, ft)))
+								else if(!(info.isMultiple() || ft.isArray() || SReflect.isSupertype(Collection.class, ft) 
+									|| !tup.getSecondEntity().booleanValue()))
 								{
 									RequiredServiceInfo rsi = component.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfo(sername);
 									Class<?> clz = rsi.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
@@ -180,6 +183,9 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								}
 								else
 								{
+									// Wait for result and block init until available
+									// Dangerous because agent blocks
+									
 									sfut.addResultListener(new IResultListener<Object>()
 									{
 										public void resultAvailable(Object result)
