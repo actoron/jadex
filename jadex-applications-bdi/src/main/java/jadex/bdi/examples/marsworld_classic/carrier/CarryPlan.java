@@ -6,6 +6,7 @@ import jadex.bdi.examples.marsworld_classic.Location;
 import jadex.bdi.examples.marsworld_classic.RequestCarry;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
@@ -30,19 +31,25 @@ public class CarryPlan extends Plan
 			(String)getBeliefbase().getBelief("move.my_type").getFact(), (Location)getBeliefbase()
 			.getBelief("move.my_home").getFact(), ((Double)getBeliefbase().getBelief("move.my_vision")
 			.getFact()).doubleValue()));
-		
-		while(true)
+		try
 		{
-			// Wait for a request to carry.
-			IMessageEvent req = waitForMessageEvent("request_carry");
-
-			Target ot = ((RequestCarry)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
-			Target target = env.getTarget(ot.getId());
-			Location dest = target.getLocation();
-
-			IGoal go_carry = createGoal("carry_ore");
-			go_carry.getParameter("destination").setValue(dest);
-			dispatchSubgoalAndWait(go_carry);
+			while(true)
+			{
+				// Wait for a request to carry.
+				IMessageEvent req = waitForMessageEvent("request_carry");
+	
+				Target ot = ((RequestCarry)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
+				Target target = env.getTarget(ot.getId());
+				Location dest = target.getLocation();
+	
+				IGoal go_carry = createGoal("carry_ore");
+				go_carry.getParameter("destination").setValue(dest);
+				dispatchSubgoalAndWait(go_carry);
+			}
+		}
+		catch(GoalDroppedException e) 
+		{
+			// nop
 		}
 	}
 }

@@ -46,11 +46,28 @@ public class FieldInfo
 		this.classname = classname;
 	}
 
+//	/**
+//	 *  Get the field for the injection.
+//	 *  @param cl The classloader.
+//	 *  @param fieldname The fieldname in case an expression string is 
+//	 *  saved in field name. If null the internal name is used.
+//	 */
+//	public Field getField(ClassLoader cl)
+//	{
+//		return getField(cl, name);
+//	}
+	
 	/**
-	 * 
+	 *  Get the field for the injection.
+	 *  @param cl The classloader.
+	 *  @param fieldname The fieldname in case an expression string is 
+	 *  saved in field name. If null the internal name is used.
 	 */
-	public Field getField(ClassLoader cl)
+	public Field getField(ClassLoader cl)//, String fieldname)
 	{
+//		if(fieldname!=null && fieldname.startsWith("%{"))
+//			throw new IllegalArgumentException("getField called with unresolved field name: "+fieldname);
+		
 		Field	ret	= null;
 		try
 		{
@@ -59,6 +76,7 @@ public class FieldInfo
 //				System.out.println("field: "+cl+" "+classname+" "+name);
 				Class<?> cla = SReflect.findClass(classname, null, cl);
 				ret = cla.getDeclaredField(name);
+//				ret = cla.getDeclaredField(fieldname!=null? fieldname: name);
 				if(cl.getClass().getName().indexOf("DummyClassLoader")==-1)	// Hack!!! don't cache dummy field.
 				{
 					field	= ret;

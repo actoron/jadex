@@ -11,6 +11,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
@@ -25,7 +26,7 @@ import jadex.micro.annotation.Configurations;
 //	@BDIConfiguration(name="rainy", initialbeliefs=@NameValue(name="raining", value="true"))
 //})
 @Configurations({@Configuration(name="sunny"), @Configuration(name="rainy")})
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 public class UniversityBDI
 {
 	// Annotation to inform FindBugs that the uninitialized field is not a bug.
@@ -35,14 +36,17 @@ public class UniversityBDI
 	@Agent
 	protected IInternalAccess agent;
 	
+	/** Belief if it is currently raining. Set through an agent argument. */
 	@Belief
 	protected boolean raining = agent.getConfiguration().equals("rainy");
 	
+	/** The top-level goal to come to the university. */
 	@Goal
 	protected class ComeToUniGoal
 	{
 	}
 	
+	/** The take x goal is for using a train or tram. */
 	@Goal
 	protected static class TakeXGoal
 	{
@@ -61,6 +65,10 @@ public class UniversityBDI
 		}
 	}
 	
+	/** 
+	 *  The agent body is executed on startup.
+	 *  It creates and dispatches a come to university goal.
+	 */
 	@AgentBody
 	public void body()
 	{
@@ -77,7 +85,10 @@ public class UniversityBDI
 		}
 	}
 	
-	// Walk only if its not raining and not as first choice
+	/**
+	 *  The walk plan for the come to university goal.
+	 *  Walk only if its not raining and not as first choice
+	 */
 	@Plan(trigger=@Trigger(goals=ComeToUniGoal.class), priority=-1)
 	protected class WalkPlan
 	{
@@ -94,7 +105,10 @@ public class UniversityBDI
 		}
 	}
 	
-	// Only take train when its raining (too expensive)
+	/**
+	 *  The train plan for the come to university goal.
+	 *  Only take train when its raining (too expensive)
+	 */
 	@Plan(trigger=@Trigger(goals=ComeToUniGoal.class))
 	protected class TrainPlan
 	{
@@ -113,7 +127,10 @@ public class UniversityBDI
 		}
 	}
 
-	// Tram is always a good idea
+	/**
+	 *  The tram plan for come to university goal.
+	 *  Tram is always a good idea.
+	 */
 	@Plan(trigger=@Trigger(goals=ComeToUniGoal.class))
 	protected void tramPlan(IPlan plan)
 	{
@@ -122,6 +139,9 @@ public class UniversityBDI
 		System.out.println("Took tram to Uni.");
 	}
 	
+	/**
+	 *  Take X plan for the take X goal.
+	 */
 	@Plan(trigger=@Trigger(goals=TakeXGoal.class))
 	protected void takeX(TakeXGoal goal)
 	{

@@ -67,6 +67,7 @@ public interface IChatGuiService
 	 *  Post a status change.
 	 *  @param status The new status or null for no change.
 	 *  @param image The new avatar image or null for no change.
+	 *  @param receivers The receivers.
 	 */
 	public IIntermediateFuture<IChatService> status(String status, byte[] image, IComponentIdentifier[] receivers);
 

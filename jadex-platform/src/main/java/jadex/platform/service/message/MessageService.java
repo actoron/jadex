@@ -297,8 +297,6 @@ public class MessageService extends BasicService implements IMessageService
 				TransportAddressService.getTransportComponentIdentifier(
 						receiver, taddresses),
 				conid, true, och);
-		// System.out.println("created ocon: "+component+",
-		// "+System.currentTimeMillis()+", "+och.getConnectionId());
 		return con;
 	}
 
@@ -330,8 +328,6 @@ public class MessageService extends BasicService implements IMessageService
 				TransportAddressService.getTransportComponentIdentifier(
 						receiver, taddresses),
 				conid, true, ich);
-		// System.out.println("created icon: "+component+",
-		// "+System.currentTimeMillis()+", "+ich.getConnectionId());
 		return con;
 	}
 
@@ -375,29 +371,6 @@ public class MessageService extends BasicService implements IMessageService
 			final byte[] codecids)// , final Map<String, Object> nonfunc)
 	{
 		final Future<Void> ret = new Future<Void>();
-		// IResultListener<DiscoveryInfo> disclistener = new
-		// IResultListener<DiscoveryInfo>()
-		// {
-		// public void resultAvailable(final DiscoveryInfo discoveryinfo)
-		// {
-		//
-		//
-		// }
-		//
-		// public void exceptionOccurred(Exception exception)
-		// {
-		// resultAvailable(null);
-		// }
-		// };
-		//
-		// if (ams != null)
-		// {
-		// ams.getPlatformInfo(realrec.getRoot()).addResultListener(disclistener);
-		// }
-		// else
-		// {
-		// disclistener.resultAvailable(null);
-		// }
 
 		final IComponentIdentifier loc = IComponentIdentifier.LOCAL.get();
 
@@ -407,28 +380,11 @@ public class MessageService extends BasicService implements IMessageService
 		final ITransportComponentIdentifier sender = TransportAddressService
 				.getTransportComponentIdentifier(osender, taddresses);
 
-		// final IComponentIdentifier sender =
-		// internalUpdateComponentIdentifier(osender);
-		// addrservice.getTransportComponentIdentifier(osender).addResultListener(new
-		// ExceptionDelegationResultListener<ITransportComponentIdentifier,
-		// Void>(ret)
-		// {
-		// public void customResultAvailable(final ITransportComponentIdentifier
-		// sender)
-		// {
-		// System.out.println("on0: "+IComponentIdentifier.CALLER.get()+"
-		// "+IComponentIdentifier.LOCAL.get());
-
 		libservice.getClassLoader(rid).addResultListener(
 				new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
 					public void customResultAvailable(final ClassLoader cl)
 					{
-//						System.err.println("send msg3: " + sender + " "
-//								+ msg.get(SFipa.CONTENT));
-						// System.out.println("on1:
-						// "+IComponentIdentifier.CALLER.get()+"
-						// "+IComponentIdentifier.LOCAL.get());
 
 						if (loc != null
 								&& IComponentIdentifier.LOCAL.get() != null
@@ -449,48 +405,6 @@ public class MessageService extends BasicService implements IMessageService
 									"Sender must not be null: " + msg));
 							return;
 						}
-
-						// Replace own component identifiers.
-						// Now done just before send
-						// String[] params = type.getParameterNames();
-						// for(int i=0; i<params.length; i++)
-						// {
-						// Object o = msg.get(params[i]);
-						// if(o instanceof IComponentIdentifier)
-						// {
-						// msg.put(params[i],
-						// updateComponentIdentifier((IComponentIdentifier)o));
-						// }
-						// }
-						// String[] paramsets = type.getParameterSetNames();
-						// for(int i=0; i<paramsets.length; i++)
-						// {
-						// Object o = msg.get(paramsets[i]);
-						//
-						// if(SReflect.isIterable(o))
-						// {
-						// List rep = new ArrayList();
-						// for(Iterator it=SReflect.getIterator(o);
-						// it.hasNext(); )
-						// {
-						// Object item = it.next();
-						// if(item instanceof IComponentIdentifier)
-						// {
-						// rep.add(updateComponentIdentifier((IComponentIdentifier)item));
-						// }
-						// else
-						// {
-						// rep.add(item);
-						// }
-						// }
-						// msg.put(paramsets[i], rep);
-						// }
-						// else if(o instanceof IComponentIdentifier)
-						// {
-						// msg.put(paramsets[i],
-						// updateComponentIdentifier((IComponentIdentifier)o));
-						// }
-						// }
 
 						// Automatically add optional meta information.
 						String senid = type.getSenderIdentifier();
@@ -532,34 +446,7 @@ public class MessageService extends BasicService implements IMessageService
 									"Receivers must not be empty: " + msg));
 							return;
 						}
-						// cms.getExternalAccess(sender).addResultListener(new
-						// ExceptionDelegationResultListener<IExternalAccess,
-						// Void>(ret)
-						// {
-						// public void customResultAvailable(IExternalAccess
-						// exta)
-						// {
-						//// System.out.println("msgservice calling
-						// doSendMessage()");
-						//// System.out.println("on2:
-						// "+IComponentIdentifier.CALLER.get()+"
-						// "+IComponentIdentifier.LOCAL.get());
-						//
-						//// System.err.println("send msg4: "+sender+"
-						// "+msg.get(SFipa.CONTENT));
-						// IEncodingContext enccont = new EncodingContext(new
-						// Date());
-						// doSendMessage(msg, type, exta, cl, ret, codecids,
-						// enccont);
-						// }
-						// public void exceptionOccurred(Exception exception)
-						// {
-						// super.exceptionOccurred(exception);
-						// }
-						// });
-
-						// System.out.println("Getting final release date: " +
-						// msg);
+						
 						cms.getExternalAccess(sender).addResultListener(
 								new ExceptionDelegationResultListener<IExternalAccess, Void>(
 										ret)
@@ -733,11 +620,6 @@ public class MessageService extends BasicService implements IMessageService
 				? remotemarshalingconfig.getSerializer(serializerid)
 				: remotemarshalingconfig.getDefaultSerializer();
 		final IBinaryCodec[] codecs = getBinaryCodecs(cids);
-		// ICodec[] codecs = new ICodec[cids.length];
-		// for(int i=0; i<codecs.length; i++)
-		// {
-		// codecs[i] = codecfactory.getCodec(cids[i]);
-		// }
 
 		final CounterResultListener<Void> crl = new CounterResultListener<Void>(
 				managers.size(), false,
@@ -759,23 +641,6 @@ public class MessageService extends BasicService implements IMessageService
 					rid, getTransports(), preprocessors, serializer, codecs,
 					cl);
 			tm.addMessage(task).addResultListener(crl);
-
-			// addrservice.getTransportComponentIdentifiers(recs).addResultListener(new
-			// IResultListener<ITransportComponentIdentifier[]>()
-			// {
-			// public void resultAvailable(ITransportComponentIdentifier[]
-			// trecs)
-			// {
-			// MapSendTask task = new MapSendTask(msgcopy, type, trecs,
-			// getTransports(), codecs, cl, enccontext);
-			// tm.addMessage(task).addResultListener(crl);
-			//// task.getSendManager().addMessage(task).addResultListener(crl);
-			// }
-			//
-			// public void exceptionOccurred(Exception exception)
-			// {
-			// }
-			// });
 		}
 
 		// sendmsg.addMessage(msgcopy, type, receivers, ret);
@@ -793,50 +658,6 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		return codecs;
 	}
-
-	// /**
-	// * Get a matching content codec.
-	// * @param props The properties.
-	// * @return The content codec.
-	// */
-	// public Map<Class<?>, Object[]> getContentCodecInfo(IModelInfo model,
-	// ClassLoader cl)
-	// {
-	// Map<Class<?>, Object[]> ret = null;
-	// Map props = model.getProperties();
-	// if(props!=null)
-	// {
-	// for(Iterator it=props.keySet().iterator(); ret==null && it.hasNext();)
-	// {
-	// String name = (String)it.next();
-	// if(name.startsWith("contentcodecinfo"))
-	// {
-	// ret = (Map<Class<?>, Object[]>)model.getProperty(name, cl);
-	// }
-	// }
-	// }
-	//
-	// return ret;
-	// }
-
-	// /**
-	// * Get the clock service.
-	// * @return The clock service.
-	// */
-	// public IClockService getClockService()
-	// {
-	// return clockservice;
-	// }
-
-	// /**
-	// * Deliver a message to some components.
-	// */
-	// public void deliverMessage(Map<String, Object> msg, String type,
-	// IComponentIdentifier[] receivers)
-	// {
-	// delivermsg.addMessage(new MessageEnvelope(msg, Arrays.asList(receivers),
-	// type));
-	// }
 
 	/**
 	 * Get the serializers.
@@ -934,49 +755,6 @@ public class MessageService extends BasicService implements IMessageService
 				return false;
 			}
 		});
-		
-//		if (task instanceof MapSendTask)
-//		{
-//			final MapSendTask mst = (MapSendTask) task;
-//			Map<String, Object> msg = (Map<String, Object>) SCloner.clone(mst.getRawMessage());
-//			deliverToAllReceivers(mst.getReceivers(), cms, null, msg, logger, mst.getMessageType());
-//		}
-//		else if (task instanceof StreamSendTask)
-//		{
-//			StreamSendTask sst = (StreamSendTask) task;
-//			sst.setRawMessage(SCloner.clone(sst.getRawMessage()));
-//			deliverDecodedStreamMessage(sst.getStreamMessageType(), sst.getStreamId(), sst.getSequenceNumber()!=null?sst.getSequenceNumber():-1, sst.getRawMessage());
-//		}
-//		exeservice.execute(new IExecutable()
-//		{
-//			@SuppressWarnings("unchecked")
-//			public boolean execute()
-//			{
-//				System.out.println("EXEC deliver locally");
-//				try
-//				{
-//				if (task instanceof MapSendTask)
-//				{
-//					final MapSendTask mst = (MapSendTask) task;
-//					Map<String, Object> msg = (Map<String, Object>) SCloner.clone(mst.getRawMessage());
-////					Map<String, Object> msg = (Map<String, Object>) Traverser.traverseObject(mst.getRawMessage(), null, null, null, true, null);
-////					final MessageEnvelope me = mst.getEnvelope();
-//					deliverToAllReceivers(mst.getReceivers(), cms, null, msg, logger, mst.getMessageType());
-//				}
-//				else if (task instanceof StreamSendTask)
-//				{
-//					StreamSendTask sst = (StreamSendTask) task;
-//					sst.setRawMessage(SCloner.clone(sst.getRawMessage()));
-////					sst.setRawMessage(Traverser.traverseObject(sst.getRawMessage(), null, null, null, true, null));
-//					deliverDecodedStreamMessage(sst.getStreamMessageType(), sst.getStreamId(), sst.getSequenceNumber()!=null?sst.getSequenceNumber():-1, sst.getRawMessage());
-//				}
-//				}catch(Exception e)
-//				{
-//					e.printStackTrace();
-//				}
-//				return false;
-//			}
-//		});
 	}
 
 	/**
@@ -1123,82 +901,6 @@ public class MessageService extends BasicService implements IMessageService
 	}
 
 	// -------- IPlatformService interface --------
-
-	// /**
-	// * Start the service.
-	// */
-	// public IFuture startService()
-	// {
-	// final Future ret = new Future();
-	//
-	// ITransport[] tps = (ITransport[])transports.toArray(new
-	// ITransport[transports.size()]);
-	// if(transports.size()==0)
-	// {
-	// ret.setException(new RuntimeException("MessageService has no working
-	// transport for sending messages."));
-	// }
-	// else
-	// {
-	// CounterResultListener lis = new CounterResultListener(tps.length, new
-	// IResultListener()
-	// {
-	// public void resultAvailable(Object result)
-	// {
-	// SServiceProvider.getService(provider, IClockService.class,
-	// RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new
-	// IResultListener()
-	// {
-	// public void resultAvailable(Object result)
-	// {
-	// clockservice = (IClockService)result;
-	// SServiceProvider.getServiceUpwards(provider,
-	// IComponentManagementService.class).addResultListener(new
-	// IResultListener()
-	// {
-	// public void resultAvailable(Object result)
-	// {
-	// cms = (IComponentManagementService)result;
-	// MessageService.super.startService().addResultListener(new
-	// DelegationResultListener(ret));
-	// }
-	//
-	// public void exceptionOccurred(Exception exception)
-	// {
-	// ret.setException(exception);
-	// }
-	// });
-	// }
-	//
-	// public void exceptionOccurred(Exception exception)
-	// {
-	// ret.setException(exception);
-	// }
-	// });
-	// }
-	//
-	// public void exceptionOccurred(Exception exception)
-	// {
-	// }
-	// });
-	//
-	// for(int i=0; i<tps.length; i++)
-	// {
-	// try
-	// {
-	// tps[i].start().addResultListener(lis);
-	// }
-	// catch(Exception e)
-	// {
-	// System.out.println("Could not initialize transport: "+tps[i]+" reason:
-	// "+e);
-	// transports.remove(tps[i]);
-	// }
-	// }
-	// }
-	//
-	// return ret;
-	// }
 
 	/**
 	 * Start the service.
@@ -1366,19 +1068,6 @@ public class MessageService extends BasicService implements IMessageService
 	public IFuture<Void> shutdownService()
 	{
 		Future<Void> ret = new Future<Void>();
-		// ret.addResultListener(new IResultListener<Void>()
-		// {
-		// public void resultAvailable(Void result)
-		// {
-		// System.err.println("MessageService shutdown end");
-		// }
-		//
-		// public void exceptionOccurred(Exception exception)
-		// {
-		// System.err.println("MessageService shutdown error");
-		// exception.printStackTrace();
-		// }
-		// });
 		SendManager[] tmp = (SendManager[]) managers.values()
 				.toArray(new SendManager[managers.size()]);
 		final SendManager[] sms = (SendManager[]) SUtil.arrayToSet(tmp)
@@ -1388,20 +1077,7 @@ public class MessageService extends BasicService implements IMessageService
 		final CounterResultListener<Void> crl = new CounterResultListener<Void>(
 				transports.size() + sms.length + 1, true,
 				new DelegationResultListener<Void>(ret));
-		// {
-		// public void intermediateResultAvailable(Void result)
-		// {
-		// System.err.println("MessageService shutdown intermediate result:
-		// "+result+", "+cnt);
-		// super.intermediateResultAvailable(result);
-		// }
-		// public boolean intermediateExceptionOccurred(Exception exception)
-		// {
-		// System.err.println("MessageService shutdown intermediate error:
-		// "+exception+", "+cnt);
-		// return super.intermediateExceptionOccurred(exception);
-		// }
-		// };
+		
 		super.shutdownService().addResultListener(crl);
 
 		for (int i = 0; i < sms.length; i++)
@@ -1412,8 +1088,6 @@ public class MessageService extends BasicService implements IMessageService
 
 		for (int i = 0; i < transports.size(); i++)
 		{
-			// System.err.println("MessageService transport shutdown:
-			// "+transports.get(i));
 			((ITransport) transports.get(i)).shutdown().addResultListener(crl);
 		}
 
@@ -1515,25 +1189,6 @@ public class MessageService extends BasicService implements IMessageService
 		return IFuture.DONE;
 	}
 
-	// /**
-	// * Update component identifier.
-	// * @param cid The component identifier.
-	// * @return The component identifier.
-	// */
-	// public ITransportComponentIdentifier
-	// internalUpdateComponentIdentifier(ITransportComponentIdentifier cid)
-	// {
-	// TransportComponentIdentifier ret = null;
-	// if(cid.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
-	// {
-	// ret = new TransportComponentIdentifier(cid.getName(),
-	// internalGetAddresses());
-	//// System.out.println("Rewritten cid: "+ret+"
-	// :"+SUtil.arrayToString(ret.getAddresses()));
-	// }
-	// return ret==null? cid: ret;
-	// }
-
 	/**
 	 * Announce that addresses of transports might have changed.
 	 */
@@ -1553,18 +1208,6 @@ public class MessageService extends BasicService implements IMessageService
 				component.getComponentIdentifier().getRoot().getName(),
 				internalGetAddresses()));
 	}
-
-	// /**
-	// * Update component identifier.
-	// * @param cid The component identifier.
-	// * @return The component identifier.
-	// */
-	// public IFuture<ITransportComponentIdentifier>
-	// updateComponentIdentifier(ITransportComponentIdentifier cid)
-	// {
-	// return new
-	// Future<ITransportComponentIdentifier>(internalUpdateComponentIdentifier(cid));
-	// }
 
 	// -------- internal methods --------
 
@@ -1644,9 +1287,6 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						if (!mypcons[i].isConnectionAlive())
 						{
-							// System.out.println("removed con: "+component+",
-							// "+System.currentTimeMillis()+",
-							// "+mypcons[i].getConnectionId());
 							mypcons[i].close();
 							pcons.remove(Integer
 									.valueOf(mypcons[i].getConnectionId()));
@@ -1658,9 +1298,6 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						if (!myicons[i].isConnectionAlive())
 						{
-							// System.out.println("removed con: "+component+",
-							// "+System.currentTimeMillis()+",
-							// "+myicons[i].getConnectionId());
 							myicons[i].close();
 							icons.remove(Integer
 									.valueOf(myicons[i].getConnectionId()));
@@ -1795,192 +1432,6 @@ public class MessageService extends BasicService implements IMessageService
 						ret.setResult(result);
 					}
 				});
-		return ret;
-	}
-
-	/**
-	 * Get the classloader for a resource identifier.
-	 */
-	protected IFuture<ClassLoader> getRIDClassLoader(final Map msg,
-			final MessageType mt)
-	{
-		final Future<ClassLoader> ret = new Future<ClassLoader>();
-
-		// MessageType mt = getMessageType(type);
-		final IResourceIdentifier rid = (IResourceIdentifier) msg
-				.get(mt.getResourceIdIdentifier());
-		final IComponentIdentifier realrec = (IComponentIdentifier) msg
-				.get(mt.getRealReceiverIdentifier());
-
-		// System.out.println("getRIDCl:
-		// "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+" "+rid+" "+realrec);
-
-		// Explanation for only using global rids:
-		// Local rids are mapped to a path, but different platforms may use
-		// different
-		// means for inlcuding them a) as new resource with custom rid b) in the
-		// startup path with platform rid
-		if (rid != null && rid.getGlobalIdentifier() != null)
-		{
-			SServiceProvider
-					.getService(component, ILibraryService.class,
-							RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(
-							new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(
-									ret)
-							{
-								public void customResultAvailable(
-										final ILibraryService ls)
-								{
-									ls.getClassLoader(rid).addResultListener(
-											new DelegationResultListener<ClassLoader>(
-													ret)
-											{
-												public void customResultAvailable(
-														ClassLoader result)
-												{
-													// System.out.println("got:
-													// "+result+" "+rid);
-													// Hack!!! Use current
-													// platform class loader for
-													// rms message, if no rid
-													// class loader available.
-													if (result == null)
-													{
-														Object recs = msg.get(mt
-																.getReceiverIdentifier());
-														if ((recs instanceof IComponentIdentifier[]
-																&& ((IComponentIdentifier[]) recs).length == 1
-																&& ((IComponentIdentifier[]) recs)[0]
-																		.getLocalName()
-																		.equals("rms"))
-																|| (recs instanceof List
-																		&& ((List<?>) recs)
-																				.size() == 1
-																		&& ((IComponentIdentifier) ((List<?>) recs)
-																				.get(0)).getLocalName()
-																						.equals("rms")))
-														{
-															// System.out.println("cl
-															// is global");
-															ls.getClassLoader(
-																	null)
-																	.addResultListener(
-																			new DelegationResultListener<ClassLoader>(
-																					ret));
-														}
-														else
-														{
-															// System.out.println("cl
-															// is ridloader:
-															// "+result);
-															super.customResultAvailable(
-																	null);
-														}
-													}
-													else
-													{
-														super.customResultAvailable(
-																result);
-													}
-												}
-											});
-								}
-
-								public void exceptionOccurred(
-										Exception exception)
-								{
-									super.resultAvailable(null);
-								}
-							});
-		}
-		else if (realrec != null)
-		{
-			SServiceProvider
-					.getService(component, IComponentManagementService.class,
-							RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(
-							new ExceptionDelegationResultListener<IComponentManagementService, ClassLoader>(
-									ret)
-							{
-								public void customResultAvailable(
-										IComponentManagementService cms)
-								{
-									cms.getComponentDescription(realrec)
-											.addResultListener(
-													new ExceptionDelegationResultListener<IComponentDescription, ClassLoader>(
-															ret)
-													{
-														public void customResultAvailable(
-																final IComponentDescription desc)
-														{
-															SServiceProvider
-																	.getService(
-																			component,
-																			ILibraryService.class,
-																			RequiredServiceInfo.SCOPE_PLATFORM)
-																	.addResultListener(
-																			new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(
-																					ret)
-																			{
-																				public void customResultAvailable(
-																						ILibraryService ls)
-																				{
-																					ls.getClassLoader(
-																							desc.getResourceIdentifier())
-																							.addResultListener(
-																									new DelegationResultListener<ClassLoader>(
-																											ret));
-																				}
-
-																				public void exceptionOccurred(
-																						Exception exception)
-																				{
-																					super.resultAvailable(
-																							null);
-																				}
-																			});
-														}
-													});
-								}
-
-								public void exceptionOccurred(
-										Exception exception)
-								{
-									super.resultAvailable(null);
-								}
-							});
-		}
-		else
-		{
-			// Hack? Use global loader if no rid declared? Use x_receiver?
-
-			SServiceProvider
-					.getService(component, ILibraryService.class,
-							RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(
-							new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(
-									ret)
-							{
-								public void customResultAvailable(
-										final ILibraryService ls)
-								{
-									ls.getClassLoader(null).addResultListener(
-											new DelegationResultListener<ClassLoader>(
-													ret)
-											{
-												public void customResultAvailable(
-														ClassLoader result)
-												{
-													super.customResultAvailable(
-															result);
-												}
-											});
-								}
-							});
-			// ret.setResult(null);
-		}
-
 		return ret;
 	}
 
@@ -2211,8 +1662,7 @@ public class MessageService extends BasicService implements IMessageService
 				idx += 4;
 
 				int seqnumber = -1;
-				if (type == StreamSendTask.DATA_OUTPUT_INITIATOR
-						|| type == StreamSendTask.DATA_INPUT_PARTICIPANT)
+				if (type == StreamSendTask.DATA_OUTPUT_INITIATOR || type == StreamSendTask.DATA_INPUT_PARTICIPANT)
 				{
 					// for(int i=0; i<4; i++)
 					// {
@@ -2583,39 +2033,13 @@ public class MessageService extends BasicService implements IMessageService
 				component.getLogger().warning("MessageService failed to decode envelope: " + obj);
 			}
 			final MessageEnvelope me = tmpenv;
-			// me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj,
-			// remotemarshalingconfig.getPostprocessors(),
-			// remotemarshalingconfig.getAllSerializers(),
-			// remotemarshalingconfig.getAllCodecs(), classloader, rep);
 			
 			if (!errors.isEmpty())
 			{
 				logger.warning(
 						"Ignored errors during message decoding: " + errors);
-				// for(Exception e: errors)
-				// {
-				// e.printStackTrace();
-				// }
 			}
-			// byte[] rawmsg = (byte[])obj;
-			// int idx = 0;
-			// byte rmt = rawmsg[idx++];
-			// byte[] codec_ids = new byte[rawmsg[idx++]];
-			// for(int i=0; i<codec_ids.length; i++)
-			// {
-			// codec_ids[i] = rawmsg[idx++];
-			// }
-			//
-			// Object tmp = new ByteArrayInputStream(rawmsg, idx,
-			// rawmsg.length-idx);
-			// for(int i=codec_ids.length-1; i>-1; i--)
-			// {
-			// ICodec dec = codecfactory.getCodec(codec_ids[i]);
-			// tmp = dec.decode(tmp, classloader);
-			// }
-			// me = (MessageEnvelope)tmp;
-
-			// final Map<String, Object> msg = me.getMessage();
+			
 			final String type = me.getTypeName();
 			final IComponentIdentifier[] receivers = me.getReceivers();
 			// System.out.println("Received message:
@@ -3253,34 +2677,4 @@ public class MessageService extends BasicService implements IMessageService
 			mws.announceComponentIdentifier(cid);
 		}
 	}
-	
-	protected static final class AllResourceIdentifier implements IResourceIdentifier
-	{
-		public AllResourceIdentifier()
-		{
-			// TODO Auto-generated constructor stub
-		}
-		
-		public ILocalResourceIdentifier getLocalIdentifier()
-		{
-			return new LocalResourceIdentifier();
-		}
-		
-		public IGlobalResourceIdentifier getGlobalIdentifier()
-		{
-			return new GlobalResourceIdentifier();
-		}
-		
-		public boolean equals(Object obj)
-		{
-			boolean ret = false;
-			if (obj instanceof IResourceIdentifier)
-			{
-				IResourceIdentifier rid = (IResourceIdentifier) obj;
-				ret = getClass().equals(rid.getClass());
-			}
-			return ret;
-		};
-	}
-
 }

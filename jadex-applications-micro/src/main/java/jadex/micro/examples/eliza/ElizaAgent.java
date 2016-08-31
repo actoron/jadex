@@ -66,17 +66,18 @@ public class ElizaAgent
 	{
 		this.conversations	= new HashMap<IComponentIdentifier, Tuple2<ElizaParse,Long>>();
 		
-		chat.setNickName("Eliza");
-		chat.status(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle.
+		chat.setNickName("Eliza").get();
+		// Status get() comes back when all receivers have acknowledge their receipt of the info :-(
+		chat.status(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle. 
 		try
 		{
-			chat.setImage(new LazyResource(ElizaAgent.class, "images/eliza.png").getData());
+			chat.setImage(new LazyResource(ElizaAgent.class, "images/eliza.png").getData()).get();
 		}
 		catch(IOException e)
 		{
 		}
 		
-		final IComponentIdentifier	self	= ((IService)chat).getServiceIdentifier().getProviderId();
+		final IComponentIdentifier self = ((IService)chat).getServiceIdentifier().getProviderId();
 		chat.subscribeToEvents().addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 		{
 			public void intermediateResultAvailable(ChatEvent event)

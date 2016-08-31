@@ -1,6 +1,7 @@
 package jadex.commons.transformation.traverser;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,11 +16,11 @@ import jadex.commons.transformation.traverser.Traverser.MODE;
 public class ExcludeProcessor implements ITraverseProcessor
 {
 	/** The static excluded types. */
-	protected static final Set excluded;
+	protected static final Set<Class<?>> excluded;
 	
 	static
 	{
-		excluded = new HashSet();
+		excluded = new HashSet<Class<?>>();
 		excluded.add(Boolean.class);
 		excluded.add(boolean.class);
 		excluded.add(Integer.class);
@@ -40,6 +41,30 @@ public class ExcludeProcessor implements ITraverseProcessor
 		excluded.add(Class.class);
 	}
 	
+	protected static final Class<?>[] excludedsupertypes;
+	static
+	{
+		List<Class<?>> types = new ArrayList<Class<?>>();
+		
+		// Java 8 stuff
+		String[] reflectionclasses = new String[] { "java.time.chrono.ChronoLocalDate",
+													"java.time.LocalTime",
+													"java.time.chrono.ChronoLocalDateTime" };
+		for (int i = 0; i < reflectionclasses.length; ++i)
+		{
+			try
+			{
+				Class<?> reflectionclass = Class.forName(reflectionclasses[i]);
+				types.add(reflectionclass);
+			}
+			catch (Exception e)
+			{
+			}
+		}
+		
+		excludedsupertypes = types.toArray(new Class<?>[types.size()]);
+	}
+	
 	/**
 	 *  Test if the processor is applicable.
 	 *  @param object The object.
@@ -50,7 +75,12 @@ public class ExcludeProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return object == null || excluded.contains(clazz);
+		boolean supermatch = false;
+		for (int i = 0; i < excludedsupertypes.length && !supermatch; ++i)
+		{
+			supermatch = SReflect.isSupertype(excludedsupertypes[i], clazz);
+		}
+		return object == null || supermatch || excluded.contains(clazz);
 	}
 	
 	/**

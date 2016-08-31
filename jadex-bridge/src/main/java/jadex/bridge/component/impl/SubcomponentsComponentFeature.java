@@ -233,21 +233,24 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	{
 		String ret = null;
 		SubcomponentTypeInfo si = component.getType(model);
-		if(si.getFilename()!=null && si.getFilename().startsWith("%{"))
-		{
-			try
-			{
-				ret = (String)SJavaParser.evaluateExpression(si.getFilename().substring(2, si.getFilename().length()-1), model.getAllImports(), this.component.getFetcher(), this.component.getClassLoader());
-			}
-			catch(Exception e)
-			{
-				ret = si.getFilename();
-			}
-		}
-		else
-		{
-			ret	= si.getFilename();
-		}
+		
+		ret = (String)SJavaParser.evaluateExpressionPotentially(si.getFilename(), model.getAllImports(), this.component.getFetcher(), this.component.getClassLoader());
+		
+//		if(si.getFilename()!=null && si.getFilename().startsWith("%{"))
+//		{
+//			try
+//			{
+//				ret = (String)SJavaParser.evaluateExpression(si.getFilename().substring(2, si.getFilename().length()-1), model.getAllImports(), this.component.getFetcher(), this.component.getClassLoader());
+//			}
+//			catch(Exception e)
+//			{
+//				ret = si.getFilename();
+//			}
+//		}
+//		else
+//		{
+//			ret	= si.getFilename();
+//		}
 		return ret;
 	}
 	

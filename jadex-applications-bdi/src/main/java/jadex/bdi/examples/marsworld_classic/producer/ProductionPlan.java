@@ -7,6 +7,7 @@ import jadex.bdi.examples.marsworld_classic.RequestCarry;
 import jadex.bdi.examples.marsworld_classic.RequestProduction;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
@@ -47,26 +48,33 @@ public class ProductionPlan extends Plan
 			(String)getBeliefbase().getBelief("move.my_type").getFact(), (Location)getBeliefbase()
 			.getBelief("move.my_home").getFact(),((Number)getBeliefbase().getBelief("move.my_vision").getFact()).doubleValue()));
 		
-		while(true)
+		try
 		{
-			// Wait for a request.
-			IMessageEvent req = waitForMessageEvent("request_production");
-
-			Target ot = ((RequestProduction)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
-			Target target = env.getTarget(ot.getId());
-
-			// Producing ore here.
-			IGoal produce_ore = createGoal("produce_ore");
-			produce_ore.getParameter("target").setValue(target);
-			dispatchSubgoalAndWait(produce_ore);
-
-			//System.out.println("Production of ore has finished....");
-			//System.out.println("Calling Carry Agent....");
-			callCarryAgent(target);
-
-			/*RGoal go_home = createGoal("move_dest");
-			go_home.getParameter("destination", getBeliefbase().getBelief("???").getFact("my_home"));
-			RGoalEvent ev_home = dispatchSubgoalAndWait(go_home);*/
+			while(true)
+			{
+				// Wait for a request.
+				IMessageEvent req = waitForMessageEvent("request_production");
+	
+				Target ot = ((RequestProduction)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
+				Target target = env.getTarget(ot.getId());
+	
+				// Producing ore here.
+				IGoal produce_ore = createGoal("produce_ore");
+				produce_ore.getParameter("target").setValue(target);
+				dispatchSubgoalAndWait(produce_ore);
+	
+				//System.out.println("Production of ore has finished....");
+				//System.out.println("Calling Carry Agent....");
+				callCarryAgent(target);
+	
+				/*RGoal go_home = createGoal("move_dest");
+				go_home.getParameter("destination", getBeliefbase().getBelief("???").getFact("my_home"));
+				RGoalEvent ev_home = dispatchSubgoalAndWait(go_home);*/
+			}
+		}
+		catch(GoalDroppedException e) 
+		{
+			// nop
 		}
 	}
 

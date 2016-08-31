@@ -37,6 +37,7 @@ public class GoalDroppedException	extends GoalFailureException
 	
 	public void printStackTrace()
 	{
+		Thread.dumpStack();
 		super.printStackTrace();
 	}
 }
