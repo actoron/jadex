@@ -215,15 +215,17 @@ public class Executor implements Runnable
 		synchronized(this)
 		{
 			if(!shutdown)
-			{		
-				// Indicate that thread should continue to run (if running).
-				wanttorun	= true;
-				
-				if(!running)
+			{
+				if(running)
 				{
-					running	= true;
+					// Indicate that thread should continue to run (if running).
+					wanttorun	= true;
+				}
+				else
+				{
 					// Invoke the code of the executor object using the thread pool,
 					// which allows thread to be shared, when code is idle.
+					running	= true;
 					execute	= true;
 				}
 			}
