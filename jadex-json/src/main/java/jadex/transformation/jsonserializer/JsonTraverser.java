@@ -67,6 +67,7 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLRUProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLocalDateTimeProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
 		
 		readprocs = new ArrayList<ITraverseProcessor>();
@@ -96,6 +97,7 @@ public class JsonTraverser extends Traverser
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveObjectProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLRUProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMapProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLocalDateTimeProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor());
 	}
