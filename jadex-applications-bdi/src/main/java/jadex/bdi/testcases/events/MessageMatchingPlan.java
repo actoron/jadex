@@ -22,6 +22,7 @@ public class MessageMatchingPlan extends Plan
 		me.getParameterSet("receivers").addValue(getScope().getComponentIdentifier());
 		me.getParameter(SFipa.CONVERSATION_ID).setValue("conv-id");
 		sendMessage(me).get();
+		System.out.println("sent 1 ");
 		waitFor(300);
 
 		if(getBeliefbase().getBeliefSet("results").containsFact("two"))
@@ -41,6 +42,7 @@ public class MessageMatchingPlan extends Plan
 		me.getParameter(SFipa.CONTENT).setValue("two");
 		me.getParameterSet("receivers").addValue(getScope().getComponentIdentifier());
 		sendMessage(me).get();
+		System.out.println("sent 2 ");
 		waitFor(300);
 
 		if(getBeliefbase().getBeliefSet("results").size()==1)
@@ -60,6 +62,7 @@ public class MessageMatchingPlan extends Plan
 		me.getParameter(SFipa.CONTENT).setValue("one");
 		me.getParameterSet("receivers").addValue(getScope().getComponentIdentifier());
 		sendMessage(me).get();
+		System.out.println("sent 3 ");
 		waitFor(300);
 
 		if(getBeliefbase().getBeliefSet("results").containsFact("one"))

@@ -3,8 +3,12 @@ package jadex.platform.service.message.transport.codecs;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+
+import org.tukaani.xz.LZMA2Options;
+import org.tukaani.xz.XZInputStream;
+import org.tukaani.xz.XZOutputStream;
+import org.xerial.snappy.SnappyInputStream;
+import org.xerial.snappy.SnappyOutputStream;
 
 import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.commons.SUtil;
@@ -12,19 +16,19 @@ import jadex.commons.SUtil;
 /**
  *  Converts byte[] -> byte[] in both directions.
  */
-public class GZIPCodec extends AbstractCodec
+public class SnappyCodec extends AbstractCodec
 {
 	//-------- constants --------
 	
 	/** The gzip codec id. */
-	public static final byte CODEC_ID = 0;
+	public static final byte CODEC_ID = 3;
 
 	//-------- methods --------
 	
 	/**
 	 *  Create a new codec.
 	 */
-	public GZIPCodec()
+	public SnappyCodec()
 	{
 	}
 	
@@ -80,9 +84,10 @@ public class GZIPCodec extends AbstractCodec
 		{
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			baos.write(SUtil.intToBytes(val.length));
-			GZIPOutputStream gzos = new GZIPOutputStream(baos);
-			gzos.write(val);
-			gzos.close();
+			
+			SnappyOutputStream sos = new SnappyOutputStream(baos);
+			sos.write(val);
+			sos.close();
 			ret = baos.toByteArray();
 		}
 		catch(Exception e) 
@@ -123,8 +128,8 @@ public class GZIPCodec extends AbstractCodec
 			
 			int len = SUtil.bytesToInt(buf);
 			ret = new byte[len];
-			GZIPInputStream gzis = new GZIPInputStream(bais);
-			SUtil.readStream(gzis, ret, 0, -1);
+			SnappyInputStream sis = new SnappyInputStream(bais);
+			SUtil.readStream(sis, ret, 0, -1);
 		}
 		catch(Exception e) 
 		{

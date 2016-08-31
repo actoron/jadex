@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 import jadex.commons.SUtil;
 import jadex.commons.collection.BloomFilter;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 
 /**
  *  A result listener that filters duplicates.
@@ -114,7 +114,7 @@ public class DuplicateRemovalIntermediateResultListener<E> extends IntermediateD
 		}	
 		else 
 		{
-			ret = BinarySerializer.objectToByteArray(value, null);
+			ret = SBinarySerializer.writeObjectToByteArray(value, null);
 		}
 		
 		return ret;

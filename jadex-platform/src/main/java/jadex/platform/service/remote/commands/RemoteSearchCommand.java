@@ -274,7 +274,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 											
 											public void resultAvailable(Collection<IService> result)
 											{
-				//								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
+//												System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
+//												System.out.println("result command of search: "+callid+" "+result);
 												// Create proxy info(s) for service(s)
 												Object content;
 				//								if(result instanceof Collection)

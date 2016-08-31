@@ -118,7 +118,7 @@ public class MessageEnvelope
 	 *  Sets the real receiver.
 	 *  @param servicerec The real receiver to set
 	 */
-	public void setServiceRec(IComponentIdentifier realrec)
+	public void setRealRec(IComponentIdentifier realrec)
 	{
 		this.realrec = realrec;
 	}

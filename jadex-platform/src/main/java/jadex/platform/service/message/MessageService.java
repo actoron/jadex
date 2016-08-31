@@ -28,15 +28,19 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
+import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceTerminatedException;
@@ -98,7 +102,6 @@ import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.ITransport;
 import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.platform.service.remote.RemoteMethodInvocationHandler;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.Traverse;
 
 /**
  * The Message service serves several message-oriented purposes: a) sending and
@@ -900,35 +903,80 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public void deliverMessageLocally(final ISendTask task)
 	{
+		
 		exeservice.execute(new IExecutable()
 		{
-			@SuppressWarnings("unchecked")
+			boolean doexecute = true;
+			
 			public boolean execute()
 			{
-				try
+				if (doexecute)
 				{
-				if (task instanceof MapSendTask)
-				{
-					final MapSendTask mst = (MapSendTask) task;
-					Map<String, Object> msg = (Map<String, Object>) SCloner.clone(mst.getRawMessage());
-//					Map<String, Object> msg = (Map<String, Object>) Traverser.traverseObject(mst.getRawMessage(), null, null, null, true, null);
-//					final MessageEnvelope me = mst.getEnvelope();
-					deliverToAllReceivers(mst.getReceivers(), cms, null, msg, logger, mst.getMessageType());
+					System.out.println("Executing local delivery.");
+					if (task instanceof MapSendTask)
+					{
+						final MapSendTask mst = (MapSendTask) task;
+						Map<String, Object> msg = (Map<String, Object>) SCloner.clone(mst.getRawMessage());
+						deliverToAllReceivers(mst.getReceivers(), cms, null, msg, logger, mst.getMessageType());
+					}
+					else if (task instanceof StreamSendTask)
+					{
+						StreamSendTask sst = (StreamSendTask) task;
+						sst.setRawMessage(SCloner.clone(sst.getRawMessage()));
+						deliverDecodedStreamMessage(sst.getStreamMessageType(), sst.getStreamId(), sst.getSequenceNumber()!=null?sst.getSequenceNumber():-1, sst.getRawMessage());
+					}
+					doexecute = false;
 				}
-				else if (task instanceof StreamSendTask)
+				else
 				{
-					StreamSendTask sst = (StreamSendTask) task;
-					sst.setRawMessage(SCloner.clone(sst.getRawMessage()));
-//					sst.setRawMessage(Traverser.traverseObject(sst.getRawMessage(), null, null, null, true, null));
-					deliverDecodedStreamMessage(sst.getStreamMessageType(), sst.getStreamId(), sst.getSequenceNumber()!=null?sst.getSequenceNumber():-1, sst.getRawMessage());
-				}
-				}catch(Exception e)
-				{
-					e.printStackTrace();
+					System.out.println("Skipping spurious execution.");
 				}
 				return false;
 			}
 		});
+		
+//		if (task instanceof MapSendTask)
+//		{
+//			final MapSendTask mst = (MapSendTask) task;
+//			Map<String, Object> msg = (Map<String, Object>) SCloner.clone(mst.getRawMessage());
+//			deliverToAllReceivers(mst.getReceivers(), cms, null, msg, logger, mst.getMessageType());
+//		}
+//		else if (task instanceof StreamSendTask)
+//		{
+//			StreamSendTask sst = (StreamSendTask) task;
+//			sst.setRawMessage(SCloner.clone(sst.getRawMessage()));
+//			deliverDecodedStreamMessage(sst.getStreamMessageType(), sst.getStreamId(), sst.getSequenceNumber()!=null?sst.getSequenceNumber():-1, sst.getRawMessage());
+//		}
+//		exeservice.execute(new IExecutable()
+//		{
+//			@SuppressWarnings("unchecked")
+//			public boolean execute()
+//			{
+//				System.out.println("EXEC deliver locally");
+//				try
+//				{
+//				if (task instanceof MapSendTask)
+//				{
+//					final MapSendTask mst = (MapSendTask) task;
+//					Map<String, Object> msg = (Map<String, Object>) SCloner.clone(mst.getRawMessage());
+////					Map<String, Object> msg = (Map<String, Object>) Traverser.traverseObject(mst.getRawMessage(), null, null, null, true, null);
+////					final MessageEnvelope me = mst.getEnvelope();
+//					deliverToAllReceivers(mst.getReceivers(), cms, null, msg, logger, mst.getMessageType());
+//				}
+//				else if (task instanceof StreamSendTask)
+//				{
+//					StreamSendTask sst = (StreamSendTask) task;
+//					sst.setRawMessage(SCloner.clone(sst.getRawMessage()));
+////					sst.setRawMessage(Traverser.traverseObject(sst.getRawMessage(), null, null, null, true, null));
+//					deliverDecodedStreamMessage(sst.getStreamMessageType(), sst.getStreamId(), sst.getSequenceNumber()!=null?sst.getSequenceNumber():-1, sst.getRawMessage());
+//				}
+//				}catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//				return false;
+//			}
+//		});
 	}
 
 	/**
@@ -1684,6 +1732,12 @@ public class MessageService extends BasicService implements IMessageService
 		// DelegationResultListener<ClassLoader>(ret));
 		// }
 		// else if (servicerec != null)
+//		System.out.println("RID IS " + receivers[0].getLocalName());
+//		if (realrec != null && component.getComponentIdentifier().getRoot().equals(realrec))
+//		{
+//			libservice.getClassLoader(null).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+//		}
+//		else 
 		if (realrec != null)
 		{
 			cms.getComponentDescription(realrec).addResultListener(
@@ -2517,9 +2571,18 @@ public class MessageService extends BasicService implements IMessageService
 					errors.add(e);
 				}
 			};
-			final MessageEnvelope me = MapSendTask.decodeMessageEnvelope(obj,
-					remotemarshalingconfig.getAllSerializers(),
-					remotemarshalingconfig.getAllCodecs(), msgsrvcl, null);
+			MessageEnvelope tmpenv = null;
+			try
+			{
+				tmpenv = MapSendTask.decodeMessageEnvelope(obj,
+						remotemarshalingconfig.getAllSerializers(),
+						remotemarshalingconfig.getAllCodecs(), msgsrvcl, null);
+			}
+			catch (Exception e)
+			{
+				component.getLogger().warning("MessageService failed to decode envelope: " + obj);
+			}
+			final MessageEnvelope me = tmpenv;
 			// me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj,
 			// remotemarshalingconfig.getPostprocessors(),
 			// remotemarshalingconfig.getAllSerializers(),
@@ -2585,7 +2648,16 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					@SuppressWarnings("unchecked")
 //					final Map<String, Object> msg = (Map<String, Object>) MapSendTask.decodeMessage(obj, remotemarshalingconfig.getPostprocessors(),remotemarshalingconfig.getAllSerializers(),remotemarshalingconfig.getAllCodecs(),classloader, rep);
-					final Map<String, Object> msg = (Map<String, Object>) MapSendTask.decodeMessage(me, remotemarshalingconfig.getPostprocessors(),remotemarshalingconfig.getAllSerializers(),remotemarshalingconfig.getAllCodecs(),classloader, rep);
+					Map<String, Object> tempmsg = null;
+					try
+					{
+						tempmsg = (Map<String, Object>) MapSendTask.decodeMessage(me, remotemarshalingconfig.getPostprocessors(),remotemarshalingconfig.getAllSerializers(),remotemarshalingconfig.getAllCodecs(),classloader, rep);
+					}
+					catch (Exception e)
+					{
+						component.getLogger().warning("MessageService failed to decode message: " + me.getReceivers() + " " + me.getRealRec() + " " + me.getRid());
+					}
+					final Map<String, Object> msg = tempmsg; 
 					if (!msg.containsKey(SFipa.RECEIVERS))
 						msg.put(SFipa.RECEIVERS, me.getReceivers());
 					if (me.getRealRec() != null)
@@ -3180,6 +3252,35 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			mws.announceComponentIdentifier(cid);
 		}
+	}
+	
+	protected static final class AllResourceIdentifier implements IResourceIdentifier
+	{
+		public AllResourceIdentifier()
+		{
+			// TODO Auto-generated constructor stub
+		}
+		
+		public ILocalResourceIdentifier getLocalIdentifier()
+		{
+			return new LocalResourceIdentifier();
+		}
+		
+		public IGlobalResourceIdentifier getGlobalIdentifier()
+		{
+			return new GlobalResourceIdentifier();
+		}
+		
+		public boolean equals(Object obj)
+		{
+			boolean ret = false;
+			if (obj instanceof IResourceIdentifier)
+			{
+				IResourceIdentifier rid = (IResourceIdentifier) obj;
+				ret = getClass().equals(rid.getClass());
+			}
+			return ret;
+		};
 	}
 
 }

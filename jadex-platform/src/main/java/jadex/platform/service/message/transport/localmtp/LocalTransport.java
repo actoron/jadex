@@ -145,6 +145,7 @@ public class LocalTransport implements ITransport
 	 */
 	public void	sendMessage(String address, final ISendTask task)
 	{
+		System.out.println("SENDING LOCALLY " + task);
 		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 		{
 			public IFuture<Void> execute(Void args)

@@ -13,6 +13,8 @@ import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.platform.service.message.transport.codecs.GZIPCodec;
+import jadex.platform.service.message.transport.codecs.LZ4Codec;
+import jadex.platform.service.message.transport.codecs.SnappyCodec;
 import jadex.platform.service.message.transport.codecs.XZCodec;
 import jadex.platform.service.message.transport.serializers.JadexBinarySerializer;
 import jadex.platform.service.message.transport.serializers.JadexJsonSerializer;
@@ -52,7 +54,7 @@ public class RemoteMarshalingConfig
 	public static String[] SERIALIZER_NAMES = {"JadexBinarySerializer"};
 	
 	/** The codec names, array index equals CODEC_ID. */
-	public static String[] BINARYCODEC_NAMES = {"No Codec", "GZIPCodec"};
+	public static String[] BINARYCODEC_NAMES = {"No Codec", "GZIPCodec", "XZCodec", "LZ4Codec", "SnappyCodec"};
 	
 	//-------- constructors --------
 
@@ -90,14 +92,14 @@ public class RemoteMarshalingConfig
 			if (SReflect.isAndroid())
 			{
 				// Hard-code classes for Android since scanning may not work.
-				codecs = new Class[] {GZIPCodec.class, XZCodec.class};
+				codecs = new Class[] {GZIPCodec.class, XZCodec.class, LZ4Codec.class, SnappyCodec.class};
 				serializers= new Class[] {JadexBinarySerializer.class, JadexJsonSerializer.class};
 			}
 			else
 			{
 				// TODO: Implement scan for available serializers and codecs, use hard-coding for now
 //				codecs = new Class[] {GZIPCodec.class};
-				codecs = new Class[] {GZIPCodec.class, XZCodec.class};
+				codecs = new Class[] {GZIPCodec.class, XZCodec.class, LZ4Codec.class, SnappyCodec.class};
 				
 				String[] classnames = new String[]
 				{
@@ -154,7 +156,8 @@ public class RemoteMarshalingConfig
 		}
 		else
 		{
-			default_sid = JadexBinarySerializer.SERIALIZER_ID;
+			default_sid = JadexJsonSerializer.SERIALIZER_ID;
+//			default_sid = JadexBinarySerializer.SERIALIZER_ID;
 		}
 		
 		if(default_codecs!=null && default_codecs.length>0)
@@ -163,7 +166,7 @@ public class RemoteMarshalingConfig
 		}
 		else
 		{
-			default_ids = new byte[]{GZIPCodec.CODEC_ID};
+			default_ids = new byte[]{SnappyCodec.CODEC_ID};
 		}
 	}
 	

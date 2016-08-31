@@ -14,7 +14,7 @@ import jadex.commons.SUtil;
 /**
  *  Converts byte[] -> byte[] in both directions.
  */
-public class XZCodec implements IBinaryCodec
+public class XZCodec extends AbstractCodec
 {
 	//-------- constants --------
 	

@@ -19,6 +19,8 @@ import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.platform.service.message.transport.ITransport;
 import jadex.platform.service.message.transport.MessageEnvelope;
+import jadex.platform.service.remote.commands.RemoteResultCommand;
+import jadex.platform.service.remote.commands.RemoteSearchCommand;
 
 /**
  *  The manager send task is responsible for coordinating
@@ -74,7 +76,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, IBinaryCodec[] codecs, ClassLoader classloader)//, SendManager manager)
 	{
 		super(receivers, transports, preprocessors, serializer, codecs, (Map<String, Object>)message.get(SFipa.X_NONFUNCTIONAL));
-		if(codecs==null || codecs.length==0)
+		if(codecs==null)// || codecs.length==0)
 			throw new IllegalArgumentException("Codecs must not null.");
 		this.message = message;
 		this.messagetype = messagetype;
@@ -192,6 +194,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Create the data.
 	 */
+	@SuppressWarnings("rawtypes")
 	protected byte[] createData(Object msg, ITraverseProcessor[] preprocessors, ISerializer serializer, IBinaryCodec[] codecs, ClassLoader cl)
 	{
 		MessageEnvelope	envelope = new MessageEnvelope(receivers, realrec, rid, messagetype.getName(), MESSAGE_TYPE_MAP);
@@ -271,7 +274,8 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 			length = rawmsg.length;
 		}
 		
-		MessageEnvelope envelope = (MessageEnvelope) serializers.get(rawmsg[offset]).decode(new ByteArrayInputStream(rawmsg, offset + 1, rawmsg.length - offset - 1), cl, null, rep);
+		MessageEnvelope envelope=(MessageEnvelope) serializers.get(rawmsg[offset]).decode(new ByteArrayInputStream(rawmsg, offset + 1, rawmsg.length - offset - 1), cl, null, rep);
+
 		envelope.serializerid = rawmsg[offset];
 		
 		return envelope;
@@ -282,8 +286,21 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	 */
 	protected static Object decodeMessage(MessageEnvelope envelope, ITraverseProcessor[] postprocessors, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader cl, IErrorReporter rep)
 	{
-		Object ret = serializers.get(envelope.serializerid).decode(envelope.getContentData(), cl, postprocessors, rep);
+		Object ret = null;
+		try
+		{
+			ret = serializers.get(envelope.serializerid).decode(envelope.getContentData(), cl, postprocessors, rep);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 		envelope.setContentData(null);
+		
+//		if (((Map) ret).get("content") instanceof RemoteSearchCommand && ((RemoteSearchCommand) ((Map) ret).get("content")).getType().toString().contains("IServiceCallService"))
+//			System.out.println("RSC 02394");
+//		if (((Map) ret).get("content") instanceof RemoteResultCommand)
+//			System.out.println("RRC 023212194");
 		return ret;
 	}
 
