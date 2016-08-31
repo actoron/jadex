@@ -67,6 +67,7 @@ public class SBinarySerializer2
 		ENCODER_HANDLERS.add(new CertificateCodec());
 		ENCODER_HANDLERS.add(new StackTraceElementCodec());
 		ENCODER_HANDLERS.add(new ThrowableCodec());
+		ENCODER_HANDLERS.add(new LocalDateTimeCodec());
 		ENCODER_HANDLERS.add(new BeanCodec());
 	}
 	
