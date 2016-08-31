@@ -12,7 +12,7 @@ public class FinishedPlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("killing "+getComponentName()+" due to "+getReason().getModelElement().getName());
+//		System.out.println("killing "+getComponentName()+" due to "+getReason());
 		killAgent();
 	}
 }

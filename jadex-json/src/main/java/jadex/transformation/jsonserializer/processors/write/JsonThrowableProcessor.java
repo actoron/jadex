@@ -48,13 +48,16 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 		
 		wr.write("{");
 		
-		if(wr.isWriteClass())
-			wr.writeClass(object.getClass());
-		
 		boolean first = true;
+		if(wr.isWriteClass())
+		{
+			wr.writeClass(object.getClass());
+			first = false;
+		}
+		
 		if(t.getMessage()!=null)
 		{
-			if(wr.isWriteClass())
+			if(!first)
 				wr.write(",");
 			wr.write("\"msg\":");
 			traverser.doTraverse(t.getMessage(), String.class, traversed, processors, clone, targetcl, context);

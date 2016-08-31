@@ -72,7 +72,7 @@ import java.util.zip.ZipOutputStream;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
@@ -4492,7 +4492,7 @@ public class SUtil
 	 *  @param e The exception.
 	 *  @return The exception stacktrace.
 	 */
-	public static String getExceptionStacktrace(Exception e)
+	public static String getExceptionStacktrace(Throwable e)
 	{
 		StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
@@ -4706,7 +4706,7 @@ public class SUtil
 		{
 			cache.getParentFile().mkdirs();
 			FileOutputStream	fos	= new FileOutputStream(cache);
-			SBinarySerializer.writeObjectToStream(fos, HASHES, null);
+			SBinarySerializer2.writeObjectToStream(fos, HASHES, null);
 		}
 		catch(Exception e)
 		{

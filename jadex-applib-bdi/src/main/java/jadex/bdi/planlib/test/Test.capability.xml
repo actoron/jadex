@@ -63,7 +63,7 @@
 		</achievegoal>
 		<achievegoal name="test_timeout">
 			<creationcondition>
-				$beliefbase.timeout_failure
+				!$beliefbase.off &amp;&amp; $beliefbase.timeout_failure
 			</creationcondition>		
 		</achievegoal>
 	</goals>

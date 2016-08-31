@@ -171,6 +171,25 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	 */
 	public IFuture<Void>	shutdown()
 	{
+		doCleanup();
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Kill is only invoked, when shutdown of some (e.g. other) feature does not return due to timeout.
+	 *  The feature should do any kind of possible cleanup, but no asynchronous operations.
+	 */
+	public void kill()
+	{
+		doCleanup();
+	}
+	
+	/**
+	 *  Perform cleanup in shutdown or kill.
+	 */
+	protected void doCleanup()
+	{
 		if(resfuts!=null)
 		{
 			Exception	ex	= getComponent().getException();
@@ -190,8 +209,6 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			}
 			resfuts	= null;
 		}
-		
-		return IFuture.DONE;
 	}
 
 	

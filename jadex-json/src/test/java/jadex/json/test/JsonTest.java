@@ -1,5 +1,6 @@
 package jadex.json.test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -53,8 +54,25 @@ public class JsonTest extends jadex.commons.transformation.Test
 		exs.add("b");
 		ex.put(A.class, exs);
 		String ret = JsonTraverser.objectToString(a, null, false, ex);
-		System.out.println(ret);
+		System.out.println("ret: " + ret);
 		
+		assertTrue(ret.contains("\"s\""));
 		assertTrue(!ret.contains("\"b\":"));
+	}
+
+
+	public void testException() {
+		String nullString = null;
+		NullPointerException npe = null;
+		try {
+			nullString.length();
+		} catch (NullPointerException e) {
+			npe = e;
+		}
+		String s = JsonTraverser.objectToString(npe, null);
+		NullPointerException fromString = JsonTraverser.objectFromString(s, null, NullPointerException.class);
+		assertEquals(fromString.getMessage(), npe.getMessage());
+		assertEquals(fromString.getCause(), npe.getCause());
+		assertTrue(Arrays.equals(fromString.getStackTrace(), npe.getStackTrace()));
 	}
 }

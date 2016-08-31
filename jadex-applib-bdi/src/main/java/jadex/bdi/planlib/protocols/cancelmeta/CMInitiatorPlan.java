@@ -5,11 +5,15 @@ import java.util.List;
 import jadex.bdi.planlib.protocols.InteractionState;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
+import jadex.micro.annotation.Binding;
 
 /**
  *  Plan to handle protocol abortion according to FIPA cancel meta protocol
@@ -50,7 +54,7 @@ public class CMInitiatorPlan extends Plan
 				long wait_time;
 				if(timeout==Timeout.NONE)
 				{
-					wait_time	= Timeout.NONE;
+					wait_time	= 10000;	// Hack!!! Avoids deadlock on exit when deftimeout == -1
 				}
 				else
 				{
@@ -61,17 +65,52 @@ public class CMInitiatorPlan extends Plan
 					}
 				}
 
-				IMessageEvent reply = waitForReply(cancel, wait_time);
-				rec.remove(reply.getParameter(SFipa.SENDER).getValue());
-				
-				// Store result in interaction state.
-				if(state!=null)
+				try
 				{
-					String	response	= "cm_inform".equals(reply.getType()) ? InteractionState.CANCELLATION_SUCCEEDED
-						: "cm_failure".equals(reply.getType()) ? InteractionState.CANCELLATION_FAILED
-						: InteractionState.CANCELLATION_UNKNOWN;
-					state.addCancelResponse((IComponentIdentifier)reply.getParameter(SFipa.SENDER).getValue(),
-						response, reply.getParameter(SFipa.CONTENT).getValue());
+					IMessageEvent reply	= waitForReply(cancel, wait_time);
+					rec.remove(reply.getParameter(SFipa.SENDER).getValue());
+					
+					// Store result in interaction state.
+					if(state!=null)
+					{
+						String	response	= "cm_inform".equals(reply.getType()) ? InteractionState.CANCELLATION_SUCCEEDED
+							: "cm_failure".equals(reply.getType()) ? InteractionState.CANCELLATION_FAILED
+							: InteractionState.CANCELLATION_UNKNOWN;
+						state.addCancelResponse((IComponentIdentifier)reply.getParameter(SFipa.SENDER).getValue(),
+							response, reply.getParameter(SFipa.CONTENT).getValue());
+					}
+				}
+				catch(TimeoutException te)
+				{
+					if(timeout!=Timeout.NONE && getTime()>time+timeout)
+					{
+						throw te;
+					}
+					else
+					{
+						// Check, if components still exist
+						// Hack!!! Avoids deadlock on exit when deftimeout == -1
+						for(Object arec: rec)
+						{
+//							System.out.println("cancel retry checking if exists: "+arec);
+							try
+							{
+								SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, Binding.SCOPE_PLATFORM)
+									.getComponentDescription((IComponentIdentifier)arec).get(10000);
+//								System.out.println("cancel retry not removed: "+arec);
+							}
+							catch(ComponentNotFoundException ce)
+							{
+//								System.out.println("cancel retry removed: "+arec);
+								rec.remove(arec);
+							}
+							catch(Exception e)
+							{
+								// ignore.
+//								System.out.println("cancel retry not removed: "+arec+", "+e);
+							}
+						}
+					}
 				}
 			}
 		}

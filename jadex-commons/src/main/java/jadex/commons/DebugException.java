@@ -22,7 +22,7 @@ public class DebugException extends RuntimeException
 	//-------- attributes --------
 	
 	/** The stack trace. */
-	protected String	stacktrace;
+//	protected StackTraceElement[] stacktrace;
 	
 	//-------- constructors --------
 	
@@ -52,9 +52,8 @@ public class DebugException extends RuntimeException
 	public synchronized Throwable fillInStackTrace()
 	{
 		Throwable throwable = super.fillInStackTrace();
-		StringWriter	sw	= new StringWriter();
-		printStackTrace(new PrintWriter(sw));
-		stacktrace	= sw.toString();
+		// when getStackTrace() is called, super saves the stacktrace elements, so we don't have to.
+		StackTraceElement[] stackTrace = getStackTrace();
 		return throwable;
 	}
 }
