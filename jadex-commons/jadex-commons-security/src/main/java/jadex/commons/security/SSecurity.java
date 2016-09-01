@@ -386,7 +386,7 @@ public class SSecurity
 //	    	AsymmetricCipherKeyPair keys = r.generateKeyPair();
 	    	
 	    	KeyPair keys = generateKeyPair("RSA", 1024);
-		    Certificate c = generateCertificate("CN=CKS Self Signed Cert", keys, 1000, "MD5WithRSA");
+		    Certificate c = generateCertificate("CN=CKS Self Signed Cert", keys, 1000, "SHA256WithRSA");
 		    
 		    // Creates key entry (i.e. keypair with certificate)
 		    ks.setKeyEntry(alias, keys.getPrivate(), keypass.toCharArray(),  
