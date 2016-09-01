@@ -193,9 +193,9 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	{
 		if(delegate != null)
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
+			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneIntermediateResultListener)delegate).resultAvailableIfUndone(result);
+				((IUndoneResultListener)delegate).resultAvailableIfUndone(result);
 			}
 			else
 			{
@@ -223,9 +223,9 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	{
 		if(delegate != null)
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
+			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneIntermediateResultListener)delegate).exceptionOccurredIfUndone(exception);
+				((IUndoneResultListener)delegate).exceptionOccurredIfUndone(exception);
 			}
 			else
 			{
@@ -356,9 +356,9 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		}
 		else
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
+			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneIntermediateResultListener)delegate).exceptionOccurredIfUndone(e);
+				((IUndoneResultListener)delegate).exceptionOccurredIfUndone(e);
 			}
 			else
 			{
