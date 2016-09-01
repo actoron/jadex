@@ -133,13 +133,7 @@ A message event type matches an incoming message if all fixed parameter values a
 
 
 
-There are several reasons why an agent may fail to correctly process an incoming message. These are indicated by different logging outputs at different logging levels (see &lt;xref linkend="events.message-matching"/>). 
-<!-- 
-TODO: fix cross ref
--->In the first case, if more than one message event type has a match with the incoming event the most specific match will be used. The number of fixed parameters and the presence of a match expression are used as indicator for the specificity. As this is a common case, it is only logged at level *INFO*. When a message is received, which does not match any of the declared message events of the agent, a *WARNING* is generated, indicating that this message is ignored by the agent. Finally, when there are two or more message events, which all match an incoming message to the same degree (e.g., all have the same number of fixed parameters) the system cannot decide which message event to use, and has to choose one arbitrarily. As this probably indicates a programming error in the ADF, a *SEVERE* ouput is produced.
-
-
-
+There are several reasons why an agent may fail to correctly process an incoming message. These are indicated by different logging outputs at different logging levels:
 
 |Level  | Output |
 |-------|--------|
@@ -149,16 +143,14 @@ TODO: fix cross ref
 
 *Possible problems when matching messages*
 
+In the first case, if more than one message event type has a match with the incoming event the most specific match will be used. The number of fixed parameters and the presence of a match expression are used as indicator for the specificity. As this is a common case, it is only logged at level *INFO*. When a message is received, which does not match any of the declared message events of the agent, a *WARNING* is generated, indicating that this message is ignored by the agent. Finally, when there are two or more message events, which all match an incoming message to the same degree (e.g., all have the same number of fixed parameters) the system cannot decide which message event to use, and has to choose one arbitrarily. As this probably indicates a programming error in the ADF, a *SEVERE* ouput is produced.
+
+
 ## Sending Messages
 
-Messages to be sent also have to be declared in the ADF. The actual sending is usually done inside a plan, which instantiates the declared message event, fills in desired parameter values, and dispatches the message using one of the &lt;methodname>sendMessage...()&lt;/methodname> methods. The super class of both plan types (*jadex.bdi.runtime.AbstractPlan*) provides several convenience methods to create message events. To send a message, a message event has to be created using the *createMessageEvent(Strint type)* method supplying the declared message event type name as parameter. The receivers of fipa messages are specified by agent identifiers (interface *jadex.bdige.IComponentIdentifier*). The message content can be supplied as String or as Object with *getParameter(SFipa.CONTENT).setValue(Object content)*. If the content is provided as Object it must be ensured that the agent can encode it into a transmissable representation as described in the following section about content languages.
-
-
-
-
-
-   
-To actually send the message event it is sufficient to call the *sendMessage(IMessageEvent me)* method with the prepared message event as parameter. It is also possible to send a message and directly wait for a reply with an optional timeout by using the *sendMessageAndWait(IMessageEvent me [, timeout])* method. This is described in
+Messages to be sent also have to be declared in the ADF. The actual sending is usually done inside a plan, which instantiates the declared message event, fills in desired parameter values, and dispatches the message using one of the ```sendMessage...()``` methods. The super class of both plan types (*jadex.bdi.runtime.AbstractPlan*) provides several convenience methods to create message events. To send a message, a message event has to be created using the *createMessageEvent(Strint type)* method supplying the declared message event type name as parameter. The receivers of fipa messages are specified by agent identifiers (interface *jadex.bdige.IComponentIdentifier*). The message content can be supplied as String or as Object with *getParameter(SFipa.CONTENT).setValue(Object content)*. If the content is provided as Object it must be ensured that the agent can encode it into a transmissable representation as described in the following section about content languages.
+ 
+To actually send the message event it is sufficient to call the *sendMessage(IMessageEvent me)* method with the prepared message event as parameter. It is also possible to send a message and directly wait for a reply with an optional timeout by using the *sendMessageAndWait(IMessageEvent me [, timeout])* method. This is described in the following XML:
    
 ```xml
 <imports>
@@ -176,7 +168,7 @@ To actually send the message event it is sufficient to call the *sendMessage(IMe
     </parameter>
   </messageevent>
 </events>
-```
+```  
 *Example of declaration for a message*
 
 
@@ -189,8 +181,8 @@ public void body()
   me.getParameter(SFipa.CONTENT).setValue("ping 2"); 
   sendMessage(me);
 }
-```
-*Plan snippet showing the creation and sending of the message*\
+```  
+*Plan snippet showing the creation and sending of the message*
 
 
 ## Using Ontologies and Content Languages
@@ -235,11 +227,6 @@ public void body()
 *Example of sending an object inside a message*
 
 
-
-
-
-
-
 As the decoded object is already availble for matching an incoming message, on the receiver side, the match expression can be used to only match messages containing a *Target* object.
    
 ```xml
@@ -268,22 +255,19 @@ public void body()
 *Example of receiving an object inside a message**
 
 
-
-
 Three content languages are predefined in Jadex itself and therefore are available on all platforms. These languages are defined in the constants *SFipa.JAVA_XML* and *SFipa.NUGGETS_XML* and *SFipa.JADEX_XML*. All three are Java bean converters. The Java XML language uses the bean encoder available in the JDK, to convert Java objects adhering to the JavaBeans specification to standardized XML files. The nuggets XML language is a proprietary language in Jadex, that works similar to the Java XML language but the encoding and decoding is much faster. Finally, the third alternative is also a Jadex variant, which is part of the Jadex XML databinding framework and is meant to replace nuggets in the long term. All languages allow marshalling content objects independently from the underlying ontology as they rely completely on the Java Bean specification. Using these languages requires that Java bean information about the content object can be found or inferred by the Java bean introspector.    
 Please have a look at the Beanynizer tool (available from the [Jadex Homepage](http://vsis-www.informatik.uni-hamburg.de/projects/jadex/)) if you are interested in converting an ontology to Java beans including the necessary bean infos.    
-Other content languages are available depending on the underlying platform (e.g. the JADE platform supports the FIPA SL language). The usage of these platform-specific languages is described in  &lt;xref linkend="adapters"/>.
-<!-- TODO: fix cross ref-->
-
-
-
-If you want to use your own mechanism for encoding and decoding of message contents, you can implement the interface *IContentCodec* from package *jadex.bridge*. The interface requires you to implement three methods. The *match()* method is used by Jadex, to determine if your codec applies to a given message. For this decision, the important message properties (e.g. langauge and ontology) are supplied. The other two methods are called to *encode()* an object to a string for sending and to *decode()* a string back to an object, when receiving a message. To register a custom content codec in an agent, it is sufficient to add a property starting with *contentcodec.* in the properties section of an agent:
+Other content languages are available depending on the underlying platform (e.g. the JADE platform supports the FIPA SL language). The usage of these platform-specific languages is specified as property:
 
 ```xml
 <properties>
   <property name="contentcodec.my-codec"<new MyContentCodec()</property>
 </properties>
 ```
+
+If you want to use your own mechanism for encoding and decoding of message contents, you can implement the interface *IContentCodec* from package *jadex.bridge*. The interface requires you to implement three methods. The *match()* method is used by Jadex, to determine if your codec applies to a given message. For this decision, the important message properties (e.g. langauge and ontology) are supplied. The other two methods are called to *encode()* an object to a string for sending and to *decode()* a string back to an object, when receiving a message. To register a custom content codec in an agent, it is sufficient to add a property starting with *contentcodec.* in the properties section of an agent:
+
+
 *Include a custom content codec*
 
 ## Using Conversations for Managing Sequences of Messages
@@ -335,9 +319,7 @@ public void body()
 *Example of an initial conversation message*
 
 
-
-
-On the other hand, if you have received a message event and want to reply to the sender you don't have to create a new message event from scratch but can directly create a reply. This ensures that all important information such as the conversation-id or in-reply-to also appears in the answer. Moreover, message properties, which should not change during a conversation (e.g. protocol, language and ontology) are also automatically copied into the reply. A reply can be created by calling *createReply(String type \[, Object content\])* method directly on the received message event. This method takes the message event type for the reply as parameter. Note that the message type with which you are replying also has to be present in your ADF as shown in the following example.   
+On the other hand, if you have received a message event and want to reply to the sender you don't have to create a new message event from scratch but can directly create a reply. This ensures that all important information such as the conversation-id or in-reply-to also appears in the answer. Moreover, message properties, which should not change during a conversation (e.g. protocol, language and ontology) are also automatically copied into the reply. A reply can be created by calling *createReply(String type [, Object content])* method directly on the received message event. This method takes the message event type for the reply as parameter. Note that the message type with which you are replying also has to be present in your ADF as shown in the following example.   
 Example for Replying to a Message:
 
 ```xml
@@ -367,7 +349,6 @@ public void body()
 }
 ```
 *Example code for creating and sending a reply message**
-
 
 
 The way of handling conversations described in this section is pretty different to programming agents based on abstract goals, as the programmer has to directly deal with all alternatives of the interaction flow. This process can be tedious and error-prone. Therefore, in Jadex a predefined capability is available, that already implements common use cases of interactions as specified in standardized FIPA interaction protocols (e.g. request, contract-net, auctions). The protocols capability allows to focus on the goals of the agents participating in a conversation. The protocols capability is described in detail in [Predefined Capabilities](16 Predefined Capabilities). Even if you want to implement your own custom interaction protocol, you should have a look at the protocols capability, because it introduces helpful patterns that can be applied to other interactions as well.

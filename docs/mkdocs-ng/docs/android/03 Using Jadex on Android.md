@@ -185,7 +185,8 @@ To adjust Jadex Platform behaviour, implement the constructor like below:
 
 As with using jadex from an activity, you can override the methods ```onPlatformStarting()``` and ```onPlatformStarted()``` to get access to the platform inside the service.
 
-Take a look at the TODO: Api Docs to see available methods for starting and configuring the platform.
+<!--TODO: Api docs-->
+Take a look at the Api Docs to see available methods for starting and configuring the platform.
 
 Additionally, it is useful to override ```onBind()``` to return your own Binder object and specifiy your own service interface. See the [Android docs: Bound Services](http://developer.android.com/guide/components/bound-services.html) for more information about this topic.
 
@@ -372,7 +373,8 @@ The dispatched event will then be passed to the matching event receiver.
 
 The provided methods for accessing the platform depend on whether you are using JadexAndroidActivity (running Jadex inside an activity) or JadexPlatformService (running Jadex inside a service).
 You can, however, get the internal platform service from a JadexAndroidActivity by calling getPlatformService(). The returned object should contain all methods listed here.
-See also TODO API docs.
+See also API docs.
+<!--TODO: Api docs-->
 
 -   isPlatformRunning(): Checks whether the platform is running or not.
 -   getService(): Gets a service of a component running on the platform (asynchronously).

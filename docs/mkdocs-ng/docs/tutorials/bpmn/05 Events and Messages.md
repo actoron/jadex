@@ -154,8 +154,8 @@ Additionally, a component identifier may hold a number of transport addresses, w
 
 ### Sending a Message in a Process
 
-For sending a message, add a message intermediate event as shown below. As mentioned earlier, BPMN distinguishes between *catching*- and *throwing*-events. The events we have used so far, were all catching-events which are represented by white icons within the BPMN event symbol. In contrast, throwing events are represented by black icons (see below). While catching a message is an analogy to receiving, throwing is an analogy to sending a message. Because of this, the event's mode has to be changed by right-clicking on the symbol and choosing "Set as a throwing shape". Add message parameters as required (cf.  ToDo: Update screenshot !
-
+For sending a message, add a message intermediate event as shown below. As mentioned earlier, BPMN distinguishes between *catching*- and *throwing*-events. The events we have used so far, were all catching-events which are represented by white icons within the BPMN event symbol. In contrast, throwing events are represented by black icons (see below). While catching a message is an analogy to receiving, throwing is an analogy to sending a message. Because of this, the event's mode has to be changed by right-clicking on the symbol and choosing "Set as a throwing shape". Add message parameters as required.
+<!-- TODO: update screenshot-->
 ![05 Events and Messages@eclipsemessagesending.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsemessagesending.png)
 
 We want to send a message to the process from Exercise D3. Thus, set the performative to request as expected by the D3 process and and enter an appropriate content for the message. Finally, we need to specify the recipient of the message.

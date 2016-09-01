@@ -15,8 +15,8 @@ For more details, check out the Active Components User Guide about [Platform Awa
 Please refer to the [Configuration examples](../platform/platform/#configuration-examples) in the Platform chapter or visit the [Platform Awareness](../guides/ac/07 Platform Awareness/#configuration) section of the Active Components User Guide for awareness configuration. 
 
 ## Manually Connecting Platforms
-
-TODO: how to manually add remote platforms
+${SorryNotYetAvailable}
+<!--TODO: how to manually add remote platforms-->
 
 # Security
 
@@ -63,10 +63,10 @@ public interface IPublicService {...
 By default, the security level for all services is ```Security.PASSWORD``` and requires a shared platform-level password.
 
 # Transports
-TODO
+<!--TODO: List Transports and their features-->
 
 # Serialization
-TODO
+<!--TODO: Explain serialization!!-->
 
 # Advanced Topics 
 
