@@ -102,12 +102,6 @@ public class PlatformConfiguration
 	/** The opengl disable flag argument. */
 	public static final String OPENGL = "opengl";
 	
-	/** Flag to enable or disable dht features (service discovery). **/
-	public static final String DHT = "dht";
-	
-	/** Flag to enable or disable dht providing features (service discovery). **/
-	public static final String DHT_PROVIDE = "dhtprovide";
-	
 	/** Flag to enable or disable registry service (for distributed registry management). **/
 	public static final String REGISTRY_SYNC = "registrysync";
 	
@@ -159,8 +153,6 @@ public class PlatformConfiguration
 		RESERVED.add(NOSTACKCOMPACTION);
 		RESERVED.add(OPENGL);
 		RESERVED.add(DEFTIMEOUT);
-		RESERVED.add(DHT);
-		RESERVED.add(DHT_PROVIDE);
 //		RESERVED.add(REGISTRY_SYNC);
 	}
 
@@ -256,7 +248,6 @@ public class PlatformConfiguration
 		rootConfig.setSettings(true);
 		rootConfig.setContext(true);
 		rootConfig.setAddress(true);
-		rootConfig.setDhtProvide(false);
 //		rootConfig.setRegistrySync(false);
 		return config;
 	}
@@ -315,7 +306,6 @@ public class PlatformConfiguration
 		rootConfig.setSettings(true);
 		rootConfig.setContext(true);
 		rootConfig.setAddress(true);
-		rootConfig.setDhtProvide(false);
 		return config;
 	}
 	
@@ -700,58 +690,19 @@ public class PlatformConfiguration
 	}
 	
 	/**
-	 * Set the DHT flag.
-	 * @param value
-	 */
-	public void setDht(boolean value) 
-	{
-		setValue(DHT, value);
-	}
-	
-	/**
-	 * Get the DHT flag.
-	 * @return
-	 */
-	public boolean getDht() 
-	{
-		return Boolean.TRUE.equals(getValue(DHT));
-	}
-	
-	/**
-	 * Set the provide DHT flag.
-	 * @param value
-	 */
-	public void setDhtProvide(boolean value) 
-	{
-//		setValue(DHT_PROVIDE, value);
-		rootconfig.setDhtProvide(value);
-	}
-	/**
-	 * Get the provide DHT flag.
-	 * @return
-	 */
-	public boolean getDhtProvide() 
-	{
-//		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
-		return rootconfig.getDhtProvide();
-	}
-	
-	/**
-	 * Set the provide DHT flag.
+	 * Enables/disables distributed registry synchronization.
 	 * @param value
 	 */
 	public void setRegistrySync(boolean value) 
 	{
-//		setValue(DHT_PROVIDE, value);
 		rootconfig.setRegistrySync(value);
 	}
 	/**
-	 * Get the provide DHT flag.
+	 * Get the flag for distributed registry synchronization.
 	 * @return
 	 */
 	public boolean getRegistrySync() 
 	{
-//		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
 		return rootconfig.getRegistrySync();
 	}
 	
