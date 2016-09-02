@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -30,27 +31,23 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.collection.WeakList;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 
 /**
  *  Extension to allow message injection in agent methods.
- *  
- *  // todo: call registerMessageEvent in sendMessage() methods
  */
-public class BDIXMessageComponentFeature extends MessageComponentFeature
+public class BDIXMessageComponentFeature extends MessageComponentFeature	implements IInternalBDIXMessageFeature
 {
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIXMessageComponentFeature.class);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIXMessageComponentFeature.class, IInternalBDIXMessageFeature.class);
 	
 	//-------- attributes --------
 	
-	/** Send message tracking (reply_with->Entry). */
-	//protected Set sent_mevents;
-	protected List<RMessageEvent> sent_mevents;
+	/** Sent message tracking (msg->cnt). */
+	protected Map<RMessageEvent, Integer> sent_mevents;
 	
 	/** The maximum number of outstanding messages. */
 	protected long mevents_max;
@@ -64,7 +61,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 	{
 		super(component, cinfo);
 		
-		this.sent_mevents = new WeakList<RMessageEvent>();
+		this.sent_mevents = new WeakHashMap<RMessageEvent, Integer>();
 	}
 	
 	//-------- IInternalMessageFeature interface --------
@@ -129,37 +126,14 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 			List<MMessageEvent>	events	= SCollection.createArrayList();
 			List<MMessageEvent>	matched	= SCollection.createArrayList();
 			int	degree	= 0;
-
-			// todo: capabilities
-			degree = matchMessageEvents(message.getParameterMap(), bdif.getBDIModel().getCapability().getMessageEvents(), matched, events, degree, message.getMessageType());
 			
-			// todo: find original message event to know in which scope the
-			// new message event type should be searched
-			
+			// Find original message event to know in which scope the
+			//   new message event type should be searched
 			// For messages without conversation all capabilities are considered.
-//			if(original==null)
-//			{
-//				// Search through event bases to find matching events.
-//				// Only original message events are considered to respect encapsualtion of a capability.
-//				//Object	content	= extractMessageContent(msg);
-//				for(int i=0; i<capas.size(); i++)
-//				{
-//					RCapability capa = (RCapability)capas.get(i);
-//					IMEventbase eb = (IMEventbase)capa.getEventbase().getModelElement();
-//					degree = matchMessageEvents(message, eb.getMessageEvents(), matched, events, degree);
-//				}
-//			}
-//
-//			// For messages of ongoing conversations only the source capability is considered.
-//			else
-//			{
-//				//System.out.println("Found reply :-) "+original);
-//				RCapability capa = original.getScope();
-//				IMEventbase eb = (IMEventbase)capa.getEventbase().getModelElement();
-//
-//				degree = matchMessageEvents(message, eb.getMessageEvents(), matched, events, degree);
-//				degree = matchMessageEventReferences(message, eb.getMessageEventReferences(), matched, events, degree);
-//			}
+			// For messages of ongoing conversations only the source capability is considered.
+			RMessageEvent	original	= getInReplyMessageEvent(message);
+			degree = matchMessageEvents(message.getParameterMap(), bdif.getBDIModel().getCapability().getMessageEvents(), matched, events, degree, message.getMessageType(),
+				original!=null, original==null ? null : original.getModelElement().getCapabilityName());
 
 			if(events.size()==0)
 			{
@@ -236,38 +210,41 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 	/**
 	 *  Match message events with a message adapter.
 	 */
-	protected int matchMessageEvents(Map<String, Object> message, List<MMessageEvent> mevents, List<MMessageEvent> matched, List<MMessageEvent> events, int degree, MessageType mt)
+	protected int matchMessageEvents(Map<String, Object> message, List<MMessageEvent> mevents, List<MMessageEvent> matched, List<MMessageEvent> events, int degree, MessageType mt, boolean checkscope, String scope)
 	{
 		for(MMessageEvent mevent: mevents)
 		{
-			Direction dir = mevent.getDirection();
-			if(dir==null)
-				System.out.println("null");
-
-			try
+			if(!checkscope || SUtil.equals(mevent.getCapabilityName(), scope))
 			{
-				if((dir.equals(Direction.RECEIVE)
-					|| dir.equals(Direction.SENDRECEIVE))
-					&& match(mevent, message, mt))
+				Direction dir = mevent.getDirection();
+				if(dir==null)
+					System.out.println("null");
+	
+				try
 				{
-					matched.add(mevent);
-					if(mevent.getSpecializationDegree()>degree)
+					if((dir.equals(Direction.RECEIVE)
+						|| dir.equals(Direction.SENDRECEIVE))
+						&& match(mevent, message, mt))
 					{
-						degree	= mevent.getSpecializationDegree();
-						events.clear();
-						events.add(mevent);
-					}
-					else if(mevent.getSpecializationDegree()==degree)
-					{
-						events.add(mevent);
+						matched.add(mevent);
+						if(mevent.getSpecializationDegree()>degree)
+						{
+							degree	= mevent.getSpecializationDegree();
+							events.clear();
+							events.add(mevent);
+						}
+						else if(mevent.getSpecializationDegree()==degree)
+						{
+							events.add(mevent);
+						}
 					}
 				}
-			}
-			catch(RuntimeException e)
-			{
-				StringWriter	sw	= new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				getComponent().getLogger().severe(sw.toString());
+				catch(RuntimeException e)
+				{
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					getComponent().getLogger().severe(sw.toString());
+				}
 			}
 		}
 		return degree;
@@ -278,7 +255,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 	 *  @param msgevent The message event.
 	 *  @return True, if message matches the message event.
 	 */
-	public boolean match(MMessageEvent msgevent, Map<String, Object> msg, MessageType mt)
+	protected boolean match(MMessageEvent msgevent, Map<String, Object> msg, MessageType mt)
 	{
 		boolean	match	= true;
 
@@ -418,10 +395,8 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 	 *  Register a conversation or reply-with to be able
 	 *  to send back answers to the source capability.
 	 *  @param msgevent The message event.
-	 *  //@param replywith The reply-with tag.
-	 *  todo: indexing for msgevents for speed.
 	 */
-	protected void registerMessageEvent(RMessageEvent msgevent)
+	public void registerMessageEvent(RMessageEvent msgevent)
 	{
 		if(mevents_max!=0 && sent_mevents.size()>mevents_max)
 		{
@@ -430,8 +405,27 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 		}
 		else
 		{
-			sent_mevents.add(msgevent);
-			//System.out.println("+++"+getScope().getAgent().getName()+" has open conversations: "+sent_mevents.size()+" "+sent_mevents);
+			sent_mevents.put(msgevent, sent_mevents.containsKey(msgevent) ? sent_mevents.get(msgevent)+1 : 1);
+		}
+	}
+	
+	/**
+	 *  Deregister a conversation or reply-with.
+	 *  @param msgevent The message event.
+	 */
+	public void deregisterMessageEvent(RMessageEvent msgevent)
+	{
+		if(sent_mevents.containsKey(msgevent))
+		{
+			int	cnt = sent_mevents.get(msgevent)-1;
+			if(cnt>0)
+			{
+				sent_mevents.put(msgevent, cnt);
+			}
+			else
+			{
+				sent_mevents.remove(msgevent);
+			}
 		}
 	}
 	
@@ -441,13 +435,14 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature
 	 */
 	public RMessageEvent getInReplyMessageEvent(IMessageAdapter message)
 	{
-		//System.out.println("+++"+getScope().getAgent().getName()+" has open conversations: "+sent_mevents.size()+" "+sent_mevents);
+//		System.out.println("+++"+getComponent().getComponentIdentifier()+" has open conversations: "+sent_mevents.size()+" "+sent_mevents);
 		
 		RMessageEvent	ret	= null;
 		// Prefer the newest messages for finding replies.
 		// todo: conversations should be better supported
-		RMessageEvent[] smes = (RMessageEvent[])sent_mevents.toArray(new RMessageEvent[0]);
-		
+		RMessageEvent[] smes = (RMessageEvent[])sent_mevents.keySet().toArray(new RMessageEvent[0]);
+		//todo: indexing for msgevents for speed.
+
 		for(int i=smes.length-1; ret==null && i>-1; i--)
 		{
 			boolean	match = true; // Does the message match all convid parameters?

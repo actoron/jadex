@@ -92,32 +92,14 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 //	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step);
 	
 	/**
-	 *  Schedule a step of the component.
-	 *  May safely be called from external threads.
-	 *  @param step	Code to be executed as a step of the component.
-	 *  @param delay The delay to wait before step should be done.
-	 *  @return The result of the step.
+	 *  Wait for some time and execute a component step afterwards.
 	 */
-	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step, long delay);
-	
+	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime);
+
 	/**
-	 *  Schedule a step of the component.
-	 *  May safely be called from external threads.
-	 *  @param step	Code to be executed as a step of the component.
-	 *  @param delay The delay to wait before step should be done.
-	 *  @return The result of the step.
+	 *  Wait for some time and execute a component step afterwards.
 	 */
-	public <T>	IFuture<T> scheduleStep(int priority, IComponentStep<T> step, long delay);
-	
-//	/**
-//	 *  Execute some code on the component's thread.
-//	 *  Unlike scheduleStep(), the action will also be executed
-//	 *  while the component is suspended.
-//	 *  @param action	Code to be executed on the component's thread.
-//	 *  @param delay The delay to wait before step should be done.
-//	 *  @return The result of the step.
-//	 */
-//	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step, long delay);
+	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
 	
 	/**
 	 *  Test if current thread is an external thread.

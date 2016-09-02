@@ -782,11 +782,11 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 						{
 							if(getMGoal().isRebuild())
 							{
-								ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(this), getMGoal().getRetryDelay());
+								ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new FindApplicableCandidatesAction(this));
 							}
 							else
 							{
-								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this), getMGoal().getRetryDelay());
+								ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new SelectCandidatesAction(this));
 							}
 						}
 						else
@@ -821,7 +821,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 						setProcessingState(ia, GoalProcessingState.PAUSED);
 						if(getMGoal().getRecurDelay()>-1)
 						{
-							ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+							ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRecurDelay(),
+								new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
@@ -834,7 +835,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 									}
 									return IFuture.DONE;
 								}
-							}, getMGoal().getRecurDelay());
+							});
 						}
 					}
 					else

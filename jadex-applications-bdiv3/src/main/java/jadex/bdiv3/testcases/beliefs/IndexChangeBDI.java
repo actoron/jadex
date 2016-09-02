@@ -38,7 +38,7 @@ public abstract class IndexChangeBDI implements IBDIAgent
 		final TestReport tr = new TestReport("#1", "Test if waiting for an specific index works.");
 
 		final int[] cnt = new int[1];
-		getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		getExternalAccess().waitForDelay(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -46,11 +46,11 @@ public abstract class IndexChangeBDI implements IBDIAgent
 				System.out.println("now is: "+Arrays.toString(guards));
 				if(++cnt[0]<guards.length)
 				{
-					getExternalAccess().scheduleStep(this, 1000);
+					getExternalAccess().waitForDelay(1000, this);
 				}
 				return IFuture.DONE;
 			}
-		}, 1000);
+		});
 		
 		try
 		{
