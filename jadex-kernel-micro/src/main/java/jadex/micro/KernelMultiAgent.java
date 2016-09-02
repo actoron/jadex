@@ -22,6 +22,8 @@ import jadex.micro.annotation.ProvidedServices;
 @Arguments({
 	@Argument(name="defaultkernels", description= "Kernel default locations.", 
 		clazz=String[].class, defaultvalue="null"),
+	@Argument(name="potentialkernels", description= "Potential kernel locations.", 
+		clazz=String[].class, defaultvalue="new String[] { \"jadex.micro.KernelComponentAgent.class\",\"jadex.micro.KernelBpmnAgent.class\",\"jadex.bdiv3.KernelBDIV3Agent.class\",\"jadex.application.KernelApplication.component.xml\",\"jadex.bdiv3x.KernelBDIX.component.xml\" }"),
 	@Argument(name="ignorekernels", description="Kernels that are ignored.",
 		clazz=String[].class, defaultvalue="new String[] {}"),//{\"KernelBDI.component.xml\"}"),
 	@Argument(name="ignoreextensions", description="File extensions that are ignored.",
@@ -29,7 +31,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs  (ignored on android as there is only the DEX file).",
 		clazz=String.class, defaultvalue="jadex.commons.SReflect.isAndroid() ? \".*\" : \".*[Kk]ernel.*\"")})
 @ProvidedServices({
-	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
+	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.potentialkernels, $args.ignorekernels, $args.ignoreextensions)")),
 	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
 })
 @ComponentTypes({
