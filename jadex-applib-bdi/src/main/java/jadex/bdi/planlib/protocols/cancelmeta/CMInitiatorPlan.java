@@ -41,13 +41,13 @@ public class CMInitiatorPlan extends Plan
 		cancel.getParameter(SFipa.REPLY_WITH).setValue(SUtil.createUniqueId(getComponentName()));
 
 		// Send cancel message to participants.
-		long	timeout	= ((Number)getParameter("timeout").getValue()).longValue();
-		getWaitqueue().addReply(cancel);
-		sendMessage(cancel);
-		long time = getTime();
 		List<Object>	rec	= SUtil.arrayToList(message.getParameterSet(SFipa.RECEIVERS).getValues());
+		long	timeout	= ((Number)getParameter("timeout").getValue()).longValue();
+		long time = getTime();
 		try
 		{
+			getWaitqueue().addReply(cancel);
+			sendMessage(cancel);
 			while(rec.size()>0)
 			{
 				// Wait for the replies.
@@ -125,6 +125,10 @@ public class CMInitiatorPlan extends Plan
 						InteractionState.CANCELLATION_UNKNOWN, null);
 				}
 			}		
+		}
+		finally
+		{
+			getWaitqueue().removeReply(cancel);
 		}
 	}
 }

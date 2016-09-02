@@ -272,9 +272,9 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 		
 		if(exception!=NULL && !ignorefailures)
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
+			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneIntermediateResultListener<E>)delegate).exceptionOccurredIfUndone(exception);
+				((IUndoneResultListener<Collection<E>>)delegate).exceptionOccurredIfUndone(exception);
 			}
 			else
 			{
@@ -283,9 +283,9 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 		}
 		else
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
+			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneIntermediateResultListener<E>)delegate).resultAvailableIfUndone(results);
+				((IUndoneResultListener<Collection<E>>)delegate).resultAvailableIfUndone(results);
 			}
 			else
 			{

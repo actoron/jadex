@@ -68,7 +68,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		"message",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/message_small.png"),
 		"message_overlay",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/overlay_message.png"),
 		"conversation_sel", SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/new_conversation_sel.png"),
-		"help",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/help.gif"),
+		"help",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/help.png"),
 	});
 
 	//-------- attributes --------

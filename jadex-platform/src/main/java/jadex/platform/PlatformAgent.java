@@ -16,7 +16,6 @@ import static jadex.base.RootComponentConfiguration.CLOCK;
 import static jadex.base.RootComponentConfiguration.CONTEXT;
 import static jadex.base.RootComponentConfiguration.CONTEXTSERVICECLASS;
 import static jadex.base.RootComponentConfiguration.DF;
-import static jadex.base.RootComponentConfiguration.DHT_PROVIDE;
 import static jadex.base.RootComponentConfiguration.REGISTRY_SYNC;
 import static jadex.base.RootComponentConfiguration.FILETRANSFER;
 import static jadex.base.RootComponentConfiguration.GUI;
@@ -102,7 +101,6 @@ import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
 import jadex.platform.service.df.DirectoryFacilitatorAgent;
-import jadex.platform.service.dht.DistributedServiceRegistryAgent;
 import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
@@ -202,7 +200,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=DHT_PROVIDE, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=REGISTRY_SYNC, clazz=boolean.class, defaultvalue="false")
 })
 
@@ -243,7 +240,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
-	@ComponentType(name="distregistry", clazz=DistributedServiceRegistryAgent.class),
 	@ComponentType(name="registrysync", clazz=RegistrySynchronizationAgent.class),
 })
 
@@ -358,7 +354,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.dhtprovide? 1 : 0"),
 		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
 	}),
 	@Configuration(name="fixed", arguments={
@@ -439,7 +434,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.dhtprovide? 1 : 0"),
 		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
 	})
 })

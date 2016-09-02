@@ -99,7 +99,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 {
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIXAgentFeature.class, BDIXAgentFeature.class,  
 //		new Class[]{IMicroLifecycleFeature.class}, null);
-		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class}, new Class<?>[]{IInternalBDIAgentFeature.class});
+		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class}, IInternalBDIAgentFeature.class);
 	
 	/** The bdi model. */
 	protected IBDIModel bdimodel;
