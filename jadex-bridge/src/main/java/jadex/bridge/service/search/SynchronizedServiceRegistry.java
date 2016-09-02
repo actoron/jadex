@@ -388,7 +388,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> T searchService(final Class<T> type, final IComponentIdentifier cid, final String scope)
+	public <T> T searchService(final ClassInfo type, final IComponentIdentifier cid, final String scope)
 	{
 		return (T)readActionSync(new IResultCommand<Object, Void>()
 		{
@@ -407,7 +407,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> Collection<T> searchServices(final Class<T> type, final IComponentIdentifier cid, final String scope)
+	public <T> Collection<T> searchServices(final ClassInfo type, final IComponentIdentifier cid, final String scope)
 	{
 		return (Collection<T>)readActionSync(new IResultCommand<Object, Void>()
 		{
@@ -426,7 +426,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for service.
 	 */
-	public <T> T searchService(final Class<T> type, final IComponentIdentifier cid, final String scope, final IFilter<T> filter)
+	public <T> T searchService(final ClassInfo type, final IComponentIdentifier cid, final String scope, final IFilter<T> filter)
 	{
 		return (T)readActionSync(new IResultCommand<Object, Void>()
 		{
@@ -445,7 +445,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for service.
 	 */
-	public <T> Collection<T> searchServices(final Class<T> type, final IComponentIdentifier cid, final String scope, final IFilter<T> filter)
+	public <T> Collection<T> searchServices(final ClassInfo type, final IComponentIdentifier cid, final String scope, final IFilter<T> filter)
 	{
 		return (Collection<T>)readActionSync(new IResultCommand<Object, Void>()
 		{
@@ -464,7 +464,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for service.
 	 */
-	public <T> IFuture<T> searchService(final Class<T> type, final IComponentIdentifier cid, final String scope, final IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchService(final ClassInfo type, final IComponentIdentifier cid, final String scope, final IAsyncFilter<T> filter)
 	{
 //		return (IFuture<T>)readActionAsync(new IResultCommand<IFuture<Object>, Void>()
 //		{
@@ -496,7 +496,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(final Class<T> type, final IComponentIdentifier cid, final String scope, final IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(final ClassInfo type, final IComponentIdentifier cid, final String scope, final IAsyncFilter<T> filter)
 	{
 //		if(filter!=null)
 //			System.out.println("filter: "+filter.getClass());
@@ -530,7 +530,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> IFuture<T> searchGlobalService(final Class<T> type, final IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchGlobalService(final ClassInfo type, final IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
 		if(syncglobal)
 		{
@@ -569,7 +569,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(final Class<T> type, final IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(final ClassInfo type, final IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
 		if(syncglobal)
 		{

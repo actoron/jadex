@@ -226,7 +226,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension dim = toolkit.getScreenSize();
 		this.setLocation((int)(dim.getWidth()/2-this.getWidth()/2),
-				(int)(dim.getHeight()/2-this.getHeight()/2));
+			(int)(dim.getHeight()/2-this.getHeight()/2));
 
 		this.setLocation(SGUI.calculateMiddlePosition(this));
 		this.setVisible(true);

@@ -58,8 +58,9 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 			{
 				public void run()
 				{
-					Class<T> mytype = query.getType()==null? null: (Class<T>)query.getType().getType0();
-					searchRemoteServices(query.getOwner(), mytype, query.getFilter()).addIntermediateResultListener(lis);
+//					Class<T> mytype = query.getType()==null? null: (Class<T>)query.getType().getType0();
+//					searchRemoteServices(query.getOwner(), mytype, query.getFilter()).addIntermediateResultListener(lis);
+					searchRemoteServices(query.getOwner(), query.getType(), query.getFilter()).addIntermediateResultListener(lis);
 					
 					if(!ret.isDone())
 						waitForDelay(delay, this);

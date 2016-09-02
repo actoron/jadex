@@ -83,45 +83,47 @@ public interface IServiceRegistry
 	 *  Search for services.
 	 */
 	// read
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope);
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope);
 	
 	/**
 	 *  Search for services.
 	 */
 	// read
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope);
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope);
 	
 	/**
 	 *  Search for service.
 	 */
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter);
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter);
 	
 	/**
 	 *  Search for service.
 	 */
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter);
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter);
 	
 	/**
 	 *  Search for service.
 	 */
-	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
+	public <T> IFuture<T> searchService(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
 	
 	/**
 	 *  Search for services.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
-	
-	/**
-	 *  Search for services.
-	 */
-	// read
-	public <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter);
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
 	
 	/**
 	 *  Search for services.
 	 */
 	// read
-	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter);
+	public <T> IFuture<T> searchGlobalService(final ClassInfo type, IComponentIdentifier cid, final IAsyncFilter<T> filter);
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(ClassInfo type, IComponentIdentifier cid, IAsyncFilter<T> filter);
+	
+	
 	
 	/**
 	 *  Add an excluded component. 
@@ -173,3 +175,48 @@ public interface IServiceRegistry
 	public void removeSubregistry(IComponentIdentifier cid);
 
 }
+
+///**
+// *  Search for services.
+// */
+//// read
+//public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope);
+//
+///**
+// *  Search for services.
+// */
+//// read
+//public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope);
+//
+///**
+// *  Search for service.
+// */
+//public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter);
+//
+///**
+// *  Search for service.
+// */
+//public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter);
+//
+///**
+// *  Search for service.
+// */
+//public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
+//
+///**
+// *  Search for services.
+// */
+//public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
+//
+///**
+// *  Search for services.
+// */
+//// read
+//public <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter);
+//
+///**
+// *  Search for services.
+// */
+//// read
+//public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter);
+//

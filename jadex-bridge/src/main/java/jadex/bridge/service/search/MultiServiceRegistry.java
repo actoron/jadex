@@ -243,7 +243,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	 *  Search for services.
 	 */
 	// read
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
 		return searchfunc.searchService(type, cid, scope);
 	}
@@ -252,7 +252,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	 *  Search for services.
 	 */
 	// read
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
 		return searchfunc.searchServices(type, cid, scope);
 	}
@@ -260,7 +260,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	/**
 	 *  Search for service.
 	 */
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		return searchfunc.searchService(type, cid, scope, filter);
 	}
@@ -268,7 +268,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	/**
 	 *  Search for service.
 	 */
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		return searchfunc.searchServices(type, cid, scope, filter);
 	}
@@ -276,7 +276,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	/**
 	 *  Search for service.
 	 */
-	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchService(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		return searchfunc.searchService(type, cid, scope, filter);
 	}
@@ -284,7 +284,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	/**
 	 *  Search for services.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		return searchfunc.searchServices(type, cid, scope, filter);
 	}
@@ -292,7 +292,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	/**
 	 *  Search for services.
 	 */
-	public  <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	public  <T> IFuture<T> searchGlobalService(final ClassInfo type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
 		return searchfunc.searchService(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
 	}
@@ -300,7 +300,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	/**
 	 *  Search for services.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(ClassInfo type, IComponentIdentifier cid, IAsyncFilter<T> filter)
 	{
 		return searchfunc.searchServices(type, cid, RequiredServiceInfo.SCOPE_GLOBAL, filter);
 	}

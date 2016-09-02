@@ -153,7 +153,7 @@ public class DistributedServiceRegistry extends ServiceRegistry
 	}
 
 	@Override
-	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final IComponentIdentifier caller, final Class<T> type, IAsyncFilter<T> filter)
+	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final IComponentIdentifier caller, final ClassInfo type, IAsyncFilter<T> filter)
 	{
 		final TerminableIntermediateFuture<T> myret = new TerminableIntermediateFuture<T>();
 		ITerminableIntermediateFuture<T> ret = myret;
@@ -162,14 +162,14 @@ public class DistributedServiceRegistry extends ServiceRegistry
 	//		IDistributedServiceRegistryService kvService = getKvService().get();
 			if (isValid(kvService) && !caller.getName().contains("diststore")) {
 				System.out.println("Searching in DHT for: " + type + ", caller: " + caller.getName());
-				IFuture<Collection<ServiceRegistration>> lookup = kvService.lookup(type.getName());
+				IFuture<Collection<ServiceRegistration>> lookup = kvService.lookup(type.getTypeName());
 				lookup.addResultListener(new InvalidateServiceListener<Collection<ServiceRegistration>>()
 				{
 		
 					@Override
 					public void resultAvailable(Collection<ServiceRegistration> regs)
 					{
-						System.out.println("services found in dht store: " + type.getName() + ":");
+						System.out.println("services found in dht store: " + type.getTypeName() + ":");
 						if (regs!= null) {
 							
 							for(ServiceRegistration reg : regs)
@@ -203,7 +203,7 @@ public class DistributedServiceRegistry extends ServiceRegistry
 		return ret;
 	}
 
-	protected <T> TerminableIntermediateFuture<T> getServiceProxies(Collection<ServiceRegistration> regs, Class<T> type, IComponentIdentifier caller) {
+	protected <T> TerminableIntermediateFuture<T> getServiceProxies(Collection<ServiceRegistration> regs, ClassInfo type, IComponentIdentifier caller) {
 //		System.out.println("getproxies start.");
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		final CounterResultListener<Void> counter = new CounterResultListener<Void>(regs.size(), new DefaultResultListener<Void>()
@@ -219,7 +219,8 @@ public class DistributedServiceRegistry extends ServiceRegistry
 		{
 			IServiceIdentifier sid = reg.getSid();
 			if (!sid.getProviderId().getRoot().equals(access.getComponentIdentifier().getRoot())) {
-				getServiceProxy(sid, type, caller).addResultListener(new DefaultResultListener<T>() {
+				IFuture<T> fut = getServiceProxy(sid, type, caller);
+				fut.addResultListener(new DefaultResultListener<T>() {
 					
 					public void resultAvailable(T result)
 					{
@@ -243,7 +244,7 @@ public class DistributedServiceRegistry extends ServiceRegistry
 		return ret;
 	}
 	
-	protected <T> IFuture<T> getServiceProxy(final IServiceIdentifier sid, Class<T> type, IComponentIdentifier caller)
+	protected <T> IFuture<T> getServiceProxy(final IServiceIdentifier sid, ClassInfo type, IComponentIdentifier caller)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -267,7 +268,7 @@ public class DistributedServiceRegistry extends ServiceRegistry
 	}
 
 	@Override
-	protected <T> IFuture<T> searchRemoteService(IComponentIdentifier caller, final Class<T> type, IAsyncFilter<T> filter)
+	protected <T> IFuture<T> searchRemoteService(IComponentIdentifier caller, final ClassInfo type, IAsyncFilter<T> filter)
 	{
 		// TODO: single service lookup
 		return super.searchRemoteService(caller, type, filter);
@@ -283,7 +284,7 @@ public class DistributedServiceRegistry extends ServiceRegistry
 			System.out.println("Searching service...");
 			kvService = getService(IDistributedServiceRegistryService.class);
 			if (kvService == null) {
-				IFuture<IDistributedServiceRegistryService> search = super.searchRemoteService(access.getComponentIdentifier(), IDistributedServiceRegistryService.class, null);
+				IFuture<IDistributedServiceRegistryService> search = super.searchRemoteService(access.getComponentIdentifier(), new ClassInfo(IDistributedServiceRegistryService.class), null);
 				search.addResultListener(new DefaultResultListener<IDistributedServiceRegistryService>()
 				{
 
