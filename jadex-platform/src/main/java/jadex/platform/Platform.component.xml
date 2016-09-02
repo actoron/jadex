@@ -176,8 +176,6 @@
 		<argument name="context" class="boolean">true</argument>
 		<!-- Flag if address component and service should be started.  -->
 		<argument name="address" class="boolean">true</argument>
-		<!-- Flag if dht storage ring should be provided. -->
-		<argument name="dhtprovide" class="boolean">false</argument>
 		<!-- Flag if registry synchronization should be used. -->
 		<argument name="registrysync" class="boolean">false</argument>
 	</arguments>
@@ -217,7 +215,6 @@
 		<componenttype filename="jadex/platform/service/context/Context.component.xml" name="context"/>
 		<componenttype filename="jadex/platform/service/address/TransportAddressAgent.class" name="address"/>
 		
-		<componenttype filename="jadex/platform/service/dht/DistributedServiceRegistryAgent.class" name="distregistry"/>
 		<componenttype filename="jadex/platform/service/registry/RegistrySynchronizationAgent.class" name="registrysync"/>
 	</componenttypes>
 	
@@ -383,7 +380,6 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
-				<component name="distregistry" type="distregistry" daemon="true" number="Boolean.TRUE.equals($args.providedht)? 1: 0"/>
 				<component name="registrysync" type="registrysync" daemon="true" number="Boolean.TRUE.equals($args.registrysync)? 1: 0"/>
 			</components>
 		</configuration>
@@ -477,7 +473,6 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
-				<component name="distregistry" type="distregistry" daemon="true" number="Boolean.TRUE.equals($args.providedht)? 1: 0"/>
 				<component name="registrysync" type="registrysync" daemon="true" number="Boolean.TRUE.equals($args.registrysync)? 1: 0"/>
 			</components>
 		</configuration>

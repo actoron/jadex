@@ -66,25 +66,25 @@ public class RegistrySearchFunctionality
 		return provider.getQueries(type);
 	}
 	
-	/**
-	 *  Get services per type.
-	 *  @param type The interface type. If type is null all services are returned.
-	 *  @return First matching service or null.
-	 */
-	// read
-	protected Iterator<IService> getServices(Class<?> type)
-	{
-		return getServices(type==null? null: new ClassInfo(type));
-	}
+//	/**
+//	 *  Get services per type.
+//	 *  @param type The interface type. If type is null all services are returned.
+//	 *  @return First matching service or null.
+//	 */
+//	// read
+//	protected Iterator<IService> getServices(Class<?> type)
+//	{
+//		return getServices(type==null? null: new ClassInfo(type));
+//	}
 	
 	/**
 	 *  Search for services.
 	 */
 	// read
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
-		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
-			System.out.println("search: "+type+" - "+cid);
+//		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
+//			System.out.println("search: "+type+" - "+cid);
 		
 		T ret = null;
 		Iterator<IService> sers = getServices(type);
@@ -111,7 +111,7 @@ public class RegistrySearchFunctionality
 	 *  Search for services.
 	 */
 	// read
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
 		Set<T> ret = null;
 		Iterator<IService> sers = getServices(type);
@@ -135,12 +135,12 @@ public class RegistrySearchFunctionality
 	 *  Search for service.
 	 */
 	// read
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		T ret = null;
 		
-		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
-			System.out.println("search: "+type+" - "+cid);
+//		if(type!=null && type.getTypeName().indexOf("IRegistrySer")!=-1)
+//			System.out.println("search: "+type+" - "+cid);
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
@@ -176,12 +176,12 @@ public class RegistrySearchFunctionality
 	 *  Search for service.
 	 */
 	// read
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		List<T> ret = new ArrayList<T>();
 		
-		if(type!=null && type.toString().indexOf("Factory")!=-1)
-			System.out.println("sdfsdf");
+//		if(type!=null && type.toString().indexOf("Factory")!=-1)
+//			System.out.println("sdfsdf");
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
@@ -213,7 +213,7 @@ public class RegistrySearchFunctionality
 	 *  Search for service.
 	 */
 	// read
-	public <T> IFuture<T> searchService(final Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchService(final ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 				
@@ -261,7 +261,7 @@ public class RegistrySearchFunctionality
 		}
 		else
 		{
-			ret.setException(new ServiceNotFoundException(type.getName()));
+			ret.setException(new ServiceNotFoundException(type.getTypeName()));
 		}
 		
 		return ret;
@@ -327,7 +327,7 @@ public class RegistrySearchFunctionality
 	 *  Search for services.
 	 */
 	// read
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		try
 		{

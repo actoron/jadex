@@ -93,8 +93,8 @@ See the [RequiredServiceInfo](${URLJavaDoc}/jadex/bridge/service/RequiredService
 
 Service Scopes are respected in two cases: When providing a service and during service search. This means a *locally* provided service cannot be found by other components, even if the search scope is set to *global*.
 
-## Service Tagging
-TODO
+<!--## Service Tagging-->
+<!--TODO-->
 
 # Using Services
 

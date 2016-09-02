@@ -177,6 +177,12 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 												}
 											}
 										}
+										
+										@Override
+										public String toString()
+										{
+											return "DeltaTimeExecutor for "+container.getComponentIdentifier();
+										}
 									});
 								}
 								

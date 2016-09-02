@@ -127,7 +127,37 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 			}
 		}
 		getParameter("cfp_info").setValue(nr.getCFPInfo());
-		getLogger().info(getComponentName()+"(I)CNPPlan finished: "+convid);
+		getLogger().info(getComponentName()+"(I)CNPPlan finished: "+convid);		
+	}
+	
+	@Override
+	public void passed()
+	{
+		if(me!=null)
+		{
+			getWaitqueue().removeReply(me);
+		}
+		super.passed();
+	}
+	
+	@Override
+	public void failed()
+	{
+		if(me!=null)
+		{
+			getWaitqueue().removeReply(me);
+		}
+		super.failed();
+	}
+	
+	@Override
+	public void aborted()
+	{
+		if(me!=null)
+		{
+			getWaitqueue().removeReply(me);
+		}
+		super.aborted();
 	}
 	
 	/**

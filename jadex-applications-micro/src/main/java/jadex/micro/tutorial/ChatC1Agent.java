@@ -20,7 +20,8 @@ public class ChatC1Agent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentService
+	// Lazy false means that agent init waits for service search being done
+	@AgentService(lazy=false)
 	protected IClockService clockservice;
 	
 	@AgentBody

@@ -15,6 +15,7 @@ import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
+import jadex.commons.future.IUndoneResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 
 /**
@@ -226,9 +227,9 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 */
 	public void customResultAvailable(Collection<E> result)
 	{
-		if(undone && listener instanceof IUndoneIntermediateResultListener)
+		if(undone && listener instanceof IUndoneResultListener)
     	{
-    		((IUndoneIntermediateResultListener<E>)listener).resultAvailableIfUndone(result);
+    		((IUndoneResultListener<Collection<E>>)listener).resultAvailableIfUndone(result);
     	}
     	else
     	{
@@ -242,9 +243,9 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 */
 	public void customExceptionOccurred(Exception exception)
 	{
-		if(undone && listener instanceof IUndoneIntermediateResultListener)
+		if(undone && listener instanceof IUndoneResultListener)
     	{
-    		((IUndoneIntermediateResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+    		((IUndoneResultListener<Collection<E>>)listener).exceptionOccurredIfUndone(exception);
     	}
     	else
     	{

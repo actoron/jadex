@@ -16,6 +16,7 @@ import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
@@ -3225,8 +3226,8 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			public void customResultAvailable(IRemoteServiceManagementService rms)
 			{
-				rms.getServiceProxy(agent.getComponentIdentifier(), cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, null)
-					.addResultListener(createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
+				IFuture<IComponentManagementService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), cid, new ClassInfo(IComponentManagementService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
+				fut.addResultListener(createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
 			}
 		}));
 		

@@ -27,11 +27,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.search.DistributedServiceRegistry;
 import jadex.bridge.service.search.GlobalQueryServiceRegistry;
 import jadex.bridge.service.search.MultiServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
@@ -382,13 +380,8 @@ public class Starter
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 
-					if(config.getDht() || config.getDhtProvide()) 
-					{
-						boolean providedhtonly = !config.getDht();
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess(), providedhtonly));						
-					} 
 //					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
-					else if(config.getRegistrySync())
+					if(config.getRegistrySync())
 					{
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(true, new MultiServiceRegistry()));
 					}

@@ -1,26 +1,14 @@
 # Using Predefined Capabilities
 
 The documentation of the predefined capabilities is not yet finished.
-Please also take a look at the [BDI Tutorial (Exercise F4)](../BDI Tutorial/07 Using Events#exercise-f4-a-multi-agent-scenario)
-and at the [legacy documentation of Jadex 0.96](http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef_cap.html).
+Please also take a look at the [BDI Tutorial](../../tutorials/bdiv3/06 Using Capabilities/)
+and at the [legacy documentation of Jadex 0.96](${URLLegacyDoc}/userguide/predef_cap.html).
 
-<!-- 
-TODO: fix legacy link
--->
-
-
-Jadex uses capabilities for the modularization of agents (see [Chapter 5. Capabilities](05 Capabilities)), whereby capabilities contain ready to use functionalities. The Jadex distribution contains several ready-to-use predefined capabilities for different purposes. Besides the basic management capabilties for using the CMS (component management service, see [CMSCapability](#the-component-management-service-cms-capability) below and the Directory Facilitator (see [DFCapability](../AC Tool Guide/A3 Directory Facilitator/) also a [Protocols Capability](#HTheProtocolsCapability) is available for the efficient usage of some predefined FIPA interaction protocols. The interface of a capability mainly consists of a set of exported goals which is similar to an object-oriented method-based interface description. This chapter aims at depicting their usage by offering the application programmer an overview and explanation of their functionalities and additionally a selection of short code snippets that can directly be used in your applications. 
-
-
-<!-- 
-TODO: fix protocols capability link
--->
+Jadex uses capabilities for the modularization of agents (see [Chapter 5. Capabilities](05 Capabilities)), whereby capabilities contain ready to use functionalities. The Jadex distribution contains several ready-to-use predefined capabilities for different purposes. Besides the basic management capabilties for using the CMS (component management service, see [CMSCapability](#the-component-management-service-cms-capability) below and the Directory Facilitator (see [DFCapability](../../tools/A3 Directory Facilitator/) also a Protocols Capability is available for the efficient usage of some predefined FIPA interaction protocols. The interface of a capability mainly consists of a set of exported goals which is similar to an object-oriented method-based interface description. This chapter aims at depicting their usage by offering the application programmer an overview and explanation of their functionalities and additionally a selection of short code snippets that can directly be used in your applications. 
 
 The test capability for writing agent-based unit test is explained in the *Jadex Tool Guide*, which also illustrates the usage of the corresponding Test Center user interface.
- 
 
 ## The Component Management Service (CMS) Capability
-
 
 The Component Management Service (CMS) capability provides goals, that allow the application programmer
 to use functionalties of the local or some remote CMS. Basically the CMS is responsible for
@@ -425,15 +413,6 @@ In case of a remote request you have to set the component identifier
 of the remote CMS well.
 
 
-
-The documentation of the predefined capabilities is not yet finished.
-Please also take a look at the [BDI Tutorial (Exercise F4)](../BDI Tutorial/07 Using Events#exercise-f4-a-multi-agent-scenario)
-and at the [legacy documentation of Jadex 0.96](http://jadex.informatik.uni-hamburg.de/docs/jadex-0.96x/userguide/predef_cap.html).
-
-<!--
-TODO: FIX LEGACY LINK
--->
-
 The same goal is used to search for remote components:
 
 ```java
@@ -460,13 +439,6 @@ create the *CMSComponentDescription* with a new *ComponentIdentifier* as paramet
 you must instantiate the "cms_destroy_component"-goal by using the
 *createGoal()*-method with the parameter "cms_search_components".
 
-
-
 After dispatching the goal and waiting for success, you can fetch the result by calling
 *getParameterSet("result").getValues()* on the goal and casting to an array of
 CMS-component-descriptions. If no matching components were found, the resulting array will be empty.
-
-
-## Shutting down the platform
-
-Todo

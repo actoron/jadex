@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -12,11 +13,15 @@ import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
+import jadex.micro.annotation.ComponentType;
+import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -27,7 +32,15 @@ import jadex.micro.annotation.RequiredServices;
  *  It connects itself to the platform chat service.
  */
 @Agent
-@RequiredServices(@RequiredService(name="chat", type=IChatGuiService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
+@ComponentTypes(@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"))	// Hack!!! Implicit dependency to jadex-platform
+@Configurations({
+	@Configuration(name="intern", components=@Component(type="chat", arguments=@NameValue(name="nosave", value="true"), configuration="user")),
+	@Configuration(name="extern")
+})
+@RequiredServices({
+	@RequiredService(name="chat_intern", type=IChatGuiService.class),
+	@RequiredService(name="chat_extern", type=IChatGuiService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+})
 public class EchoChatAgent
 {
 	//-------- attributes --------
@@ -37,7 +50,7 @@ public class EchoChatAgent
 	protected IInternalAccess	agent;
 	
 	/** The gui service for controlling the inner chat component. */
-	@AgentService
+	@AgentService(name="%{\"chat_\"+$config}")
 	protected IChatGuiService	chat;
 	
 	//-------- methods --------
@@ -49,7 +62,9 @@ public class EchoChatAgent
 	public void	start()
 	{
 		chat.status(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle.
-//		chat.setNickName("Echo");
+		
+		chat.setNickName("Echo").get();
+
 //		try
 //		{
 //			chat.setImage(new LazyResource(EchoChatAgent.class, "images/eliza.png").getData());
@@ -58,7 +73,7 @@ public class EchoChatAgent
 //		{
 //		}
 		
-		final IComponentIdentifier	self	= ((IService)chat).getServiceIdentifier().getProviderId();
+		final IComponentIdentifier	self = ((IService)chat).getServiceIdentifier().getProviderId();
 		chat.subscribeToEvents().addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 		{
 			public void intermediateResultAvailable(ChatEvent event)

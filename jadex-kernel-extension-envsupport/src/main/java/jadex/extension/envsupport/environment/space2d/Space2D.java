@@ -140,15 +140,17 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public void setPosition(Object id, IVector2 pos)
 	{
+		ISpaceObject obj;
+		IVector2 newpos;
 		synchronized(monitor)
 		{
-			ISpaceObject obj = getSpaceObject(id);
+			obj = getSpaceObject(id);
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
 			
-			IVector2 newpos = adjustPosition(pos);
-			obj.setProperty(PROPERTY_POSITION, newpos);
+			 newpos = adjustPosition(pos);
 		}
+		obj.setProperty(PROPERTY_POSITION, newpos);
 	}
 
 	/**

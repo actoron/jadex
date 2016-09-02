@@ -94,7 +94,8 @@ rootConfig.setUsePass(false);
 ```
 
 # Platform services
-TODO: List of all services a default platform provides. 
+${SorryNotYetAvailable}
+<!--TODO: List of all services a default platform provides. -->
 
 # Packaging an Application
 

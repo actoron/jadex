@@ -304,7 +304,8 @@ public interface IComponentStep<T>
 
 
 ### Features
-TODO
+${SorryNotYetAvailable}
+<!--TODO: Describe IComponentFeature -->
 
 ### Extension Types
 

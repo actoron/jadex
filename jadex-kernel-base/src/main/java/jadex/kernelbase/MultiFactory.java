@@ -158,7 +158,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param extensionblacklist File extension the factory should not consider to be models 
 	 *  	   (no extension and most files with .class extension are ignored by default)
 	 */
-	public MultiFactory(String[] defaultLocations, String[] kernelblacklist, String[] extensionblacklist)
+	public MultiFactory(String[] defaultLocations, String[] potentiallocs, String[] kernelblacklist, String[] extensionblacklist)
 	{
 		//super(ia.getServiceContainer().getId(), IComponentFactory.class, null);
 		//this.ia = ia;
@@ -192,6 +192,15 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		}
 //		this.extensionblacklist = new HashSet(baseextensionblacklist);
 		this.potentialkernellocations = new HashSet<String>();
+		
+		if (potentiallocs != null)
+		{
+			for (int i = 0; i < potentiallocs.length; ++i)
+				potentialkernellocations.add(potentiallocs[i]);
+			
+		}
+		
+		
 		this.listeners = new ArrayList<IMultiKernelListener>();
 		started = false;
 	}

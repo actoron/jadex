@@ -227,6 +227,8 @@ public class SFuture
 	{
 		Future<?> ret = null;
 		
+		// todo: refactor to not catch exception but check type?
+		
 		try
 		{
 			ret = (Future<?>)clazz.newInstance();

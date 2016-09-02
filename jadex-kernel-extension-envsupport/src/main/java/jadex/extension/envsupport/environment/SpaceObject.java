@@ -118,11 +118,11 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 //			System.out.println("Setting: "+name+" "+value);
 		
 		Object	oldvalue;
-		synchronized(getMonitor())
-		{
-			oldvalue	= super.getProperty(name); 
-			super.setProperty(name, value);
-		}
+//		synchronized(getMonitor())
+//		{
+		oldvalue	= super.getProperty(name); 
+		super.setProperty(name, value);
+//		}
 		
 		space.fireObjectEvent(this, name, oldvalue);
 	}
@@ -133,10 +133,10 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 */
 	public Object getId()
 	{
-		synchronized(monitor)
-		{
+//		synchronized(monitor)
+//		{
 			return id;
-		}
+//		}
 	}
 	
 	/**
@@ -157,10 +157,10 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 */
 	public String getType()
 	{
-		synchronized(monitor)
-		{
+//		synchronized(monitor)
+//		{
 			return typename;
-		}
+//		}
 	}
 	
 	/**

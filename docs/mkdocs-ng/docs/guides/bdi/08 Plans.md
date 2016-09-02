@@ -182,12 +182,9 @@ public void body()
 ## Plan Success or Failure and BDI Exceptions
 
 If a plan completes without producing an exception it is considered as succeeded. Completion means for standard plans that the *body()* method returns. To perform cleanup after the plan has finished, you can override the *passed()*, *failed()*, and *aborted()* methods, which are called when the plan succeeds (runs through without exception), fails (e.g., due to an exception), or was aborted during execution (e.g., because the root goal was dropped or has been achieved before the plan reached its end). 
-<!--
-TODO: cross ref-correct image
--->
-In &lt;xref linkend="plans.plan\_skeleton"/&gt; a plan skeleton of a standard Jadex plan is depicted including all predefined methods. In the *failed()* method, a plan may call the *getException()* method to see which problem occured. To find out whether the plan was aborted, because its root goal was achieved, you can call the *isAbortedOnSuccess()* method inside the *aborted()* method.
-   
 
+Below, a plan skeleton of a standard Jadex plan is depicted including all predefined methods. In the *failed()* method, a plan may call the *getException()* method to see which problem occured. To find out whether the plan was aborted, because its root goal was achieved, you can call the *isAbortedOnSuccess()* method inside the *aborted()* method.
+   
 ```java
 
 public class MyPlan extends Plan 
@@ -219,9 +216,7 @@ public class MyPlan extends Plan
   }
 }
 
-```
-
-
+```  
 *Standard plan skeleton*
 
 Regardless if standard or mobile plans are used, a plan is considered as failed if it produces an exception. To aid debugging, occurring exceptions are (by default) printed on the console (*logging.level.WARNING*), although the agent continues to execute. Subclasses of *jadex.bdi.runtime.BDIFailureException* are not printed, because they are produced by the system and indicate "normal" plan failure (*logging.level.INFO*). If you want your plan explicitly to fail without printing an exception, you can throw a *PlanFailureException* or, as a shortcut, call the *fail()* method. Other subclasses of the *BDIFailureException are generated automatically by the system, to denote certain failures during plan execution. All of these exceptions can be explicitly handled if desired, or just ignored (causing the plan to fail). The **GoalFailureException*, is thrown, when a subgoal of a plan could not be reached or if the subgoal could not be adopted due to its uniqueness settings (i.e. there exists already a goal that is considered equal to the new one). The *MessageFailureException* indicates that a message could not be sent, e.g., because the receiver is unknown. A *TimeoutException* occurs when calling *waitFor()* with a timout, and the awaited event does not happen. Finally, the *ComponentTerminatedException* is thrown when an operation could not be performed, because the agent has died. This usually does not occur inside plans, but only when accessing an agent from external processes.
@@ -244,9 +239,7 @@ public void body()
   ...
 }
 
-```
-
-
+```  
 *How to establish an atomic block*
 
 ## Goal Processing
@@ -264,7 +257,6 @@ The mechanism to make a plan reacting to a specific goal is for all kinds of goa
   </trigger>
 </plan>
 
-```
-
+```  
 
 *Plan triggered by a goal*
