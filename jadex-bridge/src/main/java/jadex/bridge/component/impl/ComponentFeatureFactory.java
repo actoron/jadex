@@ -55,7 +55,7 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	/**
 	 *  Create a new feature factory.
 	 */
-	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] lookuptypes)
+	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>... lookuptypes)
 	{
 		this(type, impl, null, null, lookuptypes);
 	}
@@ -71,7 +71,7 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	/**
 	 *  Create a new feature factory.
 	 */
-	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs, Class<?>[] lookuptypes)
+	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs, Class<?>... lookuptypes)
 	{
 		this(type, impl, pres, sucs, true, lookuptypes);
 	}
