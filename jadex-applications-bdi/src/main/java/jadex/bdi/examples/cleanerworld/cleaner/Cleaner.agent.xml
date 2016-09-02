@@ -129,8 +129,8 @@
 			<creationcondition beliefs="wastes">
 				true
 			</creationcondition>
-			<contextcondition >
-				$beliefbase.my_chargestate&gt;0
+			<contextcondition>
+				$beliefbase.daytime
  			</contextcondition>
 			<dropcondition >
 				$beliefbase.myself.waste==null &amp;&amp;
@@ -155,18 +155,15 @@
 		<!-- Look out for waste when nothing better to do, what means that
 			the agent is not cleaning, not loading and it is daytime. -->
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
-			<!-- <contextcondition >
+			<contextcondition >
 				$beliefbase.daytime
- 			</contextcondition> -->
- 			<contextcondition >
-				$beliefbase.my_chargestate&gt;0
  			</contextcondition>
  		</performgoal>
 
 		<!-- Perform patrols at night when the agent is not loading. -->
 		<performgoal name="performpatrol" retry="true" exclude="never">
 			<contextcondition >
-				!$beliefbase.daytime &amp;&amp; $beliefbase.my_chargestate>0
+				!$beliefbase.daytime
  			</contextcondition>
  		</performgoal>
 
@@ -236,11 +233,7 @@
 		</achievegoal>
 
 		<!-- Memorize the already visited positions in a raster. -->
-		<performgoal name="performmemorizepositions">
-			<contextcondition>
-				$beliefbase.my_chargestate&gt;0
- 			</contextcondition>
-		</performgoal>
+		<performgoal name="performmemorizepositions"/>
 		
 		<!-- Drop a piece of waste. -->
 		<achievegoal name="helpbatteryempty">
@@ -399,7 +392,7 @@
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="performlookforwaste"/>
-  				<!-- <initialgoal ref="performpatrol"/>-->
+  				<initialgoal ref="performpatrol"/>
 		  		<initialgoal ref="maintainbatteryloaded"/>
 				<initialgoal ref="performmemorizepositions"/>
 			</goals>
