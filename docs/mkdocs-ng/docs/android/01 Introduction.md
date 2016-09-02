@@ -37,7 +37,14 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 
 ##  Release Notes
 
-### 3.0-RC16
+### 3.0.0-RC68
+-	Better error messages when generating BDIV3 agents at compile time using jadex-gradle-plugin
+
+### 3.0.0-RC42
+
+-   Ported the jadex-gradle-plugin to the new Transform API (android build tools 2.0.0 required)
+
+### 3.0.0-RC16
 
 -   PlatformConfiguration object for platform configuration
 -   Android Studio support (Eclipse support dropped!)
@@ -84,7 +91,7 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 -   communication between platforms fixed, so remote mobile platform components are visible in JCC
     (This requires the HTTP Relay Transport to be enabled if running in an emulator)
 -   added AndroidSettingsService for File Access on Android Devices
--   introduced AndroidContextService to provide access to android files (TODO: properties)
+-   introduced AndroidContextService to provide access to android files
 -   Security Service is active by default. The generated Plattform Password will be written to LogCat and saved in
     */data/data/<packagename\>/files/<platformname\>.settings.xml*.
     To disable the Security Service, just uncomment the Service in your platform.component.xml

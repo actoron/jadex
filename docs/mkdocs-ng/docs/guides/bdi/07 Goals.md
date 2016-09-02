@@ -245,41 +245,13 @@ The current release of Jadex includes a goal deliberation strategy called *Easy 
 
 The goal deliberation settings are included in the goal specification in the ADF Using the &lt;deliberation&gt; tag. The cardinality is specified as an integer value in the cardinality attribute of the &lt;deliberation&gt; tag. The default is to allow an unlimited number of goals of a type to be processed at once. Inhibition arcs between goal types are specified using the *ref* attribute of the &lt;inhibits&gt; tag, which specifies the name of the goal to inhibit. Per default, any instance of the inhibiting goal type inhibits any instance of the referenced goal type. An expression can be included as content of the inhibits tag, in which case the inhibition only takes effect when the expression evaluates to true. Using the expression variables $goal and $ref, fine-grained instance-level inhibition releationships may be specified. Some goals, such as idle maintain goals, might not alway be in conflict with other goals, therefore it is sometimes required to restrict the inhibition to only take effect when the goal is in process. This can be specified with the inhibit attribute of the &lt;inhibits&gt; tag, using "when_active" (default) or "when_in_process" as appropriate. For a better understanding of the goal deliberation mechanism in the following the deliberation settings of the cleanerworld example will be explained.
 
+The following figure shows the dependencies between the goals of a cleaner agent (cf. package jadex.bdi.examples.cleanerworld). The basic idea is that the cleaner agent (being an autonomous robot) has at daytime the task to look for waste in some environment and clean up the located pieces by bringing them to a near waste-bin. At night it should stop cleaning and instead patrol around to guard its environment. Additionally, it always has to monitor its battery state and reload it at a charging station when the energy level drops below some threshold.
 
-<!-- TODO: fix image link
-
-![](wheredoesthisimagego.png)
-
-&lt;xref linkend="goals.deliberation.example.fig"/&gt; 
-
--->
-
-shows the dependencies between the goals of a cleaner agent (cf. package jadex.bdi.examples.cleanerworld). The basic idea is that the cleaner agent (being an autonomous robot) has at daytime the task to look for waste in some environment and clean up the located pieces by bringing them to a near waste-bin. At night it should stop cleaning and instead patrol around to guard its environment. Additionally, it always has to monitor its battery state and reload it at a charging station when the energy level drops below some threshold.
-
-
-
-
-![](cleanergoals.png)
-
+![](cleanergoals.png)  
 *Figure 4: Example goal dependencies (taken from Cleanerworld scenario)*
 
+The dependencies can be naturally mapped to the goal specifications in the ADF below:
 
-
-
-The dependencies can be naturally mapped to the goal specifications in the ADF 
-
-<!-- TODO: fix code link
-
-![](wheredoesthisimagego.png)
-
-
-(see &lt;xref linkend="goals.deliberation.example.xml"/&gt;). 
--->
-
-
-The &lt;inhibits&gt; tags are used to specify that the "maintainbatteryloaded" goal is more important than the other goals. As the "maintainbatteryloaded" is a maintain goal, it only needs to precede the other goals when it is in process, i.e., the cleaner is currently recharging its battery. The cardinality of the "achievecleanup" goal specifies, that the agent should only pursue one cleanup goal at the same time. The goal inhibits the "performlookforwaste" goal and additionally introduces a runtime inhibition relationship to other goals of its type. The expression contained in the inhibits declaration means that one "achievecleanup" goal should inhibit other instances of the "achievecleanup" goal, when its waste location is nearer to the agent.
-
-  
 ```xml
 <maintaingoal name="maintainbatteryloaded">
   <deliberation>
@@ -302,6 +274,10 @@ The &lt;inhibits&gt; tags are used to specify that the "maintainbatteryloaded" g
 </achievegoal>
 ```
 *Example goals (taken from Cleanerworld scenario)*
+
+The &lt;inhibits&gt; tags are used to specify that the "maintainbatteryloaded" goal is more important than the other goals. As the "maintainbatteryloaded" is a maintain goal, it only needs to precede the other goals when it is in process, i.e., the cleaner is currently recharging its battery. The cardinality of the "achievecleanup" goal specifies, that the agent should only pursue one cleanup goal at the same time. The goal inhibits the "performlookforwaste" goal and additionally introduces a runtime inhibition relationship to other goals of its type. The expression contained in the inhibits declaration means that one "achievecleanup" goal should inhibit other instances of the "achievecleanup" goal, when its waste location is nearer to the agent.
+
+  
 
 # Meta Goal
 
