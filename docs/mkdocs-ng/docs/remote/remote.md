@@ -66,7 +66,55 @@ By default, the security level for all services is ```Security.PASSWORD``` and r
 TODO
 
 # Serialization
-TODO
+When a remote service is called, the data of the call must be transmitted to the remote machine using a network connection. Critically, this data includes the method parameters of the call as well as the return values once the call is complete.
+
+Java objects like those in the parameters exist in the local computers memory. In order to send them over to the remote machine, they must be converted into a form that can be send over networks. This process is called serialization, which turns Java objects into binary or text representations that can be transmitted.
+
+Jadex Active Components includes a number of serialization approaches, the default being a compact binary format. However, not all objects can be sensible serialized, for example, it makes no sense to serialize a java.lang.Thread object, since it represents an execution thread only valid on the local machine. Therefore, in order for serialization to work, the classes you use in service calls must one of the following:
+
+* A number of classes, mostly standard Java library classes, are directly supported by Jadex Active Components. This includes primitive value (int, long, ...), Strings, Java collection classes (Lists, Sets, Maps, ...) as well as certain useful standard classes like Exceptions, Date, Image and URI/URL.
+
+* Classes that loosely follow the JavaBean conventions.
+
+The latter option allows you to easily implement your own classes that can be transmitted. The classes do not have to follow the full JavaBean specification, only two things are required:
+
+* The class must offer a "default constructor", which means it includes a constructor that has no arguments.
+
+* JavaBean-conforming accessor methods for each field you want transmitted.
+
+For example, the following example would conform to this:
+
+```java
+public class Customer {
+
+	private int id;
+	private String name;
+	
+	public Customer() {
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public String getName() {
+		return id;
+	}
+	
+	public void setName(int name) {
+		this.name = name;
+	}
+```
+
+As long as your classes conform to this pattern or are one of the directly supported types, they can be transmitted. You can also nest (use one of them as a field in another class) at will and even include (self-) references to other parts of the object graph and the object will be correctly recreated on the remote computer.
+
+<x-hint title="java.io.Serializable">
+Notice that the class does not implement the java.io.Serializable interface. It is not necessary because Jadex Active Components does not use the Java built-in serialization by default. While the build-in serialization works and is quick, it has some serious drawbacks that makes it inflexible such as requiring implementing the java.io.Serialization marker interface in all classes nested in an object as well as lack of support for partially-matching class versions.
+</x-hint>
 
 # Advanced Topics 
 
