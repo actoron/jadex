@@ -40,19 +40,23 @@ public class MoveToLocationPlan extends Plan
 			double dy = target.getY()-myloc.getY();
 			//time	= newtime;
 
+			// Alter the charge state
+			double	charge	= ((Double)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
+			charge	-= r*0.075;
+			if(charge<0)
+			{
+				throw new RuntimeException("Out of battery.");
+			}
+			getBeliefbase().getBelief("my_chargestate").setFact(Double.valueOf(charge));
+
 			// When radius greater than distance, just move a step.
 			double rx = r<d? r*dx/d: dx;
 			double ry = r<d? r*dy/d: dy;
 			getBeliefbase().getBelief("my_location").setFact(new Location(myloc.getX()+rx, myloc.getY()+ry));
 
-			// Alter the charge state
-			double	charge	= ((Double)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-			charge	-= r*0.075;
-			getBeliefbase().getBelief("my_chargestate").setFact(Double.valueOf(charge));
-
 			waitFor(100); // wait for 0.01 seconds
 
-			// Ceck if location has changed in mean time.
+			// Check if location has changed in mean time.
 			myloc = (Location)getBeliefbase().getBelief("my_location").getFact();
 
 			updateVision();
