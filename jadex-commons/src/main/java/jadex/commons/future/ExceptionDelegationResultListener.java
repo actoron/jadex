@@ -93,7 +93,7 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public abstract void customResultAvailable(E result);
+	public abstract void customResultAvailable(E result) throws Exception;
 
 	/**
 	 *  Called when an exception occurred.
