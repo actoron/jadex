@@ -150,7 +150,12 @@ public class SResultListener {
      * @return {@link IResultListener}
      */
     public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, boolean undone, final IFunctionalResultListener<E> customResultListener) {
-    	return new ExceptionDelegationResultListener<E, T>(delegate, undone, customResultListener);
+    	return new ExceptionDelegationResultListener<E, T>(delegate, undone) {
+			@Override
+			public void customResultAvailable(E result) {
+				customResultListener.resultAvailable(result);
+			}
+		};
     }
     
     /**

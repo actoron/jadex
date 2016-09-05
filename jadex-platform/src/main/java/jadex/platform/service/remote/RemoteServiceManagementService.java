@@ -13,6 +13,7 @@ import java.util.TimerTask;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -392,7 +393,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<T> getServiceProxy(IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<T> getServiceProxy(IComponentIdentifier caller, final IComponentIdentifier cid, final ClassInfo service, String scope, IAsyncFilter<T> filter)
 	{
 //		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
@@ -408,7 +409,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 				else
 				{
-					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getName()));
+					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getTypeName()));
 				}
 			}
 			
@@ -430,7 +431,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, final String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(IComponentIdentifier caller, final IComponentIdentifier cid, final ClassInfo service, final String scope, IAsyncFilter<T> filter)
 	{
 		return getServiceProxies(caller, cid, service, scope, true, filter);
 	}
@@ -444,7 +445,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final IComponentIdentifier cid, final ClassInfo service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
 	{
 		final Future<Collection<T>> ret = new Future<Collection<T>>();
 		
@@ -475,7 +476,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final ITransportComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final ITransportComponentIdentifier cid, final ClassInfo service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
 	{
 //		final Future<T>	ret	= new Future<T>();
 //		

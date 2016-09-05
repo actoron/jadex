@@ -2,6 +2,7 @@ package jadex.bridge.service.types.remote;
 
 import java.util.Collection;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IAsyncFilter;
@@ -22,7 +23,7 @@ public interface IRemoteServiceManagementService
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<T> getServiceProxy(IComponentIdentifier caller, IComponentIdentifier cid, Class<T> service, String scope, IAsyncFilter<T> filter);
+	public <T> IFuture<T> getServiceProxy(IComponentIdentifier caller, IComponentIdentifier cid, ClassInfo service, String scope, IAsyncFilter<T> filter);
 	
 	/**
 	 *  Get all service proxies from a remote component.
@@ -33,7 +34,7 @@ public interface IRemoteServiceManagementService
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(IComponentIdentifier caller, IComponentIdentifier cid, Class<T> service, String scope, IAsyncFilter<T> filter);
+	public <T> IFuture<Collection<T>> getServiceProxies(IComponentIdentifier caller, IComponentIdentifier cid, ClassInfo service, String scope, IAsyncFilter<T> filter);
 
 	/**
 	 *  Get an external access proxy from a remote component.

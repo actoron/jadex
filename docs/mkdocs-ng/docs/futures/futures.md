@@ -311,8 +311,8 @@ Some of the most useful types are introduced below, for a complete list check ou
 
 ### Delegation
 As Futures, respectively the corresponding asynchronous calls, get nested, we need way to delegate results from one Future to the other.
-E.g., in the following method, we want to add two integers and then convert them to a string.
-The ```ExceptionDelegationResultListener``` forwards exceptions to the given future and allows to implement a custom result handling.
+E.g., in the following method, we want to add two integers and then convert them to a string.  
+The ```ExceptionDelegationResultListener``` forwards exceptions to the given future and allows to implement a custom result handling.  
 The ```DelegationResultListener``` forwards results and exceptions to the given future.
 ```java
 public IFuture<String> addAndToString(int a, int b) {
@@ -327,7 +327,7 @@ public IFuture<String> addAndToString(int a, int b) {
 }
 ```
 
-Additionally, with Java 8 Lambda Expressions, you can also use ```SResultListener.delegate``` and ```SResultListener.delegateExceptions```::
+Additionally, with Java 8 Lambda Expressions, you can also use ```SResultListener.delegate``` and ```SResultListener.delegateExceptions```:
 ```java
 addService.add(a,b).addResultListener(SResultListener.delegateExceptions(res, 
 	sum -> toStringService.toString(sum).addResultListener(SResultListener.delegate(res))));

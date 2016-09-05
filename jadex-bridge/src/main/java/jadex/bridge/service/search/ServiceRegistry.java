@@ -267,7 +267,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for services.
 	 */
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
@@ -277,7 +277,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for services.
 	 */
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			throw new IllegalArgumentException("For global searches async method searchGlobalServices has to be used.");
@@ -287,7 +287,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for service.
 	 */
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
@@ -297,7 +297,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for service.
 	 */
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
@@ -307,7 +307,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for service.
 	 */
-	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchService(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			return new Future<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
@@ -317,7 +317,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for services.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			return new SubscriptionIntermediateFuture<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
@@ -427,7 +427,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for services.
 	 */
-	public <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchGlobalService(final ClassInfo type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		final IComponentIdentifier	lcid	= IComponentIdentifier.LOCAL.get();
@@ -451,7 +451,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for services.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(ClassInfo type, IComponentIdentifier cid, IAsyncFilter<T> filter)
 	{		
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
@@ -508,7 +508,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 *  @param type The type.
 	 *  @param filter The filter.
 	 */
-	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final IComponentIdentifier caller, final Class<T> type, final IAsyncFilter<T> filter)
+	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final IComponentIdentifier caller, final ClassInfo type, final IAsyncFilter<T> filter)
 	{
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		// Must not find services twice (e.g. having two proxies for the same platform)
@@ -608,7 +608,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 *  @param type The type.
 	 *  @param scope The scope.
 	 */
-	protected <T> IFuture<T> searchRemoteService(final IComponentIdentifier caller, final Class<T> type, final IAsyncFilter<T> filter)
+	protected <T> IFuture<T> searchRemoteService(final IComponentIdentifier caller, final ClassInfo type, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -631,7 +631,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 					{
 						public void customResultAvailable(Void result)
 						{
-							ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+							ret.setExceptionIfUndone(new ServiceNotFoundException(type.getTypeName()));
 						}
 					});
 					
@@ -670,17 +670,17 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 				}
 				else
 				{
-					ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+					ret.setExceptionIfUndone(new ServiceNotFoundException(type.getTypeName()));
 				}
 			}
 			else
 			{
-				ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+				ret.setExceptionIfUndone(new ServiceNotFoundException(type.getTypeName()));
 			}
 		}
 		else
 		{
-			ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+			ret.setExceptionIfUndone(new ServiceNotFoundException(type.getTypeName()));
 		}
 		
 		return ret;

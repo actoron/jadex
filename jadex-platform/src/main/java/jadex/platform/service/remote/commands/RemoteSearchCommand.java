@@ -85,14 +85,14 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/**
 	 *  Create a new remote search command.
 	 */
-	public RemoteSearchCommand(IComponentIdentifier providerid, Class<?> type, 
+	public RemoteSearchCommand(IComponentIdentifier providerid, ClassInfo type, 
 		boolean multiple, String scope, String callid, IAsyncFilter<IService> filter, IComponentIdentifier caller)
 	{
 //		if(type==null)
 //			System.out.println("type is null");
 		
 		this.providerid = providerid;
-		this.type = new ClassInfo(type);
+		this.type = type;
 		this.multiple = multiple;
 		this.scope = scope;
 		this.callid = callid;
