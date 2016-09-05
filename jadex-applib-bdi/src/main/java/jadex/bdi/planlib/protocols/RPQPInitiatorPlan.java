@@ -58,6 +58,10 @@ public class RPQPInitiatorPlan extends AbstractInitiatorPlan
 		{
 			requestFinished(false, STATUS_TIMEOUT);
 		}
+		finally
+		{
+			getWaitqueue().removeReply(request);
+		}
 	}
 
 	//-------- helper methods --------

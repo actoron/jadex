@@ -57,6 +57,12 @@
 				<component type="DumbHunter" number="1" />
 			</components>
 		</configuration>
+		<configuration name="Dumpo">
+			<components>
+				<component type="Environment" />
+				<component type="DumbPrey" number="1" />
+			</components>
+		</configuration>
 	</configurations>
 
 </applicationtype>
