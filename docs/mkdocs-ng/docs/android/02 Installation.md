@@ -2,7 +2,7 @@
 
 This document will guide you through the setup that is necessary to develop applications using Jadex-Android.
 
-**Please [report](http://sourceforge.net/projects/jadex/forums/forum/274112) ** any difficulties or errors in this document as well as in the provided *jadex-android* libraries.
+**Please [report](${URLJadexForum}) ** any difficulties or errors in this document as well as in the provided *jadex-android* libraries.
 
 ## Requirements
 
