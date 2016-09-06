@@ -217,7 +217,7 @@ public class RegistrySearchFunctionality
 	{
 		final Future<T> ret = new Future<T>();
 				
-//		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
+//		if(type!=null && type.getTypeName().indexOf("IClient")!=-1)
 //			System.out.println("search: "+type+" - "+cid);
 		
 //		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
@@ -329,8 +329,6 @@ public class RegistrySearchFunctionality
 	// read
 	public <T> ISubscriptionIntermediateFuture<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
-		try
-		{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
@@ -348,12 +346,6 @@ public class RegistrySearchFunctionality
 			ret.setFinished();
 		}
 		return ret;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
 	}
 	
 //	/**

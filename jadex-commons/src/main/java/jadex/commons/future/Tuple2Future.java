@@ -177,17 +177,21 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
 	public void addTuple2ResultListener(final IFunctionalResultListener<E> firstListener, final IFunctionalResultListener<F> secondListener, IFunctionalExceptionListener exceptionListener)
 	{
 		final IFunctionalExceptionListener innerExceptionListener = (exceptionListener == null) ? SResultListener.printExceptions() : exceptionListener;
-		addResultListener(new DefaultTuple2ResultListener<E, F>() {
-
-			public void firstResultAvailable(E result) {
+		addResultListener(new DefaultTuple2ResultListener<E, F>() 
+		{
+			public void firstResultAvailable(E result) 
+			{
 				firstListener.resultAvailable(result);
 			}
 
-			public void secondResultAvailable(F result) {
-				secondListener.resultAvailable(result);
+			public void secondResultAvailable(F result) 
+			{
+				if(secondListener!=null)
+					secondListener.resultAvailable(result);
 			}
 
-			public void exceptionOccurred(Exception exception) {
+			public void exceptionOccurred(Exception exception) 
+			{
 				innerExceptionListener.exceptionOccurred(exception);
 			}
 		});
