@@ -36,7 +36,6 @@ import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3x.BDIXModel;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bdiv3x.features.IInternalBDIXMessageFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -379,17 +378,9 @@ public abstract class Plan
 		}
 		else
 		{
-			// todo??? add scope name if is in capa
+			// todo: add scope name if is in capa
 			rplan.setWaitAbstraction(wa);
-			try
-			{
-				agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)event);
-				return ret.get(timeout);
-			}
-			finally
-			{
-				agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)event);
-			}
+			return ret.get(timeout);
 		}
 	}
 	
@@ -574,15 +565,7 @@ public abstract class Plan
 		sendMessage(me);
 		
 		Future<IMessageEvent> ret = new Future<IMessageEvent>();
-		try
-		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)me);
-			return ret.get(timeout);
-		}
-		finally
-		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)me);
-		}
+		return ret.get(timeout);
 	}
 
 	/**
@@ -1369,7 +1352,6 @@ public abstract class Plan
 		 */
 		public void addReply(IMessageEvent mevent)
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)mevent);
 			getWaitAbstraction().addReply((RMessageEvent)mevent, null);
 		}
 
@@ -1451,7 +1433,6 @@ public abstract class Plan
 		 */
 		public void removeReply(IMessageEvent me)
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)me);
 			getWaitAbstraction().addReply((RMessageEvent)me, null);
 		}
 

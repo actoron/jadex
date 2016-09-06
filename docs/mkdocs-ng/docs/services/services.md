@@ -66,10 +66,11 @@ Additionally, the following parameters can be specified:
 |Parameter|Description|
 |---------|-----------|
 |*value*  |A class implementing the service|
-|*expression*| Java expression to be executed for instantiation of the service. Can be used instead of *value* to pass constructor arguments. TODO: link to expression guide|
+|*expression*| Java expression to be executed for instantiation of the service. Can be used instead of *value* to pass constructor arguments. <!--TODO: link to (non-existing) java expression guide-->|
 |*proxytype* | The [type](#proxy-types) of the service proxy that is created.|
-|*interceptors* | (not documented) |
-|*binding* | (not documented) |
+
+<!--|*interceptors* | (not documented) |-->
+<!--|*binding* | The binding for forwarding service calls to another component. |-->
 
 ## Service Scopes
 Whether a service is visible for another component depends on it's scope as shown in the figure below.
@@ -121,8 +122,8 @@ Inside the ```@RequiredService``` annotation, the following parameters can be sp
 |*type*| The type (interface) of the service|
 |*multiple*| Set to true if multiple instances of the service should be used, see [Advanced Service Topics](#using-multiple-services)|
 |*binding*| A ```@Binding``` annotation (see below)|
-|*multiplextype*| (not documented)|
-|*nfprops*| TODO nfprops|
+|*multiplextype*| The type for multiplexing. See [service multiplexing](#service-multiplexing).|
+|*nfprops*| The required service non functional properties. See [non functional properties](#non-functional-properties).|
 
 ** @Binding **  
 The ```@Binding``` annotation defines parameters of the service binding that Jadex will establish between providing and requiring components. Most notably, it defines the [search scope](#service-scopes). Other parameters are:
@@ -278,6 +279,10 @@ In this case, the classpath will be searched for a component of type *sum* (e.g.
 ## Proxy types
 
 ## Properties
+
+## Non Functional Properties
+
+## Service Multiplexing
 
 ## Publishing
 

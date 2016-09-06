@@ -177,8 +177,6 @@ This section discusses some of the more advanced topics regarding components.
 
 ## More Annotations
 The most important annotations common to all components were already discussed.
-<!-- TODO: Describe more annotations-->
-<!--The following is an uncomplete list of other potentially useful annotations. -->
 For a full reference, have a look at the [jadex.micro.annotation](${URLJavaDoc}/jadex/micro/annotation/package-summary.html) package.
 
 <!--InternalAccess?-->
@@ -188,10 +186,10 @@ For a full reference, have a look at the [jadex.micro.annotation](${URLJavaDoc}/
 <!--## Messaging-->
 <!--TODO: Messaging-->
 
-|Annotation|Description|Method declaration|
-|----------|-----------|------------------|
-| **@AgentMessageArrived** | Methods annotated with this will be called when the component receives messages.| void messageArrived(Map<String, Object> msg, MessageType mt)
-| **@AgentStreamArrived** | Methods annotated with this will be called when the component receives a new message stream. | TODO method header?
+<!--|Annotation|Description|Method declaration|-->
+<!--|----------|-----------|------------------|-->
+<!--| **@AgentMessageArrived** | Methods annotated with this will be called when the component receives messages.| void messageArrived(Map<String, Object> msg, MessageType mt)-->
+<!--| **@AgentStreamArrived** | Methods annotated with this will be called when the component receives a new message stream. | TODO method header?-->
 
 <!--## Composition-->
 <!--TODO: Component Composition!-->

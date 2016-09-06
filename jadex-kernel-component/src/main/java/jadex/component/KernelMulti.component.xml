@@ -15,6 +15,7 @@
 	<arguments>
 		<argument name="defaultkernels" class="String[]">null</argument>
 		<!-- <argument name="ignorekernels">new String[] {"KernelBDI.component.xml"}</argument> -->
+		<argument name="potentialkernels" class="String[]">null</argument>
 		<argument name="ignorekernels" class="String[]">null</argument>
 		<argument name="ignoreextensions" class="String[]">null</argument>
 		<!-- Regular expression identifying kernel URIs (ignored on android as there is only the DEX file). -->
@@ -35,7 +36,7 @@
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation>
-				new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)
+				new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.potentialkernels, $args.ignorekernels, $args.ignoreextensions)
 			</implementation>
 		</providedservice>
 		
