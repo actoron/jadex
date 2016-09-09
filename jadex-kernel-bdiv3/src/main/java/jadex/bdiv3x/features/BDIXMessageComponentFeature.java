@@ -443,7 +443,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		RMessageEvent[] smes = (RMessageEvent[])sent_mevents.keySet().toArray(new RMessageEvent[0]);
 		//todo: indexing for msgevents for speed.
 
-		for(int i=smes.length-1; ret==null && i>-1; i--)
+		for(int i=smes.length-1; i>-1; i--)
 		{
 			boolean	match = true; // Does the message match all convid parameters?
 			boolean	matched	= false; // Does the message match at least one (non-null) convid parameter?
@@ -480,7 +480,12 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			
 			if(matched && match)
 			{
-				ret	= smes[i];
+				// Break tie by using shorter (full) capability name -> prefers outer capa before inner (e.g. cnp_cap vs. cnp_cap/cm_cap).
+				if(ret==null || smes[i].getModelElement().getCapabilityName()==null
+					|| smes[i].getModelElement().getCapabilityName().length()<(ret.getModelElement().getCapabilityName()==null ? 0 : ret.getModelElement().getCapabilityName().length()))
+				{
+					ret	= smes[i];
+				}
 			}
 		}
 		
