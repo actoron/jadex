@@ -11,7 +11,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
- * 
+ *  Processor for java util date.
  */ 
 public class JsonDateProcessor implements ITraverseProcessor
 {	
@@ -25,6 +25,7 @@ public class JsonDateProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
 		Class<?> clazz = SReflect.getClass(type);
+		// Timestamp is handled separately
 		return SReflect.isSupertype(Date.class, clazz) && !SReflect.isSupertype(Timestamp.class, clazz);
 	}
 	
