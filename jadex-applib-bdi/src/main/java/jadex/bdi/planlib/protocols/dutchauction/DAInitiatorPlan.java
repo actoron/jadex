@@ -132,6 +132,36 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 		announceAuctionEnd(receivers, convid, winning_offer, winner);
 	}
 	
+	@Override
+	public void passed()
+	{
+		if(start!=null)
+		{
+			getWaitqueue().removeReply(start);
+		}
+		super.passed();
+	}
+	
+	@Override
+	public void failed()
+	{
+		if(start!=null)
+		{
+			getWaitqueue().removeReply(start);
+		}
+		super.failed();
+	}
+	
+	@Override
+	public void aborted()
+	{
+		if(start!=null)
+		{
+			getWaitqueue().removeReply(start);
+		}
+		super.aborted();
+	}
+	
 	/**
 	 *  Announce the planned auction.
 	 *  @param auctiondesc the auction description.

@@ -59,4 +59,13 @@ public class PropertyChangeEvent extends EventObject {
     public Object getNewValue() {
         return newValue;
     }
+    
+    /**
+     * Returns a String representation of this EventObject.
+     *
+     * @return  A a String representation of this EventObject.
+     */
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ", name="+propertyName+"]";
+    }
 }
