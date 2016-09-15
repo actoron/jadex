@@ -9,7 +9,6 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
-import jadex.commons.SUtil;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.collection.WeakSet;
@@ -25,7 +24,7 @@ public class BlocksworldPanel	extends JPanel
 	/** The block placement x variance as fraction of the total available space (0-1). */
 	protected static final double	XVARIANCE	= 0.2;
 
-	/** The block placement variance as fraction of the total available space (0-XVARIANCE). */
+	/** The block placement y variance as fraction of the total available space (0-XVARIANCE). */
 	protected static final double	YVARIANCE	= 0.04;
 
 	//-------- attributes --------
