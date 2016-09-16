@@ -2,7 +2,6 @@ package jadex.bpmn.runtime.task;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,6 +17,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -170,20 +170,7 @@ public class PojoTaskWrapper implements ITask
 		}
 		catch(Exception e)
 		{
-			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-			if(t instanceof Error)
-			{
-				throw (Error)t;
-			}
-			else if(t instanceof RuntimeException)
-			{
-				throw (RuntimeException)t;
-			}
-			else
-			{
-				throw new RuntimeException(t);
-			}
-//			throw t instanceof BodyAborted? (BodyAborted)t: t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		return ret;
@@ -227,20 +214,7 @@ public class PojoTaskWrapper implements ITask
 		}
 		catch(Exception e)
 		{
-			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-			if(t instanceof Error)
-			{
-				throw (Error)t;
-			}
-			else if(t instanceof RuntimeException)
-			{
-				throw (RuntimeException)t;
-			}
-			else
-			{
-				throw new RuntimeException(t);
-			}
-//			throw t instanceof BodyAborted? (BodyAborted)t: t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		return ret;

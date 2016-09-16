@@ -123,17 +123,9 @@ public class APL
 						candidates = (List<Object>)m.invoke(pojo, new Object[0]);
 						done = true;
 					}
-					catch(InvocationTargetException e)
-					{
-						throw e.getTargetException() instanceof RuntimeException
-							? (RuntimeException)e.getTargetException()
-							: new RuntimeException(e.getTargetException());
-					}
 					catch(Exception e)
 					{
-						throw e instanceof RuntimeException
-							? (RuntimeException)e
-							: new RuntimeException(e);
+						throw SUtil.throwUnchecked(e);
 					}
 				}
 			}

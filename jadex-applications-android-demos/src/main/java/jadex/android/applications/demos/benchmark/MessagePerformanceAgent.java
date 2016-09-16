@@ -17,6 +17,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentMessageArrived;
@@ -211,7 +212,7 @@ public class MessagePerformanceAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						throw (exception instanceof RuntimeException) ? (RuntimeException) exception : new RuntimeException(exception);
+						throw SUtil.throwUnchecked(exception);
 					}
 				});
 			}

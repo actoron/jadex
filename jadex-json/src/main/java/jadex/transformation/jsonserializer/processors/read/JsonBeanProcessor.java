@@ -9,6 +9,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
@@ -66,7 +67,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		return ret;
@@ -105,7 +106,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 			}
 			catch(Exception e)
 			{
-				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+				throw SUtil.throwUnchecked(e);
 			}
 		}
 		
@@ -130,7 +131,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 //			}
 //			catch(Exception e)
 //			{
-//				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+//				throw SUtil.throwUnchecked(e);
 //			}
 //		}
 	}

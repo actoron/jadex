@@ -1,7 +1,6 @@
 package jadex.micro.features.impl;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
@@ -259,8 +258,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 													}
 													catch(Throwable t)
 													{
-														t = t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
-														throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+														throw SUtil.throwUnchecked(t);
 													}
 													return IFuture.DONE;
 												}
@@ -289,8 +287,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 													}
 													catch(Throwable t)
 													{
-														t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
-														throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+														throw SUtil.throwUnchecked(t);
 													}
 													return IFuture.DONE;
 												}
@@ -333,9 +330,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 												}
 												catch(Throwable t)
 												{
-													t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
-													lis2.exceptionOccurred(t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t));
-//													throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+													throw SUtil.throwUnchecked(t);
 												}
 												return IFuture.DONE;
 											}

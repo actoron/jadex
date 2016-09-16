@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 /**
  *  Processor that traverses all fields of an object.
@@ -56,7 +57,7 @@ class FieldProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		return ret;
@@ -93,7 +94,7 @@ class FieldProcessor implements ITraverseProcessor
 					}
 					catch(Exception e)
 					{
-						throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+						throw SUtil.throwUnchecked(e);
 					}
 				}
 			}

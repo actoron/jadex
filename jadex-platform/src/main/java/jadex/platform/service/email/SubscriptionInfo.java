@@ -248,8 +248,7 @@ public class SubscriptionInfo
 		}
 		catch(Exception e)
 		{
-			throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
-//			e.printStackTrace();
+			throw SUtil.throwUnchecked(e);
 		}
 		finally
 		{

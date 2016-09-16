@@ -176,7 +176,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		catch(Exception e)
 		{
-			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 	}
 	
@@ -196,7 +196,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		catch(Exception e)
 		{
-			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 	}
 	
@@ -1435,7 +1435,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				}
 				catch(Exception e)
 				{
-					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+					throw SUtil.throwUnchecked(e);
 				}
 				
 				injectAgent(getComponent(), capa, caps[i].getSecondEntity(), globalname);

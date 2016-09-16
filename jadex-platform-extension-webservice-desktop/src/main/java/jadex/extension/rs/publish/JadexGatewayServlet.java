@@ -134,7 +134,7 @@ public class JadexGatewayServlet extends HttpServlet
 //		{
 //			public void exceptionOccurred(Exception e)
 //			{
-//				throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
+//				throw SUtil.throwUnchecked(e);
 //			}
 //			
 //			public void resultAvailable(Void result)
@@ -188,7 +188,7 @@ public class JadexGatewayServlet extends HttpServlet
 				{
 					if(!complete[0])
 						ctx.complete();
-					throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
+					throw SUtil.throwUnchecked(e);
 				}
 				
 				public void resultAvailable(Void result)

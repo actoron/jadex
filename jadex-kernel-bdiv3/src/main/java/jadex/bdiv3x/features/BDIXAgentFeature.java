@@ -232,7 +232,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		}
 		catch(Exception e)
 		{
-			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 	}
 	
@@ -717,7 +717,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 //				}
 //				catch(Exception e)
 //				{
-//					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+//					throw SUtil.throwUnchecked(e);
 //				}
 //				
 ////				injectAgent(getComponent(), capa, caps[i].getSecondEntity(), globalname);

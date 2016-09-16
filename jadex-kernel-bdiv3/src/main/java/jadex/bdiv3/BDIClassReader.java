@@ -277,7 +277,7 @@ public class BDIClassReader extends MicroClassReader
 					}
 					catch(Exception e)
 					{
-						throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+						throw SUtil.throwUnchecked(e);
 					}
 				}
 			}
