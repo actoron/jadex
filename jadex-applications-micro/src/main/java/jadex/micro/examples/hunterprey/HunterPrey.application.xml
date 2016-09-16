@@ -30,9 +30,15 @@
 	<extensiontypes>
 		<env:envspacetype name="2dspace" class="Grid2D" width="30" height="30">
 			<env:objecttypes>
-				<env:objecttype name="hunter" />
-				<env:objecttype name="prey" />
-				<env:objecttype name="obstacle" />
+				<env:objecttype name="hunter">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
+				<env:objecttype name="prey">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
+				<env:objecttype name="obstacle">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
 				<env:objecttype name="food" >
 					<env:property name="size" dynamic="true">
 						new Vector2Double(

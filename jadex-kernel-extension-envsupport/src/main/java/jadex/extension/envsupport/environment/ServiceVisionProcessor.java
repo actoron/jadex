@@ -8,7 +8,7 @@ public class ServiceVisionProcessor	extends SimplePropertyObject implements IPer
 {
 	public ServiceVisionProcessor()
 	{
-		System.out.println("created: "+this);
+//		System.out.println("created: "+this);
 	}
 	
 	public void processPercept(IEnvironmentSpace space, String type, Object percept, IComponentDescription component, ISpaceObject avatar)

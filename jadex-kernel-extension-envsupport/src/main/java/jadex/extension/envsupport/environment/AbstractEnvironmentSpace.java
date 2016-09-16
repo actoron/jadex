@@ -2093,12 +2093,12 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		String	componenttype = comp.getLocalType();
 		synchronized(monitor)
 		{
-//					if(!percepttypes.containsKey(typename))
-//						throw new RuntimeException("Unknown percept type: "+typename);
+//			if(!percepttypes.containsKey(typename))
+//				throw new RuntimeException("Unknown percept type: "+typename);
 			
-//					System.out.println("New percept: "+typename+", "+data+", "+component);
+//			System.out.println("New percept: "+typename+", "+data+", "+comp.getName());
 			
-//					String	componenttype = ia.getComponentType(cid);
+//			String	componenttype = ia.getComponentType(cid);
 			List procs	= (List)perceptprocessors.get(componenttype);
 			IPerceptProcessor proc = null;
 			if(procs!=null)
