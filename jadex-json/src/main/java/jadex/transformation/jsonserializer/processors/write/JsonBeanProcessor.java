@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import jadex.commons.SUtil;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
@@ -71,7 +72,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		wr.write("}");
@@ -119,7 +120,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 			}
 			catch(Exception e)
 			{
-				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+				throw SUtil.throwUnchecked(e);
 			}
 		}
 	}

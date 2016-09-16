@@ -2,10 +2,11 @@ package jadex.commons.gui;
 
 import java.awt.Component;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.swing.SwingUtilities;
+
+import jadex.commons.SUtil;
 
 /**
  *  The gui creator.
@@ -37,18 +38,9 @@ public class GuiCreator
 					Constructor<?> con = clazz.getConstructor(argclasses);
 					gui = (Component)con.newInstance(args);
 				}
-				catch(InvocationTargetException e)
-				{
-					throw e.getTargetException() instanceof RuntimeException
-						? (RuntimeException)e.getTargetException() : new RuntimeException(e.getTargetException());
-				}
-				catch(RuntimeException e)
-				{
-					throw e;
-				}
 				catch(Exception e)
 				{
-					throw new RuntimeException(e);
+					throw SUtil.throwUnchecked(e);
 				}
 			}
 		});

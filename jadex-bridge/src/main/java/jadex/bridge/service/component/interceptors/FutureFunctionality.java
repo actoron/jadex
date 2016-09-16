@@ -91,7 +91,7 @@ public class FutureFunctionality
 //		Thread.dumpStack();
 //		if(!undone && ! async)
 //		{
-//			throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+//			throw SUtil.throwUnchecked(e);
 //		}
 	}
 	

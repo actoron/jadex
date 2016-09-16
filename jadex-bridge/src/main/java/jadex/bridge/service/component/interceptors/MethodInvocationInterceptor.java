@@ -9,6 +9,7 @@ import jadex.bridge.StepAborted;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ErrorException;
 import jadex.commons.future.Future;
@@ -164,14 +165,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			if(t instanceof StepAborted
 				|| !SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType()))
 			{
-				if(t instanceof Error)
-				{
-					throw (Error)t;
-				}
-				else
-				{
-					throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
-				}
+				throw SUtil.throwUnchecked(t);
 			}
 			else
 			{

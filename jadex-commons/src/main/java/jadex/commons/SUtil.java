@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -71,6 +72,7 @@ import java.util.zip.ZipOutputStream;
 
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
+import jadex.commons.future.ErrorException;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -4499,6 +4501,35 @@ public class SUtil
 		return sw.toString();
 	}
 	
+	/**
+	 *  Convert a throwable to an unchecked exception (i.e. error or runtime exception).
+	 *  Also unpacks InvocationTargeteException and ErrorException.
+	 *  @param t	The throwable.
+	 *  @return Dummy return value as exception will be thrown inside. Use as <code>throw SUtil.throwUnchecked(t);</code> to avoid compilation errors.
+	 */
+	public static RuntimeException throwUnchecked(Throwable t)	throws Error,	RuntimeException
+	{
+		if(t instanceof InvocationTargetException)
+		{
+			throw throwUnchecked(((InvocationTargetException)t).getTargetException());
+		}
+		else if(t instanceof ErrorException)
+		{
+			throw throwUnchecked(((ErrorException)t).getError());
+		}
+		else if(t instanceof Error)
+		{
+			throw (Error)t;
+		}
+		else if(t instanceof RuntimeException)
+		{
+			throw (RuntimeException)t;
+		}
+		else
+		{
+			throw new RuntimeException(t);
+		}
+	}
 
 	/**
 	 *  Guess the mime type by the file name.

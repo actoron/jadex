@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 /**
  *  Processor that clones cloneable objects.
@@ -46,7 +47,7 @@ public class CloneProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 	}
 }

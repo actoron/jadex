@@ -99,7 +99,7 @@ public class MethodCondition implements ICondition
 		catch(Exception e)
 		{
 			fut.setException(e);			
-			//throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+			//throw SUtil.throwUnchecked(e);
 		}
 		return fut;
 	}

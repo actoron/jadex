@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 
 /**
@@ -54,7 +55,7 @@ public class BeanProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		return ret;
@@ -94,7 +95,7 @@ public class BeanProcessor implements ITraverseProcessor
 				}
 				catch(Exception e)
 				{
-					throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+					throw SUtil.throwUnchecked(e);
 				}
 			}
 //			clazz = clazz.getSuperclass();

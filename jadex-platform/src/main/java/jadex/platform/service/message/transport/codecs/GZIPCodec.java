@@ -79,7 +79,7 @@ public class GZIPCodec implements ICodec
 		}
 		catch(Exception e) 
 		{
-			throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		return ret;
@@ -125,7 +125,7 @@ public class GZIPCodec implements ICodec
 		}
 		catch(Exception e) 
 		{
-			throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 	
 		return ret;

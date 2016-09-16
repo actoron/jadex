@@ -16,6 +16,7 @@ import jadex.bridge.service.annotation.CheckState;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -99,7 +100,7 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 			else
 			{
 				// Synchronous method -> have to throw exception!?
-				throw ex instanceof RuntimeException ? (RuntimeException)ex : new RuntimeException(ex);
+				throw SUtil.throwUnchecked(ex);
 			}
 		}
 		

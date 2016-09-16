@@ -257,7 +257,7 @@ public class BeanCodec extends AbstractCodec
 			}
 			catch(Exception e)
 			{
-				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+				throw SUtil.throwUnchecked(e);
 			}
 		}*/
 		
