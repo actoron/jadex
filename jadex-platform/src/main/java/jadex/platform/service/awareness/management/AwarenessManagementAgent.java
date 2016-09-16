@@ -942,14 +942,14 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 					ci.setDaemon(true);
 //					ci.setParent(parent);
 					
-//					System.out.println("create proxy: "+(++cnt));
+//					System.out.println("create proxy: "+dif.getComponentIdentifier());
 					
 					cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/platform/service/remote/ProxyAgent.class", ci, 
 						agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(agent.getLogger())
 					{
 						public void resultAvailable(Collection<Tuple2<String, Object>> result)
 						{
-//									System.out.println("Proxy killed: "+source);
+//							System.out.println("Proxy killed: "+source);
 							dif.setProxy(null);
 							informListeners(dif);
 						}

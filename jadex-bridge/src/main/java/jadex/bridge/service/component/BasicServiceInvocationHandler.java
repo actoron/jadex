@@ -198,8 +198,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //		if(method.getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("call method ex");
 		
-//		if(method.getName().indexOf("calculate")!=-1)
-//			System.out.println("call method child");
+		if(method.getName().indexOf("addB")!=-1)
+			System.out.println("call method add");
 		
 //		ServiceInvocationContext sicon = null;
 		

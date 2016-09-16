@@ -428,8 +428,8 @@ public class ServiceInvocationContext
 	{
 		IFuture<Void> ret;
 		
-//		if(method.getName().equals("testResultReferences"))
-//			System.out.println("invoke: "+caller);
+		if(method.getName().equals("addB"))
+			System.out.println("invoke: "+caller);
 		
 		push(object, method, args, null);
 		

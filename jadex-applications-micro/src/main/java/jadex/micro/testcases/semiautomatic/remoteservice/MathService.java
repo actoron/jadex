@@ -33,7 +33,7 @@ public class MathService extends BasicService implements IMathService
 	public IFuture<Integer> addNB(int a, int b)
 	{
 		System.out.println("addNB: "+a+" "+b);
-		return new Future(Integer.valueOf(a+b));
+		return new Future<Integer>(Integer.valueOf(a+b));
 	}
 	
 	/**

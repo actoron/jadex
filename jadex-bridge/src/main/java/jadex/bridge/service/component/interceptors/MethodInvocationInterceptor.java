@@ -41,8 +41,8 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			// a) the method is directly the business logic or
 			// b) the method jumps from required to provided interceptor chain
 				
-//			if(sic.getMethod().getName().indexOf("method")!=-1)
-//				System.out.println("ggggg");
+			if(sic.getMethod().getName().indexOf("addB")!=-1)
+				System.out.println("ggggg");
 			
 			// Problem that the object could be an rmi proxy itself that delegates the call
 			// Is this case the switch (current becomes next) must not occur

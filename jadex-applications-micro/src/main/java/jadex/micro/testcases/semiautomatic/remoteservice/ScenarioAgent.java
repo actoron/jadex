@@ -57,12 +57,11 @@ public class ScenarioAgent
 							}
 						}
 						StartScenario.startScenario(libpaths.toArray(new String[libpaths.size()])).addResultListener(
-							agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+							agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess[]>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(IExternalAccess[] platforms)
 							{
 								System.out.println("Killing platforms");
-								IExternalAccess[] platforms = (IExternalAccess[])result;
 								for(int i=0; i<platforms.length; i++)
 									platforms[i].killComponent();
 							}
