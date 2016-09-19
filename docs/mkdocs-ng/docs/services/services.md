@@ -45,7 +45,7 @@ A service can be provided by any component. Just add the following Annotation to
 public class SumAgent {...
 ```
 
-To provide multiple services, just add them to the list of ```@ProvidedServices``` (comma-separated).
+To provide multiple services, just add them to the comma-separated list of ```@ProvidedServices```.
 
 ** @ProvidedService **  
 Inside the ```@ProvidedService``` annotation, the following parameters can be specified:
