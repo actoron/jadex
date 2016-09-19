@@ -1,4 +1,4 @@
-site_name: Jadex Active Components ${jadexversion} Documentation
+site_name: Jadex Active Components ${jadexversiontitle} Documentation
 theme_dir: 'theme'
 pages:
 

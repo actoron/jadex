@@ -11,7 +11,7 @@ The alternative commands for launching the Jadex Standalone platform are:
 
 ```java jadex.standalone.Platform```   <!-- 2 spaces generate a non-paragraph-line-break -->
 or     
-```java -jar libjadex-platform-standalone-launch-${ireallyneedajadexversion}.jar```   
+```java -jar libjadex-platform-standalone-launch-${jadexversion}.jar```   
 (As the name of the jar depends on the current release please be sure to use the correct version).
 
 ## Exercise A1 - Creating a Project

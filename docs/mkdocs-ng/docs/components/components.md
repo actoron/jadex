@@ -181,7 +181,7 @@ For a full reference, have a look at the [jadex.micro.annotation](${URLJavaDoc}/
 
 <!--InternalAccess?-->
 <!--| **@Agent** | fields | Injects the ```IExternalAccess``` of the component.|-->
-<!--| **@Parent** | fields | TODO |-->
+<!--| **@Parent** | fields | |-->
 
 <!--## Messaging-->
 <!--TODO: Messaging-->
@@ -189,17 +189,20 @@ For a full reference, have a look at the [jadex.micro.annotation](${URLJavaDoc}/
 <!--|Annotation|Description|Method declaration|-->
 <!--|----------|-----------|------------------|-->
 <!--| **@AgentMessageArrived** | Methods annotated with this will be called when the component receives messages.| void messageArrived(Map<String, Object> msg, MessageType mt)-->
-<!--| **@AgentStreamArrived** | Methods annotated with this will be called when the component receives a new message stream. | TODO method header?-->
+<!--| **@AgentStreamArrived** | Methods annotated with this will be called when the component receives a new message stream. | method header?-->
 
 <!--## Composition-->
 <!--TODO: Component Composition!-->
 
-<!-- TODO: Parameter Guesser-->
-<!--## Parameter Guesser-->
-<!--What can be guessed: -->
 
-<!--- component features-->
-<!--- agent capabilities-->
-<!--- IInternalAccess-->
-<!--- IExternalAccess-->
-<!--- Agent Pojo-->
+## Parameter Guesser
+Each Jadex Active Component has a *Parameter Guesser* that is used for annotation-based injections, e.g. when using ```@ServiceComponent``` inside Services or ```@AgentFeature``` inside Components.  
+When using one of these annotations on methods or fields, fields and method parameters declared with the following types are filled with values, if possible:
+
+-  IInternalAccess
+-  IExternalAccess
+-  Subtypes of IComponentFeature (see [Component Features](#component-features))
+-  Subtypes of ICapability (for bdiv3 components)
+-  Type of your Component - to inject the Component POJO
+
+<!-- TODO: for which annotations does the parameter guesser work? -->

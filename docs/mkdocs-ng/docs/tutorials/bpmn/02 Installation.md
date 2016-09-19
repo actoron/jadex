@@ -38,7 +38,7 @@ Afterwards enter a group and artifact id, e.g. 'jadex' and 'bpmntutorial' and cl
 
 ![02 Installation@4.png](02%20Installation/02%20Installation-4.png)
 
-Now we have to add a dependency to Jadex in the 'pom.xml'. If you want to use the latest Jadex nighly builds, it is necessary to add the Jadex repository to the pom.xml. Releases can be directly obtained from the Maven central repository. Below, it is shown what has to be added to the pom.xml for using version ${ireallyneedajadexversion} of Jadex.
+Now we have to add a dependency to Jadex in the 'pom.xml'. If you want to use the latest Jadex nighly builds, it is necessary to add the Jadex repository to the pom.xml. Releases can be directly obtained from the Maven central repository. Below, it is shown what has to be added to the pom.xml for using version ${jadexversion} of Jadex.
 
 
 ```xml
@@ -47,7 +47,7 @@ Now we have to add a dependency to Jadex in the 'pom.xml'. If you want to use th
   <dependency>
     <groupId>org.activecomponents.jadex</groupId>
     <artifactId>jadex-distribution-standard</artifactId>
-    <version>${ireallyneedajadexversion}</version>
+    <version>${jadexversion}</version>
   </dependency> 
 </dependencies> 
   

@@ -95,7 +95,7 @@ See the [RequiredServiceInfo](${URLJavaDoc}/jadex/bridge/service/RequiredService
 Service Scopes are respected in two cases: When providing a service and during service search. This means a *locally* provided service cannot be found by other components, even if the search scope is set to *global*.
 
 <!--## Service Tagging-->
-<!--TODO-->
+<!--TODO: Service tags -->
 
 # Using Services
 
@@ -130,16 +130,16 @@ The ```@Binding``` annotation defines parameters of the service binding that Jad
 
 |Parameter|Description|
 |---------|-----------|
-|*proxytype*| TODO |
-|*name*| TODO|
-|*componentname*|TODO|
-|*componenttype*|TODO|
-|*scope*| The search scope to find the required service |
-|*dynamic*| If set to true, a new search will be initiated every time the required service is accessed |
+<!--|*name*| |-->
+<!--|*componentname*||-->
+<!--|*componenttype*||-->
+|*scope*| The [search scope](#service-scopse) to find the required service. |
+|*dynamic*| If set to true, a new search will be initiated every time the required service is accessed. |
 |*create*| Set to true if the service should be instantiated by the local component |
 |*creationInfo*| ```@CreationInfo``` annotation, see [Advanced Service Topics](#auto-instantiation-of-required-services) |
-|*recover*| TODO|
-|*interceptors*| (not documented)|
+<!--|*recover*| TODO: Document recover flag|-->
+<!--|*interceptors*| Document interceptors flag |-->
+|*proxytype*| To access a service, a proxy is created. By default, this proxy decouples the two component threads involved in a service call. Read more about this in [../guides/ac/05 Services/#interceptor-handling]. |
 
 
 # Accessing Services
@@ -160,7 +160,14 @@ public void setSumService(ISumService sum) { ...
 </x-hint>
 
 Instead of injecting the service instance, you can directly inject values of the service:
-TODO: @AgentServiceValue
+```java
+@RequiredServices(@RequiredService(name="piService", ...))
+public class PiAgent {
+	@AgentServiceValue(name="piService")
+	private double pi 
+	...
+```
+This will look up the value of the field *pi* in the *piService* and inject it into the component field. Note that both field names have to be equal.
 
 ## Using Component Features
 You can also access the required services of a component by using the RequiredServicesFeature. Inject the feature inside the code of your component and call *getRequiredService()*:
@@ -178,7 +185,16 @@ Note that the name specified must match the required service declaration.
 By using the ```IProvidedServiceFeature```, you can also get access to services *provided* by your component.
 
 ## The IService interface
-TODO
+Each Required Service is made available to the Component by a *Proxy* that implements the ```IService``` interface. This interface provides access to some metadata which can be accessed by casting any service to the IService interface:
+
+```java
+IService sumservice = (IService) sum;
+IServiceIdentifier id = sumservice.getServiceIdentifier();
+IComponentIdentifier cid = id.getProviderId();
+String platformName = cid.getPlatformName();
+```
+The Component Identifier of the service provider is probably the most interesting information held by the IService interface, as it can be used to check on which component and platform the service is running.
+Check the API documentation for [IService](${URLJavaDoc}/jadex/bridge/service/IService.html) for more information.
 
 # Accessing the Component
 
@@ -196,7 +212,7 @@ private IInternalAccess agentAccess;
 private MyAgent agent;
 ```
 
-This annotation will also inject Agent Capabilities (see [BDI Capabilities](../bdiv3/06 Using Capabilities/)) and other instances that can be guessed by the [Parameter Guesser](../components/components/#parameter-guesser).
+This annotation will also inject Agent Capabilities (see [BDI Capabilities](../tutorials/bdiv3/06 Using Capabilities/)) and other instances that can be guessed by the [Parameter Guesser](../components/components/#parameter-guesser).
 
 # Service Lifecycle
 
@@ -275,15 +291,16 @@ public class UsingAgent {...
 In this case, the classpath will be searched for a component of type *sum* (e.g., *SumAgent*), which will be instantiated when *UsingAgent* is started. 
 
 ## Using Multiple services
-
+{SorryNotYetAvailable}
+<!-- TODO: using multiple services -->
 ## Proxy types
-
+<!-- TODO: service proxy types-->
 ## Properties
-
+<!-- TODO: service properties-->
 ## Non Functional Properties
-
+<!-- TODO: non functional service properties -->
 ## Service Multiplexing
-
+<!-- TODO: service multiplexing-->
 ## Publishing
-
-| **@Publish** | TODO |
+<!-- TODO: Service publishing-->
+<!--| **@Publish** | |-->

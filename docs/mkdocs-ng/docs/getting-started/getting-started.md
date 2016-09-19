@@ -32,7 +32,7 @@ Alternatively, add the following code to your build script's dependency section:
  
 ###Gradle Project
 ```groovy
-compile 'org.activecomponents.jadex:jadex-distribution-standard:${ireallyneedajadexversion}'
+compile 'org.activecomponents.jadex:jadex-distribution-standard:${jadexversion}'
 ```
   
 ###Apache Maven Project:
@@ -96,7 +96,7 @@ This project will be used as a basis for your own development projects. To make 
 ![02 Installation@eclipsebuildpathexport.png](eclipsebuildpathexport.png)  
 *Export jars from build path*
 
-For further simplifying later development, you should attach the sources to the Jadex jars, as this will enable eclipse to provide better context sensitive help on method signatures, etc. Open the 'Referenced Libraries' node (if shown) and the 'jadex-applications-micro-${ireallyneedajadexversion}.jar'. In the 'jadex.micro.examples.helloworld' package double click on the 'HelloWorldAgent.class' file. The file will be opened, showing the reverse engineered byte code. Click the 'Attach Source...' button, choose 'Workspace...' and select the 'sources.zip' file contained in the Jadex project. Click 'OK'. The Java source of the hello world agent should now be displayed. Repeat these steps for the other Jadex jars. It is recommended for this tutorial to add the sources at least to the 'jadex-bridge', 'jadex-commons', 'jadex-kernel-micro' jars.
+For further simplifying later development, you should attach the sources to the Jadex jars, as this will enable eclipse to provide better context sensitive help on method signatures, etc. Open the 'Referenced Libraries' node (if shown) and the 'jadex-applications-micro-${jadexversion}.jar'. In the 'jadex.micro.examples.helloworld' package double click on the 'HelloWorldAgent.class' file. The file will be opened, showing the reverse engineered byte code. Click the 'Attach Source...' button, choose 'Workspace...' and select the 'sources.zip' file contained in the Jadex project. Click 'OK'. The Java source of the hello world agent should now be displayed. Repeat these steps for the other Jadex jars. It is recommended for this tutorial to add the sources at least to the 'jadex-bridge', 'jadex-commons', 'jadex-kernel-micro' jars.
 
 ## Development Project Setup
 
@@ -106,7 +106,7 @@ In this lesson you will set up your own an eclipse project for all the files tha
 
 Create a new Java project in eclipse. Choose a name as you like (e.g. 'tutorial'). Create a Java package in this project. The following examples use 'tutorial' as a package name. You can find sample solution files in the Jadex distribution in the *jadex.micro.tutorial* package.
 
-Add a reference to the project with the Jadex distribution. To do so, right-click on the tutorial project and select 'Build Path -&gt; Configure Build Path...'. In the 'Projects' tab click 'Add...', check the 'jadex-${ireallyneedajadexversion}' checkbox and hit 'OK'. Close the build path window by hitting 'OK' again.
+Add a reference to the project with the Jadex distribution. To do so, right-click on the tutorial project and select 'Build Path -&gt; Configure Build Path...'. In the 'Projects' tab click 'Add...', check the 'jadex-${jadexversion}' checkbox and hit 'OK'. Close the build path window by hitting 'OK' again.
 
 ![02 Installation@eclipsebuildpath.png](eclipsebuildpath.png)  
 *Add project dependency*
@@ -161,7 +161,7 @@ Right-click in the upper left area (called the model explorer, as it is used to 
 *Add path in JCC*
 
 A file requester appears. Navigate to the directory, where you unpacked the Jadex distribution. 
-Open the *lib* directory and select the file *jadex-applications-micro-${ireallyneedajadexversion}.jar*. 
+Open the *lib* directory and select the file *jadex-applications-micro-${jadexversion}.jar*. 
 Note that depending on your Jadex version the last part of the filename might differ in your setting. 
 
 ### Selecting and Starting a Component
@@ -175,7 +175,7 @@ The component will be executed, thereby printing some messages to the (eclipse) 
 
 Execute some other examples, e.g. 'heatbugs' or 'mandelbrot'. Many examples involve more than one component and are typically launched by selecting and starting the *.application.xml* component, which automatically starts all components of the application.
 
-You can also load the other 'jadex-applications-*-${ireallyneedajadexversion}.jar' files (e.g. BDI or BPMN) and try the examples included there. These use different [component types](../component-types/component-types) such as BDI or BPMN.
+You can also load the other 'jadex-applications-*-${jadexversion}.jar' files (e.g. BDI or BPMN) and try the examples included there. These use different [component types](../component-types/component-types) such as BDI or BPMN.
 
 ### Saving JCC and Platform Settings
 

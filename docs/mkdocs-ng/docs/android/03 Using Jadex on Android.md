@@ -50,20 +50,20 @@ repositories {
 
 dependencies {
     // required: 
-    compile 'org.activecomponents.jadex:jadex-platform-android:${ireallyneedajadexversion}'
+    compile 'org.activecomponents.jadex:jadex-platform-android:${jadexversion}'
     
     // optional:
-    compile 'org.activecomponents.jadex:jadex-kernel-bdiv3-android:${ireallyneedajadexversion}'
+    compile 'org.activecomponents.jadex:jadex-kernel-bdiv3-android:${jadexversion}'
     
-    compile 'org.activecomponents.jadex:jadex-kernel-bpmn:${ireallyneedajadexversion}'
-    compile 'org.activecomponents.jadex:jadex-kernel-component:${ireallyneedajadexversion}'
-    compile 'org.activecomponents.jadex:jadex-android-xmlpull:${ireallyneedajadexversion}'
-    compile 'org.activecomponents.jadex:jadex-android-antlr:${ireallyneedajadexversion}'
+    compile 'org.activecomponents.jadex:jadex-kernel-bpmn:${jadexversion}'
+    compile 'org.activecomponents.jadex:jadex-kernel-component:${jadexversion}'
+    compile 'org.activecomponents.jadex:jadex-android-xmlpull:${jadexversion}'
+    compile 'org.activecomponents.jadex:jadex-android-antlr:${jadexversion}'
     
     // Control center: 
-    compile 'org.activecomponents.jadex:jadex-runtimetools-android:${ireallyneedajadexversion}'
+    compile 'org.activecomponents.jadex:jadex-runtimetools-android:${jadexversion}'
     // REST client:
-    compile 'org.activecomponents.jadex:jadex-platform-extension-webservice-android:${ireallyneedajadexversion}'
+    compile 'org.activecomponents.jadex:jadex-platform-extension-webservice-android:${jadexversion}'
 }
 ```
 
