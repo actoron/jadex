@@ -45,7 +45,7 @@ task processDocs(type: Copy) {
     propfile.withInputStream {
         stream -> props.load(stream)
     }
-    boolean liveBuild = project.hasProperty('livebuild') && project.property('livebuild');
+    boolean liveBuild = project.hasProperty('livebuild') && project.property('livebuild').toLowerCase().equals("true");
     props.each() { String k, v ->
         if (k.endsWith("MASTER") && liveBuild) {
             k = k.substring(0,k.length()-6);
