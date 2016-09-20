@@ -22,6 +22,8 @@ import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 /**
  *  The JsonTraverser converts a preparsed JsonValue object to
  *  a corresponding Java object.
+ *  
+ *  todo: introduce boolean in traverser that checks if read a json object in map is ok
  */
 public class JsonTraverser extends Traverser
 {

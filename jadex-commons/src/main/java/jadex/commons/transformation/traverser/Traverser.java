@@ -259,6 +259,9 @@ public class Traverser
 					//processorcache.put(clazz, proc);
 				}
 			}
+			
+			if(!fin)
+				throw new RuntimeException("Found no processor for: "+object+" "+type);
 		}
 		else
 		{

@@ -15,7 +15,7 @@ import jadex.commons.transformation.traverser.Traverser;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
- * 
+ *  Processor for reading maps.
  */
 public class JsonMapProcessor implements ITraverseProcessor
 {
@@ -29,7 +29,8 @@ public class JsonMapProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(Map.class, clazz));
+//		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(Map.class, clazz));
+		return object instanceof JsonObject && SReflect.isSupertype(Map.class, clazz);		
 	}
 	
 	/**
