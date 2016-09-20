@@ -74,7 +74,7 @@
 
   var currentChapter = $("li .current");
   var searchHeader = $(".wy-side-nav-search");
-  console.log(searchHeader.height());
+//  console.log(searchHeader.height());
   $("#stickyheader").scrollTop(currentChapter.offset().top-(searchHeader.height()+20));
 
 
@@ -87,3 +87,17 @@
   	$("<h4>Hint</h4>").insertBefore(element);
   });
 
+
+  // correct javadoc links
+  var docsHome = $(searchHeader).find('a.icon-home').attr('href');
+//  console.log(docsHome);
+
+  var lengthOf = "$RELJAVADOCPATH".length;
+  $('a[href*="$RELJAVADOCPATH"]').each(function(index, element) {
+//  	console.log(window.location.pathname);
+//  	window.location.pathname.indexof
+	var originalHref = element.getAttribute('href')
+	var url = docsHome + "/../" + "javadoc" +  originalHref.substring(originalHref.indexOf('$RELJAVADOCPATH') + lengthOf);
+	console.log("replacing with: " + url);
+	element.setAttribute('href', url);
+  });

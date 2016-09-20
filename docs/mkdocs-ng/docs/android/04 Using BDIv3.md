@@ -40,7 +40,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0' // this is probably already there
-        classpath "org.activecomponents.jadex:jadex-gradle-plugin:${ireallyneedajadexversion}"
+        classpath "org.activecomponents.jadex:jadex-gradle-plugin:${jadexversion}"
     }
 }
 
