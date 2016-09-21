@@ -38,11 +38,9 @@ import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.Tuple2Future;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.platform.service.remote.commands.RemoteFutureBackwardCommand;
 import jadex.platform.service.remote.commands.RemoteFuturePullCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteMethodInvocationCommand;
-import sun.security.action.GetLongAction;
 
 /**
  *  Class that implements the Java proxy InvocationHandler, which
