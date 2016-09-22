@@ -28,7 +28,7 @@ Note that this tutorial is not a replacement for the existing eclipse documentat
 Jadex uses *gradle* as build tool. If you want to use Gradle or apache Maven for your project, you do not need to download the whole Jadex distribution. Just add a dependency for the required Jadex artifacts and they will be downloaded automatically.
 We provide an example project that uses maven/gradle which is described in [the next section](#example-project).
 
-Alternatively, add the following code to your build script's dependency section:
+Alternatively, add the following code to your build script's dependency section (replace **${jadexversion}** with the desired version):
  
 ###Gradle Project
 ```groovy
@@ -40,7 +40,7 @@ compile 'org.activecomponents.jadex:jadex-distribution-standard:${jadexversion}'
 <dependency>
     <groupId>org.activecomponents.jadex</groupId>
     <artifactId>jadex-distribution-minimal</artifactId>
-    <version>3.0.0-RC68</version>
+    <version>${jadexversion}</version>
 </dependency>
 ```
 
