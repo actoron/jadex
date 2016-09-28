@@ -28,7 +28,7 @@ For API Documentation of Jadex Active Components ${jadexversiontitle} please vis
 
 ## Advanced Guides
  * [Jadex Active Components User Guide](guides/ac/01 Introduction/)
- * [BDI User Guide](guides/bdi/01 Introduction)  
+ * [BDI User Guide](guides/bdiv3/01 Introduction)  
 
 ## FAQ
  * [FAQ](faq/faq/)

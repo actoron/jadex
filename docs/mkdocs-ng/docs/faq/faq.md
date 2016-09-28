@@ -56,4 +56,4 @@ If you want to be notified when an agent dies you can use an agent listener.
 In the current version Jadex does not provide a ready-to-use persistence mechanism for the beliefs of an agent. We have successfully used normal object-relational mapping frameworks such as Hibernate in combination with Jadex. Nonetheless, the task of persisting data cannot be fully automated and needs to be done in plans. This topic should be an issue of further research and improvement.
 
 ### Can capabilities be used for group communication, i.e. are they some kind of tuple space, where one agent puts in data and other can read it?
-No, this seems to be a common misunderstanding of the concept. A capability is comparable to a module. Each agent that includes a capability get a separate instance of that module. For details have a look at [Capabilities](../guides/bdi/05 Capabilities/).
+No, this seems to be a common misunderstanding of the concept. A capability is comparable to a module. Each agent that includes a capability get a separate instance of that module. For details have a look at [Capabilities](../guides/bdiv3/05 Capabilities/).
