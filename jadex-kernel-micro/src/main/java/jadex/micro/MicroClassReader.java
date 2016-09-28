@@ -1986,6 +1986,46 @@ public class MicroClassReader
 		}
 		
 		/**
+		 *  This method implements a fallback to the library service baseclassloader if
+		 *  a) a library service classloader is used and
+		 *  b) the class was not found in the DummyClassLoader
+		 *  
+		 *  This still limits the scope of loadable classes to avoid accidental loading of
+		 *  non-enhanced user code while allowing Jadex classesto be in the baseclassloader instead
+		 *  of the system classloader.
+		 */
+		protected Class<?>	loadClass(String name, boolean resolve)	throws ClassNotFoundException
+		{
+			Class<?> ret = null;
+			try
+			{
+				ret	= super.loadClass(name, resolve);
+			}
+			catch(ClassNotFoundException e)
+			{
+				ClassLoader bcl = null;
+				try
+				{
+					Method gbcl = orig.getClass().getDeclaredMethod("getBaseClassLoader", (Class<?>[]) null);
+					gbcl.setAccessible(true);
+					bcl = (ClassLoader) gbcl.invoke(orig, (Object[]) null);
+				}
+				catch (Exception e1)
+				{
+					e1.printStackTrace();
+					throw e;
+				}
+				
+				ret = bcl.loadClass(name);
+				if(resolve)
+				{
+					resolveClass(ret);
+				}
+			}
+			return ret;
+		}
+		
+		/**
 		 * 
 		 */
 		public String toString()
