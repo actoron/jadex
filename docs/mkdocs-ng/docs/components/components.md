@@ -206,3 +206,13 @@ When using one of these annotations on methods or fields, fields and method para
 -  Type of your Component - to inject the Component POJO
 
 <!-- TODO: for which annotations does the parameter guesser work? -->
+
+## Scheduling steps
+The [concurrency model](../guides/ac/05 Services/#concurrency) of Jadex Active Components is based on single-threaded components.
+If you want to execute your code on a component's thread from outside, you can call [scheduleStep](${URLJavaDoc}/jadex/bridge/IExternalAccess.html#scheduleStep-jadex.bridge.IComponentStep-) on the IExternalAccess of a component:
+```java
+extAcc.scheduleStep(iAccess -> {
+    // now you are on the component's thread
+    return Future.DONE;
+});
+```
