@@ -16,7 +16,7 @@ For API Documentation of Jadex Active Components ${jadexversiontitle} please vis
   * [Futures](futures/futures/)
   * [Remote](remote/remote/)
   * [Component Types](component-types/component-types/)
-  * [Android](android/01 Introduction/)
+  * [Android](android/android/)
   * [Web API](webapi/webapi/)
   * [Simulation](simulation/simulation/)
   * [Environment](env/01 Introduction/)

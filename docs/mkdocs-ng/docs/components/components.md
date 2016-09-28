@@ -148,6 +148,11 @@ For features specific to a component-type, take a look at [component types](../c
 |IMonitoringComponentFeature| Components can publish monitoring events with this feature. |
 |IRequiredServicesFeature | See [Services](../services/services#accessing-services) |
 |IProvidedServicesFeature | See [Services](../services/services#accessing-services) |
+<!-- TODO: describe all default features -->
+<!--PropertiesComponentFeature-->
+<!--ISubcomponentsFeature-->
+<!--NFPropertyComponentFeature-->
+<!--ComponentLifecycleFeature-->
 
 <!-- TODO: defining custom component features -->
 <!--You can even define new component features. Please refer to [TODO](TODO) to see how.-->

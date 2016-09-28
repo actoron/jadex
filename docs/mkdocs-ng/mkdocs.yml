@@ -11,12 +11,7 @@ pages:
 - Futures: 'futures/futures.md'
 - Remote Communication: 'remote/remote.md'
 - Component Types: 'component-types/component-types.md'
-- Android:
-    - 'android/01 Introduction.md'
-    - 'android/02 Installation.md'
-    - 'android/03 Using Jadex on Android.md'
-    - 'android/04 Using BDIv3.md'
-#    - 'android/05 PlatformApp - ClientApp Separation.md'
+- Android: 'android/android.md'
 - Web API: 'webapi/webapi.md'
 - Simulation: 'simulation/simulation.md'
 - Environment:
