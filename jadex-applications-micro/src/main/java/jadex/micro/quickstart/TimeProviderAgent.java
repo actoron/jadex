@@ -1,19 +1,17 @@
 package jadex.micro.quickstart;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -123,54 +121,51 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 	 */
 	protected static String	determineLocation()
 	{
-		final Future<String>	fut	= new Future<String>();
-		new Thread(new Runnable()
-		{
-			public void run()
-			{
-				String	ret	= "unknown";
-				try
-				{
-					// Get geo location, e.g.
-					// 134.100.11.200,DE,Germany,HH,Hamburg,Hamburg,22767,Europe/Berlin,53.55,10.00,0
-					Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv/").openStream(), "UTF-8");
-					scanner.findInLine("([^,]*),");
-					scanner.findInLine("([^,]*),");
-					scanner.findInLine("([^,]*),");
-					ret	= scanner.match().group(1);	// Country
-					scanner.findInLine("([^,]*),");
-					scanner.findInLine("([^,]*),");
-					ret	= scanner.match().group(1) + ", " + ret;	// City
-					scanner.close();
-				}
-				catch(Exception e)
-				{
-					// freegeoip sometimes has connection timeouts :-(
-					System.err.println("Cannot determine location: "+e);
-				}
-				fut.setResult(ret);
-			}
-		}).start();
-
+		String	ret	= "unknown";
 		try
 		{
-			return fut.get(Starter.getScaledRemoteDefaultTimeout(IComponentIdentifier.LOCAL.get(), 0.8));
+			// These free-to-try geoip services have (almost) the same result format.
+//			Scanner scanner	= new Scanner(new URL("http://ipinfo.io/json").openStream(), "UTF-8");
+//			Scanner scanner	= new Scanner(new URL("http://api.petabyet.com/geoip/").openStream(), "UTF-8");
+//			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/json/").openStream(), "UTF-8");	// use "country_name"
+			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
+			
+			// Very simple JSON parsing, matches ..."key": "value"... parts to find country and city.
+			String	country	= null;
+			String	city	= null;
+			scanner.useDelimiter(",");
+			while(scanner.findWithinHorizon("\"([^\"]*)\"[^:]*:[^\"]*\"([^\"]*)\"", 0)!=null)
+			{
+				String	key	= scanner.match().group(1);
+				String	val	= scanner.match().group(2);
+				if("country".equals(key))
+//				if("country_name".equals(key))
+				{
+					country	= val;
+				}
+				else if("city".equals(key))
+				{
+					city	= val;
+				}
+			}
+			scanner.close();
+			
+			ret	= city!=null ? country!=null ? city+", "+country : city
+				: country!=null ? country : "unknown";
+				
 		}
-		catch(TimeoutException e)
+		catch(Exception e)
 		{
-			return "unknown";
+//			e.printStackTrace();
 		}
+		
+		return ret;
 	}
-	
-	public static void main(String[] args) throws Exception
+
+	public static void	main(String[] args)
 	{
-		InputStream	is	= new URL("http://freegeoip.net/csv/").openStream();
-		byte[]	buf	= new byte[1234];
-		int read;
-		while((read=is.read(buf))!=-1)
-		{
-			System.out.write(buf, 0, read);
-		}
-		is.close();
+		PlatformConfiguration	config	= PlatformConfiguration.getDefault();
+		config.addComponent(TimeProviderAgent.class.getName()+".class");
+		Starter.createPlatform(config).get();
 	}
 }

@@ -1,6 +1,6 @@
 # Introduction
 
-This tutorial provides a quick start for using Jadex. It is intended for people who just like to "jump in" and quickly getting things to run. Furthermore this tutorial provides many pointers to other documentation pages that you can follow if you want to learn a bit more about a certain topic.
+This tutorial uses a small example use case to illustrate some basic features of Jadex without too much technical fuss. It is aimed at programmers with solid Java experience who just like to "jump in" and quickly want to get something running. Furthermore the tutorial provides many pointers to other documentation pages that you can follow if you want to learn a bit more about a certain topic.
 
 ## Purpose of the Example Application
 
@@ -11,11 +11,11 @@ a) ![01 Introduction@subscribe.png](subscribe.png)
 b) ![01 Introduction@publish.png](publish.png)  
 *Figure 1: a) Time users subscribing to time providers, b) time providers publishing their current time to time users*
 
-Although this application is quite simple, it contains several common challenges regarding programming distributed systems. In the following it will be shortly sketched, how the Jadex Active Components middleware helps coping with these challenges:
+Although this application is quite simple, it contains several common challenges regarding the programming of distributed systems. In the following it will be shortly sketched, how the Jadex Active Components middleware helps coping with these challenges:
 
 **Challenge 1: Discovery of distributed components**
 
-The time user components need to discover the available time provider components. In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../AC User Guide/07 Platform Awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole internet. Second, the [service search](../AC User Guide/05 Services) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
+The time user components need to discover the available time provider components. In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../AC User Guide/07 Platform Awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../AC User Guide/05 Services) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
 
 **Challenge 2: Components with internal behavior**
 
