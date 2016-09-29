@@ -130,17 +130,17 @@ The ```@Binding``` annotation defines parameters of the service binding that Jad
 
 |Parameter|Description|
 |---------|-----------|
-<!--|*name*| |-->
-<!--|*componentname*||-->
-<!--|*componenttype*||-->
 |*scope*| The [search scope](#service-scopse) to find the required service. |
 |*dynamic*| If set to true, a new search will be initiated every time the required service is accessed. |
 |*create*| Set to true if the service should be instantiated by the local component |
 |*creationInfo*| ```@CreationInfo``` annotation, see [Advanced Service Topics](#auto-instantiation-of-required-services) |
-<!--|*recover*| TODO: Document recover flag|-->
-<!--|*interceptors*| Document interceptors flag |-->
 |*proxytype*| To access a service, a proxy is created. By default, this proxy decouples the two component threads involved in a service call. Read more about this in [../guides/ac/05 Services/#interceptor-handling]. |
 
+<!--|*name*| |-->
+<!--|*componentname*||-->
+<!--|*componenttype*||-->
+<!--|*recover*| TODO: Document recover flag|-->
+<!--|*interceptors*| Document interceptors flag |-->
 
 # Accessing Services
 

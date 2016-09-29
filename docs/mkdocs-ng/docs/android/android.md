@@ -1,3 +1,169 @@
+#  Introduction
+
+Jadex Android is a framework for developing software agents running on the Android platform. Agent-Oriented Software Engineering (AOSE) is a software development paradigm especially suited for distributed Systems as the main buildings blocks are constituted by software agents, whose outstanding characteristics are - among others - autonomy, message-based and asynchronous communication, re- and proactivity, social abilities and cooperation. 
+![JadexAndroid-Logo.png](JadexAndroid-Logo.png)
+
+From the perspective of an Android developer, there are several advantages of using Jadex.
+Communication and thus developing distributed software is made easy, because Jadex provides features such as awareness (auto-discovery of other platforms), remote service calls and secure communication.
+Decomposing the software into Active Components allows the developer to migrate compute-intense tasks to a cloud infrastructure without touching interfaces or implementation. 
+
+Most of the content of this guide assumes you are already familiar with Jadex and only discusses Android specifics and additions.
+
+-   [Chapter 2 - Installation](02%20Installation)  describes how to install the required tools and libaries and start development of Jadex Android applications.
+-   [Chapter 3 - Using Jadex on Android](03%20Using%20Jadex%20on%20Android) gives an overview of available API functions
+
+## General Notes on Jadex Android
+
+Most of the Jadex features are available on Android, too.
+The probably most important difference is that there is no JCC and Android Apps are initialized very differently - you can read more about that in [Chapter 3](03 Using Jadex on Android/#differences-to-the-desktop-version-of-jadex).
+
+You can follow the release notes below to get an impression of the ongoing development, the latest distribution can be found on the [download page](https://www.activecomponents.org/bin/view/Download/Distributions).
+
+### Unsupported Modules
+
+Most notably, there is no JCC and no envsupport available on Android.
+This is a more complete list of currently unsupported modules on Jadex Android:
+
+-   jadex-json
+-   jadex-kernel-application
+-   jadex-kernel-extension-agr
+-   jadex-kernel-extension-envsupport
+-   jadex-platform-extension-management
+-   jadex-platform-extension-maven
+-   jadex-platform-extension-securetransport
+-   jadex-platform-extension-webservice (REST client is supported)
+-   jadex-servletfilter
+-   several jadex-tools modules
+
+##  Release Notes
+
+### 3.0.0-RC68
+-	Better error messages when generating BDIV3 agents at compile time using jadex-gradle-plugin
+
+### 3.0.0-RC42
+
+-   Ported the jadex-gradle-plugin to the new Transform API (android build tools 2.0.0 required)
+
+### 3.0.0-RC16
+
+-   PlatformConfiguration object for platform configuration
+-   Android Studio support (Eclipse support dropped!)
+
+### 2.5-SNAPSHOT
+
+-   mainly working on PlatformApp/ClientApp Separation
+
+### 2.4
+
+-   Maven Plugin to generate BDIV3 Agent code at compile time -&gt; enables the use of BDIV3 on Android.
+-   JadexAndroidEvents for dispatching events from Agent to Service/Activity
+-   synchronous getsService() method in JadexService
+-   awareness set to enabled by default, as it is default on desktop platforms
+-   new PlatformApp/ClientApp functionality: separate Jadex Platform into a standalone app.
+
+### 2.3
+
+-   API Changes! Please refer to the example project on how to start the platform.
+-   fixed problems with BDI Agents
+-   added REST client api + demo (working since 2012-11-14)
+-   new demo applications project
+-   included chat application
+
+### 2.2.1
+
+-   No specific changes
+
+### 2.1
+
+-   provides a simple control center application (see example project)
+-   since 2012-05-31: based on modular jadex distribution instead of separate artifacts (NOTE: Your Android applications will require different dependencies now!)
+-   adjusted version numbering to Jadex' Version
+-   Jadex-Android uses android xml pull parser now instead of woodstox, reduces memory footprint
+-   Jadex-Android stores settings in Android Shared Preferences now. It will, however, prefer properties stored in a default.settings.xml (/data/data/&lt;application package name&gt;/files/default.settings.xml)
+
+### 0.0.5
+
+-   fixed bug, preventing service calls from Desktop-Jadex to Android-Jadex. Please note, that due to the Android emulator's virtual network environment, it is still not possible to call services offered by Desktop-Jadex. You have to manually create a ProxyAgent on the Android device to communicate. On real devices, if you are not in a private Wifi network you need to use Jadex' relay server as broadcasts are generally not supported over the Internet.
+
+### 0.0.4
+
+-   updated maven projects to maven-andoid-plugin-3.0.0-alpha-14 -&gt; supports ADT R15
+-   communication between platforms fixed, so remote mobile platform components are visible in JCC
+    (This requires the HTTP Relay Transport to be enabled if running in an emulator)
+-   added AndroidSettingsService for File Access on Android Devices
+-   introduced AndroidContextService to provide access to android files
+-   Security Service is active by default. The generated Plattform Password will be written to LogCat and saved in
+    */data/data/<packagename\>/files/<platformname\>.settings.xml*.
+    To disable the Security Service, just uncomment the Service in your platform.component.xml
+
+### 0.0.3
+
+-   uses Woodstox XML Parser instead of broken StaX reference implementation
+
+# Installation
+
+This document will guide you through the setup that is necessary to develop applications using Jadex-Android.
+
+**Please [report](${URLJadexForum}) ** any difficulties or errors in this document as well as in the provided *jadex-android* libraries.
+
+## Requirements
+
+- Java JDK, tested with JDK 7. On Linux, look for packages from your distributor. On Windows, get the JDK from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk).
+- Android Studio (currently tested with ${AndroidStudioTestedVersion}) from [here](http://developer.android.com/sdk/index.html) (Be sure to download **Android Studio**, not only the SDK)
+- Android SDK (usually included in Android Studio)
+- Latest Jadex Android distribution (release or nightly) from the [downloads page](https://www.activecomponents.org/bin/view/Download/Distributions) 
+
+### **Note for 64-bit Ubuntu installations:**
+> If you have a 64bit ubuntu distributions, install the following packages first:  
+> ```sudo apt-get install lib32stdc++6 lib32z1```
+
+### Install Android Studio
+First, set the *JAVA_HOME* environment variable to your JDK (This may be done automatically).
+
+To install Android Studio, just extract it and execute *studio.sh* or *studio.exe* located in the *bin/* directory.  
+On the first start, you can decide whether to import settings from a previous version. Choose *I do not have a previous version* if this is your first installation and click *OK*.  
+Complete the Setup Wizard. Be sure to pay attention to the page named **Emulator Settings**, which provides information on how to speed up the Android emulator.  
+After Android Studio has downloaded the necessary SDK components, it will show a welcome screen.
+
+## Extract the Jadex distribution
+
+- Install Android Studio, following the descriptions from their download page.
+- Extract the jadex-android-*version*.zip. You will see two example projects in the extracted directory.
+- Extract *jadex-android-example-project-gradle.zip*. It contains a Jadex Android example project, which can be opened in Android Studio.
+
+## Import the example project in Android Studio
+
+Open Android Studio.
+If you see a welcome screen, choose *Import project*.  
+If you already have another project opened, choose *File -> Open*.
+
+Navigate to the folder which contains the extracted the example project and click *OK*.  
+If Android Studio asks whether to open the project in a new window, choose *New Window*, if unsure.  
+Android Studio should now import the project, download all necessary libraries and build the example project.
+
+### Download required SDK Platform
+If you get an error like this:
+
+    Error: Cause: failed to find target with hash string 'android-21' in: [...]
+    *Open Android SDK Manager*  
+Open the SDK Manager by clicking on the provided link inside the error message, click the checkbox next to the SDK Platform with the API Level given in the error message (e.g. choose **Android 5.0.1** for API Level **21**) and click *OK*.  
+The required SDK platform will be downloaded and the project should build sucessfully.
+
+## Setting up an Android Virtual Device (AVD)
+If you haven't set up an Android Virtual Device at this point, follow this instructions.  
+Open the AVD manager by clicking on ![](studio_avd_icon.png). Click on *Create Virtual Device* and follow the instructions.  
+We recommend to choose a device which supports an API Level of **21**.  
+Choosing an x86 ABI will result in a faster emulator, but can only run if hardware emulation is enabled on your system.
+Read more about this in the [Emulator documentation](http://developer.android.com/tools/devices/emulator.html#accel-vm)
+
+## Run example Project
+
+When successfully imported and built, you can view the project files by activating the *Project* Tab on the left (![](studio_project_tab.png)).
+A run configuration will appear in the upper toolbar.  
+Click on the green arrow on the right of the configuration *jadex-android-example-project-gradle* to launch the project (![](studio_build_config_run.png)). Choose a running device or launch a new emulator as requested.  
+Once the APK is generated, it will be uploaded onto the AVD and executed.  
+Proceed to the next chapter to learn about how to create your own Jadex Android Application.
+
 #  Using Jadex on Android
 
 Once you have installed the necessary tools, the **jadex-android-example-project** can be helpful to get started.  
@@ -427,3 +593,77 @@ startActivity(i);
 ```
 
 This is also part of the example-project.
+
+# Using BDIv3 on Android
+
+The BDI v3 programming model heavily depends on code-generation based on java annotations.
+It's using the ASM Bytecode manipulation framework to generate the code.
+Android not only uses a different virtual machine than any Java SE environment, the Dalvik Virtual Machine (DVM), it also uses a different bytecode representation, which is not supported by Jadex BDIV3.
+
+As runtime bytecode generation is slow on android anyway, the classes are transformed during compile-time for android.
+This is done by the *jadex-gradle-plugin*, which means you **need to use gradle to use BDIv3 components**! 
+Since Android Studio uses gradle by default, this is usually not a problem.
+
+To make BDIv3 components work, you need to include the jadex-gradle plugin in your *build.gradle*.
+For compatibility with specific android tools version, please refer to the [compatibility section](#compatibility). 
+
+## Limitations
+Currently, the jadex-gradle-plugin does not work together with *Instant Run*, a feature which has been introduced with recent Android Studio updates. Please **disable Instant Run** for now if you use BDIv3.
+
+## Applying the jadex-gradle BDIPlugin
+
+The simplest way to use the Jadex gradle plugin is to include the jadex repositories as buildscript dependency repositories, like the following extract from build.gradle shows:
+
+
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+        mavenLocal()
+        mavenCentral()
+        maven
+        {
+            name 'jadexsnapshots'
+            url 'https://nexus.actoron.com/content/repositories/oss-nightlies/'
+        }
+        maven
+        {
+            name 'jadexreleases'
+            url 'https://nexus.actoron.com/content/repositories/oss/'
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.0.0' // this is probably already there
+        classpath "org.activecomponents.jadex:jadex-gradle-plugin:${jadexversion}"
+    }
+}
+
+apply plugin: 'com.android.application' // this is probably already there
+// for bdiv3 code generation:
+apply plugin: jadex.gradle.BDIPlugin
+
+```
+
+If you compile your project with gradle or android studio now (just click on "run"), the plugin will run, detect all BDIV3 Agents and will enhance the classes as needed by the Jadex runtime.
+
+
+## Compatibility
+
+### jadex-gradle-plugin 3.0.0-RC42
+Starting with RC42, the jadex-gradle-plugin uses the new Android Transform API to enhance BDI classes.
+This means version 2.0.0 of the android build tools is required to use the jadex-gradle-plugin now.
+```groovy
+dependencies {
+    classpath 'com.android.tools.build:gradle:2.0.0'
+}
+```
+
+### jadex-gradle-plugin up to 3.0.0-RC41
+Please be aware that versions before 3.0.0-RC41 are only compatible with android build tools version up to 1.3.0. 
+This means you have to make sure version 1.3.0 of the build tools is used:
+```groovy
+dependencies {
+    classpath 'com.android.tools.build:gradle:1.3.0'
+}
+```
