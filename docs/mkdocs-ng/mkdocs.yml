@@ -42,6 +42,10 @@ pages:
     - 'tools/A1 Conversation Center.md'
     - 'tools/A2 Communication Analyzer.md'
     - 'tools/A3 Directory Facilitator.md'
+- Quickstart Tutorial:
+    - 'tutorials/quickstart/01 Introduction.md'
+    - 'tutorials/quickstart/02 Time Service Interface.md'
+    - 'tutorials/quickstart/03 Time User.md'
 - BDIV3 Tutorial:
     - 'tutorials/bdiv3/01 Introduction.md'
     - 'tutorials/bdiv3/02 Starting an Agent.md'

@@ -9,9 +9,10 @@ Create Java file *TimeUserAgent.java* in the package *jadex.micro.quickstart* an
 
 
 ```java
-
 package jadex.micro.quickstart;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.service.IService;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -42,6 +43,16 @@ public class TimeUserAgent
 			System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
 		}
 	}
+	
+	/**
+	 *  Start a Jadex platform and the TimeUserAgent.
+	 */
+	public static void	main(String[] args)
+	{
+		PlatformConfiguration	config	= PlatformConfiguration.getDefault();
+		config.addComponent(TimeUserAgent.class.getName()+".class");
+		Starter.createPlatform(config).get();
+	}
 }
 ```
 
@@ -49,13 +60,9 @@ public class TimeUserAgent
 ## Execute the Agent
 
 
-Start the Jadex platform with its main class ```jadex.base.Starter```. Add the directory containing the compiled classes of your agent to the Jadex Control Center (JCC). Select the TimeUserAgent.class and click *Start*.
+Start the Jadex platform and the agent with the provided *main()* method. In case there are any time services online, you should see their time printed to the console in periodic updates. In the next chapter you will learn how to start a local time provider.
 
-In case there are any time services online, you should see their time printed to the console in periodic updates. If no time service is found after 30 seconds, a *jadex.bridge.service.search.ServiceNotFoundException* is printed.
-
-See [AC Tutorial.Chapter 02: Installation](../AC%20Tutorial/02%20Installation)  for details on setting up a launch configuration and starting agents in the JCC.
-
-The details of the agent are explained in the following subsections.
+The details of the time user agent are explained in the following subsections. Furthermore, you can see [Platform.Starting a Platform](../../../platform/platform/#starting-a-platform) for details on platform configurations and [Tools.JCC Overview](../../../tools/02 JCC Overview/) for details on the Jadex control center window (JCC).
 
 ## Class Name and @Agent Annotation
 
@@ -67,10 +74,8 @@ A Jadex agent may use services provided by other agents. An agent might search f
 
 The time user agent declares the usage of the ITimeService by the @RequiredService annotation. The annotation here states, that the agent is interested in multiple instances of the service at once (```multiple=true```) and that all platforms world wide should be searched for available services (```binding=@Binding(scope=Binding.SCOPE_GLOBAL)```).
 
-The required service declaration is given the name ```timeservices``` and is used for the corresponding field of the class. The ```@AgentService``` annotation fo the field states that at startup, the field should be injected with the found required services as given in the required service declaration with the same name. Here a type of IIntermediateFuture is used to receive each service immediately when found as shown in the agent body.
+The ```@AgentService``` annotation to the ```addTimeService()``` method states that at startup a service search should be started and the method should be called with every found service as given in the required service declaration. The corresponding required service declaration is found by matching the method name to the name given in the @RequireService annotation.
 
-## The Agent Body
+## The Agent Behavior
 
-The agent body is executed after the agent is started. Using the @AgentBody annotation a method can be designated as agent body.
-
-The body first adds a listener to the timeservices field, to receive updates whenever a timeservice is found. For each found service, the ```intermediateResultAvailable()``` method is called. In this method, the agent subscribes to the found time service by adding another listener. This listener is informed about each new time notified by the specific time service.
+The method is called for each found service. In this method, the agent subscribes to the found time service by adding another listener. This listener is informed about each new time notified by the specific time service.

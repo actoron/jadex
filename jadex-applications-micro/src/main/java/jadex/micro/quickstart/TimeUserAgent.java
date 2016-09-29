@@ -32,7 +32,10 @@ public class TimeUserAgent
 			System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
 		}
 	}
-
+	
+	/**
+	 *  Start a Jadex platform and the TimeUserAgent.
+	 */
 	public static void	main(String[] args)
 	{
 		PlatformConfiguration	config	= PlatformConfiguration.getDefault();
