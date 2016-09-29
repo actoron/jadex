@@ -12,7 +12,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.future.Future;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -26,53 +26,19 @@ import jadex.micro.annotation.ProvidedServices;
  *  The time provider periodically sends out time values to all subscribers.
  *  For simplicity, the agent implements the time service itself.
  */
-@Agent
+@Agent(keepalive=Boolean3.TRUE)
 @Service
 @ProvidedServices(@ProvidedService(type=ITimeService.class))
-public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
+public class TimeProviderAgent	implements ITimeService
 {
 	//-------- attributes --------
-	
-	/** The jadex component that executes the time provider agent.
-	 *  Gets automatically injected at agent startup. */
-	@Agent
-	protected IInternalAccess	agent;
-	
+		
 	/** The location (determined at startup). */
 	protected String	location	= determineLocation();
 	
 	/** The subscriptions to be informed about the time. */
 	protected Set<SubscriptionIntermediateFuture<String>>	subscriptions
 		= new LinkedHashSet<SubscriptionIntermediateFuture<String>>();
-	
-	//-------- agent lifecycle methods --------
-	
-	/**
-	 *  Due to annotation, called once after agent is initialized.
-	 *  Also used as step and thus called periodically as rersult of waitFor().
-	 */
-	@AgentBody
-	public IFuture<Void> execute(IInternalAccess ia)
-	{
-		// Calculate date of last full five seconds.
-		Date	d = new Date(System.currentTimeMillis()-System.currentTimeMillis()%5000);
-
-		// Notify all subscribers
-		for(SubscriptionIntermediateFuture<String> subscriber: subscriptions)
-		{
-			// Add the current time as intermediate result.
-			// The if-undone part is used to ignore errors,
-			// when subscription was cancelled in the mean time.
-			subscriber.addIntermediateResultIfUndone(d.toString());
-		}
-		
-		// Wait until the next full five seconds.
-		long	millis	= d.getTime()+5000-System.currentTimeMillis();
-		ia.getComponentFeature(IExecutionFeature.class).waitForDelay(millis, this);
-		
-		// Return empty non-finished future to keep agent alive.
-		return new Future<Void>();
-	}
 	
 	//-------- ITimeService interface --------
 	
@@ -114,6 +80,38 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		return ret;
 	}
 	
+	//-------- agent life cycle --------
+	
+	/**
+	 *  Due to annotation, called once after agent is initialized.
+	 *  The internal access parameter is optional and is injected automatically.
+	 */
+	@AgentBody
+	public void body(IInternalAccess ia)
+	{
+		// The execution feature provides methods for controlling the execution of the agent.
+		IExecutionFeature	exe	= ia.getComponentFeature(IExecutionFeature.class);
+		
+		// Execute a step every 5000 milliseconds, start from next full 5000 milliseconds
+		exe.repeatStep(5000-System.currentTimeMillis()%5000, 5000, new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// Notify all subscribers
+				for(SubscriptionIntermediateFuture<String> subscriber: subscriptions)
+				{
+					// Add the current time as intermediate result.
+					// The if-undone part is used to ignore errors,
+					// when subscription was cancelled in the mean time.
+					subscriber.addIntermediateResultIfUndone(new Date().toString());
+				}
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
 	//-------- helper methods --------
 	
 	/**
@@ -121,7 +119,7 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 	 */
 	protected static String	determineLocation()
 	{
-		String	ret	= "unknown";
+		String	ret;
 		try
 		{
 			// These free-to-try geoip services have (almost) the same result format.
@@ -156,12 +154,16 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		}
 		catch(Exception e)
 		{
-//			e.printStackTrace();
+			// ignore
+			ret	= "unknown";
 		}
 		
 		return ret;
 	}
 
+	/**
+	 *  Start a Jadex platform and the TimeProviderAgent.
+	 */
 	public static void	main(String[] args)
 	{
 		PlatformConfiguration	config	= PlatformConfiguration.getDefault();
