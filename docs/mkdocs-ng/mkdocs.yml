@@ -46,6 +46,7 @@ pages:
     - 'tutorials/quickstart/01 Introduction.md'
     - 'tutorials/quickstart/02 Time Service Interface.md'
     - 'tutorials/quickstart/03 Time User.md'
+    - 'tutorials/quickstart/04 Time Provider.md'
 - BDIV3 Tutorial:
     - 'tutorials/bdiv3/01 Introduction.md'
     - 'tutorials/bdiv3/02 Starting an Agent.md'
