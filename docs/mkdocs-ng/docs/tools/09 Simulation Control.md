@@ -1,5 +1,4 @@
-Chapter 9 - Simulation Control
-===========================================
+# Simulation Control
 
 ![09 Simulation Control@simulation.png](simulation.png)
 

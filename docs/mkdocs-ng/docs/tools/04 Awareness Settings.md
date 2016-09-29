@@ -1,5 +1,4 @@
-Chapter 4 - Awareness Settings
-===========================================
+# Awareness Settings
 
 Awareness is the mechanism used in Jadex to automatically discover other platforms. The awareness settings allow for customizing how awareness is realized and which other platforms one wants to ignore. The general mechanism how awareness works is described in the corresponding [tool guide chapter](../AC%20User%20Guide/07%20Platform%20Awareness) . The main idea is to represent remote platforms as local components (called proxy components). Thus, for the platform there is no specific mechanism to search for remote services. Instead these remote services are discovered automatically if a proxy component of that platform exists locally and the search reaches the proxy. The awareness component automatically creates platform proxy components if it is notified by one of its awareness mechanisms that such a platform exists. Hence, platforms participating in awareness regularily send awareness infos over the network. These infos include the sender id of the platform as well as a lease time that tells the receiver the validity of the received packet. If this time passes by and the lease has not been renewed by the platform the proxy wil be automatically deleted (assuming some buffer time).
 

@@ -1,5 +1,4 @@
-Chapter 2 - Jadex Control Center Overview
-======================================================
+# Jadex Control Center Overview
 
 ![02 JCC Overview@jcc.png](jcc.png)  
 *JCC Overview*
