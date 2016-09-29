@@ -1,7 +1,4 @@
-Chapter 7 - Deployer
-=================================
-
-
+# Deployer
 
 The deployer tool can be used to transfer files between computers. In this sense it is very similar to a typical ftp tool but it could be convenient to use the Jadex deployer tool for the following reasons:
 

@@ -1,5 +1,4 @@
-Chaper 10 - Component Viewer
-=========================================
+# Component Viewer
 
 ![10 Component Viewer@componentviewer.png](componentviewer.png)
 

@@ -1,5 +1,4 @@
-Chapter 5 - Security Settings
-==========================================
+# Security Settings
 
 ![05 Security Settings @sec.png](sec.png)  
 *Security settings panel*
