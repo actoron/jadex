@@ -1,5 +1,4 @@
-Chapter 6 - Library Center
-=======================================
+# Library Center
 
 ![06 Library Center@libservice.png](libservice.png)
 
