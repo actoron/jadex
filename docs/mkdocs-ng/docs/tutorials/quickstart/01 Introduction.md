@@ -5,7 +5,7 @@ This tutorial uses a small example use case to illustrate some basic features of
 ## Purpose of the Example Application
 
 
-In this tutorial, a small distributed system will be built in which time clients can subscribe to time servers for continuously receiving the current time of the server. Therefore time user components will search for available time provider components and subscribe to all providers they can find (see Fig.1a). The time providers remember the subscribed time user components. They then periodically (e.g. every 5 seconds) send their current time to all subscribed time users components (see Fig.1b).
+In this tutorial, a small distributed system will be built, in which time clients can subscribe to time servers for continuously receiving the current time of the server. Therefore time user components will search for available time provider components and subscribe to all providers they can find (see Fig.1a). The time providers remember the subscribed time user components. They then periodically (e.g. every 5 seconds) send their current time to all subscribed time users components (see Fig.1b).
 
 a) ![01 Introduction@subscribe.png](subscribe.png)  
 b) ![01 Introduction@publish.png](publish.png)  
@@ -15,7 +15,7 @@ Although this application is quite simple, it contains several common challenges
 
 **Challenge 1: Discovery of distributed components**
 
-The time user components need to discover the available time provider components. In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../AC User Guide/07 Platform Awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../AC User Guide/05 Services) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
+The time user components need to discover the available time provider components. In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../../remote/remote/#awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../AC User Guide/05 Services) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
 
 **Challenge 2: Components with internal behavior**
 
