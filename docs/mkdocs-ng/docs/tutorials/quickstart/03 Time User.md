@@ -1,12 +1,10 @@
 # The Time User Agent
 
-
 This chapter shows how to discover and use the time service.
 
 ## Agent Implementation
 
 Create Java file *TimeUserAgent.java* in the package *jadex.micro.quickstart* and paste the contents as shown below.
-
 
 ```java
 package jadex.micro.quickstart;
@@ -56,9 +54,7 @@ public class TimeUserAgent
 }
 ```
 
-
 ## Execute the Agent
-
 
 Start the Jadex platform and the agent with the provided *main()* method. In case there are any time services online, you should see their time printed to the console in periodic updates. In the next chapter you will learn how to start a local time provider.
 

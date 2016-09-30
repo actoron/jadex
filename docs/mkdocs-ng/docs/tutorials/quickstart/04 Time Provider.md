@@ -1,4 +1,10 @@
-# Time Provider
+# Time Provider Agent
+
+This chapter shows how to implement and publish time service.
+
+## Agent Implementation
+
+Create Java file *TimeProviderAgent.java* in the package *jadex.micro.quickstart* and paste the contents as shown below.
 
 ```java
 package jadex.micro.quickstart;
@@ -15,7 +21,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -29,7 +34,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  The time provider periodically sends out time values to all subscribers.
  *  For simplicity, the agent implements the time service itself.
  */
-@Agent(keepalive=Boolean3.TRUE)
+@Agent
 @Service
 @ProvidedServices(@ProvidedService(type=ITimeService.class))
 public class TimeProviderAgent	implements ITimeService
@@ -175,3 +180,21 @@ public class TimeProviderAgent	implements ITimeService
 	}
 }
 ```
+
+## Execute the Agent
+
+Start the Jadex platform and the time provider agent with the provided *main()* method. Afterwards start the time user agent with its *main()* method. The two platforms will connect automatically and the time user will find the time provider and print out its time update messages.
+
+The details of the time provider agent are explained in the following subsections. Furthermore, you can see [Remote Communication](../../remote/remote/#awareness) for details on automatic platform discovery.
+
+## Service Annotations
+
+The  @ProvidedService annotation tells the Jadex runtime that this agent provides a service of type *ITimeService.class*. The @Service annotation furthermore states, that the agent class implements the service itself instead of having a seperate class for the service implementation.
+
+See, e.g.,  [Services.Providing Services](../../services/services/#providing-services) for more details on the @ProvidedService annotation.
+
+## Object Attributes
+
+There are two fields declared in the class. The first just holds a string of the agent's location. The location is computed using an HTTP request to a free GeoIP service in the *determineLocation()* method. The field is accessed in the *getLocation()* method to return the immutable location of the service. (Remember that this value is cached) 02 Time Service Interface/#the-getname-method
+
+The second field is a set of the current subscriptions to the time service. The object type *SubscriptionIntermediateFuture* used for the set will be explained next. 

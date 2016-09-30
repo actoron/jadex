@@ -12,7 +12,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -26,7 +25,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  The time provider periodically sends out time values to all subscribers.
  *  For simplicity, the agent implements the time service itself.
  */
-@Agent(keepalive=Boolean3.TRUE)
+@Agent
 @Service
 @ProvidedServices(@ProvidedService(type=ITimeService.class))
 public class TimeProviderAgent	implements ITimeService

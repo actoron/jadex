@@ -14,31 +14,35 @@ Create Java file *ITimeService.java* in the package *jadex.micro.quickstart* and
 
 
 ```java
-
 package jadex.micro.quickstart;
 
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
-import java.util.Date;
 
 /**
  *  Simple service to publish the local system time.
+ *  As the service does not change the local system
+ *  and provides no sensitive information, no security
+ *  restrictions are required. 
  */
 @Security(Security.UNRESTRICTED)
 public interface ITimeService
 {
-  /**
-   *  Get the name of the platform, where the time service runs.
-   */
-  public String getName();
-
-  /**
-   *  Subscribe to the time service.
-   */
-  public ISubscriptionIntermediateFuture<Date> subscribe();
+	/**
+	 *  Get the location of the platform, where the time service runs.
+	 *  The location is a constant value for each service, therefore it can be cached
+	 *  and no future is needed.
+	 */
+	public String	getLocation();
+	
+	/**
+	 *  Subscribe to the time service.
+	 *  Every couple of seconds, a string with the current time will be
+	 *  sent to the subscriber.
+	 */
+	public ISubscriptionIntermediateFuture<String>	subscribe();
 }
-
 ```
 
 
@@ -48,10 +52,10 @@ public interface ITimeService
 
 In Jadex, the fully qualified name of a service interface is used for service discovery. Therefore when you implement a time user component to search for your *ITimeService*, Jadex will discover all components worldwide that offer a service of type *jadex.micro.quickstart.ITimeService*. Therefore, if you make sure to use the interface and package name as shown, you might be able to find other peoples time provider components. E.g. for testing purposes there should be a time provider running in our [infrastructure](http://www.activecomponents.org/bin/view/Infrastructure/Overview).
 
-### The *getName()* Method
+### The *getLocation()* Method
 
 
-Normally, all service methods are potentially remote calls. Therefore it is alway a good idea to use [future types](../AC User Guide/03 Asynchronous Programming) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts. One notable exception is when service operations only provide constant values. In the time service example, the name is considered a value that does not change during the lifetime of a service instance. This means that each separate instance of the time service may have a different name, but this name is constant with respect to each instance. Therefore the name can be transmitted as part of the service reference and can be provided without an additional remote call. To indicate that the name is constant the getName() method is declared with a String return value.
+Normally, all service methods are potentially remote calls. Therefore it is always a good idea to use [future types](../AC User Guide/03 Asynchronous Programming) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts. One notable exception is when service operations only provide constant values. In the time service example, the location is considered a value that does not change during the lifetime of a service instance. This means that each separate instance of the time service may have a different location, but this location is constant with respect to each instance. Therefore the location can be transmitted as part of the service reference and can be provided without an additional remote call. To indicate that the location is constant the getLocation() method is declared with a plain return type instead of a type wrapped in a future.
 
 ### The *subscribe()* Method
 
