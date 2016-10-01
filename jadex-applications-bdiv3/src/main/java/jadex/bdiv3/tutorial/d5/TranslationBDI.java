@@ -20,6 +20,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
 
 /**
@@ -32,9 +33,13 @@ import jadex.micro.annotation.Description;
 @Service
 public class TranslationBDI
 {
-	/** The agent. */
+	/** The BDI feature. */
+	@AgentFeature
+	protected IBDIAgentFeature bdiFeature;
+
+	/** The execution feature. */
 	@Agent
-	protected IInternalAccess agent;
+	protected IExecutionFeature execFeature;
 	
 	/** The current time. */
 	@Belief
@@ -94,7 +99,7 @@ public class TranslationBDI
 	public void body()
 	{
 		// Add a new wordpair after a few seconds
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		execFeature.waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -102,9 +107,9 @@ public class TranslationBDI
 				return IFuture.DONE;
 			}
 		});
-		
+
 		String eword = "bugger";
-		String gword = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Translate(eword)).get();
+		String gword = (String)bdiFeature.dispatchTopLevelGoal(new Translate(eword)).get();
 		System.out.println("Translated: "+eword+" "+gword);
 	}
 	

@@ -77,7 +77,7 @@ Letting *eword* and *gword* being the English and German words respectively.
 ```java
 @Plans(@Plan(body=@Body(TranslationPlan.class)))
 ```
--   Add a field called *bdiFeature* to the agent class and annotate it with ```@AgentFeature```. The field should be of type ```IBDIAgentFeature```. This will let the engine automatically inject the BDI Agent API to the POJO agent class. 
+-   Add a field called *bdiFeature* to the agent class and annotate it with ```@AgentFeature```. The field should be of type ```IBDIAgentFeature```. This will let the engine automatically inject the BDI agent feature to the POJO agent class. 
 Read more about features [here](../../components/components/#component-features).
 
 ```java
