@@ -37,6 +37,32 @@ Alternatively, add the following code to your build script's dependency section 
 ```groovy
 compile 'org.activecomponents.jadex:jadex-distribution-standard:${jadexversion}'
 ```
+
+A minimal complete build.gradle could look like this:
+```groovy
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+        compile 'org.activecomponents.jadex:jadex-distribution-standard:${jadexversion}'
+}
+```
+
+If you want to use our nightly builds, you need add another repository:
+
+```groovy
+repositories {
+    mavenCentral()
+    maven
+    {
+        name 'jadexsnapshots'
+        url 'https://nexus.actoron.com/content/repositories/oss-nightlies/'
+    }
+}  
+```
   
 #### Apache Maven Project:
 ```xml
@@ -45,6 +71,17 @@ compile 'org.activecomponents.jadex:jadex-distribution-standard:${jadexversion}'
     <artifactId>jadex-distribution-minimal</artifactId>
     <version>${jadexversion}</version>
 </dependency>
+```
+
+If you want to use our nightly builds, you need to add our repository:
+
+```xml
+<repositories>
+    <repository>
+        <id>jadex-oss-nightlies</id>
+        <url>https://nexus.actoron.com/content/repositories/oss-nightlies</url>
+    </repository>
+</repositories>
 ```
 
 ### Example Project
@@ -149,11 +186,10 @@ To start your applications developed with Jadex Active Components, you first nee
 Alternatively, you can pass your component to the PlatformConfiguration object:
 
 ```java
-	PlatformConfiguration	config	= PlatformConfiguration.getDefault();
+	PlatformConfiguration	config	= PlatformConfiguration.getDefaultNoGui();
 	config.addComponent("com.example.mypackage.MyAgent.class");
 	Starter.createPlatform(config).get();
 ```
-This configuration will also start up a [JCC](../tools/01 Introduction/) by default.
 
 <x-hint title="Referencing components in start-up code">
 While you can also call config.addComponent(MyAgent.class) in most cases, you **must not** do so when **starting BDI agents** for technical reasons.

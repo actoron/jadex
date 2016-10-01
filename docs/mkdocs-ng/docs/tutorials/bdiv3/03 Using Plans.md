@@ -29,12 +29,11 @@ Please note that in Jadex methods that are invoked by the framework can have any
 In this exercise we will use a plan for translating words from English to German.  
 Create a new TranslationBDI.java file by copying the file from the last lecture.
 
-## Creating the Plan
+## Exercise B1: Creating a Plan
 
-Create a new file called TranslationPlan.java responsible for a basic word translation with the following properties:
+Create a new file called *TranslationPlan.java* responsible for a basic word translation with the following properties:
 
 -   Content of the plan class:
-
 
 ```java
 @Plan
@@ -55,11 +54,22 @@ public class TranslationPlan
 }
 ```
 
-
--   In this first version we will use a very simple plan that does not allow for translating words on request. Instead we here just use a hash table as kind of dictionary for a few word pairs. The dictionary should be created in the constructor and some word pairs should be added.
+-   In this first version we will use a very simple plan that does not allow for translating words on request. Instead we here just use a hash map as kind of dictionary for a few word pairs. The dictionary should be created in the constructor and some word pairs should be added:
+```java
+this.wordtable = new HashMap<String, String>();
+this.wordtable.put("coffee", "Kaffee");
+this.wordtable.put("milk", "Milch");
+this.wordtable.put("cow", "Kuh");
+this.wordtable.put("cat", "Katze");
+this.wordtable.put("dog", "Hund");
+```
 -   In the body method (the name of the method and its signature does not matter, the annotation is important) we just look up one word and print the translation in the form:  
-    System.out.println("Translated: "+eword+" - "+gword);  
-    letting eword and gword being the English and German words respectively.
+```java 
+String eword = "dog";
+String gword = wordtable.get(eword);
+System.out.println("Translated: "+eword+" - "+gword);
+```  
+Letting *eword* and *gword* being the English and German words respectively.
 
 ## Adding the plan to the agent
 
@@ -67,7 +77,7 @@ public class TranslationPlan
 ```java
 @Plans(@Plan(body=@Body(TranslationPlan.class)))
 ```
--   Add a field called bdi to the agent class and annotate it with ```@AgentFeature```. The field should be of type ```IBDIAgentFeature```. This will let the engine automatically inject the bdi agent (api) to the POJO agent class. 
+-   Add a field called *bdiFeature* to the agent class and annotate it with ```@AgentFeature```. The field should be of type ```IBDIAgentFeature```. This will let the engine automatically inject the BDI Agent API to the POJO agent class. 
 Read more about features [here](../../components/components/#component-features).
 
 ```java
@@ -155,12 +165,12 @@ public void translateEnglishGerman()
 ## Method Plans with Parameters
 When you create your plans as inner classes, you can just pass parameters as constructor arguments.
 However, it is also possible to have parameterized plans using method plans.
-First, declare a parameter of type *ChangeEvent*:
+First, declare a parameter of type *jadex.bdiv3.runtime.ChangeEvent* and extract the first value as *eword*:
 ```java
 @Plan
 public void translateEnglishGerman(ChangeEvent<Object[]> event)
 {
-    String word = (String)ev.getValue()[0];
+    String eword = (String)event.getValue()[0];
 }
 ```
 
@@ -191,7 +201,7 @@ The agent body method should look like this:
 ```java
 try
 {
-  bdiFeature.adoptPlan(new TranslatePlan()).get();
+  bdiFeature.adoptPlan(new TranslationPlan()).get();
 }
 catch(Exception e)
 {
@@ -246,14 +256,12 @@ Besides the lifecycle methods that have been introduced in the former exercise a
 ## Creating the agent
 As preparation we can copy the agent from the last exercise and modify the following:
 
--   We add a field named context of boolean type and put an ```@Belief``` annotation above it. Details about the meaning of beliefs will be explained in the next chapter. 
-
+-   We add a field named *context* of boolean type and put an ```@Belief``` annotation above it. Details about the meaning of beliefs will be explained in the next chapter. 
 
 ```java
   @Belief
   protected boolean context = true;
 ```
-
 
 -   To access the waitFor methods we add another ```@AgentFeature``` of type ```IExecutionFeature``` to our agent. 
 
@@ -263,13 +271,12 @@ As preparation we can copy the agent from the last exercise and modify the follo
   protected IExecutionFeature execFeature;
 ```
 
--   In the agent body method we do not wait until plan completion. Instead we wait for one second and afterwards set the context field to false. 
+-   In the agent body method we do not wait until plan completion. Instead we wait for one second and afterwards set the *context* field to false. 
 
 ```java
-
 try
 {
-  bdiFeature.adoptPlan(new TranslatePlan());
+  bdiFeature.adoptPlan(new TranslationPlan());
   execFeature.waitForDelay(1000).get();
   context = false;
   System.out.println("context set to false");
@@ -282,11 +289,12 @@ catch(Exception e)
 
 ## Changing the plan
 
--   In the inner plan class we add a field for the plan API and a method for the context condition. The plan API is of type IPlan and needs the ```@PlanAPI``` annotation. This ensures that the API will be automatically injected to the field when the plan is created.   
-The context method should have a ```@PlanContextCondition``` annotation. 
-Furthermore, we want the condition to be reevaluated whenever the belief context changes. 
-This is achieved by adding a dependency to the context belief via the beliefs declaration in the annotation. The method itself should simply return the value of the context field:
+-   In the inner plan class we add a field for the plan API. The plan API is of type IPlan and needs the ```@PlanAPI``` annotation. This ensures that the API will be automatically injected to the field when the plan is created.
+ 
+-  Next, we add a method for the context condition. The context method should have a ```@PlanContextCondition``` annotation.
 
+-  Furthermore, we want the condition to be reevaluated whenever the belief context changes.   
+This is achieved by adding a dependency to the context belief via the *beliefs* parameter in the annotation. The method itself should simply return the value of the *context* field:
 
 ```java
 @PlanAPI
@@ -298,7 +306,6 @@ public boolean checkCondition()
   return context;
 }
 ```
-
 
 -   Finally, the plan logic has to be changed in order to be active a longer period of time. To achieve this we first print 'Plan started' and then use a ```waitFor()``` statement to let the plan wait for 10 seconds. The wait methods are accessible via the injected plan API. Finally, we add a print statement with 'Plan resumed':
 

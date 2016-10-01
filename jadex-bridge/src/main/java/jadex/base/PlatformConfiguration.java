@@ -253,6 +253,17 @@ public class PlatformConfiguration
 	}
 
 	/**
+	 * Returns a PlatformConfiguration with the default parameters but without gui.
+	 * @return
+	 */
+	public static PlatformConfiguration getDefaultNoGui()
+	{
+		PlatformConfiguration config = getDefault();
+		config.getRootConfig().setGui(false);
+		return config;
+	}
+
+	/**
 	 * Returns a PlatformConfiguration with the default parameters.
 	 * @return
 	 */
