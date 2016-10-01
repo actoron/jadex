@@ -84,7 +84,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	protected List<IComponentFeature>	ifeatures;
 	
 	/** The logger. */
-	protected Logger	logger;
+	protected Logger logger;
 	
 	/** The failure reason (if any). */
 	protected Exception	exception;
