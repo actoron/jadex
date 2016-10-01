@@ -74,4 +74,10 @@ The ```@AgentService``` annotation to the ```addTimeService()``` method states t
 
 ## The Agent Behavior
 
-The method is called for each found service. In this method, the agent subscribes to the found time service by adding another listener. This listener is informed about each new time notified by the specific time service.
+The *addTimeService()* method is called for each found service. In this method, the agent subscribes to the found time service and receives the client side of the subscription future as described in the [last section](../02 Time Service Interface/#the-subscribe-method). In the while loop, *hasNextIntermediateResult()* blocks until the next time notification becomes available and can be fetched by *getNextIntermediateResult()*.
+*todo: check link to last section*
+*todo: describe IService and service identifier?*
+
+*todo: describe main method details?*
+
+*todo: consistency of class/method name highlighting throughout all guides!!!???*

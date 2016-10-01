@@ -189,12 +189,22 @@ The details of the time provider agent are explained in the following subsection
 
 ## Service Annotations
 
-The  @ProvidedService annotation tells the Jadex runtime that this agent provides a service of type *ITimeService.class*. The @Service annotation furthermore states, that the agent class implements the service itself instead of having a seperate class for the service implementation.
+The  @ProvidedService annotation tells the Jadex runtime that this agent provides a service of type *ITimeService.class*. The @Service annotation furthermore states, that the agent class implements the service itself instead of having a separate class for the service implementation.
 
 See, e.g.,  [Services.Providing Services](../../services/services/#providing-services) for more details on the @ProvidedService annotation.
 
 ## Object Attributes
 
-There are two fields declared in the class. The first just holds a string of the agent's location. The location is computed using an HTTP request to a free GeoIP service in the *determineLocation()* method. The field is accessed in the *getLocation()* method to return the immutable location of the service. (Remember that this value is cached) 02 Time Service Interface/#the-getname-method
+There are two fields declared in the class. The first just holds a string of the agent's location. The location is computed using an HTTP request to a free GeoIP service in the *determineLocation()* method. The field is accessed in the *getLocation()* method to return the immutable location of the service. Remember that this value is cached as described [before](../02 Time Service Interface/#the-getlocation-method).
+*todo: test link to before*
 
-The second field is a set of the current subscriptions to the time service. The object type *SubscriptionIntermediateFuture* used for the set will be explained next. 
+The second field is a set of the current subscriptions to the time service. The object type *SubscriptionIntermediateFuture* represents the server side of the subscription future as described for the [time service interface's *subscribe()* method](../02 Time Service Interface/#the-subscribe-method)
+*todo: test link to subscribe method*
+
+## The Subscribe Method
+
+*todo*
+
+## The Agent Life Cycle
+
+*todo*
