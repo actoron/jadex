@@ -24,7 +24,7 @@ Note that this tutorial is not a replacement for the existing eclipse documentat
 ## Prerequisites
 
 -   Download and install a recent **Java** environment from [http://java.sun.com/javase/downloads](http://java.sun.com/javase/downloads) (if not already present).
--   Download and install a suitable **eclipse** distribution (&gt;= ${EclipseMinVersion}) from [http://www.eclipse.org/downloads](http://www.eclipse.org/downloads/)  (if not already present). The following has been tested with the 'Eclipse IDE for Java EE Developers' package.
+-   Download and install a suitable **Eclipse** distribution (&gt;= ${EclipseMinVersion}) from [http://www.eclipse.org/downloads](http://www.eclipse.org/downloads/)  (if not already present). The following has been tested with the 'Eclipse IDE for Java EE Developers' package.
 -   If you want to use Gradle: Install the **Gradle IDE Pack** from [eclipse marketplace](https://marketplace.eclipse.org/content/gradle-ide-pack).
 
 ## Project Setup with Gradle/Maven
@@ -80,6 +80,8 @@ Download the latest Jadex distribution from [Downloads](${URLACDownloadPage}) an
 Start eclipse. Start the 'New Java Project' wizard, disable the 'Use default location' checkbox and browse to the directory, where you unpacked the Jadex distribution. Note that the name of the directory might slightly differ due to changing Jadex version numbers.
 
 <!--TODO: update screenshots and texts-->
+
+<!-- TODO: also describe a way where you can use the libs directly (without jadex project in eclipse) -->
 
 ![02 Installation@eclipseprojectcreate.png](eclipseprojectcreate.png)  
 *Create Java project in eclipse*
@@ -148,6 +150,11 @@ Alternatively, you can pass your component to the PlatformConfiguration object:
 
 ```java
 	PlatformConfiguration	config	= PlatformConfiguration.getDefault();
-	config.addComponent(MyAgent.class);
+	config.addComponent("com.example.mypackage.MyAgent.class");
 	Starter.createPlatform(config).get();
 ```
+This configuration will also start up a [JCC](../tools/01 Introduction/) by default.
+
+<x-hint title="Referencing components in start-up code">
+While you can also call config.addComponent(MyAgent.class) in most cases, you **must not** do so when **starting BDI agents** for technical reasons.
+</x-hint>

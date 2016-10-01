@@ -2,7 +2,12 @@
 
 Goals make up the agent's motivational stance and are the driving forces for its actions. Therefore, the representation and handling of goals is one of the main features of Jadex. The concepts that make up the basis for the representation of goals in Jadex are described in the following sections and in more detail in [Braubach et al. 04] and [Braubach et al. 09]. Currently Jadex supports four different goal kinds and a meta-level goal kind. A perform goal specifies some activities to be done. Therefore the outcome of the goal depends only on the fact, if activities were performed. In contrast, an achieve goal can be seen as a goal in the classical sense by representing a target state that needs to be achieved. Similar to the behavior of the achieve goal is the query goal, which is used to enquire information about a specified issue. The maintain goal has the purpose to observe some desired world state and actively reestablishes this state when it gets violated. Meta-level goals can be used in the plan selection process for reasoning about events and suitable plans.
 
+<!-- 
+Text moved from bdiv3 tutorial:
 
+The goal representation has changed a bit in V3 compared to the former versions of Jadex. In Jadex V3 a goal is a Java POJO, i.e. a user defined object. Furthermore, the different kinds of goals need not to be specified explicitly. Instead, it is sufficient to just use the type of conditions that are required to produce the disired behaviour. 
+
+-->
 
 
 Figure 1 shows that a specific tag for each goal kind exists. Additionally, the &lt;...goalref&gt; tags allow for the definition of references to goals from other capabilities (cf. Figure 1 in the Capabilities section).

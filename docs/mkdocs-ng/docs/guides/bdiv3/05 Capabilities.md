@@ -2,6 +2,19 @@
 
 The term capability is used for different purposes in the agent community. In the context of Jadex, the term is used to denote an encapsulated agent module composed of beliefs, goals, and plans. The concept of an agent module (and the usage of the term capability) was proposed by [Busetta et al. 99] and first implemented in JACK Agents [Winikoff 05]. Capabilities allow for packaging a subset of beliefs, plans, and goals into an agent module and to reuse this module wherever needed. Capabilities can contain subcapabilities forming arbitrary hierarchies of modules. In Jadex, a revised and extended capability model has been implemented as described in [Braubach et al. 05]. In this model, the connection between a parent (outer) and a child (inner) capability is established by a uniform visibility mechanism for contained elements (see Figure 1).
 
+<!--
+Text moved from bdiv3 tutorial:
+ 
+ A module has to provide an explicit boundary which allows for connecting it with an agent or with another module. 
+ In contrast to BDI V2, in which it had to be explicitly declared which beliefs, goals and plans are exported and thus visible to the outside of a module, in BDI V3 these specifications have been pushed to the Java level. 
+ This means that the visibility modifiers you use in Java determines also if beliefs, goals and plans are visible.
+ 
+ There is basically one additional feature that goes beyond these rules. 
+ In order to allow the specification of abstract beliefs, which should be available in the module but are made concrete and are assigned at the level of the outer, i.e. including module, unimplemented beliefs can be specified. 
+ Such unimplemented beliefs are represented as native getter/setter pairs without method body. 
+ In the outer capability an explicit belief mapping has to be stated which describes the connection of a local and the abstract belief of the submodule. 
+ -->
+
 ![](capability.png)
 
 *Figure 1: Capability concept*

@@ -2,6 +2,12 @@
 
 Beliefs represent the agent's knowledge about its enviroment and itself. In Jadex the beliefs can be any Java objects. They are stored in a belief base and can be referenced in expressions, as well as accessed and modified from plans using the beliefbase interface.
 
+<!-- 
+Text moved from bdi tutorial:
+
+If you already know the former versions of Jadex BDI, you may be aware of the distinction between beliefs and belief sets. This distinction is not necessary in V3 any longer and instead all elements are marked with the ```@Belief``` annotation.  
+-->
+
 # Defining Beliefs in the ADF
 
 The beliefbase is the container for the facts known by the agent. Beliefs are usually defined in the ADF and accessed and modified from plans. To define a single valued belief or a multi-valued belief set in the ADF the developer has to use the corresponding &lt;belief&gt; or &lt;beliefset&gt; tags and has to provide a name and a class. The name is used to refer to the fact(s) contained in the belief. The class specifies the (super) class of the fact objects that can be stored in the belief. The default fact(s) of a belief may be supplied in enclosed &lt;fact&gt; tags. Alternatively, for belief sets a collection of initial facts can be directly specified using a &lt;facts&gt; tag. This is useful, when you do not know the number of initial facts in advanvce, e.g., when invoking a static method or retrieving values from a database (see Figure 1). References to beliefs and belief sets from inner capabilities can be defined using the &lt;beliefref&gt; and &lt;beliefsetref&gt; tags (cf. Figure 2 in the Capabilities chapter).
