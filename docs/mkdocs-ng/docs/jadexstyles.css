@@ -10,10 +10,6 @@
 	color: #2C6700;
 }
 
-.hljs-keyword {
-	color:#6F0000;
-}
-
 .hljs-attribute {
 	color: #800080;
 }
@@ -25,6 +21,14 @@
 
 .hljs-tag .hljs-title {
 	color:#008080;
+}
+
+.java.hljs .hljs-keyword {
+	color:#6F0000;
+}
+
+.java.hljs .hljs-annotation {
+	color:#646464;
 }
 
 p {
