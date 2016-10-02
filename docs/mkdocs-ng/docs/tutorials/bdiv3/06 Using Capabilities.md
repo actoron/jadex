@@ -97,7 +97,7 @@ public void body()
 }
 ```
 
-## Starting and testing the agent
+** Starting and testing the agent **
 
 After starting the agent you should see again the print out of the translated word.
 
@@ -183,5 +183,6 @@ public void body() {
 }
 ```
 
-## Starting and testing the agent
+** Starting and testing the agent **
+
 After starting the agent you should the print out of the translated word and a list of found synonyms.

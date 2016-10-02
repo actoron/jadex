@@ -16,8 +16,26 @@ Whenever a new request is issued (e.g. from a browser), a new goal containing th
 The translation plan handles this translation goal and sends back some HTML content including some text and the translated word.
 
 -   Create a new agent class called *TranslationBDI*.
--   Add again the fields for the agent API and the word table.
--   Add another field called server that stores the ```ServerSocket```.
+-   Add the following fields with feature injections: *execFeature*, *bdiFeature*.
+-   Add a field for the wordtable as in the previous exercises.
+-   Add another field called server that stores the ```ServerSocket```:
+
+```java
+@Agent
+public class TranslationBDI
+{
+    @AgentFeature
+	protected IExecutionFeature execFeature;
+	
+    @AgentFeature
+    protected IBDIAgentFeature bdiFeature;
+	
+	protected Map<String, String> wordtable;
+
+	protected ServerSocket server;
+}
+```
+
 -   Create a goal as inner class called *Translate* that has a field called *client* of type ```Socket```. 
 -   Add a constructor with a parameter of type ```Socket``` and add getter/setter methods for it.
 
@@ -31,7 +49,16 @@ public class Translate
   {
     this.client = client;
   }
-  ...
+  
+  public Socket getClient()
+  {
+    return client;
+  }
+  
+  public void setClient(Socket client)
+  {
+    this.client = client;
+  }
 }
 ```
 
@@ -44,12 +71,14 @@ Runnable run = new Runnable()
   {
     try
     {
-      server = new ServerSocket(port);
+      server = new ServerSocket(9099);
     }
     catch(IOException e)
     {
       throw new RuntimeException(e.getMessage());
     }
+  }
+};
 ```
 
 -   If the socket could be opened we start waiting in an endless loop in a blocking fashion for incoming calls. Whenever a request is received we schedule a step on the agent and dispatch a translation goal with the new client socket. 
@@ -70,7 +99,7 @@ while(true)
 }
 ```
 
-You need to put the loop code above in a try/catch construct to shut down the server when a component termination exception occurs (i.e. the agent was terminated).
+You need to put the loop code above in a try/catch construct to shut down the server when a component termination exception occurs (i.e. the agent was terminated):
 
 ```java
 if(server!=null)
@@ -110,9 +139,9 @@ public void translate(Translate trans)
     String gword = wordtable.get(eword);
     System.out.println(request);
     PrintStream	out = new PrintStream(client.getOutputStream());
-    out.print("HTTP/1.0 200 OKrn");
-    out.print("Content-type: text/htmlrn");
-    out.println("rn");
+    out.print("HTTP/1.0 200 OK\r\n");
+    out.print("Content-type: text/html\r\n");
+    out.println("\r\n");
     out.println("<html><head><title>TranslationM1 - "+eword+"</title></head><body>");
     out.println("<p>Translated from english to german: "+eword+" = "+gword+".");
     out.println("</p></body></html>");
@@ -126,5 +155,6 @@ public void translate(Translate trans)
 } 
 ```
 
-## Starting and testing the agent 
-Start the agent and open a browser to issue translation request. This can be done by entering the server url and appending the word to translate, e.g. [http://localhost:9099/dog.](http://localhost:9099/dog.)  The result should be printed out in the returned web page.
+** Starting and testing the agent **
+
+Start the agent and open a browser to issue translation request. This can be done by entering the server url and appending the word to translate, e.g. [http://localhost:9099/dog](http://localhost:9099/dog).  The result should be printed out in the returned web page.

@@ -122,7 +122,7 @@ public void body()
 }
 ```
 
-## Starting and testing the agent
+** Starting and testing the agent **
 
 After starting the agent it should print out the word for which we have created and dispatched a goal.
 
@@ -174,7 +174,7 @@ protected String translate(String eword)
 }
 ```
 
-## Starting and testing the agent
+** Starting and testing the agent **
 
 After starting the agent it should behave in the same way as in the last exercise.
 
@@ -208,7 +208,7 @@ protected String translateB(String eword)
 ```
 
 
-## Starting and testing the agent
+** Starting and testing the agent **
 
 After starting the agent you should see that first plan A and afterwards plan B is executed.   
 Think about what happens if the second plan would also throw an exception.  
@@ -258,7 +258,7 @@ protected void translate(String eword)
 }
 ```
 
-## Starting and testing the agent
+** Starting and testing the agent **
 
 After starting the agent you should see that for each belief assignment a new print out is produced.
 
@@ -341,7 +341,7 @@ public void body()
 ```
 
 
-## Starting and testing the agent
+** Starting and testing the agent **
 
 Start the agent and check whether the goal is reactivated by the recur condition triggers.
 
@@ -428,8 +428,7 @@ public void body()
 }
 ```
 
-
-### Starting and testing the agent
+** Starting and testing the agent **
 
 Start the agent and observe the print outs on the console. You should see entries getting added periodically. 
 When five entries are in the dictionary, the maintain goal is activated and entries get removed until only two remain. 

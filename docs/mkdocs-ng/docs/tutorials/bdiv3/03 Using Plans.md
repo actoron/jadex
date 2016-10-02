@@ -29,7 +29,7 @@ Please note that in Jadex methods that are invoked by the framework can have any
 In this exercise we will use a plan for translating words from English to German.  
 Create a new TranslationBDI.java file by copying the file from the last lecture.
 
-## Exercise B1: Creating a Plan
+# Exercise B1: Creating a Plan
 
 Create a new file called *TranslationPlan.java* responsible for a basic word translation with the following properties:
 
@@ -98,7 +98,7 @@ public void body()
 ## Starting and testing the agent
 Start your agent and observe the output. You should see it printing the translated word.
 
-#Exercise B2 - A Plan as Inner Class
+# Exercise B2 - A Plan as Inner Class
 
 In the lecture we will use an inner class as plan instead of an extra plan class. The functionality remains the same. Again, copy the translation agent class from the last lecture and apply the following changes:
 

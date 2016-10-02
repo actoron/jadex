@@ -24,7 +24,9 @@ public class TranslationBDI
 }
 ```
 
-## Start your first Jadex agent
+
+** Start your first Jadex agent **
+
 The easiest way to start your agent is to create a class *Main* with a main method that starts up a Jadex Platform together with your agent:
 ```java
 public class Main {

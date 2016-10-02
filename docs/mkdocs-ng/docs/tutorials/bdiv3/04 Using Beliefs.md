@@ -16,7 +16,6 @@ In case of collection beliefs, **use the collection interfaces (List, Map, Set)*
 
 In this exercise we will develop a translation agent that checks if only good word pairs are added to his dictionary. For this purpose we will make the wordtable become a belief and create a check plan that is activated always when the dictionary changes. 
 
-## Creating the agent
 This time we start with a fresh agent file and do the following:
 
 -   Create a new TranslationBDI agent Java class file and add the ```@Agent``` annotation to the class
@@ -63,13 +62,15 @@ public void checkWordPairPlan(ChangeEvent event)
 }
 ```
 
-## Starting and testing the agent
+** Starting and testing the agent **
+
 Start your translation agent and observe the output. You should see it printing the warning.
 
 # Exercise C2 - Dynamic Beliefs
 
 Besides normal beliefs it is sometimes helpful to have a belief that directly depends on other beliefs and is automatically reevaluated whenever one of the beliefs changes it relies on. 
 For these so-called *dynamic beliefs* it is required that they are fields with an init expression directly in its declaration, i.e. e.g. ```private String name = othername+id```, assuming that *othername* and *id* are other beliefs.
+
 
 -   Create a *TranslationBDI* class by copying it from the last exercise. 
 -   Change the belief definition in two ways: 
@@ -103,7 +104,8 @@ public void checkWordPairPlan(ChangeEvent event)
 ```
 
 
-## Starting and testing the agent
+** Starting and testing the agent **
+
 Start the agent and verify that it behaves the same way as in the last exercise.
 
 # Exercise C3 - Getter/Setter Belief
@@ -152,7 +154,8 @@ protected void body() {
 }
 ```
 
-## Starting and testing the agent
+** Starting and testing the agent **
+
 Start the agent and check that it prints out the current time.
 
 # Exercise C4 - Getter/Setter Belief without Field
@@ -165,7 +168,8 @@ This lecture will show that you can use also a getter/setter belief without an u
 -   In the body of the agent just call ```setTime()```.
 -   The plan remains completely the same as in the last exercise.
 
-## Starting and testing the agent
+** Starting and testing the agent **
+
 Start the agent and check that it prints out the current time. Think about why it works? You just call an empty method (```setTime()```), don't you?
 
 # Exercise C5 - Belief with Update Rate
@@ -189,5 +193,6 @@ protected void printTime()
 }
 ```
 
-## Starting and testing the agent
+** Starting and testing the agent **
+
 Start the agent and check that it prints out the current time every second.

@@ -120,7 +120,7 @@ bt.addActionListener(new ActionListener()
 
 For more information about service invocation, visit the [Services](../../services/services/#using-services) chapter.
 
-## Starting and testing the agents
+** Starting and testing the agents **
 
 Start both agents. The user interface should appear after the user agent has been started. Enter a word and press the Translate button. You should see the translated word appearing immediately in the text field below. 
 
@@ -227,7 +227,7 @@ public String internetTranslate(Object[] params)
 }
 ```
 
-## Starting and testing the agents
+** Starting and testing the agents **
 
 Again, start both agents. Now try out if internal as well as internet translations are displayed when entering translation requests in the gui.
 
@@ -351,7 +351,7 @@ public String translatePlan(String eword)
 ```
 
 
-## Starting and testing the agents
+** Starting and testing the agents **
 
 Start both agents and verify that translation requests get executed.
 
