@@ -32,7 +32,7 @@ public class TranslationBDI
 	protected IBDIAgentFeature bdiFeature;
 
 	/** The execution feature. */
-	@Agent
+	@AgentFeature
 	protected IExecutionFeature execFeature;
 	
 	/** The map of words. */
