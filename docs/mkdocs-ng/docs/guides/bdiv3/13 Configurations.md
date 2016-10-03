@@ -1,5 +1,7 @@
 # Configurations
 
+${SorryOutdated}
+
 Configurations represent both the initial and/or end states of an agent type. Initial instance elements can be declared that are created when the agent (resp. the capability) is started. This means that initial elements such as goals or plans are created immediately when an agent is born. On the conatrary, end elements can be used to declare instance elements such as goals or plans that will be created when an agent is going to be terminated. After an agent has been urged to terminate (e.g. by calling *killAgent()* from within a plan or by an CMS *cms_destroy_component* goal), all normal goals and plans will be aborted (except plans that perform their cleanup code, i.e. execute one of the *passed()*, *failed()* or *aborted()* methods) and the declared end elements will be created and executed.
 
 

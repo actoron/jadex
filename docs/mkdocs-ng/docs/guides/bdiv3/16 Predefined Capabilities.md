@@ -1,7 +1,9 @@
 # Using Predefined Capabilities
 
+${SorryOutdated}
+
 The documentation of the predefined capabilities is not yet finished.
-Please also take a look at the [BDI Tutorial](../../tutorials/bdiv3/06 Using Capabilities/)
+Please also take a look at the [BDIV3 Tutorial](../../tutorials/bdiv3/06 Using Capabilities/)
 and at the [legacy documentation of Jadex 0.96](${URLLegacyDoc}/userguide/predef_cap.html).
 
 Jadex uses capabilities for the modularization of agents (see [Chapter 5. Capabilities](05 Capabilities)), whereby capabilities contain ready to use functionalities. The Jadex distribution contains several ready-to-use predefined capabilities for different purposes. Besides the basic management capabilties for using the CMS (component management service, see [CMSCapability](#the-component-management-service-cms-capability) below and the Directory Facilitator (see [DFCapability](../../tools/A3 Directory Facilitator/) also a Protocols Capability is available for the efficient usage of some predefined FIPA interaction protocols. The interface of a capability mainly consists of a set of exported goals which is similar to an object-oriented method-based interface description. This chapter aims at depicting their usage by offering the application programmer an overview and explanation of their functionalities and additionally a selection of short code snippets that can directly be used in your applications. 

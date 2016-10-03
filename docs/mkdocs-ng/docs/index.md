@@ -30,7 +30,7 @@ For API Documentation of Jadex Active Components ${jadexversiontitle} please vis
 
 # Advanced Guides
  * [Jadex Active Components User Guide](guides/ac/01 Introduction/)
- * [BDIV3 User Guide](guides/bdiv3/01 Introduction)  
+ * [BDI User Guide](guides/bdiv3/01 Introduction) (currently outdated)  
  * [Environment User Guide](guides/env/01 Introduction/)
  * [Jadex Tools](tools/01 Introduction/)
  

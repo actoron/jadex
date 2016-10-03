@@ -1,5 +1,7 @@
 # Imports
 
+${SorryOutdated}
+
 The &lt;imports&gt; tag is used to specify, which classes and packages can be used by Java expressions throughout an agent or capability definition file. The import section with an ADF resembles very much the Java import section of a class file. A Jadex import statement has the same syntax as in Java allowing single classes as well as whole packages being included.
 
 
