@@ -15,6 +15,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 
 /**
  *  The translation agent e1.
@@ -24,8 +25,8 @@ import jadex.micro.annotation.AgentCreated;
 @Agent
 public class TranslationBDI
 {
-	/** The agent. */
-	@Agent
+	/** The bdi feature. */
+	@AgentFeature
 	protected IBDIAgentFeature bdiFeature;
 	
 	@Capability(beliefmapping=@Mapping(value="wordtable"))
