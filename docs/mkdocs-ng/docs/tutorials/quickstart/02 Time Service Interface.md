@@ -50,10 +50,12 @@ public interface ITimeService
 
 ### The Name and Package of the Interface
 
-In Jadex, the fully qualified name of a service interface is used for service discovery. Therefore when you implement a time user component to search for your *ITimeService*, Jadex will discover all components worldwide that offer a service of type *jadex.micro.quickstart.ITimeService*. Therefore, if you make sure to use the interface and package name as shown, you might be able to find other peoples time provider components. E.g. for testing purposes there should be a time provider running in our [infrastructure](http://www.activecomponents.org/bin/view/Infrastructure/Overview).
-*todo: infrastructure link?*
-*todo: time provider autodeploy from build*
-*todo: web page listing available time providers (jadex.js)*
+In Jadex, the fully qualified name of a service interface is used for service discovery. Therefore when you implement a time user component to search for your *ITimeService*, Jadex will discover all components worldwide that offer a service of type *jadex.micro.quickstart.ITimeService*. If you make sure to use the interface and package name as shown, you might be able to find other people's time provider components.
+
+[//]: # (*todo: E.g. for testing purposes there should be a time provider running on our infrastructure.*)
+[//]: # (*todo: infrastructure link?*)
+[//]: # (*todo: time provider autodeploy from build*)
+[//]: # (*todo: web page listing available time providers (jadex.js)*)
 
 ### The *getLocation()* Method
 
