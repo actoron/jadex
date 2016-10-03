@@ -253,6 +253,17 @@ public class PlatformConfiguration
 	}
 
 	/**
+	 * Returns a PlatformConfiguration with the default parameters but without gui.
+	 * @return
+	 */
+	public static PlatformConfiguration getDefaultNoGui()
+	{
+		PlatformConfiguration config = getDefault();
+		config.getRootConfig().setGui(false);
+		return config;
+	}
+
+	/**
 	 * Returns a PlatformConfiguration with the default parameters.
 	 * @return
 	 */
@@ -493,7 +504,19 @@ public class PlatformConfiguration
 	public long getRemoteDefaultTimeout() {
 		return (defaultTimeout != null) ? defaultTimeout : DEFAULT_REMOTE_TIMEOUT;
 	}
-	
+
+	/**
+	 * Add a component that is started after platform startup.
+	 * DO NOT use this method for starting BDI agents!
+	 * Pass a fully qualified classname as string to addComponent(String) instead.
+	 * @param clazz Class of the component.
+	 */
+	public void addComponent(Class clazz)
+	{
+		// check for loaded bdi classes here?
+		components.add(clazz.getName() + ".class");
+	}
+
 	/**
 	 * Add a component that is started after platform startup.
 	 * @param path Path to the component.
@@ -502,6 +525,7 @@ public class PlatformConfiguration
 	{
 		components.add((String)path);
 	}
+
 	/**
 	 * Set the list of components to be started at startup.
 	 * @param newcomps List of components.

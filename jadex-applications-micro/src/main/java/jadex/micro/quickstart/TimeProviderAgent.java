@@ -1,20 +1,17 @@
 package jadex.micro.quickstart;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -31,50 +28,16 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(type=ITimeService.class))
-public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
+public class TimeProviderAgent	implements ITimeService
 {
 	//-------- attributes --------
-	
-	/** The jadex component that executes the time provider agent.
-	 *  Gets automatically injected at agent startup. */
-	@Agent
-	protected IInternalAccess	agent;
-	
+		
 	/** The location (determined at startup). */
 	protected String	location	= determineLocation();
 	
 	/** The subscriptions to be informed about the time. */
 	protected Set<SubscriptionIntermediateFuture<String>>	subscriptions
 		= new LinkedHashSet<SubscriptionIntermediateFuture<String>>();
-	
-	//-------- agent lifecycle methods --------
-	
-	/**
-	 *  Due to annotation, called once after agent is initialized.
-	 *  Also used as step and thus called periodically as rersult of waitFor().
-	 */
-	@AgentBody
-	public IFuture<Void> execute(IInternalAccess ia)
-	{
-		// Calculate date of last full five seconds.
-		Date	d = new Date(System.currentTimeMillis()-System.currentTimeMillis()%5000);
-
-		// Notify all subscribers
-		for(SubscriptionIntermediateFuture<String> subscriber: subscriptions)
-		{
-			// Add the current time as intermediate result.
-			// The if-undone part is used to ignore errors,
-			// when subscription was cancelled in the mean time.
-			subscriber.addIntermediateResultIfUndone(d.toString());
-		}
-		
-		// Wait until the next full five seconds.
-		long	millis	= d.getTime()+5000-System.currentTimeMillis();
-		ia.getComponentFeature(IExecutionFeature.class).waitForDelay(millis, this);
-		
-		// Return empty non-finished future to keep agent alive.
-		return new Future<Void>();
-	}
 	
 	//-------- ITimeService interface --------
 	
@@ -116,6 +79,38 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		return ret;
 	}
 	
+	//-------- agent life cycle --------
+	
+	/**
+	 *  Due to annotation, called once after agent is initialized.
+	 *  The internal access parameter is optional and is injected automatically.
+	 */
+	@AgentBody
+	public void body(IInternalAccess ia)
+	{
+		// The execution feature provides methods for controlling the execution of the agent.
+		IExecutionFeature	exe	= ia.getComponentFeature(IExecutionFeature.class);
+		
+		// Execute a step every 5000 milliseconds, start from next full 5000 milliseconds
+		exe.repeatStep(5000-System.currentTimeMillis()%5000, 5000, new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// Notify all subscribers
+				for(SubscriptionIntermediateFuture<String> subscriber: subscriptions)
+				{
+					// Add the current time as intermediate result.
+					// The if-undone part is used to ignore errors,
+					// when subscription was cancelled in the mean time.
+					subscriber.addIntermediateResultIfUndone(new Date().toString());
+				}
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
 	//-------- helper methods --------
 	
 	/**
@@ -123,54 +118,55 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 	 */
 	protected static String	determineLocation()
 	{
-		final Future<String>	fut	= new Future<String>();
-		new Thread(new Runnable()
-		{
-			public void run()
-			{
-				String	ret	= "unknown";
-				try
-				{
-					// Get geo location, e.g.
-					// 134.100.11.200,DE,Germany,HH,Hamburg,Hamburg,22767,Europe/Berlin,53.55,10.00,0
-					Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv/").openStream(), "UTF-8");
-					scanner.findInLine("([^,]*),");
-					scanner.findInLine("([^,]*),");
-					scanner.findInLine("([^,]*),");
-					ret	= scanner.match().group(1);	// Country
-					scanner.findInLine("([^,]*),");
-					scanner.findInLine("([^,]*),");
-					ret	= scanner.match().group(1) + ", " + ret;	// City
-					scanner.close();
-				}
-				catch(Exception e)
-				{
-					// freegeoip sometimes has connection timeouts :-(
-					System.err.println("Cannot determine location: "+e);
-				}
-				fut.setResult(ret);
-			}
-		}).start();
-
+		String	ret;
 		try
 		{
-			return fut.get(Starter.getScaledRemoteDefaultTimeout(IComponentIdentifier.LOCAL.get(), 0.8));
+			// These free-to-try geoip services have (almost) the same result format.
+//			Scanner scanner	= new Scanner(new URL("http://ipinfo.io/json").openStream(), "UTF-8");
+//			Scanner scanner	= new Scanner(new URL("http://api.petabyet.com/geoip/").openStream(), "UTF-8");
+//			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/json/").openStream(), "UTF-8");	// use "country_name"
+			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
+			
+			// Very simple JSON parsing, matches ..."key": "value"... parts to find country and city.
+			String	country	= null;
+			String	city	= null;
+			scanner.useDelimiter(",");
+			while(scanner.findWithinHorizon("\"([^\"]*)\"[^:]*:[^\"]*\"([^\"]*)\"", 0)!=null)
+			{
+				String	key	= scanner.match().group(1);
+				String	val	= scanner.match().group(2);
+				if("country".equals(key))
+//				if("country_name".equals(key))
+				{
+					country	= val;
+				}
+				else if("city".equals(key))
+				{
+					city	= val;
+				}
+			}
+			scanner.close();
+			
+			ret	= city!=null ? country!=null ? city+", "+country : city
+				: country!=null ? country : "unknown";
+				
 		}
-		catch(TimeoutException e)
+		catch(Exception e)
 		{
-			return "unknown";
+			// ignore
+			ret	= "unknown";
 		}
+		
+		return ret;
 	}
-	
-	public static void main(String[] args) throws Exception
+
+	/**
+	 *  Start a Jadex platform and the TimeProviderAgent.
+	 */
+	public static void	main(String[] args)
 	{
-		InputStream	is	= new URL("http://freegeoip.net/csv/").openStream();
-		byte[]	buf	= new byte[1234];
-		int read;
-		while((read=is.read(buf))!=-1)
-		{
-			System.out.write(buf, 0, read);
-		}
-		is.close();
+		PlatformConfiguration	config	= PlatformConfiguration.getDefault();
+		config.addComponent(TimeProviderAgent.class.getName()+".class");
+		Starter.createPlatform(config).get();
 	}
 }

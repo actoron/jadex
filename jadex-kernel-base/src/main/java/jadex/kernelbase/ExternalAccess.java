@@ -1315,13 +1315,39 @@ public class ExternalAccess implements IExternalAccess
 //	}
 	
 	/**
-	 * 
+	 *  Get the internal access.
+	 *  @return The internal access.
 	 */
 	public IInternalAccess getInternalAccess()
 	{
 		return ia;
 	}
 	
+	
+	/**
+	 *  Get the hashcode.
+	 *  @return The hashcode.
+	 */
+	public int hashCode()
+	{
+		return cid == null? 0 : cid.hashCode();
+	}
+
+	/**
+	 *  Test if an object equals this object.
+	 *  @param obj The object to test.
+	 *  @return True, if equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		
+		if(obj instanceof IExternalAccess)
+			ret = ((IExternalAccess)obj).getComponentIdentifier().equals(cid);
+		
+		return ret;
+	}
+
 	/**
 	 *  Get the string representation.
 	 */

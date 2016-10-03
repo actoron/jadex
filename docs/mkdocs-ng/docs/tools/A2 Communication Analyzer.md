@@ -1,2 +1,1 @@
-Chapter A2 - Communication Analyzer
-================================================
+# Communication Analyzer

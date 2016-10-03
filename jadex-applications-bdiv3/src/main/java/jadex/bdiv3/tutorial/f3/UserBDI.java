@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goals;
@@ -26,6 +27,7 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
@@ -46,6 +48,12 @@ public class UserBDI
 
 	@Agent
 	protected IInternalAccess agent;
+
+	@AgentFeature
+	protected IExecutionFeature execFeature;
+
+	@AgentFeature
+	protected IBDIAgentFeature bdiFeature;
 	
 	/** The gui. */
 	protected JFrame	f;
@@ -73,13 +81,13 @@ public class UserBDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+						execFeature.scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								try
 								{
-									final String gword = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TranslationGoal(tfe.getText())).get();
+									final String gword = (String)bdiFeature.dispatchTopLevelGoal(new TranslationGoal(tfe.getText())).get();
 									SwingUtilities.invokeLater(new Runnable()
 									{
 										public void run()

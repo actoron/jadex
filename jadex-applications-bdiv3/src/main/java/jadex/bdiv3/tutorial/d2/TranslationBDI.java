@@ -11,6 +11,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -26,14 +27,10 @@ import jadex.micro.annotation.Description;
 @Agent
 public class TranslationBDI
 {
-	/** The agent. */
-	@Agent
-	protected IInternalAccess agent;
-	
-	/** The bdi api. */
+	/** The BDI feature. */
 	@AgentFeature
-	protected IBDIAgentFeature bdi;
-	
+	protected IBDIAgentFeature bdiFeature;
+
 	/** The current time. */
 	@Belief
 	protected Map<String, String> wordtable = new HashMap<String, String>();
@@ -80,7 +77,7 @@ public class TranslationBDI
 	public void body()
 	{
 		String eword = "cat";
-		String gword = (String)bdi.dispatchTopLevelGoal(new Translate(eword)).get();
+		String gword = (String)bdiFeature.dispatchTopLevelGoal(new Translate(eword)).get();
 		System.out.println("Translated: "+eword+" "+gword);
 	}
 	

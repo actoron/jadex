@@ -15,6 +15,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 
 /**
  *  The translation agent e1.
@@ -24,9 +25,9 @@ import jadex.micro.annotation.AgentCreated;
 @Agent
 public class TranslationBDI
 {
-	/** The agent. */
-	@Agent
-	protected IInternalAccess agent;
+	/** The bdi feature. */
+	@AgentFeature
+	protected IBDIAgentFeature bdiFeature;
 	
 	@Capability(beliefmapping=@Mapping(value="wordtable"))
 	protected TranslationCapability capa = new TranslationCapability();
@@ -59,10 +60,10 @@ public class TranslationBDI
 	public void body()
 	{
 		String eword = "dog";
-		String gword = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(capa.new Translate(eword)).get();
+		String gword = (String)bdiFeature.dispatchTopLevelGoal(capa.new Translate(eword)).get();
 		System.out.println("Translated: "+eword+" "+gword);
 
-		List<String> syns = (List<String>)agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("findSynonyms", new Object[]{eword}).get();
+		List<String> syns = (List<String>)bdiFeature.adoptPlan("findSynonyms", new Object[]{eword}).get();
 		System.out.println("Found synonyms: "+eword+" "+syns);
 	}
 	

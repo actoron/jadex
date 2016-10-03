@@ -1,5 +1,4 @@
-Chapter 12 - Debugger
-==================================
+# Debugger
 
 ![12 Debugger@debugger.png](debugger.png)
 

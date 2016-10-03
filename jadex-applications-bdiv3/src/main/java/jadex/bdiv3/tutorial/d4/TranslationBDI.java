@@ -11,11 +11,14 @@ import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
 
 /**
@@ -28,10 +31,10 @@ import jadex.micro.annotation.Description;
 @Service
 public class TranslationBDI
 {
-	/** The agent. */
-	@Agent
-	protected IInternalAccess agent;
-	
+	/** The BDI feature. */
+	@AgentFeature
+	protected IBDIAgentFeature bdiFeature;
+
 	/** The current time. */
 	@Belief
 	protected Map<String, String> wordtable = new HashMap<String, String>();

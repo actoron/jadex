@@ -21,6 +21,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
 
 /**
@@ -37,6 +38,12 @@ to perform a translation.
 public class TranslationBDI
 {
 	//-------- attributes --------
+
+	@AgentFeature
+	protected IExecutionFeature execFeature;
+
+	@AgentFeature
+	protected IBDIAgentFeature bdiFeature;
 
 	@Agent
 	protected IInternalAccess agent;
@@ -128,12 +135,12 @@ public class TranslationBDI
 					while(true)
 					{
 						final Socket client	= server.accept();
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+						execFeature.scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("translate")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Translate(client));
+								bdiFeature.dispatchTopLevelGoal(new Translate(client));
 								return IFuture.DONE;
 							}
 						});

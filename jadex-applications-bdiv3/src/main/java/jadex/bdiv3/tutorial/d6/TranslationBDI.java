@@ -14,6 +14,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentFeature;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,13 +27,17 @@ import java.util.Map;
 @Agent
 public class TranslationBDI
 {
-	/** The injected agent. */
-	@Agent
-	protected IInternalAccess agent;
+	/** The BDI feature. */
+	@AgentFeature
+	protected IBDIAgentFeature bdiFeature;
+
+	/** The execution feature. */
+	@AgentFeature
+	protected IExecutionFeature execFeature;
 	
 	/** The map of words. */
 	@Belief
-	protected Map<String, String> egwords = new LinkedHashMap<String, String>();
+	protected Map<String, String> wordtable = new LinkedHashMap<String, String>();
 	
 	/** The max value of entries allowed in the map. */
 //	@Belief
@@ -43,23 +48,23 @@ public class TranslationBDI
 	
 	/**
 	 *  Maintain goal that ensures that only maxstorage
-	 *  number of entries are in the table egwords.
+	 *  number of entries are in the table wordtable.
 	 */
 	@Goal(excludemode=ExcludeMode.Never)
 	public class MaintainStorageGoal
 	{
-		@GoalMaintainCondition//(beliefs="egwords")
+		@GoalMaintainCondition//(beliefs="wordtable")
 		protected boolean maintain()
 		{
-//			System.out.println("check maintain: "+egwords.size()+" "+(egwords.size()<=maxstorage));
-			return egwords.size()<=4;//maxstorage;
+//			System.out.println("check maintain: "+wordtable.size()+" "+(wordtable.size()<=maxstorage));
+			return wordtable.size()<=4;//maxstorage;
 		}
 		
-		@GoalTargetCondition//(beliefs="egwords")
+		@GoalTargetCondition//(beliefs="wordtable")
 		protected boolean target()
 		{
-//			System.out.println("check target: "+egwords.size()+" "+event);
-			return egwords.size()<3;
+//			System.out.println("check target: "+wordtable.size()+" "+event);
+			return wordtable.size()<3;
 		}
 		
 //		@GoalContextCondition
@@ -76,20 +81,20 @@ public class TranslationBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MaintainStorageGoal());
+		bdiFeature.dispatchTopLevelGoal(new MaintainStorageGoal());
 
-		egwords.put("milk", "Milch");
-		egwords.put("cow", "Kuh");
-		egwords.put("cat", "Katze");
-		egwords.put("dog", "Hund");
+		wordtable.put("milk", "Milch");
+		wordtable.put("cow", "Kuh");
+		wordtable.put("cat", "Katze");
+		wordtable.put("dog", "Hund");
 
-		agent.getComponentFeature(IExecutionFeature.class).repeatStep(0, 2000, new IComponentStep<Void>()
+		execFeature.repeatStep(0, 2000, new IComponentStep<Void>()
 		{
 			int cnt = 0;
             public IFuture<Void> execute(IInternalAccess ia)
             {
-            	egwords.put("eword_#"+cnt, "gword_#"+cnt++);
-				System.out.println("egwords: "+egwords);
+            	wordtable.put("eword_#"+cnt, "gword_#"+cnt++);
+				System.out.println("wordtable: "+ wordtable);
 				return IFuture.DONE;
             }
 		});
@@ -123,9 +128,9 @@ public class TranslationBDI
 	@Plan(trigger=@Trigger(goals=MaintainStorageGoal.class))
 	protected void removeEntry()
 	{
-		String key = egwords.keySet().iterator().next();
-		String val = egwords.remove(key);
-		System.out.println("removed: "+key+" "+val+" "+egwords);
+		String key = wordtable.keySet().iterator().next();
+		String val = wordtable.remove(key);
+		System.out.println("removed: "+key+" "+val+" "+ wordtable);
 	}
 	
 //	/**
