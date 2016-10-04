@@ -15,8 +15,8 @@ public class RequestProduction implements IComponentAction
 {
 	//-------- attributes ----------
 
-	/** Attribute for slot target. */
-	protected ISpaceObject	target;
+	/** Attribute for slot target id. */
+	protected Object	target;
 
 	//-------- constructors --------
 
@@ -31,7 +31,7 @@ public class RequestProduction implements IComponentAction
 	/**
 	 *  Create a new RequestProduction.
 	 */
-	public RequestProduction(ISpaceObject target)
+	public RequestProduction(Object target)
 	{
 		this();
 		setTarget(target);
@@ -40,19 +40,19 @@ public class RequestProduction implements IComponentAction
 	//-------- accessor methods --------
 
 	/**
-	 *  Get the target of this RequestProduction.
-	 * @return target
+	 *  Get the target id of this RequestProduction.
+	 * @return target id
 	 */
-	public ISpaceObject getTarget()
+	public Object getTarget()
 	{
 		return this.target;
 	}
 
 	/**
-	 *  Set the target of this RequestProduction.
+	 *  Set the target id of this RequestProduction.
 	 * @param target the value to be set
 	 */
-	public void setTarget(ISpaceObject target)
+	public void setTarget(Object target)
 	{
 		this.target = target;
 	}
