@@ -18,7 +18,7 @@ The time user components need to discover the available time provider components
 
 **Challenge 2: Components with internal behavior**
 
-The time providers need to periodically send out time values. Unlike purely passive servers like, e.g., static web applications, the server component requires some active internal behavior.
+The time providers need to periodically send out time values. Unlike purely passive servers like, e.g., static web applications, the server component requires some active internal behavior. In addition, concurrency between client requests and also with respect to internal behavior needs to be handled to assure consistency of the time provider's internal state.
 
 **Challenge 3: Designing communication protocols**
 
