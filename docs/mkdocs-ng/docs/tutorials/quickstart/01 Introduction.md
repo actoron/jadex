@@ -1,6 +1,6 @@
 # Introduction
 
-This tutorial uses a small example use case to illustrate some basic features of Jadex without too much technical fuss. It is aimed at programmers with solid Java experience who just like to "jump in" and quickly want to get something running. Furthermore the tutorial provides many pointers to other documentation pages that you can follow if you want to learn a bit more about a certain topic.
+This tutorial uses a small example use case to illustrate some basic features of Jadex without too much technical fuss. It is aimed at programmers with solid Java experience who like to "jump in" and quickly want to get something running. Furthermore the tutorial provides many pointers to other documentation pages that you can follow if you want to learn a bit more about a certain topic.
 
 ## Purpose of the Example Application
 
@@ -18,11 +18,11 @@ The time user components need to discover the available time provider components
 
 **Challenge 2: Components with internal behavior**
 
-The time providers need to periodically send out time values. Unlike purely passive servers *todo...*
+The time providers need to periodically send out time values. Unlike purely passive servers like, e.g., static web applications, the server component requires some active internal behavior. In addition, concurrency between client requests and also with respect to internal behavior needs to be handled to assure consistency of the time provider's internal state.
 
 **Challenge 3: Designing communication protocols**
 
-The communication between time user and time provider needs to be defined. *todo: application level + protocol level* 
+The communication between time user and time provider needs to be defined including, on the protocol level, the allowed sequences of messages and, on the application level, the data format for the transferred information.
 
 **Challenge 4: Handling partial failures**
 
