@@ -8,6 +8,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -22,9 +23,9 @@ import jadex.micro.annotation.RequiredServices;
 	binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 public class ChatC3Agent
 {
-	/** The underlying mirco agent. */
-	@Agent
-	protected IInternalAccess agent;
+	/** The required services feature. */
+	@AgentFeature
+	protected IRequiredServicesFeature requiredServicesFeature;
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -33,7 +34,7 @@ public class ChatC3Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IComponentManagementService>	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+		IFuture<IComponentManagementService>	cms	= requiredServicesFeature.getRequiredService("cms");
 		cms.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(final IComponentManagementService cms)

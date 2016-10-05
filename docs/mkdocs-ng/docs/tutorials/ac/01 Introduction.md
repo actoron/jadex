@@ -1,17 +1,16 @@
 # Introduction
 
-The Active Components project aims at providing programming and execution facilities for distributed and concurrent systems. The general idea is to consider systems to be composed of components acting as service providers and consumers. Hence, it is very similar to the Service Component Architecture (SCA) approach and extends it in the direction of agents. In contrast to SCA, components are always active entities, i.e. they posses autonomy with respect to what they do and when they perform actions making them akin to agents. In contrast to agents communication is preferably done using service invocations. 
+This tutorial provides step-by-step instructions to learn how to use the Jadex Active Components concept for developing applications. You will learn how to compose systems from components. 
 
-This tutorial provides step-by-step instructions to learn how to use the Jadex active components infrastructure. You will learn how to install and use the infrastructure (i.e. the Jadex platform) to execute components and how to compose systems from components. In particular, the following topics are covered in the upcoming chapters:
+The following topics are covered in the upcoming chapters:
 
--   [Chapter 02 Installation ](02 Installation)  describes the steps necessary to install and run the Jadex Active Components runtime.
 -   [Chapter 03 Active Components ](03 Active Components)  illustrates how to program simple components.
 -   [Chapter 04 Required Services ](04 Required Services)  describes how to fetch and use services of other components.
 -   [Chapter 05 Provided Services ](05 Provided Services)  explains how to equip a component with services.
 -   [Chapter 06 Composition ](06 Composition)  describes how to compose a component from subcomponents.
 -   [Chapter 07 External Access ](07 External Access)  describes how to attach tightly coupled functionality, e.g. for GUIs.
 
-## Application Context
+# Application Context
 
 In this tutorial a simple chat application will be implemented. The chat application can be used to send messages to other users. This base functionality will be extended in the different exercises, but it is not our goal to build up a solution that combines all the extensions, because this would lead to difficulties concerning the complexity of the application. Instead this tutorial will concentrate on setting up simple components that explain the Jadex concepts step by step.
 
@@ -21,3 +20,7 @@ In this tutorial a simple chat application will be implemented. The chat applica
 The figure above shows the conceptual design of the chat application. On different computers, so called 'Chat' components are running, each of which provides a graphical interface to a local user. When a user enters a new chat message (e.g. in 'Chat 1'), the message gets forwarded to all chat components in the network (e.g. 'Chat 2' and 'Chat 3).
 
 We will come back to this design in [05 Provided Services](05 Provided Services), where we put all the pieces together that allow us building an initial working version of this chat application.
+
+
+# Prerequisites
+Before you can start with this tutorial, please follow the steps in our [Getting Started](../../getting-started/getting-started/#ide-setup) section to setup your IDE.

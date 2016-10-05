@@ -20,9 +20,8 @@ pages:
     - 'tutorials/quickstart/03 Time User.md'
     - 'tutorials/quickstart/04 Time Provider.md'
     - 'tutorials/quickstart/05 Summary.md'
-- AC Tutorial:
+- Active Components Tutorial:
     - 'tutorials/ac/01 Introduction.md'
-    - 'tutorials/ac/02 Installation.md'
     - 'tutorials/ac/03 Active Components.md'
     - 'tutorials/ac/04 Required Services.md'
     - 'tutorials/ac/05 Provided Services.md'
