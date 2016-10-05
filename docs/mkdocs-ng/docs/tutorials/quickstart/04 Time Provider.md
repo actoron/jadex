@@ -2,7 +2,7 @@
 
 This chapter shows how to implement and publish the time service.
 
-## Agent Implementation
+# Agent Implementation
 
 Create Java file *TimeProviderAgent.java* in the package *jadex.micro.quickstart* and paste the contents as shown below.
 
@@ -187,30 +187,28 @@ Start the Jadex platform and the time provider agent with the provided *main()* 
 
 The details of the time provider agent are explained in the following subsections. Furthermore, you can see [Remote Communication](../../remote/remote/#awareness) for details on automatic platform discovery.
 
-## Service Annotations
+# Service Annotations
 
 The  @ProvidedService annotation tells the Jadex runtime that this agent provides a service of type *ITimeService.class*. The @Service annotation furthermore states, that the agent class implements the service itself instead of having a separate class for the service implementation.
 
 See, e.g.,  [Services.Providing Services](../../services/services/#providing-services) for more details on the @ProvidedService annotation.
 
-## Object Attributes
+# Object Attributes
 
 There are two fields declared in the class. The first just holds a string of the agent's location. The location is computed using an HTTP request to a free GeoIP service in the *determineLocation()* method. The field is accessed in the *getLocation()* method to return the immutable location of the service. Remember that this value is cached as described [before](02 Time Service Interface/#the-getlocation-method).
 
 The second field is a set of the current subscriptions to the time service. The object type *SubscriptionIntermediateFuture* represents the server side of the subscription future as described for the [time service interface's *subscribe()* method](02 Time Service Interface/#the-subscribe-method).
 
-## The Subscribe Method
+# The Subscribe Method
 
 On each call, the *subscribe()* method creates a new subscription future object for the new subscriber and returns that object. The subcription future object is also added to the subscriptions list, so it can be notified about each new time message.  
 
 Furthermore, a termination command is set on the subscription future. This command is executed when the subscription ends either due to a network error or when a client explicitly cancels the subscription. In the command, the time provider agent prints out a message and removes the subscription from the list. 
 
-## The Agent Life Cycle
+# The Agent Life Cycle
 
 The notification behavior of the time provider is captured in the *body()* method. It is annotated with *@AgentBody* to state that it should be called once after the agent is started.
 
-The repeated notification is modeled by a so called component step, which is scheduled using the *IExecutionFeature*. Each Jadex component is internally operated by a set of features that handle the different aspects like execution and required or provided services. The features can be accessed using the *IInternalAccess.getComponentFeature(Class<?>)* method. The API of the available features can be found [here](../../../../javadoc/index.html?jadex/bridge/component/package-summary.html).
-
-[//]: # (*todo: relative link to same version also for master?*)
+The repeated notification is modeled by a so called component step, which is scheduled using the *IExecutionFeature*. Each Jadex component is internally operated by a set of features that handle the different aspects like execution and required or provided services. The features can be accessed using the *IInternalAccess.getComponentFeature(Class<?>)* method. The API of the available features can be found [here](${URLJavaDoc}/index.html?jadex/bridge/component/package-summary.html).
 
 Using the *repeatStep()* method of the execution feature, a step is scheduled every 5 seconds. In this step, the time provider iterates through all current subscriptions and sends the next time message using the *addIntermediateResultIfUndone()* method. The 'IfUndone' part threby states that errors should be ignored, e.g. when the subscription was just cancelled.

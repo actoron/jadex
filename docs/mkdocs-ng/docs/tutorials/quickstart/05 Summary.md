@@ -2,7 +2,7 @@
 
 This section shortly recaptures the lessons learned in the previous sections and provides pointer where to go next.
 
-## Challenges Addressed in the Example Application
+# Challenges Addressed in the Example Application
 
 In the following it will be shortly sketched, how the Jadex Active Components middleware helps coping with the challenges laid out in the [introduction](../01 Introduction/).
 
@@ -46,7 +46,7 @@ Using the available interaction pattern for publish/subscribe, Jadex will automa
 
 In Jadex, by default only trusted platform may invoke services of each other, therefore running a Jadex platform is safe by default. More fine-grained treatment of security issues is supported by security annotations. These annotations can be placed alongside the component code and allows a clean separation between component functionality and non-functional aspects like security. E.g., the *Security.UNRESTRICTED* flag is used on the time service interface to mark the service as being safe to be called from the outside without prior authentication or authorization.
 
-## Where To Go Next?
+# Where To Go Next?
 
 There are several possible paths for further exploring the features of Jadex. For practical experiences, you can continue by looking at examples provided in the *jadex-application-xyz* jars. These can be started after adding the jar to the JCC starter panel. Some examples are also available online as [webstart applications](https://www.activecomponents.org/index.html#docs/examples) or as [web applications](http://www.activecomponents.org/jadex-applications-web/).
 

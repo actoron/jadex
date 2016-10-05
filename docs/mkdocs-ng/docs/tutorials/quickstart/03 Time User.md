@@ -2,7 +2,7 @@
 
 This chapter shows how to discover and use the time service.
 
-## Agent Implementation
+# Agent Implementation
 
 Create Java file *TimeUserAgent.java* in the package *jadex.micro.quickstart* and paste the contents as shown below.
 
@@ -72,7 +72,7 @@ The time user agent declares the usage of the ITimeService by the @RequiredServi
 
 The ```@AgentService``` annotation to the ```addTimeService()``` method states that at startup a service search should be started and the method should be called with every found service as given in the required service declaration. The corresponding required service declaration is found by matching the method name to the name given in the @RequireService annotation.
 
-## The Agent Behavior
+# The Agent Behavior
 
 The *addTimeService()* method is called for each found service. In this method, the agent subscribes to the found time service and receives the client side of the subscription future as described in the [last section](02 Time Service Interface/#the-subscribe-method). In the while loop, *hasNextIntermediateResult()* blocks until the next time notification becomes available and can be fetched by *getNextIntermediateResult()*.
 
