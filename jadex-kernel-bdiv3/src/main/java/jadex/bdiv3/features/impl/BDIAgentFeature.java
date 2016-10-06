@@ -308,7 +308,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			{
 				try
 				{
-					// Does not work in innner inner classes $1 $2 ...
+					// Does not work in STATIC (i think?) inner inner classes $1 $2 ...
+					// because __agent cannot be accessed :(
+					// TODO: static inner classes may need __agent field!
 //					Field fi = tmp.getClass().getDeclaredField("this$0");
 					Field[] fs = tmp.getClass().getDeclaredFields();
 					boolean found = false;

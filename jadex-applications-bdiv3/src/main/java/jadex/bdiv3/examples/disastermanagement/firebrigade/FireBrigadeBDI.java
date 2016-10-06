@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
+import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
@@ -14,7 +15,6 @@ import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
-import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.TreatVictims;
 import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
 import jadex.bdiv3.examples.disastermanagement.movement.IEnvAccess;
 import jadex.bdiv3.examples.disastermanagement.movement.MoveToLocationPlan;
@@ -137,10 +137,10 @@ public class FireBrigadeBDI implements IEnvAccess
 	 */
 	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true, inhibits=ExtinguishFire.class), 
 		publish=@Publish(type=IExtinguishFireService.class, method="extinguishFire"))
-	public static class ExtinguishFire
+	public class ExtinguishFire
 	{
 		/** The disaster. */
-//		@GoalParameter
+		@GoalParameter
 		protected ISpaceObject disaster;
 
 		/**
@@ -154,11 +154,13 @@ public class FireBrigadeBDI implements IEnvAccess
 		/**
 		 * 
 		 */
-		@GoalTargetCondition(rawevents=@RawEvent(value=ChangeEvent.PARAMETERCHANGED, second="disaster"))//(parameters="disaster")	// Todo: auto-detect parameters
+		@GoalTargetCondition(parameters = "disaster")
 		public boolean checkTarget()
 		{
 			Integer cnt = (Integer)getDisaster().getProperty("fire");
-			return cnt!=null && cnt.intValue()==0;
+			boolean ret = cnt != null && cnt.intValue() == 0;
+//			System.out.println("checkTarget: " + ret + " fires: " + cnt);
+			return ret;
 		}
 
 		/**
@@ -169,7 +171,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
-				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(TreatVictims.class).size()>1;
+				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(ExtinguishFire.class).size()>1;
 //			if(ret)
 //				System.out.println("dropping ext fire: "+disaster);
 			return ret;
@@ -190,10 +192,10 @@ public class FireBrigadeBDI implements IEnvAccess
 	 */
 	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true, inhibits={ExtinguishFire.class, ClearChemicals.class}), 
 		publish=@Publish(type=IClearChemicalsService.class, method="clearChemicals"))
-	public static class ClearChemicals
+	public class ClearChemicals
 	{
 		/** The disaster. */
-//		@GoalParameter
+		@GoalParameter
 		protected ISpaceObject disaster;
 
 		/**
@@ -207,11 +209,11 @@ public class FireBrigadeBDI implements IEnvAccess
 		/**
 		 * 
 		 */
-		@GoalTargetCondition(rawevents=@RawEvent(value=ChangeEvent.PARAMETERCHANGED, second="disaster"))//(parameters="disaster")	// Todo: auto-detect parameters
+		@GoalTargetCondition(parameters = "disaster")
 		public boolean checkTarget()
 		{
 			Integer cnt = (Integer)getDisaster().getProperty("chemicals");
-			return cnt!=null && cnt.intValue()==0;
+			return  cnt!=null && cnt.intValue()==0;
 		}
 		
 		/**
@@ -222,7 +224,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
-				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(TreatVictims.class).size()>1;
+				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(ExtinguishFire.class).size()>1;
 //			if(ret)
 //				System.out.println("dropping clear chemicals: "+disaster);
 			return ret;
