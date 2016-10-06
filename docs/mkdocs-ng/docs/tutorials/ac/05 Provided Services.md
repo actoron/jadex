@@ -2,11 +2,16 @@
 
 This chapter will deal with aspects of how to implement and provide component services. In general, a component service consists of two aspects: a service interface and a service implementation.
 
-Learning how to build provided services allows building an initial version of the chat application as described in [01 Introduction](01 Introduction). The design figure is repeated below for completeness. Now that the concepts of active components and services has been introduced, you should be able to grasp some more details of this figure. First, each chat instance is represented by an active component. Second, the chat components communicate using a provided and required service called *IChatService*. Third, this service provides a method *message()* that is called on all running components, whenever a chat component whishes to send a message.
+Learning how to build provided services allows building an initial version of the chat application as described in [Application Context](01 Introduction#application-context). 
+The design figure is repeated below for completeness. 
 
 ![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)  
 *Conceptual design of the chat application*
 
+Now that the concepts of active components and services has been introduced, you should be able to grasp some more details of this figure.  
+First, each chat instance is represented by an active component.  
+Second, the chat components communicate using a provided and required service called *IChatService*.  
+Third, this service provides a method *message()* that is called on all running components, whenever a chat component wishes to send a message.
 
 # Exercise D1 - Defining a service
 
@@ -18,48 +23,56 @@ In this exercise we will create a basic chat service, attach it to the chat comp
 
 ## Defining the chat service implementation
 
--   Create a Java class file called *ChatServiceD1.java* and let it implement the IChatService interface.
+-   Create a Java class file called *ChatServiceD1.java* and let it implement the *IChatService* interface.
+
 -   Add the ```@Service``` annotation above the class definition.
--   Add a field of type ```IInternalAccess``` and name it *agent*. Also add a @ServiceComponent annotation above this field. Jadex will automatically inject the agent to the service so that the service can access functionalities of the agent.
--   Add a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Also add a @ServiceComponent annotation above this field. 
-You can also inject agent features directly into services.
+
+-   Add a field of type ```IInternalAccess``` and name it *agent*. Also add a ```@ServiceComponent``` annotation above this field. Jadex will automatically inject the agent API to this field.
+
+-   You can also [inject agent features directly into services](../../services/services/#accessing-the-component): Add a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Also add a ```@ServiceComponent``` annotation above this field. 
 
 -   Add a field of type *IClockService* and name it *clock*.
 
 -   Add a field of type *DateFormat* and name it *format*.
 
--   Add the *message* method from the *IChatService* interface. The method will be called to let the chat service know about a new message. In the message body this new message should be printed out to the console. Concretely the output should look like: &lt;receiver component name&gt; received at &lt;time&gt; from: &lt;sender&gt; message: &lt;text&gt;. You can access the receiver's component name using *agent.getComponentIdentifier().getLocalName()*.
+-   Add the *message* method from the *IChatService* interface. The method will be called to let the chat service know about a new message. In the message body this new message should be printed out to the console. You can access the receiver's component name using ```agent.getComponentIdentifier().getLocalName()```. Concretely the output should look like:
 
--   Add a method called *startService* with no parameters and an *IFuture&lt;Void&gt;* return value. Place the ```@ServiceStart``` annotation above the method signature (see [service lifecycle](../../services/services/#service-lifecycle)) 
-In this case the method should assign the *format* with *new SimpleDateFormat("hh:mm:ss")* and the *clock* by fetching the clock service in the same way as in earlier lectures. Please note that it is important that the method should return a future indicating when the init has been finished. As fetching the clock service is done asynchronously init has finished when the clock service has been assigned. To ensure that the caller of the start method is notified also in case an error occurs and the service could not be found a *DelegationResultListener* can be used. It will forward exception to the future that is passed to it. This init code for the clock should look like this: 
+		<receiver component name> received at <time> from: <sender> message: <text>.
+
+-   Add a public method called *startService* with no parameters and an *IFuture&lt;Void&gt;* return value. Place the ```@ServiceStart``` annotation above the method signature (see [service lifecycle](../../services/services/#service-lifecycle)) 
+In this case the method should assign the *format* with ```new SimpleDateFormat("hh:mm:ss")``` and the *clock* by fetching the clock service in the same way as in earlier lectures.  
+Please note that it is important that the method should return a future indicating when the init has been finished. As fetching the clock service is done asynchronously init has finished when the clock service has been assigned.   
+To ensure that the caller of the start method is notified also in case an error occurs and the service could not be found an ```ExceptionDelegationResultListener``` can be used (read more about it in the [Futures](../../futures/futures/#special-result-listeners) chapter) It will forward exceptions to the future that is passed to it.  This init code for the clock should look like this: 
 
 ```java
-final Future ret = new Future();
-...
+format = new SimpleDateFormat("hh:mm:ss");
+final Future<Void> ret = new Future<Void>();
 IFuture<IClockService> fut = requiredServicesFeature.getRequiredService("clockservice");
-fut.addResultListener(new DelegationResultListener<IClockService>(ret)
+fut.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 {
-  public void customResultAvailable(IClockService result)
-  {
-    clock = result;
-    super.customResultAvailable(null);
-  }
+	public void customResultAvailable(IClockService result)
+	{
+		clock = result;
+		ret.setResult(null);
+	}
 });
 return ret;
 ```
 
 ## Defining the chat service component
 
--   Create a Java class file called *ChatD1Agent.java* and copy its content from the ChatC2Agent.
--   Add a second required service definition to the agent. For that purpose you have to change the required services specification to look like @RequiredServices({rs1, rs2}), with rs1, rs2 representing the respective service definitions. The first clock service specification can be kept and the second we will name *chatservices*. The type has to be declared as *IChatService* and as we wish to retrieve all chat services we need to set *multiple* to true. In the binding of the service we use scope *platform* again and additionally define it as *dynamic*. Making it dynamic disallows caching former search results and will always deliver the currently available chat services to the caller. 
+-   Create a Java class file called *ChatD1Agent.java* by copying the agent from ChatC2Agent.
+-   Add a second required service definition to the agent. For that purpose you have to change the required services specification to look like ```@RequiredServices({rs1, rs2})```, with rs1, rs2 representing the respective service definitions (see the [Services](../../services/services/#using-services) Chapter).  
+The first clock service specification can be kept and the second we will name *chatservices*. The type has to be declared as *IChatService* and as we wish to retrieve all chat services we need to set *multiple* to true. In the binding of the service we use scope *platform* again and additionally define it as *dynamic*. Making it dynamic disables caching former search results and will always deliver the currently available chat services to the caller. 
 
--   Furthermore, we need to specifiy the provided service. We use the *@ProvidedServices* annotation and add one *@ProvidedService* annotation inside. For a provided service we have to define its interface using the type attribute and set it to *IChatService* in this case. In addition, a provided service should have an implementation which is defined using the *@Implementation* annotation. Here, we just directly specify the implementation class to *ChatServiceD1*. It should look like the following:
+-   Furthermore, we need to specifiy the provided service. We use the ```@ProvidedServices``` annotation and add one ```@ProvidedService``` annotation inside. For a provided service we have to define its interface using the type attribute and set it to *IChatService.class* in this case. In addition, a provided service should have an implementation which is defined using the ```@Implementation``` annotation. Here, we just directly specify the implementation class to *ChatServiceD1*. It should look like the following:
 
 ```java
 @ProvidedServices(@ProvidedService(type=IChatService.class, implementation=@Implementation(ChatServiceD1.class)))
 ```
 
--   The code of the agent body should be changed to fetch the chat services using the call ```requiredServicesFeature.getRequiredServices("chatservices")```. As result you will retrieve a *java.util.Collection* of the available chat services (at least the one our agent is offering itself). Iterate through this collection and invoke the *message* method on each service with your own component name as sender *getComponentIdentifier().getName()* and some arbitrary text as message content. 
+-   The code of the agent body should be changed to fetch the chat services using the call ```requiredServicesFeature.getRequiredServices("chatservices")```. As result you will retrieve a *java.util.Collection* of the available chat services (at least the one our agent is offering itself). 
+Iterate through this collection and invoke the *message* method on each service with your own component name as sender (```agent.getComponentIdentifier().getName()```) and some arbitrary text as message content. 
 
 ## Verify the Component Behavior
 
@@ -78,51 +91,48 @@ In this lecture we will add a small graphical chat user interface. The interface
 ## Defining the chat user interface
 
 -   Create a new Java class called *ChatGuiD2* that extends *JFrame*.
--   Add a field of type *JTextArea* and name it *received*. It will be used to display the received messages.
--   Add a method *addMessage* that adds new chat messages to the content of the text area.
--   Create a constructor with one parameter *ChatGuiD2(final IExternalAccess agent)*. The external access allows the user interface to work on the agent. In the constructor the following needs to be done:
-    - Set the title of the chat window to the component name by calling *super(agent.getComponentIdentifier().getName())*
-    - Create the user interface components, the *received* text area, a *JTextField* called *message* for the user to enter a message text and a *JButton* called *send* for sending messages.
-    - Layout the gui components using some LayoutManager, e.g. using a *BorderLayout*
-    - Show the gui by calling *pack()* and *setVisible(true)*
-    - Add an *ActionListener* to the send button to notify the available chat services of the new message. The code should look like the following:
-
+-   Add a field of type ```JTextArea``` and name it *received*. It will be used to display the received messages.
+-   Add a method *addMessage(String)* that adds new chat messages to the content of the text area.
+-   Create a constructor with one parameter ```ChatGuiD2(final IExternalAccess agent)```. The external access allows the user interface to work on the agent. In the constructor the following needs to be done:
+    - Set the title of the chat window to the component name by calling ```super(agent.getComponentIdentifier().getName())```
+    - Create the user interface components, the *received* text area, a ```JTextField``` called *message* for the user to enter a message text and a ```JButton``` called *send* for sending messages.
+    - Layout the gui components using some LayoutManager, e.g. using a ```BorderLayout```
+    - Show the gui by calling ```pack()``` and ```setVisible(true)```
+    - Add an ```ActionListener``` to the send button to notify the available chat services of the new message. The code should look like the following:
 
 ```java
-
 send.addActionListener(new ActionListener()
 {
-  public void actionPerformed(ActionEvent e)
-  {
-    final String text = message.getText(); 
-    agent.scheduleStep(new IComponentStep<Void>()
-    {
-      public IFuture<Void> execute(IInternalAccess ia)
-      {
-        IFuture<Collection<IChatService>> chatservices = ia.getServiceContainer().getRequiredServices("chatservices");
-        chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
-        {
-          public void resultAvailable(Collection<IChatService> result)
-          {
-            for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
-            {
-              IChatService cs = it.next();
-              cs.message(agent.getComponentIdentifier().getName(), text);
-            }
-          }
-        });
-        return IFuture.DONE;
-      }
-    });
-  }
+	public void actionPerformed(ActionEvent e)
+	{
+		final String text = message.getText(); 
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IFuture<Collection<IChatService>>	chatservices	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
+				chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
+				{
+					public void resultAvailable(Collection<IChatService> result)
+					{
+						for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
+						{
+							IChatService cs = it.next();
+							cs.message(agent.getComponentIdentifier().getName(), text);
+						}
+					}
+				});
+				return IFuture.DONE;
+			}
+		});
+	}
 });
-
 ```
+Note that we need to schedule a step on the component in order to get the internal access which in turn let's us access the components features, including the required services feature.
 
 -   Also in the constructor, add code to terminate the chat component when the window is closed:
 
 ```java
-
 addWindowListener(new WindowAdapter()
 {
   public void windowClosing(WindowEvent e)
@@ -130,36 +140,34 @@ addWindowListener(new WindowAdapter()
     agent.killComponent();
   }
 });
-
 ```
 
 
 ## Defining the chat service implementation
 
 -   Create a Java class file called *ChatServiceD2.java* and copy its content from the last lecture.
--   In contrast to the previous lecture we will use the user interface to output the received messages. Therefore, in the *startService* method we need to create the gui and then use it in the *message* method. The creation of the gui has to be done on the Swing thread. Hence, we will change the result listener to a *SwingDelegationResultListener* which ensures that the *customResultAvailable()* method is called on the Swing thread. The user interface can be created by calling *new ChatGuiD2(exta)*, letting exta being the external access of the agent. The init code should then look like the following:
-
+-  Add a field *gui* of type *ChatGuiD2*
+-  In contrast to the previous lecture we will use the user interface to output the received messages. Therefore, in the *startService* method we need to create the gui and then use it in the *message* method.
+-  The creation of the gui has to be done on the Swing thread. Hence, we will change the result listener to a ```SwingExceptionDelegationResultListener``` which ensures that the ```customResultAvailable()``` method is called on the Swing thread. The user interface can be created by calling ```new ChatGuiD2(exta)```, letting exta being the external access of the agent. The init code should then look like the following:
 
 ```java
-
 final IExternalAccess exta = agent.getExternalAccess();
-IFuture<IClockService> fut = agent.getServiceContainer().getRequiredService("clockservice");
-fut.addResultListener(new SwingDelegationResultListener<IClockService>(ret)
+IFuture<IClockService>	clockservice	= requiredServicesFeature.getRequiredService("clockservice");
+clockservice.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 {
-  public void customResultAvailable(IClockService result)
-  {
-    clock = result;
-    gui = createGui(exta);
-    super.customResultAvailable(null);
-  }
+	public void customResultAvailable(IClockService result)
+	{
+		clock = result;
+		gui = createGui(exta);
+		ret.setResult(null);
+	}
 });
-
 ```
-
 
 -   Add the *protected ChatGuiD2 createGui(IExternalAccess agent)* method and implement it by simply returning *new ChatGuiD2(agent)*. 
 
--   In order to dispose the user interface when the component is killed, a new method called *shutdownService()* needs to be created. Equip the method with the *@ServiceShutdown* annotation to let Jadex call the method when the service is terminated. Within the method you should call *gui.dispose()* to close the user interface. You should call dispose from the Swing thread, which can be achieved by using *SwingUtilities.invokeLater()* and placing the dispose within the *Runnable* that has to be passed as parameter. 
+-   In order to dispose the user interface when the component is killed, a new method *shutdownService* needs to be created. Equip the method with the ```@ServiceShutdown``` annotation to let Jadex call the method when the service is terminated. 
+Within the method you should call *gui.dispose()* to close the user interface. You should call dispose from the Swing thread, which can be achieved by using ```SwingUtilities.invokeLater()``` and placing the dispose within the ```Runnable``` that has to be passed as parameter. 
 
 -   Finally the *message* method has to be adjusted that it does not print out the message but redirects it to user interface using the previouly defined gui method *addMessage*
 
@@ -171,10 +179,9 @@ fut.addResultListener(new SwingDelegationResultListener<IClockService>(ret)
 
 ## Verify the Component Behavior
 
-After starting several chat agents you should be able to enter text messages and send them using the send button. If your implementation works correctly you should see the sent messages appearing the all other chat windows. Also verify that the chat window is close when you kill the agent from the component tree. Below the screenshot shows what can be expected.
+After starting several chat agents you should be able to enter text messages and send them using the send button. If your implementation works correctly you should see the sent messages appearing the all other chat windows. Also verify that the chat window is close when you kill the agent (by stopping the platform or from the component tree in the JCC). Below the screenshot shows what can be expected.
 
 ![05 Provided Services@chatter.png](chatter.png)
-
 
 
 ## Understanding the Chat Implementation
@@ -183,6 +190,9 @@ The figure below shows the interplay between the implemented Java classes when e
 
 ![AC Tutorial.05 Provided Services@chatimpl.png](chatimpl.png)  
 *Interplay between implemented Java classes inside a chat component*
+
+
+<!-- TODO: ab hier weitermachen mit ueberarbeitung! -->
 
 # Exercise D3 - Service Interfaces
 

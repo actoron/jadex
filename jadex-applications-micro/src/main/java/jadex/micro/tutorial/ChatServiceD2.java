@@ -29,6 +29,10 @@ public class ChatServiceD2 implements IChatService
 	/** The agent. */
 	@ServiceComponent
 	protected IInternalAccess agent;
+
+	/** The required services feature **/
+	@ServiceComponent
+	private IRequiredServicesFeature requiredServicesFeature;
 	
 	/** The clock service. */
 	protected IClockService clock;
@@ -51,13 +55,13 @@ public class ChatServiceD2 implements IChatService
 		
 		this.format = new SimpleDateFormat("hh:mm:ss");
 		final IExternalAccess exta = agent.getExternalAccess();
-		IFuture<IClockService>	clockservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+		IFuture<IClockService>	clockservice	= requiredServicesFeature.getRequiredService("clockservice");
 		clockservice.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(IClockService result)
 			{
-				ChatServiceD2.this.clock = result;
-				ChatServiceD2.this.gui = createGui(exta);
+				clock = result;
+				gui = createGui(exta);
 				ret.setResult(null);
 			}
 		});
