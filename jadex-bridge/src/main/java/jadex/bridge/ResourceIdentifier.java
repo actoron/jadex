@@ -123,7 +123,8 @@ public class ResourceIdentifier implements IResourceIdentifier
 		if(gid==null && lid!=null)
 		{
 			File f	= new File(lid.getUri().getPath());
-			this.gid	= new GlobalResourceIdentifier("::"+SUtil.getHashCode(f), null, null);
+			// Use SUtil.getHashCode(f, false) to test with directory and jar
+			this.gid	= new GlobalResourceIdentifier("::"+SUtil.getHashCode(f, true), null, null);
 		}
 	}
 	
