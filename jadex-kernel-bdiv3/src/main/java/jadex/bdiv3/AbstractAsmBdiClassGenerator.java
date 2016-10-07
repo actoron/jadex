@@ -24,6 +24,8 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import com.sun.javafx.geom.transform.GeneralTransform3D;
+
 import jadex.bdiv3.exceptions.JadexBDIGenerationException;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
@@ -120,17 +122,31 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		// inner classes.
 		boolean agentclass = isAgentClass(cn);
 		boolean	planclass	= isPlanClass(cn);
+//		boolean	goalclass	= isGoalClass(cn);
+		
+		MGoal mg = getGoal(cn, model, dummycl);
+		
 		// Check method for array store access of beliefs and replace with
 		// static method call
 		MethodNode[] mths = (MethodNode[])cn.methods.toArray(new MethodNode[0]);
 
 		MultiCollection<String, MethodBeliefs> methodbeliefs = new MultiCollection<String, MethodBeliefs>();
+		MultiCollection<String, MethodBeliefs> methodparams = new MultiCollection<String, MethodBeliefs>();
+		
 		for(MethodNode mn : mths)
 		{
 			transformArrayStores(mn, model, iclname);
+			
 			Set<String> bels = findBeliefs(cn, mn, model, others);
 			if(bels.size()>0)
 				methodbeliefs.add(mn.name, new MethodBeliefs(mn, bels));
+		
+			if(mg!=null)
+			{
+				Set<String> params = findParameters(cn, mn, model, others, mg);
+				if(params.size()>0)
+					methodparams.add(mn.name, new MethodBeliefs(mn, params));
+			}
 		}
 		
 //		System.out.println("Found bel usages: "+cn.name+" "+methodbeliefs);
@@ -145,7 +161,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				{
 					conds.addAll(entry.getValue());
 				}
-				addBeliefEventsToConditions(cn, dummycl, conds, methodbeliefs, model);
+				addBeliefEventsToConditions(cn, dummycl, conds, methodbeliefs, methodparams, model);
 			}
 		}
 		
@@ -157,7 +173,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				conds.add(mplan.getContextCondition());
 			if(mplan.getTrigger()!=null && mplan.getTrigger().getCondition()!=null)
 				conds.add(mplan.getTrigger().getCondition());
-			addBeliefEventsToConditions(cn, dummycl, conds, methodbeliefs, model);
+			addBeliefEventsToConditions(cn, dummycl, conds, methodbeliefs, methodparams, model);
 		}
 		
 		if(agentclass)
@@ -374,6 +390,27 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	}
 	
 	/**
+	 *  Get a goal per class node.
+	 * @param cn
+	 * @return
+	 */
+	protected MGoal getGoal(ClassNode cn, BDIModel model, ClassLoader cl)
+	{
+		MGoal mgoal = null;
+		List<MGoal> mgoals = model.getCapability().getGoals();
+		for(MGoal mg : mgoals)
+		{
+			if(cn.name.equals(Type.getInternalName(mg.getTargetClass(cl))))
+			{
+				mgoal = mg;
+				break;
+			}
+		}
+		return mgoal;
+	}
+	
+	
+	/**
 	 * 
 	 * @param cn
 	 * @param dummycl
@@ -382,8 +419,10 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 * @param model
 	 */
 	protected void addBeliefEventsToConditions(ClassNode cn, ClassLoader dummycl, List<MCondition> conditions, 
-		MultiCollection<String, MethodBeliefs> methodbeliefs, BDIModel model)
+		MultiCollection<String, MethodBeliefs> methodbeliefs, MultiCollection<String, MethodBeliefs> methodparams, BDIModel model)
 	{
+		MGoal mg = getGoal(cn, model, dummycl);
+		
 		for(MCondition cond: conditions)
 		{
 			MethodInfo mi = cond.getMethodTarget();
@@ -401,45 +440,44 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				c = ci.getConstructor(dummycl);
 				clname = Type.getInternalName(c.getDeclaringClass());
 			}
+			
+			// If current class belongs to condition (method or constructor)
 			if(cn.name.equals(clname))
 			{
 				// nothing declared?
 				if(cond.getEvents().size()==0)
 				{
 					Collection<MethodBeliefs> mbs = methodbeliefs.get(mi!=null? mi.getName(): "<init>");
-					
-					MethodBeliefs mb = null;
-					if(mbs!=null && mbs.size()>1)
-					{
-						String mdesc = m!=null? Type.getMethodDescriptor(m): Type.getConstructorDescriptor(c);
-						for(MethodBeliefs tmp: mbs)
-						{
-							if(tmp.getMethodNode().desc.equals(mdesc))
-							{
-								mb = tmp;
-								break;
-							}
-						}
-					}
-					else if(mbs!=null && mbs.size()==1)
-					{
-						mb =  mbs.iterator().next();
-					}
+					MethodBeliefs mb = findMethodBelief(mbs, m, c);
 
+					List<EventType> events = new ArrayList<EventType>();
+					
 					if(mb!=null)
 					{
-						List<EventType> events = new ArrayList<EventType>();
 						for(String belname: mb.getBeliefs())
-						{
 							BDIAgentFeature.addBeliefEvents(model.getCapability(), events, belname, dummycl);
-						}
 						cond.setEvents(events);
 						String	desc	= model.getModelInfo().getDescription();
 						String	info	= "<ul><li>Added belief dependency of condition: "+cond.getName()+" "+cond.getEvents()+"</li></ul>"; 
 						((ModelInfo)model.getModelInfo()).setDescription(desc!=null ? desc + "\n" +info : info);
 //						System.out.println(info);
 					}
-					else
+					
+					Collection<MethodBeliefs> mps = methodparams.get(mi!=null? mi.getName(): "<init>");
+					mb = findMethodBelief(mps, m, c);
+					
+					if(mb!=null)
+					{
+						for(String pname: mb.getBeliefs())
+							BDIAgentFeature.addParameterEvents(mg, model.getCapability(), events, pname, dummycl);
+						cond.setEvents(events);
+						String	desc	= model.getModelInfo().getDescription();
+						String	info	= "<ul><li>Added parameter dependency of condition: "+cond.getName()+" "+cond.getEvents()+"</li></ul>"; 
+						((ModelInfo)model.getModelInfo()).setDescription(desc!=null ? desc + "\n" +info : info);
+//						System.out.println(info);
+					}
+					
+					if(cond.getEvents().size()==0)
 					{
 						// Todo: add error to model report.
 						throw new RuntimeException("Found condition without triggering events (will never trigger): "+cond.getName());
@@ -449,6 +487,37 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		}
 	}
 
+	/**
+	 * 
+	 * @param mbs
+	 * @param m
+	 * @param c
+	 * @return
+	 */
+	protected MethodBeliefs findMethodBelief(Collection<MethodBeliefs> mbs, Method m, Constructor<?> c)
+	{
+		MethodBeliefs mb = null;
+		
+		if(mbs!=null && mbs.size()>1)
+		{
+			String mdesc = m!=null? Type.getMethodDescriptor(m): Type.getConstructorDescriptor(c);
+			for(MethodBeliefs tmp: mbs)
+			{
+				if(tmp.getMethodNode().desc.equals(mdesc))
+				{
+					mb = tmp;
+					break;
+				}
+			}
+		}
+		else if(mbs!=null && mbs.size()==1)
+		{
+			mb =  mbs.iterator().next();
+		}
+		
+		return mb;
+	}
+	
 	protected abstract void transformArrayStores(MethodNode mn, BDIModel model, String iclname);
 
 	/**
@@ -488,6 +557,12 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 */
 	protected abstract Set<String> findBeliefs(ClassNode cn, MethodNode mn, BDIModel model, Map<String, ClassNode> others);
 
+	/**
+	 *  Find the beliefs used in a method.
+	 */
+	protected abstract Set<String> findParameters(ClassNode cn, MethodNode mn, BDIModel model, Map<String, ClassNode> others, MGoal mgoal);
+
+	
 	// ----- Helper methods ------
 	
 	
@@ -559,6 +634,29 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			for(AnnotationNode an: visibleAnnotations)
 			{
 				if("Ljadex/bdiv3/annotation/Plan;".equals(an.desc))
+				{
+					result	= true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param classNode
+	 * @return
+	 */
+	protected boolean isGoalClass(ClassNode classNode) 
+	{
+		boolean result = false;
+		List<AnnotationNode> visibleAnnotations = classNode.visibleAnnotations;
+		if(visibleAnnotations!=null)
+		{
+			for(AnnotationNode an: visibleAnnotations)
+			{
+				if("Ljadex/bdiv3/annotation/Goal;".equals(an.desc))
 				{
 					result	= true;
 					break;

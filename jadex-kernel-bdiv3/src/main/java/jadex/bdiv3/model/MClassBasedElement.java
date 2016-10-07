@@ -4,13 +4,14 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 /**
- * 
+ *  Processable element based on a class.
  */
 public class MClassBasedElement extends MProcessableElement
 {
 	/** The target. */
 	protected String target;
 	protected Class<?> targetclass;
+	protected ClassLoader lastcl;
 	
 	/**
 	 *	Bean Constructor. 
@@ -43,8 +44,11 @@ public class MClassBasedElement extends MProcessableElement
 	 */
 	public Class<?> getTargetClass(ClassLoader cl)
 	{
-		if(targetclass==null && target!=null)
+		if(lastcl!=cl || (targetclass==null && target!=null))
+		{
+			lastcl = cl;
 			targetclass = SReflect.findClass0(target, null, cl);
+		}
 		return targetclass;
 	}
 
@@ -58,7 +62,8 @@ public class MClassBasedElement extends MProcessableElement
 	}
 	
 	/**
-	 * 
+	 *  Check if other object is equal.
+	 *  @return True, if equal.
 	 */
 	public boolean equals(Object other)
 	{
@@ -74,7 +79,8 @@ public class MClassBasedElement extends MProcessableElement
 	}
 
 	/**
-	 * 
+	 *  Get the hashcode.
+	 *  @return The hash code.
 	 */
 	public int hashCode()
 	{

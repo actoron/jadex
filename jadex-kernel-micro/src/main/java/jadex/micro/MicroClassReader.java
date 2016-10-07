@@ -2008,7 +2008,7 @@ public class MicroClassReader
 				{
 					Method gbcl = orig.getClass().getDeclaredMethod("getBaseClassLoader", (Class<?>[]) null);
 					gbcl.setAccessible(true);
-					bcl = (ClassLoader) gbcl.invoke(orig, (Object[]) null);
+					bcl = (ClassLoader)gbcl.invoke(orig, (Object[]) null);
 				}
 				catch (Exception e1)
 				{

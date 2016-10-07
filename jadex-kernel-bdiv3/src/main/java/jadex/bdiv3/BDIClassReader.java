@@ -213,7 +213,7 @@ public class BDIClassReader extends MicroClassReader
 	 *  Fill the model details using annotation.
 	 *  // called with dummy classloader (that was used to load cma first time)
 	 */
-	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, Class<?> cma, ClassLoader cl,  IResourceIdentifier rid, IComponentIdentifier root, List<IComponentFeatureFactory> features)
+	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, Class<?> cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root, List<IComponentFeatureFactory> features)
 	{
 //		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
@@ -564,10 +564,12 @@ public class BDIClassReader extends MicroClassReader
 		
 		for(Class<?> agcl: agtcls)
 		{
-//			Class<?> acl =
-			try {
+			try 
+			{
 				gen.generateBDIClass(agcl.getName(), bdimodel, cl);
-			} catch (JadexBDIGenerationException e) {
+			} 
+			catch (JadexBDIGenerationException e) 
+			{
 				throw new JadexBDIGenerationRuntimeException("Could not read bdi agent: " + agcl, e);
 			}
 //			System.out.println("genclazz: "+agcl.getName()+" "+agcl.hashCode()+" "+agcl.getClassLoader());
