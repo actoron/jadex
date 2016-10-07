@@ -370,6 +370,10 @@ public class HttpRelayTransport implements ITransport
 										else
 											ras.connected(address);
 									}
+									else
+									{
+										System.out.println("Warning: No relay discovery service found.");
+									}
 								}
 								
 								public void exceptionOccurred(Exception exception)

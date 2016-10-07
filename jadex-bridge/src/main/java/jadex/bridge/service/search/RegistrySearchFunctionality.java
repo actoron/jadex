@@ -606,7 +606,7 @@ public class RegistrySearchFunctionality
 	{
 		boolean ret = false;
 		
-		if(excluded && !provider.isIncluded(cid, ser))
+		if(!excluded && !provider.isIncluded(cid, ser))
 		{
 			return ret;
 		}
