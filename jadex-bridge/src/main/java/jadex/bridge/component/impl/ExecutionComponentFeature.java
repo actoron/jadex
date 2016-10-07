@@ -373,6 +373,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		final Future<T> ret = new Future<T>();
 		
+		// todo: support getLocal... with proxy==false
 //		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
@@ -383,6 +384,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					public void timeEventOccurred(long currenttime)
 					{
+//						System.out.println("step: "+step);
 						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 					}
 					
@@ -815,7 +817,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					{
 						if(!unblocked[0])
 						{
-							unblock(monitor, new TimeoutException(null, ex));
+							unblock(monitor, new TimeoutException(Future.DEBUG ? "" : "Use PlatformConfiguration.setDebugFutures(true) for timeout cause.", ex));
 						}
 					}
 					

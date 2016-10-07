@@ -121,7 +121,7 @@
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
 			</parameter>
-			<match>((ISpaceObject)$content).getType().equals("target")</match>
+				<match>$beliefbase.getBelief("move.environment").getFact().getSpaceObject($content).getType().equals("target")</match>
 		</messageevent>
 
 		<messageevent name="request_producer" type="fipa" direction="send">

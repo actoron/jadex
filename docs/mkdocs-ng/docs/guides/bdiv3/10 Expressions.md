@@ -1,5 +1,6 @@
 # Expressions
 
+${SorryOutdated}
 
 For many elements (parameter values, default and initial facts of beliefs, etc.) the developer has to specify expressions in the ADF. The most important part of an expression is the expression string. In addition, some meta information can be attached to expressions, e.g., to specify the class the resulting value should have. 
 

@@ -228,6 +228,17 @@ pre code {
 	display: block;
 }
 
+.rst-content x-attention {
+	padding: 12px;
+	font-size:100%;
+	font-weight:bold;
+    border-radius: 5px;
+    border: 1px dashed black;
+    width: 100%;
+	background: #ff6666;
+	display: block;
+}
+
 @media screen and (max-width: 768px) {
 	.wy-nav-side {
 /*		left: -301px;*/

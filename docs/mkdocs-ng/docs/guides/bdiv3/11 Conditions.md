@@ -1,5 +1,6 @@
 # Chapter 11. Conditions
 
+${SorryOutdated}
 
 In essence, a condition is a monitored boolean expression, what means that whenever some of the referenced entities (e.g., beliefs) change the expression of the condition is evaluated. Associated with a condition is an action, that gets executed whenever the condition is triggered. Context-specific conditions as defined in the ADF have special associated actions (e.g., for activating goals).
 

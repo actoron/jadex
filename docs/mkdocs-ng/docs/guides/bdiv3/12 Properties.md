@@ -1,5 +1,7 @@
 # Properties
 
+${SorryOutdated}
+
 This chapter contains an overview about the usage of agent and capability properties, that allow to change the behavior of the agent. In general, properties represent static expressions, i.e. they are interpreted but only once when an agent instance is loaded. Properties can be defined using the properties section of the agent (and capability) XML file and add an arbitrary number of properties.
 
 ![](jadexpropertiesadf.png)

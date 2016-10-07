@@ -2,11 +2,11 @@
 
 Plans play a central role in Jadex, because they encapsulate the recipe for achieving some state of affair. A plan defines two aspects. 
 
-In the **head** of the plan (i.e. in its ```@Plan``` annotation) meta information about the plan is defined. This means that in the plan head several properties of the plan can be specified, e.g. the circumstances under which it is activated and its importance in relation to other plans.
+In the **head** of the plan (i.e. in its [```@Plan```](${URLJavaDoc}/jadex/bdiv3/annotation/Plan.html) annotation) meta information about the plan is defined. This means that in the plan head several properties of the plan can be specified, e.g. the circumstances under which it is activated and its importance in relation to other plans.
 
 The **body** of a plan contains the concrete instruction that should be carried out. 
 The concrete representation of a plan in Jadex can vary as it is the case for beliefs and goals as well. 
-The rationale behind this is that we wanted to achieve language orthogonality between BDI and object oriented concepts. For this reason it is possible to use the following elements as a plan by adding a ```@Plan``` annotation to it:
+The rationale behind this is that we wanted to achieve language orthogonality between BDI and object oriented concepts. For this reason it is possible to use the following elements as a plan by adding a [```@Plan```](${URLJavaDoc}/jadex/bdiv3/annotation/Plan.html) annotation to it:
 
 -   **Method**: in this case not all plan aspects can be used, e.g. no pre- or context conditions are possible)
 -   **Inner Class**: in case of a non-static inner class allows for easy access of agent beliefs and fields
@@ -16,10 +16,10 @@ For a plan, the triggering events and goals can be specified in the plan head to
 
 Often a plan does some action and then wants to wait until the action has been done before continuing (e.g. dispatching a subgoal). Therefore a plan can use one of the various waitFor() methods of the plan API, that come in quite different flavors. 
 The plan API can be retrieved as an object via two mechanisms:  
-First, the ```@PlanAPI``` annotation can used above a field of type IPlan in plan classes. 
+First, the [```@PlanAPI```](${URLJavaDoc}/jadex/bdiv3/annotation/PlanAPI.html) annotation can used above a field of type IPlan in plan classes. 
 The engine will automatically inject the plan API when a plan instance is created. 
 
-When using a method as plan this is not possible. Hence, the signature of the plan method can be used to retrieve the plan API just by adding a parameter of type ```IPlan```. 
+When using a method as plan this is not possible. Hence, the signature of the plan method can be used to retrieve the plan API just by adding a parameter of type [```IPlan```](${URLJavaDoc}/jadex/bdiv3/runtime/IPlan.html). 
 <x-hint title="parameters">
 Please note that in Jadex methods that are invoked by the framework can have any signature. The engine will do its best to [automatically determine](../../components/components/#parameter-guesser) which values are expected and set them as parameter values. If the engine does not find a suitable value of a given type the value will be null.
 </x-hint>
@@ -144,7 +144,7 @@ public void init()
 }
 ```
 
--   Change the ```adoptPlan()``` method call to 
+-   Change the [```adoptPlan()```](${URLJavaDoc}/jadex/bdiv3/features/IBDIAgentFeature.html#adoptPlan-T-) method call to 
 ```java
 bdiFeature.adoptPlan("translateEnglishGerman");
 ```

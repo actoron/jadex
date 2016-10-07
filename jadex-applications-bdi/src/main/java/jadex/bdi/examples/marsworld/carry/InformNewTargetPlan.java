@@ -34,7 +34,7 @@ public class InformNewTargetPlan extends Plan
 		{
 			IMessageEvent mevent = createMessageEvent("inform_target");
 			mevent.getParameterSet(SFipa.RECEIVERS).addValues(sentries);
-			mevent.getParameter(SFipa.CONTENT).setValue(target);
+			mevent.getParameter(SFipa.CONTENT).setValue(target.getId());
 			sendMessage(mevent);
 		}
 

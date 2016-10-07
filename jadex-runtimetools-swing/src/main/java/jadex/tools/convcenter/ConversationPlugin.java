@@ -87,6 +87,14 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	{
 		return "Conversation Center";
 	}
+	
+	/**
+	 *  ConvCenter should initialize non-lazy to catch all incoming messages.
+	 */
+	public boolean isLazy()
+	{
+		return false;
+	}
 
 	/**
 	 * @return the conversation icon

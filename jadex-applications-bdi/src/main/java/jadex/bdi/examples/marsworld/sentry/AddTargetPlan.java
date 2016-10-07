@@ -24,9 +24,7 @@ public class AddTargetPlan extends Plan
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
 		IMessageEvent req = (IMessageEvent)getReason();
 
-		ISpaceObject ot = (ISpaceObject)req.getParameter(SFipa.CONTENT).getValue();
-		ISpaceObject target = env.getSpaceObject(ot.getId());
-
+		ISpaceObject target = env.getSpaceObject(req.getParameter(SFipa.CONTENT).getValue());
 		//if(ts.length>0)
 		//	System.out.println("Sees: "+SUtil.arrayToString(ts));
 

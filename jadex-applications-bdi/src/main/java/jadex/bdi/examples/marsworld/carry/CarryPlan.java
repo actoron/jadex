@@ -32,9 +32,9 @@ public class CarryPlan extends Plan
 				// Wait for a request.
 				IMessageEvent req = waitForMessageEvent("request_carry");
 	
-				ISpaceObject ot = ((RequestCarry)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
+//				ISpaceObject ot = ((RequestCarry)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
 				IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-				ISpaceObject target = env.getSpaceObject(ot.getId());
+				ISpaceObject target = env.getSpaceObject(((RequestCarry)req.getParameter(SFipa.CONTENT).getValue()).getTarget());
 	
 				// Producing ore here.
 				IGoal carry_ore = createGoal("carry_ore");

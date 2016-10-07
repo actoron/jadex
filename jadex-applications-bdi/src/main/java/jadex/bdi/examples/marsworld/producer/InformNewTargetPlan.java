@@ -23,7 +23,11 @@ public class InformNewTargetPlan extends Plan
 	 */
 	public void body()
 	{
-		ISpaceObject	target	= ((ChangeEvent<ChangeInfo<ISpaceObject>>)getReason()).getValue().getValue();
+		ChangeEvent<ChangeInfo<ISpaceObject>> ce = (ChangeEvent<ChangeInfo<ISpaceObject>>)getReason();
+//		if (ce.getValue().getValue() == null)
+			System.out.println("CE: " + ce + " type: " + ce.getType() + " ");
+			System.out.println("VAL: " + ce.getValue().getValue());
+		ISpaceObject	target	= (ce).getValue().getValue();
 		
 		// Todo: multiple spaces by name...
 		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getAgent(), "myagrspace").get();
@@ -32,7 +36,7 @@ public class InformNewTargetPlan extends Plan
 		
 		IMessageEvent mevent = createMessageEvent("inform_target");
 		mevent.getParameterSet(SFipa.RECEIVERS).addValues(sentries);
-		mevent.getParameter(SFipa.CONTENT).setValue(target);
+		mevent.getParameter(SFipa.CONTENT).setValue(target.getId());
 		sendMessage(mevent);
 
 //		System.out.println("Informing sentries: "+getScope().getAgentName());

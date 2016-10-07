@@ -1,5 +1,7 @@
 # Agent Specification
 
+${SorryOutdated}
+
 The BDI programmer's guide is a reference to the concepts and constructs available, when programming Jadex agents. It is not meant as a step-by-step introduction to the programming of Jadex agents. For a step-by-step introduction consider working through the [BDIV3 Tutorial](../../tutorials/bdiv3/01 Introduction)
 
 

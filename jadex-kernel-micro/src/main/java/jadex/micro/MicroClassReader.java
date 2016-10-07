@@ -2012,7 +2012,6 @@ public class MicroClassReader
 				}
 				catch (Exception e1)
 				{
-					e1.printStackTrace();
 					throw e;
 				}
 				

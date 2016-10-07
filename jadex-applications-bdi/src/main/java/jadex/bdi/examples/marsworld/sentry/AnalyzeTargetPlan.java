@@ -82,7 +82,7 @@ public class AnalyzeTargetPlan extends Plan
 			int sel = (int)(Math.random()*producers.length); // todo: Select not randomly
 //			System.out.println("Found agents: "+producers.length+" selected: "+sel);
 
-			RequestProduction rp = new RequestProduction(target);
+			RequestProduction rp = new RequestProduction(target.getId());
 			//Action action = new Action();
 			//action.setAction(rp);
 			//action.setActor(SJade.convertAIDtoJade(producers[sel].getName()));
