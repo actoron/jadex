@@ -80,8 +80,16 @@ public class RegistrySearchFunctionality
 	/**
 	 *  Search for services.
 	 */
-	// read
 	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope)
+	{
+		return searchService(type, cid, scope, false);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, boolean excluded)
 	{
 //		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
 //			System.out.println("search: "+type+" - "+cid);
@@ -93,7 +101,7 @@ public class RegistrySearchFunctionality
 			while(sers.hasNext())
 			{
 				IService ser = sers.next();
-				if(checkSearchScope(cid, ser, scope) && checkPublicationScope(cid, ser))
+				if(checkSearchScope(cid, ser, scope, excluded) && checkPublicationScope(cid, ser))
 				{
 //					if(ret!=null)
 //						System.out.println("found another: "+ser.getServiceIdentifier());
@@ -121,7 +129,7 @@ public class RegistrySearchFunctionality
 			while(sers.hasNext())
 			{
 				IService ser = sers.next();
-				if(checkSearchScope(cid, ser, scope) && checkPublicationScope(cid, ser))
+				if(checkSearchScope(cid, ser, scope, false) && checkPublicationScope(cid, ser))
 				{
 					ret.add((T)ser);
 				}
@@ -148,7 +156,7 @@ public class RegistrySearchFunctionality
 			while(sers.hasNext())
 			{
 				T ser = sers.next();
-				if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+				if(checkSearchScope(cid, (IService)ser, scope, false) && checkPublicationScope(cid, (IService)ser))
 				{
 					try
 					{
@@ -189,7 +197,7 @@ public class RegistrySearchFunctionality
 			while(sers.hasNext())
 			{
 				T ser = sers.next();
-				if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+				if(checkSearchScope(cid, (IService)ser, scope, false) && checkPublicationScope(cid, (IService)ser))
 				{
 					try
 					{
@@ -420,7 +428,7 @@ public class RegistrySearchFunctionality
 		while(it.hasNext())
 		{
 			final T ser = it.next();
-			if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+			if(checkSearchScope(cid, (IService)ser, scope, false) && checkPublicationScope(cid, (IService)ser))
 			{
 				ret.add(ser);
 				if(oneresult)
@@ -561,7 +569,7 @@ public class RegistrySearchFunctionality
 		IComponentIdentifier cid = queryinfo.getQuery().getOwner();
 		String scope = queryinfo.getQuery().getScope();
 		IAsyncFilter<IService> filter = (IAsyncFilter)queryinfo.getQuery().getFilter();
-		if(!checkSearchScope(cid, service, scope) || !checkPublicationScope(cid, service))
+		if(!checkSearchScope(cid, service, scope, false) || !checkPublicationScope(cid, service))
 		{
 			ret.setResult(Boolean.FALSE);
 		}
@@ -594,11 +602,11 @@ public class RegistrySearchFunctionality
 	/**
 	 *  Check if service is ok with respect to search scope of caller.
 	 */
-	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope)
+	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope, boolean excluded)
 	{
 		boolean ret = false;
 		
-		if(!provider.isIncluded(cid, ser))
+		if(excluded && !provider.isIncluded(cid, ser))
 		{
 			return ret;
 		}

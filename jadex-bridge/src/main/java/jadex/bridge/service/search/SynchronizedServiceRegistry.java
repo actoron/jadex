@@ -388,13 +388,22 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> T searchService(final ClassInfo type, final IComponentIdentifier cid, final String scope)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope)
+	{
+		return searchService(type, cid, scope, false);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	public <T> T searchService(final ClassInfo type, final IComponentIdentifier cid, final String scope, final boolean excluded)
 	{
 		return (T)readActionSync(new IResultCommand<Object, Void>()
 		{
 			public Object execute(Void args)
 			{
-				return delegate.searchService(type, cid, scope);
+				return delegate.searchService(type, cid, scope, excluded);
 			}
 			
 			public String toString()

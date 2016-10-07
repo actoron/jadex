@@ -82,7 +82,7 @@ import jadex.micro.annotation.RequiredServices;
 //	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
 	@Argument(name="mechanisms", clazz=String.class, description="The discovery mechanisms."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+	@Argument(name="fast", clazz=boolean.class, defaultvalue="false", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="autocreate", clazz=boolean.class, defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
 	@Argument(name="autodelete", clazz=boolean.class, defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
 	@Argument(name="proxydelay", clazz=long.class, defaultvalue="15000", description="The delay used by proxies."),
@@ -273,6 +273,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		this.delay = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
 		this.autocreate = ((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("autocreate")).booleanValue();
 		this.autodelete = ((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("autodelete")).booleanValue();
+		Boolean	bfast = (Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("fast");
+		fast	= bfast!=null ? bfast.booleanValue() : false;
 		
 		this.includes	= new ArrayList<String>();
 		StringTokenizer	stok	= new StringTokenizer((String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("includes"), ",");

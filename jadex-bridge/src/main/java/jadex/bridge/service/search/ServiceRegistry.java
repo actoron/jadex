@@ -37,6 +37,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
+import jdk.nashorn.internal.ir.SplitReturn;
 
 /**
  *  Local service registry. 
@@ -269,11 +270,20 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return searchfunc.searchService(type, cid, scope);
+		return searchService(type, cid, scope, false);
 	}
 	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, boolean excluded)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+		return searchfunc.searchService(type, cid, scope, excluded);
+	}
+
 	/**
 	 *  Search for services.
 	 */
@@ -732,21 +742,6 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		return ret;
 	}
 	
-	/**
-	 *  Check if service is ok with respect to search scope of caller.
-	 */
-	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope)
-	{
-		if(!isIncluded(cid, ser))
-		{
-			return false;
-		}
-		else
-		{
-			return searchfunc.checkSearchScope(cid, ser, scope);
-		}
-	}
-
 	/**
 	 *  Notify the event listeners (if any).
 	 *  @param event The event.

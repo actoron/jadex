@@ -159,6 +159,12 @@ public class RootComponentConfiguration
 																								// default:
 																								// 20000
 
+	/** The awareness fast flag **/
+	public static final String	AWAFAST				= "awafast";								// class:
+																								// boolean
+																								// default:
+																								// false
+
 	/** Include entries for awareness agent. **/
 	public static final String	AWAINCLUDES			= "awaincludes";							// class:
 																								// String
@@ -780,6 +786,16 @@ public class RootComponentConfiguration
 	public void setAwaDelay(long value)
 	{
 		setValue(AWADELAY, value);
+	}
+
+	public boolean isAwaFast()
+	{
+		return (Boolean)getValue(AWAFAST);
+	}
+
+	public void setAwaFast(boolean value)
+	{
+		setValue(AWAFAST, value);
 	}
 
 	public String getAwaIncludes()

@@ -340,6 +340,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
 				@NameValue(name="delay", value="$args.awadelay"),
+				@NameValue(name="fast", value="$args.awafast"),
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),

@@ -1,5 +1,7 @@
 package jadex.platform.service.awareness.discovery.relay;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +25,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
@@ -45,17 +47,20 @@ import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 @Properties(@NameValue(name="system", value="true"))
 public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarenessService
 {
+	//-------- attributes --------
+	
+	/** The init future when fast==true. */
+	protected Future<Void>	init;
+	
 	//-------- agent methods --------
 	
 	/**
 	 *  After starting, perform initial registration at server.
 	 */
-	@AgentBody
-	public void executeBody()
+	@AgentCreated
+	public IFuture<Void>	init()
 	{
-		super.executeBody();
-
-		sendInfo(false);
+		return sendInfo(false);
 	}
 	
 	/**
@@ -126,8 +131,6 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 		});
 		
 		return ret;		
-	
-//		return IFuture.DONE;
 	}
 
 	//-------- internal methods --------
@@ -137,92 +140,122 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 	 */
 	protected IFuture<Void>	sendInfo(final boolean offline)
 	{
-		IFuture<Void>	ret;
-		if(offline || isStarted())
+		agent.getLogger().info("Sending awareness info to server...");
+		
+		final Future<Void>	ret;
+		if(isFast() && init==null)
 		{
-			agent.getLogger().info("Sending awareness info to server...");
-			final Future<Void>	fut	= new Future<Void>();
-			IFuture<IMessageService>	msfut =	agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
-			msfut.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(fut)
-			{
-				public void customResultAvailable(final IMessageService ms)
-				{
-					ms.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Void>(fut)
-					{
-						public void customResultAvailable(String[] addresses)
-						{
-							// Send init message to all connected relay servers.
-							final List<IComponentIdentifier> receivers = new ArrayList<IComponentIdentifier>();
-							for(int i=0; i<addresses.length; i++)
-							{
-								for(int j=0; j<SRelay.ADDRESS_SCHEMES.length; j++)
-								{
-									if(addresses[i].startsWith(SRelay.ADDRESS_SCHEMES[j]))
-									{
-										receivers.add(new ComponentIdentifier("__relay"+i,
-											new String[]{addresses[i].endsWith("/") ? addresses[i]+"awareness" : addresses[i]+"/awareness"}));
-									}
-								}
-							}
-							
-							if(!receivers.isEmpty())
-							{
-								createAwarenessInfo().addResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(fut)
-								{
-									public void customResultAvailable(final AwarenessInfo awainfo)
-									{
-										awainfo.setDelay(-1);	// no delay required
-										if(offline)
-											awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-										
-										final Map<String, Object> msg = new HashMap<String, Object>();
-										msg.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receivers);
-										msg.put(SFipa.CONTENT, awainfo);
-										// Send content object without inner codec.
-										msg.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
-										agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE)
-											.addResultListener(new DelegationResultListener<Void>(fut));
-									}
-								});
-							}
-							else
-							{
-								fut.setException(new RuntimeException("No relay addresses found."));
-//								{
-//									public void printStackTrace()
-//									{
-//										super.printStackTrace();
-//									}
-//								});
-							}
-						}
-					});
-				}
-			});
-			
-			fut.addResultListener(new IResultListener<Void>()
-			{
-				public void resultAvailable(Void result)
-				{
-					agent.getLogger().info("Sending awareness info to server...success");
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					if(!(exception instanceof ComponentTerminatedException))
-					{
-//						exception.printStackTrace();
-						agent.getLogger().info("Sending awareness info to server...failed: "+exception);
-					}
-				}
-			});
-			
-			ret	= fut;
+			init	= new Future<Void>();
+			ret	= init;
+		}
+		else if(isFast() && !init.isDone())
+		{
+			ret	= init;				
 		}
 		else
 		{
-			ret	= IFuture.DONE;
+			ret	= new Future<Void>();
 		}
+			
+		IFuture<IMessageService>	msfut =	agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
+		msfut.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+		{
+			public void customResultAvailable(final IMessageService ms)
+			{
+				ms.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+				{
+					public void customResultAvailable(String[] addresses)
+					{
+						// Send init message to all connected relay servers.
+						final List<IComponentIdentifier> receivers = new ArrayList<IComponentIdentifier>();
+						for(int i=0; i<addresses.length; i++)
+						{
+							for(int j=0; j<SRelay.ADDRESS_SCHEMES.length; j++)
+							{
+								if(addresses[i].startsWith(SRelay.ADDRESS_SCHEMES[j]))
+								{
+									receivers.add(new ComponentIdentifier("__relay"+i,
+										new String[]{addresses[i].endsWith("/") ? addresses[i]+"awareness" : addresses[i]+"/awareness"}));
+								}
+							}
+						}
+						
+						if(!receivers.isEmpty())
+						{
+							createAwarenessInfo().addResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
+							{
+								public void customResultAvailable(final AwarenessInfo awainfo)
+								{
+									awainfo.setDelay(-1);	// no delay required
+									if(offline)
+										awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+									
+									final Map<String, Object> msg = new HashMap<String, Object>();
+									msg.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receivers);
+									msg.put(SFipa.CONTENT, awainfo);
+									// Send content object without inner codec.
+									msg.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
+									agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE)
+										.addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+											agent.getLogger().info("Sending awareness info to server...success");
+											ret.setResult(null);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											if(!(exception instanceof ComponentTerminatedException))
+											{
+												agent.getLogger().info("Sending awareness info to server...failed: "+exception);
+												if(ret!=init)
+												{
+													ret.setException(new RuntimeException("No relay addresses found."));
+												}
+											}
+										}
+									});
+								}
+							});
+						}
+						else
+						{
+							agent.getLogger().info("Sending awareness info to server...failed: No relay addresses found.");
+							if(isFast() && ret!=init)
+							{
+								ret.setException(new RuntimeException("No relay addresses found.")
+								{
+									@Override
+									public void printStackTrace(PrintWriter s)
+									{
+										Thread.dumpStack();
+										super.printStackTrace(s);
+									}
+									@Override
+									public void printStackTrace()
+									{
+										Thread.dumpStack();
+										super.printStackTrace();
+									}
+									@Override
+									public void printStackTrace(PrintStream s)
+									{
+										Thread.dumpStack();
+										super.printStackTrace(s);
+									}
+								});
+							}
+							else if(!isFast())
+							{
+								// Ignore failure in init when fast awareness not desired
+								ret.setResult(null);
+							}
+						}
+					}
+				});
+			}
+		});
 		
 		return ret;
 	}
