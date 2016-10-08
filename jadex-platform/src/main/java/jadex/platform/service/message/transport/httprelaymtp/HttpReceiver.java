@@ -13,11 +13,13 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.ICodec;
@@ -225,29 +227,34 @@ public class HttpReceiver
 		if(shutdown)
 			return;
 		
-		SServiceProvider.getService(access, IAwarenessManagementService.class, Binding.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<IAwarenessManagementService>()
+		access.scheduleStep(new IComponentStep<Void>()
 		{
-			public void resultAvailable(IAwarenessManagementService awa)
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				try
+				IAwarenessManagementService awa	= SynchronizedServiceRegistry.getRegistry(ia)
+					.searchService(new ClassInfo(IAwarenessManagementService.class), ia.getComponentIdentifier(), Binding.SCOPE_PLATFORM, true);
+				if(awa!=null)
 				{
-					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
-//					System.out.println("Received awareness info: "+info);
-					awa.addAwarenessInfo(info);
+					try
+					{
+						AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
+//						System.out.println("Received awareness info: "+info);
+						awa.addAwarenessInfo(info);
+					}
+					catch(Exception e)
+					{
+						ia.getLogger().info("Error receiving awareness info: "+SUtil.getExceptionStacktrace(e));
+					}
 				}
-				catch(Exception e)
+				else
 				{
-					// Todo: logger?
-//					System.out.println("Error receiving awareness info: "+e);
+					// No awa service -> ignore awa infos.
 				}
+
+				return IFuture.DONE;
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// No awa service -> ignore awa infos.
-			}
-		});		
+		});
 	}
 
 	/**
