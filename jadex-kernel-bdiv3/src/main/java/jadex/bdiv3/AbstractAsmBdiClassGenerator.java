@@ -24,8 +24,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.sun.javafx.geom.transform.GeneralTransform3D;
-
 import jadex.bdiv3.exceptions.JadexBDIGenerationException;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
