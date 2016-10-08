@@ -565,9 +565,12 @@ public class BDIClassReader extends MicroClassReader
 		for(Class<?> agcl: agtcls)
 		{
 //			Class<?> acl =
-			try {
+			try 
+			{
 				gen.generateBDIClass(agcl.getName(), bdimodel, cl);
-			} catch (JadexBDIGenerationException e) {
+			} 
+			catch(JadexBDIGenerationException e) 
+			{
 				throw new JadexBDIGenerationRuntimeException("Could not read bdi agent: " + agcl, e);
 			}
 //			System.out.println("genclazz: "+agcl.getName()+" "+agcl.hashCode()+" "+agcl.getClassLoader());
