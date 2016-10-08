@@ -37,7 +37,6 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jdk.nashorn.internal.ir.SplitReturn;
 
 /**
  *  Local service registry. 

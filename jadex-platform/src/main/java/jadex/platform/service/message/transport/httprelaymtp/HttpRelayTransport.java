@@ -372,7 +372,7 @@ public class HttpRelayTransport implements ITransport
 									}
 									else
 									{
-										System.out.println("Warning: No relay discovery service found.");
+										ia.getLogger().info("Relay transport connected. No relay discovery service found.");
 									}
 								}
 								
