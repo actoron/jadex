@@ -89,6 +89,12 @@ public interface IServiceRegistry
 	 *  Search for services.
 	 */
 	// read
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, boolean excluded);
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
 	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope);
 	
 	/**
