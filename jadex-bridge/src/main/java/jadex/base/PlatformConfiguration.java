@@ -335,9 +335,7 @@ public class PlatformConfiguration
 		rootConfig.setAwaFast(true);	// Make sure awareness finds other platforms quickly
 		rootConfig.setRelayTransport(true);
 		
-//		rootConfig.setSecurity(true);	// enable security when remote comm.
-//		rootConfig.setSimul(true);
-
+		rootConfig.setSecurity(true);	// enable security when remote comm.
 		
 		return config;
 	}
