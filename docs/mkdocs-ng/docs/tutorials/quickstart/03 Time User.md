@@ -47,7 +47,7 @@ public class TimeUserAgent
 	 */
 	public static void	main(String[] args)
 	{
-		PlatformConfiguration	config	= PlatformConfiguration.getDefault();
+		PlatformConfiguration	config	= PlatformConfiguration.getMinimalRelayAwareness();
 		config.addComponent(TimeUserAgent.class.getName()+".class");
 		Starter.createPlatform(config).get();
 	}

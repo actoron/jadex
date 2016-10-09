@@ -3,6 +3,7 @@ package jadex.platform;
 import static jadex.base.RootComponentConfiguration.ADDRESS;
 import static jadex.base.RootComponentConfiguration.ASYNCEXECUTION;
 import static jadex.base.RootComponentConfiguration.AWADELAY;
+import static jadex.base.RootComponentConfiguration.AWAFAST;
 import static jadex.base.RootComponentConfiguration.AWAEXCLUDES;
 import static jadex.base.RootComponentConfiguration.AWAINCLUDES;
 import static jadex.base.RootComponentConfiguration.AWAMECHANISMS;
@@ -148,6 +149,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
 	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
 	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
+	@Argument(name=AWAFAST, clazz=boolean.class, defaultvalue="false"),
 
 	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),
@@ -340,6 +342,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
 				@NameValue(name="delay", value="$args.awadelay"),
+				@NameValue(name="fast", value="$args.awafast"),
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),

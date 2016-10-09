@@ -242,10 +242,18 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	/**
 	 *  Search for services.
 	 */
-	// read
 	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
-		return searchfunc.searchService(type, cid, scope);
+		return searchService(type, cid, scope, false);
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, boolean excluded)
+	{
+		return searchfunc.searchService(type, cid, scope, excluded);
 	}
 	
 	/**

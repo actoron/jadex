@@ -289,6 +289,7 @@ public class PlatformConfiguration
 		RootComponentConfiguration rootConfig = config.getRootConfig();
 		rootConfig.setWelcome(false);
 		rootConfig.setGui(false);
+		rootConfig.setCli(false);
 		rootConfig.setCliConsole(false);
 		
 		rootConfig.setChat(false);
@@ -331,9 +332,10 @@ public class PlatformConfiguration
 		
 		rootConfig.setAwareness(true);
 		rootConfig.setAwaMechanisms(AWAMECHANISM.relay);
+		rootConfig.setAwaFast(true);	// Make sure awareness finds other platforms quickly
 		rootConfig.setRelayTransport(true);
 		
-		rootConfig.setKernels(KERNEL.micro);
+		rootConfig.setSecurity(true);	// enable security when remote comm.
 		
 		return config;
 	}
