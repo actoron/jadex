@@ -26,7 +26,7 @@ public class ExtinguishFirePlan
 	{
 		ISpaceObject disaster = goal.getDisaster();
 		IExtinguishFireService force = (IExtinguishFireService)goal.getRescueForce();
-		ef = force.extinguishFire(disaster);
+		ef = force.extinguishFire(disaster.getId());
 		ef.get();
 	}
 	

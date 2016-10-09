@@ -1,11 +1,14 @@
 package jadex.bdiv3.actions;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
+import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.annotation.GoalParent;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.Direction;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
@@ -81,6 +84,15 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 //			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			// todo: observe class and goal itself!
 //			goal.observeGoal(ia);
+			
+			// inject agent in static inner class goals
+			MGoal mgoal = (MGoal)goal.getModelElement();
+			Class<?> gcl = mgoal.getTargetClass(agent.getClassLoader());
+			if(gcl.isMemberClass() && Modifier.isStatic(gcl.getModifiers()))
+			{
+				Field f = gcl.getDeclaredField(IBDIClassGenerator.AGENT_FIELD_NAME);
+				f.set(goal.getPojoElement(), agent);
+			}
 			
 			// inject goal elements
 			if(goal.getPojoElement()!=null)

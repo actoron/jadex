@@ -20,6 +20,15 @@ pages:
     - 'tutorials/quickstart/03 Time User.md'
     - 'tutorials/quickstart/04 Time Provider.md'
     - 'tutorials/quickstart/05 Summary.md'
+- Active Components Tutorial:
+    - 'tutorials/ac/01 Introduction.md'
+    - 'tutorials/ac/03 Active Components.md'
+    - 'tutorials/ac/04 Required Services.md'
+    - 'tutorials/ac/05 Provided Services.md'
+    - 'tutorials/ac/06 Composition.md'
+    - 'tutorials/ac/07 External Access.md'
+    - 'tutorials/ac/08 Security.md'
+    - 'tutorials/ac/09 Application Integration.md'
 - BDIV3 Tutorial:
     - 'tutorials/bdiv3/01 Introduction.md'
     - 'tutorials/bdiv3/02 Your first BDI Agent.md'

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bdiv3.annotation.GoalAPLBuild;
+import jadex.bdiv3.annotation.GoalFinished;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
@@ -89,6 +90,10 @@ public class MGoal extends MClassBasedElement
 	
 	/** The method info for building apl. */
 	protected MethodInfo buildaplmethod;
+
+	/** The method info for the finished callback. */
+	protected MethodInfo finishedmethod;
+
 	
 	//-------- additional xml attributes --------
 	
@@ -583,7 +588,7 @@ public class MGoal extends MClassBasedElement
 			{
 				if(ms[i].isAnnotationPresent(GoalAPLBuild.class))
 				{
-					if((ms[i].getModifiers()&Modifier.PUBLIC)!=0)
+//					if((ms[i].getModifiers()&Modifier.PUBLIC)!=0)
 					{
 						buildaplmethod = new MethodInfo(ms[i]);
 						done = true;
@@ -595,6 +600,34 @@ public class MGoal extends MClassBasedElement
 		}
 		
 		return buildaplmethod==MBody.MI_NOTFOUND? null: buildaplmethod;
+	}
+	
+	/**
+	 *  Get the goal finished callback method.
+	 */
+	public MethodInfo getFinishedMethod(ClassLoader cl)
+	{
+		if(finishedmethod==null)
+		{
+			Class<?> tcl = getTargetClass(cl);
+			Method[] ms = SReflect.getAllMethods(tcl);
+			boolean done = false;
+			for(int i=0; !done && i<ms.length; i++)
+			{
+				if(ms[i].isAnnotationPresent(GoalFinished.class))
+				{
+//					if((ms[i].getModifiers()&Modifier.PUBLIC)!=0)
+					{
+						finishedmethod = new MethodInfo(ms[i]);
+						done = true;
+					}
+				}
+			}
+			if(finishedmethod==null)
+				finishedmethod = MBody.MI_NOTFOUND;
+		}
+		
+		return finishedmethod==MBody.MI_NOTFOUND? null: finishedmethod;
 	}
 
 	/**

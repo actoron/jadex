@@ -10,6 +10,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -36,6 +37,10 @@ public class ChatD1Agent
 	/** The underlying micro agent. */
 	@Agent
 	protected IInternalAccess agent;
+
+	/** The required services feature. */
+	@AgentFeature
+	protected IRequiredServicesFeature requiredServicesFeature;
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -44,7 +49,7 @@ public class ChatD1Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<Collection<IChatService>>	chatservices	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
+		IFuture<Collection<IChatService>>	chatservices	= requiredServicesFeature.getRequiredServices("chatservices");
 		chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 		{
 			public void resultAvailable(Collection<IChatService> result)

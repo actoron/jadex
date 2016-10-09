@@ -43,18 +43,22 @@ public class PojoHelloWorldAgent
 	{
 //		System.out.println(agent.getComponentFeature(IArgumentsFeature.class).getArgument("welcome text"));
 		
-		IClockService cl = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		System.out.println("clockservice: "+cl);
+//		IClockService cl = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		System.out.println("clockservice: "+cl);
+		
+//		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+//		{			
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				System.out.println("Good bye world.");
+//				agent.killComponent();
+//				return IFuture.DONE;
+//			}
+//		});
 		
 		System.out.println(text);
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
-		{			
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				System.out.println("Good bye world.");
-				agent.killComponent();
-				return IFuture.DONE;
-			}
-		});
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000).get();
+		System.out.println("Good bye world.");
+		agent.killComponent();
 	}
 }

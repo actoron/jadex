@@ -255,6 +255,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						}
 						potentialuris.remove(uri);
 						validuris.remove(uri);
+						
 						return IFuture.DONE;
 					}
 				});
@@ -274,6 +275,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //							extensionblacklist = new HashSet(baseextensionblacklist);
 							validuris.add(uri);
 							potentialuris.add(uri);
+							
 							return IFuture.DONE;
 						}
 					});
@@ -390,7 +392,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				}
 			}
 		}));
-				
+			
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("fettisch");
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//			}
+//		});
 		
 		return ret;
 	}
@@ -426,7 +438,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, IResourceIdentifier rid)
 	{
 //		if(model.indexOf("ich")!=-1)
-//			System.out.println("loadModel: "+model);
+			System.out.println("loadModel: "+model);
 		
 		return loadModel(model, imports, rid, false);
 	}
@@ -512,7 +524,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-//		System.out.println("isStartable: "+model);
+		System.out.println("isStartable: "+model);
 
 		final Future<Boolean> ret = new Future<Boolean>();
 		findKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
@@ -1211,7 +1223,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture searchPotentialUrls(final IResourceIdentifier rid)
 	{
-//		System.out.println("searchPotentialURLs: "+rid+", "+potentialurls);
+//		System.out.println("searchPotentialURLs: "+rid+", "+rid);//potentialurls);
 		
 		final Future ret = new Future();
 		final IResultListener reslis = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
@@ -1301,7 +1313,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				String loc = (String) obj;
 //				if (loc.toLowerCase().contains("kernel"))
 //				{
-//					System.out.println(loc);
+//					System.out.println("kernel" + loc);
 //					System.out.println(loc.substring(loc.lastIndexOf('/') + 1).toLowerCase().startsWith("kernel"));
 //				}
 				// For jar entries, strip directory part.
@@ -1470,6 +1482,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected List<String> searchUri(URI uri, IFilter filter)
 	{
+//		System.out.println("Searing uri " + uri);
 		try
 		{
 			File file = new File(uri);

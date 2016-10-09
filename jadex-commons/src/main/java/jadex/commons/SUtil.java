@@ -4624,9 +4624,10 @@ public class SUtil
 	/**
 	 *  Get the hash code for a file or directory.
 	 */
-	public static String	getHashCode(File f)
+	public static String	getHashCode(File f, boolean flat)
 	{
 //		long	start0	= System.nanoTime();
+		
 		try
 		{
 			String	path	= f.getCanonicalPath();
@@ -4643,46 +4644,53 @@ public class SUtil
 				}
 				else
 				{
-					ZipFile	zf	= null;
-					try
+					if(!flat)
 					{
-						// Try zip file as directory.
-						zf	= new ZipFile(f);
-						List<ZipEntry>	entries	= new ArrayList<ZipEntry>();
-						Enumeration<? extends ZipEntry>	en	= zf.entries();
-						while(en.hasMoreElements())
+						ZipFile	zf	= null;
+						try
 						{
-							ZipEntry	ze	= en.nextElement();
-							if(!ze.isDirectory() && !ze.getName().startsWith("META-INF/"))
+							// Try zip file as directory.
+							zf	= new ZipFile(f);
+							List<ZipEntry>	entries	= new ArrayList<ZipEntry>();
+							Enumeration<? extends ZipEntry>	en	= zf.entries();
+							while(en.hasMoreElements())
 							{
-								entries.add(ze);
+								ZipEntry	ze	= en.nextElement();
+								if(!ze.isDirectory() && !ze.getName().startsWith("META-INF/"))
+								{
+									entries.add(ze);
+								}
+							}
+							Collections.sort(entries, new Comparator<ZipEntry>()
+							{
+								public int compare(ZipEntry o1, ZipEntry o2)
+								{
+									return o1.getName().compareTo(o2.getName());
+								}
+							});
+							for(ZipEntry ze: entries)
+							{
+	//							System.out.println("Zip entry: "+ze.getName());
+								md.update(ze.getName().getBytes("UTF-8"));
+								hashStream(zf.getInputStream(ze), md);
 							}
 						}
-						Collections.sort(entries, new Comparator<ZipEntry>()
+						catch(ZipException ze)
 						{
-							public int compare(ZipEntry o1, ZipEntry o2)
+							// Treat as flat file.
+							hashStream(new FileInputStream(f), md);					
+						}
+						finally
+						{
+							if(zf!=null)
 							{
-								return o1.getName().compareTo(o2.getName());
+								zf.close();
 							}
-						});
-						for(ZipEntry ze: entries)
-						{
-//							System.out.println("Zip entry: "+ze.getName());
-							md.update(ze.getName().getBytes("UTF-8"));
-							hashStream(zf.getInputStream(ze), md);
 						}
 					}
-					catch(ZipException ze)
+					else
 					{
-						// Treat as flat file.
-						hashStream(new FileInputStream(f), md);					
-					}
-					finally
-					{
-						if(zf!=null)
-						{
-							zf.close();
-						}
+						hashStream(new FileInputStream(f), md);
 					}
 				}
 				hash	= new String(Base64.encode(md.digest()), "UTF-8");

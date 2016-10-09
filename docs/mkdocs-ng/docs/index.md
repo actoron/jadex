@@ -25,6 +25,7 @@ For API Documentation of Jadex Active Components ${jadexversiontitle} please vis
 
 # Tutorials
  * [Quickstart Tutorial](tutorials/quickstart/01 Introduction/)
+ * [Active Components Tutorial](tutorials/ac/01 Introduction/)
  * [BDIV3 Tutorial](tutorials/bdiv3/01 Introduction/)
  * [BPMN Tutorial](tutorials/bpmn/01 Introduction/)
 

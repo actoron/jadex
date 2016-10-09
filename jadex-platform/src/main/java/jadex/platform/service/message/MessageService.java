@@ -2340,7 +2340,7 @@ public class MessageService extends BasicService implements IMessageService
 							}
 							catch(Exception e)
 							{
-								logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ fmessage.get(messagetype.getIdIdentifier())+", "+e);
+								logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ fmessage.get(messagetype.getIdIdentifier())+", "+e+", "+fmessage.get(messagetype.getSenderIdentifier()));
 								
 								// todo: notify sender that message could not be delivered!
 								// Problem: there is no connection back to the sender, so that
@@ -2349,7 +2349,7 @@ public class MessageService extends BasicService implements IMessageService
 						}
 						else
 						{
-							logger.warning("Message could not be delivered to local receiver (no communication feature): " + receiver + ", "+ fmessage.get(messagetype.getIdIdentifier()));							
+							logger.warning("Message could not be delivered to local receiver (no communication feature): " + receiver + ", "+ fmessage.get(messagetype.getIdIdentifier())+", "+fmessage.get(messagetype.getSenderIdentifier()));							
 						}
 						
 						return IFuture.DONE;
@@ -2359,7 +2359,7 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ msg.get(messagetype.getIdIdentifier())+", "+exception);
+				logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ msg.get(messagetype.getIdIdentifier())+", "+exception+", "+fmessage.get(messagetype.getSenderIdentifier()));
 				ret.setResult(null);
 			}
 		});

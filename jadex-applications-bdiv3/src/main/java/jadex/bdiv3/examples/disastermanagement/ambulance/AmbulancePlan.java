@@ -63,7 +63,7 @@ public class AmbulancePlan
 			// Treat victims.
 			if(target!=null)
 			{
-				TreatVictims goal = new TreatVictims(target);
+				TreatVictims goal = capa.new TreatVictims(target);
 				rplan.dispatchSubgoal(goal).get();
 			}
 			

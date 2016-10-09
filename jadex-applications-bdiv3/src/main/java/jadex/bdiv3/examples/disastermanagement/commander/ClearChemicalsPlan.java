@@ -26,7 +26,7 @@ public class ClearChemicalsPlan
 	{
 		ISpaceObject disaster = goal.getDisaster();
 		IClearChemicalsService force = (IClearChemicalsService)goal.getRescueForce();
-		cc = force.clearChemicals(disaster);
+		cc = force.clearChemicals(disaster.getId());
 		cc.get();
 	}
 	

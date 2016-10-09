@@ -27,7 +27,10 @@ public class FireBrigadePlan
 	
 	@PlanAPI
 	protected IPlan rplan;
-	
+
+	@PlanCapability
+	protected FireBrigadeBDI fireBrigadeBDI;
+
 //	@PlanReason
 //	protected TreatVictims goal;
 	
@@ -75,12 +78,12 @@ public class FireBrigadePlan
 				{
 					if("clear_chemicals".equals(goaltype))
 					{
-						ClearChemicals goal = new ClearChemicals(target);
+						ClearChemicals goal = fireBrigadeBDI.new ClearChemicals(target);
 						rplan.dispatchSubgoal(goal).get();
 					}
 					else if("extinguish_fire".equals(goaltype))
 					{
-						ExtinguishFire goal = new ExtinguishFire(target);
+						ExtinguishFire goal = fireBrigadeBDI.new ExtinguishFire(target);
 						rplan.dispatchSubgoal(goal).get();
 					}
 				}

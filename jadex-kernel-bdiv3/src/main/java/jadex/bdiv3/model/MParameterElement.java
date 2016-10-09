@@ -82,4 +82,29 @@ public class MParameterElement extends MElement
 			parameters = new ArrayList<MParameter>();
 		this.parameters.add(parameter);
 	}
+	
+	/**
+	 *  Test if a param is contained.
+	 *  @param name The name.
+	 *  @return The correctly spelled parameter name or null.
+	 */
+	public String hasParameterIgnoreCase(String name)
+	{
+		String ret = null;
+		name = name.toLowerCase();
+		
+		if(parameters!=null && name!=null)
+		{
+			for(MParameter param: parameters)
+			{
+				if(name.equals(param.getName().toLowerCase()))
+				{
+					ret = param.getName();
+					break;
+				}
+			}
+		}
+		
+		return ret;
+	}
 }

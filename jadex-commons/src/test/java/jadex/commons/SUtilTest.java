@@ -55,7 +55,7 @@ public class SUtilTest //extends TestCase
 		SUtil.writeDirectory(src, new BufferedOutputStream(fos));
 		fos.close();
 		
-		Assert.assertEquals(SUtil.getHashCode(src), SUtil.getHashCode(dest));
+		Assert.assertEquals(SUtil.getHashCode(src, false), SUtil.getHashCode(dest, false));
 		
 		SUtil.deleteDirectory(dest.getParentFile());
 	}
