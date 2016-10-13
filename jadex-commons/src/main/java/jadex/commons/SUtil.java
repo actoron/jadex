@@ -4630,7 +4630,7 @@ public class SUtil
 		
 		try
 		{
-			String	path	= f.getCanonicalPath();
+			String	path	= f.getAbsolutePath();	// Not canonical, because we want to ignore symlinks.
 			Tuple2<Long, String>	entry	= HASHES.get(path);
 			String	hash	=	entry!=null ? entry.getSecondEntity() : null; 
 			
@@ -4826,7 +4826,7 @@ public class SUtil
 			{
 				try
 				{
-					return o1.getCanonicalPath().compareTo(o2.getCanonicalPath());
+					return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());	// Not canonical, because we want to ignore symlinks.
 				}
 				catch(IOException e)
 				{
@@ -4846,11 +4846,19 @@ public class SUtil
 			}
 			else
 			{
-				String	fpath	= f.getCanonicalPath();
+				String	fpath	= f.getAbsolutePath(); 	// Not canonical, because we want to ignore symlinks.
 				assert fpath.startsWith(root);
-				String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
+				if(root.length()+1>fpath.length())
+				{
+					// Shouldn't happen (bugfix for 3.0.0), left here for testing -> remove when confirmed working with symlinks
+					System.out.println("root: "+root+", fpath: "+fpath);
+				}
+				else
+				{
+					String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
+					md.update(entry.getBytes("UTF-8"));
+				}
 //				System.out.println("Dir entry: "+entry);
-				md.update(entry.getBytes("UTF-8"));
 				hashStream(new FileInputStream(f), md);
 			}
 		}
