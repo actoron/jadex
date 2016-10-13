@@ -4824,14 +4824,7 @@ public class SUtil
 			// -> have to implement our own portable comparator for matching hash values on all systems. 
 			public int compare(File o1, File o2)
 			{
-				try
-				{
-					return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());	// Not canonical, because we want to ignore symlinks.
-				}
-				catch(IOException e)
-				{
-					throw new RuntimeException(e);
-				}
+				return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());	// Not canonical, because we want to ignore symlinks.
 			}
 		});
 		
