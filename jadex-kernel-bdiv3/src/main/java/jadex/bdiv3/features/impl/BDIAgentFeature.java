@@ -878,6 +878,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //				System.out.println("res: "+res);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
+				if (agent == null) {
+					// this should only happen if inner static class
+					throw new RuntimeException("Plans/Goals/etc inner classes must not be static!");
+				}
 			}
 			catch(RuntimeException e)
 			{

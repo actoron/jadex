@@ -177,6 +177,8 @@ All annotations also allow for methods with parameters, see [Parameter Guesser](
 |**@AgentBody** | A method marked with this annotation will be called after creation of the agent is complete. At this point, all fields and required services are available and can be used.|
 |**@AgentKilled** | A method marked with this annotation will be called just before the component is removed from the platform.|  
 
+<!-- TODO: keepalive=true, damit agent nach body nicht beendet wird. Agent wird beendet, wenn body ein future returned - nicht bei void. -->
+
 # Advanced Topics
 
 This section discusses some of the more advanced topics regarding components.
