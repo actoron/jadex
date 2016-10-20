@@ -137,6 +137,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	 */
 	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true, inhibits=ExtinguishFire.class), 
 		publish=@Publish(type=IExtinguishFireService.class, method="extinguishFire"))
+//	public static class ExtinguishFire
 	public class ExtinguishFire
 	{
 		/** The disaster. */
@@ -149,6 +150,14 @@ public class FireBrigadeBDI implements IEnvAccess
 		public ExtinguishFire(ISpaceObject disaster)
 		{
 			this.disaster = disaster;
+		}
+		
+		/**
+		 *  Create a new ExtinguishFire. 
+		 */
+		public ExtinguishFire(Object disasterid)
+		{
+			this.disaster = movecapa.getEnvironment().getSpaceObject(disasterid);
 		}
 		
 		/**
@@ -192,6 +201,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	 */
 	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true, inhibits={ExtinguishFire.class, ClearChemicals.class}), 
 		publish=@Publish(type=IClearChemicalsService.class, method="clearChemicals"))
+//	public static class ClearChemicals
 	public class ClearChemicals
 	{
 		/** The disaster. */
@@ -204,6 +214,14 @@ public class FireBrigadeBDI implements IEnvAccess
 		public ClearChemicals(ISpaceObject disaster)
 		{
 			this.disaster = disaster;
+		}
+		
+		/**
+		 *  Create a new ExtinguishFire. 
+		 */
+		public ClearChemicals(Object disasterid)
+		{
+			this.disaster = movecapa.getEnvironment().getSpaceObject(disasterid);
 		}
 		
 		/**
@@ -224,7 +242,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
-				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(ExtinguishFire.class).size()>1;
+				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(ClearChemicals.class).size()>1;
 //			if(ret)
 //				System.out.println("dropping clear chemicals: "+disaster);
 			return ret;

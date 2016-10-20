@@ -529,11 +529,12 @@ def createDistZip(distname, arts, isaddon)
 
 				} else {
 					if (isApp(sp)) {
-						zipfileset dir: spbdir + '/libs', prefix: foldername + '/apps/', includes: '*.jar,*.war', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
+						zipfileset dir: spbdir + '/libs', prefix: foldername + '/apps/', includes: '*.jar,*.war', excludes: '*-sources.jar,*-javadoc.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
 					}
 					else {
-						zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar', excludes: '*-sources.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
-						
+						zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar', excludes: '*-sources.jar,*-javadoc.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
+
+						// copy all runtime deps:
 						def runtimeConfig = sp.configurations.runtime
 						if (distname.contains('android')) {
 							runtimeConfig = sp.configurations.runtimeAndroid
@@ -549,8 +550,7 @@ def createDistZip(distname, arts, isaddon)
 					}
 				}
 				
-				zipfileset dir: spbdir + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
-
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
 				
 				def exdir = new File(sp.projectDir.getCanonicalPath() + File.separator + 'dist/exampleprojects')
 				if (exdir.exists() && exdir.isDirectory()) {

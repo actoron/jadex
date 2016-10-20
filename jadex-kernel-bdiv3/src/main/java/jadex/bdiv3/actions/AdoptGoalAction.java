@@ -88,7 +88,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 			// inject agent in static inner class goals
 			MGoal mgoal = (MGoal)goal.getModelElement();
 			Class<?> gcl = mgoal.getTargetClass(agent.getClassLoader());
-			if(gcl.isMemberClass() && Modifier.isStatic(gcl.getModifiers()))
+			if(gcl!=null && gcl.isMemberClass() && Modifier.isStatic(gcl.getModifiers()))
 			{
 				Field f = gcl.getDeclaredField(IBDIClassGenerator.AGENT_FIELD_NAME);
 				f.set(goal.getPojoElement(), agent);

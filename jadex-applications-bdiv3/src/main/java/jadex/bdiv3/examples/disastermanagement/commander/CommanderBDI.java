@@ -11,7 +11,9 @@ import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.annotation.GoalCreationCondition;
+import jadex.bdiv3.annotation.GoalFinished;
 import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
@@ -27,7 +29,9 @@ import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.HandleDisa
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescueForce;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.TreatVictims;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
@@ -90,6 +94,23 @@ public class CommanderBDI
 					disasters.add(di);
 				}
 			}
+			
+			IBDIAgentFeature bdif = agent.getComponentFeature(IBDIAgentFeature.class);
+			Collection<HandleDisaster> goals = bdif.getGoals(HandleDisaster.class);
+			Set<ISpaceObject> done = new HashSet<ISpaceObject>();
+			if(goals!=null)
+			{
+				for(HandleDisaster goal: goals)
+				{
+					goal.getDisaster().setProperty("active", bdif.getGoal(goal).isActive());
+					done.add(goal.getDisaster());
+				}
+			}
+			for(ISpaceObject disa: disasters)
+			{
+				if(!done.contains(disa))
+					disa.setProperty("active", false);
+			}
 		}
 	}
 	
@@ -98,6 +119,9 @@ public class CommanderBDI
 	{
 		/** The disaster. */
 		protected ISpaceObject disaster;
+		
+		@GoalAPI
+		protected IGoal rgoal;
 
 		/**
 		 *  Create a new HandleDisaster. 
@@ -182,6 +206,16 @@ public class CommanderBDI
 		private CommanderBDI getOuterType()
 		{
 			return CommanderBDI.this;
+		}
+		
+		/**
+		 *  Called when goal is finished.
+		 */
+		@GoalFinished
+		protected void finished()
+		{
+			if(!checkTarget())
+				System.out.println("Goal finished: "+this+" "+rgoal.getException());
 		}
 	}
 

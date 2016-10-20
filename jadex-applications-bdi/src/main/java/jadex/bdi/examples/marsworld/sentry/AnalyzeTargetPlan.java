@@ -56,7 +56,7 @@ public class AnalyzeTargetPlan extends Plan
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			// Fails for one agent, when two agents try to analyze the same target at once.
 		}
 	}

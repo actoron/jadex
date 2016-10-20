@@ -44,10 +44,10 @@ public class MoveToLocationPlan extends Plan
 		ret.get();
 	}
 	
-	public void failed() 
-	{
-		super.failed();
-		System.out.println("failed: "+getException());
-		getException().printStackTrace();
-	}
+//	public void failed() 
+//	{
+//		super.failed();
+//		System.out.println("failed: "+getException());
+//		getException().printStackTrace();
+//	}
 }

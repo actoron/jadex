@@ -34,7 +34,10 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -454,6 +457,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
 //			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+			
 			abortPlans().addResultListener(new IResultListener<Void>()
 			{
 				@Override
@@ -1215,6 +1219,58 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				throw new RuntimeException(e);
 			}
 		}
+	}
+	
+	/**
+	 *  Call the user finished method if available.
+	 */
+	public IFuture<Void> callFinishedMethod()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		Object pojo = getPojoElement();
+		if(pojo!=null)
+		{
+			MGoal mgoal = (MGoal)getModelElement();
+			MethodInfo mi = mgoal.getFinishedMethod(getAgent().getClassLoader());
+			if(mi!=null)
+			{
+				Method m = mi.getMethod(getAgent().getClassLoader());
+				try
+				{
+					m.setAccessible(true);
+					Object res = m.invoke(pojo, new Object[0]);
+					if(res instanceof IFuture)
+					{
+						((IFuture<Object>)res).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								ret.setResult(null);
+							}
+						});
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 //	/**

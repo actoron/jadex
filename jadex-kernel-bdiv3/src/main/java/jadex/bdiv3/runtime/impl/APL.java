@@ -120,6 +120,7 @@ public class APL
 					Method m = mi.getMethod(ia.getClassLoader());
 					try
 					{
+						m.setAccessible(true);
 						candidates = (List<Object>)m.invoke(pojo, new Object[0]);
 						done = true;
 					}

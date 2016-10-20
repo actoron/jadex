@@ -44,7 +44,7 @@ public class MClassBasedElement extends MProcessableElement
 	 */
 	public Class<?> getTargetClass(ClassLoader cl)
 	{
-		if(lastcl!=cl || (targetclass==null && target!=null))
+		if((lastcl!=cl && target != null) || (targetclass==null && target!=null))
 		{
 			lastcl = cl;
 			targetclass = SReflect.findClass0(target, null, cl);

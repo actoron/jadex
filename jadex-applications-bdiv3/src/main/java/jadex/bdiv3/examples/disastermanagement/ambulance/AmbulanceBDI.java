@@ -131,18 +131,29 @@ public class AmbulanceBDI implements IEnvAccess
 	 */
 	@Goal(deliberation=@Deliberation(cardinalityone=true),
 		publish=@Publish(type=ITreatVictimsService.class, method="treatVictims"))
-	public static class TreatVictims
+//	public static class TreatVictims
+	public class TreatVictims
 	{
 		/** The disaster. */
 		protected ISpaceObject disaster;
+//		protected Object disasterid;
 
+//		/**
+//		 *  Create a new TreatVictims. 
+//		 */
+//		public TreatVictims(ISpaceObject disaster)
+//		{
+////			System.out.println("created treat victims");
+//			this.disaster = disaster;
+//		}
+		
 		/**
 		 *  Create a new TreatVictims. 
 		 */
-		public TreatVictims(ISpaceObject disaster)
+		public TreatVictims(Object disasterid)
 		{
-//			System.out.println("created treat victims");
-			this.disaster = disaster;
+//			System.out.println("created treat victims goal: "+disasterid);
+			this.disaster = movecapa.getEnvironment().getSpaceObject(disasterid);
 		}
 
 		/**
@@ -153,7 +164,7 @@ public class AmbulanceBDI implements IEnvAccess
 		{
 			return disaster;
 		}
-
+		
 		/**
 		 *  Drop if this goal is only option and there are others.
 		 */
