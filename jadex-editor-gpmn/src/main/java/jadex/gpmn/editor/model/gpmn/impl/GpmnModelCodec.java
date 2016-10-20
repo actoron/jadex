@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +44,9 @@ public class GpmnModelCodec extends AbstractModelCodec
 {
 	/** The format version */
 	protected String VERSION = "3";
+	
+	/** Enable consistency check */
+	protected static final boolean DEBUG_ENABLE_CONSISTENCY_CHECK = true;
 	
 	/** Carriage return. */
 	private static final String CR = new String(new byte[] { (byte) 13 }, SUtil.UTF8);
@@ -560,6 +564,9 @@ public class GpmnModelCodec extends AbstractModelCodec
 	 */
 	public mxIGraphModel readModel(File file) throws Exception
 	{
+		Set<IElement> vlinkedelems = new HashSet<IElement>();
+		List<IElement> belems = new ArrayList<IElement>();
+		
 		FileInputStream fis = new FileInputStream(file);
 		XMLInputFactory fac = XMLInputFactory.newInstance(); 
 		XMLStreamReader reader = fac.createXMLStreamReader(fis);
@@ -590,6 +597,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	else if ("goal".equals(localname))
 		    	{
 		    		Goal goal = (Goal) model.createNode(IGoal.class);
+		    		belems.add(goal);
 		    		goal.setRetry(false);
 		    		current = goal;
 		    	}
@@ -628,11 +636,13 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	else if ("activationplan".equals(localname))
 		    	{
 		    		ActivationPlan plan = (ActivationPlan) model.createNode(IActivationPlan.class);
+		    		belems.add(plan);
 		    		current = plan;
 		    	}
 		    	else if ("refplan".equals(localname))
 		    	{
 		    		RefPlan plan = (RefPlan) model.createNode(IRefPlan.class);
+		    		belems.add(plan);
 		    		current = plan;
 		    	}
 		    	else if ("activationedge".equals(localname))
@@ -797,6 +807,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    		{
 		    			VGoal vgoal = (VGoal) current;
 		    			Goal goal = goals.get(name);
+		    			vlinkedelems.add(goal);
 		    			vgoal.setValue(goal);
 		    			vgoals.put(name, vgoal);
 		    			graphmodel.beginUpdate();
@@ -874,6 +885,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    			mxPoint pos = (mxPoint) obj[1];
 		    			AbstractPlan plan = plans.get(name);
 		    			VPlan vplan = new VPlan(plan, pos);
+		    			vlinkedelems.add(plan);
 		    			if (obj[2] != null)
 		    			{
 		    				vplan.setVisible(((Boolean) obj[2]).booleanValue());
@@ -987,17 +999,36 @@ public class GpmnModelCodec extends AbstractModelCodec
 			    			target = plans.get(targetname);
 			    		}
 			    		IEdge edge = null;
-			    		edge = model.createEdge(source, target, (Class) obj[0]);
-			    		String name = (String) obj[1];
-			    		edge.setName(name);
-			    		edges.put(name, (AbstractEdge) edge);
-			    		if (edge instanceof ActivationEdge && obj[3] != null)
+			    		if (source != null && target != null)
 			    		{
-			    			((ActivationEdge) edge).setOrder(((Integer) obj[3]).intValue());
+				    		edge = model.createEdge(source, target, (Class) obj[0]);
+				    		String name = (String) obj[1];
+				    		edge.setName(name);
+				    		edges.put(name, (AbstractEdge) edge);
+				    		if (edge instanceof ActivationEdge && obj[3] != null)
+				    		{
+				    			((ActivationEdge) edge).setOrder(((Integer) obj[3]).intValue());
+				    		}
+			    		}
+			    		else
+			    		{
+			    			System.err.println("Dropping unconnected edge with source/target: " + source + " " + target);
 			    		}
 		    		}
 		    	}
 		    }
+		}
+		
+		if (DEBUG_ENABLE_CONSISTENCY_CHECK)
+		{
+			for (IElement elem : belems)
+			{
+				if (!(elem instanceof IEdge) && !vlinkedelems.contains(elem))
+				{
+					System.err.println("Consistency check removed: " + elem);
+					model.removeNode((INode) elem);
+				}
+			}
 		}
 		
 		return graphmodel;
