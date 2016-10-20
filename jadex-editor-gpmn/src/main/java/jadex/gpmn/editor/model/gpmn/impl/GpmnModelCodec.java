@@ -20,6 +20,7 @@ import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxGraph;
 
+import jadex.commons.SUtil;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IEdge;
@@ -541,7 +542,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		printlnIndent(ps, --ind, "</gpmn:gpmn>");
 		ps.close();
 		
-		tmpfile.renameTo(file);
+		SUtil.moveFile(tmpfile, file);
 	}
 	
 	/**

@@ -29,6 +29,7 @@ import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxStylesheet;
 
+import jadex.commons.SUtil;
 import jadex.gpmn.editor.GpmnEditor;
 import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetGrayscale;
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
@@ -391,7 +392,7 @@ public class GpmnMenuBar extends JMenuBar
 						{
 							file = new File(file.getAbsolutePath() + ext);
 						}
-			        	tmpfile.renameTo(file);
+			        	SUtil.moveFile(tmpfile, file);
 					}
 					catch (IOException e1)
 					{

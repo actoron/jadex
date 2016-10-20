@@ -12,6 +12,7 @@ import java.util.Set;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.view.mxGraph;
 
+import jadex.commons.SUtil;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IEdge;
@@ -475,7 +476,7 @@ public class BdiModelCodec extends AbstractModelCodec
 		
 		ps.close();
 		
-		tmpfile.renameTo(file);
+		SUtil.moveFile(tmpfile, file);
 	}
 	
 	/**
