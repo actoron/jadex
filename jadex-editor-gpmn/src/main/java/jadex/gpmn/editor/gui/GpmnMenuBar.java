@@ -362,6 +362,13 @@ public class GpmnMenuBar extends JMenuBar
 							{
 								y = (int) geo.getY();
 							}
+							
+						}
+						
+						for (int i = 0; i < graph.getModel().getChildCount(graph.getDefaultParent()); ++i)
+						{
+							mxICell cell = (mxICell) graph.getModel().getChildAt(graph.getDefaultParent(), i);
+							mxRectangle geo = graph.getCellBounds(cell);
 							if (geo.getX() + geo.getWidth() - x > w)
 							{
 								w = (int) Math.ceil(geo.getX() + geo.getWidth() - x);
