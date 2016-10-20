@@ -22,6 +22,7 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxGraph;
 
 import jadex.commons.SUtil;
+import jadex.gpmn.editor.gui.GuiConstants;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IEdge;
@@ -463,6 +464,10 @@ public class GpmnModelCodec extends AbstractModelCodec
 				ps.print(geo.getX());
 				ps.print("\" y=\"");
 				ps.print(geo.getY());
+				ps.print("\" w=\"");
+				ps.print(geo.getWidth());
+				ps.print("\" h=\"");
+				ps.print(geo.getHeight());
 				ps.println("\">");
 				
 				printIndent(ps, ind, "<gpmn:goalname>");
@@ -486,6 +491,10 @@ public class GpmnModelCodec extends AbstractModelCodec
 				ps.print(geo.getX());
 				ps.print("\" y=\"");
 				ps.print(geo.getY());
+				ps.print("\" w=\"");
+				ps.print(geo.getWidth());
+				ps.print("\" h=\"");
+				ps.print(geo.getHeight());
 				if (!plan.isVisible())
 				{
 					ps.print("\" visible=\"false");
@@ -730,7 +739,10 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	{
 		    		double x = Double.parseDouble(reader.getAttributeValue("", "x"));
 		    		double y = Double.parseDouble(reader.getAttributeValue("", "y"));
+		    		double w = reader.getAttributeValue("", "w")!= null?Double.parseDouble(reader.getAttributeValue("", "w")):GuiConstants.DEFAULT_PLAN_WIDTH;
+		    		double h = reader.getAttributeValue("", "h")!= null?Double.parseDouble(reader.getAttributeValue("", "h")):GuiConstants.DEFAULT_PLAN_HEIGHT;
 		    		VGoal vgoal = new VGoal(null, new mxPoint(x, y));
+		    		vgoal.setGeometry(new mxGeometry(x, y, w, h));
 		    		current = vgoal;
 		    	}
 		    	else if ("vplan".equals(localname))
@@ -739,11 +751,13 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    		obj[0] = "vplan";
 		    		double x = Double.parseDouble(reader.getAttributeValue("", "x"));
 		    		double y = Double.parseDouble(reader.getAttributeValue("", "y"));
-		    		obj[1] = new mxPoint(x, y);
+		    		double w = reader.getAttributeValue("", "w")!= null?Double.parseDouble(reader.getAttributeValue("", "w")):GuiConstants.DEFAULT_PLAN_WIDTH;
+		    		double h = reader.getAttributeValue("", "h")!= null?Double.parseDouble(reader.getAttributeValue("", "h")):GuiConstants.DEFAULT_PLAN_HEIGHT;
+		    		obj[1] = new mxGeometry(x, y, w, h);
 		    		String visiblestr = reader.getAttributeValue("", "visible");
 		    		if (visiblestr != null)
 		    		{
-		    			obj[2] = (Boolean.parseBoolean(visiblestr));
+		    			obj[3] = (Boolean.parseBoolean(visiblestr));
 		    		}
 		    		current = obj;
 		    	}
@@ -882,9 +896,10 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    		else if (current instanceof Object[] && "vplan".equals(((Object[]) current)[0]))
 		    		{
 		    			Object[] obj = (Object[]) current;
-		    			mxPoint pos = (mxPoint) obj[1];
+		    			mxGeometry pos = (mxGeometry) obj[1];
 		    			AbstractPlan plan = plans.get(name);
-		    			VPlan vplan = new VPlan(plan, pos);
+		    			VPlan vplan = new VPlan(plan, pos.getX(), pos.getY());
+		    			vplan.setGeometry(pos);
 		    			vlinkedelems.add(plan);
 		    			if (obj[2] != null)
 		    			{
