@@ -37,11 +37,18 @@ import jadex.gpmn.editor.model.visual.VElement;
 import jadex.gpmn.editor.model.visual.VGoal;
 import jadex.gpmn.editor.model.visual.VPlan;
 import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
+import jadex.xml.stax.XmlUtil;
 
 public class GpmnModelCodec extends AbstractModelCodec
 {
 	/** The format version */
 	protected String VERSION = "3";
+	
+	/** Carriage return. */
+	private static final String CR = new String(new byte[] { (byte) 13 }, SUtil.UTF8);
+	
+	/** Line feed. */
+	private static final String LF = new String(new byte[] { (byte) 10 }, SUtil.UTF8);
 	
 	/**
 	 *  Creates a new model codec.
@@ -120,7 +127,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 			printlnIndent(ps, ind++, "<gpmn:goal>");
 			
 			printIndent(ps, ind, "<gpmn:goalname>");
-			ps.print(goal.getName());
+			ps.print(escapeString(goal.getName()));
 			ps.println("</gpmn:goalname>");
 			
 			if (!ModelConstants.DEFAULT_GOAL_TYPE.equals(goal.getGoalType()))
@@ -274,7 +281,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 			ActivationPlan plan = (ActivationPlan) node;
 			
 			printIndent(ps, ind, "<gpmn:planname>");
-			ps.print(plan.getName());
+			ps.print(escapeString(plan.getName()));
 			ps.println("</gpmn:planname>");
 			
 			if (!ModelConstants.ACTIVATION_MODE_DEFAULT.equals(plan.getMode()))
@@ -779,7 +786,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	}
 		    	else if ("goalname".equals(localname))
 		    	{
-		    		String name = reader.getText();
+		    		String name = XmlUtil.unescapeString(reader.getText());
 		    		if (current instanceof Goal)
 		    		{
 			    		Goal goal = (Goal) current;
@@ -854,7 +861,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	}
 		    	else if ("planname".equals(localname))
 		    	{
-		    		String name = reader.getText();
+		    		String name = XmlUtil.unescapeString(reader.getText());
 		    		if (current instanceof AbstractPlan)
 		    		{
 			    		AbstractPlan plan = (AbstractPlan) current;
@@ -994,5 +1001,26 @@ public class GpmnModelCodec extends AbstractModelCodec
 		}
 		
 		return graphmodel;
+	}
+	
+	/**
+	 *  Escapes strings for xml.
+	 */
+	private static final String escapeString(String string)
+	{
+//		if(string==null)
+//			System.out.println("nullnull");
+		string = string.replace("&", "&amp;");
+		string = string.replace("\"", "&quot;");
+		string = string.replace("'", "&apos;");
+		string = string.replace("<", "&lt;");
+		string = string.replace(">", "&gt;");
+		string = string.replace("\\", "\\\\");
+		string = string.replace(CR + LF, LF);
+		string = string.replace(CR + CR, LF);
+		string = string.replace(CR, LF);
+		string = string.replace(LF, "\\n");
+		string = string.replace("\n", "\\n");
+		return string;
 	}
 }
