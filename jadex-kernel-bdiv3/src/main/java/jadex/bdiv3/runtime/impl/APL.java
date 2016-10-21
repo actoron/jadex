@@ -102,6 +102,7 @@ public class APL
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		// Reset candidates when rebuild
 		if(((MProcessableElement)element.getModelElement()).isRebuild())
 			candidates = null;
 		
@@ -168,22 +169,69 @@ public class APL
 						{
 							candidates.addAll(result);
 						}
+						
+						removeTriedCandidates();
 						ret.setResult(null);
 					}
 				});
 			}
 			else
 			{
+				removeTriedCandidates();
 				ret.setResult(null);
 			}
 		}
 		else
 		{
+//			removeTriedCandidates();
 			ret.setResult(null);
 		}
+		
 		return ret;
 	}
-			
+	
+	/**
+	 *  Remove tried candidates from the actual candidate collection.
+	 */
+	protected void removeTriedCandidates()
+	{
+		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+		ExcludeMode exclude = mpe.getExcludeMode();
+		
+		if(candidates!=null && candidates.size()>0 && !ExcludeMode.Never.equals(exclude) && element.getTriedPlans()!=null)
+		{
+			List<Object> cands = new ArrayList<Object>(candidates);
+			for(Object candidate: cands)
+			{
+				for(IInternalPlan plan: element.getTriedPlans())
+				{
+					if(plan.getCandidate().equals(candidate))
+					{
+						if(isToExclude(plan, exclude))
+						{
+							candidates.remove(candidate);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Check if an rplan is to exclude wrt the exclude mode and plan result state.
+	 *  @param rplan The tried plan.
+	 *  @param exclude
+	 *  @return True, if should be excluded.
+	 */
+	protected boolean isToExclude(IInternalPlan rplan, ExcludeMode exclude)
+	{
+		return exclude.equals(ExcludeMode.WhenTried)
+			|| (rplan.isPassed() && exclude.equals(ExcludeMode.WhenSucceeded))
+			|| (rplan.isFailed() && exclude.equals(ExcludeMode.WhenFailed))
+			|| (rplan.isAborted() && rplan.getException()!=null && exclude.equals(ExcludeMode.WhenFailed));
+	}
+	
 	//-------- helper methods --------
 
 	/**
@@ -674,33 +722,12 @@ public class APL
 		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		ExcludeMode exclude = mpe.getExcludeMode();
 
-		// Do nothing is APL is always rebuilt or exclude is never
-		if(((MProcessableElement)element.getModelElement()).isRebuild()
-			|| MProcessableElement.ExcludeMode.Never.equals(exclude))
-//			|| (rplan.getModelElement() instanceof MGoal && ((MGoal)rplan.getModelElement()).isMetagoal()))
-		{
+		// Do nothing if APL exclude is never
+		if(MProcessableElement.ExcludeMode.Never.equals(exclude))
 			return;
-		}
-
-		if(exclude.equals(MProcessableElement.ExcludeMode.WhenTried))
-		{
+		
+		if(isToExclude(rplan, exclude))
 			candidates.remove(rplan.getCandidate());
-		}
-		else
-		{
-//			PlanLifecycleState state = rplan.getLifecycleState();
-			if((rplan.isPassed() && exclude.equals(MProcessableElement.ExcludeMode.WhenSucceeded))
-				|| (rplan.isFailed() && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed))
-				|| (rplan.isAborted() && rplan.getException()!=null && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed)))
-			{
-//			if(state.equals(RPlan.PlanLifecycleState.PASSED)
-//				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)
-//				|| (state.equals(RPlan.PlanLifecycleState.FAILED) 
-//				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
-//			{
-				candidates.remove(rplan.getCandidate());
-			}
-		}
 	}
 	
 	/** 
@@ -834,7 +861,7 @@ public class APL
 	}
 	
 	/**
-	 * 
+	 *  Plan info that contains the mgoal and the parameter bindings.
 	 */
 	public static class MPlanInfo
 	{
@@ -898,7 +925,9 @@ public class APL
 			this.binding = binding;
 		}
 		
-		@Override
+		/**
+		 *  Get the string representation.
+		 */
 		public String toString()
 		{
 			return "MPlanInfo(plan="+mplan+", binding="+binding+")";
@@ -906,7 +935,7 @@ public class APL
 	}
 	
 	/**
-	 * 
+	 *  Goal info that contains the mgoal and the parameter bindings.
 	 */
 	public static class MGoalInfo
 	{

@@ -1239,7 +1239,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				try
 				{
 					m.setAccessible(true);
-					Object res = m.invoke(pojo, new Object[0]);
+					Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), getModelElement(), null, null, this, getAgent());
+					Object res = m.invoke(pojo, params);
 					if(res instanceof IFuture)
 					{
 						((IFuture<Object>)res).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
