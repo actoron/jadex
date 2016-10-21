@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.cms;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
@@ -121,7 +122,7 @@ public class CreationInfo
 	
 	/**
 	 *  Create a new creation info.
-	 *  @param args	The arguments.
+	 *  @param rid	The RID.
 	 */
 	public CreationInfo(IResourceIdentifier rid)
 	{
@@ -149,7 +150,6 @@ public class CreationInfo
 	
 	/**
 	 *  Create a new creation info.
-	 *  @param nfparent	The parent of the component to be created.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IResourceIdentifier rid)
 	{
@@ -184,8 +184,6 @@ public class CreationInfo
 	 *  @param args	The arguments.
 	 *  @param parent	The parent of the component to be created.
 	 *  @param suspend	The suspend flag.
-	 *  @param master	The master flag.
-	 *  @param imports	The imports.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend)
 	{
@@ -198,7 +196,6 @@ public class CreationInfo
 	 *  @param args	The arguments.
 	 *  @param parent	The parent of the component to be created.
 	 *  @param suspend	The suspend flag.
-	 *  @param master	The master flag.
 	 *  @param imports	The imports.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
@@ -309,6 +306,22 @@ public class CreationInfo
 	public void setArguments(Map<String, Object> args)
 	{
 		this.args = args;
+	}
+
+	/**
+	 *  Add one arguments.
+	 *  Returns the updated CreationInfo for fluent API purposes.
+	 *  @param key The key.
+	 *  @param arg The value.
+     *  @return CreationInfo
+	 */
+	public CreationInfo addArgument(String key, Object arg)
+	{
+		if (this.args == null) {
+			this.args = new HashMap<String, Object>();
+		}
+		this.args.put(key, arg);
+		return this;
 	}
 
 	/**
@@ -475,8 +488,8 @@ public class CreationInfo
 	}
 
 	/**
-	 *  Set the bindings.
-	 *  @param bindings The bindings to set.
+	 *  Set the ProvidedServiceInfos.
+	 *  @param pinfos The ProvidedServiceInfo to set.
 	 */
 	public void setProvidedServiceInfos(ProvidedServiceInfo[] pinfos)
 	{
