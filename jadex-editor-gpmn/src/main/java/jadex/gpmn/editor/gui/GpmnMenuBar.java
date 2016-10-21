@@ -29,6 +29,7 @@ import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxStylesheet;
 
+import jadex.commons.SUtil;
 import jadex.gpmn.editor.GpmnEditor;
 import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetGrayscale;
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
@@ -361,6 +362,13 @@ public class GpmnMenuBar extends JMenuBar
 							{
 								y = (int) geo.getY();
 							}
+							
+						}
+						
+						for (int i = 0; i < graph.getModel().getChildCount(graph.getDefaultParent()); ++i)
+						{
+							mxICell cell = (mxICell) graph.getModel().getChildAt(graph.getDefaultParent(), i);
+							mxRectangle geo = graph.getCellBounds(cell);
 							if (geo.getX() + geo.getWidth() - x > w)
 							{
 								w = (int) Math.ceil(geo.getX() + geo.getWidth() - x);
@@ -391,7 +399,7 @@ public class GpmnMenuBar extends JMenuBar
 						{
 							file = new File(file.getAbsolutePath() + ext);
 						}
-			        	tmpfile.renameTo(file);
+			        	SUtil.moveFile(tmpfile, file);
 					}
 					catch (IOException e1)
 					{

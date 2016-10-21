@@ -550,8 +550,7 @@ def createDistZip(distname, arts, isaddon)
 					}
 				}
 				
-				zipfileset dir: spbdir + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
-
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
 				
 				def exdir = new File(sp.projectDir.getCanonicalPath() + File.separator + 'dist/exampleprojects')
 				if (exdir.exists() && exdir.isDirectory()) {

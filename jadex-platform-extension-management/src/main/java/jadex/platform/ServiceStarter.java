@@ -4,6 +4,7 @@ import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 
@@ -162,8 +163,25 @@ public class ServiceStarter implements Daemon
 	{
 		if(platform==null)
 		{
-			platform = Starter.createPlatform(args).get();
+			// Todo: allow incremental platform configuration in PlatformConfiguration directly?
+			PlatformConfiguration	config	= getConfig();
+			config.getRootConfig().setProgramArguments(args);
+			for(int i=0; args!=null && i<args.length; i+=2)
+			{
+				PlatformConfiguration.parseArg(args[i], args[i+1], config);
+			}
+			
+			platform = Starter.createPlatform(config).get();
 		}		
+	}
+	
+	/**
+	 *  Get the platform configuration.
+	 *  Subclass and override for specific use cases.
+	 */
+	protected PlatformConfiguration	getConfig()
+	{
+		return PlatformConfiguration.getDefaultNoGui();
 	}
 
 	/**

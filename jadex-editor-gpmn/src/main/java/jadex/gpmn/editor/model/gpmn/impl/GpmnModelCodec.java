@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,8 @@ import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxGraph;
 
+import jadex.commons.SUtil;
+import jadex.gpmn.editor.gui.GuiConstants;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IEdge;
@@ -36,11 +39,21 @@ import jadex.gpmn.editor.model.visual.VElement;
 import jadex.gpmn.editor.model.visual.VGoal;
 import jadex.gpmn.editor.model.visual.VPlan;
 import jadex.gpmn.editor.model.visual.VVirtualActivationEdge;
+import jadex.xml.stax.XmlUtil;
 
 public class GpmnModelCodec extends AbstractModelCodec
 {
 	/** The format version */
 	protected String VERSION = "3";
+	
+	/** Enable consistency check */
+	protected static final boolean DEBUG_ENABLE_CONSISTENCY_CHECK = true;
+	
+	/** Carriage return. */
+	private static final String CR = new String(new byte[] { (byte) 13 }, SUtil.UTF8);
+	
+	/** Line feed. */
+	private static final String LF = new String(new byte[] { (byte) 10 }, SUtil.UTF8);
 	
 	/**
 	 *  Creates a new model codec.
@@ -119,7 +132,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 			printlnIndent(ps, ind++, "<gpmn:goal>");
 			
 			printIndent(ps, ind, "<gpmn:goalname>");
-			ps.print(goal.getName());
+			ps.print(escapeString(goal.getName()));
 			ps.println("</gpmn:goalname>");
 			
 			if (!ModelConstants.DEFAULT_GOAL_TYPE.equals(goal.getGoalType()))
@@ -273,7 +286,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 			ActivationPlan plan = (ActivationPlan) node;
 			
 			printIndent(ps, ind, "<gpmn:planname>");
-			ps.print(plan.getName());
+			ps.print(escapeString(plan.getName()));
 			ps.println("</gpmn:planname>");
 			
 			if (!ModelConstants.ACTIVATION_MODE_DEFAULT.equals(plan.getMode()))
@@ -451,6 +464,10 @@ public class GpmnModelCodec extends AbstractModelCodec
 				ps.print(geo.getX());
 				ps.print("\" y=\"");
 				ps.print(geo.getY());
+				ps.print("\" w=\"");
+				ps.print(geo.getWidth());
+				ps.print("\" h=\"");
+				ps.print(geo.getHeight());
 				ps.println("\">");
 				
 				printIndent(ps, ind, "<gpmn:goalname>");
@@ -474,6 +491,10 @@ public class GpmnModelCodec extends AbstractModelCodec
 				ps.print(geo.getX());
 				ps.print("\" y=\"");
 				ps.print(geo.getY());
+				ps.print("\" w=\"");
+				ps.print(geo.getWidth());
+				ps.print("\" h=\"");
+				ps.print(geo.getHeight());
 				if (!plan.isVisible())
 				{
 					ps.print("\" visible=\"false");
@@ -541,7 +562,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		printlnIndent(ps, --ind, "</gpmn:gpmn>");
 		ps.close();
 		
-		tmpfile.renameTo(file);
+		SUtil.moveFile(tmpfile, file);
 	}
 	
 	/**
@@ -552,6 +573,9 @@ public class GpmnModelCodec extends AbstractModelCodec
 	 */
 	public mxIGraphModel readModel(File file) throws Exception
 	{
+		Set<IElement> vlinkedelems = new HashSet<IElement>();
+		List<IElement> belems = new ArrayList<IElement>();
+		
 		FileInputStream fis = new FileInputStream(file);
 		XMLInputFactory fac = XMLInputFactory.newInstance(); 
 		XMLStreamReader reader = fac.createXMLStreamReader(fis);
@@ -582,6 +606,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	else if ("goal".equals(localname))
 		    	{
 		    		Goal goal = (Goal) model.createNode(IGoal.class);
+		    		belems.add(goal);
 		    		goal.setRetry(false);
 		    		current = goal;
 		    	}
@@ -620,11 +645,13 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	else if ("activationplan".equals(localname))
 		    	{
 		    		ActivationPlan plan = (ActivationPlan) model.createNode(IActivationPlan.class);
+		    		belems.add(plan);
 		    		current = plan;
 		    	}
 		    	else if ("refplan".equals(localname))
 		    	{
 		    		RefPlan plan = (RefPlan) model.createNode(IRefPlan.class);
+		    		belems.add(plan);
 		    		current = plan;
 		    	}
 		    	else if ("activationedge".equals(localname))
@@ -712,7 +739,10 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	{
 		    		double x = Double.parseDouble(reader.getAttributeValue("", "x"));
 		    		double y = Double.parseDouble(reader.getAttributeValue("", "y"));
+		    		double w = reader.getAttributeValue("", "w")!= null?Double.parseDouble(reader.getAttributeValue("", "w")):GuiConstants.DEFAULT_PLAN_WIDTH;
+		    		double h = reader.getAttributeValue("", "h")!= null?Double.parseDouble(reader.getAttributeValue("", "h")):GuiConstants.DEFAULT_PLAN_HEIGHT;
 		    		VGoal vgoal = new VGoal(null, new mxPoint(x, y));
+		    		vgoal.setGeometry(new mxGeometry(x, y, w, h));
 		    		current = vgoal;
 		    	}
 		    	else if ("vplan".equals(localname))
@@ -721,11 +751,13 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    		obj[0] = "vplan";
 		    		double x = Double.parseDouble(reader.getAttributeValue("", "x"));
 		    		double y = Double.parseDouble(reader.getAttributeValue("", "y"));
-		    		obj[1] = new mxPoint(x, y);
+		    		double w = reader.getAttributeValue("", "w")!= null?Double.parseDouble(reader.getAttributeValue("", "w")):GuiConstants.DEFAULT_PLAN_WIDTH;
+		    		double h = reader.getAttributeValue("", "h")!= null?Double.parseDouble(reader.getAttributeValue("", "h")):GuiConstants.DEFAULT_PLAN_HEIGHT;
+		    		obj[1] = new mxGeometry(x, y, w, h);
 		    		String visiblestr = reader.getAttributeValue("", "visible");
 		    		if (visiblestr != null)
 		    		{
-		    			obj[2] = (Boolean.parseBoolean(visiblestr));
+		    			obj[3] = (Boolean.parseBoolean(visiblestr));
 		    		}
 		    		current = obj;
 		    	}
@@ -778,7 +810,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	}
 		    	else if ("goalname".equals(localname))
 		    	{
-		    		String name = reader.getText();
+		    		String name = XmlUtil.unescapeString(reader.getText());
 		    		if (current instanceof Goal)
 		    		{
 			    		Goal goal = (Goal) current;
@@ -789,6 +821,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    		{
 		    			VGoal vgoal = (VGoal) current;
 		    			Goal goal = goals.get(name);
+		    			vlinkedelems.add(goal);
 		    			vgoal.setValue(goal);
 		    			vgoals.put(name, vgoal);
 		    			graphmodel.beginUpdate();
@@ -853,7 +886,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	}
 		    	else if ("planname".equals(localname))
 		    	{
-		    		String name = reader.getText();
+		    		String name = XmlUtil.unescapeString(reader.getText());
 		    		if (current instanceof AbstractPlan)
 		    		{
 			    		AbstractPlan plan = (AbstractPlan) current;
@@ -863,9 +896,11 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    		else if (current instanceof Object[] && "vplan".equals(((Object[]) current)[0]))
 		    		{
 		    			Object[] obj = (Object[]) current;
-		    			mxPoint pos = (mxPoint) obj[1];
+		    			mxGeometry pos = (mxGeometry) obj[1];
 		    			AbstractPlan plan = plans.get(name);
-		    			VPlan vplan = new VPlan(plan, pos);
+		    			VPlan vplan = new VPlan(plan, pos.getX(), pos.getY());
+		    			vplan.setGeometry(pos);
+		    			vlinkedelems.add(plan);
 		    			if (obj[2] != null)
 		    			{
 		    				vplan.setVisible(((Boolean) obj[2]).booleanValue());
@@ -979,19 +1014,59 @@ public class GpmnModelCodec extends AbstractModelCodec
 			    			target = plans.get(targetname);
 			    		}
 			    		IEdge edge = null;
-			    		edge = model.createEdge(source, target, (Class) obj[0]);
-			    		String name = (String) obj[1];
-			    		edge.setName(name);
-			    		edges.put(name, (AbstractEdge) edge);
-			    		if (edge instanceof ActivationEdge && obj[3] != null)
+			    		if (source != null && target != null)
 			    		{
-			    			((ActivationEdge) edge).setOrder(((Integer) obj[3]).intValue());
+				    		edge = model.createEdge(source, target, (Class) obj[0]);
+				    		String name = (String) obj[1];
+				    		edge.setName(name);
+				    		edges.put(name, (AbstractEdge) edge);
+				    		if (edge instanceof ActivationEdge && obj[3] != null)
+				    		{
+				    			((ActivationEdge) edge).setOrder(((Integer) obj[3]).intValue());
+				    		}
+			    		}
+			    		else
+			    		{
+			    			System.err.println("Dropping unconnected edge with source/target: " + source + " " + target);
 			    		}
 		    		}
 		    	}
 		    }
 		}
 		
+		if (DEBUG_ENABLE_CONSISTENCY_CHECK)
+		{
+			for (IElement elem : belems)
+			{
+				if (!(elem instanceof IEdge) && !vlinkedelems.contains(elem))
+				{
+					System.err.println("Consistency check removed: " + elem);
+					model.removeNode((INode) elem);
+				}
+			}
+		}
+		
 		return graphmodel;
+	}
+	
+	/**
+	 *  Escapes strings for xml.
+	 */
+	private static final String escapeString(String string)
+	{
+//		if(string==null)
+//			System.out.println("nullnull");
+		string = string.replace("&", "&amp;");
+		string = string.replace("\"", "&quot;");
+		string = string.replace("'", "&apos;");
+		string = string.replace("<", "&lt;");
+		string = string.replace(">", "&gt;");
+		string = string.replace("\\", "\\\\");
+		string = string.replace(CR + LF, LF);
+		string = string.replace(CR + CR, LF);
+		string = string.replace(CR, LF);
+		string = string.replace(LF, "\\n");
+		string = string.replace("\n", "\\n");
+		return string;
 	}
 }

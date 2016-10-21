@@ -550,7 +550,7 @@ public class RootComponentConfiguration
 	 * 
 	 * @param args
 	 */
-	protected void setProgramArguments(String[] args)
+	public void setProgramArguments(String[] args)
 	{
 		setValue(PROGRAM_ARGUMENTS, args);
 	}
