@@ -6,6 +6,7 @@ import java.util.List;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalFinished;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.GoalTargetCondition;
@@ -13,6 +14,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -60,7 +62,7 @@ public class GoalGoalBDI
 		@GoalResult
 		protected void resultReceived(Double res)
 		{
-//			System.out.println("rec: "+res);
+			System.out.println("rec: "+res);
 			results.add(res);
 		}
 		
@@ -96,6 +98,12 @@ public class GoalGoalBDI
 //		{
 //			parent.inc();
 //		}
+		
+		@GoalFinished
+		public void fini(IGoal goal)
+		{
+			System.out.println("goal: "+goal);
+		}
 	}
 	
 	@Plan(trigger=@Trigger(goals=TestGoal2.class))

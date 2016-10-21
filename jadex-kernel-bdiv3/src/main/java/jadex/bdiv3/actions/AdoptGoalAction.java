@@ -7,6 +7,7 @@ import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.annotation.GoalParent;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
@@ -88,10 +89,19 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 			// inject agent in static inner class goals
 			MGoal mgoal = (MGoal)goal.getModelElement();
 			Class<?> gcl = mgoal.getTargetClass(agent.getClassLoader());
-			if(gcl!=null && gcl.isMemberClass() && Modifier.isStatic(gcl.getModifiers()))
+			if(gcl!=null)// && gcl.isMemberClass() && Modifier.isStatic(gcl.getModifiers()))
 			{
-				Field f = gcl.getDeclaredField(IBDIClassGenerator.AGENT_FIELD_NAME);
-				f.set(goal.getPojoElement(), agent);
+				try
+				{
+					Field f = gcl.getDeclaredField(IBDIClassGenerator.AGENT_FIELD_NAME);
+					f.set(goal.getPojoElement(), agent);
+					// Perform init writes means that the events of constructor parameter changes are thrown
+					BDIAgentFeature.performInitWrites(agent, goal.getPojoElement());
+				}
+				catch(Exception e)
+				{
+					// nop
+				}
 			}
 			
 			// inject goal elements

@@ -85,14 +85,14 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	 */
 	public List<Class<?>> generateBDIClass(String clname, BDIModel model, ClassLoader dummycl) throws JadexBDIGenerationException 
 	{
-		return generateBDIClass(clname, model, dummycl, new HashMap<String, ClassNode>(), false);
+		return generateBDIClass(clname, model, dummycl, new HashMap<String, ClassNode>());
 	}
 	
 	/**
 	 *  Generate class.
 	 */
 	public List<Class<?>> generateBDIClass(final String clname, final BDIModel model, 
-		ClassLoader dummycl, final Map<String, ClassNode> done, final boolean isstatic) throws JadexBDIGenerationException 
+		ClassLoader dummycl, final Map<String, ClassNode> done) throws JadexBDIGenerationException //final boolean isstatic
 	{
 		List<Class<?>> ret = new ArrayList<Class<?>>();
 		final ClassLoader cl = ((DummyClassLoader)dummycl).getOriginal();
@@ -100,7 +100,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		System.out.println("Generating with cl: "+cl+" "+clname);
 		
 		final List<String> todo = new ArrayList<String>();
-		final Set<String> statics = new HashSet<String>();
+//		final Set<String> statics = new HashSet<String>();
 		
 		try
 		{
@@ -121,7 +121,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			{
 				boolean isagentorcapa = false;
 				boolean isgoal = false;
-//				boolean staticc = false;
+//				boolean iamstaticc = false;
 //				boolean isplan = false;
 //				Set<String> fields = new HashSet<String>();
 				
@@ -147,7 +147,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //						access = ~Opcodes.ACC_ABSTRACT & access;
 						access = access-Opcodes.ACC_ABSTRACT;
 					}
-//					staticc = (access&Opcodes.ACC_STATIC)!=0;
+//					iamstaticc = (access&Opcodes.ACC_STATIC)!=0;
 					super.visit(version, access, name, null, superName, interfaces);
 				}
 				
@@ -175,8 +175,58 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //			    			isplan = true;
 //			    		}
 			    	}
-			    	return super.visitAnnotation(desc, visible);
+//			    	return super.visitAnnotation(desc, visible);
+			    
+//			    	System.out.println("visA: "+desc);
+//			    	
+			    	return new AnnotationVisitor(api, super.visitAnnotation(desc, visible))
+					{
+			    		public AnnotationVisitor visitAnnotation(String name, String desc)
+			    		{
+//			    			System.out.println("visit: "+name+" "+desc);
+			    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? this: new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+							{
+			    				public void visit(String name, Object value)
+			    				{
+//			    					if("clazz".equals(name))
+//			    					{
+//			    						String cln = ((Type)value).getClassName();
+//			    						
+//			    						if(!done.containsKey(cln))
+//			    							todo.add(cln);
+//			    					}
+			    					super.visit(name, value);
+			    				}
+							};
+			    		}
+			    		
+			    		public AnnotationVisitor visitArray(String name)
+			    		{
+			    			return new AnnotationVisitor(api, super.visitArray(iclname))
+							{
+			    				public AnnotationVisitor visitAnnotation(String name, String desc)
+					    		{
+//					    			System.out.println("visit: "+name+" "+desc);
+					    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? this: new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+									{
+					    				public void visit(String name, Object value)
+					    				{
+					    					if("clazz".equals(name))
+					    					{
+					    						String cln = ((Type)value).getClassName();
+					    						
+					    						if(!done.containsKey(cln))
+					    							todo.add(cln);
+					    					}
+					    					super.visit(name, value);
+					    				}
+									};
+					    		}
+							};
+			    		}
+					};
 			    }
+			    
 
 			    public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
 				{
@@ -288,8 +338,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				{
 					String icln = name.replace("/", ".");
 					
-					if((access&Opcodes.ACC_STATIC)!=0)
-						statics.add(icln);
+//					if((access&Opcodes.ACC_STATIC)!=0)
+//						statics.add(icln);
 					
 					// Exclude non-relevant inner classes (that do not belong to the application code)
 					if(iclname!=null && (outerName!=null && iclname.startsWith(outerName)) 
@@ -308,7 +358,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public void visitEnd()
 				{
-					if(isagentorcapa || (isgoal && isstatic))
+					if(isagentorcapa || (isgoal))// && (isstatic || iamstaticc)))
 						visitField(Opcodes.ACC_PUBLIC, AGENT_FIELD_NAME, Type.getDescriptor(IInternalAccess.class), null, null);
 					visitField(Opcodes.ACC_PUBLIC, GLOBALNAME_FIELD_NAME, Type.getDescriptor(String.class), null, null);
 					super.visitEnd();
@@ -393,7 +443,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			for(String icl: todo)
 			{
-				List<Class<?>> classes = generateBDIClass(icl, model, dummycl, done, statics.contains(icl));
+				List<Class<?>> classes = generateBDIClass(icl, model, dummycl, done);//, statics.contains(icl));
 				ret.addAll(classes);
 			}
 		}
