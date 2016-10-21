@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -233,8 +232,14 @@ public class StandaloneRelay
 							pw.flush();
 							client.close();
 						}
-						else if(get && "/ping".equals(path))
+						else if(get && path.startsWith("/ping"))
 						{
+							if(get && path.startsWith("/ping?id="))
+							{
+								String	id	= URLDecoder.decode(path.substring(path.indexOf('=')+1), "UTF-8");
+								handler.handlePing(id);
+							}
+							
 							PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
 							pw.print("HTTP/1.0 200 OK\r\n");
 							pw.println("\r\n");
