@@ -190,6 +190,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			public void customResultAvailable(TransportAddressBook addresses)
 			{
 				AwarenessManagementAgent.this.addresses = addresses;
+				AwarenessManagementAgent.this.root	= addresses.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
 				
 				IFuture<ISettingsService>	setfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("settings");
 				setfut.addResultListener(new IResultListener<ISettingsService>()
@@ -302,15 +303,6 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		final Future<Void> ret = new Future<Void>();
 		
 		startRemoveBehaviour();
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Void>(ret)
-		{
-			public void customResultAvailable(ITransportComponentIdentifier tcid)
-			{
-				root = tcid;
-//				ret.setResult(null);
-			}
-		});
 		
 		return ret;
 	}

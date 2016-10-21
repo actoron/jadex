@@ -258,6 +258,23 @@ public class HttpReceiver
 	}
 
 	/**
+	 *  Send a reply to a ping.
+	 */
+	protected void	sendPingReply()
+	{
+		if(shutdown)
+			return;
+		try
+		{
+			transport.getConnectionManager().ping(address, transport.component.getComponentIdentifier());
+		}
+		catch(IOException e)
+		{
+			log(Level.WARNING, "Could not ping to "+address+": "+e);
+		}
+	}
+
+	/**
 	 *  Get the current addresses (if any).
 	 */
 	public synchronized String[]	getAddresses()
@@ -493,7 +510,8 @@ public class HttpReceiver
 										}
 										else if(b==SRelay.MSGTYPE_PING)
 										{
-			//								System.out.println("Received ping");
+//											System.out.println("Received ping");
+											sendPingReply();
 										}
 										else if(b==SRelay.MSGTYPE_AWAINFO)
 										{

@@ -34,6 +34,15 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	 */
 	public void	ping(final String address)	throws IOException
 	{
+		ping(address, null);
+	}
+	
+	/**
+	 *  Ping a relay server.
+	 *  @throws IOException on connection failures
+	 */
+	public void	ping(final String address, final IComponentIdentifier sender)	throws IOException
+	{
 		// sun.net.www HttpUrlConnection hangs on openConnection without any means to abort :-(
 		// Use extra thread to not hold up platform shutdown due to not-responding relay.
 		
@@ -49,7 +58,7 @@ public class RelayConnectionManager	extends HttpConnectionManager
 			{
 				try
 				{
-					doPing(address);
+					doPing(address, sender);
 					ret.setResultIfUndone(null);
 				}
 				catch(Exception e)
@@ -67,7 +76,7 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	 *  Ping a relay server.
 	 *  @throws IOException on connection failures
 	 */
-	protected void	doPing(String address)	throws IOException
+	protected void	doPing(String address, IComponentIdentifier sender)	throws IOException
 	{
 		address	= httpAddress(address);
 		
@@ -84,7 +93,7 @@ public class RelayConnectionManager	extends HttpConnectionManager
 		HttpURLConnection	con	= null;
 		try
 		{
-			con	= openConnection(address + "ping");
+			con	= openConnection(address + (sender==null ? "ping" : "ping?id="+URLEncoder.encode(sender.getRoot().getName(), "UTF-8")));
 			con.connect();
 			int	code	= con.getResponseCode();
 			while(con.getInputStream().read(RESPONSE_BUF)!=-1)
@@ -249,7 +258,9 @@ public class RelayConnectionManager	extends HttpConnectionManager
 				+(ownaddress!=null ? "?peerurl="+URLEncoder.encode(ownaddress, "UTF-8")+"&initial="+initial+"&peerid="+ownid+"&peerstate="+dbstate : ""));
 			if(con.getContentType()!=null && con.getContentType().startsWith("text/plain"))
 			{
-				ret	= new Scanner(con.getInputStream(), "UTF-8").useDelimiter("\\A").next();
+				Scanner	s	= new Scanner(con.getInputStream(), "UTF-8");
+				ret	= s.useDelimiter("\\A").next();
+				s.close();
 			}
 			else
 			{

@@ -223,7 +223,7 @@ public class RelayHandler
 		else
 		{
 			// Throws exception, if reconnect not allowed (e.g. from different IP).
-			info.reconnect(hostip, hostname);
+			info.reconnect(hostip, hostname, protocol, statsdb);
 		}
 		
 		if(statsdb!=null)
@@ -235,6 +235,7 @@ public class RelayHandler
 		if(queue!=null)
 		{
 			// Close old queue to free old servlet request
+			getLogger().info("Closing old queue due to reconnect of: "+id);
 			List<Message>	items	= queue.setClosed(true);
 			queue	= 	new ArrayBlockingQueue<Message>();
 			// Add outstanding requests to new queue.
@@ -279,7 +280,10 @@ public class RelayHandler
 				try
 				{
 					// Get next request from queue.
-					Message	msg	= queue.dequeue(SRelay.PING_DELAY);	// Todo: make ping delay configurable on per client basis
+					long	timeout	= (long)(SRelay.PING_DELAY*0.85);
+					getLogger().info("Waiting for message for: "+info.getId()+", timeout="+timeout);
+					Message	msg	= queue.dequeue(timeout);	// Todo: make ping delay configurable on per client basis
+					info.updateLastActiveTime();
 //					System.out.println("sending data to:"+id);
 					try
 					{
@@ -308,6 +312,12 @@ public class RelayHandler
 				}
 				catch(TimeoutException te)
 				{
+					getLogger().info("Activity timeout. Requesting ping from: "+info.getId()+", timeout="+info.testPlatformTimeout(SRelay.PING_DELAY));
+					if(info.testPlatformTimeout(SRelay.PING_DELAY))
+					{
+						throw new TimeoutException("No platform activity in the last "+SRelay.PING_DELAY+" ms.");
+					}
+					
 					// Send ping and continue loop.
 //					System.out.println("pinging: "+id);
 					out.write(SRelay.MSGTYPE_PING);
@@ -324,6 +334,7 @@ public class RelayHandler
 		
 		if(!queue.isClosed())
 		{
+			getLogger().info("Closing queue due disconnect of: "+id);
 			List<Message>	items	= queue.setClosed(true);
 			map.remove(id);
 			PlatformInfo	platform	= platforms.remove(id);
@@ -412,6 +423,7 @@ public class RelayHandler
 		boolean	initial	= platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(info.getState());
 		if(platform!=null)
 		{
+			platform.updateLastActiveTime();
 			platform.setAwarenessInfo(info);
 			platform.setPreferredCodecs(pcodecs);
 			
@@ -471,6 +483,7 @@ public class RelayHandler
 			IBlockingQueue<Message>	queue	= map.get(id);
 			if(queue!=null)
 			{
+				getLogger().info("Closing queue due offline notification of: "+id);
 				List<Message>	items	= queue.setClosed(true);
 				map.remove(id);
 				for(int i=0; i<items.size(); i++)
@@ -506,6 +519,19 @@ public class RelayHandler
 		{
 			sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false, false);
 		}			
+	}
+	
+	/**
+	 *  Called when a ping is received from a specific sender.
+	 */
+	public void handlePing(String id)
+	{
+		PlatformInfo	pi	= platforms.get(id);
+		if(pi!=null)
+		{
+			pi.updateLastActiveTime();
+			RelayHandler.getLogger().info("Received ping from platform: "+id);
+		}
 	}
 	
 	/**
