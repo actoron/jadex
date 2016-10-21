@@ -59,6 +59,9 @@ public class APL
 	/** The list of candidates. */
 	protected List<Object> candidates;
 	
+	/** The list of candidates. */
+	protected Set<Object> triedcandidates;
+	
 	/** The metagoal. */
 //	protected Object apl_has_metagoal;
 	
@@ -674,33 +677,47 @@ public class APL
 		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		ExcludeMode exclude = mpe.getExcludeMode();
 
-		// Do nothing is APL is always rebuilt or exclude is never
-		if(((MProcessableElement)element.getModelElement()).isRebuild()
-			|| MProcessableElement.ExcludeMode.Never.equals(exclude))
-//			|| (rplan.getModelElement() instanceof MGoal && ((MGoal)rplan.getModelElement()).isMetagoal()))
-		{
+		// Do nothing if APL exclude is never
+		if(MProcessableElement.ExcludeMode.Never.equals(exclude))
 			return;
-		}
-
-		if(exclude.equals(MProcessableElement.ExcludeMode.WhenTried))
+		
+		if(((MProcessableElement)element.getModelElement()).isRebuild())
 		{
-			candidates.remove(rplan.getCandidate());
+			// Must be done after new rebuild
+			addTriedCandidate(rplan.getCandidate());
 		}
 		else
 		{
-//			PlanLifecycleState state = rplan.getLifecycleState();
-			if((rplan.isPassed() && exclude.equals(MProcessableElement.ExcludeMode.WhenSucceeded))
-				|| (rplan.isFailed() && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed))
-				|| (rplan.isAborted() && rplan.getException()!=null && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed)))
+			if(exclude.equals(MProcessableElement.ExcludeMode.WhenTried))
 			{
-//			if(state.equals(RPlan.PlanLifecycleState.PASSED)
-//				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)
-//				|| (state.equals(RPlan.PlanLifecycleState.FAILED) 
-//				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
-//			{
 				candidates.remove(rplan.getCandidate());
 			}
+			else
+			{
+	//			PlanLifecycleState state = rplan.getLifecycleState();
+				if((rplan.isPassed() && exclude.equals(MProcessableElement.ExcludeMode.WhenSucceeded))
+					|| (rplan.isFailed() && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed))
+					|| (rplan.isAborted() && rplan.getException()!=null && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed)))
+				{
+	//			if(state.equals(RPlan.PlanLifecycleState.PASSED)
+	//				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)
+	//				|| (state.equals(RPlan.PlanLifecycleState.FAILED) 
+	//				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
+	//			{
+					candidates.remove(rplan.getCandidate());
+				}
+			}
 		}
+	}
+	
+	/**
+	 *  Add a tried candidate. 
+	 */
+	protected void addTriedCandidate(Object candidate)
+	{
+		if(triedcandidates==null)
+			triedcandidates = new HashSet<Object>();
+		triedcandidates.add(candidate);
 	}
 	
 	/** 
@@ -834,7 +851,7 @@ public class APL
 	}
 	
 	/**
-	 * 
+	 *  Plan info that contains the mgoal and the parameter bindings.
 	 */
 	public static class MPlanInfo
 	{
@@ -898,7 +915,9 @@ public class APL
 			this.binding = binding;
 		}
 		
-		@Override
+		/**
+		 *  Get the string representation.
+		 */
 		public String toString()
 		{
 			return "MPlanInfo(plan="+mplan+", binding="+binding+")";
@@ -906,7 +925,7 @@ public class APL
 	}
 	
 	/**
-	 * 
+	 *  Goal info that contains the mgoal and the parameter bindings.
 	 */
 	public static class MGoalInfo
 	{

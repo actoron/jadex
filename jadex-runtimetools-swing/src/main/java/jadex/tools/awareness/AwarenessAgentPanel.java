@@ -194,7 +194,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 		final JLabel	map	= new JLabel("No map available.", JLabel.CENTER);
 		this.panel	= new JTabbedPane();
 		panel.add(mainpanel, "Main");
-		panel.add(map, "Map");
+		
+		// Commented out as long as it is broken
+//		panel.add(map, "Map");
 		
 		map.addComponentListener(new ComponentAdapter()
 		{
