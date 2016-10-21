@@ -216,7 +216,9 @@ public class Starter
 	 *  Create the platform.
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
+	 *  @deprecated since 3.0.7. Use other createPlatform methods instead.
 	 */
+	@Deprecated
 	public static IFuture<IExternalAccess> createPlatform(Map<String, String> args)
 	{
 		PlatformConfiguration config = PlatformConfiguration.processArgs(args);
