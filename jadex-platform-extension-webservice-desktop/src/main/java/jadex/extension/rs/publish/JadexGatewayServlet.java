@@ -61,7 +61,7 @@ public class JadexGatewayServlet extends HttpServlet
 //		for(String cname=pnames.nextElement(); pnames.hasMoreElements(); cname=pnames.nextElement())
 		while(pnames.hasMoreElements())
 		{
-			String cname= pnames.nextElement();
+			String cname = pnames.nextElement();
 			if(cname.startsWith("component"))
 			{
 				int cnt = SUtil.countOccurrences(cname, '_');

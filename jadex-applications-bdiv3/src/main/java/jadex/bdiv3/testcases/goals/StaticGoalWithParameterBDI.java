@@ -26,9 +26,6 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 /**
- * 
- */
-/**
  *  Agent that tests rebuild in connection with ExcludeMode.WhenTried.
  */
 @Agent

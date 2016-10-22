@@ -22,11 +22,14 @@ import jadex.commons.future.IFuture;
 
 /**
  *  Rest publish service that works with an external web server.
+ *  
+ *  In case of an external web server the host:port/context part of requests
+ *  are determined by the server.
  */
 @Service
 public class ExternalRestPublishService extends AbstractRestPublishService implements IRequestHandlerService
 {
-	/** The servers per service id. */
+	/** The servers per service id (for unpublishing). */
 	protected Map<IServiceIdentifier, Tuple2<PathHandler, URI>> sidservers;
 	
 	/** The servers per port. */
@@ -71,6 +74,11 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		if(portservers!=null)
 		{
 			PathHandler ph = portservers.get(Integer.valueOf(request.getLocalPort()));
+
+			// If tolerant mode (todo) use default server (one might not know the hostname port before deployment)
+			if(ph==null)
+				ph = portservers.get(0);
+			
 			if(ph!=null)
 			{
 				try
@@ -146,8 +154,18 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	{
 	    try
 	    {
-	        final URI uri = new URI(info.getPublishId());
+	    	// If tolerant url notation cut off first part till real publish part
+	    	URI uri = new URI(info.getPublishId().replace("[", "").replace("]", ""));
+	    	
+	    	String pid = info.getPublishId();
+	    	if(pid.startsWith("["))
+	    	{
+	    		pid = pid.substring(pid.indexOf("]")+1);
+	    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+	    	}
+	       
 	        System.out.println("Adding http handler to server: "+uri.getPath());
+	        
 	        PathHandler ph = (PathHandler)getHttpServer(uri, info);
 	        
 	        final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
@@ -267,6 +285,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	}
 	
 	/**
+	 *  Produce overview site of published services.
 	 */
 	public String getServicesInfo(HttpServletRequest request, PathHandler ph)
 	{

@@ -44,11 +44,18 @@ public class PathHandler implements IRequestHandler
 		String host = request.getHeader("host");
 		int	idx	= host.indexOf(":");
 		if(idx!=-1)
-			host	= host.substring(0, idx);
+			host = host.substring(0, idx);
+		
+		String pathcp = null; 
+		String ctx = request.getContextPath();
+		if(ctx!=null && ctx.length()>0)
+			pathcp = path.replaceFirst(ctx, "/DEFAULTAPP");
 		
 		Tuple2<String, IRequestHandler> tup = subhandlercache.get(new Tuple2<String, String>(host, path));
-		if(tup == null)
+		if(tup==null)
 			tup = subhandlercache.get(new Tuple2<String, String>(null, path));
+		if(tup==null && pathcp!=null)
+			tup = subhandlercache.get(new Tuple2<String, String>(null, pathcp));
 		
 		int pidx = path.lastIndexOf('/');
 		if(tup == null && pidx > 0 && pidx <= path.length() - 1)
@@ -57,21 +64,26 @@ public class PathHandler implements IRequestHandler
 			tup = subhandlercache.get(new Tuple2<String, String>(host, cpath));
 		}
 		
-		if(tup == null)
+		if(tup==null)
 		{
 			tup = findSubhandler(host, path);
-			if(tup == null)
-			{
+			if(tup==null)
 				tup = findSubhandler(null, path);
-			}
 			
-			if(tup != null)
-			{
+			if(tup!=null)
 				subhandlercache.put(new Tuple2<String, String>(host, path), tup);
-			}
 		}
 		
-		if(tup == null)
+		if(tup==null)
+		{
+			if(pathcp!=null)
+				tup = findSubhandler(null, pathcp);
+			
+			if(tup!=null)
+				subhandlercache.put(new Tuple2<String, String>(host, pathcp), tup);
+		}
+		
+		if(tup==null)
 			throw new RuntimeException("No handler found for path: " + path);
 		
 //		Method setcontextpath = request.getClass().getDeclaredMethod("setContextPath", new Class<?>[]{String.class});
