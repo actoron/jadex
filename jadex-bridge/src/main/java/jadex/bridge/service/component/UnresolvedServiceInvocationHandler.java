@@ -12,6 +12,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.SResultListener;
 
 /**
  *  Lazy service proxy that resolves a service via a search command.
@@ -109,13 +110,7 @@ public class UnresolvedServiceInvocationHandler implements InvocationHandler
 				try
 				{
 					IFuture resfut = (IFuture)invoke(proxy, method, args);
-					resfut.addResultListener(new DelegationResultListener(fut)
-					{
-						public void customResultAvailable(Object result)
-						{
-							super.customResultAvailable(result);
-						}
-					});
+					SResultListener.delegateFromTo(resfut, fut);
 				}
 				catch(Throwable t)
 				{

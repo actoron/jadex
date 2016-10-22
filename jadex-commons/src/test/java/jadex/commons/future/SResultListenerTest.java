@@ -104,6 +104,24 @@ public class SResultListenerTest {
         assertEquals("myRes", successTarget.get());
     }
 
+    // delegate with IntermediateFuts
+
+    @Test
+    public void delegateWithIntermediateFutures() {
+        IntermediateFuture<String> iFut = new IntermediateFuture<String>();
+        IntermediateFuture<String> delegationTarget = new IntermediateFuture<String>();
+
+        SResultListener.delegateFromTo(iFut, delegationTarget);
+
+        iFut.addIntermediateResultListener(new IntermediateDelegationResultListener<String>(delegationTarget));
+        iFut.addIntermediateResult("test1");
+
+        String nextRes = delegationTarget.getNextIntermediateResult();
+
+        assertEquals("test1", nextRes);
+    }
+
+
 
     // counter:
 
