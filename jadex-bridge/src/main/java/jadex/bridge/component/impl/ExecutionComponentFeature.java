@@ -925,8 +925,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public boolean execute()
 	{
-		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getComponent()));
-		
 		synchronized(this)
 		{
 			if(executing)
@@ -1472,6 +1470,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		IInternalExecutionFeature.LOCAL.set(getComponent());
 		ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(component.getClassLoader());
+		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getComponent()));
 		return cl;
 	}
 	
