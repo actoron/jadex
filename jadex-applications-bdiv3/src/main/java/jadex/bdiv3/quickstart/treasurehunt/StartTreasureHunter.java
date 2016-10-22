@@ -14,7 +14,8 @@ public class StartTreasureHunter
 	public static void main(String[] args)
 	{
 		PlatformConfiguration	config	= PlatformConfiguration.getDefault();
-		config.addComponent("jadex.bdiv3.quickstart.treasurehunt.TreasureHunterA1BDI.class");
+//		config.getRootConfig().setLogging(true);
+		config.addComponent("jadex.bdiv3.quickstart.treasurehunt.TreasureHunterB1BDI.class");
 		Starter.createPlatform(config).get();
 	}
 }

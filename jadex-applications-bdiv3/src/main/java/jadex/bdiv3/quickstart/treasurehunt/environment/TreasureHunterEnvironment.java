@@ -2,6 +2,9 @@ package jadex.bdiv3.quickstart.treasurehunt.environment;
 
 import java.awt.BorderLayout;
 import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.Closeable;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
@@ -9,10 +12,14 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
+
 /**
  *  The treasure hunter world representation.
  */
-public class TreasureHunterEnvironment
+public class TreasureHunterEnvironment	implements Closeable
 {
 	//-------- attributes --------
 	
@@ -62,6 +69,61 @@ public class TreasureHunterEnvironment
 				window.getContentPane().add(BorderLayout.CENTER, new EnvironmentPanel(TreasureHunterEnvironment.this));
 				window.pack();
 				window.setVisible(true);
+			}
+		});
+		
+		// Kill component on window close
+		IInternalAccess	comp	= IInternalExecutionFeature.LOCAL.get();
+		if(comp!=null)
+		{
+			final IExternalAccess	ext	= comp.getExternalAccess();
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					window.addWindowListener(new WindowAdapter()
+					{
+						@Override
+						public void windowClosing(WindowEvent e)
+						{
+							ext.killComponent();
+						}
+					});
+				}
+			});
+		}
+	}
+	
+	//-------- environment access methods --------
+	
+	/**
+	 *  Get a copy of the current treasures.
+	 */
+	public synchronized Set<Treasure>	getTreasures()
+	{
+		Set<Treasure>	ret	= new LinkedHashSet<Treasure>();
+		for(Treasure t: treasures)
+		{
+			ret.add(t.clone());
+		}
+		return ret;
+	}
+	
+	//-------- Closeable interface --------
+	
+	/**
+	 *  Auto close the gui when the agent is killed.
+	 */
+	@Override
+	public void close()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				window.dispose();
 			}
 		});
 	}

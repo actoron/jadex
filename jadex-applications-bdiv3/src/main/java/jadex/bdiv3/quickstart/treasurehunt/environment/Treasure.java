@@ -6,9 +6,32 @@ import java.util.Random;
 /**
  *  A treasure object.
  */
-public class Treasure
+public class Treasure	implements Cloneable
 {
+	//-------- static part --------
+	
+	/** The id counter: */
+	protected static int	IDCNT	= 0;
+	
+	/**
+	 *  Create a random treasure.
+	 *  @param rnd	The random number generator.
+	 *  @param width	The environment width.
+	 *  @param height	The environment height.
+	 */
+	protected static synchronized Treasure	create(Random rnd, int width, int height)
+	{
+		Treasure	t	= new Treasure();
+		t.id	= ++IDCNT;
+		t.location	= new Point(rnd.nextInt(width), rnd.nextInt(height));
+		t.weight	= rnd.nextInt(10)+1;
+		return t;
+	}
+
 	//-------- attributes --------
+	
+	/** The id. */
+	protected int id;
 	
 	/** The location. */
 	protected Point	location;
@@ -19,16 +42,37 @@ public class Treasure
 	//-------- methods --------
 	
 	/**
-	 *  Create a random treasure.
-	 *  @param rnd	The random number generator.
-	 *  @param width	The environment width.
-	 *  @param height	The environment height.
+	 *  Calculate the hash code.
 	 */
-	protected static Treasure	create(Random rnd, int width, int height)
+	@Override
+	public int hashCode()
 	{
-		Treasure	t	= new Treasure();
-		t.location	= new Point(rnd.nextInt(width), rnd.nextInt(height));
-		t.weight	= rnd.nextInt(10)+1;
-		return t;
+		return 31+id;
+	}
+	
+	/**
+	 *  Test if two treasures are the same.
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		return obj instanceof Treasure && id==((Treasure)obj).id;
+	}
+	
+	/**
+	 *  Create a copy of this treasure.
+	 */
+	@Override
+	public Treasure clone()
+	{
+		try
+		{
+			return (Treasure)super.clone();
+		}
+		catch(CloneNotSupportedException e)
+		{
+			// Shouldn't happen.
+			throw new RuntimeException(e);
+		}
 	}
 }
