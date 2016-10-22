@@ -68,6 +68,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
+import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -221,7 +222,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		try
 		{
-//				System.out.println("write: "+val+" "+fieldname+" "+obj);
+//			System.out.println("write: "+val+" "+fieldname+" "+obj);
 //			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = getComponent().getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
 
@@ -236,7 +237,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			if(!SUtil.equals(val, oldval))
 			{
 				publishToolBeliefEvent(getComponent(), mbel);
-//					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+//				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
 				rs.addEvent(new jadex.rules.eca.Event(ev1, new ChangeInfo<Object>(val, oldval, null)));
 				
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
@@ -374,7 +375,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			try
 			{
 				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
-//					System.out.println("res: "+res);
+//				System.out.println("res: "+res);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 			}
 			catch(RuntimeException e)
@@ -418,7 +419,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).writeField(val, belname, fieldname, obj);
 		}
-		
 		// Only store event for non-update-rate beliefs (update rate beliefs get set later)
 //		else if(mbel.getUpdaterate()<=0)
 		else if(mbel.getUpdateRate()==null)
@@ -427,63 +427,161 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			
 			try
 			{
-				setFieldValue(obj, fieldname, val);
+				Object oldval = setFieldValue(obj, fieldname, val);
+				// rule engine not turned on so no unobserve necessary
+//				unobserveObject(agent, obj, etype, rs);
+				addInitWrite(agent, new InitWriteBelief(belname, val, oldval));
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-			addInitWrite(agent, belname, val);
 		}
 	}
 	
 	/** Saved init writes. */
-	protected final static Map<Object, List<Object[]>> initwrites = new HashMap<Object, List<Object[]>>();
+//	protected final static Map<Object, List<Object[]>> initwrites = new HashMap<Object, List<Object[]>>();
+	protected final static Map<Object, List<ICommand<IInternalAccess>>> newinitwrites = new HashMap<Object, List<ICommand<IInternalAccess>>>();
+
+	
+//	/**
+//	 *  Add an init write.
+//	 */
+//	protected static void addInitWrite(IInternalAccess agent, String belname, Object val)
+//	{
+////		System.out.println("iniw start");
+//		synchronized(initwrites)
+//		{
+//			List<Object[]> inits = initwrites.get(agent);
+//			if(inits==null)
+//			{
+//				inits = new ArrayList<Object[]>();
+//				initwrites.put(agent, inits);
+//			}
+//			inits.add(new Object[]{val, belname});
+//		}
+////		System.out.println("iniw end");
+//	}
 	
 	/**
 	 *  Add an init write.
 	 */
-	protected static void addInitWrite(IInternalAccess agent, String belname, Object val)
+	public static void addInitWrite(Object key, ICommand<IInternalAccess> cmd)
 	{
 //		System.out.println("iniw start");
-		synchronized(initwrites)
+		synchronized(newinitwrites)
 		{
-			List<Object[]> inits = initwrites.get(agent);
+			List<ICommand<IInternalAccess>> inits = newinitwrites.get(key);
 			if(inits==null)
 			{
-				inits = new ArrayList<Object[]>();
-				initwrites.put(agent, inits);
+				inits = new ArrayList<ICommand<IInternalAccess>>();
+				newinitwrites.put(key, inits);
 			}
-			inits.add(new Object[]{val, belname});
+			inits.add(cmd);
 		}
 //		System.out.println("iniw end");
 	}
 	
+//	/**
+//	 *  Perform the writes of the init.
+//	 */
+//	public static void performInitWrites(IInternalAccess agent)
+//	{
+//		synchronized(newinitwrites)
+//		{
+//			List<Object[]> writes = newinitwrites.remove(agent);
+//			if(writes!=null)
+//			{
+//				for(Object[] write: writes)
+//				{
+////					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
+////					agent.writeField(write[0], (String)write[1], write[2]);
+////					BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+//					RuleSystem rs = agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+//					final String belname = (String)write[1];
+//					Object val = write[0];
+////					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+//					rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, null, null)));
+//					MBelief	mbel = ((MCapability)agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement()).getBelief(belname);
+//					observeValue(rs, val, agent, ChangeEvent.FACTCHANGED+"."+belname, mbel);
+//				}
+//			}
+//		}
+//	}
+	
 	/**
 	 *  Perform the writes of the init.
 	 */
-	public static void performInitWrites(IInternalAccess agent)
+	public static void performInitWrites(IInternalAccess agent, Object key)
 	{
-		synchronized(initwrites)
+		synchronized(newinitwrites)
 		{
-			List<Object[]> writes = initwrites.remove(agent);
+			List<ICommand<IInternalAccess>> writes = newinitwrites.remove(key);
 			if(writes!=null)
 			{
-				for(Object[] write: writes)
+				for(ICommand<IInternalAccess> write: writes)
 				{
-//					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
-//					agent.writeField(write[0], (String)write[1], write[2]);
-//					BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-					RuleSystem rs = agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
-					final String belname = (String)write[1];
-					Object val = write[0];
-//						rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
-					rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, null, null)));
-					MBelief	mbel = ((MCapability)agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement()).getBelief(belname);
-					observeValue(rs, val, agent, ChangeEvent.FACTCHANGED+"."+belname, mbel);
+					write.execute(agent);
 				}
 			}
+		}
+	}
+	
+	/**
+	 *  Init write for beliefs.
+	 */
+	public static class InitWriteBelief implements ICommand<IInternalAccess>
+	{
+		protected String name;
+		protected Object val;
+		protected Object oldval;
+		
+		public InitWriteBelief(String name, Object val, Object oldval)
+		{
+			this.name = name;
+			this.val = val;
+			this.oldval = oldval;
+		}
+		
+		public void execute(IInternalAccess agent)
+		{
+			RuleSystem rs = agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+			EventType etype = new EventType(ChangeEvent.BELIEFCHANGED+"."+name);
+			unobserveObject(agent, oldval, etype, rs);	
+			rs.addEvent(new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(val, null, null)));
+			MBelief	mbel = ((MCapability)agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement()).getBelief(name);
+			observeValue(rs, val, agent, ChangeEvent.FACTCHANGED+"."+name, mbel);
+		}
+	}
+
+	/**
+	 *  Init write for parameter.
+	 */
+	public static class InitWriteParameter implements ICommand<IInternalAccess>
+	{
+		protected String name;
+		protected String fieldname;
+		protected Object val;
+		protected Object oldval;
+		
+		public InitWriteParameter(String name, String fieldname, Object val, Object oldval)
+		{
+			this.name = name;
+			this.fieldname = fieldname;
+			this.val = val;
+			this.oldval = oldval;
+		}
+		
+		public void execute(IInternalAccess agent)
+		{
+			// todo: observe/unobserve not ok with only type. needs instance info
+			
+			RuleSystem rs = agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+			EventType etype = new EventType(ChangeEvent.PARAMETERCHANGED+"."+name+"."+fieldname);
+			unobserveObject(agent, oldval, etype, rs);	
+			rs.addEvent(new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(val, null, null)));
+			observeValue(rs, val, agent, etype, null);
 		}
 	}
 	
@@ -792,26 +890,26 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			System.out.println("createEv: "+val+" "+agent+" "+belname);
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		
-		try
-		{
-		if(((IInternalBDILifecycleFeature)agent.getComponentFeature(ILifecycleComponentFeature.class)).isInited())
-		{
-			MBelief mbel = agent.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel().getCapability().getBelief(belname);
-			
-			RuleSystem rs = agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
-			rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, oldval, info)));
-			
-			publishToolBeliefEvent(agent, mbel);
-		}
-		else
-		{
-			addInitWrite(agent, belname, val);
-		}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		try
+//		{
+			if(((IInternalBDILifecycleFeature)agent.getComponentFeature(ILifecycleComponentFeature.class)).isInited())
+			{
+				MBelief mbel = agent.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel().getCapability().getBelief(belname);
+				
+				RuleSystem rs = agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+				rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, oldval, info)));
+				
+				publishToolBeliefEvent(agent, mbel);
+			}
+			else
+			{
+				addInitWrite(agent, new InitWriteBelief(belname, val, oldval));
+			}
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 	
 	/**
@@ -870,6 +968,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 //		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
 		
+		String elemname = obj.getClass().getName();
+		
 		// This is the case in inner classes
 		if(agent==null)
 		{
@@ -878,9 +978,39 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //				System.out.println("res: "+res);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
-				if (agent == null) {
-					// this should only happen if inner static class
-					throw new RuntimeException("Plans/Goals/etc inner classes must not be static!");
+				if(agent==null) 
+				{
+					// this should only happen if class is static or external
+					// In this case the value will be set but the event will be saved till agent is available
+//					System.out.println("added init write for: "+obj);
+					
+					try
+					{
+						EventType addev = new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, fieldname});
+						EventType remev = new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, fieldname});
+						EventType chev = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
+						if(val instanceof List && !(val instanceof ListWrapper))
+						{
+							val = new ListWrapper((List<?>)val, null, addev, remev, chev, null);
+						}
+						else if(val instanceof Set && !(val instanceof SetWrapper))
+						{
+							val = new SetWrapper((Set<?>)val, null, addev, remev, chev, null);
+						}
+						else if(val instanceof Map && !(val instanceof MapWrapper))
+						{
+							val = new MapWrapper((Map<?,?>)val, null, addev, remev, chev, null);
+						}
+						Object oldval = setFieldValue(obj, fieldname, val);
+						addInitWrite(obj, new InitWriteParameter(elemname, fieldname, val, oldval));
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}					
+					
+					return;
 				}
 			}
 			catch(RuntimeException e)
@@ -894,10 +1024,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-		String elemname = obj.getClass().getName();
+		
 		MGoal mgoal = agent.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel().getCapability().getGoal(elemname);
 		
-//			String paramname = elemname+"."+fieldname; // ?
+//		String paramname = elemname+"."+fieldname; // ?
 
 		if(mgoal!=null)
 		{

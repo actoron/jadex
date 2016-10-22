@@ -1,1139 +1,868 @@
 package jadex.base;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
-import jadex.base.RootComponentConfiguration.AWAMECHANISM;
-import jadex.base.RootComponentConfiguration.KERNEL;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.SReflect;
-import jadex.javaparser.SJavaParser;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringService;
 
 /**
- * Configuration of the platform setup. 
+ * This class models the Configuration of a Jadex Platform.
+ * It includes a configuration for the Starter as well as one for the RootComponent (usually an Agent).
+ * All methods in this class are delegated to one of the former.
  */
-public class PlatformConfiguration
+public class PlatformConfiguration extends AbstractPlatformConfiguration
 {
-	/** ======== Arguments used by starter. ======== **/
-	
-	/** The name of the platform component (null for auto generation). To use a custom prefix name 
-	      and an auto generated postfix the name should end with _* (3 digits) or with _ and an arbitrary number of +, e.g. _++++.  **/	
-	public static final String PLATFORM_NAME = "platformname"; // class: String default: "jadex"
-	/** The configuration to use. **/	
-	public static final String CONFIGURATION_NAME = "configname"; // class: String default: "auto"
-	/** Automatically shut down the platform when no user agents are running anymore. **/	
-	public static final String AUTOSHUTDOWN = "autoshutdown"; // class: boolean default: false
-	/** Tell the starter to use the default platform component implementation (usually no need to change). **/	
-	public static final String PLATFORM_COMPONENT = "platformcomponent"; // class: Class default: jadex.platform.service.cms.PlatformComponent.class
-	
-	//-------- platform data keys --------
-	
-	/** Flag if copying parameters for local service calls is allowed. */
-	public static final String DATA_PARAMETERCOPY = "parametercopy";
 
-	/**  Flag if local timeouts should be realtime (instead of clock dependent). */
-	public static final String DATA_REALTIMETIMEOUT = "realtimetimeout";
-	
-	/** The local service registry data key. */
-	public static final String DATA_SERVICEREGISTRY = "serviceregistry";
-	
-	/** The transport address book data key. */
-	public static final String DATA_ADDRESSBOOK = "addressbook";
-	
-	/** Constant for local default timeout name. */
-	public static final String DATA_DEFAULT_LOCAL_TIMEOUT = "default_local_timeout";
+	// NO DELEGATES FOR:
+	//
+	// setPlatformModel
+	// enhanceWith
+	// setModel
+	// setValue
+	// getValue
+	// checkConsistency
+	//
 
-	/** Constant for remote default timeout name. */
-	public static final String DATA_DEFAULT_REMOTE_TIMEOUT = "default_remote_timeout";
-	
-	/** Global platform data. */
-	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
-	
-	//-------- constants --------
-
-	/** The default platform configuration. */
-//	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/Platform.component.xml";
-	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/PlatformAgent.class";
-
-	/** The default component factory to be used for platform component. */
-//	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
-	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.micro.MicroAgentFactory";
-
-	/** The configuration file argument. */
-	public static final String CONFIGURATION_FILE = "conf";
-	
-	/** The component factory classname argument. */
-	public static final String COMPONENT_FACTORY = "componentfactory";
-	
-	/** The monitoring flag argument. */
-	public static final String MONITORING = "monitoring";
-
-	/** The component flag argument (for starting an additional component). */
-	public static final String COMPONENT = "component";
-	
-	/** The persist flag argument. */
-	public static final String PERSIST = "persist";
-
-	/** The default timeout argument. */
-	public static final String DEFTIMEOUT = "deftimeout";
-	
-	/** The debug futures flag argument. */
-	public static final String DEBUGFUTURES = "debugfutures";
-	
-	/** The debug futures services argument. */
-	public static final String DEBUGSERVICES = "debugservices";
-	
-	/** The debug futures services argument. */
-	public static final String DEBUGSTEPS = "debugsteps";
-	
-	/** The stack compaction disable flag argument. */
-	public static final String NOSTACKCOMPACTION = "nostackcompaction";
-	
-	/** The opengl disable flag argument. */
-	public static final String OPENGL = "opengl";
-	
-	/** Flag to enable or disable registry service (for distributed registry management). **/
-	public static final String REGISTRY_SYNC = "registrysync";
-	
-	/** The reserved platform parameters. Those are (usually) not handled by the root component. */
-	public static final Set<String> RESERVED;
-	
-	
-	/** Constant for remote default timeout. */
-	private static long DEFAULT_REMOTE_TIMEOUT = SReflect.isAndroid() ? 60000 : 30000;;
-
-	/** Constant for local default timeout. */
-	private static long DEFAULT_LOCAL_TIMEOUT = SReflect.isAndroid() ? 60000 : 30000;
-	
-	static
-	{
-		// Set deftimeout from environment, if set.
-		String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
-		if(dtoprop!=null)
-		{
-			System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
-		}
-		else
-		{
-			dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
-		}
-		if(dtoprop!=null)
-		{
-			DEFAULT_REMOTE_TIMEOUT = (Long.parseLong(dtoprop));
-			DEFAULT_LOCAL_TIMEOUT = (Long.parseLong(dtoprop));
-			System.out.println("Setting jadex_deftimeout: "+dtoprop);
-		}
-		
-		RESERVED = new HashSet<String>();
-		RESERVED.add(CONFIGURATION_FILE);
-		RESERVED.add(CONFIGURATION_NAME);
-		RESERVED.add(PLATFORM_NAME);
-		RESERVED.add(COMPONENT_FACTORY);
-		RESERVED.add(PLATFORM_COMPONENT);
-		RESERVED.add(AUTOSHUTDOWN);
-		RESERVED.add(MONITORING);
-		RESERVED.add(RootComponentConfiguration.WELCOME);
-		RESERVED.add(COMPONENT);
-		RESERVED.add(DATA_PARAMETERCOPY);
-		RESERVED.add(DATA_REALTIMETIMEOUT);
-		RESERVED.add(PERSIST);
-		RESERVED.add(DEBUGFUTURES);
-		RESERVED.add(DEBUGSERVICES);
-		RESERVED.add(DEBUGSTEPS);
-		RESERVED.add(NOSTACKCOMPACTION);
-		RESERVED.add(OPENGL);
-		RESERVED.add(DEFTIMEOUT);
-//		RESERVED.add(REGISTRY_SYNC);
+	public PlatformConfiguration(PlatformConfiguration config) {
+		super(config);
 	}
 
-	/** Command line arguments. **/
-	private Map<String, Object>	cmdargs;
-	/** Components to start. **/
-	private List<String>	components;
-	/** Default platform timeout. **/
-	private Long defaultTimeout;
-	/** Configuration of the root component. **/
-	private RootComponentConfiguration	rootconfig;
-	
-	/** Platform model. Used to extract default values. */
-	private IModelInfo	model;
-	/** Name of the configured configuration **/
-	private ConfigurationInfo	configurationInfo;
-
-
-	/**
-	 * Creates an empty configuration.
-	 */
-	public PlatformConfiguration()
-	{
-		cmdargs = new HashMap<String, Object>();	// Starter arguments (required for instantiation of root component)
-		rootconfig = new RootComponentConfiguration();
-		components = new ArrayList<String>();	// Additional components to start
-	}
-	
-	/**
-	 * Returns a PlatformConfiguration with the default parameters.
-	 * @return
-	 */
-	public static PlatformConfiguration getDefault()
-	{
-		PlatformConfiguration config = new PlatformConfiguration();
-//		config.setPlatformName("jadex");
-		config.setPlatformName(null);
-		config.setConfigurationName("auto");
-		config.setAutoShutdown(false);
-		config.setPlatformComponent(SReflect.classForName0("jadex.platform.service.cms.PlatformComponent", null));
-		RootComponentConfiguration rootConfig = config.getRootConfig();
-		rootConfig.setWelcome(true);
-		rootConfig.setGui(true);
-		rootConfig.setCliConsole(true);
-		rootConfig.setSaveOnExit(true);
-		rootConfig.setJccPlatforms(null);
-		rootConfig.setLogging(false);
-		rootConfig.setLoggingLevel(Level.SEVERE);
-		rootConfig.setThreadpoolDefer(true);
-		rootConfig.setPersist(false);
-		rootConfig.setUniqueIds(true);
-		
-		rootConfig.setChat(true);
-		
-		rootConfig.setAwareness(true);
-		rootConfig.setAwaMechanisms(AWAMECHANISM.broadcast, AWAMECHANISM.multicast, AWAMECHANISM.message, AWAMECHANISM.relay, AWAMECHANISM.local);
-		rootConfig.setAwaDelay(20000);
-		rootConfig.setAwaIncludes("");
-		rootConfig.setAwaExcludes("");
-		
-		rootConfig.setBinaryMessages(true);
-		rootConfig.setStrictCom(false);
-		rootConfig.setPrintPass(true);
-		
-		rootConfig.setLocalTransport(true);
-		rootConfig.setTcpTransport(false);
-		rootConfig.setTcpPort(0);
-		rootConfig.setNioTcpTransport(true);
-		rootConfig.setNioTcpPort(0);
-		rootConfig.setRelayTransport(true);
-//		rootConfig.setRelayAddress("jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS");
-//			rootConfig.setRelaySecurity(true);
-		rootConfig.setSslTcpTransport(false);
-		rootConfig.setSslTcpPort(0);
-		
-		rootConfig.setWsPublish(false);
-		rootConfig.setRsPublish(false);
-		rootConfig.setKernels(KERNEL.multi);
-		rootConfig.setMavenDependencies(false);
-		rootConfig.setSensors(false);
-		rootConfig.setThreadpoolClass(null);
-		rootConfig.setContextServiceClass(null);
-		
-		rootConfig.setMonitoringComp(true);
-		rootConfig.setDf(true);
-		rootConfig.setClock(true);
-		rootConfig.setMessage(true);
-		rootConfig.setSimul(true);
-		rootConfig.setFiletransfer(true);
-		rootConfig.setMarshal(true);
-		rootConfig.setSecurity(true);
-		rootConfig.setLibrary(true);
-		rootConfig.setSettings(true);
-		rootConfig.setContext(true);
-		rootConfig.setAddress(true);
-//		rootConfig.setRegistrySync(false);
-		return config;
+	public PlatformConfiguration(String[] args) {
+		super(args);
 	}
 
-	/**
-	 * Returns a PlatformConfiguration with the default parameters but without gui.
-	 * @return
-	 */
-	public static PlatformConfiguration getDefaultNoGui()
-	{
-		PlatformConfiguration config = getDefault();
-		config.getRootConfig().setGui(false);
-		return config;
+	public PlatformConfiguration() {
 	}
 
-	/**
-	 * Returns a PlatformConfiguration with the default parameters.
-	 * @return
-	 */
-	public static PlatformConfiguration getAndroidDefault()
-	{
-		PlatformConfiguration config = getDefault();
-		RootComponentConfiguration rootConfig = config.getRootConfig();
-		rootConfig.setGui(false);
-		rootConfig.setChat(false);
-		rootConfig.setKernels(KERNEL.component, KERNEL.micro, KERNEL.bpmn, KERNEL.v3);
-		rootConfig.setLoggingLevel(Level.INFO);
-//		config.setDebugFutures(true);
-		return config;
-	}
-	
-	/**
-	 * Returns a minimal platform configuration without any network connectivity.
-	 * @return
-	 */
-	public static PlatformConfiguration getMinimal()
-	{
-		PlatformConfiguration config = getDefault();
-		RootComponentConfiguration rootConfig = config.getRootConfig();
-		rootConfig.setWelcome(false);
-		rootConfig.setGui(false);
-		rootConfig.setCli(false);
-		rootConfig.setCliConsole(false);
-		
-		rootConfig.setChat(false);
-		
-		rootConfig.setAwareness(false);
-		rootConfig.setAwaMechanisms();
-		
-		rootConfig.setLocalTransport(true); // needed by message
-		rootConfig.setNioTcpTransport(false);
-		rootConfig.setRelayTransport(false);
-		rootConfig.setSslTcpTransport(false);
-		
-		rootConfig.setKernels(KERNEL.micro);
-//		rootConfig.setThreadpoolClass(null);
-//		rootConfig.setContextServiceClass(null);
-		
-		rootConfig.setMonitoringComp(false);
-		rootConfig.setDf(false);
-		rootConfig.setClock(true);
-		rootConfig.setMessage(true); // needed by rms
-		rootConfig.setSimul(false);
-		rootConfig.setFiletransfer(false);
-		rootConfig.setMarshal(true);
-		rootConfig.setSecurity(false);
-		rootConfig.setLibrary(true); // needed by micro
-		rootConfig.setSettings(true);
-		rootConfig.setContext(true);
-		rootConfig.setAddress(true);
-		return config;
-	}
-	
-	/**
-	 * Returns a minimal platform configuration that communicates via relay.
-	 * @return
-	 */
-	public static PlatformConfiguration getMinimalRelayAwareness()
-	{
-		PlatformConfiguration config = getMinimal();
-		RootComponentConfiguration rootConfig = config.getRootConfig();
-		
-		rootConfig.setAwareness(true);
-		rootConfig.setAwaMechanisms(AWAMECHANISM.relay);
-		rootConfig.setAwaFast(true);	// Make sure awareness finds other platforms quickly
-		rootConfig.setRelayTransport(true);
-		
-		rootConfig.setSecurity(true);	// enable security when remote comm.
-		
-		return config;
-	}
 
-	/**
-	 * Copy constructor.
-	 */
-	public PlatformConfiguration(PlatformConfiguration source) 
-	{
-		this.cmdargs = new HashMap<String, Object>(cmdargs);
-		this.rootconfig = new RootComponentConfiguration(source.rootconfig);
-		this.components = new ArrayList<String>(source.components);
-	}
-
-	/**
-	 * Constructor that creates a new Configuration based on an args object.
-	 * (which can be a Map or a String array).
-	 * @param args
-	 */
-	private PlatformConfiguration(String[] args)
-	{
-		this();
-		rootconfig.setProgramArguments(args);
-	}
-	
-	/**
-	 * Returns the configuration of the root component.
-	 * @return RootComponentConfiguration
-	 */
-	public RootComponentConfiguration getRootConfig()
-	{
-		return rootconfig;
-	}
-	
-	/**
-	 * Sets the platform model to extract configuration values from it.
-	 * @param model
-	 */
-	public void setPlatformModel(IModelInfo model)
-	{
-		this.model = model;
-		configurationInfo = getConfigurationInfo(model);
-		this.rootconfig.setModel(model);
-	}
-	
-	/**
-	 * Generic setter for cmd args.
-	 * @param key
-	 * @param value
-	 */
-	public void setValue(String key, Object value) 
-	{
-		this.cmdargs.put(key, value);
-	}
-	
-	/**
-	 * Generic getter for configuration parameters.
-	 * Retrieves values in 3 stages:
-	 * 1. From given command line arguments.
-	 * 2. From given model configuration ("auto", "fixed", ...)
-	 * 3. From model default values. 
-	 * 
-	 * For retrieval from model, setPlatformModel has to be called before.
-	 * @param key
-	 * @return
-	 */
-	public Object getValue(String key) {
-		
-		Object val = cmdargs.get(key);
-		if(val==null && model != null && configurationInfo != null)
-		{
-			val = getArgumentValueFromModel(key);
-		}
-		else if(val instanceof String)
-		{
-			// Try to parse value from command line.
-			try
-			{
-				Object newval	= SJavaParser.evaluateExpression((String)val, null);
-				if(newval!=null)
-				{
-					val	= newval;
-				}
-			}
-			catch(RuntimeException e)
-			{
-			}
-		}
-		
-		return val;
-	}
-	
-	// ---- getter/setter for individual properties ----
-	
-	/** Get the platform name. */
-	public String getPlatformName()
-	{
-		return (String)getValue(PLATFORM_NAME);
-	}
-	/** Set the platform name. */
-	public void setPlatformName(String value)
-	{
-		setValue(PLATFORM_NAME, value);
-	}
-
-	/** Get the configuration name. */
-	public String getConfigurationName()
-	{
-		return (String)getValue(CONFIGURATION_NAME);
-	}
-	/** Set the configuration name. */
-	public void setConfigurationName(String value)
-	{
-		setValue(CONFIGURATION_NAME, value);
-	}
-
-	/** Get autoshutdown flag. */
-	public boolean getAutoShutdown()
-	{
-		return Boolean.TRUE.equals(getValue(AUTOSHUTDOWN));
-	}
-	/** Set autoshutdown flag. */
-	public void setAutoShutdown(boolean value)
-	{
-		setValue(AUTOSHUTDOWN, value);
-	}
-	
-	/** Get platform component. */
-	public Class getPlatformComponent()
-	{
-		return (Class)getValue(PLATFORM_COMPONENT);
-	}
-	/** Set platform component. */
-	public void setPlatformComponent(Class value)
-	{
-		setValue(PLATFORM_COMPONENT, value);
-	}
-	
-	/**
-	 * Set the default timeout.
-	 * @param to timeout in ms.
-	 */
-	public void setDefaultTimeout(long to)
-	{
-		defaultTimeout = to;
-	}
-	/**
-	 * Gets the default timeout.
-	 * @return timeout in ms.
-	 */
-	public Long getDefaultTimeout()
-	{
-		return defaultTimeout;
-	}
-	
-	/**
-	 * Get the default timeout for local calls.
-	 * @return default timeout in ms.
-	 */
-	public long getLocalDefaultTimeout() {
-		return (defaultTimeout != null) ? defaultTimeout : DEFAULT_LOCAL_TIMEOUT;
-	}
-	
-	/**
-	 * Get the default timeout for remote calls.
-	 * @return default timeout in ms.
-	 */
-	public long getRemoteDefaultTimeout() {
-		return (defaultTimeout != null) ? defaultTimeout : DEFAULT_REMOTE_TIMEOUT;
-	}
-
-	/**
-	 * Add a component that is started after platform startup.
-	 * DO NOT use this method for starting BDI agents!
-	 * Pass a fully qualified classname as string to addComponent(String) instead.
-	 * @param clazz Class of the component.
-	 */
-	public void addComponent(Class clazz)
-	{
-		// check for loaded bdi classes here?
-		components.add(clazz.getName() + ".class");
-	}
-
-	/**
-	 * Add a component that is started after platform startup.
-	 * @param path Path to the component.
-	 */
-	public void addComponent(String path)
-	{
-		components.add((String)path);
-	}
-
-	/**
-	 * Set the list of components to be started at startup.
-	 * @param newcomps List of components.
-	 */
-	public void setComponents(List<String> newcomps) 
-	{
-		components = newcomps;
-	}
-	/**
-	 * Get the list of components to be started at startup.
-	 * @return List of components
-	 */
-	public List<String> getComponents()
-	{
-		return components;
-	}
-	
-	/**
-	 * Get the component factory.
-	 * @return name of component factory
-	 */
-	public String getComponentFactory()
-	{
-		return (String)cmdargs.get(COMPONENT_FACTORY)!=null? 
-			(String)cmdargs.get(COMPONENT_FACTORY): FALLBACK_COMPONENT_FACTORY;
-	}
-	
-	/**
-	 * Set the main configuration file, e.g. path to PlatformAgent.
-	 * @param value Path to configuration file
-	 */
-	public void setConfigurationFile(String value)
-	{
-		setValue(CONFIGURATION_FILE, value);
-	}
-	/**
-	 * Get the main configuration file, e.g. path to PlatformAgent.
-	 * @return Path to configuration file
-	 */
-	public String getConfigurationFile()
-	{
-		return (String)cmdargs.get(CONFIGURATION_FILE)!=null? 
-			(String)cmdargs.get(CONFIGURATION_FILE): FALLBACK_PLATFORM_CONFIGURATION;
-	}
-	
-	/**
-	 * Set the monitoring level.
-	 * @param level
-	 */
-	public void setMonitoring(PublishEventLevel level) 
-	{
-		setValue(MONITORING, level);
-	}
-	/**
-	 * Get the monitoring level.
-	 * @return
-	 */
-	public PublishEventLevel getMonitoring() 
-	{
-		return (PublishEventLevel)getValue(MONITORING);
-	}
-	
-	/**
-	 * Set the persist flag.
-	 * @param value
-	 */
-	public void setPersist(boolean value) 
-	{
-		setValue(PERSIST, value);
-	}
-	/**
-	 * Get the persist flag.
-	 * @return boolean
-	 */
-	public boolean getPersist() 
-	{
-		return (Boolean)getValue(PERSIST);
-	}
-	
-	/**
-	 * Set the debug futures flag.
-	 * @param value
-	 */
-	public void setDebugFutures(boolean value) 
-	{
-		setValue(DEBUGFUTURES, value);
-	}
-	
-	/**
-	 * Get the debug futures flag.
-	 * @return
-	 */
-	public boolean getDebugFutures() 
-	{
-		return Boolean.TRUE.equals(getValue(DEBUGFUTURES));
-	}
-	
-	/**
-	 * Set the debug services flag.
-	 * @param value
-	 */
-	public void setDebugServices(boolean value) 
-	{
-		setValue(DEBUGSERVICES, value);
-	}
-	/**
-	 * Get the debug services flag.
-	 * @return
-	 */
-	public boolean getDebugServices() 
-	{
-		return Boolean.TRUE.equals(getValue(DEBUGSERVICES));
-	}
-	
-	/**
-	 * Set the debug steps flag.
-	 * @param value
-	 */
-	public void setDebugSteps(boolean value) 
-	{
-		setValue(DEBUGSTEPS, value);
-	}
-	
-	/**
-	 * Get the debug steps flag.
-	 * @return
-	 */
-	public boolean getDebugSteps() 
-	{
-		return Boolean.TRUE.equals(getValue(DEBUGSTEPS));
-	}
-	
-	/**
-	 * Set the no stack compaction flag.
-	 * @param value
-	 */
-	public void setNoStackCompaction(boolean value) 
-	{
-		setValue(NOSTACKCOMPACTION, value);
-	}
-	
-	/**
-	 * Get the no stack compaction flag.
-	 * @return True if no stack compaction.
-	 */
-	public boolean getNoStackCompaction() 
-	{
-		return Boolean.TRUE.equals(getValue(NOSTACKCOMPACTION));
-	}
-	
-	/**
-	 *  Get the boolean value of a flag.
-	 */
-	public boolean getBooleanValue(String key) 
-	{
-		return Boolean.TRUE.equals(getValue(key));
-	}
-	
-	/**
-	 * Set the OPENGL flag.
-	 * @param value
-	 */
-	public void setOpenGl(boolean value) 
-	{
-		setValue(OPENGL, value);
-		Class<?> p2d = SReflect.classForName0("jadex.extension.envsupport.observer.perspective.Perspective2D", Starter.class.getClassLoader());
-		if(p2d!=null)
-		{
-			try
-			{
-				p2d.getField("OPENGL").set(null, Boolean.valueOf(value));
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
-	/**
-	 * Get the OPENGL flag.
-	 * @return
-	 */
-	public boolean getOpenGl() 
-	{
-		return Boolean.TRUE.equals(getValue(OPENGL));
-	}
-	
-	/**
-	 * Enables/disables distributed registry synchronization.
-	 * @param value
-	 */
-	public void setRegistrySync(boolean value) 
-	{
-		rootconfig.setRegistrySync(value);
-	}
-	/**
-	 * Get the flag for distributed registry synchronization.
-	 * @return
-	 */
-	public boolean getRegistrySync() 
-	{
-		return rootconfig.getRegistrySync();
-	}
-	
-	/**
-	 *  Get a global platform value.
-	 *  @param platform The platform name.
-	 *  @param key The key.
-	 *  @return The value.
-	 */
-	public static synchronized Object getPlatformValue(IComponentIdentifier platform, String key)
-	{
-		Object ret = null;
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		if(mem!=null)
-			ret = mem.get(key);
-		return ret;
-	}
-	
-	/**
-	 *  Get a global platform value.
-	 *  @param platform The platform name.
-	 *  @param key The key.
-	 *  @param value The value.
-	 */
-	public static synchronized void putPlatformValue(IComponentIdentifier platform, String key, Object value)
-	{
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		if(mem==null)
-		{
-			mem = new HashMap<String, Object>();
-			platformmem.put(platform, mem);
-		}
-		mem.put(key, value);
-	}
-	
-	/**
-	 *  Get a global platform value.
-	 *  @param platform The platform name.
-	 *  @param key The key.
-	 *  @return The value.
-	 */
-	public static synchronized boolean hasPlatformValue(IComponentIdentifier platform, String key)
-	{
-		boolean ret = false;
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		if(mem!=null)
-			ret = mem.containsKey(key);
-		return ret;
-	}
-	
-	/**
-	 *  Get a global platform value.
-	 *  @param platform The platform name.
-	 */
-	public static synchronized void removePlatformMemory(IComponentIdentifier platform)
-	{
-		platformmem.remove(platform.getRoot());
-	}
-	
-	/**
-	 *  Get the remote default timeout.
-	 */
-	public static synchronized long getRemoteDefaultTimeout(IComponentIdentifier platform)
-	{
-		if(platform==null)
-			return DEFAULT_REMOTE_TIMEOUT;
-		
-		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue(): DEFAULT_REMOTE_TIMEOUT;
-	}
-
-	/**
-	 *  Get the scaled remote default timeout.
-	 */
-	public static synchronized long	getScaledRemoteDefaultTimeout(IComponentIdentifier platform, double scale)
-	{
-		long ret = getRemoteDefaultTimeout(platform);
-		return ret==-1 ? -1 : (long)(ret*scale);
-	}
-
-	/**
-	 *  Get the local default timeout.
-	 */
-	public static synchronized long getLocalDefaultTimeout(IComponentIdentifier platform)
-	{
-		if(platform==null)
-			return DEFAULT_LOCAL_TIMEOUT;
-		
-		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue(): DEFAULT_LOCAL_TIMEOUT;
-	}
-
-	/**
-	 *  Get the scaled local default timeout.
-	 */
-	public static synchronized long getScaledLocalDefaultTimeout(IComponentIdentifier platform, double scale)
-	{
-		long ret = getLocalDefaultTimeout(platform);
-		return ret==-1 ? -1 : (long)(ret*scale);
-	}
-
-	/**
-	 *  Set the remote default timeout.
-	 */
-	public static synchronized void setRemoteDefaultTimeout(IComponentIdentifier platform, long timeout)
-	{
-		putPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT, timeout);
-	}
-
-	/**
-	 *  Set the local default timeout.
-	 */
-	public static synchronized void setLocalDefaultTimeout(IComponentIdentifier platform, long timeout)
-	{
-		putPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT, timeout);
-	}
-	
-	/**
-	 *  Check if the real time timeout flag is set for a platform.
-	 */
-	public static synchronized boolean	isRealtimeTimeout(IComponentIdentifier platform)
-	{
-		// Hack!!! Should default to false?
-		return !Boolean.FALSE.equals(getPlatformValue(platform, PlatformConfiguration.DATA_REALTIMETIMEOUT));
-	}
-	
-	/**
-	 *  Check if the parameter copy flag is set for a platform.
-	 */
-	public static synchronized boolean	isParameterCopy(IComponentIdentifier platform)
-	{
-		// not equals false to make true the default.
-		return !Boolean.FALSE.equals(getPlatformValue(platform, PlatformConfiguration.DATA_PARAMETERCOPY));
-	}
-	
-	/**  Puts parsed value into component args to be available at instance. */
-//	public void putArgumentValue(String name, Object val)
-//	{
-//		rootconfig.setValue(name, val);
-//	}
-
-	private Object getArgumentValueFromModel(String name)
-	{
-		Object val = null;
-				
-		boolean	found	= false;
-		// first try to get the value from choosen configuration
-		if(configurationInfo!=null)
-		{
-			UnparsedExpression[]	upes	= configurationInfo.getArguments();
-			for(int i=0; !found && i<upes.length; i++)
-			{
-				if(name.equals(upes[i].getName()))
-				{
-					found	= true;
-					val	= upes[i];
-				}
-			}
-		}
-		// if this fails, get default value.
-		if(!found)
-		{
-			 IArgument	arg	= model.getArgument(name);
-			 if(arg!=null)
-			 {
-				val	= arg.getDefaultValue(); 
-			 }
-		}
-		val	= SJavaParser.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
-//			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
-		return val;
-	}
-	
-	/**
-	 * Get the configuration name.
-	 */
-	private ConfigurationInfo	getConfigurationInfo(IModelInfo model)
-	{
-		String	configname	= getConfigurationName();//(String)cmdargs.get(CONFIGURATION_NAME);
-		if(configname==null)
-		{
-			Object	val	= null;
-			IArgument	arg	= model.getArgument(CONFIGURATION_NAME);
-			if(arg!=null)
-			{
-				val	= arg.getDefaultValue();
-			}
-			val	= SJavaParser.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
-//			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
-			configname	= val!=null ? val.toString() : null;
-		}
-		
-		ConfigurationInfo	compConfig	= configname!=null
-			? model.getConfiguration(configname) 
-				: model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
-				
-		return compConfig;
-	}
-
-	
-	// -----------------------------
-	// 		Argument Parsing
-	// -----------------------------
-	
-	/**
-	 *  Create the platform.
-	 *  @param args The command line arguments.
-	 *  @return PlatformConfiguration
-	 */
-//	public static PlatformConfiguration processArgs(Map<String, String> args)
-//	{
-//		PlatformConfiguration config = new PlatformConfiguration(args);
-//		if(args!=null)
-//		{
-//			for(Map.Entry<String, String> entry: args.entrySet())
-//			{
-//				parseArg(entry.getKey(), entry.getValue(), config);
-//			}
-//		}
-//		return config;
-//	}
-
-	/**
-	 *  Create a platform configuration.
-	 *  @param args The command line arguments.
-	 *  @return PlatformConfiguration
-	 */
-	public static PlatformConfiguration processArgs(String args)
-	{
-		return processArgs(args.split("\\s+"));
-	}
-
-	/**
-	 *  Create a platform configuration.
-	 *  @param args The command line arguments.
-	 *  @return PlatformConfiguration
-	 */
-	public static PlatformConfiguration processArgs(String[] args)
-	{
-		PlatformConfiguration config = new PlatformConfiguration(args);
-		if(args!=null)
-		{
-			for(int i=0; args!=null && i<args.length; i+=2)
-			{
-				parseArg(args[i], args[i+1], config);
-			}
-		}
-		return config;
-	}
-	
-	/**
-	 *  Create a platform configuration.
-	 *  @param args The command line arguments.
-	 *  @return PlatformConfiguration
-	 */
-	public static PlatformConfiguration processArgs(Map<String, String> args)
-	{
-		PlatformConfiguration config = new PlatformConfiguration(); // ?! hmm needs to be passed as parameter also?
-		if(args!=null)
-		{
-			for(Map.Entry<String, String> arg: args.entrySet())
-			{
-				parseArg(arg.getKey(), arg.getValue(), config);
-			}
-		}
-		return config;
-	}
-	
-	/**
-	 *  Parse an argument.
-	 *  @param okey The key.
-	 *  @param val The value.
-	 *  @param config The config.
-	 */
-	public static void parseArg(String okey, String val, PlatformConfiguration config)
-	{
-		String key = okey.startsWith("-")? okey.substring(1): okey;
-		Object value = val;
-		if(!RESERVED.contains(key))
-		{
-			// if not reserved, value is parsed and written to root config.
-			try
-			{
-				value = SJavaParser.evaluateExpression(val, null);
-			}
-			catch(Exception e)
-			{
-				System.out.println("Argument parse exception using as string: "+key+" \""+val+"\"");
-			}
-			config.getRootConfig().setValue(key, value);
-		}
-		else if(COMPONENT.equals(key))
-		{
-			config.addComponent((String) val);
-		}
-		else if(DEBUGFUTURES.equals(key) && "true".equals(val))
-		{
-			config.setDebugFutures(true);
-		}
-		else if(DEBUGSERVICES.equals(key) && "true".equals(val))
-		{
-			config.setDebugServices(true);
-		}
-		else if(DEBUGSTEPS.equals(key) && "true".equals(val))
-		{
-			config.setDebugSteps(true);
-		}
-		else if(DEFTIMEOUT.equals(key))
-		{
-			value = SJavaParser.evaluateExpression(val, null);
-//				BasicService.DEFTIMEOUT	= ((Number)val).longValue();
-			long to	= ((Number)value).longValue();
-//			setLocalDefaultTimeout(platform, to);
-//			setRemoteDefaultTimeout(platform, to);
-			config.setDefaultTimeout(to);
-			
-//			BasicService.setRemoteDefaultTimeout(to);
-//			BasicService.setLocalDefaultTimeout(to);
-//			System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
-		}
-		else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
-		{
-			config.setNoStackCompaction(true);
-		}
-		else if(OPENGL.equals(key) && "false".equals(val))
-		{
-			config.setOpenGl(false);
-		}
-		else if(MONITORING.equals(key)) 
-		{
-			Object tmpmoni = config.getValue(PlatformConfiguration.MONITORING);
-			PublishEventLevel moni = PublishEventLevel.OFF;
-			if(tmpmoni instanceof Boolean)
-			{
-				moni = ((Boolean)tmpmoni).booleanValue()? PublishEventLevel.FINE: PublishEventLevel.OFF;
-			}
-			else if(tmpmoni instanceof String)
-			{
-				moni = PublishEventLevel.valueOf((String)tmpmoni);
-			}
-			else if(tmpmoni instanceof PublishEventLevel)
-			{
-				moni = (PublishEventLevel)tmpmoni;
-			}
-			config.setMonitoring(moni);
-		}
-		else
-		{
-			config.setValue(key, value);
-		}
+	@Override
+	public Map<String, Object> getArgs() {
+		return getRootConfig().getArgs();
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder("");
-
-		Set<Map.Entry<String, Object>> entries = cmdargs.entrySet();
-
-		for (Map.Entry<String, Object> arg: entries) 
-		{
-			if (!(arg.getValue() == null || arg.getValue().equals(false))) 
-			{
-				sb.append(arg.getKey());
-				sb.append(": ");
-				sb.append(arg.getValue());
-				sb.append("\n");
-			}
-		}
-
-		entries = rootconfig.getArgs().entrySet();
-
-		for (Map.Entry<String, Object> arg: entries) 
-		{
-			if (!(arg.getValue() == null || arg.getValue().equals(false))) 
-			{
-				sb.append(arg.getKey());
-				sb.append(": ");
-				sb.append(arg.getValue());
-				sb.append("\n");
-			}
-		}
-
-		sb.append(rootconfig.toString());
-		return sb.toString();
+	public void setProgramArguments(String[] args) {
+		getRootConfig().setProgramArguments(args);
 	}
 
-	/**
-	 * Enhance this config with given other config.
-	 * Will overwrite all values that are set in the other config.
-	 * @param other
-	 */
-	public void enhanceWith(PlatformConfiguration other) 
-	{
-		for (Map.Entry<String, Object> entry : other.cmdargs.entrySet()) 
-		{
-			this.setValue(entry.getKey(), entry.getValue());
-		}
-		rootconfig.enhanceWith(other.rootconfig);
+	@Override
+	public boolean getWelcome() {
+		return getRootConfig().getWelcome();
 	}
 
-	/**
-	 * Checks this configuration for consistency errors.
-	 */
-	protected void checkConsistency() 
-	{
-		rootconfig.checkConsistency();
+	@Override
+	public void setWelcome(boolean value) {
+		getRootConfig().setWelcome(value);
+	}
+
+	@Override
+	public void setPlatformAccess(IPlatformComponentAccess value) {
+		getRootConfig().setPlatformAccess(value);
+	}
+
+	@Override
+	public void setComponentFactory(IComponentFactory value) {
+		getRootConfig().setComponentFactory(value);
+	}
+
+	@Override
+	public boolean getGui() {
+		return getRootConfig().getGui();
+	}
+
+	@Override
+	public void setGui(boolean value) {
+		getRootConfig().setGui(value);
+	}
+
+	@Override
+	public boolean getCli() {
+		return getRootConfig().getCli();
+	}
+
+	@Override
+	public void setCli(boolean value) {
+		getRootConfig().setCli(value);
+	}
+
+	@Override
+	public boolean getCliConsole() {
+		return getRootConfig().getCliConsole();
+	}
+
+	@Override
+	public void setCliConsole(boolean value) {
+		getRootConfig().setCliConsole(value);
+	}
+
+	@Override
+	public boolean getSaveOnExit() {
+		return getRootConfig().getSaveOnExit();
+	}
+
+	@Override
+	public void setSaveOnExit(boolean value) {
+		getRootConfig().setSaveOnExit(value);
+	}
+
+	@Override
+	public String getJccPlatforms() {
+		return getRootConfig().getJccPlatforms();
+	}
+
+	@Override
+	public void setJccPlatforms(String value) {
+		getRootConfig().setJccPlatforms(value);
+	}
+
+	@Override
+	public boolean getLogging() {
+		return getRootConfig().getLogging();
+	}
+
+	@Override
+	public void setLogging(boolean value) {
+		getRootConfig().setLogging(value);
+	}
+
+	@Override
+	public Level getLoggingLevel() {
+		return getRootConfig().getLoggingLevel();
+	}
+
+	@Override
+	public void setLoggingLevel(Level value) {
+		getRootConfig().setLoggingLevel(value);
+	}
+
+	@Override
+	public boolean getSimulation() {
+		return getRootConfig().getSimulation();
+	}
+
+	@Override
+	public void setSimulation(boolean value) {
+		getRootConfig().setSimulation(value);
+	}
+
+	@Override
+	public boolean getAsyncExecution() {
+		return getRootConfig().getAsyncExecution();
+	}
+
+	@Override
+	public void setAsyncExecution(boolean value) {
+		getRootConfig().setAsyncExecution(value);
+	}
+
+	@Override
+	public boolean getPersist() {
+		return getRootConfig().getPersist();
+	}
+
+	@Override
+	public void setDebugFutures(boolean value) {
+		getStarterConfig().setDebugFutures(value);
+	}
+
+	@Override
+	public boolean getDebugFutures() {
+		return getStarterConfig().getDebugFutures();
+	}
+
+	@Override
+	public void setDebugServices(boolean value) {
+		getStarterConfig().setDebugServices(value);
+	}
+
+	@Override
+	public boolean getDebugServices() {
+		return getStarterConfig().getDebugServices();
+	}
+
+	@Override
+	public void setDebugSteps(boolean value) {
+		getStarterConfig().setDebugSteps(value);
+	}
+
+	@Override
+	public boolean getDebugSteps() {
+		return getStarterConfig().getDebugSteps();
+	}
+
+	@Override
+	public void setNoStackCompaction(boolean value) {
+		getStarterConfig().setNoStackCompaction(value);
+	}
+
+	@Override
+	public boolean getNoStackCompaction() {
+		return getStarterConfig().getNoStackCompaction();
+	}
+
+	@Override
+	public boolean getBooleanValue(String key) {
+		return getStarterConfig().getBooleanValue(key);
+	}
+
+	@Override
+	public void setOpenGl(boolean value) {
+		getStarterConfig().setOpenGl(value);
+	}
+
+	@Override
+	public boolean getOpenGl() {
+		return getStarterConfig().getOpenGl();
+	}
+
+	@Override
+	public void setPersist(boolean value) {
+		getRootConfig().setPersist(value);
+	}
+
+	@Override
+	public boolean getUniqueIds() {
+		return getRootConfig().getUniqueIds();
+	}
+
+	@Override
+	public void setUniqueIds(boolean value) {
+		getRootConfig().setUniqueIds(value);
+	}
+
+	@Override
+	public boolean getThreadpoolDefer() {
+		return getRootConfig().getThreadpoolDefer();
+	}
+
+	@Override
+	public void setThreadpoolDefer(boolean value) {
+		getRootConfig().setThreadpoolDefer(value);
+	}
+
+	@Override
+	public String getLibPath() {
+		return getRootConfig().getLibPath();
+	}
+
+	@Override
+	public void setLibPath(String value) {
+		getRootConfig().setLibPath(value);
+	}
+
+	@Override
+	public ClassLoader getBaseClassloader() {
+		return getRootConfig().getBaseClassloader();
+	}
+
+	@Override
+	public void setBaseClassloader(ClassLoader value) {
+		getRootConfig().setBaseClassloader(value);
+	}
+
+	@Override
+	public boolean getChat() {
+		return getRootConfig().getChat();
+	}
+
+	@Override
+	public void setChat(boolean value) {
+		getRootConfig().setChat(value);
+	}
+
+	@Override
+	public boolean getAwareness() {
+		return getRootConfig().getAwareness();
+	}
+
+	@Override
+	public void setAwareness(boolean value) {
+		getRootConfig().setAwareness(value);
+	}
+
+	@Override
+	public RootComponentConfiguration.AWAMECHANISM[] getAwaMechanisms() {
+		return getRootConfig().getAwaMechanisms();
+	}
+
+	@Override
+	public void setAwaMechanisms(RootComponentConfiguration.AWAMECHANISM... values) {
+		getRootConfig().setAwaMechanisms(values);
+	}
+
+	@Override
+	public long getAwaDelay() {
+		return getRootConfig().getAwaDelay();
+	}
+
+	@Override
+	public void setAwaDelay(long value) {
+		getRootConfig().setAwaDelay(value);
+	}
+
+	@Override
+	public boolean isAwaFast() {
+		return getRootConfig().isAwaFast();
+	}
+
+	@Override
+	public void setAwaFast(boolean value) {
+		getRootConfig().setAwaFast(value);
+	}
+
+	@Override
+	public String getAwaIncludes() {
+		return getRootConfig().getAwaIncludes();
+	}
+
+	@Override
+	public void setAwaIncludes(String value) {
+		getRootConfig().setAwaIncludes(value);
+	}
+
+	@Override
+	public String getAwaExcludes() {
+		return getRootConfig().getAwaExcludes();
+	}
+
+	@Override
+	public void setAwaExcludes(String value) {
+		getRootConfig().setAwaExcludes(value);
+	}
+
+	@Override
+	public boolean getBinaryMessages() {
+		return getRootConfig().getBinaryMessages();
+	}
+
+	@Override
+	public void setBinaryMessages(boolean value) {
+		getRootConfig().setBinaryMessages(value);
+	}
+
+	@Override
+	public boolean getStrictCom() {
+		return getRootConfig().getStrictCom();
+	}
+
+	@Override
+	public void setStrictCom(boolean value) {
+		getRootConfig().setStrictCom(value);
+	}
+
+	@Override
+	public boolean getUsePass() {
+		return getRootConfig().getUsePass();
+	}
+
+	@Override
+	public void setUsePass(boolean value) {
+		getRootConfig().setUsePass(value);
+	}
+
+	@Override
+	public boolean getPrintPass() {
+		return getRootConfig().getPrintPass();
+	}
+
+	@Override
+	public void setPrintPass(boolean value) {
+		getRootConfig().setPrintPass(value);
+	}
+
+	@Override
+	public boolean getTrustedLan() {
+		return getRootConfig().getTrustedLan();
+	}
+
+	@Override
+	public void setTrustedLan(boolean value) {
+		getRootConfig().setTrustedLan(value);
+	}
+
+	@Override
+	public String getNetworkName() {
+		return getRootConfig().getNetworkName();
+	}
+
+	@Override
+	public void setNetworkName(String value) {
+		getRootConfig().setNetworkName(value);
+	}
+
+	@Override
+	public String getNetworkPass() {
+		return getRootConfig().getNetworkPass();
+	}
+
+	@Override
+	public void setNetworkPass(String value) {
+		getRootConfig().setNetworkPass(value);
+	}
+
+	@Override
+	public Map getVirtualNames() {
+		return getRootConfig().getVirtualNames();
+	}
+
+	@Override
+	public void setVirtualNames(Map value) {
+		getRootConfig().setVirtualNames(value);
+	}
+
+	@Override
+	public long getValidityDuration() {
+		return getRootConfig().getValidityDuration();
+	}
+
+	@Override
+	public void setValidityDuration(long value) {
+		getRootConfig().setValidityDuration(value);
+	}
+
+	@Override
+	public boolean getLocalTransport() {
+		return getRootConfig().getLocalTransport();
+	}
+
+	@Override
+	public void setLocalTransport(boolean value) {
+		getRootConfig().setLocalTransport(value);
+	}
+
+	@Override
+	public boolean getTcpTransport() {
+		return getRootConfig().getTcpTransport();
+	}
+
+	@Override
+	public void setTcpTransport(boolean value) {
+		getRootConfig().setTcpTransport(value);
+	}
+
+	@Override
+	public int getTcpPort() {
+		return getRootConfig().getTcpPort();
+	}
+
+	@Override
+	public void setTcpPort(int value) {
+		getRootConfig().setTcpPort(value);
+	}
+
+	@Override
+	public boolean getNioTcpTransport() {
+		return getRootConfig().getNioTcpTransport();
+	}
+
+	@Override
+	public void setNioTcpTransport(boolean value) {
+		getRootConfig().setNioTcpTransport(value);
+	}
+
+	@Override
+	public int getNioTcpPort() {
+		return getRootConfig().getNioTcpPort();
+	}
+
+	@Override
+	public void setNioTcpPort(int value) {
+		getRootConfig().setNioTcpPort(value);
+	}
+
+	@Override
+	public boolean getRelayTransport() {
+		return getRootConfig().getRelayTransport();
+	}
+
+	@Override
+	public void setRelayTransport(boolean value) {
+		getRootConfig().setRelayTransport(value);
+	}
+
+	@Override
+	public String getRelayAddress() {
+		return getRootConfig().getRelayAddress();
+	}
+
+	@Override
+	public void setRelayAddress(String value) {
+		getRootConfig().setRelayAddress(value);
+	}
+
+	@Override
+	public boolean getRelaySecurity() {
+		return getRootConfig().getRelaySecurity();
+	}
+
+	@Override
+	public void setRelaySecurity(boolean value) {
+		getRootConfig().setRelaySecurity(value);
+	}
+
+	@Override
+	public boolean getRelayAwaonly() {
+		return getRootConfig().getRelayAwaonly();
+	}
+
+	@Override
+	public void setRelayAwaonly(boolean value) {
+		getRootConfig().setRelayAwaonly(value);
+	}
+
+	@Override
+	public boolean getSslTcpTransport() {
+		return getRootConfig().getSslTcpTransport();
+	}
+
+	@Override
+	public void setSslTcpTransport(boolean value) {
+		getRootConfig().setSslTcpTransport(value);
+	}
+
+	@Override
+	public int getSslTcpPort() {
+		return getRootConfig().getSslTcpPort();
+	}
+
+	@Override
+	public void setSslTcpPort(int value) {
+		getRootConfig().setSslTcpPort(value);
+	}
+
+	@Override
+	public boolean getWsPublish() {
+		return getRootConfig().getWsPublish();
+	}
+
+	@Override
+	public void setWsPublish(boolean value) {
+		getRootConfig().setWsPublish(value);
+	}
+
+	@Override
+	public boolean getRsPublish() {
+		return getRootConfig().getRsPublish();
+	}
+
+	@Override
+	public void setRsPublish(boolean value) {
+		getRootConfig().setRsPublish(value);
+	}
+
+	@Override
+	public String getRsPublishComponent() {
+		return getRootConfig().getRsPublishComponent();
+	}
+
+	@Override
+	public void setRsPublishComponent(String value) {
+		getRootConfig().setRsPublishComponent(value);
+	}
+
+	@Override
+	public RootComponentConfiguration.KERNEL[] getKernels() {
+		return getRootConfig().getKernels();
+	}
+
+	@Override
+	public void setKernels(String... value) {
+		getRootConfig().setKernels(value);
+	}
+
+	@Override
+	public void setKernels(RootComponentConfiguration.KERNEL... value) {
+		getRootConfig().setKernels(value);
+	}
+
+	@Override
+	public boolean getMavenDependencies() {
+		return getRootConfig().getMavenDependencies();
+	}
+
+	@Override
+	public void setMavenDependencies(boolean value) {
+		getRootConfig().setMavenDependencies(value);
+	}
+
+	@Override
+	public boolean getMonitoringComp() {
+		return getRootConfig().getMonitoringComp();
+	}
+
+	@Override
+	public void setMonitoringComp(boolean value) {
+		getRootConfig().setMonitoringComp(value);
+	}
+
+	@Override
+	public boolean getSensors() {
+		return getRootConfig().getSensors();
+	}
+
+	@Override
+	public void setSensors(boolean value) {
+		getRootConfig().setSensors(value);
+	}
+
+	@Override
+	public String getThreadpoolClass() {
+		return getRootConfig().getThreadpoolClass();
+	}
+
+	@Override
+	public void setThreadpoolClass(String value) {
+		getRootConfig().setThreadpoolClass(value);
+	}
+
+	@Override
+	public String getContextServiceClass() {
+		return getRootConfig().getContextServiceClass();
+	}
+
+	@Override
+	public void setContextServiceClass(String value) {
+		getRootConfig().setContextServiceClass(value);
+	}
+
+	@Override
+	public boolean getDf() {
+		return getRootConfig().getDf();
+	}
+
+	@Override
+	public void setDf(boolean value) {
+		getRootConfig().setDf(value);
+	}
+
+	@Override
+	public boolean getClock() {
+		return getRootConfig().getClock();
+	}
+
+	@Override
+	public void setClock(boolean value) {
+		getRootConfig().setClock(value);
+	}
+
+	@Override
+	public boolean getMessage() {
+		return getRootConfig().getMessage();
+	}
+
+	@Override
+	public void setMessage(boolean value) {
+		getRootConfig().setMessage(value);
+	}
+
+	@Override
+	public boolean getSimul() {
+		return getRootConfig().getSimul();
+	}
+
+	@Override
+	public void setSimul(boolean value) {
+		getRootConfig().setSimul(value);
+	}
+
+	@Override
+	public boolean getFiletransfer() {
+		return getRootConfig().getFiletransfer();
+	}
+
+	@Override
+	public void setFiletransfer(boolean value) {
+		getRootConfig().setFiletransfer(value);
+	}
+
+	@Override
+	public boolean getMarshal() {
+		return getRootConfig().getMarshal();
+	}
+
+	@Override
+	public void setMarshal(boolean value) {
+		getRootConfig().setMarshal(value);
+	}
+
+	@Override
+	public boolean getSecurity() {
+		return getRootConfig().getSecurity();
+	}
+
+	@Override
+	public void setSecurity(boolean value) {
+		getRootConfig().setSecurity(value);
+	}
+
+	@Override
+	public boolean getLibrary() {
+		return getRootConfig().getLibrary();
+	}
+
+	@Override
+	public void setLibrary(boolean value) {
+		getRootConfig().setLibrary(value);
+	}
+
+	@Override
+	public boolean getSettings() {
+		return getRootConfig().getSettings();
+	}
+
+	@Override
+	public void setSettings(boolean value) {
+		getRootConfig().setSettings(value);
+	}
+
+	@Override
+	public boolean getContext() {
+		return getRootConfig().getContext();
+	}
+
+	@Override
+	public void setContext(boolean value) {
+		getRootConfig().setContext(value);
+	}
+
+	@Override
+	public boolean getAddress() {
+		return getRootConfig().getAddress();
+	}
+
+	@Override
+	public void setAddress(boolean value) {
+		getRootConfig().setAddress(value);
+	}
+
+	@Override
+	public boolean getRegistrySync() {
+		return getRootConfig().getRegistrySync();
+	}
+
+	@Override
+	public void setRegistrySync(boolean value) {
+		getRootConfig().setRegistrySync(value);
+	}
+
+	//---- DELEGATES for StarterConfiguration -----//
+
+
+//	@Override
+//	public void setValue(String key, Object value) {
+//		getStarterConfig().setValue(key, value);
+//	}
+//
+//	@Override
+//	public Object getValue(String key) {
+//		return getStarterConfig().getValue(key);
+//	}
+
+	@Override
+	public String getPlatformName() {
+		return getStarterConfig().getPlatformName();
+	}
+
+	@Override
+	public void setPlatformName(String value) {
+		getStarterConfig().setPlatformName(value);
+	}
+
+	@Override
+	public String getConfigurationName() {
+		return getStarterConfig().getConfigurationName();
+	}
+
+	@Override
+	public void setConfigurationName(String value) {
+		getStarterConfig().setConfigurationName(value);
+	}
+
+	@Override
+	public boolean getAutoShutdown() {
+		return getStarterConfig().getAutoShutdown();
+	}
+
+	@Override
+	public void setAutoShutdown(boolean value) {
+		getStarterConfig().setAutoShutdown(value);
+	}
+
+	@Override
+	public Class getPlatformComponent() {
+		return getStarterConfig().getPlatformComponent();
+	}
+
+	@Override
+	public void setPlatformComponent(Class value) {
+		getStarterConfig().setPlatformComponent(value);
+	}
+
+	@Override
+	public void setDefaultTimeout(long to) {
+		getStarterConfig().setDefaultTimeout(to);
+	}
+
+	@Override
+	public Long getDefaultTimeout() {
+		return getStarterConfig().getDefaultTimeout();
+	}
+
+	@Override
+	public long getLocalDefaultTimeout() {
+		return getStarterConfig().getLocalDefaultTimeout();
+	}
+
+	@Override
+	public long getRemoteDefaultTimeout() {
+		return getStarterConfig().getRemoteDefaultTimeout();
+	}
+
+	@Override
+	public void addComponent(Class clazz) {
+		getStarterConfig().addComponent(clazz);
+	}
+
+	@Override
+	public void addComponent(String path) {
+		getStarterConfig().addComponent(path);
+	}
+
+	@Override
+	public void setComponents(List<String> newcomps) {
+		getStarterConfig().setComponents(newcomps);
+	}
+
+	@Override
+	public List<String> getComponents() {
+		return getStarterConfig().getComponents();
+	}
+
+	@Override
+	public String getComponentFactory() {
+		return getStarterConfig().getComponentFactory();
+	}
+
+	@Override
+	public void setConfigurationFile(String value) {
+		getStarterConfig().setConfigurationFile(value);
+	}
+
+	@Override
+	public String getConfigurationFile() {
+		return getStarterConfig().getConfigurationFile();
+	}
+
+	@Override
+	public void setMonitoring(IMonitoringService.PublishEventLevel level) {
+		getStarterConfig().setMonitoring(level);
+	}
+
+	@Override
+	public IMonitoringService.PublishEventLevel getMonitoring() {
+		return getStarterConfig().getMonitoring();
 	}
 }

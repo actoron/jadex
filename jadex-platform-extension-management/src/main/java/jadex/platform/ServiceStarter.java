@@ -163,13 +163,9 @@ public class ServiceStarter implements Daemon
 	{
 		if(platform==null)
 		{
-			// Todo: allow incremental platform configuration in PlatformConfiguration directly?
 			PlatformConfiguration	config	= getConfig();
-			config.getRootConfig().setProgramArguments(args);
-			for(int i=0; args!=null && i<args.length; i+=2)
-			{
-				PlatformConfiguration.parseArg(args[i], args[i+1], config);
-			}
+			config.setProgramArguments(args);
+			config.parseArgs(args);
 			
 			platform = Starter.createPlatform(config).get();
 		}		

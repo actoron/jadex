@@ -1971,7 +1971,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //			System.out.println("inited: "+component.getComponentIdentifier());
 			
 			// perform init write fields (after injection of bdiagent)
-			BDIAgentFeature.performInitWrites(component);
+			BDIAgentFeature.performInitWrites(component, component);
 			
 			// Start rule system
 //				if(getComponentIdentifier().getName().indexOf("Cleaner")!=-1)// && getComponentIdentifier().getName().indexOf("Burner")==-1)

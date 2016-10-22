@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -2019,7 +2018,14 @@ public class SReflect
 	
 	/** Cached flag for android check. */
 	protected static volatile Boolean isAndroid;
-	
+
+	/** private setter that can be made accessible for robolectric testcases. **/
+	private static void setAndroid(boolean value) {
+		synchronized (SReflect.class) {
+			isAndroid = value;
+		}
+	}
+
 	/**
 	 *  Test if running on android.
 	 */
@@ -2031,16 +2037,14 @@ public class SReflect
 			{
 				if (isAndroid==null)
 				{
-					try
-					{
-						SReflect.class.getClassLoader().loadClass("android.app.Activity");
-						isAndroid = Boolean.TRUE;
-					}
-					catch(Exception e)
-					{
-						isAndroid = Boolean.FALSE;
-					}
-//					isAndroid	= Boolean.valueOf(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
+					String vmName = System.getProperty("java.vm.name");
+					String vmVendor = System.getProperty("java.vm.vendor");
+					String vendorUrl = System.getProperty("java.vendor.url");
+
+					isAndroid =
+							("Dalvik".equalsIgnoreCase(vmName) ||
+							"The Android Project".equalsIgnoreCase(vmVendor) ||
+							"http://www.android.com".equalsIgnoreCase(vendorUrl));
 				}
 			}
 		}
