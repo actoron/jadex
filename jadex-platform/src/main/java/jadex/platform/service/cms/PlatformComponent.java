@@ -943,13 +943,13 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				}
 				
 				if(!found && ((exact && IInternalAccess.class.equals(type))
-					|| (!exact && SReflect.isSupertype(IInternalAccess.class, type))))
+					|| (!exact && SReflect.isSupertype(type, IInternalAccess.class))))
 				{
 					ret	= getInternalAccess();
 					found	= true;
 				}
 				else if(!found && ((exact && IExternalAccess.class.equals(type))
-					|| (!exact && SReflect.isSupertype(IExternalAccess.class, type))))
+					|| (!exact && SReflect.isSupertype(type, IExternalAccess.class))))
 				{
 					ret	= getExternalAccess();
 					found	= true;
