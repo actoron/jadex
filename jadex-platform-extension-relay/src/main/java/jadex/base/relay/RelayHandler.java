@@ -281,7 +281,7 @@ public class RelayHandler
 				{
 					// Get next request from queue.
 					long	timeout	= (long)(SRelay.PING_DELAY*0.85);
-					getLogger().info("Waiting for message for: "+info.getId()+", timeout="+timeout);
+//					getLogger().info("Waiting for message for: "+info.getId()+", timeout="+timeout);
 					Message	msg	= queue.dequeue(timeout);	// Todo: make ping delay configurable on per client basis
 					info.updateLastActiveTime();
 //					System.out.println("sending data to:"+id);
@@ -312,7 +312,7 @@ public class RelayHandler
 				}
 				catch(TimeoutException te)
 				{
-					getLogger().info("Activity timeout. Requesting ping from: "+info.getId()+", timeout="+info.testPlatformTimeout(SRelay.PING_DELAY));
+//					getLogger().info("Activity timeout. Requesting ping from: "+info.getId()+", timeout="+info.testPlatformTimeout(SRelay.PING_DELAY));
 					if(info.testPlatformTimeout(SRelay.PING_DELAY))
 					{
 						throw new TimeoutException("No platform activity in the last "+SRelay.PING_DELAY+" ms.");
@@ -530,7 +530,7 @@ public class RelayHandler
 		if(pi!=null)
 		{
 			pi.updateLastActiveTime();
-			RelayHandler.getLogger().info("Received ping from platform: "+id);
+//			RelayHandler.getLogger().info("Received ping from platform: "+id);
 		}
 	}
 	
