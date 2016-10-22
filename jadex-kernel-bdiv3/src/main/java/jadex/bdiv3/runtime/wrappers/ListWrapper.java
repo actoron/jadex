@@ -2,6 +2,7 @@ package jadex.bdiv3.runtime.wrappers;
 
 import java.util.List;
 
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
 import jadex.rules.eca.EventType;
@@ -12,7 +13,7 @@ import jadex.rules.eca.EventType;
 public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrapper<T> 
 {
 	/** The event publisher. */
-	protected EventPublisher publisher;
+	protected IEventPublisher publisher;
 
 	/**
 	 *  Create a new list wrapper.
@@ -30,13 +31,36 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 		EventType addevent, EventType remevent, EventType changeevent, MElement melem)
 	{
 		super(delegate);
-		this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, melem);
-		
+		if(agent!=null)
+			this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, melem);
+		else
+			this.publisher = new InitEventPublisher(delegate, addevent, remevent, changeevent, melem);
+			
 		int	i=0;
 		for(T entry: delegate)
 		{
 			publisher.entryAdded(entry, i++);
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void setAgent(IInternalAccess agent)
+	{
+		if(publisher instanceof InitEventPublisher)
+		{
+			InitEventPublisher pub = (InitEventPublisher)publisher;
+			this.publisher = new EventPublisher(agent, pub.addevent, pub.remevent, pub.changeevent, pub.melement);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isInitWrite()
+	{
+		return publisher instanceof InitEventPublisher;
 	}
 	
 	/**

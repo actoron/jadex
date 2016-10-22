@@ -124,7 +124,8 @@ public class ResourceIdentifier implements IResourceIdentifier
 		{
 			File f	= new File(lid.getUri().getPath());
 			// Use SUtil.getHashCode(f, false) to test with directory and jar
-			this.gid	= new GlobalResourceIdentifier("::"+SUtil.getHashCode(f, true), null, null);
+			// Commented out due to excessive long time consumption on Jadex startup 
+//			this.gid	= new GlobalResourceIdentifier("::"+SUtil.getHashCode(f, true), null, null);
 		}
 	}
 	
