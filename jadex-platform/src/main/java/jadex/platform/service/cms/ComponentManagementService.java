@@ -1974,9 +1974,7 @@ public class ComponentManagementService implements IComponentManagementService
 				else
 				{
 					// No listener -> print exception.
-					StringWriter	sw	= new StringWriter();
-					ex.printStackTrace(new PrintWriter(sw));
-					comp.getLogger().severe("Fatal error, component '"+cid+"' will be removed.\n"+sw);
+					comp.getLogger().severe("Fatal error, component '"+cid+"' will be removed.\n"+SUtil.getExceptionStacktrace(ex));
 				}
 			}
 			
