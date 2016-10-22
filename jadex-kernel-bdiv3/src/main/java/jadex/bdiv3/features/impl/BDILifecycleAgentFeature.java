@@ -1,5 +1,6 @@
 package jadex.bdiv3.features.impl;
 
+import java.io.Closeable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -98,6 +99,9 @@ import jadex.rules.eca.annotations.CombinedCondition;
  */
 public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature implements IInternalBDILifecycleFeature
 {
+	/** The autoclosable class, if present. */
+	public static final Class<?>	AUTOCLOSABLE	= SReflect.classForName0("java.lang.AutoCloseable", BDILifecycleAgentFeature.class.getClassLoader());
+	
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(ILifecycleComponentFeature.class, BDILifecycleAgentFeature.class,
 		new Class<?>[]{IRequiredServicesFeature.class, IProvidedServicesFeature.class, ISubcomponentsFeature.class}, null, false);
@@ -2015,6 +2019,60 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			// Barrier to wait for all body processing.
 			FutureBarrier<Void>	bodyend	= new FutureBarrier<Void>();
+			
+			// Cleanup beliefs when value is (auto)closeable
+			List<MBelief> beliefs = ((BDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
+			for(MBelief belief: beliefs)
+			{
+				if(belief.isMulti(component.getClassLoader()))
+				{
+					try
+					{
+						Object	fact	= belief.getValue(component);
+						if(fact!=null && SReflect.isIterableClass(fact.getClass()))
+						{
+							for(Object item: SReflect.getIterable(fact))
+							{
+								if(fact instanceof Closeable)
+								{
+									((Closeable)fact).close();
+								}
+								else if(fact!=null && AUTOCLOSABLE!=null && SReflect.isSupertype(AUTOCLOSABLE, fact.getClass()))
+								{
+									AUTOCLOSABLE.getMethod("close", new Class<?>[0]).invoke(fact, new Object[0]);
+								}
+								else
+								{
+									break;
+								}
+							}
+						}
+					}
+					catch(Exception e)
+					{
+						component.getLogger().warning("Exception during autoclose of belief set "+belief.getName()+": "+SUtil.getExceptionStacktrace(e));
+					}
+				}
+				else
+				{
+					try
+					{
+						Object	fact	= belief.getValue(component);
+						if(fact instanceof Closeable)
+						{
+							((Closeable)fact).close();
+						}
+						else if(fact!=null && AUTOCLOSABLE!=null && SReflect.isSupertype(AUTOCLOSABLE, fact.getClass()))
+						{
+							AUTOCLOSABLE.getMethod("close", new Class<?>[0]).invoke(fact, new Object[0]);
+						}
+					}
+					catch(Exception e)
+					{
+						component.getLogger().warning("Exception during autoclose of belief "+belief.getName()+": "+SUtil.getExceptionStacktrace(e));
+					}
+				}
+			}
 			
 			// Abort running goals.
 			Collection<RGoal> goals = bdif.getCapability().getGoals();
