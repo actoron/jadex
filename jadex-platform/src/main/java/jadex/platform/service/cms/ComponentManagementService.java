@@ -1484,10 +1484,6 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			((CMSComponentDescription)desc).setState(IComponentDescription.STATE_TERMINATED);
 		}
-
-
-
-
 		return ret!=null;
 	}
 	
