@@ -2021,7 +2021,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			FutureBarrier<Void>	bodyend	= new FutureBarrier<Void>();
 			
 			// Cleanup beliefs when value is (auto)closeable
-			List<MBelief> beliefs = ((BDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
+			List<MBelief> beliefs = ((IBDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
 			for(MBelief belief: beliefs)
 			{
 				if(belief.isMulti(component.getClassLoader()))
