@@ -1,6 +1,4 @@
 package jadex.launch.test;
-import java.io.File;
-
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
 import junit.framework.Test;
@@ -17,6 +15,8 @@ public class BDIV3Test	extends	ComponentTestSuite
 	private static final String[]	EXCLUDES	=
 		new String[]
 		{
+			"treasurehunter",	// in progress -> include later
+			
 			"INegotiationAgent",	// Not an agent.
 			"QuickstartBDI",	// blocks due to opened dialog
 			"Ambulance",	// sub agent
