@@ -1314,7 +1314,7 @@ public class ComponentManagementService implements IComponentManagementService
 //				}
 //			});
 //		}
-		
+
 		return ret;
 	}
 
@@ -1463,13 +1463,11 @@ public class ComponentManagementService implements IComponentManagementService
 	{
 //		Thread.dumpStack();
 		Future<Map<String, Object>>	ret;
-		if(desc instanceof CMSComponentDescription)
-		{
-			((CMSComponentDescription)desc).setState(IComponentDescription.STATE_TERMINATED);
-		}
 		ccs.remove(cid);
 		ret	= (Future<Map<String, Object>>)cfs.remove(cid);
-		
+
+		// setting result/exception MUST happen before setting state to terminated.
+		// otherwise result cannot be passed to the component.
 		if(ret!=null)
 		{
 			if(ex!=null)
@@ -1481,7 +1479,15 @@ public class ComponentManagementService implements IComponentManagementService
 				ret.setResultIfUndone(results);
 			}
 		}
-		
+
+		if(desc instanceof CMSComponentDescription)
+		{
+			((CMSComponentDescription)desc).setState(IComponentDescription.STATE_TERMINATED);
+		}
+
+
+
+
 		return ret!=null;
 	}
 	
@@ -1851,7 +1857,7 @@ public class ComponentManagementService implements IComponentManagementService
 	class CleanupCommand implements IResultListener<Void>
 	{
 		protected IComponentIdentifier cid;
-		
+
 		public CleanupCommand(IComponentIdentifier cid)
 		{
 //			System.out.println("CleanupCommand created");
@@ -1894,7 +1900,7 @@ public class ComponentManagementService implements IComponentManagementService
 			
 			desc	= (CMSComponentDescription)comp.getComponentDescription();
 			results = comp.getComponentFeature(IArgumentsResultsFeature.class).getResults();
-			
+
 //				desc.setState(IComponentDescription.STATE_TERMINATED);
 //				ccs.remove(cid);
 //				cfs.remove(cid);
@@ -1938,7 +1944,7 @@ public class ComponentManagementService implements IComponentManagementService
 				if(pad!=null)
 					((IInternalSubcomponentsFeature)pad.getComponentFeature(ISubcomponentsFeature.class)).componentRemoved(desc);
 			}
-			
+
 			// Must be executed out of sync block due to deadlocks
 			// agent->cleanupcommand->space.componentRemoved (holds adapter mon -> needs space mone)
 			// space executor->general loop->distributed percepts->(holds space mon -> needs adapter mon for getting external access)
