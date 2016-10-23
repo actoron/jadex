@@ -1466,8 +1466,10 @@ public class ComponentManagementService implements IComponentManagementService
 		ccs.remove(cid);
 		ret	= (Future<Map<String, Object>>)cfs.remove(cid);
 
-		// setting result/exception MUST happen before setting state to terminated.
-		// otherwise result cannot be passed to the component.
+		if(desc instanceof CMSComponentDescription)
+		{
+			((CMSComponentDescription)desc).setState(IComponentDescription.STATE_TERMINATED);
+		}
 		if(ret!=null)
 		{
 			if(ex!=null)
@@ -1480,10 +1482,6 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 		}
 
-		if(desc instanceof CMSComponentDescription)
-		{
-			((CMSComponentDescription)desc).setState(IComponentDescription.STATE_TERMINATED);
-		}
 		return ret!=null;
 	}
 	
