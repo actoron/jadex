@@ -146,13 +146,86 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	{
 		return new EndBehavior(component);
 	}
-
+	
+	/**
+	 *  Kill is only invoked, when shutdown of some (e.g. other) feature does not return due to timeout.
+	 *  The feature should do any kind of possible cleanup, but no asynchronous operations.
+	 */
+	public void kill()
+	{
+		doSyncCleanup();
+	}
+	
+	/**
+	 *  Synchronous cleanup of agent.
+	 *  Done in shutdown and kill.
+	 *  Asynchronous cleanup is delegated to end behavior.
+	 */
+	protected void	doSyncCleanup()
+	{
+		setShutdown(true);
+		
+		// Cleanup beliefs when value is (auto)closeable
+		List<MBelief> beliefs = ((IBDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
+		for(MBelief belief: beliefs)
+		{
+			if(belief.isMulti(component.getClassLoader()))
+			{
+				try
+				{
+					Object	fact	= belief.getValue(component);
+					if(fact!=null && SReflect.isIterableClass(fact.getClass()))
+					{
+						for(Object item: SReflect.getIterable(fact))
+						{
+							if(fact instanceof Closeable)
+							{
+								((Closeable)fact).close();
+							}
+							else if(fact!=null && AUTOCLOSABLE!=null && SReflect.isSupertype(AUTOCLOSABLE, fact.getClass()))
+							{
+								AUTOCLOSABLE.getMethod("close", new Class<?>[0]).invoke(fact, new Object[0]);
+							}
+							else
+							{
+								break;
+							}
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					component.getLogger().warning("Exception during autoclose of belief set "+belief.getName()+": "+SUtil.getExceptionStacktrace(e));
+				}
+			}
+			else
+			{
+				try
+				{
+					Object	fact	= belief.getValue(component);
+					if(fact instanceof Closeable)
+					{
+						((Closeable)fact).close();
+					}
+					else if(fact!=null && AUTOCLOSABLE!=null && SReflect.isSupertype(AUTOCLOSABLE, fact.getClass()))
+					{
+						AUTOCLOSABLE.getMethod("close", new Class<?>[0]).invoke(fact, new Object[0]);
+					}
+				}
+				catch(Exception e)
+				{
+					component.getLogger().warning("Exception during autoclose of belief "+belief.getName()+": "+SUtil.getExceptionStacktrace(e));
+				}
+			}
+		}
+	}
+	
 	/**
 	 *  Cleanup the agent.
 	 */
 	public IFuture<Void> shutdown()
 	{
-		setShutdown(true);
+		doSyncCleanup();
 		
 		final Future<Void>	ret	= new Future<Void>();
 		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
@@ -2019,61 +2092,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			// Barrier to wait for all body processing.
 			FutureBarrier<Void>	bodyend	= new FutureBarrier<Void>();
-			
-			// Cleanup beliefs when value is (auto)closeable
-			List<MBelief> beliefs = ((IBDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
-			for(MBelief belief: beliefs)
-			{
-				if(belief.isMulti(component.getClassLoader()))
-				{
-					try
-					{
-						Object	fact	= belief.getValue(component);
-						if(fact!=null && SReflect.isIterableClass(fact.getClass()))
-						{
-							for(Object item: SReflect.getIterable(fact))
-							{
-								if(fact instanceof Closeable)
-								{
-									((Closeable)fact).close();
-								}
-								else if(fact!=null && AUTOCLOSABLE!=null && SReflect.isSupertype(AUTOCLOSABLE, fact.getClass()))
-								{
-									AUTOCLOSABLE.getMethod("close", new Class<?>[0]).invoke(fact, new Object[0]);
-								}
-								else
-								{
-									break;
-								}
-							}
-						}
-					}
-					catch(Exception e)
-					{
-						component.getLogger().warning("Exception during autoclose of belief set "+belief.getName()+": "+SUtil.getExceptionStacktrace(e));
-					}
-				}
-				else
-				{
-					try
-					{
-						Object	fact	= belief.getValue(component);
-						if(fact instanceof Closeable)
-						{
-							((Closeable)fact).close();
-						}
-						else if(fact!=null && AUTOCLOSABLE!=null && SReflect.isSupertype(AUTOCLOSABLE, fact.getClass()))
-						{
-							AUTOCLOSABLE.getMethod("close", new Class<?>[0]).invoke(fact, new Object[0]);
-						}
-					}
-					catch(Exception e)
-					{
-						component.getLogger().warning("Exception during autoclose of belief "+belief.getName()+": "+SUtil.getExceptionStacktrace(e));
-					}
-				}
-			}
-			
+						
 			// Abort running goals.
 			Collection<RGoal> goals = bdif.getCapability().getGoals();
 //			System.out.println(component.getComponentIdentifier()+" dropping body goals: "+goals);
