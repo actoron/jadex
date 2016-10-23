@@ -19,12 +19,14 @@ public class CustomTestRunner extends RobolectricTestRunner {
     private static final int MAX_SDK_SUPPORTED_BY_ROBOLECTRIC = 18;
 
 	static {
-		Method setAndroid = SReflect.getMethod(SReflect.class, "setAndroid", new Class[]{boolean.class});
 		try {
+			Method setAndroid = SReflect.class.getDeclaredMethod("setAndroid", new Class[]{boolean.class});
 			setAndroid.invoke(null, true);
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		}
 	}
