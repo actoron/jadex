@@ -817,17 +817,39 @@ public class ComponentManagementService implements IComponentManagementService
 																			{
 																				public void run()
 																				{
-																					components.remove(cid);
-																					removeInitInfo(cid);
-																					
-																					if(resultlistener!=null)
+																					IPlatformComponentAccess	comp	= components.get(cid);
+																					if(comp==null)
 																					{
-																						resultlistener.exceptionOccurred(exception);
+																						InitInfo	ii	= getInitInfo(cid);
+																						assert ii!=null: "Should be either in 'components' or 'initinfos'.";
+																						comp	= ii.getComponent();
 																					}
 																					
-																					exitDestroy(cid, ad, exception, null);
-																					
-																					inited.setException(exception);
+																					comp.getInternalAccess().getExternalAccess().killComponent(exception)
+																						.addResultListener(new IResultListener<Map<String,Object>>()
+																					{
+																						@Override
+																						public void resultAvailable(Map<String, Object> result)
+																						{
+																							// Shouldn't happen.
+																							Thread.dumpStack();
+																						}
+																						
+																						@Override
+																						public void exceptionOccurred(Exception exception)
+																						{
+																							components.remove(cid);
+																							removeInitInfo(cid);
+
+																							if(resultlistener!=null)
+																							{
+																								resultlistener.exceptionOccurred(exception);
+																							}
+
+																							inited.setException(exception);
+																						}
+																					});
+//																					exitDestroy(cid, ad, exception, null);
 																				}
 																			};
 																			
@@ -1392,9 +1414,10 @@ public class ComponentManagementService implements IComponentManagementService
 						logger.info("Terminated component structure: "+cid.getName());
 						CleanupCommand	cc	= null;
 						IFuture<Void>	fut	= null;
-//						IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-						final IPlatformComponentAccess comp = components.get(cid);
-						// Component may be already killed (e.g. when autoshutdown).
+						
+						// Fetch comp again as component may be already killed (e.g. when autoshutdown).
+						InitInfo infos	= getInitInfo(cid);
+						IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : components.get(cid);
 						if(comp!=null)
 						{
 //							if(cid.toString().indexOf("AutoTerminate")!=-1)
