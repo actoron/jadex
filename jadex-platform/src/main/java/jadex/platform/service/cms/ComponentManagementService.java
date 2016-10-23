@@ -33,6 +33,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
+import jadex.bridge.component.impl.IInternalArgumentsResultsFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
@@ -1459,7 +1460,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  Exit the destroy method by setting description state and resetting maps.
 	 *  @return True, when somebody was notified.
 	 */
-	protected boolean exitDestroy(IComponentIdentifier cid, IComponentDescription desc, Exception ex, Map<String, Object> results)
+	protected void	exitDestroy(IComponentIdentifier cid, IComponentDescription desc, Exception ex, Map<String, Object> results)
 	{
 //		Thread.dumpStack();
 		Future<Map<String, Object>>	ret;
@@ -1484,7 +1485,6 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			((CMSComponentDescription)desc).setState(IComponentDescription.STATE_TERMINATED);
 		}
-		return ret!=null;
 	}
 	
 	/**
@@ -1895,7 +1895,9 @@ public class ComponentManagementService implements IComponentManagementService
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
 			
 			desc	= (CMSComponentDescription)comp.getComponentDescription();
-			results = comp.getComponentFeature(IArgumentsResultsFeature.class).getResults();
+			
+			IArgumentsResultsFeature	af	= comp.getComponentFeature0(IArgumentsResultsFeature.class); 
+			results = af!=null ? af.getResults() : null;
 
 //				desc.setState(IComponentDescription.STATE_TERMINATED);
 //				ccs.remove(cid);
@@ -1959,7 +1961,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			}
 			// else parent has just been killed.
 			
-			boolean	notified	= exitDestroy(cid, desc, exception, results);
+			exitDestroy(cid, desc, exception, results);
 
 			notifyListenersRemoved(cid, desc, results);
 			
@@ -1968,7 +1970,7 @@ public class ComponentManagementService implements IComponentManagementService
 			if(ex!=null)
 			{
 				// Unhandled component exception
-				if(notified)
+				if(af!=null && ((IInternalArgumentsResultsFeature)af).hasListener())
 				{
 					// Delegated exception to some listener, only print info.
 					comp.getLogger().info("Fatal error, component '"+cid+"' will be removed due to "+ex);
