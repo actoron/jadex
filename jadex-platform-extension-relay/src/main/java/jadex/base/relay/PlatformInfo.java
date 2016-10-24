@@ -541,7 +541,7 @@ public final class PlatformInfo
 	public void	updateLastActiveTime()
 	{
 		this.lastactive_time	= new Date();
-		RelayHandler.getLogger().info("Activity update for: "+getId());
+//		RelayHandler.getLogger().info("Activity update for: "+getId());
 
 	}
 	
@@ -551,7 +551,7 @@ public final class PlatformInfo
 	public boolean	testPlatformTimeout(long timeout)
 	{
 		long	idle	= lastactive_time!=null ? System.currentTimeMillis() - lastactive_time.getTime() : -1;
-		RelayHandler.getLogger().info("Activity timeout test for "+getId()+": idle="+idle+" vs. timeout="+timeout);
+//		RelayHandler.getLogger().info("Activity timeout test for "+getId()+": idle="+idle+" vs. timeout="+timeout);
 		return idle>timeout;
 	}
 }

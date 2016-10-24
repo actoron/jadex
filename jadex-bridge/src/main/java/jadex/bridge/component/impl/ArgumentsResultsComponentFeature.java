@@ -28,7 +28,7 @@ import jadex.javaparser.SJavaParser;
 /**
  *  This feature provides arguments.
  */
-public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher
+public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher, IInternalArgumentsResultsFeature
 {
 	//-------- attributes --------
 	
@@ -296,7 +296,18 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		});
 		return ret;
 	}
+
+	//-------- internal interface --------
 	
+	/**
+	 *  Check if there is somebody waiting for this component to finish.
+	 *  Used to decide if a fatal error needs to be printed to the console.
+	 */
+	public boolean	hasListener()
+	{
+		return resfuts!=null && !resfuts.isEmpty();
+	}
+
 	//-------- helper methods --------
 	
 	/**

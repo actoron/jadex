@@ -317,18 +317,18 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		MethodInfo	mi	= model.getAgentMethod(ann);
 		if(mi!=null)
 		{
-			Method	method	= mi.getMethod(component.getClassLoader());
-			
-			// Try to guess parameters from given args or component internals.
-			IParameterGuesser	guesser	= args!=null ? new SimpleParameterGuesser(component.getParameterGuesser(), Arrays.asList(args)) : component.getParameterGuesser();
-			Object[]	iargs	= new Object[method.getParameterTypes().length];
-			for(int i=0; i<method.getParameterTypes().length; i++)
-			{
-				iargs[i]	= guesser.guessParameter(method.getParameterTypes()[i], false);
-			}
-			
 			try
 			{
+				Method	method	= mi.getMethod(component.getClassLoader());
+				
+				// Try to guess parameters from given args or component internals.
+				IParameterGuesser	guesser	= args!=null ? new SimpleParameterGuesser(component.getParameterGuesser(), Arrays.asList(args)) : component.getParameterGuesser();
+				Object[]	iargs	= new Object[method.getParameterTypes().length];
+				for(int i=0; i<method.getParameterTypes().length; i++)
+				{
+					iargs[i]	= guesser.guessParameter(method.getParameterTypes()[i], false);
+				}
+				
 				// It is now allowed to use protected/private agent created, body, terminate methods
 				method.setAccessible(true);
 				Object res = method.invoke(component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);

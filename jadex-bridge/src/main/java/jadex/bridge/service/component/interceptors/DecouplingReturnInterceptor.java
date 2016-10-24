@@ -8,6 +8,7 @@ import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.ICommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -54,6 +55,12 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							{
 								com.execute(null);
 							}
+							else if (caller.getComponentDescription().getState().equals(IComponentDescription.STATE_TERMINATED)
+									&& sic.getMethod().getName().equals("destroyComponent")
+									&& sic.getArguments().size()==1 && caller!=null && caller.getComponentIdentifier().equals(sic.getArguments().get(0))) {
+								// do not try to reschedule if component killed itself and is already terminated to allow passing results to the original caller.
+								com.execute(null);
+							}
 							else
 							{
 								try
@@ -71,25 +78,16 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											// Special case: ignore ComponentTerminatedException when component has called cms.destroyComponent() for itself
 											if(exception instanceof ComponentTerminatedException)
 											{
-												if(sic.getMethod().getName().equals("destroyComponent")
-													&& sic.getArguments().size()==1 && caller!=null && caller.getComponentIdentifier().equals(sic.getArguments().get(0)))
+												// pass exception back to future as receiver is already dead.
+												if(res instanceof ITerminableFuture<?>)
 												{
-													// ignore
+													((ITerminableFuture<?>)res).terminate(exception);
 												}
 												else
 												{
-													// pass exception back to future as receiver is already dead.
-													if(res instanceof ITerminableFuture<?>)
-													{
-														((ITerminableFuture<?>)res).terminate(exception);
-													}
-													else
-													{
-														getLogger().warning("Future receiver already dead: "+exception);
-													}
+													getLogger().warning("Future receiver already dead: "+exception);
 												}
 											}
 											else
