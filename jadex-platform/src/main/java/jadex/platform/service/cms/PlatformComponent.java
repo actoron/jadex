@@ -315,7 +315,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //				System.out.println("Initing of "+getComponentIdentifier()+" failed due to "+fut.getException());
 				
 				// Init failed: remove failed feature.
-				ifeatures.remove(ifeatures.size()-1);
+				IComponentFeature	feature	= ifeatures.remove(ifeatures.size()-1);
+				feature.kill();	// Kill failed feature. Other features will be shutdowned.
 			}
 			else
 			{

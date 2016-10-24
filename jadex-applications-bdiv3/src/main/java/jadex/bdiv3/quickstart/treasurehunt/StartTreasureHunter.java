@@ -1,6 +1,7 @@
 package jadex.bdiv3.quickstart.treasurehunt;
 
 import jadex.base.PlatformConfiguration;
+import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 
 /**
@@ -13,7 +14,8 @@ public class StartTreasureHunter
 	 */
 	public static void main(String[] args)
 	{
-		PlatformConfiguration	config	= PlatformConfiguration.getDefault();
+		PlatformConfiguration	config	= PlatformConfiguration.getMinimal();
+        config.setKernels(RootComponentConfiguration.KERNEL.micro, RootComponentConfiguration.KERNEL.v3);
 //		config.getRootConfig().setLogging(true);
 		config.addComponent("jadex.bdiv3.quickstart.treasurehunt.TreasureHunterB1BDI.class");
 		Starter.createPlatform(config).get();

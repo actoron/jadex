@@ -1,5 +1,6 @@
 package jadex.bdiv3.model;
 
+import java.io.Closeable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
@@ -36,6 +38,9 @@ import jadex.rules.eca.EventType;
  */
 public class MBelief extends MElement
 {
+	/** The autoclosable class, if present. */
+	public static final Class<?>	AUTOCLOSABLE	= SReflect.classForName0("java.lang.AutoCloseable", BDILifecycleAgentFeature.class.getClassLoader());
+
 	/** The field target. */
 	protected FieldInfo ftarget;
 
@@ -621,6 +626,61 @@ public class MBelief extends MElement
 			}
 		}
 		return field;
+	}
+	
+	/**
+	 *  Cleanup the value on agent shutdown, i.e., call close() on closeable fact objects.
+	 */
+	public void	cleanup(IInternalAccess component)
+	{
+		if(isMulti(component.getClassLoader()))
+		{
+			try
+			{
+				Object	fact	= getValue(component);
+				if(fact!=null && SReflect.isIterableClass(fact.getClass()))
+				{
+					for(Object item: SReflect.getIterable(fact))
+					{
+						if(fact instanceof Closeable)
+						{
+							((Closeable)fact).close();
+						}
+						else if(fact!=null && AUTOCLOSABLE!=null && SReflect.isSupertype(AUTOCLOSABLE, fact.getClass()))
+						{
+							AUTOCLOSABLE.getMethod("close", new Class<?>[0]).invoke(fact, new Object[0]);
+						}
+						else
+						{
+							break;
+						}
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				component.getLogger().warning("Exception during autoclose of belief set "+getName()+": "+SUtil.getExceptionStacktrace(e));
+			}
+		}
+		else
+		{
+			try
+			{
+				Object	fact	= getValue(component);
+				if(fact instanceof Closeable)
+				{
+					((Closeable)fact).close();
+				}
+				else if(fact!=null && AUTOCLOSABLE!=null && SReflect.isSupertype(AUTOCLOSABLE, fact.getClass()))
+				{
+					AUTOCLOSABLE.getMethod("close", new Class<?>[0]).invoke(fact, new Object[0]);
+				}
+			}
+			catch(Exception e)
+			{
+				component.getLogger().warning("Exception during autoclose of belief "+getName()+": "+SUtil.getExceptionStacktrace(e));
+			}
+		}
 	}
 	
 	/**

@@ -150,6 +150,38 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return IFuture.DONE;
 	}
 	
+	/**
+	 *  Called on shutdown after successful init.
+	 */
+	@Override
+	public IFuture<Void> shutdown()
+	{
+		doCleanup();
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Called on init failure.
+	 */
+	@Override
+	public void kill()
+	{
+		doCleanup();
+	}
+	
+	/**
+	 *  Cleanup the beliefs in kill and shutdown.
+	 */
+	protected void	doCleanup()
+	{
+		// Cleanup beliefs when value is (auto)closeable
+		List<MBelief> beliefs = ((IBDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
+		for(MBelief belief: beliefs)
+		{
+			belief.cleanup(getComponent());
+		}
+	}
+	
 	//-------- internal method used for rewriting field access -------- 
 	
 	/**
