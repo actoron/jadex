@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *  Panel for showing the treasure hunter world view.
@@ -17,6 +18,9 @@ class EnvironmentPanel extends JPanel
 		
 	/** The treasure hunter environment. */
 	protected TreasureHunterEnvironment	env;
+	
+	/** The paint-in-progress flag. */
+	protected boolean	updating;
 		
 	//-------- constructors --------
 
@@ -26,6 +30,28 @@ class EnvironmentPanel extends JPanel
 	public EnvironmentPanel(TreasureHunterEnvironment env)
 	{
 		this.env	= env;
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Cause the panel to repaint.
+	 */
+	public void	environmentChanged()
+	{
+		if(!updating)
+		{
+			updating	= true;
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					updating	= false;
+					repaint();
+				}
+			});
+		}
 	}
 	
 	//-------- JPanel methods --------
@@ -80,7 +106,7 @@ class EnvironmentPanel extends JPanel
 //		}
 //
 		// Paint treasures.
-		for(Treasure t: env.treasures)
+		for(Treasure t: env.getTreasures())
 		{
 			p	= t.location;
 			int size	= objectsize*t.weight/10;
