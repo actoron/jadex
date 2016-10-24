@@ -1,7 +1,5 @@
 package jadex.platform.service.cms;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -186,7 +184,7 @@ public class ComponentManagementService implements IComponentManagementService
 		this.lockentries = SCollection.createHashMap();
 		this.cidcounts = new HashMap<String, Integer>();
 		
-		this.initinfos.put(access.getInternalAccess().getComponentIdentifier(), new InitInfo(access, null, null));
+		putInitInfo(access.getInternalAccess().getComponentIdentifier(), new InitInfo(access, null, null));
 	}
     
     //-------- IComponentManagementService interface --------
@@ -629,7 +627,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	component.create(cci, features);
 																	if(resultlistener!=null)
 																	{
-																		IArgumentsResultsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsResultsFeature.class);
+																		IArgumentsResultsFeature	af	= component.getInternalAccess().getComponentFeature0(IArgumentsResultsFeature.class);
 																		IResultListener<Collection<Tuple2<String, Object>>>	rl	= new IIntermediateResultListener<Tuple2<String, Object>>()
 																		{
 																			public void exceptionOccurred(final Exception exception)
@@ -685,15 +683,18 @@ public class ComponentManagementService implements IComponentManagementService
 																				Thread.dumpStack();
 																			}
 																		}; 
-																		af.subscribeToResults().addResultListener(rl);
+																		if(af!=null)
+																		{
+																			af.subscribeToResults().addResultListener(rl);
+																		}
 																	}
 																	
-																	initinfos.put(cid, new InitInfo(component, cinfo, resfut));
+																	putInitInfo(cid, new InitInfo(component, cinfo, resfut));
 																	
 																	// Start regular execution of inited component
 																	// when this component is the outermost component, i.e. with no parent
 																	// or the parent is already running
-																	final boolean	doinit	= cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null;
+																	final boolean	doinit	= cinfo.getParent()==null || getInitInfo(cinfo.getParent())==null;
 																	
 																	logger.info("Starting component: "+cid.getName());
 							//										System.err.println("Pre-Init: "+cid);
@@ -709,13 +710,13 @@ public class ComponentManagementService implements IComponentManagementService
 		//																	System.out.println("created: "+ad);
 																			
 																			// Init successfully finished. Add description and adapter.
-																			InitInfo	info	= initinfos.get(cid);
+																			InitInfo	info	= getInitInfo(cid);
 																			
 																			// Init finished. Set to suspended until parent registration is finished.
 																			// not set to suspend to allow other initing sibling components invoking services
 				//															ad.setState(IComponentDescription.STATE_SUSPENDED);
 																			
-					//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
+//																			System.out.println("adding cid: "+cid);
 																			components.put(cid, info.getComponent());
 																			// Removed in resumeComponent()
 				//																initinfos.remove(cid);
@@ -762,7 +763,7 @@ public class ComponentManagementService implements IComponentManagementService
 																						cids.add(cid);
 																						for(int i=0; i<cids.size(); i++)
 																						{
-																							initinfos.remove(cids.get(i));
+																							removeInitInfo(cids.get(i));
 																							CMSComponentDescription	desc	= (CMSComponentDescription)getDescription((IComponentIdentifier)cids.get(i));
 																							if(desc!=null)
 																							{
@@ -826,29 +827,32 @@ public class ComponentManagementService implements IComponentManagementService
 																					}
 																					
 																					comp.getInternalAccess().getExternalAccess().killComponent(exception)
-																						.addResultListener(new IResultListener<Map<String,Object>>()
+																						.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, IComponentIdentifier>(inited)
 																					{
 																						@Override
-																						public void resultAvailable(Map<String, Object> result)
+																						public void customResultAvailable(Map<String, Object> result)
 																						{
 																							// Shouldn't happen.
 																							Thread.dumpStack();
-																						}
-																						
-																						@Override
-																						public void exceptionOccurred(Exception exception)
-																						{
-																							components.remove(cid);
-																							removeInitInfo(cid);
-
-																							if(resultlistener!=null)
-																							{
-																								resultlistener.exceptionOccurred(exception);
-																							}
-
-																							inited.setException(exception);
-																						}
+																						}																							
 																					});
+//																							new IResultListener<Map<String,Object>>()
+//																					{
+//																						
+//																						@Override
+//																						public void exceptionOccurred(Exception exception)
+//																						{
+//																							components.remove(cid);
+//																							removeInitInfo(cid);
+//
+//																							if(resultlistener!=null)
+//																							{
+//																								resultlistener.exceptionOccurred(exception);
+//																							}
+//
+//																							inited.setException(exception);
+//																						}
+//																					});
 //																					exitDestroy(cid, ad, exception, null);
 																				}
 																			};
@@ -1695,7 +1699,7 @@ public class ComponentManagementService implements IComponentManagementService
 								}
 									
 								// Killed after init but before init resume -> execute queued destroy.
-								else if(initinfos.containsKey(cid))
+								else if(getInitInfo(cid)!=null)
 								{
 									removeInitInfo(cid);
 									cfs.remove(cid);
@@ -1905,8 +1909,13 @@ public class ComponentManagementService implements IComponentManagementService
 //			boolean shutdown = false;
 
 //			System.out.println("CleanupCommand remove called for: "+cid);
-//			adapter = (IComponentAdapter)adapters.remove(cid);
-			PlatformComponent comp = (PlatformComponent)components.remove(cid);
+			IPlatformComponentAccess	comp	= components.remove(cid);
+			if(comp==null)
+			{
+				InitInfo	ii	= removeInitInfo(cid);
+				assert ii!=null: "Should be either in 'components' or 'initinfos'.";
+				comp	= ii.getComponent();
+			}
 			PlatformComponent pad = null;
 			if(comp==null)
 				throw new ComponentNotFoundException("Component Identifier not registered: "+cid);
@@ -1914,9 +1923,9 @@ public class ComponentManagementService implements IComponentManagementService
 //				if(cid.getName().indexOf("Peer")==-1)
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
 			
-			desc	= (CMSComponentDescription)comp.getComponentDescription();
+			desc	= (CMSComponentDescription)comp.getInternalAccess().getComponentDescription();
 			
-			IArgumentsResultsFeature	af	= comp.getComponentFeature0(IArgumentsResultsFeature.class); 
+			IArgumentsResultsFeature	af	= comp.getInternalAccess().getComponentFeature0(IArgumentsResultsFeature.class); 
 			results = af!=null ? af.getResults() : null;
 
 //				desc.setState(IComponentDescription.STATE_TERMINATED);
@@ -1981,24 +1990,25 @@ public class ComponentManagementService implements IComponentManagementService
 //			}
 			// else parent has just been killed.
 			
-			exitDestroy(cid, desc, exception, results);
+			// Use adapter exception before cleanup exception as it probably happened first.
+			Exception	ex	= comp.getInternalAccess().getException()!=null ? comp.getInternalAccess().getException() : exception;
+			
+			exitDestroy(cid, desc, ex, results);
 
 			notifyListenersRemoved(cid, desc, results);
 			
-			// Use adapter exception before cleanup exception as it probably happened first.
-			Exception	ex	= comp.getException()!=null ? comp.getException() : exception;
 			if(ex!=null)
 			{
 				// Unhandled component exception
 				if(af!=null && ((IInternalArgumentsResultsFeature)af).hasListener())
 				{
 					// Delegated exception to some listener, only print info.
-					comp.getLogger().info("Fatal error, component '"+cid+"' will be removed due to "+ex);
+					comp.getInternalAccess().getLogger().info("Fatal error, component '"+cid+"' will be removed due to "+ex);
 				}
 				else
 				{
 					// No listener -> print exception.
-					comp.getLogger().severe("Fatal error, component '"+cid+"' will be removed.\n"+SUtil.getExceptionStacktrace(ex));
+					comp.getInternalAccess().getLogger().severe("Fatal error, component '"+cid+"' will be removed.\n"+SUtil.getExceptionStacktrace(ex));
 				}
 			}
 			
@@ -2802,7 +2812,7 @@ public class ComponentManagementService implements IComponentManagementService
 			platformname = agent.getComponentIdentifier().getName();
 		ret = new BasicComponentIdentifier(localname+"@"+platformname);
 		
-		if(uniqueids || components.containsKey(ret) || initinfos.containsKey(ret))
+		if(uniqueids || components.containsKey(ret) || getInitInfo(ret)!=null)
 		{
 			String key = localname+"@"+platformname;
 			
@@ -2820,7 +2830,7 @@ public class ComponentManagementService implements IComponentManagementService
 					ret = new BasicComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
 				}
 			}
-			while(components.containsKey(ret) || initinfos.containsKey(ret) || cfs.containsKey(ret));
+			while(components.containsKey(ret) || getInitInfo(ret)!=null || cfs.containsKey(ret));
 		}
 		
 		return ret;
@@ -2863,7 +2873,7 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(Void result)
 				{
-					initinfos.remove(agent.getComponentIdentifier());
+					removeInitInfo(agent.getComponentIdentifier());
 					components.put(agent.getComponentIdentifier(), access);
 					
 					ret.setResult(null);

@@ -317,9 +317,10 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		MethodInfo	mi	= model.getAgentMethod(ann);
 		if(mi!=null)
 		{
+			Method	method	= null;
 			try
 			{
-				Method	method	= mi.getMethod(component.getClassLoader());
+				method	= mi.getMethod(component.getClassLoader());
 				
 				// Try to guess parameters from given args or component internals.
 				IParameterGuesser	guesser	= args!=null ? new SimpleParameterGuesser(component.getParameterGuesser(), Arrays.asList(args)) : component.getParameterGuesser();
@@ -329,33 +330,49 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 					iargs[i]	= guesser.guessParameter(method.getParameterTypes()[i], false);
 				}
 				
-				// It is now allowed to use protected/private agent created, body, terminate methods
-				method.setAccessible(true);
-				Object res = method.invoke(component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);
-				if(res instanceof IFuture)
+				try
 				{
-					ret	= (IFuture<Void>)res;
+					// It is now allowed to use protected/private agent created, body, terminate methods
+					method.setAccessible(true);
+					Object res = method.invoke(component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);
+					if(res instanceof IFuture)
+					{
+						ret	= (IFuture<Void>)res;
+					}
+					else
+					{
+						ret	= IFuture.DONE;
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					ret	= IFuture.DONE;
+					if(e instanceof InvocationTargetException)
+					{
+						if(((InvocationTargetException)e).getTargetException() instanceof Exception)
+						{
+							e	= (Exception)((InvocationTargetException)e).getTargetException();
+						}
+						else if(((InvocationTargetException)e).getTargetException() instanceof Error)
+						{
+							// re-throw errors, e.g. StepAborted
+							throw (Error)((InvocationTargetException)e).getTargetException();
+						}
+					}
+					ret	= new Future<Void>(e);
 				}
+
 			}
 			catch(Exception e)
 			{
-				if(e instanceof InvocationTargetException)
+				// Error in method search or parameter guesser
+				if(method==null)
 				{
-					if(((InvocationTargetException)e).getTargetException() instanceof Exception)
-					{
-						e	= (Exception)((InvocationTargetException)e).getTargetException();
-					}
-					else if(((InvocationTargetException)e).getTargetException() instanceof Error)
-					{
-						// re-throw errors, e.g. StepAborted
-						throw (Error)((InvocationTargetException)e).getTargetException();
-					}
+					ret	= new Future<Void>(new RuntimeException("Cannot find method: "+mi, e));
 				}
-				ret	= new Future<Void>(e);
+				else
+				{
+					ret	= new Future<Void>(new RuntimeException("Cannot inject values for method: "+method, e));
+				}
 			}
 		}
 		else

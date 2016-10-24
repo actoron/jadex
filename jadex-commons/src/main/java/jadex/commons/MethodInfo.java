@@ -329,6 +329,11 @@ public class MethodInfo
 			buf.append(SReflect.getUnqualifiedTypeName(returntype.toString())).append(" ");
 		}
 		
+		if(classname!=null)
+		{
+			buf.append(classname).append(".");
+		}
+		
 		buf.append(getName());
 		if(parametertypes!=null && parametertypes.length>0)
 		{
