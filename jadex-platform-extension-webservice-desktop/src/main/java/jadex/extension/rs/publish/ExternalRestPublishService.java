@@ -154,10 +154,14 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	{
 	    try
 	    {
-	    	// If tolerant url notation cut off first part till real publish part
-	    	URI uri = new URI(info.getPublishId().replace("[", "").replace("]", ""));
+	    	String infopid = info.getPublishId();
+	    	if(infopid.endsWith("/"))
+	    		infopid = infopid.substring(0, infopid.length()-1);
 	    	
-	    	String pid = info.getPublishId();
+	    	// If tolerant url notation cut off first part till real publish part
+	    	URI uri = new URI(infopid.replace("[", "").replace("]", ""));
+	    	
+	    	String pid = infopid;
 	    	if(pid.startsWith("["))
 	    	{
 	    		pid = pid.substring(pid.indexOf("]")+1);
@@ -326,8 +330,11 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 			for(Tuple2<String, String> key: subhandlers.keySet())
 			{
 				ret.append("<div class=\"method\">");
-				ret.append("Host: ").append(key.getFirstEntity()!=null? key.getFirstEntity(): "-").append(" Path: ").append(key.getSecondEntity()).append("<br/>");
-				String url = getServletHost(request)+key.getSecondEntity();
+				String path = key.getSecondEntity();
+				if(path.startsWith("/DEFAULTAPP"))
+					path = path.replaceFirst("/DEFAULTAPP", request.getContextPath());
+				String url = getServletHost(request) + path;
+				ret.append("Host: ").append(key.getFirstEntity()!=null? key.getFirstEntity(): "-").append(" Path: ").append(path).append("<br/>");
 				ret.append("<a href=\"").append(url).append("\">").append(url).append("</a>");
 				ret.append("</div>");
 			}

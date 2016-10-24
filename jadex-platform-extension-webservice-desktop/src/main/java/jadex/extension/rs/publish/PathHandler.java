@@ -41,10 +41,15 @@ public class PathHandler implements IRequestHandler
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 	{
 		String path = request.getRequestURI();//request.getRequest().getRequestURIRef().getURI();
+		if(path.endsWith("/"))
+			path = path.substring(0, path.length()-1);
 		String host = request.getHeader("host");
-		int	idx	= host.indexOf(":");
-		if(idx!=-1)
-			host = host.substring(0, idx);
+		if(host!=null)
+		{
+			int	idx	= host.indexOf(":");
+			if(idx!=-1)
+				host = host.substring(0, idx);
+		}
 		
 		String pathcp = null; 
 		String ctx = request.getContextPath();
@@ -92,9 +97,11 @@ public class PathHandler implements IRequestHandler
 		
 		HttpServletRequestWrapper wr = new HttpServletRequestWrapper(request);
 		String cp = tup.getFirstEntity();
+		if(cp.startsWith("/DEFAULTAPP"))
+			cp = cp.replaceFirst("/DEFAULTAPP", request.getContextPath());
 		wr.setContextPath(cp);
 		String full = request.getRequestURI();
-		idx = full.indexOf(cp)+cp.length();
+		int idx = full.indexOf(cp)+cp.length();
 		String npi = full.substring(idx);
 		wr.setPathInfo(npi);
 		
