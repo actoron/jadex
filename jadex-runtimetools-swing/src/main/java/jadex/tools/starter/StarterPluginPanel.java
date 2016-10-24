@@ -665,13 +665,13 @@ public class StarterPluginPanel extends JPanel
 	public IFuture setProperties(Properties props)
 	{
 		double dl = props.getDoubleProperty("leftsplit_location");
-		if(dl!=0)
+		if(dl>0)
 		{
 			lsplit.setDividerLocation(dl);
 			lsplit.setResizeWeight(dl);
 		}
 		dl = props.getDoubleProperty("mainsplit_location");
-		if(dl!=0)
+		if(dl>0)
 		{
 			csplit.setDividerLocation(dl);
 			csplit.setResizeWeight(dl);

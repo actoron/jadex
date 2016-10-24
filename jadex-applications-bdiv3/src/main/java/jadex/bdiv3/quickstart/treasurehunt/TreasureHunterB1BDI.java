@@ -1,10 +1,13 @@
 package jadex.bdiv3.quickstart.treasurehunt;
 
+import java.awt.Point;
 import java.util.Set;
 
-import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.quickstart.treasurehunt.environment.Treasure;
 import jadex.bdiv3.quickstart.treasurehunt.environment.TreasureHunterEnvironment;
 import jadex.commons.future.IFuture;
@@ -28,6 +31,9 @@ public class TreasureHunterB1BDI
 	@Belief(dynamic=true)
 	protected Set<Treasure>	treasures	= env.getTreasures();
 
+	@Belief(dynamic=true)
+	protected Point	location	= env.getHunterLocation();
+
 	//-------- goals --------
 	
 	/**
@@ -49,6 +55,23 @@ public class TreasureHunterB1BDI
 		}
 	}
 	
+	//-------- plans --------
+	
+	/**
+	 *  A plan to collect a treasure.
+	 */
+	@Plan(trigger=@Trigger(goals={CollectTreasureGoal.class}))
+	public void	collectTreasurePlan(CollectTreasureGoal goal)
+	{
+		// Move towards treasure location
+		int	dx	= goal.treasure.getLocation().x - location.x;
+		int	dy	= goal.treasure.getLocation().y - location.y;
+		env.move(dx, dy).get();
+		
+		// Then, pick up the treasure
+		env.pickUp(goal.treasure).get();
+	}
+	
 	//-------- agent life cycle --------
 	
 	/**
@@ -56,16 +79,18 @@ public class TreasureHunterB1BDI
 	 *  @param agent	The agent parameter is optional and allows to access bdi agent functionality.
 	 */
 	@AgentBody
-	public void	body(IBDIAgent agent)
+	public void	body(IBDIAgentFeature agent)
 	{
 		// Continue until no more treasures.
 		while(!treasures.isEmpty())
 		{
 			// Fetch next treasure.
-			Treasure	t	= treasures.iterator().next();
+			Treasure	treasure	= treasures.iterator().next();
+			
+			System.out.println("Hunter "+location+", treasure "+treasure.getLocation());
 			
 			// Create the goal object.
-			CollectTreasureGoal	ctgoal	= new CollectTreasureGoal(t);
+			CollectTreasureGoal	ctgoal	= new CollectTreasureGoal(treasure);
 			
 			// Dispatch the goal in the agent.
 			IFuture<Void>	fut	= agent.dispatchTopLevelGoal(ctgoal);

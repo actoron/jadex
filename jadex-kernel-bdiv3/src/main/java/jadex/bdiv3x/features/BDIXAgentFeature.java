@@ -151,8 +151,8 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 
 	/**
 	 *  Initialize the feature.
-	 *  Empty implementation that can be overridden.
 	 */
+	@Override
 	public IFuture<Void> init()
 	{
 		RBeliefbase bb = new RBeliefbase(getComponent());
@@ -180,6 +180,37 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		return IFuture.DONE;
 	}
 	
+	/**
+	 *  Called on shutdown after successful init.
+	 */
+	@Override
+	public IFuture<Void> shutdown()
+	{
+		doCleanup();
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Called on init failure.
+	 */
+	@Override
+	public void kill()
+	{
+		doCleanup();
+	}
+	
+	/**
+	 *  Cleanup the beliefs in kill and shutdown.
+	 */
+	protected void	doCleanup()
+	{
+		// Cleanup beliefs when value is (auto)closeable
+		List<MBelief> beliefs = ((IBDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
+		for(MBelief belief: beliefs)
+		{
+			belief.cleanup(getComponent());
+		}
+	}
 	
 //	/**
 //	 *  Init beliefbase after services have been created.
