@@ -172,7 +172,20 @@ public class JadexGatewayServlet extends HttpServlet
 		
 		try
 		{
-			System.out.println("received request: "+request.getRequestURL().toString());
+//			System.out.println("received request: "+request.getRequestURL().toString());
+			
+			// Some idiot servers (read: the Eclipse one - surprise)
+			// destroy the context path in async mode
+			// which is apparently allowed by spec, so we save it here.
+			// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=433321
+			final String ctxtpath = request.getContextPath();
+			request = new HttpServletRequestWrapper(request)
+			{
+				public String getContextPath()
+				{
+					return ctxtpath;
+				}
+			};
 			
 			final AsyncContext ctx = request.startAsync();
 			final boolean[] complete = new boolean[1];
@@ -207,6 +220,7 @@ public class JadexGatewayServlet extends HttpServlet
 				}
 			});
 			
+			System.out.println("Calling handler with cp " + request.getContextPath());
 			handler.handleRequest(request, response, null).addResultListener(new IResultListener<Void>()
 			{
 				public void exceptionOccurred(Exception e)
