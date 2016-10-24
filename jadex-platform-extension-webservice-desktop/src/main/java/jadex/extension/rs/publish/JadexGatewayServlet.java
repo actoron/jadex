@@ -9,6 +9,7 @@ import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,11 +46,7 @@ public class JadexGatewayServlet extends HttpServlet
 	{
 	    super.init(config);
 	    
-	    PlatformConfiguration pc = PlatformConfiguration.getDefault();
-	    pc.getRootConfig().setGui(false);
-//	    pc.getRootConfig().setLogging(true);
-	    pc.getRootConfig().setRsPublish(true);	
-	    this.platform = Starter.createPlatform(pc).get();
+	    this.platform = startPlatform();
 	    
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 //		cms.createComponent(ExternalRSPublishAgent.class.getName()+".class", null).getFirstResult();
@@ -103,6 +100,34 @@ public class JadexGatewayServlet extends HttpServlet
 			CreationInfo cinfo = new CreationInfo(entry.getValue());
 			cms.createComponent(model, cinfo).getFirstResult();
 		}
+	}
+	
+	/**
+	 *  Start the platform.
+	 *  @return The platform.
+	 */
+	public IExternalAccess startPlatform()
+	{
+		ServletContext ctx = getServletContext();
+		IExternalAccess ret = null;
+		
+		synchronized (ctx)
+		{
+			ret = (IExternalAccess) ctx.getAttribute("jadex_platform");
+			
+			if (ret != null)
+			{
+				PlatformConfiguration pc = PlatformConfiguration.getDefault();
+			    pc.getRootConfig().setGui(false);
+			    pc.getRootConfig().setRsPublish(true);
+			
+			    ret = Starter.createPlatform(pc).get();
+			    
+			    ctx.setAttribute("jadex_platform", ret);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
