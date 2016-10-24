@@ -1,4 +1,4 @@
-package jadex.bdiv3.quickstart.treasurehunt.environment;
+package jadex.bdiv3.quickstart.treasureisland.environment;
 
 import java.awt.Color;
 import java.awt.Dimension;

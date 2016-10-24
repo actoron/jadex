@@ -1,15 +1,12 @@
-package jadex.bdiv3.quickstart.treasurehunt;
-
-import java.awt.Point;
-import java.util.Set;
+package jadex.bdiv3.quickstart.treasureisland;
 
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.quickstart.treasurehunt.environment.Treasure;
-import jadex.bdiv3.quickstart.treasurehunt.environment.TreasureHunterEnvironment;
+import jadex.bdiv3.quickstart.treasureisland.environment.Treasure;
+import jadex.bdiv3.quickstart.treasureisland.environment.TreasureHunterEnvironment;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -27,13 +24,6 @@ public class TreasureHunterB1BDI
 	@Belief
 	protected TreasureHunterEnvironment	env	= new TreasureHunterEnvironment(800, 600);
 	
-	/** The known treasures. */
-	@Belief(dynamic=true)
-	protected Set<Treasure>	treasures	= env.getTreasures();
-
-	@Belief(dynamic=true)
-	protected Point	location	= env.getHunterLocation();
-
 	//-------- goals --------
 	
 	/**
@@ -64,8 +54,8 @@ public class TreasureHunterB1BDI
 	public void	collectTreasurePlan(CollectTreasureGoal goal)
 	{
 		// Move towards treasure location
-		int	dx	= goal.treasure.getLocation().x - location.x;
-		int	dy	= goal.treasure.getLocation().y - location.y;
+		int	dx	= goal.treasure.getLocation().x - env.getHunterLocation().x;
+		int	dy	= goal.treasure.getLocation().y - env.getHunterLocation().y;
 		env.move(dx, dy).get();
 		
 		// Then, pick up the treasure
@@ -82,12 +72,10 @@ public class TreasureHunterB1BDI
 	public void	body(IBDIAgentFeature agent)
 	{
 		// Continue until no more treasures.
-		while(!treasures.isEmpty())
+		while(!env.getTreasures().isEmpty())
 		{
 			// Fetch next treasure.
-			Treasure	treasure	= treasures.iterator().next();
-			
-			System.out.println("Hunter "+location+", treasure "+treasure.getLocation());
+			Treasure	treasure	= env.getTreasures().iterator().next();
 			
 			// Create the goal object.
 			CollectTreasureGoal	ctgoal	= new CollectTreasureGoal(treasure);

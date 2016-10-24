@@ -1,7 +1,7 @@
-package jadex.bdiv3.quickstart.treasurehunt;
+package jadex.bdiv3.quickstart.treasureisland;
 
 import jadex.bdiv3.annotation.Belief;
-import jadex.bdiv3.quickstart.treasurehunt.environment.TreasureHunterEnvironment;
+import jadex.bdiv3.quickstart.treasureisland.environment.TreasureHunterEnvironment;
 import jadex.micro.annotation.Agent;
 
 /**
