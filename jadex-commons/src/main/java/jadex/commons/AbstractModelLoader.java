@@ -203,7 +203,7 @@ public abstract class AbstractModelLoader
 	 *  @param clkey	The class loader key to allow caching by e.g. RID.
 	 *  @return null, when model not found or not yet loaded.
 	 */
-	public synchronized ICacheableModel	getCachedModel(String name, String extension, String[] imports, Object clkey)
+	public synchronized ICacheableModel	getCachedModel(String name, String extension, String[] imports, Object clkey)	throws Exception
 	{
 		ICacheableModel cached = null;
 		if(registered.containsKey(name))
@@ -222,6 +222,12 @@ public abstract class AbstractModelLoader
 			Tuple	keytuple	= new Tuple(keys);
 			cached	= modelcache.get(keytuple);
 		}
+		
+		if(cached instanceof BrokenModel)
+		{
+			throw ((BrokenModel)cached).getException();
+		}
+		
 		return cached;
 	}
 	
