@@ -206,46 +206,53 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //		if(model.indexOf("HelloWorld")!=-1)
 //			System.out.println("hw");
 		
-		MicroModel	cached	= (MicroModel)loader.getCachedModel(model, MicroModelLoader.FILE_EXTENSION_MICRO, imports, rid);
-		if(cached!=null)
+		try
 		{
-			ret.setResult(cached.getModelInfo());
-		}
-		else
-		{
-			ILibraryService libservice = getLibraryService();
-			if(libservice!=null)
+			MicroModel	cached	= (MicroModel)loader.getCachedModel(model, MicroModelLoader.FILE_EXTENSION_MICRO, imports, rid);
+			if(cached!=null)
 			{
-				libservice.getClassLoader(rid)
-					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
-				{
-					public void customResultAvailable(ClassLoader cl)
-					{
-						try
-						{
-							IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
-							ret.setResult(mi);
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
-					}
-				});		
+				ret.setResult(cached.getModelInfo());
 			}
 			else
 			{
-				try
+				ILibraryService libservice = getLibraryService();
+				if(libservice!=null)
 				{
-					ClassLoader cl = getClass().getClassLoader();
-					IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
-					ret.setResult(mi);
+					libservice.getClassLoader(rid)
+						.addResultListener(new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
+					{
+						public void customResultAvailable(ClassLoader cl)
+						{
+							try
+							{
+								IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+								ret.setResult(mi);
+							}
+							catch(Exception e)
+							{
+								ret.setException(e);
+							}
+						}
+					});		
 				}
-				catch(Exception e)
+				else
 				{
-					ret.setException(e);
-				}			
+					try
+					{
+						ClassLoader cl = getClass().getClassLoader();
+						IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+						ret.setResult(mi);
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}			
+				}
 			}
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
 		}
 		
 		return ret;
