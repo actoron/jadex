@@ -220,7 +220,6 @@ public class JadexGatewayServlet extends HttpServlet
 				}
 			});
 			
-			System.out.println("Calling handler with cp " + request.getContextPath());
 			handler.handleRequest(request, response, null).addResultListener(new IResultListener<Void>()
 			{
 				public void exceptionOccurred(Exception e)

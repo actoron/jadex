@@ -140,7 +140,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			public String convertObject(Object val, Object context)
 			{
-				System.out.println("write response in json");
+//				System.out.println("write response in json");
                 byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader());
 				return new String(data);
 			}
@@ -152,7 +152,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			public String convertObject(Object val, Object context)
 			{
-				System.out.println("write response in xml");
+//				System.out.println("write response in xml");
 				byte[] data = JavaWriter.objectToByteArray(val, component.getClassLoader());
 				return new String(data);
 			}
@@ -565,8 +565,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	
 //	        if(sr.size()>0)
 //	            System.out.println("found acceptable in types: "+sr);
-	        if(sr.size()==0)
-	            System.out.println("found no acceptable in types.");
+//	        if(sr.size()==0)
+//	            System.out.println("found no acceptable in types.");
 	        
 	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: new Object[inparamsmap.size()];
 	        
@@ -828,14 +828,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 sr.retainAll(cl);
             }
 
-            if(sr.size()==0)
+/*            if(sr.size()==0)
             {
                 System.out.println("found no acceptable return types.");
             }
             else
             {
             	System.out.println("acceptable return types: "+sr+" ("+cl+")");
-            }
+            }*/
             
             if(callid!=null)
             {
