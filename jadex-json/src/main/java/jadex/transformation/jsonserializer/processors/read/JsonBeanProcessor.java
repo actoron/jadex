@@ -96,7 +96,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 					JsonValue val = jval.get(name);
 					if(val!=null && !val.isNull()) 
 					{
-						Object newval = traverser.doTraverse(val, prop.getGenericType(), cloned, processors, clone, targetcl, context);
+						Object newval = traverser.doTraverse(val, prop.getGenericType()!=null?prop.getGenericType():prop.getType(), cloned, processors, clone, targetcl, context);
 						if(newval != Traverser.IGNORE_RESULT && (object!=ret || val!=newval))
 						{
 							prop.setPropertyValue(ret, convertBasicType(newval, prop.getType()));
