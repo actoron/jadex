@@ -1,6 +1,9 @@
 package jadex.extension.rs.invoke;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.DELETE;
@@ -13,6 +16,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import jadex.bridge.IComponentStep;
@@ -24,10 +29,6 @@ import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentService;
-import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 /** Simple base agent for calling JSON-based REST services. */
 @Agent
@@ -42,7 +43,7 @@ public class SRestInvocationHelper
 	 *  @param path Path to invoke.
 	 *  @param headers Header fields.
 	 *  @param params Parameters.
-	 * @return
+	 *  @return Reply string
 	 */
 	public static final IFuture<String> invokeJson(IInternalAccess component,
 													  final String uri,
@@ -51,28 +52,68 @@ public class SRestInvocationHelper
 										 			  final Map<String, Object> params,
 										 			  final Class<?> resttype)
 	{
+		return invokeJson(component, uri, path, headers, params, resttype, true);
+	}
+	
+	/**
+	 *  Invokes the REST service for a JSON response.
+	 *  @param uri URI to invoke.
+	 *  @param path Path to invoke.
+	 *  @param headers Header fields.
+	 *  @param params Parameters.
+	 *  @return Reply string
+	 */
+	public static final IFuture<String> invokeJson(IInternalAccess component,
+													  final String uri,
+										 			  final String path,
+										 			  final Map<String, Object> headers,
+										 			  final Map<String, Object> params,
+										 			  final Class<?> resttype,
+										 			  final boolean inurlparams)
+	{
 		IDaemonThreadPoolService tp = SServiceProvider.getLocalService(component.getComponentIdentifier(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		final Future<String> ret = new Future<String>();
 		final IExternalAccess exta = component.getExternalAccess();
 		tp.execute(new Runnable()
 		{
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public void run()
 			{
 				WebTarget wt = CLIENT.target(uri).path(path);
+				
+				Entity<?> data = null;
 				if (params != null)
 				{
-					for (Map.Entry<String, Object> entry : params.entrySet())
+					if(inurlparams)
 					{
-						if (entry.getValue() instanceof Collection)
+						for (Map.Entry<String, Object> entry : params.entrySet())
 						{
-							@SuppressWarnings("unchecked")
-							Collection<Object> coll = (Collection<Object>) entry.getValue();
-							for (Object obj : coll)
+							if (entry.getValue() instanceof Collection)
 							{
-								wt.queryParam(entry.getKey(), obj);
+								Collection<Object> coll = (Collection<Object>) entry.getValue();
+								for (Object obj : coll)
+								{
+									wt.queryParam(entry.getKey(), obj);
+								}
 							}
+							else
+								wt = wt.queryParam(entry.getKey(), entry.getValue());
 						}
-						wt = wt.queryParam(entry.getKey(), entry.getValue());
+					}
+					else
+					{
+						MultivaluedMap<String, Object> datamap = new MultivaluedHashMap<String, Object>();
+						for (Map.Entry<String, Object> entry : params.entrySet())
+						{
+							if (entry.getValue() instanceof Collection)
+							{
+								Collection<Object> coll = (Collection<Object>) entry.getValue();
+								datamap.put(entry.getKey(), coll instanceof List? (List) coll: new ArrayList<Object>(coll));
+								
+							}
+							else
+								datamap.put(entry.getKey(), Arrays.asList(new Object[] { entry.getValue() }));
+						}
 					}
 				}
 				
@@ -87,7 +128,6 @@ public class SRestInvocationHelper
 				}
 				ib.accept("application/json");
 				Response res = null;
-				Entity<?> data = null;
 				if(POST.class.equals(resttype))
 				{
 					res = ib.post(data);
