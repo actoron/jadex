@@ -19,6 +19,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -30,23 +31,10 @@ import jadex.micro.annotation.RequiredServices;
 
 /** Simple base agent for calling JSON-based REST services. */
 @Agent
-@RequiredServices(
+public class SRestInvocationHelper
 {
-	@RequiredService(name="tp", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-})
-public class AbstractRestInvocationAgent
-{
-	/** External access for decoupling. */
-	@Agent
-	protected IInternalAccess agent;
-	
-	/** Threadpool service. */
-	@AgentService(lazy=false)
-	protected IDaemonThreadPoolService tp;
-	
 	/** The client. */
-	protected Client client = ClientBuilder.newClient();
-	
+	protected static final Client CLIENT = ClientBuilder.newClient();
 	
 	/**
 	 *  Invokes the REST service for a JSON response.
@@ -56,19 +44,21 @@ public class AbstractRestInvocationAgent
 	 *  @param params Parameters.
 	 * @return
 	 */
-	protected IFuture<String> invokeJson(final String uri,
-										 final String path,
-										 final Map<String, Object> headers,
-										 final Map<String, Object> params,
-										 final Class<?> resttype)
+	public static final IFuture<String> invokeJson(IInternalAccess component,
+													  final String uri,
+										 			  final String path,
+										 			  final Map<String, Object> headers,
+										 			  final Map<String, Object> params,
+										 			  final Class<?> resttype)
 	{
+		IDaemonThreadPoolService tp = SServiceProvider.getLocalService(component.getComponentIdentifier(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		final Future<String> ret = new Future<String>();
-		final IExternalAccess exta = agent.getExternalAccess();
+		final IExternalAccess exta = component.getExternalAccess();
 		tp.execute(new Runnable()
 		{
 			public void run()
 			{
-				WebTarget wt = client.target(uri).path(path);
+				WebTarget wt = CLIENT.target(uri).path(path);
 				if (params != null)
 				{
 					for (Map.Entry<String, Object> entry : params.entrySet())
