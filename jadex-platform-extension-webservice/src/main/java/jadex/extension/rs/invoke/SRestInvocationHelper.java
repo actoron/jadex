@@ -102,7 +102,7 @@ public class SRestInvocationHelper
 					}
 					else
 					{
-						MultivaluedMap<String, Object> datamap = new MultivaluedHashMap<String, Object>();
+						MultivaluedMap datamap = new MultivaluedHashMap();
 						for (Map.Entry<String, Object> entry : params.entrySet())
 						{
 							if (entry.getValue() instanceof Collection)
@@ -114,6 +114,7 @@ public class SRestInvocationHelper
 							else
 								datamap.put(entry.getKey(), Arrays.asList(new Object[] { entry.getValue() }));
 						}
+						Entity.form(datamap);
 					}
 				}
 				
