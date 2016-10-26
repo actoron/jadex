@@ -1,8 +1,10 @@
 package jadex.extension.rs.publish;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.AsyncContext;
@@ -22,6 +24,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.ICommand;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
@@ -33,6 +37,9 @@ import jadex.javaparser.SJavaParser;
  */
 public class JadexGatewayServlet extends HttpServlet
 {
+	/** Constant used to store the jadex platform in the application (servlet) context. */
+	public static final String JADEX_PLATFORM = "jadex_platform";
+	
 	/** The Jadex platform. */
 	protected IExternalAccess platform;
 
@@ -55,10 +62,13 @@ public class JadexGatewayServlet extends HttpServlet
 		// create components
 		Enumeration<String> pnames = config.getInitParameterNames();
 		Map<String, Map<String, Object>> comps = new HashMap<String, Map<String, Object>>();
+		List<ICommand<IExternalAccess>> initcmds = new ArrayList<ICommand<IExternalAccess>>();
+		
 //		for(String cname=pnames.nextElement(); pnames.hasMoreElements(); cname=pnames.nextElement())
 		while(pnames.hasMoreElements())
 		{
 			String cname = pnames.nextElement();
+			
 			if(cname.startsWith("component"))
 			{
 				int cnt = SUtil.countOccurrences(cname, '_');
@@ -90,6 +100,20 @@ public class JadexGatewayServlet extends HttpServlet
 					}
 				}
 			}
+			
+			if(cname.startsWith("initcommand"))
+			{
+				try
+				{
+					Class<?> cmdcl = SReflect.classForName(config.getInitParameter(cname), null);
+					ICommand<IExternalAccess> cmd = (ICommand<IExternalAccess>)cmdcl.newInstance();
+					initcmds.add(cmd);
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException("Initcommand error: "+config.getInitParameter(cname));
+				}
+			}
 		}
 		
 		System.out.println("Found components: "+comps);
@@ -99,6 +123,13 @@ public class JadexGatewayServlet extends HttpServlet
 			String model = (String)entry.getValue().remove("__model");
 			CreationInfo cinfo = new CreationInfo(entry.getValue());
 			cms.createComponent(model, cinfo).getFirstResult();
+		}
+		
+		System.out.println("Found init commands: "+initcmds);
+		
+		for(ICommand<IExternalAccess> cmd: initcmds)
+		{
+			cmd.execute(platform);
 		}
 	}
 	
@@ -111,11 +142,11 @@ public class JadexGatewayServlet extends HttpServlet
 		ServletContext ctx = getServletContext();
 		IExternalAccess ret = null;
 		
-		synchronized (ctx)
+		synchronized(ctx)
 		{
 			ret = (IExternalAccess) ctx.getAttribute("jadex_platform");
 			
-			if (ret != null)
+			if(ret==null)
 			{
 				PlatformConfiguration pc = PlatformConfiguration.getDefault();
 			    pc.getRootConfig().setGui(false);

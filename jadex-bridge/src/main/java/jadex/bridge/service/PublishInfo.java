@@ -115,7 +115,7 @@ public class PublishInfo
 	{
 		return pid;
 	}
-
+	
 	/**
 	 *  Set the publishid.
 	 *  @param publishid The publishid to set.

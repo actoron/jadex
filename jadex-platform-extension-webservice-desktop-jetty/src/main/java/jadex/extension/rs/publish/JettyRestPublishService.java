@@ -74,7 +74,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
     {
         try
         {
-            final URI uri = new URI(info.getPublishId());
+            final URI uri = new URI(getCleanPublishId(info.getPublishId()));
             Server server = (Server)getHttpServer(uri, info);
             System.out.println("Adding http handler to server: "+uri.getPath());
 

@@ -229,7 +229,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     }
 
     /**
-     * 
+     *  Handle a web request.
      */
     public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {
@@ -1930,6 +1930,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the cleaned publish id. Square brackets for the 
+	 *  optional host and context part are removed.
+	 */
+	public String getCleanPublishId(String id)
+	{
+		return id!=null? id.replace("[", "").replace("]", ""): null;
 	}
 }
 

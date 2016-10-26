@@ -25,10 +25,31 @@ import jadex.commons.future.IFuture;
  *  
  *  In case of an external web server the host:port/context part of requests
  *  are determined by the server.
+ *  
+ *  // todo: should store the published servers using hostname and port
+ *  // currently can get confused if mixed published ids are used (with and without [])
+ *  // leads to problems because different ports are used then for different handlers
+ *  // and the default handler (at port 0) is not found for a request coming on another port such as 8080
  */
 @Service
 public class ExternalRestPublishService extends AbstractRestPublishService implements IRequestHandlerService
 {
+	// The default address is used to abstract from the concrete deployment address and context
+	// If services are published using brackets [] in the publish id, the external rest
+	// publish service will replace this first part using the default address
+	
+	/** The default host name. */
+	public static final String DEFAULT_HOST = "DEFAULTHOST";
+	
+	/** The default port. */
+	public static final int DEFAULT_PORT = 0;
+	
+	/** The default app name. */
+	public static final String DEFAULT_APP = "DEFAULTAPP";
+	
+	/** The default hostportappcontext. */
+	public static final String DEFAULT_COMPLETECONTEXT = "http://"+DEFAULT_HOST+":"+DEFAULT_PORT+"/"+DEFAULT_APP+"/";
+	
 	/** The servers per service id (for unpublishing). */
 	protected Map<IServiceIdentifier, Tuple2<PathHandler, URI>> sidservers;
 	
@@ -165,7 +186,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	    	if(pid.startsWith("["))
 	    	{
 	    		pid = pid.substring(pid.indexOf("]")+1);
-	    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
+//	    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
 	    	}
 	       
 	        System.out.println("Adding http handler to server: "+uri.getPath());
@@ -331,8 +353,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 			{
 				ret.append("<div class=\"method\">");
 				String path = key.getSecondEntity();
-				if(path.startsWith("/DEFAULTAPP"))
-					path = path.replaceFirst("/DEFAULTAPP", request.getContextPath());
+				if(path.startsWith("/"+DEFAULT_APP))
+					path = path.replaceFirst("/"+DEFAULT_APP, request.getContextPath());
 				String url = getServletHost(request) + path;
 				ret.append("Host: ").append(key.getFirstEntity()!=null? key.getFirstEntity(): "-").append(" Path: ").append(path).append("<br/>");
 				ret.append("<a href=\"").append(url).append("\">").append(url).append("</a>");

@@ -54,7 +54,7 @@ public class PathHandler implements IRequestHandler
 		String pathcp = null; 
 		String ctx = request.getContextPath();
 		if(ctx!=null && ctx.length()>0)
-			pathcp = path.replaceFirst(ctx, "/DEFAULTAPP");
+			pathcp = path.replaceFirst(ctx, "/"+ExternalRestPublishService.DEFAULT_APP);
 		
 		Tuple2<String, IRequestHandler> tup = subhandlercache.get(new Tuple2<String, String>(host, path));
 		if(tup==null)
@@ -97,8 +97,8 @@ public class PathHandler implements IRequestHandler
 		
 		HttpServletRequestWrapper wr = new HttpServletRequestWrapper(request);
 		String cp = tup.getFirstEntity();
-		if(cp.startsWith("/DEFAULTAPP"))
-			cp = cp.replaceFirst("/DEFAULTAPP", request.getContextPath());
+		if(cp.startsWith("/"+ExternalRestPublishService.DEFAULT_APP))
+			cp = cp.replaceFirst("/"+ExternalRestPublishService.DEFAULT_APP, request.getContextPath());
 		wr.setContextPath(cp);
 		String full = request.getRequestURI();
 		int idx = full.indexOf(cp)+cp.length();
