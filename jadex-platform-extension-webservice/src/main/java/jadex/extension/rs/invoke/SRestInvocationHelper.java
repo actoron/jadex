@@ -151,17 +151,53 @@ public class SRestInvocationHelper
 				}
 				else
 					res = ib.get();
-				final String retstr = res.readEntity(String.class);
+				final Response fres = res;
 				exta.scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(retstr);
+						if (fres.getStatus() >= 400 && fres.getStatus() < 600)
+							ret.setException(new RequestFailedException(fres, "Request failed with status code: " + fres.getStatus()));
+						else
+						{
+							String retstr = fres.readEntity(String.class);
+							ret.setResult(retstr);
+						}
+							
 						return IFuture.DONE;
 					}
 				});
 			}
 		});
 		return ret;
+	}
+	
+	public static class RequestFailedException extends RuntimeException
+	{
+		
+		/** */
+		private static final long serialVersionUID = 1L;
+		
+		/** The received response. */
+		protected Response response;
+		
+		/**
+		 *  Create the exception.
+		 *  @param response The received response.
+		 */
+		public RequestFailedException(Response response, String message)
+		{
+			super(message);
+			this.response = response;
+		}
+		
+		/**
+		 *  Gets the received response.
+		 *  @return The received response.
+		 */
+		public Response getResponse()
+		{
+			return response;
+		}
 	}
 }
