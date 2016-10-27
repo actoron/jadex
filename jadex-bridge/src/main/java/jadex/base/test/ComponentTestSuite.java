@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -101,6 +104,15 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	
 	//-------- constructors --------
 
+	/**
+	 * Create a component test suite for components contained in class directories on the class path (i.e. not jars).
+	 * @param excludes	Files to exclude (if a pattern is contained in file path).
+	 */
+	public ComponentTestSuite(String[] excludes) throws Exception
+	{
+		this(findClassDirectories(), null, excludes);
+	}
+	
 	/**
 	 * Create a component test suite for components contained in a given path.
 	 * @param projectDir	The project directory.
@@ -518,5 +530,48 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	public ClassLoader getClassLoader()
 	{
 		return classloader;
+	}
+	
+	/**
+	 *  Find class directories on classpath.
+	 */
+	public static File[][]	findClassDirectories()
+	{
+		Set<File>	dirs	= new LinkedHashSet<File>();
+		collectClasspathDirectories(ComponentTestSuite.class.getClassLoader(), dirs);
+		File[][]	ret	= new File[dirs.size()][];
+		
+		int	i=0;
+		for(File dir: dirs)
+		{
+			ret[i++]	= new File[]{dir};
+		}
+		return ret;
+	}
+
+	/**
+	 *  Collect all directory URLs belonging to a class loader.
+	 */
+	protected static void	collectClasspathDirectories(ClassLoader classloader, Set<File> set)
+	{
+		assert classloader!=null;
+		
+		if(classloader.getParent()!=null)
+		{
+			collectClasspathDirectories(classloader.getParent(), set);
+		}
+		
+		if(classloader instanceof URLClassLoader)
+		{
+			URL[] urls = ((URLClassLoader)classloader).getURLs();
+			for(int i=0; i<urls.length; i++)
+			{
+				File	file	= SUtil.getFile(urls[i]);
+				if(file.isDirectory())
+				{
+					set.add(file);
+				}
+			}
+		}
 	}
 }
