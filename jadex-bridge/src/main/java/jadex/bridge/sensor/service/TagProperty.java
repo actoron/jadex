@@ -125,7 +125,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 	{
 		Collection<String> ret = null;
 		
-		if(obj instanceof String)
+		if(obj instanceof String || obj==null)
 		{
 			ret = new ArrayList<String>();
 			ret.add((String)obj);
