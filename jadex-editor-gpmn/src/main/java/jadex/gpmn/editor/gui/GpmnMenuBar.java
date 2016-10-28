@@ -380,8 +380,10 @@ public class GpmnMenuBar extends JMenuBar
 						}
 						
 						// Avoid cutting off shadows.
-						w += 4;
-						h += 4;
+						x -= 2;
+						y -= 2;
+						w += 6;
+						h += 6;
 						
 						File tmpfile = File.createTempFile("export", ".eps");
 						//modelcontainer.getGraphComponent().paint(g)
