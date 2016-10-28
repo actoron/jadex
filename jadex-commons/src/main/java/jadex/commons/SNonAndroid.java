@@ -331,7 +331,7 @@ public class SNonAndroid
 					{
 						final JFrame f	= new JFrame("dummy");
 						f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
-						f.setSize(100, 100);
+						f.pack();
 						f.setVisible(true);
 						
 						javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
