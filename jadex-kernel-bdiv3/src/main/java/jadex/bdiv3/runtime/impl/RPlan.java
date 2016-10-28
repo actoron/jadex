@@ -841,6 +841,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void setFinishing()
 	{
 		assert finished==null;
+		assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		finished	= new Future<Void>();
 	}
 	
@@ -1161,37 +1162,24 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 					{
 						public void resultAvailable(Void result)
 						{
-//							if(rescom.equals(getResumeCommand()))
+							if(getException()==null)
 							{
-								if(rgoal.isFinished() && getException()==null)
-								{
-//									Object o = RGoal.getGoalResult(goal, mgoal, getAgent().getClassLoader());
-									Object o = RGoal.getGoalResult(rgoal, getAgent().getClassLoader());
-									if(o==null)
-										o = goal;
-									setDispatchedElement(o);
-								}
-								else if(getException()==null)
-								{
-									setException(new PlanAbortedException());
-								}
-									
-								rescom.execute(null);
-//								System.out.println("on comp: "+getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread());
-//								RPlan.executePlan(RPlan.this, getAgent(), rescom);
+								Object o = RGoal.getGoalResult(rgoal, getAgent().getClassLoader());
+								if(o==null)
+									o = goal;
+								setDispatchedElement(o);
 								
-		//						if(!rgoal.isFinished() && (isAborted() || isFailed()))
-		//						{
-		//							setException(new PlanFailureException());
-		//						}
-		//						else
-		//						{
-		//							Object o = RGoal.getGoalResult(goal, mgoal, getAgent().getClassLoader());
-		//							ret.setResult((E)o);
-		//						}
+								// Non-maintain goal -> remove subgoal.
+								if(rgoal.isFinished())
+								{
+									removeSubgoal(rgoal);
+								}
 								
-								removeSubgoal(rgoal);
+								// else keep maintain goal until plan is finished
+								// todo: allow explicit removal / redispatch
 							}
+							
+							rescom.execute(null);
 						}
 						
 						public void exceptionOccurred(Exception exception)

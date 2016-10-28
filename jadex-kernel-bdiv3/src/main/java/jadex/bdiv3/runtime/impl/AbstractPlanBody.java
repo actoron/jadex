@@ -157,7 +157,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 				
 				rplan.setException(exception);
 				
-				assert rplan.isFinishing() != (next==2);	// either finishing (due to abort) or failed.
+				assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+				assert rplan.isFinishing() != (next==2): SUtil.getExceptionStacktrace(exception);	// either finishing (due to abort) or failed.
 				if(next==2)
 				{
 					rplan.setFinishing();

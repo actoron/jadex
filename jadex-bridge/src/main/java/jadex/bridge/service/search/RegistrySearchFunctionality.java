@@ -234,13 +234,13 @@ public class RegistrySearchFunctionality
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
-			Collection<T> ssers = checkScope(sers, cid, scope, true);
+			Collection<T> ssers = checkScope(sers, cid, scope, false);
 			
 			checkAsyncFilters(filter, ssers.iterator()).addResultListener(new IIntermediateResultListener<T>()
 			{
 				public void intermediateResultAvailable(T result)
 				{
-					ret.setResult(result);
+					ret.setResultIfUndone(result);
 				}
 				
 				public void finished()
