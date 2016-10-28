@@ -119,6 +119,18 @@ public class UserAgent
 		}
 		results.add(tr5);
 		
+		TestReport tr6 = new TestReport("#5", "Test if can find null tagged service service via SServiceProvider.getService()");
+		try
+		{
+			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, null).get(); 
+			tr6.setSucceeded(true);
+		}
+		catch(Exception e)
+		{
+			tr6.setReason("Exception occurred: "+e);
+		}
+		results.add(tr6);
+		
 		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killComponent();
