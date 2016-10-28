@@ -596,38 +596,65 @@ public class MicroClassReader
 			}
 			
 			// Take all but new overrides old
-			if(!argsdone && isAnnotationPresent(cma, Arguments.class, cl))
+			if(!argsdone)
 			{
-				Arguments val = (Arguments)getAnnotation(cma, Arguments.class, cl);
-				Argument[] vals = val.value();
-				argsdone = val.replace();
-				
-				Map args = (Map)toset.get("arguments");
-				if(args==null)
+				if(isAnnotationPresent(cma, Arguments.class, cl))
 				{
-					args = new LinkedHashMap();
-					toset.put("arguments", args);
+					Arguments val = (Arguments)getAnnotation(cma, Arguments.class, cl);
+					Argument[] vals = val.value();
+					argsdone = val.replace();
+					
+					Map args = (Map)toset.get("arguments");
+					if(args==null)
+					{
+						args = new LinkedHashMap();
+						toset.put("arguments", args);
+					}
+					
+					for(int i=0; i<vals.length; i++)
+					{
+	//					try
+	//					{
+		//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+						IArgument tmparg = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
+							vals[i].description(), SReflect.getClassName(vals[i].clazz()),
+							"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
+						
+						if(!args.containsKey(vals[i].name()))
+						{
+							args.put(vals[i].name(), tmparg);
+						}
+	//					}
+	//					catch(Exception e)
+	//					{
+							// Currently a type not present exception can occur with the applications.mixed.ShopAgent
+	//						e.printStackTrace();
+	//					}
+					}
 				}
 				
-				for(int i=0; i<vals.length; i++)
+				Field[] fields = cma.getDeclaredFields();
+				for(Field field: fields)
 				{
-//					try
-//					{
-	//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-					IArgument tmparg = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
-						"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
-					
-					if(!args.containsKey(vals[i].name()))
+					if(isAnnotationPresent(field, AgentArgument.class, cl))
 					{
-						args.put(vals[i].name(), tmparg);
+						AgentArgument arg = (AgentArgument)getAnnotation(field, AgentArgument.class, cl);
+						{
+							Map args = (Map)toset.get("arguments");
+							if(args==null)
+							{
+								args = new LinkedHashMap();
+								toset.put("arguments", args);
+							}
+							
+							if(!args.containsKey(field.getName()))
+							{
+								IArgument tmparg = new jadex.bridge.modelinfo.Argument(field.getName(), 
+									null, SReflect.getClassName(field.getType()), null);
+								args.put(field.getName(), tmparg);
+							}
+						}
 					}
-//					}
-//					catch(Exception e)
-//					{
-						// Currently a type not present exception can occur with the applications.mixed.ShopAgent
-//						e.printStackTrace();
-//					}
 				}
 			}
 			
