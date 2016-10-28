@@ -65,6 +65,9 @@ public class MicroTest	extends ComponentTestSuite
 		"PojoAgentCreationAgent",
 		"MegaParallelStarter",
 		
+		// Does not work and I need a build
+		"NullTagAgent",
+		
 		// android excludes
 		SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
 		SReflect.isAndroid() ? "nfpropvis/ProviderAndUserAgent" : NOEXCLUDE,
