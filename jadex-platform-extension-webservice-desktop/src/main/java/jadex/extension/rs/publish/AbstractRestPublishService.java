@@ -141,7 +141,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			public String convertObject(Object val, Object context)
 			{
 //				System.out.println("write response in json");
-                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader());
+				
+				boolean writeclass = false;
+				boolean writeid = false;
+				if (context instanceof Map)
+				{
+					@SuppressWarnings("unchecked")
+					Map<String, Object> ctx = ((Map<String, Object>) context);
+					if (Boolean.TRUE.equals(ctx.get("jadex-json")));
+					{
+						writeclass = true;
+						writeid = true;
+					}
+				}
+				
+				System.out.println("writeid " +writeid );
+				System.out.println("writeclass " +writeclass );
+				
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, writeclass, writeid, null, null);
 				return new String(data);
 			}
 		};
@@ -153,6 +170,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			public String convertObject(Object val, Object context)
 			{
 //				System.out.println("write response in xml");
+				
 				byte[] data = JavaWriter.objectToByteArray(val, component.getClassLoader());
 				return new String(data);
 			}
@@ -879,7 +897,17 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
 	        		if(convs!=null && convs.size()>0)
 	        		{
-	        			ret = convs.iterator().next().convertObject(result, null);
+	        			Map<String, Object> context = null;
+	        			
+	        			if (request.getHeader("x-jadex-json") != null)
+	        			{
+	        				if (context == null)
+	        					context = new HashMap<String, Object>();
+	        				
+	        				context.put("jadex-json", Boolean.TRUE);
+	        			}
+	        				
+	        			ret = convs.iterator().next().convertObject(result, context);
 	        			break;
 	        		}
 	        	}

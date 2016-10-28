@@ -203,8 +203,16 @@ public class JsonTraverser extends Traverser
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
 	{
+		return objectToByteArray(val, classloader, enc, writeclass, true, excludes, processors);
+	}
+	
+	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, boolean writeid, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
+	{
 		Traverser traverser = getWriteTraverser();
-		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
+		JsonWriteContext wr = new JsonWriteContext(writeclass, writeid, excludes);
 		
 		try
 		{

@@ -39,6 +39,16 @@ public class JsonWriteContext
 		this.writeclass = writeclass;
 		this.excludes = excludes;
 	}
+	
+	/**
+	 *  Create a new write context.
+	 */
+	public JsonWriteContext(boolean writeclass, boolean writeid, Map<Class<?>, Set<String>> excludes)
+	{
+		this.writeclass = writeclass;
+		this.writeid = writeid;
+		this.excludes = excludes;
+	}
 
 	/**
 	 *  Write a string to the buffer.
