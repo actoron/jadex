@@ -10,7 +10,7 @@ import jadex.bridge.nonfunctional.annotation.NFRProperty;
 /**
  *  Required service data.
  */
-@Target(ElementType.ANNOTATION_TYPE)
+@Target({ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiredService
 {
