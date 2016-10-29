@@ -1791,13 +1791,15 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							if(waitfuture instanceof ITerminableFuture)
 							{
 //								System.out.println("notify1: "+getId());
-								((ITerminableFuture<?>)waitfuture).terminate();
+								((ITerminableFuture<?>)waitfuture).terminate(getException());
 							}
 							else
 							{
 //								System.out.println("notify2: "+getId());
 								waitfuture.setExceptionIfUndone(getException());
 							}
+							
+							setException(null);	// Allow plan to continue when exception is catched.
 						}
 						else
 						{
