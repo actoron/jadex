@@ -60,12 +60,12 @@
 		}
 		
 		var httpmethod = document.getElementById("httpmethod").innerHTML;
-		send(form.action, httpmethod, names, vals, types, form);
+		send(form.action, httpmethod, names, vals, types, form, type);
 		
 		return false;
 	}
 
-	function send(url, method, names, vals, types, form) 
+	function send(url, method, names, vals, types, form, type) 
 	{
 		var to = 5000;
 		
@@ -102,12 +102,18 @@
 
 		var textpost = "post"==method.toLowerCase();
 		
+		var accept = "";
+		var had = [];
+		
+		if("text/plain"!=type)
+			textpost = false;
+		accept += type;
+		had[0] = type;
+		
 		// determine accept header
 		if(types.length>0)
 		{
-			var accept = "";
-			var had = [];
-			var num = 0;
+			var num = 1;
 			
 			for(i=0; i<types.length; i++)
 			{
@@ -125,16 +131,14 @@
 				}
 			}
 			
-			if(num!=0)
-			{
-				accept += ";q=0.9,*/*;q=0.8";
-//				alert(accept);
-				http.setRequestHeader("Accept", accept);
-				http.setRequestHeader("Content-Type", accept); // assumption: sent params are of same type
-			}
 			// else use default browser accept header
 //			http.setRequestHeader("Accept", "text/html,application/json;q=0.9,*/*;q=0.8");
 		}
+		
+		accept += ";q=0.9,*/*;q=0.8";
+//		alert(accept);
+		http.setRequestHeader("Accept", accept);
+		http.setRequestHeader("Content-Type", accept); // assumption: sent params are of same type
 			
 //		http.onprogress = function () 
 //		{

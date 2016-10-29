@@ -144,19 +144,18 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				
 				boolean writeclass = false;
 				boolean writeid = false;
-				if (context instanceof Map)
+				if(context instanceof Map)
 				{
-					@SuppressWarnings("unchecked")
 					Map<String, Object> ctx = ((Map<String, Object>) context);
-					if (Boolean.TRUE.equals(ctx.get("jadex-json")));
+					if(Boolean.TRUE.equals(ctx.get("jadex-json")));
 					{
 						writeclass = true;
 						writeid = true;
 					}
 				}
 				
-				System.out.println("writeid " +writeid );
-				System.out.println("writeclass " +writeclass );
+				System.out.println("writeid " +writeid);
+				System.out.println("writeclass " +writeclass);
 				
                 byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, writeclass, writeid, null, null);
 				return new String(data);
