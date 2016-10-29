@@ -1,9 +1,9 @@
 package jadex.bdiv3.quickstart.treasureisland.environment;
 
 import java.awt.BorderLayout;
-import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
 import java.io.Closeable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -25,19 +26,21 @@ import jadex.commons.gui.SGUI;
  */
 public class TreasureHunterEnvironment	implements Closeable
 {
+	//-------- constants --------
+	
+	/** The environment width. */
+	public static final double	WIDTH	= 1.5;
+	
+	/** The environment width. */
+	public static final double	HEIGHT	= 1.0;
+	
 	//-------- attributes --------
 	
 	/** The random number generator. */
 	protected Random	rnd;
 	
-	/** The environment width. */
-	protected int	width;
-	
-	/** The environment height. */
-	protected int	height;
-	
 	/** The treasure hunter location. */
-	protected Point	location;
+	protected Point2D.Double	location;
 	
 	/** The treasures. */
 	protected Set<Treasure>	treasures;
@@ -52,16 +55,14 @@ public class TreasureHunterEnvironment	implements Closeable
 	 *  @param width	The width (in pixels).
 	 *  @param height	The height (in pixels).
 	 */
-	public TreasureHunterEnvironment(int width, int height)
+	public TreasureHunterEnvironment()
 	{
 		this.rnd	= new Random(1);
-		this.width	= width;
-		this.height	= height;
-		this.location	= new Point(rnd.nextInt(width), rnd.nextInt(height));
+		this.location	= new Point2D.Double(rnd.nextDouble()*WIDTH, rnd.nextDouble()*HEIGHT);
 		this.treasures	= Collections.synchronizedSet(new LinkedHashSet<Treasure>());
 		for(int i=1; i<=10; i++)
 		{
-			treasures.add(Treasure.create(rnd, width, height));
+			treasures.add(Treasure.create(rnd, WIDTH, HEIGHT));
 		}
 		
 		SwingUtilities.invokeLater(new Runnable()
@@ -106,10 +107,10 @@ public class TreasureHunterEnvironment	implements Closeable
 	/**
 	 *  Get the treasure hunter location.
 	 */
-	public Point	getHunterLocation()
+	public Point2D	getHunterLocation()
 	{
 		// Return copy to prevent manipulation of original location from agent. 
-		return new Point(location.x, location.y);
+		return new Point2D.Double(location.getX(), location.getY());
 	}
 	
 	/**
@@ -133,12 +134,31 @@ public class TreasureHunterEnvironment	implements Closeable
 	 *  @param dy	The intended vertical movement, i.e. delta-y.
 	 *  @return	A future that is finished, when the movement operation is completed.
 	 */
-	public IFuture<Void>	move(int dx, int dy)
+	public IFuture<Void>	move(double dx, double dy)
 	{
-		this.location.x	+= dx;
-		this.location.y	+= dy;
-		
-		panel.environmentChanged();
+		// Use smooth transition using clock service, if possible
+		IInternalAccess	comp	= IInternalExecutionFeature.LOCAL.get();
+		if(comp!=null)
+		{
+			// Use 10ms per step and move 0.01 per step -> distance 1 per second
+			double	dist	= Math.sqrt(dx*dx+dy*dy);
+			int	steps	= Math.max(1, (int)dist*100);	// if too close do a step anyways.
+			for(int i=0; i<steps; i++)
+			{
+				comp.getComponentFeature(IExecutionFeature.class).waitForDelay(10).get();
+				this.location.x	+= dx/steps;
+				this.location.y	+= dy/steps;
+				
+				panel.environmentChanged();				
+			}
+		}
+		else
+		{
+			this.location.x	+= dx;
+			this.location.y	+= dy;
+			
+			panel.environmentChanged();
+		}
 		
 		return IFuture.DONE;
 	}

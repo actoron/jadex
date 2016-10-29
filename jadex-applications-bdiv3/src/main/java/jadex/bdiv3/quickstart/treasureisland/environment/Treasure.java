@@ -1,6 +1,6 @@
 package jadex.bdiv3.quickstart.treasureisland.environment;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.Random;
 
 /**
@@ -14,10 +14,10 @@ public class Treasure	implements Cloneable
 	 *  @param width	The environment width.
 	 *  @param height	The environment height.
 	 */
-	protected static Treasure	create(Random rnd, int width, int height)
+	protected static Treasure	create(Random rnd, double width, double height)
 	{
 		Treasure	t	= new Treasure();
-		t.location	= new Point(rnd.nextInt(width), rnd.nextInt(height));
+		t.location	= new Point2D.Double(rnd.nextDouble()*width, rnd.nextDouble()*height);
 		t.weight	= rnd.nextInt(10)+1;
 		return t;
 	}
@@ -25,7 +25,7 @@ public class Treasure	implements Cloneable
 	//-------- attributes --------
 	
 	/** The location. */
-	protected Point	location;
+	protected Point2D	location;
 	
 	/** The weight. */
 	protected int weight;
@@ -36,9 +36,9 @@ public class Treasure	implements Cloneable
 	 *  Get the location of the treasure.
 	 *  @return	The location
 	 */
-	public Point	getLocation()
+	public Point2D	getLocation()
 	{
 		// Return copy to prevent manipulation of original location from agent. 
-		return new Point(location.x, location.y);
+		return new Point2D.Double(location.getX(), location.getY());
 	}
 }
