@@ -22,7 +22,7 @@ public class TreasureHunterB1BDI
 	
 	/** The treasure hunter world object. */
 	@Belief
-	protected TreasureHunterEnvironment	env	= new TreasureHunterEnvironment(800, 600);
+	protected TreasureHunterEnvironment	env	= new TreasureHunterEnvironment();
 	
 	//-------- goals --------
 	
@@ -54,8 +54,8 @@ public class TreasureHunterB1BDI
 	public void	collectTreasurePlan(CollectTreasureGoal goal)
 	{
 		// Move towards treasure location
-		int	dx	= goal.treasure.getLocation().x - env.getHunterLocation().x;
-		int	dy	= goal.treasure.getLocation().y - env.getHunterLocation().y;
+		double	dx	= goal.treasure.getLocation().getX() - env.getHunterLocation().getX();
+		double	dy	= goal.treasure.getLocation().getY() - env.getHunterLocation().getY();
 		env.move(dx, dy).get();
 		
 		// Then, pick up the treasure

@@ -14,5 +14,5 @@ public class TreasureHunterA1BDI
 	
 	/** The treasure hunter world object. */
 	@Belief
-	protected TreasureHunterEnvironment	env	= new TreasureHunterEnvironment(800, 600);
+	protected TreasureHunterEnvironment	env	= new TreasureHunterEnvironment();
 }
