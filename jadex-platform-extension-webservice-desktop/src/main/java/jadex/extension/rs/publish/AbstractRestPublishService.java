@@ -594,7 +594,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        for(int i=0; i<inparams.length; i++)
 	        {
 	        	if(inparams[i] instanceof String)
-	        		inparams[i] = convertParameter(sr, (String)inparams[i]);
+	        		inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
 	        }
 	 
 	        if(method.isAnnotationPresent(ParametersMapper.class))
@@ -692,7 +692,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      *  @param val The string value.
      *  @return The decoded object.
      */
-    protected Object convertParameter(List<String> sr, String val)
+    protected Object convertParameter(List<String> sr, String val, Class<?> targetclazz)
     {
     	Object ret = val;
         boolean done = false;
@@ -701,7 +701,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         {
         	try
         	{
-        		ret = JsonTraverser.objectFromByteArray(val.getBytes(), component.getClassLoader(), (IErrorReporter)null);
+        		ret = JsonTraverser.objectFromByteArray(val.getBytes(SUtil.UTF8), component.getClassLoader(), (IErrorReporter)null, null, targetclazz);
+//        		ret = JsonTraverser.objectFromByteArray(val.getBytes(), component.getClassLoader(), (IErrorReporter)null);
         		done = true;
         	}
         	catch(Exception e)
