@@ -29,4 +29,10 @@ public @interface AgentService
 	 *  If lazy is false, the agent might block when search takes time.
 	 */
 	public boolean lazy() default true;
+	
+	/**
+	 *  Define a required service inline. If given no name it will receive
+	 *  the field name as name. 
+	 */
+	public RequiredService requiredservice() default @RequiredService(name="", type=Object.class);
 }

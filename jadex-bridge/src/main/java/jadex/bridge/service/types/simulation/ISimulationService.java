@@ -25,7 +25,7 @@ public interface ISimulationService
 	/** The execution mode time step. */
 	public static String MODE_TIME_STEP = "mode_time_step";
 	
-	/** The execution mode time step. */
+	/** The execution mode action step. */
 	public static String MODE_ACTION_STEP = "mode_action_step";
 	
 	//-------- methods --------
