@@ -140,30 +140,23 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			public String convertObject(Object val, Object context)
 			{
-//				System.out.println("write response in json");
-				
-				boolean writeclass = false;
-				boolean writeid = false;
-				if (context instanceof Map)
-				{
-					@SuppressWarnings("unchecked")
-					Map<String, Object> ctx = ((Map<String, Object>) context);
-					if (Boolean.TRUE.equals(ctx.get("jadex-json")));
-					{
-						writeclass = true;
-						writeid = true;
-					}
-				}
-				
-				System.out.println("writeid " +writeid );
-				System.out.println("writeclass " +writeclass );
-				
-                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, writeclass, writeid, null, null);
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null);
 				return new String(data);
 			}
 		};
 		converters.add(MediaType.APPLICATION_JSON, jsonc);
 		converters.add("*/*", jsonc);
+		
+		IObjectStringConverter jjsonc = new IObjectStringConverter()
+		{
+			public String convertObject(Object val, Object context)
+			{
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null);
+				return new String(data);
+			}
+		};
+		converters.add("application/x.json+jadex", jjsonc);
+		converters.add("*/*", jjsonc);
 		
 		IObjectStringConverter xmlc = new IObjectStringConverter()
 		{
@@ -896,18 +889,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        		mt = mediatype;
 	        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
 	        		if(convs!=null && convs.size()>0)
-	        		{
-	        			Map<String, Object> context = null;
-	        			
-	        			if (request.getHeader("x-jadex-json") != null)
-	        			{
-	        				if (context == null)
-	        					context = new HashMap<String, Object>();
-	        				
-	        				context.put("jadex-json", Boolean.TRUE);
-	        			}
-	        				
-	        			ret = convs.iterator().next().convertObject(result, context);
+	        		{	
+	        			ret = convs.iterator().next().convertObject(result, null);
 	        			break;
 	        		}
 	        	}
