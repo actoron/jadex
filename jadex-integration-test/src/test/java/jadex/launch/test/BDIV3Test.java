@@ -15,7 +15,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 	private static final String[]	EXCLUDES	=
 		new String[]
 		{
-			"treasurehunt",	// in progress -> include later
+			"treasureisland",	// in progress -> include later
 			
 			"INegotiationAgent",	// Not an agent.
 			"QuickstartBDI",	// blocks due to opened dialog
