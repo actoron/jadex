@@ -54,7 +54,7 @@ public class RestInvocationHelper
 	 *  @param params Parameters.
 	 *  @return Reply string
 	 */
-	protected IFuture<String> invokeJson(IInternalAccess component,
+	public IFuture<String> invokeJson(IInternalAccess component,
 													  final String uri,
 										 			  final String path,
 										 			  final Map<String, Object> headers,
@@ -73,7 +73,7 @@ public class RestInvocationHelper
 	 *  @param params Parameters.
 	 *  @return Reply string
 	 */
-	protected IFuture<String> invokeJson(IInternalAccess component,
+	public IFuture<String> invokeJson(IInternalAccess component,
 													  final String uri,
 										 			  final String path,
 										 			  final Map<String, Object> headers,
