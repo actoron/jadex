@@ -111,10 +111,6 @@ public class RestInvocationHelper
 								wt = wt.queryParam(entry.getKey(), entry.getValue());
 						}
 					}
-					else if (postplainjson != null)
-					{
-						data = Entity.json(postplainjson);
-					}
 					else
 					{
 						MultivaluedMap datamap = new MultivaluedHashMap();
@@ -131,6 +127,10 @@ public class RestInvocationHelper
 						}
 						data = Entity.form(datamap);
 					}
+				}
+				if (postplainjson != null)
+				{
+					data = Entity.json(postplainjson);
 				}
 				
 				Invocation.Builder ib = wt.request("application/json");
