@@ -140,9 +140,9 @@ public class TreasureHunterEnvironment	implements Closeable
 		IInternalAccess	comp	= IInternalExecutionFeature.LOCAL.get();
 		if(comp!=null)
 		{
-			// Use 10ms per step and move 0.01 per step -> distance 1 per second
+			// Use 10ms per step and move 0.002 per step -> distance 0.2 per second
 			double	dist	= Math.sqrt(dx*dx+dy*dy);
-			int	steps	= Math.max(1, (int)dist*100);	// if too close do a step anyways.
+			int	steps	= Math.max(1, (int)(dist*500));	// if too close do a step anyways.
 			for(int i=0; i<steps; i++)
 			{
 				comp.getComponentFeature(IExecutionFeature.class).waitForDelay(10).get();
@@ -174,7 +174,7 @@ public class TreasureHunterEnvironment	implements Closeable
 		Future<Void>	ret	= new Future<Void>();
 		if(treasures.contains(treasure))
 		{
-			if(treasure.location.equals(location))
+			if(isAtLocation(treasure.location))
 			{
 				treasures.remove(treasure);
 				panel.environmentChanged();
@@ -191,6 +191,14 @@ public class TreasureHunterEnvironment	implements Closeable
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Check if the hunter is at (i.e. close enough to) a given location.
+	 */
+	public boolean	isAtLocation(Point2D location)
+	{
+		return Math.abs(this.location.getX()-location.getX())<0.0001 && Math.abs(this.location.getY()-location.getY())<0.0001;
 	}
 	
 	//-------- Closeable interface --------
