@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -67,62 +68,36 @@ class EnvironmentPanel extends JPanel
 	 */
 	protected void	paintComponent(Graphics g)
 	{
-		// Calculate size of objects depending on view size.
-		Dimension	size	= getSize();
-		double pixelperunit	= Math.min(size.width/TreasureHunterEnvironment.WIDTH, size.height/TreasureHunterEnvironment.HEIGHT);
-		
 		// Paint background (dependent on daytime).
 		Rectangle	bounds	= getBounds();
 		g.setColor(/*drawdata.daytime ?*/ Color.lightGray);
 		g.fillRect(0, 0, bounds.width, bounds.height);
 
-//		// Paint the treasure hunter.
-//		Point2D	p	= env.location;
-//		g.setColor(Color.black);
-//		g.fillOval(p.x-objectsize/2, p.y-objectsize/2, objectsize, objectsize);
-//		g.drawString("Treasure Hunter", p.x+objectsize, p.y-objectsize);
-////		g.drawString("battery: " + (int)(drawdata.my_chargestate*100.0) + "%",
-////			p.x+5, p.y+5);
-////		g.drawString("waste: " + (drawdata.my_waste ? "yes" : "no"),
-////			p.x+5, p.y+15);
-//
-////		// Paint charge Stations.
-////		for(int i=0; i<drawdata.chargingstations.length; i++)
-////		{
-////			g.setColor(Color.blue);
-////			p	= onScreenLocation(drawdata.chargingstations[i].getLocation(), bounds);
-////			g.drawRect(p.x-10, p.y-10, 20, 20);
-////			g.setColor(drawdata.daytime ? Color.black : Color.white);
-////			g.drawString(drawdata.chargingstations[i].getName(), p.x+14, p.y+5);
-////		}
-////
-////		// Paint waste bins.
-////		for(int i=0; i<drawdata.wastebins.length; i++)
-////		{
-////			g.setColor(Color.red);
-////			p = onScreenLocation(drawdata.wastebins[i].getLocation(), bounds);
-////			g.drawOval(p.x-10, p.y-10, 20, 20);
-////			g.setColor(drawdata.daytime ? Color.black : Color.white);
-////			g.drawString(drawdata.wastebins[i].getName()+" ("+drawdata.wastebins[i].getWastes().length+"/"+drawdata.wastebins[i].getCapacity()+")", p.x+14, p.y+5);
-////		}
-////
-//		// Paint treasures.
-//		for(Treasure t: env.getTreasures())
-//		{
-//			p	= t.location;
-//			int size	= objectsize*t.weight/10;
-//			g.setColor(Color.red);
-//			g.fillOval(p.x-size/2, p.y-size/2, size, size);
-//		}
-////
-////		// Paint movement targets.
-////		for(int i=0; i<drawdata.dests.length; i++)
-////		{
-////			g.setColor(Color.black);
-////			p = onScreenLocation((Location)drawdata.dests[i], bounds);
-////			g.drawOval(p.x-5, p.y-5, 10, 10);
-////			g.drawLine(p.x-7, p.y, p.x+7, p.y);
-////			g.drawLine(p.x, p.y-7, p.x, p.y+7);
-////		}
+		// Paint treasures.
+		for(Treasure t: env.getTreasures())
+		{
+			Point2D	p	= t.location;
+			bounds	= getPixelUnits(new Rectangle2D.Double(p.getX()-0.01, p.getY()-0.01, 0.02, 0.02));
+			g.setColor(Color.red);
+			g.fillOval(bounds.x, bounds.y, bounds.width, bounds.height);
+		}
+
+		// Paint the treasure hunter.
+		Point2D	p	= env.location;
+		bounds	= getPixelUnits(new Rectangle2D.Double(p.getX()-0.01, p.getY()-0.01, 0.02, 0.02));
+		g.setColor(Color.black);
+		g.fillOval(bounds.x, bounds.y, bounds.width, bounds.height);
+		g.drawString("Treasure Hunter", bounds.x+bounds.width, bounds.y);
+	}
+
+	/**
+	 *  Convert env units to pixels.
+	 */
+	protected Rectangle	getPixelUnits(Rectangle2D bounds)
+	{
+		// Calculate size of objects depending on view size.
+		Dimension	size	= getSize();
+		double pixelperunit	= Math.min(size.width/TreasureHunterEnvironment.WIDTH, size.height/TreasureHunterEnvironment.HEIGHT);
+		return new Rectangle((int)(bounds.getX()*pixelperunit), (int)(bounds.getY()*pixelperunit), (int)(bounds.getWidth()*pixelperunit), (int)(bounds.getHeight()*pixelperunit));
 	}
 }
