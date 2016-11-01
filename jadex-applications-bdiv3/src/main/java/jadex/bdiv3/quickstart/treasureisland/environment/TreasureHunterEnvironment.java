@@ -45,6 +45,9 @@ public class TreasureHunterEnvironment	implements Closeable
 	/** The treasures. */
 	protected Set<Treasure>	treasures;
 	
+	/** The collected treasures (just for painting). */
+	protected Set<Treasure>	islands;
+	
 	/** The gui. */
 	protected EnvironmentPanel	panel;
 	
@@ -60,6 +63,7 @@ public class TreasureHunterEnvironment	implements Closeable
 		this.rnd	= new Random(1);
 		this.location	= new Point2D.Double(rnd.nextDouble()*WIDTH, rnd.nextDouble()*HEIGHT);
 		this.treasures	= Collections.synchronizedSet(new LinkedHashSet<Treasure>());
+		this.islands	= Collections.synchronizedSet(new LinkedHashSet<Treasure>());
 		for(int i=1; i<=10; i++)
 		{
 			treasures.add(Treasure.create(rnd, WIDTH, HEIGHT));
@@ -177,6 +181,7 @@ public class TreasureHunterEnvironment	implements Closeable
 			if(isAtLocation(treasure.location))
 			{
 				treasures.remove(treasure);
+				islands.add(treasure);
 				panel.environmentChanged();
 				ret.setResult(null);
 			}
