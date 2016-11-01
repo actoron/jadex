@@ -1,6 +1,5 @@
 package jadex.bdiv3.quickstart.treasureisland.environment;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -28,6 +27,7 @@ class EnvironmentPanel extends JPanel
 
 	/** The image icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
+		"background", SGUI.makeIcon(EnvironmentPanel.class, "images/background.jpg"),
 		"hunter", SGUI.makeIcon(EnvironmentPanel.class, "images/hunter.png"),
 		"island", SGUI.makeIcon(EnvironmentPanel.class, "images/island.png"),
 		"island_treasure", SGUI.makeIcon(EnvironmentPanel.class, "images/island_treasure.png")
@@ -91,9 +91,9 @@ class EnvironmentPanel extends JPanel
 		Graphics2D	g2	= img.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		
-		// Paint background (dependent on daytime).
-		g2.setColor(/*drawdata.daytime ?*/ Color.lightGray);
-		g2.fillRect(0, 0, bounds.width, bounds.height);
+		// Paint background
+		ImageIcon ii = (ImageIcon)icons.getIcon("background");
+		g2.drawImage(ii.getImage(), 0, 0, bounds.width, bounds.height, this);
 
 		// Paint collected treasures.
 		Set<Treasure>	islands;
