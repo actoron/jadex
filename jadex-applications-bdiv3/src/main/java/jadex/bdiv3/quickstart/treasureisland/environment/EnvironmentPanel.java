@@ -28,6 +28,7 @@ class EnvironmentPanel extends JPanel
 
 	/** The image icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
+		"hunter", SGUI.makeIcon(EnvironmentPanel.class, "images/hunter.png"),
 		"island", SGUI.makeIcon(EnvironmentPanel.class, "images/island.png"),
 		"island_treasure", SGUI.makeIcon(EnvironmentPanel.class, "images/island_treasure.png")
 	});
@@ -115,10 +116,7 @@ class EnvironmentPanel extends JPanel
 		
 		// Paint the treasure hunter.
 		Point2D	p	= env.location;
-		bounds	= getPixelUnits(new Rectangle2D.Double(p.getX()-0.01, p.getY()-0.01, 0.02, 0.02));
-		g2.setColor(Color.black);
-		g2.fillOval(bounds.x, bounds.y, bounds.width, bounds.height);
-		g2.drawString("Treasure Hunter", bounds.x+bounds.width, bounds.y);
+		paintIcon("hunter", new Rectangle2D.Double(p.getX()-0.05, p.getY()-0.05, 0.1, 0.1), g2);
 		
 		g.drawImage(img, 0, 0, this);
 	}
