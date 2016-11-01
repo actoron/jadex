@@ -54,11 +54,31 @@ public class RestInvocationHelper
 	 *  @param params Parameters.
 	 *  @return Reply string
 	 */
-	protected IFuture<String> invokeJson(IInternalAccess component,
+	public IFuture<String> invokeJson(IInternalAccess component,
 													  final String uri,
 										 			  final String path,
 										 			  final Map<String, Object> headers,
 										 			  final Map<String, Object> params,
+										 			  final Class<?> resttype,
+										 			  final boolean inurlparams)
+	{
+		return invokeJson(component, uri, path, headers, params, null, resttype, inurlparams);
+	}
+	
+	/**
+	 *  Invokes the REST service for a JSON response.
+	 *  @param uri URI to invoke.
+	 *  @param path Path to invoke.
+	 *  @param headers Header fields.
+	 *  @param params Parameters.
+	 *  @return Reply string
+	 */
+	public IFuture<String> invokeJson(IInternalAccess component,
+													  final String uri,
+										 			  final String path,
+										 			  final Map<String, Object> headers,
+										 			  final Map<String, Object> params,
+										 			  final String postplainjson,
 										 			  final Class<?> resttype,
 										 			  final boolean inurlparams)
 	{
@@ -91,6 +111,10 @@ public class RestInvocationHelper
 								wt = wt.queryParam(entry.getKey(), entry.getValue());
 						}
 					}
+					else if (postplainjson != null)
+					{
+						data = Entity.json(postplainjson);
+					}
 					else
 					{
 						MultivaluedMap datamap = new MultivaluedHashMap();
@@ -105,7 +129,7 @@ public class RestInvocationHelper
 							else
 								datamap.put(entry.getKey(), Arrays.asList(new Object[] { entry.getValue() }));
 						}
-						Entity.form(datamap);
+						data = Entity.form(datamap);
 					}
 				}
 				

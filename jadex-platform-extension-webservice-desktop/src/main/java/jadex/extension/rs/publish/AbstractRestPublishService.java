@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -35,6 +36,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonValue;
 
 //import org.objectweb.asm.ClassReader;
 //import org.objectweb.asm.Type;
@@ -68,6 +73,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.traverser.Traverser;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -76,6 +82,7 @@ import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -141,7 +148,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			public String convertObject(Object val, Object context)
 			{
 //				System.out.println("write response in json");
-                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null);
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null);
 				return new String(data);
 			}
 		};
@@ -152,7 +159,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			public String convertObject(Object val, Object context)
 			{
-                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null);
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null);
 				return new String(data);
 			}
 		};
@@ -596,6 +603,34 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        {
 	        	if(inparams[i] instanceof String)
 	        		inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
+	        }
+	        
+	        String ct = request.getHeader("Content-Type");
+	        if ((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
+	        {
+	        	try
+	        	{
+	        		byte[] jsonbytes = SUtil.readStream(request.getInputStream());
+	        		if (types.length == 1)
+	        		{
+	        			inparams = new Object[] { JsonTraverser.objectFromByteArray(jsonbytes, component.getClassLoader(), null, null, types[0]) };
+	        		}
+	        		else
+	        		{
+	        			JsonArray array = (JsonArray) Json.parse(new String(jsonbytes, SUtil.UTF8));
+	        			inparams = new Object[array.size()];
+	        			for(int i=0; i<array.size(); i++)
+	        			{
+	        				JsonValue val = array.get(i);
+	        				inparams[i] = JsonTraverser.objectFromString(val.toString(), component.getClassLoader(), null, types[i], null);
+	        			}
+	        			
+	        		}
+	        	}
+	        	catch (Exception e)
+	        	{
+	        		e.printStackTrace();
+	        	}
 	        }
 	 
 	        if(method.isAnnotationPresent(ParametersMapper.class))
