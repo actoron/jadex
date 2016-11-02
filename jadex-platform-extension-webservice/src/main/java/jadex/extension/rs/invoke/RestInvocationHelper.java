@@ -34,6 +34,9 @@ import jadex.micro.annotation.Agent;
 @Agent
 public class RestInvocationHelper
 {
+	/** Use daemon threads for REST call. */
+	public static boolean USE_THREADS = true;
+	
 	/** The client */
 	protected Client client;
 	
@@ -85,7 +88,7 @@ public class RestInvocationHelper
 		IDaemonThreadPoolService tp = SServiceProvider.getLocalService(component.getComponentIdentifier(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		final Future<String> ret = new Future<String>();
 		final IExternalAccess exta = component.getExternalAccess();
-		tp.execute(new Runnable()
+		Runnable runnable = new Runnable()
 		{
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public void run()
@@ -186,7 +189,11 @@ public class RestInvocationHelper
 					}
 				});
 			}
-		});
+		};
+		if (USE_THREADS)
+			tp.execute(runnable);
+		else
+			runnable.run();
 		return ret;
 	}
 	
