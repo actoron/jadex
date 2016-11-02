@@ -1135,32 +1135,36 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //		System.out.println("Goal target triggered: "+RGoal.this);
 		if(getMGoal().getConditions(MGoal.CONDITION_MAINTAIN)!=null)
 		{
-			abortPlans().addResultListener(new IResultListener<Void>()
+			// Change maintain goal rule so it does not consider target condition triggered unless we move from false to true (not just true to true)
+			if (GoalProcessingState.INPROCESS.equals(getProcessingState()))
 			{
-				@Override
-				public void resultAvailable(Void result)
+				abortPlans().addResultListener(new IResultListener<Void>()
 				{
-					setProcessingState(ia, GoalProcessingState.IDLE);
-					// Hack! Notify finished listeners to allow for waiting via waitForGoal
-					// Cannot use notifyListeners() because it checks isSucceeded
-					if(getListeners()!=null)
+					@Override
+					public void resultAvailable(Void result)
 					{
-						for(IResultListener<Void> lis: getListeners())
+						setProcessingState(ia, GoalProcessingState.IDLE);
+						// Hack! Notify finished listeners to allow for waiting via waitForGoal
+						// Cannot use notifyListeners() because it checks isSucceeded
+						if(getListeners()!=null)
 						{
-							lis.resultAvailable(null);
+							for(IResultListener<Void> lis: getListeners())
+							{
+								lis.resultAvailable(null);
+							}
 						}
+						listeners = null;
 					}
-					listeners = null;
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					// Should not fail?
-					exception.printStackTrace();
-					resultAvailable(null);	// safety-net: continue anyways
-				}
-			});
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						// Should not fail?
+						exception.printStackTrace();
+						resultAvailable(null);	// safety-net: continue anyways
+					}
+				});
+			}
 		}
 		else
 		{
