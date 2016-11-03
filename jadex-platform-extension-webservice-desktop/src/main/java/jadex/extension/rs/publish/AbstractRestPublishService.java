@@ -73,6 +73,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
@@ -606,23 +607,37 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        }
 	        
 	        String ct = request.getHeader("Content-Type");
+	        if (ct == null)
+	        	ct = request.getHeader("Accept");
 	        if ((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
 	        {
 	        	try
 	        	{
 	        		byte[] jsonbytes = SUtil.readStream(request.getInputStream());
-	        		if (types.length == 1)
+	        		
+	        		String json = new String(jsonbytes, SUtil.UTF8);
+	        		if (types.length == 1 && json.trim().startsWith("{"))
 	        		{
-	        			inparams = new Object[] { JsonTraverser.objectFromByteArray(jsonbytes, component.getClassLoader(), null, null, types[0]) };
+	        			List<ITraverseProcessor> procs = null;
+	        			if (SReflect.isSupertype(Map.class, types[0]))
+		        			procs = JsonTraverser.nestedreadprocs;
+	        			inparams = new Object[] { JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], procs) };
+	        		}
+	        		else if (types.length == 1 && json.trim().startsWith("\""))
+	        		{
+	        			inparams = new Object[] { JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], null) };
 	        		}
 	        		else
 	        		{
-	        			JsonArray array = (JsonArray) Json.parse(new String(jsonbytes, SUtil.UTF8));
+	        			JsonArray array = (JsonArray) Json.parse(json);
 	        			inparams = new Object[array.size()];
 	        			for(int i=0; i<array.size(); i++)
 	        			{
+	        				List<ITraverseProcessor> procs = null;
+		        			if (SReflect.isSupertype(Map.class, types[i]))
+			        			procs = JsonTraverser.nestedreadprocs;
 	        				JsonValue val = array.get(i);
-	        				inparams[i] = JsonTraverser.objectFromString(val.toString(), component.getClassLoader(), null, types[i], null);
+	        				inparams[i] = JsonTraverser.objectFromString(val.toString(), component.getClassLoader(), null, types[i], procs);
 	        			}
 	        			
 	        		}
