@@ -30,7 +30,7 @@ public class JsonMapProcessor implements ITraverseProcessor
 	{
 		Class<?> clazz = SReflect.getClass(type);
 //		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(Map.class, clazz));
-		return object instanceof JsonObject && SReflect.isSupertype(Map.class, clazz);		
+		return object instanceof JsonObject && SReflect.isSupertype(Map.class, clazz);
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class JsonMapProcessor implements ITraverseProcessor
 				if(JsonTraverser.CLASSNAME_MARKER.equals(name))
 					continue;
 				Object val = obj.get(name);
-				Class<?> valclazz = val!=null? val.getClass(): null;
+				Class<?> valclazz = getValueClass(val, context);
 				Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
 				if(newval != Traverser.IGNORE_RESULT)
 				{
@@ -89,6 +89,18 @@ public class JsonMapProcessor implements ITraverseProcessor
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Returns the class of a map value.
+	 *  @param val The value.
+	 *  @param context The context.
+	 *  @return The value class.
+	 */
+	public Class<?> getValueClass(Object val, Object context)
+	{
+		Class<?> valclazz = val!=null? val.getClass(): null;
+		return valclazz;
 	}
 	
 	/**

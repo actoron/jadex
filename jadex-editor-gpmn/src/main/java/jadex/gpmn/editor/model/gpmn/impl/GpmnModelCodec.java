@@ -102,15 +102,15 @@ public class GpmnModelCodec extends AbstractModelCodec
 				printlnIndent(ps, ind++, "<gpmn:parameter>");
 				
 				printIndent(ps, ind, "<gpmn:parametername>");
-				ps.print(p.getName());
+				ps.print(escapeString(p.getName()));
 				ps.println("</gpmn:parametername>");
 				
 				printIndent(ps, ind, "<gpmn:parametertype>");
-				ps.print(p.getType());
+				ps.print(escapeString(p.getType()));
 				ps.println("</gpmn:parametertype>");
 				
 				printIndent(ps, ind, "<gpmn:parametervalue>");
-				ps.print(p.getValue());
+				ps.print(escapeString(p.getValue()));
 				ps.println("</gpmn:parametervalue>");
 				
 				if (p.isSet())
@@ -308,7 +308,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 			RefPlan plan = (RefPlan) node;
 			
 			printIndent(ps, ind, "<gpmn:planname>");
-			ps.print(plan.getName());
+			ps.print(escapeString(plan.getName()));
 			ps.println("</gpmn:planname>");
 			
 			//TODO: Throw exception if planref is undefined?
@@ -345,16 +345,16 @@ public class GpmnModelCodec extends AbstractModelCodec
 				ps.println(">");
 				
 				printIndent(ps, ind, "<gpmn:edgename>");
-				ps.print(edge.getName());
+				ps.print(escapeString(edge.getName()));
 				ps.println("</gpmn:edgename>");
 				
 				printIndent(ps, ind, "<gpmn:sourcename>");
-				ps.print(aplan.getName());
+				ps.print(escapeString(aplan.getName()));
 				ps.println("</gpmn:sourcename>");
 				
 				Goal goal = (Goal) edge.getTarget();
 				printIndent(ps, ind, "<gpmn:targetname>");
-				ps.print(goal.getName());
+				ps.print(escapeString(goal.getName()));
 				ps.println("</gpmn:targetname>");
 				
 				printlnIndent(ps, --ind, "</gpmn:activationedge>");
@@ -372,17 +372,17 @@ public class GpmnModelCodec extends AbstractModelCodec
 				printlnIndent(ps, ind++, "<gpmn:planedge>");
 				
 				printIndent(ps, ind, "<gpmn:edgename>");
-				ps.print(edge.getName());
+				ps.print(escapeString(edge.getName()));
 				ps.println("</gpmn:edgename>");
 				
 				Goal goal = (Goal) edge.getSource();
 				printIndent(ps, ind, "<gpmn:sourcename>");
-				ps.print(goal.getName());
+				ps.print(escapeString(goal.getName()));
 				ps.println("</gpmn:sourcename>");
 				
 				AbstractPlan plan = (AbstractPlan) edge.getTarget();
 				printIndent(ps, ind, "<gpmn:targetname>");
-				ps.print(plan.getName());
+				ps.print(escapeString(plan.getName()));
 				ps.println("</gpmn:targetname>");
 				
 				printlnIndent(ps, --ind, "</gpmn:planedge>");
@@ -400,17 +400,17 @@ public class GpmnModelCodec extends AbstractModelCodec
 				printlnIndent(ps, ind++, "<gpmn:suppressionedge>");
 				
 				printIndent(ps, ind, "<gpmn:edgename>");
-				ps.print(edge.getName());
+				ps.print(escapeString(edge.getName()));
 				ps.println("</gpmn:edgename>");
 				
 				Goal goal = (Goal) edge.getSource();
 				printIndent(ps, ind, "<gpmn:sourcename>");
-				ps.print(goal.getName());
+				ps.print(escapeString(goal.getName()));
 				ps.println("</gpmn:sourcename>");
 				
 				goal = (Goal) edge.getTarget();
 				printIndent(ps, ind, "<gpmn:targetname>");
-				ps.print(goal.getName());
+				ps.print(escapeString(goal.getName()));
 				ps.println("</gpmn:targetname>");
 				
 				printlnIndent(ps, --ind, "</gpmn:suppressionedge>");
@@ -471,7 +471,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 				ps.println("\">");
 				
 				printIndent(ps, ind, "<gpmn:goalname>");
-				ps.print(goal.getGoal().getName());
+				ps.print(escapeString(goal.getGoal().getName()));
 				ps.println("</gpmn:goalname>");
 				
 				printlnIndent(ps, --ind, "</gpmn:vgoal>");
@@ -502,7 +502,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 				ps.println("\">");
 				
 				printIndent(ps, ind, "<gpmn:planname>");
-				ps.print(plan.getPlan().getName());
+				ps.print(escapeString(plan.getPlan().getName()));
 				ps.println("</gpmn:planname>");
 				
 				printlnIndent(ps, --ind, "</gpmn:vplan>");
@@ -520,7 +520,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 				printlnIndent(ps, ind++, "<gpmn:vedge>");
 				
 				printIndent(ps, ind, "<gpmn:edgename>");
-				ps.print(edge.getEdge().getName());
+				ps.print(escapeString(edge.getEdge().getName()));
 				ps.println("</gpmn:edgename>");
 				
 				printlnIndent(ps, --ind, "</gpmn:vedge>");
@@ -538,17 +538,17 @@ public class GpmnModelCodec extends AbstractModelCodec
 				printlnIndent(ps, ind++, "<gpmn:virtualactivationedge>");
 				
 				printIndent(ps, ind, "<gpmn:planname>");
-				ps.print(edge.getPlan().getPlan().getName());
+				ps.print(escapeString(edge.getPlan().getPlan().getName()));
 				ps.println("</gpmn:planname>");
 				
 				Goal goal = (Goal) ((VGoal) edge.getSource()).getGoal();
 				printIndent(ps, ind, "<gpmn:sourcename>");
-				ps.print(goal.getName());
+				ps.print(escapeString(goal.getName()));
 				ps.println("</gpmn:sourcename>");
 				
 				goal = (Goal) ((VGoal) edge.getTarget()).getGoal();
 				printIndent(ps, ind, "<gpmn:targetname>");
-				ps.print(goal.getName());
+				ps.print(escapeString(goal.getName()));
 				ps.println("</gpmn:targetname>");
 				
 				printlnIndent(ps, --ind, "</gpmn:virtualactivationedge>");
@@ -961,13 +961,13 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    	}
 		    	else if ("sourcename".equals(localname))
 		    	{
-		    		String name = reader.getText();
+		    		String name = XmlUtil.unescapeString(reader.getText());
 		    		((Object[]) current)[2] = name;
 		    	}
 		    	else if ("targetname".equals(localname))
 		    	{
 		    		Object[] obj = (Object[]) current;
-		    		String targetname = reader.getText();
+		    		String targetname = XmlUtil.unescapeString(reader.getText());
 		    		String sourcename = (String) obj[2];
 		    		if (current instanceof Object[] && "virtualactivationedge".equals(((Object[]) current)[0]))
 		    		{

@@ -3,6 +3,7 @@ package jadex.extension.rs.invoke;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,15 +26,23 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Binding;
 
 /** Simple API for calling JSON-based REST services. */
 @Agent
 public class RestInvocationHelper
 {
+	/** Use daemon threads for REST call. */
+	public static boolean USE_THREADS = true;
+	
 	/** The client */
 	protected Client client;
 	
@@ -85,109 +94,160 @@ public class RestInvocationHelper
 		IDaemonThreadPoolService tp = SServiceProvider.getLocalService(component.getComponentIdentifier(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		final Future<String> ret = new Future<String>();
 		final IExternalAccess exta = component.getExternalAccess();
-		tp.execute(new Runnable()
+		Runnable runnable = new Runnable()
 		{
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public void run()
 			{
-				WebTarget wt = client.target(uri).path(path);
-				
-				Entity<?> data = null;
-				if (params != null)
+				performRequest(exta, client, uri, path, headers, params, postplainjson, resttype, inurlparams, ret);
+			}
+		};
+		if (USE_THREADS)
+			tp.execute(runnable);
+		else
+		{
+			Map<String, Object> restargs = new HashMap<String, Object>();
+			restargs.put("uri", uri);
+			restargs.put("path", path);
+			restargs.put("headers", headers);
+			restargs.put("params", params);
+			restargs.put("postplainjson", postplainjson);
+			restargs.put("resttype", resttype);
+			restargs.put("inurlparams", inurlparams);
+			CreationInfo info = new CreationInfo();
+			info.addArgument("restargs", restargs);
+			IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
+			cms.createComponent(null, "jadex.extension.rs.invoke.RestInvocationAgent.class", info, new IResultListener<Collection<Tuple2<String,Object>>>()
+			{
+				@Override
+				public void resultAvailable(Collection<Tuple2<String, Object>> result)
 				{
-					if(inurlparams)
+					// TODO Auto-generated method stub
+					Object res = result.iterator().next();
+					ret.setResult((String) res);
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Perform the REST call.
+	 * 
+	 */
+	public static final void performRequest(IExternalAccess exta,
+											Client client,
+											final String uri,
+								 			final String path,
+								 			final Map<String, Object> headers,
+								 			final Map<String, Object> params,
+								 			final String postplainjson,
+								 			final Class<?> resttype,
+								 			final boolean inurlparams,
+								 			final Future<String> ret)
+	{
+		WebTarget wt = client.target(uri).path(path);
+		
+		Entity<?> data = null;
+		if (params != null)
+		{
+			if(inurlparams)
+			{
+				for (Map.Entry<String, Object> entry : params.entrySet())
+				{
+					if (entry.getValue() instanceof Collection)
 					{
-						for (Map.Entry<String, Object> entry : params.entrySet())
+						Collection<Object> coll = (Collection<Object>) entry.getValue();
+						for (Object obj : coll)
 						{
-							if (entry.getValue() instanceof Collection)
-							{
-								Collection<Object> coll = (Collection<Object>) entry.getValue();
-								for (Object obj : coll)
-								{
-									wt.queryParam(entry.getKey(), obj);
-								}
-							}
-							else
-								wt = wt.queryParam(entry.getKey(), entry.getValue());
+							wt.queryParam(entry.getKey(), obj);
 						}
 					}
 					else
+						wt = wt.queryParam(entry.getKey(), entry.getValue());
+				}
+			}
+			else
+			{
+				MultivaluedMap datamap = new MultivaluedHashMap();
+				for (Map.Entry<String, Object> entry : params.entrySet())
+				{
+					if (entry.getValue() instanceof Collection)
 					{
-						MultivaluedMap datamap = new MultivaluedHashMap();
-						for (Map.Entry<String, Object> entry : params.entrySet())
-						{
-							if (entry.getValue() instanceof Collection)
-							{
-								Collection<Object> coll = (Collection<Object>) entry.getValue();
-								datamap.put(entry.getKey(), coll instanceof List? (List) coll: new ArrayList<Object>(coll));
-								
-							}
-							else
-								datamap.put(entry.getKey(), Arrays.asList(new Object[] { entry.getValue() }));
-						}
-						data = Entity.form(datamap);
+						Collection<Object> coll = (Collection<Object>) entry.getValue();
+						datamap.put(entry.getKey(), coll instanceof List? (List) coll: new ArrayList<Object>(coll));
+						
 					}
+					else
+						datamap.put(entry.getKey(), Arrays.asList(new Object[] { entry.getValue() }));
 				}
-				if (postplainjson != null)
+				data = Entity.form(datamap);
+			}
+		}
+		if (postplainjson != null)
+		{
+			data = Entity.json(postplainjson);
+		}
+		
+		Invocation.Builder ib = wt.request("application/json");
+		
+		if (headers != null)
+		{
+			for (Map.Entry<String, Object> entry : headers.entrySet())
+			{
+				ib.header(entry.getKey(), entry.getValue());
+			}
+		}
+		ib.accept("application/json");
+//		ib.header("Content-Type", "application/json");
+		Response res = null;
+		if(POST.class.equals(resttype))
+		{
+			res = ib.post(data);
+		}
+		else if(PUT.class.equals(resttype))
+		{
+			res = ib.put(data);
+		}
+		else if(HEAD.class.equals(resttype))
+		{
+			res = ib.head();
+		}
+		else if(OPTIONS.class.equals(resttype))
+		{
+			res = ib.options();
+		}
+		else if(DELETE.class.equals(resttype))
+		{
+			res = ib.delete();
+		}
+		else
+			res = ib.get();
+		final int statuscode = res.getStatus();
+		final String content = res.readEntity(String.class);
+		res.close();
+		exta.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if (statuscode >= 400 && statuscode < 600)
 				{
-					data = Entity.json(postplainjson);
-				}
-				
-				Invocation.Builder ib = wt.request("application/json");
-				
-				if (headers != null)
-				{
-					for (Map.Entry<String, Object> entry : headers.entrySet())
-					{
-						ib.header(entry.getKey(), entry.getValue());
-					}
-				}
-				ib.accept("application/json");
-				Response res = null;
-				if(POST.class.equals(resttype))
-				{
-					res = ib.post(data);
-				}
-				else if(PUT.class.equals(resttype))
-				{
-					res = ib.put(data);
-				}
-				else if(HEAD.class.equals(resttype))
-				{
-					res = ib.head();
-				}
-				else if(OPTIONS.class.equals(resttype))
-				{
-					res = ib.options();
-				}
-				else if(DELETE.class.equals(resttype))
-				{
-					res = ib.delete();
+					ret.setException(new RequestFailedException("Request failed with status code: " + statuscode, statuscode, content));
 				}
 				else
-					res = ib.get();
-				final int statuscode = res.getStatus();
-				final String content = res.readEntity(String.class);
-				res.close();
-				exta.scheduleStep(new IComponentStep<Void>()
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						if (statuscode >= 400 && statuscode < 600)
-						{
-							ret.setException(new RequestFailedException("Request failed with status code: " + statuscode, statuscode, content));
-						}
-						else
-						{
-							ret.setResult(content);
-						}
-							
-						return IFuture.DONE;
-					}
-				});
+					ret.setResult(content);
+				}
+					
+				return IFuture.DONE;
 			}
 		});
-		return ret;
 	}
 	
 	/**
