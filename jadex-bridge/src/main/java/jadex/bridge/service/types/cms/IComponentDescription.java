@@ -15,10 +15,10 @@ public interface IComponentDescription
 	//-------- constants --------
 	
 	// todo: remove? needed for JADE
-	/** Predefined value "initiated" for slot state. */
-	public static final String  STATE_INITIATED  = "initiated";
-	/** Predefined value "transit" for slot state. */
-	public static final String  STATE_TRANSIT  = "transit";	
+//	/** Predefined value "initiated" for slot state. */
+//	public static final String  STATE_INITIATED  = "initiated";
+//	/** Predefined value "transit" for slot state. */
+//	public static final String  STATE_TRANSIT  = "transit";	
 	
 	/** Predefined value "active" for slot state. */
 	public static final String  STATE_ACTIVE  = "active";

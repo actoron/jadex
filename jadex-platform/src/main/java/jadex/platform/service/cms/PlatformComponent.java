@@ -92,8 +92,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/** The combined value fetcher (cached for speed). */
 	protected IValueFetcher	fetcher;
 	
-//	/** The component lifecycle state (init, body, end). */
-//	protected ComponentLifecycleState state = ComponentLifecycleState.CREATE;
+	/** The shutdown flag (set on start of shutdown). */
+	protected boolean shutdown;
 	
 	//-------- IPlatformComponentAccess interface --------
 	
@@ -172,6 +172,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void>	shutdown()
 	{
+		shutdown	= true;
 //		state = ComponentLifecycleState.END;
 		
 //		System.out.println("shutdown component features start: "+getComponentIdentifier());
@@ -286,7 +287,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		while(ret.isDone() && ret.getException()==null && features.hasNext())
 		{
 			IComponentFeature	cf	= features.next();
-//			if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//			if(getComponentIdentifier().getName().indexOf("Custom")!=-1)
 //				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
 			ifeatures.add(cf);
 			ret	= cf.init();
@@ -337,11 +338,11 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		List<IFuture<Void>>	undones	= new ArrayList<IFuture<Void>>();
 		IFuture<Void>	ret	= IFuture.DONE;
-		while(ret.getException()==null && features.hasNext())
+		while(!shutdown && ret.getException()==null && features.hasNext())
 		{
 			IComponentFeature	cf	= features.next();
-//			if(getComponentIdentifier().getName().indexOf("Interceptor")!=-1)
-//				System.out.println("Starting "+cf+" of "+getComponentIdentifier());
+//			if(getComponentIdentifier().getName().indexOf("Custom")!=-1)
+//				System.out.println("Body "+cf+" of "+getComponentIdentifier());
 			ret	= cf.body();
 			
 			if(!ret.isDone())
@@ -350,7 +351,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			}
 		}
 		
-		if(ret.getException()==null)
+		// Check if need to kill due to no keepalive.
+		if(!shutdown && ret.getException()==null)
 		{
 			// Body already finished -> kill if not keep alive
 			if(undones.isEmpty())
