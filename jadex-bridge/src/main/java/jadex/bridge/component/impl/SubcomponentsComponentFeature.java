@@ -79,6 +79,17 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	}	
 	
 	/**
+	 *  Check if the feature potentially executed user code in body.
+	 *  Allows blocking operations in user bodies by using separate steps for each feature.
+	 *  Non-user-body-features are directly executed for speed.
+	 *  If unsure just return true. ;-)
+	 */
+	public boolean	hasUserBody()
+	{
+		return false;
+	}
+	
+	/**
 	 *  Get the file name of a component type.
 	 *  @param ctype The component type.
 	 *  @return The file name of this component type.

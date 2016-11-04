@@ -340,10 +340,26 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		IFuture<Void>	ret	= IFuture.DONE;
 		while(!shutdown && ret.getException()==null && features.hasNext())
 		{
-			IComponentFeature	cf	= features.next();
+			final IComponentFeature	cf	= features.next();
 //			if(getComponentIdentifier().getName().indexOf("Custom")!=-1)
 //				System.out.println("Body "+cf+" of "+getComponentIdentifier());
-			ret	= cf.body();
+			
+			// Execute user body on separate step to allow blocking get() and still execute the other bodies.
+			if(cf.hasUserBody())
+			{
+				ret	= getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				{
+					@Override
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						return cf.body();
+					}
+				});
+			}
+			else
+			{
+				ret	= cf.body();
+			}
 			
 			if(!ret.isDone())
 			{

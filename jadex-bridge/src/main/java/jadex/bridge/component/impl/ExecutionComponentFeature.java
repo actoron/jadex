@@ -173,6 +173,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	}
 	
 	/**
+	 *  Check if the feature potentially executed user code in body.
+	 *  Allows blocking operations in user bodies by using separate steps for each feature.
+	 *  Non-user-body-features are directly executed for speed.
+	 *  If unsure just return true. ;-)
+	 */
+	public boolean	hasUserBody()
+	{
+		return false;
+	}
+	
+	/**
 	 *  Kill is only invoked, when shutdown of some (e.g. other) feature does not return due to timeout.
 	 *  The feature should do any kind of possible cleanup, but no asynchronous operations.
 	 */
