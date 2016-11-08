@@ -36,11 +36,10 @@ public interface IPublishService
 	
 	/**
 	 *  Publish a service.
-	 *  @param cl The classloader.
 	 *  @param service The original service.
 	 *  @param pid The publish id (e.g. url or name).
 	 */
-	public IFuture<Void> publishService(ClassLoader cl, IService service, PublishInfo pi);
+	public IFuture<Void> publishService(IServiceIdentifier serviceid, PublishInfo pi);
 	
 	/**
 	 *  Unpublish a service.

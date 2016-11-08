@@ -55,7 +55,7 @@ public class RestInvocationAgent
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				//exception.printStackTrace();
 				done.setException(exception);
 			}
 			

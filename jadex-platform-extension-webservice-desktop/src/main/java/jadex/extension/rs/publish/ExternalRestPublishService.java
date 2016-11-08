@@ -14,6 +14,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -171,10 +172,12 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	 *  @param service The original service.
 	 *  @param pid The publish id (e.g. url or name).
 	 */
-	public IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info)
+	public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
 	{
 	    try
 	    {
+//	    	final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+	    	
 	    	String infopid = info.getPublishId();
 	    	if(infopid.endsWith("/"))
 	    		infopid = infopid.substring(0, infopid.length()-1);
@@ -194,12 +197,16 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	        
 	        PathHandler ph = (PathHandler)getHttpServer(uri, info);
 	        
-	        final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
+	        final MultiCollection<String, MappingInfo> mappings = evaluateMapping(serviceid, info);
 	
 	        IRequestHandler rh = new IRequestHandler()
 			{
+	        	protected IService service = null;
+	        	
 				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 				{
+					if (service == null)
+						service = (IService) SServiceProvider.getService(component, serviceid).get();
 					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
 				}
 			};
@@ -207,7 +214,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	        
 	        if(sidservers==null)
 	            sidservers = new HashMap<IServiceIdentifier, Tuple2<PathHandler, URI>>();
-	        sidservers.put(service.getServiceIdentifier(), new Tuple2<PathHandler, URI>(ph, uri));
+	        sidservers.put(serviceid, new Tuple2<PathHandler, URI>(ph, uri));
 	    }
 	    catch(Exception e)
 	    {

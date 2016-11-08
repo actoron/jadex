@@ -496,13 +496,14 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //				e.printStackTrace();
 			}
 			
-			getPublishService(getComponent(), pi.getPublishType(), (Iterator<IPublishService>)null)
+			getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
 				.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
 				.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 			{
 				public void customResultAvailable(IPublishService ps)
 				{
-					ps.publishService(getComponent().getClassLoader(), service, pi)
+					//System.out.println("Got publish service " + ps);
+					ps.publishService(service.getServiceIdentifier(), pi)
 						.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 				}
 				public void exceptionOccurred(Exception exception)
@@ -537,7 +538,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				{
 					final IServiceIdentifier sid = service.getServiceIdentifier();
 //					getPublishService(instance, pi.getPublishType(), null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
-					getPublishService(getComponent(), pi.getPublishType(), null).addResultListener(new IResultListener<IPublishService>()
+					getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), null).addResultListener(new IResultListener<IPublishService>()
 					{
 						public void resultAvailable(IPublishService ps)
 						{
@@ -569,18 +570,24 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param services The iterator of publish services (can be null).
 	 *  @return The publish service.
 	 */
-	public static IFuture<IPublishService> getPublishService(final IInternalAccess instance, final String type, final Iterator<IPublishService> services)
+	public static IFuture<IPublishService> getPublishService(final IInternalAccess instance, final String type, final String scope, final Iterator<IPublishService> services)
 	{
 		final Future<IPublishService> ret = new Future<IPublishService>();
 		
 		if(services==null)
 		{
-			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance, IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM, null);
+			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance, IPublishService.class, scope, null);
 			fut.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
 			{
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					// TODO Auto-generated method stub
+					super.exceptionOccurred(exception);
+					exception.printStackTrace();
+				}
 				public void customResultAvailable(Collection<IPublishService> result)
 				{
-					getPublishService(instance, type, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
+					getPublishService(instance, type, scope, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
 				}
 			}));
 		}
@@ -599,7 +606,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						}
 						else
 						{
-							getPublishService(instance, type, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
+							getPublishService(instance, type, scope, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
 						}
 					}
 				}));

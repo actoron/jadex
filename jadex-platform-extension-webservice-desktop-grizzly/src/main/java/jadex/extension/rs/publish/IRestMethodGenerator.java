@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 
 /**
  *  Rest method generator interface.
@@ -23,7 +24,7 @@ public interface IRestMethodGenerator
 	 *  @return The method infos.
 	 *  @throws Exception
 	 */
-	public List<RestMethodInfo> generateRestMethodInfos(IService service, ClassLoader classloader, 
+	public List<RestMethodInfo> generateRestMethodInfos(IServiceIdentifier serviceid, ClassLoader classloader, 
 		Class<?> baseclass, Map<String, Object> mapprops) throws Exception;
 	
 }

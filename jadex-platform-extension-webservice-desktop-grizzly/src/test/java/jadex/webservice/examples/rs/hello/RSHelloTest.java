@@ -41,7 +41,7 @@ public class RSHelloTest //extends TestCase
 		PublishInfo pi = new PublishInfo("http://localhost:9123/murks", "", IRSHelloService.class);
 		pi.addProperty("generate", "false");
 //		
-		IFuture<Void> publishService = pservice.publishService(getClass().getClassLoader(), hello, pi);
+		IFuture<Void> publishService = pservice.publishService(hello.getServiceIdentifier(), pi);
 //		
 //		ThreadSuspendable sus = new ThreadSuspendable();
 		publishService.get();

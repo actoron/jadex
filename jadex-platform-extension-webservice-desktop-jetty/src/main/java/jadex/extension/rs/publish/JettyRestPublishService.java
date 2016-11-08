@@ -19,9 +19,11 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
+import jadex.micro.annotation.AgentCreated;
 
 /**
  *  Publish service without Jersey directly using Jetty container.
@@ -54,6 +56,12 @@ public class JettyRestPublishService extends AbstractRestPublishService
     /** The servers per port. */
     protected Map<Integer, Server> portservers;
     
+    @AgentCreated
+    public void start()
+    {
+    	System.out.println("Jetyy sta");
+    }
+    
     /**
      *  Test if publishing a specific type is supported (e.g. web service).
      *  @param publishtype The type to test.
@@ -70,23 +78,30 @@ public class JettyRestPublishService extends AbstractRestPublishService
      *  @param service The original service.
      *  @param pid The publish id (e.g. url or name).
      */
-    public IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info)
+    public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
     {
         try
         {
+        	//final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+        	
             final URI uri = new URI(getCleanPublishId(info.getPublishId()));
             Server server = (Server)getHttpServer(uri, info);
             System.out.println("Adding http handler to server: "+uri.getPath());
 
             ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
 
-            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
+            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(serviceid, info);
 
             ContextHandler ch = new ContextHandler()
             {
+            	protected IService service = null;
+            	
                 public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
                     throws IOException, ServletException
                 {
+                	if (service == null)
+                		service = (IService) SServiceProvider.getService(component, serviceid).get();
+                	
                     // Hack to enable multi-part
                     // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
                     if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
@@ -104,7 +119,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
 
             if(sidservers==null)
                 sidservers = new HashMap<IServiceIdentifier, Server>();
-            sidservers.put(service.getServiceIdentifier(), server);
+            sidservers.put(serviceid, server);
         }
         catch(Exception e)
         {
