@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +83,7 @@ public class RestInvocationHelper
 	 *  @param params Parameters.
 	 *  @return Reply string
 	 */
+	@SuppressWarnings("deprecation")
 	public IFuture<String> invokeJson(IInternalAccess component,
 													  final String uri,
 										 			  final String path,
@@ -119,15 +121,24 @@ public class RestInvocationHelper
 			IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
 			cms.createComponent(null, "jadex.extension.rs.invoke.RestInvocationAgent.class", info, new IResultListener<Collection<Tuple2<String,Object>>>()
 			{
-				@Override
 				public void resultAvailable(Collection<Tuple2<String, Object>> result)
 				{
-					// TODO Auto-generated method stub
-					Object res = result.iterator().next();
-					ret.setResult((String) res);
+					String json = null;
+					Exception exception = null;
+					for (Iterator<Tuple2<String, Object>> it = result.iterator(); it.hasNext(); )
+					{
+						Tuple2<String, Object> res = it.next();
+						if (res.getSecondEntity() instanceof String)
+							json = (String) res.getSecondEntity();
+						else if (res.getSecondEntity() instanceof Exception)
+							exception = (Exception) res.getSecondEntity();
+					}
+					if (exception != null)
+						ret.setException(exception);
+					else
+						ret.setResult(json);
 				}
 				
-				@Override
 				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
