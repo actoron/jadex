@@ -21,7 +21,7 @@ public class TimeUserAgent
 	/**
 	 *  The time services are searched and added at agent startup.
 	 */
-	@AgentService
+	@AgentService(isquery=true)
 	public void	addTimeService(ITimeService timeservice)
 	{
 		ISubscriptionIntermediateFuture<String>	subscription	= timeservice.subscribe();

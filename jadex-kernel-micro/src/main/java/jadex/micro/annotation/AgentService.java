@@ -35,4 +35,9 @@ public @interface AgentService
 	 *  the field name as name. 
 	 */
 	public RequiredService requiredservice() default @RequiredService(name="", type=Object.class);
+	
+	/**
+	 *  Should be used as service query.
+	 */
+	public boolean isquery() default false;
 }

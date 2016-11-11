@@ -2173,6 +2173,40 @@ public class SServiceProvider
 	{
 		return getServices(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
 	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IInternalAccess component, Class<T> type, String scope, IAsyncFilter<T> filter)
+	{
+		return addQuery(component.getComponentIdentifier(), type, scope, filter);
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IExternalAccess component, Class<T> type, String scope, IAsyncFilter<T> filter)
+	{
+		return addQuery(component.getComponentIdentifier(), type, scope, filter);
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IComponentIdentifier cid, Class<T> type, String scope, IAsyncFilter<T> filter)
+	{
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, cid);
+		return SynchronizedServiceRegistry.getRegistry(cid).addQuery(query);
+	}
 }
 
 
