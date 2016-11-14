@@ -45,7 +45,7 @@ public class AmbulancePlan extends Plan
 			if(target!=null)
 			{
 				IGoal	goal	= createGoal("treat_victims");
-				goal.getParameter("disaster").setValue(target);
+				goal.getParameter("disasterId").setValue(target.getId());
 				dispatchSubgoalAndWait(goal);
 			}
 			

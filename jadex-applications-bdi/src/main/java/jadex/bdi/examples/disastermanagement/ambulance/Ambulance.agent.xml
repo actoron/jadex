@@ -69,7 +69,7 @@
 
 		<!-- Goal to treat one victim. -->
 		<achievegoal name="treat_victims">
-			<parameter name="disaster" class="ISpaceObject"/>
+			<parameter name="disasterId" class="Object"/>
 			<dropcondition>
 				$goal.getLifecycleState()==IGoal$GoalLifecycleState.OPTION
 				&amp;&amp; $goalbase.getGoals("treat_victims").length>1
@@ -101,8 +101,8 @@
 		
 		<!-- Plan for treating a victim. -->
 		<plan name="treat_victim_plan">
-			<parameter name="disaster" class="ISpaceObject">
-				<goalmapping ref="treat_victims.disaster"/>
+			<parameter name="disasterId" class="Object">
+				<goalmapping ref="treat_victims.disasterId"/>
 			</parameter>
 			<body class="TreatVictimPlan"/>
 			<trigger>

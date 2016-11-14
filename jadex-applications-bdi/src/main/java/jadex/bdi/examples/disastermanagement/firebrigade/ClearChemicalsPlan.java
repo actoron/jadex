@@ -27,8 +27,9 @@ public class ClearChemicalsPlan extends Plan
 	{
 		Space2D	space	= (Space2D)getBeliefbase().getBelief("environment").getFact();
 		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		ISpaceObject	disaster	= (ISpaceObject)getParameter("disaster").getValue();
-		
+		Object	disasterId	= getParameter("disasterId").getValue();
+		ISpaceObject disaster = space.getSpaceObject(disasterId);
+
 		// Move to disaster location
 		myself.setProperty("state", "moving_to_disaster");
 		IVector2	targetpos	= DisasterType.getChemicalsLocation(disaster);
