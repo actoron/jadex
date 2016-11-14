@@ -898,18 +898,25 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    			Object[] obj = (Object[]) current;
 		    			mxGeometry pos = (mxGeometry) obj[1];
 		    			AbstractPlan plan = plans.get(name);
-		    			VPlan vplan = new VPlan(plan, pos.getX(), pos.getY());
-		    			vplan.setGeometry(pos);
-		    			vlinkedelems.add(plan);
-		    			if (obj[2] != null)
+		    			if (plan != null)
 		    			{
-		    				vplan.setVisible(((Boolean) obj[2]).booleanValue());
+			    			VPlan vplan = new VPlan(plan, pos.getX(), pos.getY());
+			    			vplan.setGeometry(pos);
+			    			vlinkedelems.add(plan);
+			    			if (obj[2] != null)
+			    			{
+			    				vplan.setVisible(((Boolean) obj[2]).booleanValue());
+			    			}
+			    			
+			    			vplans.put(name, vplan);
+			    			graphmodel.beginUpdate();
+			    			graphmodel.add(parent, vplan, graphmodel.getChildCount(parent));
+			    			graphmodel.endUpdate();
 		    			}
-		    			
-		    			vplans.put(name, vplan);
-		    			graphmodel.beginUpdate();
-		    			graphmodel.add(parent, vplan, graphmodel.getChildCount(parent));
-		    			graphmodel.endUpdate();
+		    			else
+		    			{
+		    				System.out.println("Consistency check removed orphaned visual plan. " + obj);
+		    			}
 		    			/*graph.getModel().beginUpdate();
 		    			graph.addCell(vplan);
 		    			graph.getModel().endUpdate();*/
