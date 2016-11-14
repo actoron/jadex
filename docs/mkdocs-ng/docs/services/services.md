@@ -159,6 +159,11 @@ Some injection annotations can also be applied to methods. In this case, the ser
 public void setSumService(ISumService sum) { ...
 </x-hint>
 
+<!--
+TODO: document inline-requiredservice:
+@AgentService(lazy=false, requiredservice=@RequiredService(name="", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+-->
+
 Instead of injecting the service instance, you can directly inject values of the service:
 ```java
 @RequiredServices(@RequiredService(name="piService", ...))
