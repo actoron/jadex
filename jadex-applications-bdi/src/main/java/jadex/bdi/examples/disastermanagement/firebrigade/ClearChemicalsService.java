@@ -28,10 +28,10 @@ public class ClearChemicalsService implements IClearChemicalsService
 	
 	/**
 	 *  Clear chemicals.
-	 *  @param disaster The disaster.
+	 *  @param disasterId The disaster id.
 	 *  @return Future, null when done.
 	 */
-	public ITerminableFuture<Void> clearChemicals(final ISpaceObject disaster)
+	public ITerminableFuture<Void> clearChemicals(final Object disasterId)
 	{
 		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
 		
@@ -63,7 +63,7 @@ public class ClearChemicalsService implements IClearChemicalsService
 			else
 			{
 				final IGoal clearchem = capa.getGoalbase().createGoal("clear_chemicals");
-				clearchem.getParameter("disaster").setValue(disaster);
+				clearchem.getParameter("disasterId").setValue(disasterId);
 //				clearchem.addGoalListener(new IGoalListener()
 //				{
 //					public void goalFinished(AgentEvent ae)

@@ -21,7 +21,8 @@ public class ExtinguishFirePlan extends Plan
 	{
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		IExtinguishFireService force = (IExtinguishFireService)getParameter("rescueforce").getValue();
-		ef	= force.extinguishFire(disaster);
+//		System.out.println("Calling forces to handle fire: " + disaster);
+		ef	= force.extinguishFire(disaster.getId());
 		ef.get(Timeout.NONE);	// hack??? extinguishing fire may take longer than default timeout
 	}
 	

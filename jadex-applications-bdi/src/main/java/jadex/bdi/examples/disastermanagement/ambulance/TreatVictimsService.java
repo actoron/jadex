@@ -29,10 +29,10 @@ public class TreatVictimsService implements ITreatVictimsService
 	
 	/**
 	 *  Treat victims.
-	 *  @param disaster The disaster.
+	 *  @param disasterId The disaster id.
 	 *  @return Future, null when done.
 	 */
-	public ITerminableFuture<Void> treatVictims(final ISpaceObject disaster)
+	public ITerminableFuture<Void> treatVictims(final Object disasterId)
 	{
 		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
 		
@@ -48,11 +48,12 @@ public class TreatVictimsService implements ITreatVictimsService
 			
 			public void terminated(Exception reason)
 			{
+				System.out.println("treatvicservice terminated: " + reason.getMessage());
 				tv.drop();
 			}
 		});
 		
-		tv.getParameter("disaster").setValue(disaster);
+		tv.getParameter("disasterId").setValue(disasterId);
 //		tv.addGoalListener(new IGoalListener()
 //		{
 //			public void goalFinished(AgentEvent ae)

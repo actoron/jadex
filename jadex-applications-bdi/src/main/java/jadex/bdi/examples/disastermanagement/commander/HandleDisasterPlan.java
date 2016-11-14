@@ -1,15 +1,19 @@
 package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IBelief;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 
 /**
  *  Handle a disaster by assigning units.
  */
 public class HandleDisasterPlan extends Plan
 {
-	
+
+	private ISpaceObject disaster;
+
 	/**
 	 *  The body method is called on the
 	 *  instantiated plan instance from the scheduler.
@@ -17,6 +21,10 @@ public class HandleDisasterPlan extends Plan
 	public void	body()
 	{		
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
+		this.disaster = disaster;
+//		Space2D environment = (Space2D) getBeliefbase().getBelief("environment").getFact();
+		disaster.setProperty("active", true);
+
 //		System.out.println("handle: "+disaster);
 	
 		IGoal	cc	= createGoal("clear_chemicals"); 
@@ -34,24 +42,27 @@ public class HandleDisasterPlan extends Plan
 		waitForGoalFinished(cc);
 		waitForGoalFinished(ef);
 		waitForGoalFinished(tv);
+		disaster.setProperty("active", false);
 	}
 	
-//	public void aborted()
-//	{
+	public void aborted()
+	{
+		disaster.setProperty("active", false);
 //		if(getException()!=null)
 //		{
 //			System.out.println("aborted: "+getException()+" "+this);
 //		}
-//	}
+	}
 //	
-//	public void failed()
-//	{
+	public void failed()
+	{
+		disaster.setProperty("active", false);
 //		System.err.println("failed: "+this);
 //		if(getException()!=null)
 //		{
 //			getException().printStackTrace();
 //		}
-//	}
+	}
 	
 //	/** The already assigned fire units. */
 //	protected List	fireunits;

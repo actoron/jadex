@@ -23,7 +23,7 @@ public abstract class HandleForcesPlan extends Plan
 	 *  instantiated plan instance from the scheduler.
 	 */
 	public void	allocateForces(String servicename, String typename)
-	{		
+	{
 		while(true)
 		{
 			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
@@ -49,6 +49,7 @@ public abstract class HandleForcesPlan extends Plan
 						getParameterSet("units").addValue(force);
 					
 						IGoal sendforce = createGoal("send_rescueforce");
+//						System.out.println("passing disaster to forces: " + disaster);
 						sendforce.getParameter("disaster").setValue(disaster);
 						sendforce.getParameter("rescueforce").setValue(force);
 						dispatchSubgoal(sendforce).addResultListener(new IResultListener<Void>()
@@ -56,12 +57,18 @@ public abstract class HandleForcesPlan extends Plan
 							public void resultAvailable(Void result)
 							{
 								// The plans ensure that the force is guaranteed to be not duty when the goal is finished.
+//								System.out.println("removing unit from busy list " + force);
 								getParameterSet("units").removeValue(force);
 								busy.removeFact(provid);
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
+//								exception.printStackTrace();
+//								System.out.println("keeping unit busy, goal failed: " + force.getServiceIdentifier().getProviderId() + " " + exception.getMessage());
+								getParameterSet("units").removeValue(force);
+								busy.removeFact(provid);
+//								exception.printStackTrace();
 							}
 						});
 //						sendforce.addGoalListener(new IGoalListener()
