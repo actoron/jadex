@@ -82,7 +82,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		MCapability	mcapa = (MCapability)ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
 
-		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa);
+		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa, ia);
 		
 		if(cands!=null && !cands.isEmpty())
 		{
