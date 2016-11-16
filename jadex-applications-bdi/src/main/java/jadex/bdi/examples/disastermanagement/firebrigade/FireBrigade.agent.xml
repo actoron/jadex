@@ -65,13 +65,13 @@
 				$beliefbase.environment.getDistance($beliefbase.home, $beliefbase.position).getAsDouble()&gt;0.001
 			</creationcondition>
 			<dropcondition>
-				$goalbase.getGoals("extinguish_fire").length + $goalbase.getGoals("clear_chemicals").length > 1
+				$goalbase.getGoals("extinguish_fire").length + $goalbase.getGoals("clear_chemicals").length > 0
 			</dropcondition>
 		</achievegoal>
 
 		<!-- Goal to extinguish fire. -->
 		<achievegoal name="extinguish_fire" exclude="when_failed">
-			<parameter name="disaster" class="ISpaceObject"/>
+			<parameter name="disasterId" class="Object"/>
 			<dropcondition>
 				$goal.getLifecycleState()==IGoal$GoalLifecycleState.OPTION
 				&amp;&amp; $goalbase.getGoals("extinguish_fire").length
@@ -81,13 +81,13 @@
 			<deliberation cardinalityone="true"/>
 			<publish class="IExtinguishFireService" method="extinguishFire"/>
 			<targetcondition>
-				$goal.disaster.fire==0
+				$beliefbase.environment.getSpaceObject($goal.disasterId).fire==0
 			</targetcondition>
 		</achievegoal>
 
 		<!-- Goal to clear chemicals. -->
 		<achievegoal name="clear_chemicals" exclude="when_failed">
-			<parameter name="disaster" class="ISpaceObject"/>
+			<parameter name="disasterId" class="Object"/>
 			<dropcondition>
 				$goal.getLifecycleState()==IGoal$GoalLifecycleState.OPTION
 				&amp;&amp; $goalbase.getGoals("extinguish_fire").length
@@ -97,7 +97,7 @@
 			<deliberation cardinalityone="true"/>
 			<publish class="IClearChemicalsService" method="clearChemicals"/>
 			<targetcondition>
-				$goal.disaster.chemicals==0
+				$beliefbase.environment.getSpaceObject($goal.disasterId).chemicals==0
 			</targetcondition>
 		</achievegoal>
 	</goals>
@@ -121,8 +121,8 @@
 		
 		<!-- Plan for extinguishing fire. -->
 		<plan name="extinguish_fire_plan">
-			<parameter name="disaster" class="ISpaceObject">
-				<goalmapping ref="extinguish_fire.disaster"/>
+			<parameter name="disasterId" class="Object">
+				<goalmapping ref="extinguish_fire.disasterId"/>
 			</parameter>
 			<body class="ExtinguishFirePlan"/>
 			<trigger>
@@ -132,8 +132,8 @@
 		
 		<!-- Plan for clearing chemicals. -->
 		<plan name="clear_chemicals_plan">
-			<parameter name="disaster" class="ISpaceObject">
-				<goalmapping ref="clear_chemicals.disaster"/>
+			<parameter name="disasterId" class="Object">
+				<goalmapping ref="clear_chemicals.disasterId"/>
 			</parameter>
 			<body class="ClearChemicalsPlan"/>
 			<trigger>

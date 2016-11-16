@@ -21,7 +21,7 @@ public class ClearChemicalsPlan extends Plan
 	{
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		IClearChemicalsService force = (IClearChemicalsService)getParameter("rescueforce").getValue();
-		cc	= force.clearChemicals(disaster);
+		cc	= force.clearChemicals(disaster.getId());
 		cc.get(Timeout.NONE);	// hack??? clearing chemicals may take longer than default timeout
 	}
 	

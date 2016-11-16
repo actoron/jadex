@@ -53,7 +53,7 @@ public class FireBrigadePlan extends Plan
 				if(goaltype!=null)
 				{
 					IGoal	goal	= createGoal(goaltype);
-					goal.getParameter("disaster").setValue(target);
+					goal.getParameter("disaster").setValue(target.getId());
 					dispatchSubgoalAndWait(goal);
 				}
 			}

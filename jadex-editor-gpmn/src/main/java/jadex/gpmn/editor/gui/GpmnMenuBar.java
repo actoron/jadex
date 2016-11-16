@@ -216,7 +216,12 @@ public class GpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				BetterFileChooser fc = new BetterFileChooser();
+				BetterFileChooser fc = null;
+				if (modelcontainer.getFile() != null)
+					fc = new BetterFileChooser(modelcontainer.getFile());
+				else
+					fc = new BetterFileChooser();
+				
 				FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file", "gpmn");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
@@ -330,7 +335,12 @@ public class GpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				BetterFileChooser fc = new BetterFileChooser();
+				BetterFileChooser fc = null;
+				if (modelcontainer.getFile() != null)
+					fc = new BetterFileChooser(modelcontainer.getFile());
+				else
+					fc = new BetterFileChooser();
+				
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("EPS file", "eps");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
