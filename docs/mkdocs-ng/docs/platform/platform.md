@@ -24,7 +24,6 @@ If you want to adjust the platform to your needs, you can pass a ```PlatformConf
 
 ```java
 PlatformConfiguration platformConfig = PlatformConfiguration.getDefault();
-RootComponentConfiguration rootConfig = platformConfig.getRootConfig();
 
 // Pass to Starter:
 IExternalAccess platform = Starter.createPlatform(platformConfig).get();
@@ -35,7 +34,7 @@ The ```IExternalAccess``` object returned by the starter plays an important role
 Now that you know how to start a Jadex Active Components Platform you can proceed to [Components](../components/introduction) to see how to implement your own components and start them.
 
 # Configuring the Platform
-Both the PlatformConfiguration object and the RootComponentConfiguration object provide many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](${URLJavaDoc}/jadex/base/PlatformConfiguration.html) and [RootComponentConfiguration](${URLJavaDoc}/jadex/base/RootComponentConfiguration.html).
+The PlatformConfiguration provides many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](${URLJavaDoc}/jadex/base/PlatformConfiguration.html).
 
 The configuration options are also explained in more detail [here](http://www.activecomponents.org/jadex-applications-web/jadexdoc/view?model=/jadex/platform/Platform.component.xml).
 
@@ -45,13 +44,13 @@ Here you can find some examples for commonly used configuration options.
 
 **Run without GUI (JCC) and CLI:**
 ```java
-rootConfig.setGui(false);
-rootConfig.setCli(false);
+platformConfig.setGui(false);
+platformConfig.setCli(false);
 ```
 
 **Enable logging (useful for debugging):**
 ```java
-rootConfig.setLogging(true); // enables the printing of info and warning messages in addition to severe messages.
+platformConfig.setLogging(true); // enables the printing of info and warning messages in addition to severe messages.
 ```
 
 **Enable future debugging:**
@@ -61,8 +60,8 @@ platformConfig.setDebugFutures(true); // enables stacktraces of exceptions
 
 **Do not print password or welcome message on startup:**
 ```java
-rootConfig.setWelcome(false);
-rootConfig.setPrintPass(false);
+platformConfig.setWelcome(false);
+platformConfig.setPrintPass(false);
 ```
 
 **Set platform name:**
@@ -72,25 +71,25 @@ platformConfig.setPlatformName("jadexplatform");
 
 **Set available component kernels:**
 ```java
-rootConfig.setKernels(RootComponentConfiguration.KERNEL.micro,
-				RootComponentConfiguration.KERNEL.component,
-				RootComponentConfiguration.KERNEL.v3);
+rootConfig.setKernels(PlatformConfiguration.KERNEL.micro,
+				PlatformConfiguration.KERNEL.component,
+				PlatformConfiguration.KERNEL.v3);
 ```
 
 **Disable platform awareness:**
 ```java
-rootConfig.setAwareness(false);
+platformConfig.setAwareness(false);
 ```
 
 **Set Awareness mechanisms:**
 ```java
-rootConfig.setAwaMechanisms(RootComponentConfiguration.AWAMECHANISM.broadcast, 
-    RootComponentConfiguration.AWAMECHANISM.relay);
+platformConfig.setAwaMechanisms(PlatformConfiguration.AWAMECHANISM.broadcast, 
+    PlatformConfiguration.AWAMECHANISM.relay);
 ```
 
 **Disable Password protection (Caution!):**
 ```java
-rootConfig.setUsePass(false);
+platformConfig.setUsePass(false);
 ```
 
 # Platform services
