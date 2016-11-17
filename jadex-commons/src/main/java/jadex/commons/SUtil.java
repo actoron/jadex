@@ -60,6 +60,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -1939,8 +1940,10 @@ public class SUtil
 		return ret;
 	}
 
+//	protected static long convidcnt;
+
 	/** The counter for conversation ids. */
-	protected static long convidcnt;
+	protected static AtomicLong convidcnt = new AtomicLong();
 
 	/**
 	 * Create a globally unique conversation id.
@@ -1949,13 +1952,13 @@ public class SUtil
 	 */
 	public static String createUniqueId(String name)
 	{
-		synchronized(SUtil.class)
-		{
+//		synchronized(SUtil.class)
+//		{
 			// return
 			// "id_"+name+"_"+System.currentTimeMillis()+"_"+Math.random()+"_"+(++convidcnt);
 			// return "id_"+name+"_"+Math.random()+"_"+(++convidcnt);
-			return name + "_" + Math.random() + "_" + (++convidcnt);
-		}
+			return name + "_" + Math.random() + "_" + (convidcnt.incrementAndGet());
+//		}
 	}
 
 	/**
