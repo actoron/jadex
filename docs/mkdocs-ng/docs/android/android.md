@@ -272,8 +272,9 @@ public HelloWorldActivity()
     setPlatformAutostart(true);
     PlatformConfiguration config = getPlatformConfiguration();
     config.setPlatformName("HelloPlatform");
-    config.setAwareness(true);
-    config.setKernels(KERNEL_MICRO);
+    RootComponentConfiguration rootConfig = config.getRootConfig();
+    rootConfig.setAwareness(true);
+    rootConfig.setKernels(KERNEL_MICRO);
   }
 }
 
@@ -342,8 +343,9 @@ To adjust Jadex Platform behaviour, implement the constructor like below:
     setPlatformAutostart(false);
     PlatformConfiguration config = getPlatformConfiguration();
     config.setPlatformName("HelloPlatform");
-    config.setAwareness(true);
-    config.setKernels(KERNEL_MICRO);
+    RootComponentConfiguration rootConfig = config.getRootConfig();
+    rootConfig.setAwareness(true);
+    rootConfig.setKernels(KERNEL_MICRO);
   }
 ```
 

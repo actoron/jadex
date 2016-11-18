@@ -26,7 +26,22 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 		this.model = model;
 	}
 
+	/**
+	 * Kernel names enum.
+	 */
+	public enum KERNEL
+	{
+		component, micro, bpmn, v3, bdi, bdibpmn, multi
+	}
 
+	/**
+	 * Discovery names enum.
+	 */
+	public enum AWAMECHANISM
+	{
+		broadcast, multicast, message, relay, local,
+		// bluetooth
+	}
 
 	/** All configured parameters as map. **/
 	private Map<String, Object>	rootargs;

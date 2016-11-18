@@ -20,9 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -39,14 +37,8 @@ import jadex.javaparser.SJavaParser;
  */
 public class JadexGatewayServlet extends HttpServlet
 {
-	/** Serial id. */
-	private static final long serialVersionUID = 1L;
-
 	/** Constant used to store the jadex platform in the application (servlet) context. */
 	public static final String JADEX_PLATFORM = "jadex_platform";
-	
-	/** Constant used to store the jadex platform reference count in the application (servlet) context. */
-	public static final String JADEX_PLATFORM_REFCOUNT = "jadex_platform_refcount";
 	
 	/** The Jadex platform. */
 	protected IExternalAccess platform;
@@ -62,7 +54,6 @@ public class JadexGatewayServlet extends HttpServlet
 	    super.init(config);
 	    
 	    this.platform = startPlatform();
-	    ServletCallAccess.purgeServiceCalls();
 	    
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 //		cms.createComponent(ExternalRSPublishAgent.class.getName()+".class", null).getFirstResult();
@@ -104,7 +95,6 @@ public class JadexGatewayServlet extends HttpServlet
 						}
 						catch(Exception e)
 						{
-							ServletCallAccess.purgeServiceCalls();
 							throw new RuntimeException("Arguments evaluation error: "+e);
 						}
 					}
@@ -116,13 +106,11 @@ public class JadexGatewayServlet extends HttpServlet
 				try
 				{
 					Class<?> cmdcl = SReflect.classForName(config.getInitParameter(cname), null);
-					@SuppressWarnings("unchecked")
 					ICommand<IExternalAccess> cmd = (ICommand<IExternalAccess>)cmdcl.newInstance();
 					initcmds.add(cmd);
 				}
 				catch(Exception e)
 				{
-					ServletCallAccess.purgeServiceCalls();
 					throw new RuntimeException("Initcommand error: "+config.getInitParameter(cname));
 				}
 			}
@@ -143,8 +131,6 @@ public class JadexGatewayServlet extends HttpServlet
 		{
 			cmd.execute(platform);
 		}
-		
-		ServletCallAccess.purgeServiceCalls();
 	}
 	
 	/**
@@ -158,7 +144,7 @@ public class JadexGatewayServlet extends HttpServlet
 		
 		synchronized(ctx)
 		{
-			ret = (IExternalAccess) ctx.getAttribute(JADEX_PLATFORM);
+			ret = (IExternalAccess) ctx.getAttribute("jadex_platform");
 			
 			if(ret==null)
 			{
@@ -168,15 +154,8 @@ public class JadexGatewayServlet extends HttpServlet
 			
 			    ret = Starter.createPlatform(pc).get();
 			    
-			    ctx.setAttribute(JADEX_PLATFORM, ret);
+			    ctx.setAttribute("jadex_platform", ret);
 			}
-			
-			Integer refcount = (Integer) ctx.getAttribute(JADEX_PLATFORM_REFCOUNT);
-			if (refcount == null)
-				refcount = new Integer(1);
-			else
-				refcount = new Integer(refcount.intValue() + 1);
-			ctx.setAttribute(JADEX_PLATFORM_REFCOUNT, refcount);
 		}
 		
 		return ret;
@@ -290,9 +269,9 @@ public class JadexGatewayServlet extends HttpServlet
 		}
 		catch(Exception e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
-		ServletCallAccess.purgeServiceCalls();
+		
 //		System.out.println("resp is orig: "+response.hashCode());
 //		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
@@ -303,78 +282,6 @@ public class JadexGatewayServlet extends HttpServlet
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		doGet(request, response);
-	}
-	
-	/**
-	 *  Cleanup
-	 */
-	public void destroy()
-	{
-		System.out.println("Executing Servlet destroy.");
-		super.destroy();
-		
-		ServletContext ctx = getServletContext();
-		synchronized(ctx)
-		{
-			Integer refcount = (Integer) ctx.getAttribute(JADEX_PLATFORM_REFCOUNT);
-			
-			if (refcount == null || refcount.intValue() - 1 == 0)
-			{
-				if (platform != null)
-				{
-					try
-					{
-						platform.killComponent().get();
-					}
-					catch (Exception e)
-					{
-					}
-				}
-				ctx.removeAttribute(JADEX_PLATFORM);
-				ctx.removeAttribute(JADEX_PLATFORM_REFCOUNT);
-			}
-			else
-			{
-				refcount = new Integer(refcount.intValue() - 1);
-				ctx.setAttribute(JADEX_PLATFORM_REFCOUNT, refcount);
-			}
-		}
-		ServletCallAccess.purgeServiceCalls();
-	}
-	
-	/**
-	 *  Purge service call ThreadLocal objects,
-	 *  to avoid container leaks.
-	 */
-//	protected void purgeServiceCalls()
-//	{
-//		
-//		try
-//		{
-//			Field cf = ServiceCall.class.getDeclaredField("CURRENT");
-//			Field nf = ServiceCall.class.getDeclaredField("NEXT");
-//			Field lf = ServiceCall.class.getDeclaredField("LAST");
-//			cf.setAccessible(true);
-//			nf.setAccessible(true);
-//			lf.setAccessible(true);
-//			
-//			((ThreadLocal<?>) cf.get(null)).remove();
-//			((ThreadLocal<?>) nf.get(null)).remove();
-//			((ThreadLocal<?>) lf.get(null)).remove();
-//		}
-//		catch (Exception e)
-//		{
-//		}
-//	}
-	
-	protected static class ServletCallAccess extends CallAccess
-	{
-		public static void purgeServiceCalls()
-		{
-			ServiceCall.LAST.remove();
-			ServiceCall.CURRENT.remove();
-			ServiceCall.NEXT.remove();
-		}
 	}
 }
 

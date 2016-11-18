@@ -10,10 +10,11 @@ Create a class *Startup* containing the following code in it's ```public static 
 		
 ```java
 PlatformConfiguration config = PlatformConfiguration.getDefault();
-config.setGui(false);
-config.setWelcome(false);
-config.setCli(false);
-config.setPrintPass(false);
+RootComponentConfiguration rootConfig = config.getRootConfig();
+rootConfig.setGui(false);
+rootConfig.setWelcome(false);
+rootConfig.setCli(false);
+rootConfig.setPrintPass(false);
 IFuture<IExternalAccess> platfut = Starter.createPlatform(config);
 IExternalAccess platform = platfut.get();
 IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
