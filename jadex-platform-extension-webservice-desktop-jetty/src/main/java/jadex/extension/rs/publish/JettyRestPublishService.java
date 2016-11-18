@@ -21,6 +21,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.AgentCreated;
@@ -55,6 +56,9 @@ public class JettyRestPublishService extends AbstractRestPublishService
 
     /** The servers per port. */
     protected Map<Integer, Server> portservers;
+    
+    /** Infos for unpublishing. */
+    protected Map<IServiceIdentifier, Tuple2<Server, ContextHandler>> unpublishinfos = new HashMap<IServiceIdentifier, Tuple2<Server,ContextHandler>>();
     
     @AgentCreated
     public void start()
@@ -115,6 +119,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
             };
             ch.setContextPath(uri.getPath());
             collhandler.addHandler(ch);
+            unpublishinfos.put(serviceid, new Tuple2<Server,ContextHandler>(server, ch));
             ch.start(); // must be started explicitly :-(((
 
             if(sidservers==null)
@@ -176,7 +181,11 @@ public class JettyRestPublishService extends AbstractRestPublishService
      */
     public IFuture<Void> unpublishService(IServiceIdentifier sid)
     {
-        throw new UnsupportedOperationException();
+    	Tuple2<Server,ContextHandler> unpublish = unpublishinfos.get(sid);
+    	if (unpublish != null)
+    		((ContextHandlerCollection)unpublish.getFirstEntity().getHandler()).removeHandler(unpublish.getSecondEntity());
+//        throw new UnsupportedOperationException();
+    	return IFuture.DONE;
     }
 
     /**
