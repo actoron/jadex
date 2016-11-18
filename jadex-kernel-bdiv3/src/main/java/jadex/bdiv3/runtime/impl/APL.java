@@ -17,6 +17,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
@@ -245,7 +246,7 @@ public class APL
 	/**
 	 *  Select candidates from the list of applicable plans.
 	 */
-	public List<Object> selectCandidates(MCapability mcapa)
+	public List<Object> selectCandidates(MCapability mcapa, IInternalAccess ia)
 	{
 		List<Object> ret = new ArrayList<Object>();
 		
@@ -257,9 +258,11 @@ public class APL
 			numcandidates = Integer.MAX_VALUE;
 		}
 		
+		// todo: test if this works with posttoall because getNextCandidate() does not remove a candidate?!
+		
 		for(int i=0; i<numcandidates && candidates!=null && candidates.size()>0; i++)
 		{
-			ret.add(getNextCandidate(mcapa));
+			ret.add(getNextCandidate(mcapa, ia));
 		}
 		
 		return ret;
@@ -590,48 +593,74 @@ public class APL
 	 *  priority and the rank of the candidate.
 	 *  @return The next candidate.
 	 */
-	protected Object getNextCandidate(MCapability mcapa)
+	protected Object getNextCandidate(MCapability mcapa, IInternalAccess ia)
 	{
-		// Use the plan priorities to sort the candidates.
-		// If the priority is the same use the following rank order:
-		// running plan - waitqueue of running plan - passive plan
-
-		// first find the list of highest ranked candidates
-		// then choose one or more of them
+		Object cand = null;
 		
-		List<Object> finals = new ArrayList<Object>();
-		finals.add(candidates.get(0));
-		int candprio = getPriority(finals.get(0), mcapa);
-		for(int i=1; i<candidates.size(); i++)
+		MElement melem = element.getModelElement();
+		if(melem instanceof MGoal)
 		{
-			Object tmp = candidates.get(i);
-			int tmpprio = getPriority(tmp, mcapa);
-			if(tmpprio>candprio || (tmpprio == candprio && getRank(tmp)>getRank(finals.get(0))))
+			MGoal mgoal = (MGoal)melem;
+			MethodInfo mi = mgoal.getSelectCandidateMethod(ia.getClassLoader());
+			if(mi!=null)
 			{
-				finals.clear();
-				finals.add(tmp);
-				candprio = tmpprio;
+				Method m = mi.getMethod(ia.getClassLoader());
+				try
+				{
+					m.setAccessible(true);
+					Collection<Object> col = new ArrayList<Object>();
+					col.add(getCandidates());
+					cand = m.invoke(element.getPojoElement(), BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), melem, null, null, element, col, ia));
+				}
+				catch(Exception e)
+				{
+					ia.getLogger().warning("Error in select candidates method: "+e.getMessage());
+				}
 			}
-			else if(tmpprio==candprio && getRank(tmp)==getRank(finals.get(0)))
+		}
+		
+		if(cand==null)
+		{
+			// Use the plan priorities to sort the candidates.
+			// If the priority is the same use the following rank order:
+			// running plan - waitqueue of running plan - passive plan
+	
+			// first find the list of highest ranked candidates
+			// then choose one or more of them
+			
+			List<Object> finals = new ArrayList<Object>();
+			finals.add(candidates.get(0));
+			int candprio = getPriority(finals.get(0), mcapa);
+			for(int i=1; i<candidates.size(); i++)
 			{
-				finals.add(tmp);
+				Object tmp = candidates.get(i);
+				int tmpprio = getPriority(tmp, mcapa);
+				if(tmpprio>candprio || (tmpprio == candprio && getRank(tmp)>getRank(finals.get(0))))
+				{
+					finals.clear();
+					finals.add(tmp);
+					candprio = tmpprio;
+				}
+				else if(tmpprio==candprio && getRank(tmp)==getRank(finals.get(0)))
+				{
+					finals.add(tmp);
+				}
+			}
+	
+			MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+			if(mpe.isRandomSelection())
+			{
+				int rand = (int)(Math.random()*finals.size());
+				cand = finals.get(rand);
+				//System.out.println("Random sel: "+finals.size()+" "+rand+" "+cand);
+			}
+			else
+			{
+				//System.out.println("First sel: "+finals.size()+" "+0);
+				cand = finals.get(0);
 			}
 		}
-
-		Object cand;
-		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
-		if(mpe.isRandomSelection())
-		{
-			int rand = (int)(Math.random()*finals.size());
-			cand = finals.get(rand);
-			//System.out.println("Random sel: "+finals.size()+" "+rand+" "+cand);
-		}
-		else
-		{
-			//System.out.println("First sel: "+finals.size()+" "+0);
-			cand = finals.get(0);
-		}
-
+		
 		return cand;
 	}
 	

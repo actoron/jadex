@@ -7,6 +7,62 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 
 public interface IRootComponentConfiguration {
+
+    /**
+     * Kernel names enum.
+     */
+    public enum KERNEL
+    {
+        component, micro, bpmn, v3, bdi, bdibpmn, multi
+    }
+
+    /**
+     * Discovery names enum.
+     */
+    public enum AWAMECHANISM
+    {
+        /**
+         * Uses IPv4 broadcast to announce awareness infos in local networks.
+         * Default Port used is 55670.
+         */
+        broadcast,
+        /**
+         * Uses IPv4 Multicast to find other platforms.
+         * Default multicast address used is 224.0.0.0, port 5567.
+         */
+        multicast,
+        /**
+         * Message discovery allows detecting other platforms upon message reception.
+         * This helps especially if network connection is assymatric, e.g. one platform can
+         * find the other (and send messages) but not vice versa.
+         */
+        message,
+        /**
+         * The Relay discovery is the most robust discovery variant. It uses an external
+         * web server as relay where each platform registers. It is possible to set-up a self-hosted
+         * relay server, but per default, https://activecomponents.org/relay is used.
+         */
+        relay,
+        /**
+         * The local discovery uses a file-based mechanism to detect platforms running on the same host.
+         */
+        local,
+        /**
+         * The Registry mechanism implements a master-slave mechanism, where one platform is
+         * the registry. Other platforms that have this mechanism enabled register themselves
+         * and the registry distributes awareness info to all registered platforms.
+         * All RegistryDiscoveryAgents have to be parameterized with the same ip address
+         * (of the registry).
+         */
+        registry,
+        /**
+         * The IP-Scanner discovery mechanism sends out awareness infos to all IP addresses within the
+         * local network (using port 55668)
+         */
+        scanner,
+        // bluetooth
+    }
+
     /** Tell starter to print welcome message. **/
     public static final String	WELCOME				= "welcome";								// class:
     // boolean
