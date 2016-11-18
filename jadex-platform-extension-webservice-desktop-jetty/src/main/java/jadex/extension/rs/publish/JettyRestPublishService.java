@@ -181,7 +181,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
      */
     public IFuture<Void> unpublishService(IServiceIdentifier sid)
     {
-    	Tuple2<Server,ContextHandler> unpublish = unpublishinfos.get(sid);
+    	Tuple2<Server,ContextHandler> unpublish = unpublishinfos.remove(sid);
     	if (unpublish != null)
     		((ContextHandlerCollection)unpublish.getFirstEntity().getHandler()).removeHandler(unpublish.getSecondEntity());
 //        throw new UnsupportedOperationException();
