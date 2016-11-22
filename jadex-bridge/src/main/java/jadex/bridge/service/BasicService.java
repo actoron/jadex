@@ -41,10 +41,10 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	protected IInternalAccess internalaccess;
 	
 	/** The started state. */
-	protected boolean started;
+	protected volatile boolean started;
 	
 	/** The shutdowned state. */
-	protected boolean shutdowned;
+	protected volatile boolean shutdowned;
 	
 	/** The service id. */
 	protected IServiceIdentifier sid;
@@ -238,9 +238,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
 	 *  
-	 *  todo: why is method synchronized?
 	 */
-	public synchronized IFuture<Boolean> isValid()
+	public IFuture<Boolean> isValid()
 	{
 //		if(getServiceIdentifier().getServiceName().indexOf("Decoupled")!=-1)
 //			System.out.println("isValid: "+getServiceIdentifier()+": "+(started && !shutdowned));
@@ -365,8 +364,6 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		Future<Void> ret = new Future<Void>();
 		
 		boolean ex = false;
-		synchronized(this)
-		{
 			if(started)
 			{
 				ex = true;
@@ -375,8 +372,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			{
 				started = true;
 			}
-		}
-		
+
 		if(ex)
 		{
 			ret.setException(new RuntimeException("Already running."));

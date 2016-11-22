@@ -79,7 +79,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	protected Exception exception;
 	
 	/** Flag indicating if result is available. */
-	protected boolean resultavailable;
+	protected volatile boolean resultavailable;
 	
 	/** The blocked callers (caller->state). */
 	protected Map<ISuspendable, String> callers;
@@ -148,7 +148,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      *  Test if done, i.e. result is available.
      *  @return True, if done.
      */
-    public synchronized boolean isDone()
+    public boolean isDone()
     {
     	return resultavailable;
     }
