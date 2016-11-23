@@ -7,6 +7,7 @@ import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -25,9 +26,9 @@ public class SConnect
 	 *  @param host Host name.
 	 *  @param port Port.
 	 */
-	public static final void connectPlatformTcp(String platformname, String host, String port)
+	public static final void connectPlatformTcp(IInternalAccess component, String platformname, String host, String port)
 	{
-		connectPlatform(platformname, "tcp-mtp://"+host+":"+port);
+		connectPlatform(component, platformname, "tcp-mtp://"+host+":"+port);
 	}
 	
 	/**
@@ -36,26 +37,17 @@ public class SConnect
 	 *  @param platformname Name of the platform.
 	 *  @param remoteaddr Transport URL.
 	 */
-	public static final void connectPlatform(String platformname, String remoteaddr)
+	public static final void connectPlatform(IInternalAccess component, String platformname, String remoteaddr)
 	{
 		// Address of remote platform
-		IComponentIdentifier	remote_cid	= new ComponentIdentifier(platformname, new String[]{remoteaddr});
-		
-		// Start local platform
-		String[]	platformargs	= new String[]
-		{
-			"-awareness", "false",
-			"-relay", "false",
-			"-platformname", "test_local"
-		};
-		IExternalAccess	platform	= Starter.createPlatform(platformargs).get();
-		
+		IComponentIdentifier	remotecid	= new ComponentIdentifier(platformname, new String[]{remoteaddr});
 		
 		// Create proxy for remote platform such that remote services are found
 		Map<String, Object>	args = new HashMap<String, Object>();
-		args.put("component", remote_cid);
+		args.put("component", remotecid);
 		CreationInfo ci = new CreationInfo(args);
-		IComponentManagementService	cms	= SServiceProvider.getLocalService(platform.getComponentIdentifier(), IComponentManagementService.class, Binding.SCOPE_PLATFORM);
-		cms.createComponent("jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
+		ci.setDaemon(true);
+		IComponentManagementService	cms	= SServiceProvider.getLocalService(component, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
+		cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 	}
 }
