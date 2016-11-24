@@ -1,0 +1,81 @@
+// configure here:
+def junit = false;
+
+
+def defaultGradleArgs = "--info --stacktrace"
+
+if (!junit) {
+    defaultGradleArgs += " -x test"
+}
+
+
+node { // a node is a step with workspace, can be distributed
+    stage ('checkout') { // only for display purposes
+        git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
+        echo "testing jenkins with pipeline"
+        stash name: 'sources'
+    }
+
+    def version
+    // TODO determine version by checking how many commits since last release tag?
+    //   def v = version(readFile('pom.xml'))
+
+    stage ('generate Version') {
+        // TODO: reset version number on new minor (or patch?) release:
+        // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
+        version = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
+        echo "building version:" + version
+    }
+
+    withEnv(['BUILD_VERSION_SUFFIX='+version]) {
+        stage('genDepList') {
+            sh './gradlew gendeplist'
+        }
+
+        stage('jadex-gradle-plugin') {
+            sh './gradlew -Pdist=addongradleplugin clean build test install' + defaultGradleArgs
+            if (junit) junit '**/test-results/*.xml'
+        }
+
+        stage('jadex-gradle') {
+            // build everything but dont zip dists yet
+            // TODO remove -x test
+            wrap([$class: 'Xvnc', useXauthority: true]) {
+                sh './gradlew -Pdist=publishdists clean build' + defaultGradleArgs
+            }
+            if (junit) junit '**/test-results/*.xml'
+            stash name: 'compiled', includes: '*'
+        }
+
+        stage('create dists') {
+            wrap([$class: 'Xvnc', useXauthority: true]) {
+                sh './gradlew -Pdist=publishdists distZips'
+            }
+            stash name: 'dists', includes: '*'
+        }
+
+
+    }
+}
+
+parallel {
+    stage ('check distributions') {
+        node {
+            //deleteDir()
+            unstash 'dists'
+            sh 'if [ -d "sources" ]; then rm -r "sources";fi'
+            sh 'unzip jadex-${distribution}*-sources.zip'
+            // todo check dists
+        }
+    }
+
+    stage ('docs') {
+        node {
+            //deleteDir()
+            unstash 'sources'
+            sh './gradlew clean buildDocsZip buildDocsPdf' + defaultGradleArgs
+            sh './gradlew -Pdist=addonjavadoc clean javadocZip' + defaultGradleArgs
+        }
+    }
+}
+
