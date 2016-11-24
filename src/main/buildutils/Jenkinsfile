@@ -62,7 +62,7 @@ def checkDists = [:];
 
 for (int i = 0; i < dists.size(); i++) {
     def distName = dists[i];
-    checkDists["checkdist$d{istName}"] = {
+    checkDists["checkdist${distName}"] = {
         node {
             deleteDir()
             unstash 'distsources'
