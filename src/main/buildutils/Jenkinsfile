@@ -83,8 +83,8 @@ parallel (
         node {
             //deleteDir()
             unstash 'sources'
-            sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf ' + defaultGradleArgs
-            sh './gradlew -Pdist=addonjavadoc clean javadocZip' + defaultGradleArgs
+            sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
+            sh './gradlew -Pdist=addonjavadoc clean javadocZip'
         }
     }
 )
