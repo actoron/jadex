@@ -2,7 +2,7 @@
 def junit = false;
 
 
-def defaultGradleArgs = "--info --stacktrace"
+def defaultGradleArgs = " --info --stacktrace"
 
 if (!junit) {
     defaultGradleArgs += " -x test"
