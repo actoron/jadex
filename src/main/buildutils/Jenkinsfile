@@ -39,7 +39,6 @@ node { // a node is a step with workspace, can be distributed
 
         stage('jadex-gradle') {
             // build everything but dont zip dists yet
-            // TODO remove -x test
             wrap([$class: 'Xvnc', useXauthority: true]) {
                 sh './gradlew -Pdist=publishdists clean build' + defaultGradleArgs
             }
@@ -51,25 +50,34 @@ node { // a node is a step with workspace, can be distributed
             wrap([$class: 'Xvnc', useXauthority: true]) {
                 sh './gradlew -Pdist=publishdists distZips'
             }
-            stash name: 'dists', includes: '*'
+            //stash name: 'dists', includes: '*'
+            stash name: 'distsources', includes: 'build/distributions/sources/*'
         }
-
-
     }
 }
 
-parallel {
-    stage ('check distributions') {
+def dists = ['minimal', 'standard'] // todo add dists
+def checkDists = [:];
+
+for (int i = 0; i < dists.size(); i++) {
+    checkDists["checkdist${dists[i]}"] = {
         node {
-            //deleteDir()
-            unstash 'dists'
-            sh 'if [ -d "sources" ]; then rm -r "sources";fi'
-            sh 'unzip jadex-${distribution}*-sources.zip'
-            // todo check dists
+            deleteDir()
+            unstash 'distsources'
+            dir('build/distributions/sources') {
+                //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
+                sh 'unzip jadex-${distribution}*-sources.zip'
+                // todo check dists
+            }
         }
     }
+}
 
-    stage ('docs') {
+parallel (
+    'check distributions': {
+        parallel checkDists
+    },
+    'docs': {
         node {
             //deleteDir()
             unstash 'sources'
@@ -77,5 +85,5 @@ parallel {
             sh './gradlew -Pdist=addonjavadoc clean javadocZip' + defaultGradleArgs
         }
     }
-}
+)
 
