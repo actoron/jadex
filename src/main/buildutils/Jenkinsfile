@@ -48,8 +48,9 @@ node { // a node is a step with workspace, can be distributed
 
         stage('create dists') {
             wrap([$class: 'Xvnc', useXauthority: true]) {
-                sh './gradlew -Pdist=publishdists distZips'
+                sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
             }
+            if (junit) junit '**/test-results/*.xml'
             //stash name: 'dists', includes: '*'
             stash name: 'distsources', includes: 'build/distributions/sources/*'
         }
@@ -66,7 +67,7 @@ for (int i = 0; i < dists.size(); i++) {
             unstash 'distsources'
             dir('build/distributions/sources') {
                 //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
-                sh 'unzip jadex-${distribution}*-sources.zip'
+                sh 'unzip jadex-${dists[i]}*-sources.zip'
                 // todo check dists
             }
         }
