@@ -61,13 +61,14 @@ def dists = ['minimal', 'standard'] // todo add dists
 def checkDists = [:];
 
 for (int i = 0; i < dists.size(); i++) {
-    checkDists["checkdist${dists[i]}"] = {
+    def distName = dists[i];
+    checkDists["checkdist$d{istName}"] = {
         node {
             deleteDir()
             unstash 'distsources'
             dir('build/distributions/sources') {
                 //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
-                sh 'unzip jadex-${dists[i]}*-sources.zip'
+                sh "unzip jadex-${distName}*-sources.zip"
                 // todo check dists
             }
         }
