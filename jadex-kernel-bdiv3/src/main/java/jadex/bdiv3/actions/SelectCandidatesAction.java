@@ -82,21 +82,23 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		MCapability	mcapa = (MCapability)ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
 
-		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa, ia);
+		List<ICandidateInfo> cands = element.getApplicablePlanList().selectCandidates(mcapa, ia);
 		
 		if(cands!=null && !cands.isEmpty())
 		{
 //			if(element.toString().indexOf("go_home")!=-1)
 //				System.out.println("select candidates: "+element+", "+cands);
 			element.setState(RProcessableElement.State.CANDIDATESSELECTED);
-			for(final Object cand: cands)
+			for(final ICandidateInfo ca: cands)
 			{
+				Object cand = ca.getRawCandidate();
 				if(cand instanceof MPlanInfo)
 				{
 					MPlanInfo mplaninfo = (MPlanInfo)cand;
 					try
 					{
-						RPlan rplan = RPlan.createRPlan(mplaninfo.getMPlan(), cand, element, ia, mplaninfo.getBinding(), null);
+						RPlan rplan = (RPlan)ca.getPlan();
+//						RPlan rplan = RPlan.createRPlan(mplaninfo.getMPlan(), cand, element, ia, mplaninfo.getBinding(), null);
 						RPlan.executePlan(rplan, ia);
 					}
 					catch(final Exception e)
@@ -169,9 +171,9 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 								return e;
 							}
 							
-							public Object getCandidate()
+							public ICandidateInfo getCandidate()
 							{
-								return cand;
+								return ca;
 							}
 						});
 					}
@@ -185,15 +187,17 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					final RProcessableElement pae = (RProcessableElement)element;
 					final RGoal pagoal = pae instanceof RGoal? (RGoal)pae: null;
 					final MGoal mgoal = mgoalinfo.getMGoal();
-					
-					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
-					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal, mgoalinfo.getBinding(), null);
+//					
+//					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
+//					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal, mgoalinfo.getBinding(), null);
+//					
+					final RGoal rgoal = (RGoal)ca.getPlan();
 					
 					// Add candidates to meta goal
 					if(mgoal.isMetagoal())
 					{
 						APL apl = element.getApplicablePlanList();
-						List<Object> allcands = apl.getCandidates();
+						List<ICandidateInfo> allcands = apl.getCandidates();
 						if(allcands.size()==1)
 						{
 							element.planFinished(ia, null);
@@ -203,24 +207,25 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 						
 						for(Object c: allcands)
 						{
-							if(!c.equals(cand) && c instanceof MPlanInfo)
+							if(!c.equals(cand))// && c instanceof MPlanInfo)
 							{
 								MPlanInfo pi = (MPlanInfo)c;
-								final RPlan rplan = RPlan.createRPlan(pi.getMPlan(), c, element, ia, pi.getBinding(), null);
-								
+//								final RPlan rplan = RPlan.createRPlan(pi.getMPlan(), c, element, ia, pi.getBinding(), null);
+								final RPlan rplan = (RPlan)ca.getPlan();
 								// find by type and direction?!
-								rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()
-								{
-									public IPlan getPlan()
-									{
-										return rplan;
-									}
-									
-									public IElement getElement()
-									{
-										return element;
-									}
-								});
+								rgoal.getParameterSet("applicables").addValue(c);
+//								rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()
+//								{
+//									public IPlan getPlan()
+//									{
+//										return rplan;
+//									}
+//									
+//									public IElement getElement()
+//									{
+//										return element;
+//									}
+//								});
 							}
 						}
 					}
@@ -262,8 +267,9 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				}
 				else if(cand.getClass().isAnnotationPresent(Plan.class))
 				{
-					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
-					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia, null, null);
+					RPlan rplan = (RPlan)ca.getPlan();
+//					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
+//					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia, null, null);
 					RPlan.executePlan(rplan, ia);
 					ret.setResult(null);
 				}

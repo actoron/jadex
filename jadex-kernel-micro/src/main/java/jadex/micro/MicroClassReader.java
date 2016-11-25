@@ -266,7 +266,7 @@ public class MicroClassReader
 	/**
 	 *  Fill the model details using annotation.
 	 */
-	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class<?> clazz, ClassLoader cl)
+	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, final Class<?> clazz, ClassLoader cl)
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		Class<?> cma = clazz;
@@ -520,7 +520,7 @@ public class MicroClassReader
 							interceptors[j] = new UnparsedExpression(null, inters[j].clazz(), inters[j].value(), null);
 						}
 					}
-					ProvidedServiceImplementation impl = createImplementation(im);
+					ProvidedServiceImplementation impl = createImplementation(im, clazz);
 					Publish p = vals[i].publish();
 					NameValue[] props = p.properties();
 					UnparsedExpression[] exps = SNameValue.createUnparsedExpressions(props);
@@ -1589,10 +1589,24 @@ public class MicroClassReader
 	/**
 	 *  Create a service implementation.
 	 */
-	protected ProvidedServiceImplementation createImplementation(Implementation impl)
+	protected ProvidedServiceImplementation createImplementation(Implementation impl, Class<?> cma)
 	{
-		return new ProvidedServiceImplementation(!impl.value().equals(Object.class)? impl.value(): null, 
-			impl.expression().length()>0? impl.expression(): null, impl.proxytype(), createBinding(impl.binding()), createUnparsedExpressions(impl.interceptors()));
+		Class<?> cl = impl.value();
+		String exp = impl.expression().length()>0? 
+			impl.expression(): null;
+		// If not specified (Object is default) or if user accidentally used pojo class -> ignore
+		if(cl.equals(Object.class))
+		{
+			cl = null;
+		}
+		else if(cl.equals(cma))
+		{
+			cl = null;
+			exp = "$pojoagent!=null? $pojoagent: $component";
+			System.out.println("Warning: ignoring implementation class because agent is service implementation");
+		}
+		return new ProvidedServiceImplementation(cl, exp, impl.proxytype(), createBinding(impl.binding()), 
+			createUnparsedExpressions(impl.interceptors()));
 	}
 	
 	/**

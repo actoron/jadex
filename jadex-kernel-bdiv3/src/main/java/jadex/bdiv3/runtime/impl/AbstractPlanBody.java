@@ -155,6 +155,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 //				if(next==3)
 //					System.out.println("exe of: "+rplan.getId()+", "+next);
 				
+				System.out.println("setting ex on: "+rplan);
 				rplan.setException(exception);
 				
 				assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();

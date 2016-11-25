@@ -27,6 +27,8 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalProcessingState;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3x.runtime.ICandidateInfo;
+import jadex.bdiv3x.runtime.IElement;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
@@ -147,7 +149,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	protected IPlanBody body;
 	
 	/** The candidate from which this plan was created. Used for tried plans in proc elem. */
-	protected Object candidate;
+	protected ICandidateInfo candidate;
 	
 //	// hack?
 //	/** The internal access. */
@@ -171,7 +173,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  
 	 *  Reason is Object (not RProcessableElement) because it can be also ChangeEvent
 	 */
-	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia, Map<String, Object> binding, MConfigParameterElement config)
+	public static RPlan createRPlan(MPlan mplan, ICandidateInfo candidate, Object reason, IInternalAccess ia, Map<String, Object> binding, MConfigParameterElement config)
 	{
 		// Find parameter mappings for xml agents
 		Map<String, Object> mappingvals = binding;
@@ -232,9 +234,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		
 		IPlanBody body = null;
 
-		if(candidate.getClass().isAnnotationPresent(Plan.class))
+		if(candidate.getRawCandidate().getClass().isAnnotationPresent(Plan.class))
 		{
-			body = new ClassPlanBody(ia, rplan, candidate);
+			body = new ClassPlanBody(ia, rplan, candidate.getRawCandidate());
 		}
 		else if(mbody.getClazz()!=null && mbody.getServiceName()==null)
 		{
@@ -438,7 +440,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 *  Create a new plan.
 	 */
-	public RPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess agent, Map<String, Object> mappingvals, MConfigParameterElement config)
+	public RPlan(MPlan mplan, ICandidateInfo candidate, Object reason, IInternalAccess agent, Map<String, Object> mappingvals, MConfigParameterElement config)
 	{
 		super(mplan, agent, mappingvals, config);
 		this.candidate = candidate;
@@ -669,6 +671,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public void setException(Exception exception)
 	{
+		System.out.println("setting ex: "+exception);
 		this.exception = exception;
 	}
 	
@@ -694,7 +697,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  Get the candidate.
 	 *  @return The candidate.
 	 */
-	public Object getCandidate()
+	public ICandidateInfo getCandidate()
 	{
 		return candidate;
 	}
@@ -703,7 +706,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  Set the candidate.
 	 *  @param candidate The candidate to set.
 	 */
-	public void setCandidate(Object candidate)
+	public void setCandidate(ICandidateInfo candidate)
 	{
 		this.candidate = candidate;
 	}
@@ -1137,7 +1140,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getAgent(), mgoal, goal, null, null, null);
+		final RGoal rgoal = new RGoal(getAgent(), mgoal, goal, null, null, null, null);
 		rgoal.setParent(this);
 		
 		final ResumeCommand<E> rescom = new ResumeCommand<E>(ret, false);
