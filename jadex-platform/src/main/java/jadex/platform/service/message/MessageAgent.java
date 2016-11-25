@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.message.IMessageService;
@@ -50,8 +51,8 @@ public class MessageAgent
 	{//  Class																		EnableArg			Constructor Args
 		"jadex.platform.service.message.transport.localmtp.LocalTransport",			"localtransport",	"component",
 		"jadex.platform.service.message.transport.tcpmtp.TCPTransport",				"tcptransport",		"component,tcpport",
-		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport", 		"niotcptransport",	"component,niotcpport,componentlogger",
-		"jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", 		"ssltcptransport",	"component,ssltcpport",
+		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport", 		"niotcptransport",	"component," + IRootComponentConfiguration.NIOTCPPORT +",componentlogger",
+		"jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", 		"ssltcptransport",	"component,"+IRootComponentConfiguration.SSLTCPPORT,
 		"com.actoron.platform.service.message.transport.udpmtp.UdpTransport", 		"null",				"component,false,true",
 		"jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport",	"relaytransport",	"component,relayaddress,relaysecurity,relayawaonly"
 	};

@@ -49,6 +49,7 @@ public class MicroTest	extends ComponentTestSuite
 		"ChatE3Agent",
 		"TimeUserAgent",
 		"SubscriberAgent",
+		"lottery/PlayerAgent",
 		
 		// Todo: fix race condition between shutdown and autocreate
 		"mandelbrot",
