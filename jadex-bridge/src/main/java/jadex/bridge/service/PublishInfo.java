@@ -26,6 +26,9 @@ public class PublishInfo
 	/** The publish type. */
 	protected String publishtype;
 	
+	/** The publish scope. */
+	protected String publishscope = RequiredServiceInfo.SCOPE_PLATFORM;
+	
 	/** The mapping information (e.g. annotated interface). */
 	protected ClassInfo mapping;
 	
@@ -48,7 +51,7 @@ public class PublishInfo
 	 */
 	public PublishInfo(String pid, String publishtype, Class<?> mapping)
 	{
-		this(pid, publishtype, mapping, (UnparsedExpression[])null);
+		this(pid, publishtype, RequiredServiceInfo.SCOPE_PLATFORM, mapping, (UnparsedExpression[])null);
 	}
 		
 	/**
@@ -56,11 +59,12 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param publishtype The publish type.
 	 */
-	public PublishInfo(String pid, String publishtype, 
+	public PublishInfo(String pid, String publishtype, String publishscope, 
 		Class<?> mapping, UnparsedExpression[] properties)
 	{
 		this.pid = pid;
 		this.publishtype = publishtype;
+		this.publishscope = publishscope;
 		this.mapping = mapping==null? null: new ClassInfo(mapping);
 		if(properties!=null)
 		{
@@ -74,11 +78,12 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param publishtype The publish type.
 	 */
-	public PublishInfo(String pid, String publishtype, 
+	public PublishInfo(String pid, String publishtype, String publishscope, 
 		Class<?> mapping, Object[] props)
 	{
 		this.pid = pid;
 		this.publishtype = publishtype;
+		this.publishscope = publishscope;
 		this.mapping = mapping==null? null: new ClassInfo(mapping);
 		this.properties = new ArrayList<UnparsedExpression>();
 		if(props!=null)
@@ -98,6 +103,7 @@ public class PublishInfo
 	{
 		this.pid = info.getPublishId();
 		this.publishtype = info.getPublishType();
+		this.publishscope = info.getPublishScope();
 		this.mapping = info.getMapping();
 		if(info.getProperties()!=null)
 		{
@@ -141,6 +147,24 @@ public class PublishInfo
 	public void setPublishType(String type)
 	{
 		this.publishtype = type;
+	}
+	
+	/**
+	 *  Gets the publish scope.
+	 *  @return The publish scope.
+	 */
+	public String getPublishScope()
+	{
+		return publishscope;
+	}
+
+	/**
+	 *  Set the publish scope.
+	 *  @param publishscope The publish scope.
+	 */
+	public void setPublishScope(String publishscope)
+	{
+		this.publishscope = publishscope;
 	}
 
 	/**

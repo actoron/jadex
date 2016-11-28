@@ -9,23 +9,20 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.APL.MGoalInfo;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.IInternalPlan;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.impl.RPlan.ResumeCommandArgs;
 import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.ICandidateInfo;
-import jadex.bdiv3x.runtime.IElement;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -82,21 +79,23 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		MCapability	mcapa = (MCapability)ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
 
-		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa);
+		List<ICandidateInfo> cands = element.getApplicablePlanList().selectCandidates(mcapa, ia);
 		
 		if(cands!=null && !cands.isEmpty())
 		{
 //			if(element.toString().indexOf("go_home")!=-1)
 //				System.out.println("select candidates: "+element+", "+cands);
 			element.setState(RProcessableElement.State.CANDIDATESSELECTED);
-			for(final Object cand: cands)
+			for(final ICandidateInfo ca: cands)
 			{
+				Object cand = ca.getRawCandidate();
 				if(cand instanceof MPlanInfo)
 				{
 					MPlanInfo mplaninfo = (MPlanInfo)cand;
 					try
 					{
-						RPlan rplan = RPlan.createRPlan(mplaninfo.getMPlan(), cand, element, ia, mplaninfo.getBinding(), null);
+						RPlan rplan = (RPlan)ca.getPlan();
+//						RPlan rplan = RPlan.createRPlan(mplaninfo.getMPlan(), cand, element, ia, mplaninfo.getBinding(), null);
 						RPlan.executePlan(rplan, ia);
 					}
 					catch(final Exception e)
@@ -169,9 +168,9 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 								return e;
 							}
 							
-							public Object getCandidate()
+							public ICandidateInfo getCandidate()
 							{
-								return cand;
+								return ca;
 							}
 						});
 					}
@@ -185,15 +184,17 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					final RProcessableElement pae = (RProcessableElement)element;
 					final RGoal pagoal = pae instanceof RGoal? (RGoal)pae: null;
 					final MGoal mgoal = mgoalinfo.getMGoal();
-					
-					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
-					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal, mgoalinfo.getBinding(), null);
+//					
+//					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
+//					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal, mgoalinfo.getBinding(), null);
+//					
+					final RGoal rgoal = (RGoal)ca.getPlan();
 					
 					// Add candidates to meta goal
 					if(mgoal.isMetagoal())
 					{
 						APL apl = element.getApplicablePlanList();
-						List<Object> allcands = apl.getCandidates();
+						List<ICandidateInfo> allcands = apl.getCandidates();
 						if(allcands.size()==1)
 						{
 							element.planFinished(ia, null);
@@ -203,24 +204,25 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 						
 						for(Object c: allcands)
 						{
-							if(!c.equals(cand) && c instanceof MPlanInfo)
+							if(!c.equals(cand))// && c instanceof MPlanInfo)
 							{
 								MPlanInfo pi = (MPlanInfo)c;
-								final RPlan rplan = RPlan.createRPlan(pi.getMPlan(), c, element, ia, pi.getBinding(), null);
-								
+//								final RPlan rplan = RPlan.createRPlan(pi.getMPlan(), c, element, ia, pi.getBinding(), null);
+								final RPlan rplan = (RPlan)ca.getPlan();
 								// find by type and direction?!
-								rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()
-								{
-									public IPlan getPlan()
-									{
-										return rplan;
-									}
-									
-									public IElement getElement()
-									{
-										return element;
-									}
-								});
+								rgoal.getParameterSet("applicables").addValue(c);
+//								rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()
+//								{
+//									public IPlan getPlan()
+//									{
+//										return rplan;
+//									}
+//									
+//									public IElement getElement()
+//									{
+//										return element;
+//									}
+//								});
 							}
 						}
 					}
@@ -262,8 +264,9 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				}
 				else if(cand.getClass().isAnnotationPresent(Plan.class))
 				{
-					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
-					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia, null, null);
+					RPlan rplan = (RPlan)ca.getPlan();
+//					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
+//					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia, null, null);
 					RPlan.executePlan(rplan, ia);
 					ret.setResult(null);
 				}
@@ -282,7 +285,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					{
 						// normal case when plan was waiting
 //						System.out.println("rplan resume command: "+rplan);
-						rplan.getResumeCommand().execute(new Tuple2<Boolean, Boolean>(null, Boolean.FALSE));
+						rplan.getResumeCommand().execute(new ResumeCommandArgs(null, Boolean.FALSE, null));
 					}
 					ret.setResult(null);
 				}

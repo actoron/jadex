@@ -30,6 +30,10 @@ public class RestInvocationAgent
 	@AgentResult
 	protected String json;
 	
+	/** Exception if it occurred. */
+	@AgentResult
+	protected Exception resultexception;
+	
 	/** Performs the call. */
 	@SuppressWarnings("unchecked")
 	@AgentBody
@@ -55,8 +59,9 @@ public class RestInvocationAgent
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
-				done.setException(exception);
+				//exception.printStackTrace();
+				resultexception = exception;
+				done.setResult(null);
 			}
 			
 			public void resultAvailable(String result)

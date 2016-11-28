@@ -24,6 +24,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IComponentStep;
@@ -66,17 +67,21 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/** The child plan. */
 	protected RPlan childplan;
 	
+	/** The candidate from which this plan was created. Used for tried plans in proc elem. */
+	protected ICandidateInfo candidate;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal, Map<String, Object> vals, MConfigParameterElement config)
+	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal, Map<String, Object> vals, MConfigParameterElement config, ICandidateInfo candidate)
 	{
 		super(mgoal, goal, agent, vals, config);
 		this.parentgoal = parentgoal;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
+		this.candidate = candidate;
 	}
 
 	//-------- methods --------
@@ -1461,15 +1466,6 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	// IInternalPlan extra methods
 	
 	/**
-	 *  Get the candidate.
-	 *  @return The candidate.
-	 */
-	public Object getCandidate()
-	{
-		return getModelElement();
-	}
-	
-	/**
 	 *  Test if plan has passed.
 	 */
 	public boolean isPassed()
@@ -1588,5 +1584,23 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //		System.out.println("querygoal check: "+ret+" "+goal);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the candidate.
+	 *  @return The candidate.
+	 */
+	public ICandidateInfo getCandidate()
+	{
+		return candidate;
+	}
+
+	/**
+	 *  Set the candidate.
+	 *  @param candidate The candidate to set.
+	 */
+	public void setCandidate(ICandidateInfo candidate)
+	{
+		this.candidate = candidate;
 	}
 }

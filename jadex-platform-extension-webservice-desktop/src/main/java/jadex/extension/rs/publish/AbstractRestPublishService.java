@@ -464,7 +464,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      *  @param service The original service.
      *  @param pid The publish id (e.g. url or name).
      */
-    public abstract IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info);
+    public abstract IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info);
 
 //    /**
 //     * 

@@ -47,6 +47,10 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.MethodInfo;
@@ -63,6 +67,7 @@ import jadex.extension.rs.publish.annotation.MethodMapper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.javaparser.SJavaParser;
+import jadex.micro.annotation.Binding;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -170,15 +175,15 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	/**
 	 *  Get or generate a proxy class.
 	 */
-	protected Class<?> getProxyClass(IService service, ClassLoader classloader, 
+	protected Class<?> getProxyClass(IServiceIdentifier serviceid, ClassLoader classloader, 
 		Class<?> baseclass, Map<String, Object> mapprops) throws Exception
 	{
-		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+		Class<?> iface = serviceid.getServiceType().getType(classloader);
 		Class<?> ret = proxyclasses.get(new Tuple2<Class<?>, Class<?>>(iface, baseclass));
 		if(ret==null)
 		{
-			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(service, classloader, baseclass, mapprops);
-			ret = createProxyClass(service, classloader, baseclass, mapprops, rmis);
+			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(serviceid, classloader, baseclass, mapprops);
+			ret = createProxyClass(serviceid, classloader, baseclass, mapprops, rmis);
 			proxyclasses.put(new Tuple2<Class<?>, Class<?>>(iface, baseclass), ret);
 		}
 		return ret;
@@ -190,9 +195,24 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	 *  @param service The original service.
 	 *  @param pid The publish id (e.g. url or name).
 	 */
-	public IFuture<Void> publishService(ClassLoader cl, IService service, final PublishInfo pi)
+	public IFuture<Void> publishService(IServiceIdentifier serviceid, final PublishInfo pi)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+		ClassLoader cl = null;
+		ILibraryService ls = SServiceProvider.getLocalService(component, ILibraryService.class, Binding.SCOPE_PLATFORM);
+		if (serviceid.getProviderId().getPlatformName().equals(component.getComponentIdentifier().getPlatformName()))
+		{
+			// Local publish, get the component's classloader.
+			IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
+			IComponentDescription desc = cms.getComponentDescription(serviceid.getProviderId()).get();
+			cl = ls.getClassLoader(desc.getResourceIdentifier()).get();
+		}
+		else
+		{
+			// Remote, use ALL classloader.
+			cl = ls.getClassLoader(ls.getRootResourceIdentifier()).get();
+		}
 		
 		System.out.println("start publish: "+pi.getPublishId());
 		ret.addResultListener(new IResultListener<Void>()
@@ -229,10 +249,10 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			}
 			
 			// If no service type was specified it has to be generated.
-			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
+			Class<?> iface = serviceid.getServiceType().getType(cl);
 			Class<?> baseclazz = pi.getMapping()!=null? pi.getMapping().getType(cl): null;
 			
-			Class<?> rsimpl = getProxyClass(service, cl, baseclazz, mapprops);
+			Class<?> rsimpl = getProxyClass(serviceid, cl, baseclazz, mapprops);
 			
 //			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(service, cl, baseclazz, mapprops);
 //			System.out.println("Produced methods: ");
@@ -255,7 +275,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //			props.put(PackagesResourceConfig.FEATURE_REDIRECT, Boolean.TRUE);
 			props.put("com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature", Boolean.TRUE);
 //			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-			props.put(JADEXSERVICE, service);
+			props.put(JADEXSERVICE, serviceid);
 			
 			// Add info for web proxy 
 //			String wpurl = (String)mapprops.get(PublishInfo.WP_URL);
@@ -290,7 +310,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //			rc.register(new MoxyJsonFeature());
 			rc.register(MultiPartFeature.class);
 			
-			internalPublishService(uri, rc, service.getServiceIdentifier(), pi);
+			internalPublishService(uri, rc, serviceid, pi);
 //			System.out.println("handler: "+handler+" "+server.getServerConfiguration().getHttpHandlers());
 
 //			String wpurl = (String)mapprops.get(PublishInfo.WP_URL);
@@ -310,7 +330,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 				String target = uri.toString();
 				String user = (String)mapprops.get(PublishInfo.WP_USER);
 				String pass = (String)mapprops.get(PublishInfo.WP_PASS);
-				initWebProxyRefresh(url, name, target, user, pass, service.getServiceIdentifier());
+				initWebProxyRefresh(url, name, target, user, pass, serviceid);
 			}
 			
 			Thread.currentThread().setContextClassLoader(ccl);
@@ -463,12 +483,12 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	 *  @param type The web service interface type.
 	 *  @return The proxy object.
 	 */
-	protected Class<?> createProxyClass(IService service, ClassLoader classloader, 
+	protected Class<?> createProxyClass(IServiceIdentifier serviceid, ClassLoader classloader, 
 		Class<?> baseclass, Map<String, Object> mapprops, List<RestMethodInfo> geninfos) throws Exception
 	{
 		Class<?> ret = null;
 
-		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+		Class<?> iface = serviceid.getServiceType().getType(classloader);
 //		System.out.println("Creating new proxy class: "+SReflect.getInnerClassName(iface));
 		
 		// The name of the class has to ensure that it represents the different class properties:

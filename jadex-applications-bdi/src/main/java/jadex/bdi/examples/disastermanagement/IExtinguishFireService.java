@@ -10,8 +10,8 @@ public interface IExtinguishFireService
 {
 	/**
 	 *  Extinguish a fire.
-	 *  @param disaster The disaster.
+	 *  @param disasterId The disaster id.
 	 *  @return Future, null when done.
 	 */
-	public ITerminableFuture<Void> extinguishFire(ISpaceObject disaster);
+	public ITerminableFuture<Void> extinguishFire(Object disasterId);
 }

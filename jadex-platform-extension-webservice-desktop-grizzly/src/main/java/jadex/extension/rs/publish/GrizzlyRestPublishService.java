@@ -26,6 +26,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -63,10 +64,12 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
      *  @param service The original service.
      *  @param pid The publish id (e.g. url or name).
      */
-    public IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info)
+    public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
     {
         try
         {
+        	final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+        	
             final URI uri = new URI(getCleanPublishId(info.getPublishId()));
             HttpServer server = (HttpServer)getHttpServer(uri, info);
             System.out.println("Adding http handler to server: "+uri.getPath());

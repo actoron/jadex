@@ -10,9 +10,9 @@ public interface IClearChemicalsService
 {	
 	/**
 	 *  Clear chemicals.
-	 *  @param disaster The disaster.
+	 *  @param disasterId The disaster id.
 	 *  @return Future, null when done.
 	 */
-	public ITerminableFuture<Void> clearChemicals(ISpaceObject disaster);
-//	public ITerminableFuture<Void> clearChemicals(Object disasterid);
+//	public ITerminableFuture<Void> clearChemicals(ISpaceObject disaster);
+	public ITerminableFuture<Void> clearChemicals(Object disasterId);
 }

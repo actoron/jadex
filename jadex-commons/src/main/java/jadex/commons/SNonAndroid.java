@@ -212,11 +212,14 @@ public class SNonAndroid
 	{
 		try
 		{
-			return SReflect.HAS_GUI && SwingUtilities.isEventDispatchThread();
+			return SReflect.HAS_GUI
+					// pre-check because isEventDispatchThread is slow
+					&& Thread.currentThread().getName().startsWith("AWT-EventQueue")
+					&& SwingUtilities.isEventDispatchThread();
 		}
 		catch(Exception e)
 		{
-			// Todo: why null pointer exception thrown by swing?
+			// null pointer exception thrown by swing: http://bugs.java.com/view_bug.do?bug_id=8143287
 			return false;
 		}
 	}

@@ -34,6 +34,9 @@ import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
+import jadex.bdiv3.runtime.impl.APL.CandidateInfoMPlan;
+import jadex.bdiv3.runtime.impl.APL.CandidateInfoPojoPlan;
+import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
 import jadex.bdiv3.runtime.impl.CapabilityPojoWrapper;
@@ -48,6 +51,7 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -1825,7 +1829,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		final MGoal mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getComponent(), mgoal, goal, null, null, null);
+		final RGoal rgoal = new RGoal(getComponent(), mgoal, goal, null, null, null, null);
 		rgoal.addListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -1880,7 +1884,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		if(mplan==null)
 			throw new RuntimeException("Plan model not found for: "+plan);
 		
-		final RPlan rplan = RPlan.createRPlan(mplan, plan, new ChangeEvent(null, null, args, null), getComponent(), null, null);
+		ICandidateInfo ci = plan instanceof String? new CandidateInfoMPlan(new MPlanInfo(mplan, null), null, component):
+			new CandidateInfoPojoPlan(plan, null, component);
+		
+		final RPlan rplan = RPlan.createRPlan(mplan, ci, new ChangeEvent(null, null, args, null), getComponent(), null, null);
 		rplan.addListener(new DelegationResultListener(ret));
 		RPlan.executePlan(rplan, getComponent());
 		return ret;

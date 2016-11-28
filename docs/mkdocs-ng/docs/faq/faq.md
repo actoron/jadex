@@ -2,6 +2,9 @@
 
 # General Questions
 
+### How to create new components from within a component?
+Just add the IComponentManagementService to the [required services](../services/services/#using-services) of your component, inject it into a field and call [**createComponent()**](../components/components/#starting-the-component) to create a new component..
+
 ### How to retrieve the Provider of a Required Service?
 To get the Service ID or the ComponentIdentifier of the component providing a given service, you can always [cast the service to IService](../services/services/#the-iservice-interface).
 
