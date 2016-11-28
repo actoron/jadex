@@ -192,8 +192,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
 //	    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
 	    	}
-	       
-	        System.out.println("Adding http handler to server: "+uri.getPath());
+	    	
+	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
 	        
 	        PathHandler ph = (PathHandler)getHttpServer(uri, info);
 	        
