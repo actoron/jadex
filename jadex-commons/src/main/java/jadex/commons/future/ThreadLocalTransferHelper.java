@@ -85,7 +85,7 @@ public class ThreadLocalTransferHelper
 	 */
 	public void beforeSwitch()
 	{
-		vals = ThreadLocalTransferHelper.saveValues();
+		vals = saveValues();
 	}
 	
 	/**
@@ -93,6 +93,6 @@ public class ThreadLocalTransferHelper
 	 */
 	public void afterSwitch()
 	{
-		ThreadLocalTransferHelper.restoreValues(vals);
+		restoreValues(vals);
 	}
 }
