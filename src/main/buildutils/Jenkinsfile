@@ -35,16 +35,18 @@ node { // a node is a step with workspace, can be distributed
         stage('jadex-gradle-plugin') {
             // todo: dummy
             sh 'echo dummystep'
-            //sh './gradlew -Pdist=addongradleplugin clean build test install' + defaultGradleArgs
-            //if (junit) junit '**/test-results/*.xml'
+            sleep 10
 
+//            sh './gradlew -Pdist=addongradleplugin clean build test install' + defaultGradleArgs
+//            if (junit) junit '**/test-results/*.xml'
         }
 
         stage('jadex-gradle') {
-            // build everything but dont zip dists yet
             // todo: dummy
             sh 'echo dummystep'
             sleep 10
+
+            // build everything but dont zip dists yet
 //            wrap([$class: 'Xvnc', useXauthority: true]) {
 //                sh './gradlew -Pdist=publishdists clean build' + defaultGradleArgs
 //            }
@@ -56,6 +58,7 @@ node { // a node is a step with workspace, can be distributed
             // todo: dummy
             sh 'echo dummystep'
             sleep 10
+
 //            wrap([$class: 'Xvnc', useXauthority: true]) {
 //                sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
 //            }
@@ -70,36 +73,37 @@ def dists = ['minimal', 'standard'] // todo add dists
 def checkDists = [:];
 
 for (int i = 0; i < dists.size(); i++) {
-    checkDists["checkdist${dists[i]}"] = {
+    def distName = dists[i];
+    checkDists["checkdist${distName}"] = {
         node {
+            // todo: dummy
+            sh 'echo dummystep'
+            sleep 30
 //            deleteDir()
 //            unstash 'distsources'
 //            dir('build/distributions/sources') {
 //                //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
-//                sh 'unzip jadex-${dists[i]}*-sources.zip'
+//                sh "unzip jadex-${distName}*-sources.zip"
 //                // todo check dists
 //            }
-            // todo: dummy
-            sh 'echo dummystep'
-            sleep 30
         }
     }
 }
 
-node {
-    parallel (
-        'check distributions': {
-            parallel checkDists
-        },
-        'docs': {
+parallel (
+    'check distributions': {
+        parallel checkDists
+    },
+    'docs': {
+        node {
             // todo: dummy
             sh 'echo dummystep'
             sleep 30
-                //deleteDir()
-//                unstash 'sources'
-//                sh './gradlew clean buildDocsZip buildDocsPdf' + defaultGradleArgs
-//                sh './gradlew -Pdist=addonjavadoc clean javadocZip' + defaultGradleArgs
-            }
-    )
-}
+//            deleteDir()
+//            unstash 'sources'
+//            sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
+//            sh './gradlew -Pdist=addonjavadoc clean javadocZip'
+        }
+    }
+)
 
