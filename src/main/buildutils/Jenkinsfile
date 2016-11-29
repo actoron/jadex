@@ -74,17 +74,17 @@ for (int i = 0; i < dists.size(); i++) {
     }
 }
 
-parallel (
-    'check distributions': {
-        parallel checkDists
-    },
-    'docs': {
-        node {
-            //deleteDir()
-            unstash 'sources'
-            sh './gradlew clean buildDocsZip buildDocsPdf' + defaultGradleArgs
-            sh './gradlew -Pdist=addonjavadoc clean javadocZip' + defaultGradleArgs
-        }
-    }
-)
+node {
+    parallel (
+        'check distributions': {
+            parallel checkDists
+        },
+        'docs': {
+                //deleteDir()
+                unstash 'sources'
+                sh './gradlew clean buildDocsZip buildDocsPdf' + defaultGradleArgs
+                sh './gradlew -Pdist=addonjavadoc clean javadocZip' + defaultGradleArgs
+            }
+    )
+}
 
