@@ -84,7 +84,7 @@ parallel (
                         dir('build/distributions') {
                             sh "mv */jadex-${distName}-*.zip ./"
                             sh 'rm -r sources'
-                            compareDist($distName)
+                            compareDist(distName)
                         }
                     }
                 }
@@ -132,8 +132,7 @@ def withX(func) {
     }
 }
 
-def compareDist(String distName) {
-    def distribution = distName;
+def compareDist(String distribution) {
     //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
     sh "unzip jadex-${distribution}*-sources.zip"
     // build new dist from sources
