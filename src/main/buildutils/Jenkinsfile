@@ -36,7 +36,7 @@ node { // a node is a step with workspace, can be distributed
 //            sh 'echo dummystep'
 //            sleep 10
 
-            sh './gradlew -Pdist=addongradleplugin clean build test install' + defaultGradleArgs
+            sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
             if (junit) junit '**/test-results/*.xml'
         }
 
@@ -44,9 +44,9 @@ node { // a node is a step with workspace, can be distributed
 //            sh 'echo dummystep'
 //            sleep 10
 
-            // build everything but dont zip dists yet
+            // build everything but javadoc and dont zip dists yet
             withX {
-                sh './gradlew -Pdist=publishdists clean build' + defaultGradleArgs
+                sh './gradlew -Pdist=publishdists clean build -x javadoc' + defaultGradleArgs
             }
             if (junit) junit '**/test-results/*.xml'
             stash name: 'compiled', includes: '*'
@@ -58,22 +58,18 @@ node { // a node is a step with workspace, can be distributed
 
 
 parallel (
-    'deployDists': {
+    'create distributions': {
         if (deployDists) {
-            def dists = ['minimal', 'standard'] // todo add dists
+            def dists = ['minimal', 'standard'] // todo add dists: pro, android, relaystandalone
             def checkDists = [:];
 
             node {
                 stage('create dists') {
-                    //            sh 'echo dummystep'
-                    //            sleep 10
-
                     withX {
                         sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
                     }
                     if (junit) junit '**/test-results/*.xml'
-                    stash name: 'dists', includes: '*'
-                    stash name: 'distsources', includes: 'build/distributions/sources/*'
+                    stash name: 'dists', includes: 'build/distributions/*'
                 }
             }
 
@@ -81,14 +77,13 @@ parallel (
                 def distName = dists[i];
                 checkDists["checkdist${distName}"] = {
                     node {
-//                        sh 'echo dummystep'
-//                        sleep 30
                         deleteDir()
-                        unstash 'distsources'
-                        dir('build/distributions/sources') {
-                            //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
-                            sh "unzip jadex-${distName}*-sources.zip"
-                            // todo check dists
+                        unstash 'dists'
+
+                        dir('build/distributions') {
+                            sh "mv */jadex-${distName}-*.zip ./"
+                            sh 'rm -r sources'
+                            compareDist($distName)
                         }
                     }
                 }
@@ -125,4 +120,56 @@ def withX(func) {
     wrap([$class: 'Xvnc', useXauthority: true]) {
         func()
     }
+}
+
+def compareDist(String distName) {
+    //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
+    sh "unzip jadex-${distName}*-sources.zip"
+    // build new dist from sources
+    dir ('sources') {
+        sh "./gradlew -Pdist=${distName} distZip -x test -x javadoc" +defaultGradleArgs
+    }
+
+    sh 'mkdir rebuild'
+    sh 'mv sources/build/distributions/**/*.zip rebuild/'
+
+    sh 'mkdir compare'
+
+    //list zips:
+    // list content of distzip (jars): file (no file size)
+    new File().eachFile {
+        if (it.name.matches("jadex-${distName}.*\\.zip")) {
+            sh "unzip -l 'jadex-${distName}*.zip' | sed '1d' | head -n -1 | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\2/' > 'compare/${it.name}.lst' "
+        }
+    }
+
+    // sources: length, crc32, name
+
+    new File().eachFile {
+        if (it.name.matches("jadex-${distName}.*-sources\\.zip")) {
+//    for file in jadex-${distribution}*-sources.zip; do
+            sh "unzip -lv \"$file\" | sed '1d' | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\1\\t\\2/' > 'compare/${it.name}.lst' "
+        }
+    }
+
+    new File('rebuild/').eachFile {
+        if (it.name.matches(".*/jadex-${distName}.*\\.zip")) {
+            sh "unzip -l $file | sed '1d' | head -n -1 | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\2/' > \"compare/\$(basename ${it.name}).lst-rebuild\""
+        }
+    }
+
+    new File('rebuild/').eachFile {
+        if (it.name.matches(".*/jadex-${distName}.*-sources\\.zip")) {
+            sh "unzip -lv $file | sed '1d' | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\1\\t\\2/' > \"compare/\$(basename ${it.name}).lst-rebuild\""
+        }
+    }
+//    for file in sources/build/distributions/**/jadex-${distribution}*-sources.zip; do
+//
+//    done
+//
+//    for file in compare/*.lst; do
+//                                echo "checking for difference in $file ..."
+//                                diff -w "$file" "$file-rebuild" > $file.diff
+//                                // jenkins aborts here if there is a difference
+//                            done
 }
