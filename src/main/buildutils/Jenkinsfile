@@ -1,6 +1,6 @@
 // configure here:
 def junit = false;
-
+def deployDists = false;
 
 def defaultGradleArgs = " --info --stacktrace"
 
@@ -33,77 +33,96 @@ node { // a node is a step with workspace, can be distributed
         }
 
         stage('jadex-gradle-plugin') {
-            // todo: dummy
-            sh 'echo dummystep'
-            sleep 10
+//            sh 'echo dummystep'
+//            sleep 10
 
-//            sh './gradlew -Pdist=addongradleplugin clean build test install' + defaultGradleArgs
-//            if (junit) junit '**/test-results/*.xml'
+            sh './gradlew -Pdist=addongradleplugin clean build test install' + defaultGradleArgs
+            if (junit) junit '**/test-results/*.xml'
         }
 
         stage('jadex-gradle') {
-            // todo: dummy
-            sh 'echo dummystep'
-            sleep 10
+//            sh 'echo dummystep'
+//            sleep 10
 
             // build everything but dont zip dists yet
-//            wrap([$class: 'Xvnc', useXauthority: true]) {
-//                sh './gradlew -Pdist=publishdists clean build' + defaultGradleArgs
-//            }
-//            if (junit) junit '**/test-results/*.xml'
-//            stash name: 'compiled', includes: '*'
+            withX {
+                sh './gradlew -Pdist=publishdists clean build' + defaultGradleArgs
+            }
+            if (junit) junit '**/test-results/*.xml'
+            stash name: 'compiled', includes: '*'
         }
 
-        stage('create dists') {
-            // todo: dummy
-            sh 'echo dummystep'
-            sleep 10
 
-//            wrap([$class: 'Xvnc', useXauthority: true]) {
-//                sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
-//            }
-//            if (junit) junit '**/test-results/*.xml'
-//            //stash name: 'dists', includes: '*'
-//            stash name: 'distsources', includes: 'build/distributions/sources/*'
-        }
     }
 }
 
-def dists = ['minimal', 'standard'] // todo add dists
-def checkDists = [:];
-
-for (int i = 0; i < dists.size(); i++) {
-    def distName = dists[i];
-    checkDists["checkdist${distName}"] = {
-        node {
-            // todo: dummy
-            sh 'echo dummystep'
-            sleep 30
-//            deleteDir()
-//            unstash 'distsources'
-//            dir('build/distributions/sources') {
-//                //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
-//                sh "unzip jadex-${distName}*-sources.zip"
-//                // todo check dists
-//            }
-        }
-    }
-}
 
 parallel (
-    'check distributions': {
-        parallel checkDists
+    'deployDists': {
+        if (deployDists) {
+            def dists = ['minimal', 'standard'] // todo add dists
+            def checkDists = [:];
+
+            node {
+                stage('create dists') {
+                    //            sh 'echo dummystep'
+                    //            sleep 10
+
+                    withX {
+                        sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
+                    }
+                    if (junit) junit '**/test-results/*.xml'
+                    stash name: 'dists', includes: '*'
+                    stash name: 'distsources', includes: 'build/distributions/sources/*'
+                }
+            }
+
+            for (int i = 0; i < dists.size(); i++) {
+                def distName = dists[i];
+                checkDists["checkdist${distName}"] = {
+                    node {
+//                        sh 'echo dummystep'
+//                        sleep 30
+                        deleteDir()
+                        unstash 'distsources'
+                        dir('build/distributions/sources') {
+                            //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
+                            sh "unzip jadex-${distName}*-sources.zip"
+                            // todo check dists
+                        }
+                    }
+                }
+            }
+
+            node {
+                stage('check distributions') {
+                    parallel checkDists
+                }
+            }
+
+            // todo deploy dist
+        } else {
+            echo "nothing to do, deployDists is disabled"
+        }
     },
+
     'docs': {
         node {
             // todo: dummy
             sh 'echo dummystep'
             sleep 30
-//            deleteDir()
-//            unstash 'sources'
-//            sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
-//            sh './gradlew -Pdist=addonjavadoc clean javadocZip'
+            deleteDir()
+            unstash 'sources'
+            sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
+            sh './gradlew -Pdist=addonjavadoc clean javadocZip'
         }
     }
 )
 
+
+// todo deployment
+def withX(func) {
+    wrap([$class: 'Xvnc', useXauthority: true]) {
+        func()
+    }
+}
