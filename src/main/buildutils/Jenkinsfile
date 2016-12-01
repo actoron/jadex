@@ -1,9 +1,9 @@
 // configure here:
-def junit = false;
-def deployDists = true;
-def deployArtifacts = false;
+junit = false;
+deployDists = true;
+deployArtifacts = false;
 
-def defaultGradleArgs = " --info --stacktrace"
+defaultGradleArgs = " --info --stacktrace"
 
 if (!junit) {
     defaultGradleArgs += " -x test"
@@ -137,7 +137,7 @@ def compareDist(String distribution) {
     sh "unzip jadex-${distribution}*-sources.zip"
     // build new dist from sources
     dir ('sources') {
-        sh "./gradlew -Pdist=${distribution} distZip -x test -x javadoc" +defaultGradleArgs
+        sh "./gradlew -Pdist=${distribution} distZip -x test -x javadoc" + defaultGradleArgs
     }
 
     sh 'mkdir rebuild'
