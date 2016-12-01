@@ -1,6 +1,7 @@
 // configure here:
 def junit = false;
-def deployDists = false;
+def deployDists = true;
+def deployArtifacts = false;
 
 def defaultGradleArgs = " --info --stacktrace"
 
@@ -69,7 +70,7 @@ parallel (
                         sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
                     }
                     if (junit) junit '**/test-results/*.xml'
-                    stash name: 'dists', includes: 'build/distributions/*'
+                    stash name: 'dists', includes: 'build/distributions/**'
                 }
             }
 
@@ -114,8 +115,17 @@ parallel (
     }
 )
 
+node {
+    stage 'deployment' {
+        // todo deployment
 
-// todo deployment
+        if (deployArtifacts) {
+
+        }
+        // 1. build javadoc (already done if dists were build in step before :/)
+    }
+}
+
 def withX(func) {
     wrap([$class: 'Xvnc', useXauthority: true]) {
         func()
@@ -163,9 +173,15 @@ def compareDist(String distName) {
             sh "unzip -lv $file | sed '1d' | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\1\\t\\2/' > \"compare/\$(basename ${it.name}).lst-rebuild\""
         }
     }
-//    for file in sources/build/distributions/**/jadex-${distribution}*-sources.zip; do
-//
-//    done
+
+    new File('compare/').eachFile {
+        if (it.name.endsWith('.lst')) {
+            echo "checking for difference in $it ..."
+            sh "diff -w '${it}' '${it}-rebuild' > '${it}'.diff"
+            // does jenkins abort here if there is a difference?
+        }
+    }
+
 //
 //    for file in compare/*.lst; do
 //                                echo "checking for difference in $file ..."
