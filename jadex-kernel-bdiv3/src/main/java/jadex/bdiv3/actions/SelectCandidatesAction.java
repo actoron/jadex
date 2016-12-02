@@ -206,9 +206,9 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 						{
 							if(!c.equals(cand))// && c instanceof MPlanInfo)
 							{
-								MPlanInfo pi = (MPlanInfo)c;
+//								MPlanInfo pi = (MPlanInfo)c;
 //								final RPlan rplan = RPlan.createRPlan(pi.getMPlan(), c, element, ia, pi.getBinding(), null);
-								final RPlan rplan = (RPlan)ca.getPlan();
+//								final RPlan rplan = (RPlan)ca.getPlan();
 								// find by type and direction?!
 								rgoal.getParameterSet("applicables").addValue(c);
 //								rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()

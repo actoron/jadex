@@ -1107,8 +1107,8 @@ public class APL
 		 */
 		public IInternalPlan getPlan()
 		{
-			if(rplan!=null)
-				System.out.println("access");
+//			if(rplan!=null)
+//				System.out.println("access");
 			
 			if(rplan==null)
 				rplan = RPlan.createRPlan(getMPlan(), this, element, agent, mplaninfo.getBinding(), null);
@@ -1272,8 +1272,8 @@ public class APL
 		 */
 		public IInternalPlan getPlan()
 		{
-			if(rgoal!=null)
-				System.out.println("access");
+//			if(rgoal!=null)
+//				System.out.println("access");
 			
 			RProcessableElement pae = (RProcessableElement)element;
 			RGoal pagoal = pae instanceof RGoal? (RGoal)pae: null;
