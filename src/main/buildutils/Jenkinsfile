@@ -9,6 +9,15 @@ if (!junit) {
     defaultGradleArgs += " -x test"
 }
 
+node {
+    // test
+
+    def lines = getOutputLines("ls -la")
+    println lines
+    for (String line : lines) {
+        println line
+    }
+}
 
 node { // a node is a step with workspace, can be distributed
     stage ('checkout') { // only for display purposes
@@ -132,8 +141,8 @@ def withX(func) {
     }
 }
 
-String[] getOutputLines() {
-    def stdout = sh (script: "ls jadex-${distribution}*.zip", returnStdout: true).trim()
+String[] getOutputLines(command) {
+    def stdout = sh (script: command, returnStdout: true).trim()
     return stdout.split(System.getProperty("line.separator"))
 }
 
