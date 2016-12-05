@@ -150,45 +150,38 @@ def compareDist(String distribution) {
 
     def files = sh (script: "ls jadex-${distribution}*.zip", returnStdout: true).trim()
 
-    println files
-
-    file('.').eachFile {
-//    new File('.').eachFile {
-        if (it.name.matches("jadex-${distribution}.*\\.zip")) {
-            sh "unzip -l 'jadex-${distribution}*.zip' | sed '1d' | head -n -1 | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\2/' > 'compare/${it.name}.lst' "
-        }
+    println "listing contents of dist: ${files}"
+    files.eachLine {
+        sh "unzip -l \"${it}\" | sed '1d' | head -n -1 | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\2/' > 'compare/${it}.lst' "
     }
 
     // sources: length, crc32, name
-
-    file('.').eachFile {
-//    new File('.').eachFile {
-        if (it.name.matches("jadex-${distribution}.*-sources\\.zip")) {
-//    for file in jadex-${distribution}*-sources.zip; do
-            sh "unzip -lv \"$file\" | sed '1d' | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\1\\t\\2/' > 'compare/${it.name}.lst' "
-        }
-    }
-    file('rebuild/').eachFile {
-//    new File('rebuild/').eachFile {
-        if (it.name.matches(".*/jadex-${distribution}.*\\.zip")) {
-            sh "unzip -l $file | sed '1d' | head -n -1 | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\2/' > \"compare/\$(basename ${it.name}).lst-rebuild\""
-        }
+    files = sh (script: "ls jadex-${distribution}*-sources.zip", returnStdout: true).trim()
+    println "listing contents of sources: ${files}"
+    files.eachLine {
+            sh "unzip -lv \"$it\" | sed '1d' | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\1\\t\\2/' > 'compare/${it}.lst' "
     }
 
-    file('rebuild/').eachFile {
-//    new File('rebuild/').eachFile {
-        if (it.name.matches(".*/jadex-${distribution}.*-sources\\.zip")) {
-            sh "unzip -lv $file | sed '1d' | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\1\\t\\2/' > \"compare/\$(basename ${it.name}).lst-rebuild\""
-        }
+    // rebuild dist
+    files = sh (script: "ls rebuild/jadex-${distribution}*.zip", returnStdout: true).trim()
+    println "listing contents of rebuild dist: ${files}"
+    files.eachLine {
+            sh "unzip -l \"${it}\" | sed '1d' | head -n -1 | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\2/' > \"compare/\$(basename ${it}).lst-rebuild\""
     }
 
-    file('compare/').eachFile {
-//    new File('compare/').eachFile {
-        if (it.name.endsWith('.lst')) {
-            echo "checking for difference in $it ..."
-            sh "diff -w '${it}' '${it}-rebuild' > '${it}'.diff"
-            // does jenkins abort here if there is a difference?
-        }
+    // rebuild sources
+    files = sh (script: "ls rebuild/jadex-${distribution}*-sources.zip", returnStdout: true).trim()
+    println "listing contents of rebuild sources: ${files}"
+    files.eachLine {
+            sh "unzip -lv \"${it}\" | sed '1d' | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\1\\t\\2/' > \"compare/\$(basename ${it}).lst-rebuild\""
+    }
+
+    // now compare
+    files = sh (script: "ls compare/*.lst", returnStdout: true).trim()
+    files.eachLine {
+        echo "checking for difference in $it ..."
+        sh "diff -w '${it}' '${it}-rebuild' > '${it}'.diff"
+        // does jenkins abort here if there is a difference?
     }
 
 //
