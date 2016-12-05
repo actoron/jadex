@@ -28,6 +28,8 @@ dependencies
 										   // For IDEs: include manually to choose impl.
 //										   ':jadex-platform-extension-webservice-desktop-jetty',
 //										   ':jadex-platform-extension-webservice-desktop-grizzly',
+											':jadex-runtimetools-swing',
+										   ':jadex-commons-gui'
 										   ])
 	
 	launcharts.retainAll(gradle.ext.includeartifacts)
