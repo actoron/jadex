@@ -153,7 +153,7 @@ def compareDist(String distribution) {
     //list zips:
     // list content of distzip (jars): file (no file size)
 
-    Array[] files = getOutputLines("ls jadex-${distribution}*.zip")
+    String[] files = getOutputLines("ls jadex-${distribution}*.zip")
     println "listing contents of dist: ${files}"
 
     for (String it in files) {
