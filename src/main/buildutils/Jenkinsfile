@@ -147,7 +147,13 @@ def compareDist(String distribution) {
 
     //list zips:
     // list content of distzip (jars): file (no file size)
-    new File('.').eachFile {
+
+    def files = sh (script: "ls jadex-${distribution}*.zip", returnStdout: true).trim()
+
+    println files
+
+    file('.').eachFile {
+//    new File('.').eachFile {
         if (it.name.matches("jadex-${distribution}.*\\.zip")) {
             sh "unzip -l 'jadex-${distribution}*.zip' | sed '1d' | head -n -1 | sed 's/\\s*\\([0-9]*\\).*[0-2][0-9]:[0-6][0-9]\\(.*\\)/\\2/' > 'compare/${it.name}.lst' "
         }
