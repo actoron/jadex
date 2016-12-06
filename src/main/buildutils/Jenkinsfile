@@ -1,7 +1,7 @@
 // configure here:
 junit = false;
 deployDists = true;
-deployArtifacts = false;
+publishArtifacts = false;
 
 defaultGradleArgs = " --info --stacktrace"
 
@@ -45,15 +45,13 @@ nodeWithVersion(version) {
         stash name: 'sources' // todo share workspace plugin?
     }
 
-    stage('jadex-gradle-plugin') {
+    stage('build and test') {
         sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
         if (junit) junit '**/test-results/*.xml'
-    }
 
-    stage('jadex-gradle') {
         // build everything but javadoc and dont zip dists yet
         withX {
-            sh './gradlew -Pdist=publishdists clean build -x javadoc' + defaultGradleArgs
+            sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
         }
         if (junit) junit '**/test-results/*.xml'
     }
@@ -63,14 +61,22 @@ nodeWithVersion(version) {
     }
 }
 
-// todo: tests?
+nodeWithVersion(version) {
+    stage 'publish' {
+        if (publishArtifacts) {
+            deleteDir()
+            unstash 'compiled'
+            sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
+        }
+    }
+}
+
 parallel (
     'create distributions': {
         if (deployDists) {
-            def dists = ['minimal', 'standard'] // todo add dists: pro, android, relaystandalone
-            def checkDists = [:];
-
             nodeWithVersion(version) {
+                deleteDir()
+                unstash 'compiled'
                 stage('create dists') {
                     withX {
                         sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
@@ -80,10 +86,13 @@ parallel (
                 }
             }
 
+            def dists = ['minimal', 'standard'] // todo add dists: pro, android, relaystandalone
+            def checkDists = [:];
+
             for (int i = 0; i < dists.size(); i++) {
                 def distName = dists[i];
                 checkDists["checkdist${distName}"] = {
-                    nodeWithVersion {
+                    nodeWithVersion(version) {
                         stage("checkDist:${distName}") {
                             deleteDir()
                             unstash 'dists'
@@ -98,46 +107,43 @@ parallel (
                 }
             }
 
-//            node {
-//                stage('check distributions') {
             parallel checkDists
-//                }
-//            }
 
-            // todo deploy dist
+            // todo keep artifacts for deployment
         } else {
             echo "nothing to do, deployDists is disabled"
         }
     },
 
     'docs': {
+        if (deployDists) {
+            nodeWithVersion(version) {
+                deleteDir()
+                unstash 'sources'
+                sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
+                sh './gradlew -Pdist=addonjavadoc clean javadocZip'
+
+                // todo keep docs for deployment
+            }
+        } else {
+            echo "nothing to do, deployDists is disabled"
+        }
+    },
+
+    // todo if junit
+    'performancetests': {
         nodeWithVersion(version) {
-            // todo: dummy
-            sh 'echo dummystep'
-            sleep 30
             deleteDir()
-            unstash 'sources' // todo share workspace plugin
-            sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
-            sh './gradlew -Pdist=addonjavadoc clean javadocZip'
+            unstash 'compiled'
+            sh './gradlew performanceTest --info'
+            junit '**/test-results/*.xml'
         }
     }
 )
 
+// todo deployment
 
 // ------- Helper functions --------
-
-nodeWithVersion(version) {
-    stage 'deployment' {
-        // todo deployment
-
-        if (deployArtifacts) {
-            deleteDir()
-            unstash 'compiled'
-            // build javadoc (already done if dists were build in step before :/)
-            sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
-        }
-    }
-}
 
 def withX(func) {
     wrap([$class: 'Xvnc', useXauthority: true]) {
@@ -215,11 +221,5 @@ def compareDist(String distribution) {
         // jenkins aborts here if there is a difference.
     }
 
-//
-//    for file in compare/*.lst; do
-//                                echo "checking for difference in $file ..."
-//                                diff -w "$file" "$file-rebuild" > $file.diff
-//                                // jenkins aborts here if there is a difference
-//                            done
 }
 
