@@ -8,6 +8,7 @@ defaultGradleArgs = " --info --stacktrace"
 def version
 
 stage('preparation') {
+    // TODO: android prerequisites
     node { // a node is a step with workspace, can be distributed
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
         echo "testing jenkins with pipeline"
