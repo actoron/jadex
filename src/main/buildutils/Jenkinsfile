@@ -13,51 +13,35 @@ def version
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
-//        stage('checkout') {
-            git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
-            echo "testing jenkins with pipeline"
-//        }
+        git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
+        echo "testing jenkins with pipeline"
 
         // TODO determine version by checking how many commits since last release tag?
         //   def v = version(readFile('pom.xml'))
 
-//        stage('generate Version') {
-            // TODO: reset version number on new minor (or patch?) release:
-            // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
-            version = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
-            echo "building version:" + version
-//        }
+        // TODO: reset version number on new minor (or patch?) release:
+        // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
+        version = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
+        echo "building version:" + version
     }
 
     nodeWithVersion(version) {
-//        stage('genDepList') {
-            sh './gradlew gendeplist'
-//        }
-
-//        stage('stash sources') {
-            stash name: 'sources' // todo share workspace plugin?
-//        }
+        sh './gradlew gendeplist'
+        stash name: 'sources'
     }
 }
 
 stage('build and test') {
     nodeWithVersion(version) {
-//        stage('build gradle plugin') {
-            sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
-            if (junit) junit '**/test-results/*.xml'
-//        }
+        sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
+        if (junit) junit '**/test-results/*.xml'
 
-//        stage('build and test jadex') {
-            // build everything but javadoc and dont zip dists yet
-            withX {
-                sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
-            }
-            if (junit) junit '**/test-results/*.xml'
-//        }
+        withX {
+            sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
+        }
+        if (junit) junit '**/test-results/*.xml'
 
-//        stage('stash compiled') {
-            stash name: 'compiled'
-//        }
+        stash name: 'compiled'
     }
 }
 
@@ -77,7 +61,7 @@ if (deployDists) {
             }
 
             stage('checkDists') {
-                def dists = ['minimal', 'standard'] // todo add dists: pro, android, relaystandalone
+                def dists = ['minimal', 'standard', 'pro', 'android', 'relaystandalone']
                 def checkDists = [:];
 
                 for (int i = 0; i < dists.size(); i++) {
@@ -165,13 +149,14 @@ stage ('publish and deploy') {
     )
 }
 
-// todo if junit
-stage ('performancetests') {
-    nodeWithVersion(version) {
-        deleteDir()
-        unstash 'compiled'
-        sh './gradlew performanceTest --info'
-        junit '**/test-results/*.xml'
+if (junit) {
+    stage ('performancetests') {
+        nodeWithVersion(version) {
+            deleteDir()
+            unstash 'compiled'
+            sh './gradlew performanceTest' + defaultGradleArgs
+            junit '**/test-results/*.xml'
+        }
     }
 }
 
@@ -208,16 +193,12 @@ def tryOrRevertVersion(version, cl) {
     }
 }
 
-//def wasResetted = false
 
 def revertVersion(failedVersion) {
-//    if (!wasResetted) {
-        Integer oldNumber = (failedVersion as Integer) -1;
-        echo "resetting version from ${failedVersion} to ${oldNumber}"
-        oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: ''+ oldNumber])
-        echo "resetted version to:" + oldNumber
-//        wasResetted = true;
-//    }
+    Integer oldNumber = (failedVersion as Integer) -1;
+    echo "resetting version from ${failedVersion} to ${oldNumber}"
+    oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: ''+ oldNumber])
+    echo "resetted version to:" + oldNumber
 }
 
 def compareDist(String distribution) {
