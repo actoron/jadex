@@ -143,10 +143,13 @@ stage ('publish and deploy') {
                     sh 'mkdir schemas'
                     sh 'mv **/build/schemas/* schemas/'
 
-                    sh 'mkdir webappspublish'
-                    sh 'cp webapps/jadex-applications-web-*.war webappspublish/jadex-applications-web.war'
-                    sh 'cp webapps/jadex-platform-extension-relay-web-*.war webappspublish/relay.war'
-                    sh 'cp webapps/jadex-servletfilter-web-*.war webappspublish/webapi.war'
+                    sh 'mkdir webapps'
+                    sh 'mv **/build/libs/*.war webapps/'
+                    dir('webapps') {
+                        sh 'mv jadex-applications-web-*.war jadex-applications-web.war'
+                        sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
+                        sh 'mv jadex-servletfilter-web-*.war webapi.war'
+                    }
 
                     unstash 'dists'
 
@@ -199,7 +202,7 @@ def tryOrRevertVersion(version, cl) {
     try {
         cl()
     } catch (Exception e) {
-        println "Exception: ${e.getMessage()}"
+        println "Build Exception: ${e.getMessage()}"
         revertVersion(version)
         throw e
     }
