@@ -105,7 +105,7 @@ if (deployDists) {
                     unstash 'sources'
                     sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
                     sh './gradlew -Pdist=addonjavadoc clean javadocZip'
-                    stash 'docs', includes: 'docs/mkdocs-ng/build/*.zip, docs/mkdocs-ng/build/*.pdf, build/distributions/*.zip'
+                    stash name: 'docs', includes: 'docs/mkdocs-ng/build/*.zip, docs/mkdocs-ng/build/*.pdf, build/distributions/*.zip'
                 }
             }
         },
@@ -187,19 +187,23 @@ String[] runCmdAndSplit(command) {
 
 def nodeWithVersion(String label = '', version, cl) {
     node(label) {
-        withEnv(['BUILD_VERSION_SUFFIX='+version]) {
-            try {
+        tryOrRevertVersion {
+            withEnv(['BUILD_VERSION_SUFFIX='+version]) {
                 cl()
-            } catch (Exception e) {
-                println "Exception: ${e.getMessage()} ${e.getCause()}"
-                revertVersion(version)
-                throw e
             }
         }
     }
 }
 
-def wasResetted = false;
+def tryOrRevertVersion(cl) {
+    try {
+        cl()
+    } catch (Exception e) {
+        println "Exception: ${e.getMessage()}"
+        revertVersion(version)
+        throw e
+    }
+}
 
 def revertVersion(failedVersion) {
     if (!wasResetted) {
