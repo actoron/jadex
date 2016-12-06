@@ -192,13 +192,14 @@ def nodeWithVersion(String label = '', version, cl) {
                 cl()
             } catch (Exception e) {
                 revertVersion(version)
+                throw e
             }
         }
     }
 }
 
 def revertVersion(failedVersion) {
-    def oldNumber = Integer.parseInt(failedVersion) -1;
+    Integer oldNumber = (failedVersion as Integer) -1;
     echo "resetting version from ${failedVersion} to ${oldNumber}"
     oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: oldNumber])
     echo "resetted version to:" + oldNumber
