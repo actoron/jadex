@@ -1,13 +1,9 @@
 // configure here:
-junit = true;
+performancetests = true;
 deployDists = true;
 publishArtifacts = true;
 
 defaultGradleArgs = " --info --stacktrace"
-
-if (!junit) {
-    defaultGradleArgs += " -x test"
-}
 
 def version
 
@@ -33,13 +29,15 @@ stage('preparation') {
 
 stage('build and test') {
     nodeWithVersion(version) {
-        sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
-        if (junit) junit '**/test-results/*.xml'
+        withJUnit {
+            sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
+        }
 
         withX {
-            sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
+            withJUnit {
+                sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
+            }
         }
-        if (junit) junit '**/test-results/*.xml'
 
         stash name: 'compiled'
     }
@@ -53,9 +51,10 @@ if (deployDists) {
                     deleteDir()
                     unstash 'compiled'
                     withX {
-                        sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
+                        withJUnit {
+                            sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
+                        }
                     }
-                    if (junit) junit '**/test-results/*.xml'
                     stash name: 'dists', includes: 'build/distributions/**'
                 }
             }
@@ -149,13 +148,14 @@ stage ('publish and deploy') {
     )
 }
 
-if (junit) {
+if (performancetests) {
     stage ('performancetests') {
         nodeWithVersion(version) {
             deleteDir()
             unstash 'compiled'
-            sh './gradlew performanceTest' + defaultGradleArgs
-            junit '**/test-results/*.xml'
+            withJUnit {
+                sh './gradlew performanceTest' + defaultGradleArgs
+            }
         }
     }
 }
@@ -183,6 +183,15 @@ def nodeWithVersion(String label = '', version, cl) {
     }
 }
 
+def withJUnit(cl){
+    try {
+        cl()
+    } catch (Exception e) {
+        junit '**/test-results/*.xml'
+        throw e
+    }
+}
+
 def tryOrRevertVersion(version, cl) {
     try {
         cl()
@@ -193,12 +202,16 @@ def tryOrRevertVersion(version, cl) {
     }
 }
 
+revertedVersion = false
 
 def revertVersion(failedVersion) {
-    Integer oldNumber = (failedVersion as Integer) -1;
-    echo "resetting version from ${failedVersion} to ${oldNumber}"
-    oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
-    echo "resetted version to: ${oldNumber}"
+    if (!revertedVersion) {
+        Integer oldNumber = (failedVersion as Integer) -1;
+        echo "resetting version from ${failedVersion} to ${oldNumber}"
+        oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
+        echo "resetted version to: ${oldNumber}"
+        revertedVersion = true
+    }
 }
 
 def compareDist(String distribution) {
