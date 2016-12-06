@@ -197,8 +197,8 @@ def tryOrRevertVersion(version, cl) {
 def revertVersion(failedVersion) {
     Integer oldNumber = (failedVersion as Integer) -1;
     echo "resetting version from ${failedVersion} to ${oldNumber}"
-    oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: ''+ oldNumber])
-    echo "resetted version to:" + oldNumber
+    oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
+    echo "resetted version to: ${oldNumber}"
 }
 
 def compareDist(String distribution) {
