@@ -1,21 +1,13 @@
 // configure here:
 junit = false;
 deployDists = true;
-publishArtifacts = false;
+publishArtifacts = true;
 
 defaultGradleArgs = " --info --stacktrace"
 
 if (!junit) {
     defaultGradleArgs += " -x test"
 }
-
-//node {
-//    def lines = runCmdAndSplit("ls -la")
-//    println lines
-//    for (String line : lines) {
-//        println line
-//    }
-//}
 
 def version
 
@@ -27,7 +19,6 @@ stage('preparation') {
 //        }
 
         // TODO determine version by checking how many commits since last release tag?
-        // TODO reset version if failed
         //   def v = version(readFile('pom.xml'))
 
 //        stage('generate Version') {
@@ -67,16 +58,6 @@ stage('build and test') {
 //        stage('stash compiled') {
             stash name: 'compiled'
 //        }
-    }
-}
-
-if (publishArtifacts) {
-    stage ('publish') {
-        nodeWithVersion(version) {
-            deleteDir()
-            unstash 'compiled'
-            sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
-        }
     }
 }
 
@@ -124,8 +105,7 @@ if (deployDists) {
                     unstash 'sources'
                     sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
                     sh './gradlew -Pdist=addonjavadoc clean javadocZip'
-
-                    // todo keep docs for deployment
+                    stash 'docs', includes: 'docs/mkdocs-ng/build/*.zip, docs/mkdocs-ng/build/*.pdf, build/distributions/*.zip'
                 }
             }
         },
@@ -136,18 +116,49 @@ if (deployDists) {
 
 stage ('publish and deploy') {
     parallel (
-            'publish and tag': {
+        'publish and tag': {
+            if (publishArtifacts) {
                 nodeWithVersion(version) {
-
-                // TODO tag version
+                    deleteDir()
+                    unstash 'compiled'
+                    sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
+                    // TODO tag version
                 }
-            },
+            }
+        },
 
-            'deploy': {
+        'deploy': {
+            if (deployDists) {
                 nodeWithVersion(version) {
+                    deleteDir()
+                    // gather artifacts:
+                    unstash 'docs'
+                    sh 'mv docs/mkdocs-ng/build*.zip docs/mkdocs-ng/*.pdf docs/'
+                    sh 'mv build/distributions/*.zip docs/'
+
+                    unstash 'compiled'
+                    sh 'mkdir schemadoc'
+                    sh 'mv **/build/schemadocs/* schemadoc/'
+
+                    sh 'mkdir schemas'
+                    sh 'mv **/build/schemas/* schemas/'
+
+                    sh 'mkdir webappspublish'
+                    sh 'cp webapps/jadex-applications-web-*.war webappspublish/jadex-applications-web.war'
+                    sh 'cp webapps/jadex-platform-extension-relay-web-*.war webappspublish/relay.war'
+                    sh 'cp webapps/jadex-servletfilter-web-*.war webappspublish/webapi.war'
+
+                    unstash 'dists'
+
+                    // todo deploy webapps over ssh
+                    // todo deploy schemas to actoron downloads
+                    // todo deploy mkdocs (html + pdf)
+                    // todo schemadoc
+                    // todo deploy distributions + exampleprojects to download
 
                 }
             }
+        }
     )
 }
 
@@ -177,9 +188,20 @@ String[] runCmdAndSplit(command) {
 def nodeWithVersion(String label = '', version, cl) {
     node(label) {
         withEnv(['BUILD_VERSION_SUFFIX='+version]) {
-            cl()
+            try {
+                cl()
+            } catch (Exception e) {
+                revertVersion(version)
+            }
         }
     }
+}
+
+def revertVersion(failedVersion) {
+    def oldNumber = Integer.parseInt(failedVersion) -1;
+    echo "resetting version from ${failedVersion} to ${oldNumber}"
+    oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: oldNumber])
+    echo "resetted version to:" + oldNumber
 }
 
 def compareDist(String distribution) {
