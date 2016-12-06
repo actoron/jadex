@@ -19,51 +19,59 @@ if (!junit) {
 
 def version
 
-node { // a node is a step with workspace, can be distributed
-    stage('checkout') { // only for display purposes
-        git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
-        echo "testing jenkins with pipeline"
-    }
-
-    // TODO determine version by checking how many commits since last release tag?
-    //   def v = version(readFile('pom.xml'))
-
-    stage('generate Version') {
-        // TODO: reset version number on new minor (or patch?) release:
-        // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
-        version = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
-        echo "building version:" + version
-    }
-}
-
-nodeWithVersion(version) {
-    stage('genDepList') {
-        sh './gradlew gendeplist'
-    }
-
-    stage ('stash sources') {
-        stash name: 'sources' // todo share workspace plugin?
-    }
-
-    stage('build and test') {
-        sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
-        if (junit) junit '**/test-results/*.xml'
-
-        // build everything but javadoc and dont zip dists yet
-        withX {
-            sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
+stage('preparation') {
+    node { // a node is a step with workspace, can be distributed
+        stage('checkout') {
+            git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
+            echo "testing jenkins with pipeline"
         }
-        if (junit) junit '**/test-results/*.xml'
+
+        // TODO determine version by checking how many commits since last release tag?
+        //   def v = version(readFile('pom.xml'))
+
+        stage('generate Version') {
+            // TODO: reset version number on new minor (or patch?) release:
+            // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
+            version = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
+            echo "building version:" + version
+        }
     }
 
-    stage('stash compiled') {
-        stash name: 'compiled'
+    nodeWithVersion(version) {
+        stage('genDepList') {
+            sh './gradlew gendeplist'
+        }
+
+        stage('stash sources') {
+            stash name: 'sources' // todo share workspace plugin?
+        }
     }
 }
 
-nodeWithVersion(version) {
+stage('build and test') {
+    nodeWithVersion(version) {
+        stage('build gradle plugin') {
+            sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
+            if (junit) junit '**/test-results/*.xml'
+        }
+
+        stage('build and test jadex') {
+            // build everything but javadoc and dont zip dists yet
+            withX {
+                sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
+            }
+            if (junit) junit '**/test-results/*.xml'
+        }
+
+        stage('stash compiled') {
+            stash name: 'compiled'
+        }
+    }
+}
+
+if (publishArtifacts) {
     stage ('publish') {
-        if (publishArtifacts) {
+        nodeWithVersion(version) {
             deleteDir()
             unstash 'compiled'
             sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
@@ -71,75 +79,80 @@ nodeWithVersion(version) {
     }
 }
 
-parallel (
-    'create distributions': {
-        if (deployDists) {
-            nodeWithVersion(version) {
-                deleteDir()
-                unstash 'compiled'
-                stage('create dists') {
-                    withX {
-                        sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
-                    }
-                    if (junit) junit '**/test-results/*.xml'
-                    stash name: 'dists', includes: 'build/distributions/**'
-                }
-            }
-
-            def dists = ['minimal', 'standard'] // todo add dists: pro, android, relaystandalone
-            def checkDists = [:];
-
-            for (int i = 0; i < dists.size(); i++) {
-                def distName = dists[i];
-                checkDists["checkdist${distName}"] = {
+stage ('dists, docs, perftest') {
+    parallel (
+        'create distributions': {
+            if (deployDists) {
+                stage("createDists") {
                     nodeWithVersion(version) {
-                        stage("checkDist:${distName}") {
-                            deleteDir()
-                            unstash 'dists'
+                        deleteDir()
+                        unstash 'compiled'
+                        withX {
+                            sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
+                        }
+                        if (junit) junit '**/test-results/*.xml'
+                        stash name: 'dists', includes: 'build/distributions/**'
+                    }
+                }
 
-                            dir('build/distributions') {
-                                sh "mv */jadex-${distName}-*.zip ./"
-                                sh 'rm -r sources'
-                                compareDist(distName)
+                stage("checkDists") {
+                    def dists = ['minimal', 'standard'] // todo add dists: pro, android, relaystandalone
+                    def checkDists = [:];
+
+                    for (int i = 0; i < dists.size(); i++) {
+                        def distName = dists[i];
+                        checkDists["checkdist${distName}"] = {
+                            nodeWithVersion(version) {
+                                deleteDir()
+                                unstash 'dists'
+                                dir('build/distributions') {
+                                    sh "mv */jadex-${distName}-*.zip ./"
+                                    sh 'rm -r sources'
+                                    compareDist(distName)
+                                }
                             }
                         }
                     }
                 }
+
+                parallel checkDists
+
+                // todo keep artifacts for deployment
+            } else {
+                echo "nothing to do, deployDists is disabled"
             }
+        },
 
-            parallel checkDists
+        'docs': {
+            if (deployDists) {
+                stage ('docs') {
+                    nodeWithVersion(version) {
+                        deleteDir()
+                        unstash 'sources'
+                        sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
+                        sh './gradlew -Pdist=addonjavadoc clean javadocZip'
 
-            // todo keep artifacts for deployment
-        } else {
-            echo "nothing to do, deployDists is disabled"
-        }
-    },
-
-    'docs': {
-        if (deployDists) {
-            nodeWithVersion(version) {
-                deleteDir()
-                unstash 'sources'
-                sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
-                sh './gradlew -Pdist=addonjavadoc clean javadocZip'
-
-                // todo keep docs for deployment
+                        // todo keep docs for deployment
+                    }
+                }
+            } else {
+                echo "nothing to do, deployDists is disabled"
             }
-        } else {
-            echo "nothing to do, deployDists is disabled"
-        }
-    },
+        },
 
-    // todo if junit
-    'performancetests': {
-        nodeWithVersion(version) {
-            deleteDir()
-            unstash 'compiled'
-            sh './gradlew performanceTest --info'
-            junit '**/test-results/*.xml'
+        // todo if junit
+        'performancetests': {
+            stage ('performancetests') {
+                nodeWithVersion(version) {
+                    deleteDir()
+                    unstash 'compiled'
+                    sh './gradlew performanceTest --info'
+                    junit '**/test-results/*.xml'
+                }
+            }
         }
-    }
-)
+    )
+}
 
 // todo deployment
 
