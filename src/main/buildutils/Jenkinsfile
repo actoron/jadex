@@ -187,7 +187,7 @@ String[] runCmdAndSplit(command) {
 
 def nodeWithVersion(String label = '', version, cl) {
     node(label) {
-        tryOrRevertVersion {
+        tryOrRevertVersion(version) {
             withEnv(['BUILD_VERSION_SUFFIX='+version]) {
                 cl()
             }
@@ -195,7 +195,7 @@ def nodeWithVersion(String label = '', version, cl) {
     }
 }
 
-def tryOrRevertVersion(cl) {
+def tryOrRevertVersion(version, cl) {
     try {
         cl()
     } catch (Exception e) {
@@ -205,14 +205,16 @@ def tryOrRevertVersion(cl) {
     }
 }
 
+//def wasResetted = false
+
 def revertVersion(failedVersion) {
-    if (!wasResetted) {
+//    if (!wasResetted) {
         Integer oldNumber = (failedVersion as Integer) -1;
         echo "resetting version from ${failedVersion} to ${oldNumber}"
         oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: ''+ oldNumber])
         echo "resetted version to:" + oldNumber
-        wasResetted = true;
-    }
+//        wasResetted = true;
+//    }
 }
 
 def compareDist(String distribution) {
