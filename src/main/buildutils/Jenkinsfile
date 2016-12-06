@@ -62,7 +62,7 @@ nodeWithVersion(version) {
 }
 
 nodeWithVersion(version) {
-    stage 'publish' {
+    stage ('publish') {
         if (publishArtifacts) {
             deleteDir()
             unstash 'compiled'
