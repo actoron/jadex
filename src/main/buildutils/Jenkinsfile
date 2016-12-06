@@ -133,7 +133,7 @@ stage ('publish and deploy') {
                     deleteDir()
                     // gather artifacts:
                     unstash 'docs'
-                    sh 'mv docs/mkdocs-ng/build*.zip docs/mkdocs-ng/*.pdf docs/'
+                    sh 'mv docs/mkdocs-ng/build/*.zip docs/mkdocs-ng/build/*.pdf docs/'
                     sh 'mv build/distributions/*.zip docs/'
 
                     unstash 'compiled'
