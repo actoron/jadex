@@ -17,64 +17,60 @@ if (!junit) {
 //    }
 //}
 
+def version
+
 node { // a node is a step with workspace, can be distributed
-    stage ('checkout') { // only for display purposes
+    stage('checkout') { // only for display purposes
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
         echo "testing jenkins with pipeline"
     }
 
-    def version
     // TODO determine version by checking how many commits since last release tag?
     //   def v = version(readFile('pom.xml'))
 
-    stage ('generate Version') {
+    stage('generate Version') {
         // TODO: reset version number on new minor (or patch?) release:
         // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
         version = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
         echo "building version:" + version
     }
+}
 
-    withEnv(['BUILD_VERSION_SUFFIX='+version]) {
-        stage('genDepList') {
-            sh './gradlew gendeplist'
+nodeWithVersion(version) {
+    stage('genDepList') {
+        sh './gradlew gendeplist'
+    }
+
+    stage ('stash sources') {
+        stash name: 'sources' // todo share workspace plugin?
+    }
+
+    stage('jadex-gradle-plugin') {
+        sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
+        if (junit) junit '**/test-results/*.xml'
+    }
+
+    stage('jadex-gradle') {
+        // build everything but javadoc and dont zip dists yet
+        withX {
+            sh './gradlew -Pdist=publishdists clean build -x javadoc' + defaultGradleArgs
         }
+        if (junit) junit '**/test-results/*.xml'
+    }
 
-        stage ('stash sources') {
-            stash name: 'sources' // todo share workspace plugin?
-        }
-
-        stage('jadex-gradle-plugin') {
-            sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
-            if (junit) junit '**/test-results/*.xml'
-        }
-
-        stage('jadex-gradle') {
-            // build everything but javadoc and dont zip dists yet
-            withX {
-                sh './gradlew -Pdist=publishdists clean build -x javadoc' + defaultGradleArgs
-            }
-            if (junit) junit '**/test-results/*.xml'
-
-
-        }
-
-        stage('stash compiled') {
-            stash name: 'compiled'
-        }
+    stage('stash compiled') {
+        stash name: 'compiled'
     }
 }
 
-
 // todo: tests?
-
-
 parallel (
     'create distributions': {
         if (deployDists) {
             def dists = ['minimal', 'standard'] // todo add dists: pro, android, relaystandalone
             def checkDists = [:];
 
-            node {
+            nodeWithVersion(version) {
                 stage('create dists') {
                     withX {
                         sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
@@ -87,24 +83,26 @@ parallel (
             for (int i = 0; i < dists.size(); i++) {
                 def distName = dists[i];
                 checkDists["checkdist${distName}"] = {
-                    node {
-                        deleteDir()
-                        unstash 'dists'
+                    nodeWithVersion {
+                        stage("checkDist:${distName}") {
+                            deleteDir()
+                            unstash 'dists'
 
-                        dir('build/distributions') {
-                            sh "mv */jadex-${distName}-*.zip ./"
-                            sh 'rm -r sources'
-                            compareDist(distName)
+                            dir('build/distributions') {
+                                sh "mv */jadex-${distName}-*.zip ./"
+                                sh 'rm -r sources'
+                                compareDist(distName)
+                            }
                         }
                     }
                 }
             }
 
-            node {
-                stage('check distributions') {
-                    parallel checkDists
-                }
-            }
+//            node {
+//                stage('check distributions') {
+            parallel checkDists
+//                }
+//            }
 
             // todo deploy dist
         } else {
@@ -113,7 +111,7 @@ parallel (
     },
 
     'docs': {
-        node {
+        nodeWithVersion(version) {
             // todo: dummy
             sh 'echo dummystep'
             sleep 30
@@ -125,11 +123,15 @@ parallel (
     }
 )
 
-node {
+
+// ------- Helper functions --------
+
+nodeWithVersion(version) {
     stage 'deployment' {
         // todo deployment
 
         if (deployArtifacts) {
+            deleteDir()
             unstash 'compiled'
             // build javadoc (already done if dists were build in step before :/)
             sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
@@ -146,6 +148,14 @@ def withX(func) {
 String[] runCmdAndSplit(command) {
     def stdout = sh (script: command, returnStdout: true).trim()
     return stdout.split("\n")
+}
+
+def nodeWithVersion(String label = '', version, cl) {
+    node(label) {
+        withEnv(['BUILD_VERSION_SUFFIX='+version]) {
+            cl()
+        }
+    }
 }
 
 def compareDist(String distribution) {
@@ -200,9 +210,9 @@ def compareDist(String distribution) {
     files = runCmdAndSplit("ls compare/*.lst")
     for (int i = 0; i < files.length; i++) {
         def it = files[i]
-        echo "checking for difference in $it ..."
-        sh "diff -w '${it}' '${it}-rebuild' > '${it}'.diff"
-        // does jenkins abort here if there is a difference?
+        echo "checking for difference in ${it} ..."
+        sh "diff -w '${it}' '${it}-rebuild' > '${it}'.diff || echo 'rebuild distribution differs from original: ${it.substring(0,it.length()-5)}'"
+        // jenkins aborts here if there is a difference.
     }
 
 //
