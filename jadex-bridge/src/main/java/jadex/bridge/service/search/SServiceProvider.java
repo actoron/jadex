@@ -27,6 +27,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
@@ -1347,6 +1348,44 @@ public class SServiceProvider
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
+	public static <T> IFuture<T> waitForService(final IInternalAccess agent, final String reqservicename, final int max, final int delay)
+	{
+		IResultCommand<IFuture<T>, Void> searchcmd = new IResultCommand<IFuture<T>, Void>()
+		{
+			public IFuture<T> execute(Void args)
+			{
+				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(reqservicename);
+			}
+		};
+		
+		return waitForService(agent, searchcmd, max, delay);
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
+	public static <T> IFuture<T> waitForService(final IExternalAccess agent, final String reqservicename, final int max, final int delay)
+	{
+		IResultCommand<IFuture<T>, Void> searchcmd = new IResultCommand<IFuture<T>, Void>()
+		{
+			public IFuture<T> execute(Void args)
+			{
+				return agent.scheduleStep(new IComponentStep<T>()
+				{
+					public IFuture<T> execute(IInternalAccess ia)
+					{
+						return ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(reqservicename);
+					}
+				});
+			}
+		};
+		
+		return waitForService(agent, searchcmd, max, delay);
 	}
 	
 	/**
