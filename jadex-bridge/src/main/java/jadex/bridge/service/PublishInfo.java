@@ -29,6 +29,9 @@ public class PublishInfo
 	/** The publish scope. */
 	protected String publishscope = RequiredServiceInfo.SCOPE_PLATFORM;
 	
+	/** Flag for allowing publishing to multiple locations. */
+	protected boolean multi = false;
+	
 	/** The mapping information (e.g. annotated interface). */
 	protected ClassInfo mapping;
 	
@@ -51,7 +54,7 @@ public class PublishInfo
 	 */
 	public PublishInfo(String pid, String publishtype, Class<?> mapping)
 	{
-		this(pid, publishtype, RequiredServiceInfo.SCOPE_PLATFORM, mapping, (UnparsedExpression[])null);
+		this(pid, publishtype, RequiredServiceInfo.SCOPE_PLATFORM, false, mapping, (UnparsedExpression[])null);
 	}
 		
 	/**
@@ -59,7 +62,7 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param publishtype The publish type.
 	 */
-	public PublishInfo(String pid, String publishtype, String publishscope, 
+	public PublishInfo(String pid, String publishtype, String publishscope, boolean multi,
 		Class<?> mapping, UnparsedExpression[] properties)
 	{
 		this.pid = pid;
@@ -78,7 +81,7 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param publishtype The publish type.
 	 */
-	public PublishInfo(String pid, String publishtype, String publishscope, 
+	public PublishInfo(String pid, String publishtype, String publishscope, boolean multi,
 		Class<?> mapping, Object[] props)
 	{
 		this.pid = pid;
@@ -104,6 +107,7 @@ public class PublishInfo
 		this.pid = info.getPublishId();
 		this.publishtype = info.getPublishType();
 		this.publishscope = info.getPublishScope();
+		this.multi = info.multi;
 		this.mapping = info.getMapping();
 		if(info.getProperties()!=null)
 		{
@@ -174,6 +178,26 @@ public class PublishInfo
 	public ClassInfo getMapping()
 	{
 		return mapping;
+	}
+	
+	/**
+	 *  Sets if the publishing should be done on multiple publishing services.
+	 *  
+	 *  @param multi Set true, if multi-publish.
+	 */
+	public void setMulti(boolean multi)
+	{
+		this.multi = multi;
+	}
+	
+	/**
+	 *  Gets if the publishing should be done on multiple publishing services.
+	 *  
+	 *  @return True, if multi-publish.
+	 */
+	public boolean isMulti()
+	{
+		return multi;
 	}
 
 	/**

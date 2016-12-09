@@ -17,6 +17,7 @@ import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
@@ -496,23 +497,55 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //				e.printStackTrace();
 			}
 			
-			getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
-				.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
-				.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
+			if (pi.isMulti())
 			{
-				public void customResultAvailable(IPublishService ps)
+				SServiceProvider.getServices(getComponent(), IPublishService.class, pi.getPublishScope()).addResultListener(new IResultListener<Collection<IPublishService>>()
 				{
-					//System.out.println("Got publish service " + ps);
-					ps.publishService(service.getServiceIdentifier(), pi)
-						.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
-				}
-				public void exceptionOccurred(Exception exception)
+					public void exceptionOccurred(Exception exception)
+					{
+						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+						ret.setResult(null);
+					}
+					
+					public void resultAvailable(Collection<IPublishService> result)
+					{
+						for (final IPublishService pubserv : result)
+						{
+							pubserv.publishService(service.getServiceIdentifier(), pi).addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									getComponent().getLogger().severe("Could not publish to " + pubserv + ": "+service.getServiceIdentifier()+" "+exception.getMessage());
+								}
+							});
+						}
+					}
+				});
+			}
+			else
+			{
+				getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
+					.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
+					.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 				{
-//					exception.printStackTrace();
-					getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
-					ret.setResult(null);
-				}
-			}));
+					public void customResultAvailable(IPublishService ps)
+					{
+						//System.out.println("Got publish service " + ps);
+						ps.publishService(service.getServiceIdentifier(), pi)
+							.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+	//					exception.printStackTrace();
+						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+						ret.setResult(null);
+					}
+				}));
+			}
 		}
 		else
 		{

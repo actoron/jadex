@@ -30,6 +30,11 @@ public @interface Publish
 	public String publishscope() default Binding.SCOPE_PLATFORM;
 	
 	/**
+	 *  Flag if the service should be published to multiple locations.
+	 */
+	public boolean multi() default false;
+	
+	/**
 	 * The mapping information (e.g. annotated interface). 
 	 */
 	public Class<?> mapping() default Object.class;
