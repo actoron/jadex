@@ -68,6 +68,7 @@ public class PublishInfo
 		this.pid = pid;
 		this.publishtype = publishtype;
 		this.publishscope = publishscope;
+		this.multi = multi;
 		this.mapping = mapping==null? null: new ClassInfo(mapping);
 		if(properties!=null)
 		{
@@ -87,6 +88,7 @@ public class PublishInfo
 		this.pid = pid;
 		this.publishtype = publishtype;
 		this.publishscope = publishscope;
+		this.multi = multi;
 		this.mapping = mapping==null? null: new ClassInfo(mapping);
 		this.properties = new ArrayList<UnparsedExpression>();
 		if(props!=null)
