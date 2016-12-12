@@ -10,7 +10,6 @@ def version
 import groovy.transform.Field
 
 stage('preparation') {
-    // TODO: android prerequisites
     node { // a node is a step with workspace, can be distributed
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
         echo "testing jenkins with pipeline"
@@ -22,10 +21,14 @@ stage('preparation') {
         // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
         version = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
         echo "building version:" + version
+
+        // for testing, tag here:
+        print "On branch: ${env.BRANCH_NAME}"
+        sh "git tag -a jenkinsbuild -m \"build version ${version}\""
     }
 
     nodeWithVersion(version) {
-        error("Build failed because i want it to..")
+//        error("Build failed because i want it to..")
         sh './gradlew gendeplist'
         stash name: 'sources'
     }
@@ -110,6 +113,8 @@ stage ('publish and deploy') {
                     unstash 'compiled'
                     sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
                     // TODO tag version
+                    print "On branch: ${env.BRANCH_NAME}"
+                    sh "git tag -a jenkinsbuild -m \"build version ${version}\""
                 }
             }
         },
@@ -212,9 +217,9 @@ Boolean revertedVersion = false
 def revertVersion(failedVersion) {
     if (!revertedVersion) {
         Integer oldNumber = (failedVersion as Integer) -1;
-        echo "resetting version from ${failedVersion} to ${oldNumber}"
+        echo "reverting version from ${failedVersion} to ${oldNumber}"
         def generatedOldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
-        echo "resetted version to: ${generatedOldNumber}"
+        echo "reverted version to: ${generatedOldNumber}"
         revertedVersion = true
     }
 }
