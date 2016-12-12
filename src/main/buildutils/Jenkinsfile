@@ -21,7 +21,7 @@ String jadexVersion
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
-        git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'master'
+        git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'jenkinsfile'
         echo "testing jenkins with pipeline"
 
         // TODO determine version by checking how many commits since last release tag?
