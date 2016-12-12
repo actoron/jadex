@@ -7,6 +7,8 @@ defaultGradleArgs = " --info --stacktrace"
 
 def version
 
+import groovy.transform.Field
+
 stage('preparation') {
     // TODO: android prerequisites
     node { // a node is a step with workspace, can be distributed
@@ -23,6 +25,7 @@ stage('preparation') {
     }
 
     nodeWithVersion(version) {
+        error("Build failed because i want it to..")
         sh './gradlew gendeplist'
         stash name: 'sources'
     }
@@ -203,7 +206,8 @@ def tryOrRevertVersion(version, cl) {
     }
 }
 
-revertedVersion = false
+@Field
+Boolean revertedVersion = false
 
 def revertVersion(failedVersion) {
     if (!revertedVersion) {
