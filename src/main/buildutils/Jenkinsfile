@@ -9,9 +9,15 @@ def versionSuffix
 
 import groovy.transform.Field
 
-
 @Field
 String jadexVersion
+
+//@Field
+//String jadexVersion_major
+//@Field
+//String jadexVersion_minor
+//@Field
+//String jadexVersion_patch
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
@@ -29,10 +35,11 @@ stage('preparation') {
         // for testing, tag here:
 
         sh "./gradlew createVersionInfo"
-        jadexVersion = readProperties([file: 'build/jadexversion.properties']).jadexversion
-//        readProperties([file: 'build/jadexversion.properties']).jadexversion_major
-//        readProperties([file: 'build/jadexversion.properties']).jadexversion_minor
-//        readProperties([file: 'build/jadexversion.properties']).jadexversion_patch
+        def versioning = load '${rootDir}/src/main/buildutils/versioning.gradle'
+        println versioning.version
+
+        def props = readProperties([file: 'build/jadexversion.properties'])
+        jadexVersion = props.jadexversion
         println "building version: ${jadexVersion}"
         def branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
 //        println "On branch: ${env.BRANCH_NAME}"
