@@ -37,14 +37,16 @@ class VersionLoader {
     }
 }
 
-if (binding.variables.get("project")) {
+def mProject = binding.variables.get("project");
+
+if (mProject) {
     // check if running inside gradle
-    if (project.hasProperty('workspaceRootDir')) {
+    if (mProject.hasProperty('workspaceRootDir')) {
         VersionLoader.workspaceRootDir = ext.workspaceRootDir
     }
 
-    version = VersionLoader.getVersion(project.rootProject.rootDir)
-    project.ext.jadex_build_version = version.toString()
+    version = VersionLoader.getVersion(mProject.rootProject.rootDir)
+    mProject.ext.jadex_build_version = version.toString()
 }
 
 
