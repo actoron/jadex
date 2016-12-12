@@ -5,9 +5,13 @@ publishArtifacts = true;
 
 defaultGradleArgs = " --info --stacktrace"
 
-def version
+def versionSuffix
 
 import groovy.transform.Field
+
+
+@Field
+String jadexVersion
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
@@ -19,15 +23,22 @@ stage('preparation') {
 
         // TODO: reset version number on new minor (or patch?) release:
         // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
-        version = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
-        echo "building version:" + version
+        versionSuffix = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
+        echo "version suffix:" + versionSuffix
 
         // for testing, tag here:
-        print "On branch: ${env.BRANCH_NAME}"
-        sh "git tag -a jenkinsbuild -m \"build version ${version}\""
+
+        sh "./gradlew createVersionInfo"
+        jadexVersion = sh (script: "cat build/jadexversion.properties", returnStdout: true).trim()
+        println "building version: ${jadexVersion}"
+        def branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+//        println "On branch: ${env.BRANCH_NAME}"
+        println "On branch: ${branchName}"
+        sh "git tag -a ${jadexVersion} -m \"build version ${completeVersion}\""
+//        sh "git push ${completeVersion}" // TODO uncomment for push tag
     }
 
-    nodeWithVersion(version) {
+    nodeWithVersion(versionSuffix) {
 //        error("Build failed because i want it to..")
         sh './gradlew gendeplist'
         stash name: 'sources'
@@ -35,7 +46,7 @@ stage('preparation') {
 }
 
 stage('build and test') {
-    nodeWithVersion(version) {
+    nodeWithVersion(versionSuffix) {
         withJUnit {
             sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
         }
@@ -54,7 +65,7 @@ if (deployDists) {
     parallel (
         'create distributions': {
             stage('createDists') {
-                nodeWithVersion(version) {
+                nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'compiled'
                     withX {
@@ -73,7 +84,7 @@ if (deployDists) {
                 for (int i = 0; i < dists.size(); i++) {
                     def distName = dists[i];
                     checkDists["checkdist${distName}"] = {
-                        nodeWithVersion(version) {
+                        nodeWithVersion(versionSuffix) {
                             deleteDir()
                             unstash 'dists'
                             dir('build/distributions') {
@@ -90,7 +101,7 @@ if (deployDists) {
 
         'docs': {
             stage ('docs') {
-                nodeWithVersion(version) {
+                nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'sources'
                     sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
@@ -108,20 +119,19 @@ stage ('publish and deploy') {
     parallel (
         'publish and tag': {
             if (publishArtifacts) {
-                nodeWithVersion(version) {
+                nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'compiled'
                     sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
-                    // TODO tag version
                     print "On branch: ${env.BRANCH_NAME}"
-                    sh "git tag -a jenkinsbuild -m \"build version ${version}\""
+                    // TODO move tagging here
                 }
             }
         },
 
         'deploy': {
             if (deployDists) {
-                nodeWithVersion(version) {
+                nodeWithVersion(versionSuffix) {
                     deleteDir()
                     // gather artifacts:
                     unstash 'docs'
@@ -159,7 +169,7 @@ stage ('publish and deploy') {
 
 if (performancetests) {
     stage ('performancetests') {
-        nodeWithVersion(version) {
+        nodeWithVersion(versionSuffix) {
             deleteDir()
             unstash 'compiled'
             withJUnit {
