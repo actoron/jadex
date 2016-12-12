@@ -37,7 +37,8 @@ stage('preparation') {
     nodeWithVersion(versionSuffix) {
         sh "./gradlew createVersionInfo"
         def versioning = load 'src/main/buildutils/versioning.gradle'
-        println versioning.version
+        def myVersion = versioning.VersionLoader.getVersion()
+        println myVersion
 
         def props = readProperties([file: 'build/jadexversion.properties'])
         jadexVersion = props.jadexversion

@@ -6,9 +6,9 @@ class VersionLoader {
 
     static String workspaceRootDir
 
-    static ProjectVersion getVersion(Project rootProject) {
+    static ProjectVersion getVersion(File rootDir) {
         if (version == null) {
-            def propFile = new File("$rootProject.rootDir/src/main/buildutils/jadexversion.properties")
+            def propFile = new File("$rootDir/src/main/buildutils/jadexversion.properties")
             if (!propFile.exists()) {
                 propFile = new File("$workspaceRootDir/src/main/buildutils/jadexversion.properties")
             }
@@ -37,12 +37,15 @@ class VersionLoader {
     }
 }
 
-if (project.hasProperty('workspaceRootDir')) {
-    VersionLoader.workspaceRootDir = ext.workspaceRootDir
-}
+if (binding.variables.containsKey("project")) {
+    // check if running inside gradle
+    if (project.hasProperty('workspaceRootDir')) {
+        VersionLoader.workspaceRootDir = ext.workspaceRootDir
+    }
 
-version = VersionLoader.getVersion(project.rootProject)
-project.ext.jadex_build_version = version.toString()
+    version = VersionLoader.getVersion(project.rootProject.rootDir)
+    project.ext.jadex_build_version = version.toString()
+}
 
 
 class ProjectVersion {
