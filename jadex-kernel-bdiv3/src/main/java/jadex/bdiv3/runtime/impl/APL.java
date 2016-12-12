@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -29,8 +31,11 @@ import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
+import jadex.bdiv3x.runtime.ICandidateInfo;
+import jadex.bdiv3x.runtime.IElement;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
@@ -58,16 +63,16 @@ public class APL
 	protected RProcessableElement element;
 	
 	/** The list of candidates. */
-	protected List<Object> candidates;
+	protected List<ICandidateInfo> candidates;
 	
 	/** The metagoal. */
 //	protected Object apl_has_metagoal;
 	
 	/** The mplan candidates. */
-	protected List<MPlanInfo> precandidates;
+	protected List<ICandidateInfo> precandidates;
 	
 	/** The mgoal candidates (in case a goal triggers another goal). */
-	protected List<MGoalInfo> goalprecandidates;
+	protected List<ICandidateInfo> goalprecandidates;
 	
 //	/** The plan instance candidates. */
 //	protected List<RPlan> planinstancecandidates;
@@ -88,7 +93,7 @@ public class APL
 	/**
 	 *  Create a new APL.
 	 */
-	public APL(RProcessableElement element, List<Object> candidates)
+	public APL(RProcessableElement element, List<ICandidateInfo> candidates)
 	{
 		this.element = element;
 		this.candidates = candidates;
@@ -123,7 +128,34 @@ public class APL
 					try
 					{
 						m.setAccessible(true);
-						candidates = (List<Object>)m.invoke(pojo, new Object[0]);
+						List<Object> cands = (List<Object>)m.invoke(pojo, new Object[0]);
+						candidates = new ArrayList<ICandidateInfo>();
+						if(cands!=null)
+						{
+							for(Object cand: cands)
+							{
+								if(cand.getClass().isAnnotationPresent(Plan.class))
+								{
+									MCapability	mcapa = (MCapability)ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
+									MPlan mplan = mcapa.getPlan(cand.getClass().getName());
+									CandidateInfoPojoPlan ci = new CandidateInfoPojoPlan(cand, element, ia);
+									RPlan rplan = RPlan.createRPlan(mplan, ci, element, ia, null, null);
+									ci.rplan = rplan;
+									
+									candidates.add(ci);
+//									RPlan.executePlan(rplan, ia);
+								}
+								else if(cand instanceof ICandidateInfo)
+								{
+									candidates.add((ICandidateInfo)cand);
+								}
+								else
+								{
+									ret.setException(new RuntimeException("Candidates must be pojo plans or of type ICandidateInfo"));
+									return ret;
+								}
+							}
+						}
 						done = true;
 					}
 					catch(Exception e)
@@ -145,22 +177,22 @@ public class APL
 						if(rplan.isWaitingFor(element))
 						{
 							if(candidates==null)
-								candidates = new ArrayList<Object>();
-							candidates.add((Object)rplan);
+								candidates = new ArrayList<ICandidateInfo>();
+							candidates.add(new CandidateInfoRPlan(rplan, element));
 						}
 						// check if plan always waits for this proc elem
 						else if(rplan.isWaitqueueWaitingFor(element))
 						{
 							if(candidates==null)
-								candidates = new ArrayList<Object>();
-							candidates.add(rplan.getWaitqueue());
+								candidates = new ArrayList<ICandidateInfo>();
+							candidates.add(new CandidateInfoWaitqueue(rplan, element));
 						}
 					}
 				}
 				
-				doBuild(ia).addResultListener(new ExceptionDelegationResultListener<List<Object>, Void>(ret)
+				doBuild(ia).addResultListener(new ExceptionDelegationResultListener<List<ICandidateInfo>, Void>(ret)
 				{
-					public void customResultAvailable(List<Object> result)
+					public void customResultAvailable(List<ICandidateInfo> result)
 					{
 						if(candidates==null)
 						{
@@ -246,9 +278,9 @@ public class APL
 	/**
 	 *  Select candidates from the list of applicable plans.
 	 */
-	public List<Object> selectCandidates(MCapability mcapa, IInternalAccess ia)
+	public List<ICandidateInfo> selectCandidates(MCapability mcapa, IInternalAccess ia)
 	{
-		List<Object> ret = new ArrayList<Object>();
+		List<ICandidateInfo> ret = new ArrayList<ICandidateInfo>();
 		
 		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		// todo: include a number of retries...
@@ -271,9 +303,9 @@ public class APL
 	/**
 	 *  Do build the apl by adding possible candidate plans.
 	 */
-	protected IFuture<List<Object>>	doBuild(IInternalAccess ia)
+	protected IFuture<List<ICandidateInfo>>	doBuild(IInternalAccess ia)
 	{
-		final Future<List<Object>> ret = new Future<List<Object>>();
+		final Future<List<ICandidateInfo>> ret = new Future<List<ICandidateInfo>>();
 		
 		IInternalBDIAgentFeature bdif = ia.getComponentFeature(IInternalBDIAgentFeature.class);
 		
@@ -282,7 +314,7 @@ public class APL
 		// todo: generate binding candidates
 		if(precandidates==null)
 		{
-			precandidates = new ArrayList<MPlanInfo>();
+			precandidates = new ArrayList<ICandidateInfo>();
 			List<MPlan> mplans = ((MCapability)bdif.getCapability().getModelElement()).getPlans();
 			
 			if(mplans!=null)
@@ -296,7 +328,7 @@ public class APL
 						List<MGoal> mgoals = mtrigger.getGoals();
 						if(mgoals!=null && mgoals.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, element);
+							List<ICandidateInfo> cands = createMPlanCandidates(ia, mplan, element);
 							precandidates.addAll(cands);
 						}
 					}
@@ -305,7 +337,7 @@ public class APL
 						List<MServiceCall> msers = mtrigger.getServices();
 						if(msers!=null && msers.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, element);
+							List<ICandidateInfo> cands = createMPlanCandidates(ia, mplan, element);
 							precandidates.addAll(cands);
 						}
 					}
@@ -314,7 +346,7 @@ public class APL
 						List<MMessageEvent> msgs = mtrigger.getMessageEvents();
 						if(msgs!=null && msgs.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, element);
+							List<ICandidateInfo> cands = createMPlanCandidates(ia, mplan, element);
 							precandidates.addAll(cands);
 						}
 					}
@@ -323,7 +355,7 @@ public class APL
 						List<MInternalEvent> ievs = mtrigger.getInternalEvents();
 						if(ievs!=null && ievs.contains(element.getModelElement()))
 						{
-							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, element);
+							List<ICandidateInfo> cands = createMPlanCandidates(ia, mplan, element);
 							precandidates.addAll(cands);
 						}
 					}
@@ -333,7 +365,7 @@ public class APL
 		
 		if(goalprecandidates==null)
 		{
-			goalprecandidates = new ArrayList<MGoalInfo>();
+			goalprecandidates = new ArrayList<ICandidateInfo>();
 			MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 			List<MGoal> mgoals = ((MCapability)bdif.getCapability().getModelElement()).getGoals();
 			if(mgoals!=null)
@@ -359,7 +391,7 @@ public class APL
 						List<MGoal> mtrgoals = mtrigger.getGoals();
 						if(mtrgoals!=null && mtrgoals.contains(element.getModelElement()))
 						{
-							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal, element);
+							List<ICandidateInfo> cands = createMGoalCandidates(ia, mgoal, element);
 							goalprecandidates.addAll(cands);
 						}
 					}
@@ -368,7 +400,7 @@ public class APL
 						List<MServiceCall> msers = mtrigger.getServices();
 						if(msers!=null && msers.contains(element.getModelElement()))
 						{
-							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal, element);
+							List<ICandidateInfo> cands = createMGoalCandidates(ia, mgoal, element);
 							goalprecandidates.addAll(cands);
 						}
 					}
@@ -377,7 +409,7 @@ public class APL
 						List<MMessageEvent> msgs = mtrigger.getMessageEvents();
 						if(msgs!=null && msgs.contains(element.getModelElement()))
 						{
-							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal, element);
+							List<ICandidateInfo> cands = createMGoalCandidates(ia, mgoal, element);
 							goalprecandidates.addAll(cands);
 						}
 					}
@@ -386,7 +418,7 @@ public class APL
 						List<MInternalEvent> ievs = mtrigger.getInternalEvents();
 						if(ievs!=null && ievs.contains(element.getModelElement()))
 						{
-							List<MGoalInfo> cands = createMGoalCandidates(ia, mgoal, element);
+							List<ICandidateInfo> cands = createMGoalCandidates(ia, mgoal, element);
 							goalprecandidates.addAll(cands);
 						}
 					}
@@ -396,11 +428,11 @@ public class APL
 
 //		final CollectionResultListener<MPlan> lis = new CollectionResultListener<MPlan>(precandidates.size(), true, new IResultListener<Collection<MPlan>>()
 //		System.out.println("apl: "+(precandidates.size()+goalprecandidates.size()));
-		final CollectionResultListener<Object> lis = new CollectionResultListener<Object>(precandidates.size()+goalprecandidates.size(), true, new IResultListener<Collection<Object>>()
+		final CollectionResultListener<ICandidateInfo> lis = new CollectionResultListener<ICandidateInfo>(precandidates.size()+goalprecandidates.size(), true, new IResultListener<Collection<ICandidateInfo>>()
 		{
-			public void resultAvailable(Collection<Object> result) 
+			public void resultAvailable(Collection<ICandidateInfo> result) 
 			{
-				ret.setResult(new ArrayList<Object>(result));
+				ret.setResult(new ArrayList<ICandidateInfo>(result));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -409,12 +441,12 @@ public class APL
 		});
 		
 		// add all goal types as they do not have preconditions (until now)
-		for(final MGoalInfo mgoal: goalprecandidates)
+		for(final ICandidateInfo mgoal: goalprecandidates)
 		{
 			lis.resultAvailable(mgoal);
 		}
 		
-		for(final MPlanInfo mplan: precandidates)
+		for(final ICandidateInfo mplan: precandidates)
 		{
 			checkMPlan(ia, mplan, element).addResultListener(new IResultListener<Boolean>()
 			{
@@ -444,8 +476,10 @@ public class APL
 	 *  Test precondition (and match expression) of a plan to decide
 	 *  if it can be added to the candidates.
 	 */
-	public static IFuture<Boolean> checkMPlan(IInternalAccess ia, MPlanInfo mplaninfo, RProcessableElement element)
+	public static IFuture<Boolean> checkMPlan(IInternalAccess ia, ICandidateInfo cand, RProcessableElement element)
 	{
+		MPlanInfo mplaninfo = (MPlanInfo)cand.getRawCandidate();
+		
 		Future<Boolean> ret = new Future<Boolean>();
 		boolean	valid	= true;
 		MPlan mplan = mplaninfo.getMPlan();
@@ -523,7 +557,7 @@ public class APL
 				Object pojo = null;
 				if(!Modifier.isStatic(m.getModifiers()))
 				{
-					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia, mplaninfo.getBinding(), null);
+					RPlan rp = RPlan.createRPlan(mplan, cand, element, ia, mplaninfo.getBinding(), null);
 					pojo = rp.getBody().getBody();
 				}
 				
@@ -593,9 +627,9 @@ public class APL
 	 *  priority and the rank of the candidate.
 	 *  @return The next candidate.
 	 */
-	protected Object getNextCandidate(MCapability mcapa, IInternalAccess ia)
+	protected ICandidateInfo getNextCandidate(MCapability mcapa, IInternalAccess ia)
 	{
-		Object cand = null;
+		ICandidateInfo cand = null;
 		
 		MElement melem = element.getModelElement();
 		if(melem instanceof MGoal)
@@ -610,7 +644,7 @@ public class APL
 					m.setAccessible(true);
 					Collection<Object> col = new ArrayList<Object>();
 					col.add(getCandidates());
-					cand = m.invoke(element.getPojoElement(), BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), melem, null, null, element, col, ia));
+					cand = (ICandidateInfo)m.invoke(element.getPojoElement(), BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), melem, null, null, element, col, ia));
 				}
 				catch(Exception e)
 				{
@@ -628,12 +662,12 @@ public class APL
 			// first find the list of highest ranked candidates
 			// then choose one or more of them
 			
-			List<Object> finals = new ArrayList<Object>();
+			List<ICandidateInfo> finals = new ArrayList<ICandidateInfo>();
 			finals.add(candidates.get(0));
 			int candprio = getPriority(finals.get(0), mcapa);
 			for(int i=1; i<candidates.size(); i++)
 			{
-				Object tmp = candidates.get(i);
+				ICandidateInfo tmp = candidates.get(i);
 				int tmpprio = getPriority(tmp, mcapa);
 				if(tmpprio>candprio || (tmpprio == candprio && getRank(tmp)>getRank(finals.get(0))))
 				{
@@ -668,7 +702,7 @@ public class APL
 	 *  Get the candidates.
 	 *  @return The candidates
 	 */
-	public List<Object> getCandidates()
+	public List<ICandidateInfo> getCandidates()
 	{
 		return candidates==null? null: Collections.unmodifiableList(candidates);
 	}
@@ -677,34 +711,37 @@ public class APL
 	 *  Get the priority of a candidate.
 	 *  @return The priority of a candidate.
 	 */
-	protected static int getPriority(Object cand, MCapability mcapa)
+	protected static int getPriority(ICandidateInfo cand, MCapability mcapa)
 	{
-		MPlan mplan = null;
+//		MPlan mplan = null;
 //		if(cand instanceof RWaitqueuePlan)
 //		{
 //			Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.waitqueuecandidate_has_plan);
 //			mplan = state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
 //		}
-		if(cand instanceof RPlan)
-		{
-			mplan = (MPlan)((RPlan)cand).getModelElement();
-		}
-		else if(cand.getClass().isAnnotationPresent(Plan.class))
-		{
-			mplan = mcapa.getPlan(cand.getClass().getName());
-		}
-		else if(cand instanceof MPlan)
-		{
-			mplan = (MPlan)cand;
-		}
-		else if(cand instanceof MPlanInfo)
-		{
-			mplan = ((MPlanInfo)cand).getMPlan();
-		}
-//		else if(cand instanceof MGoal)
+		
+		MPlan mplan = cand.getMPlan();
+		
+//		if(cand instanceof RPlan)
 //		{
-//			mgoal = (MGoal)cand;
+//			mplan = (MPlan)((RPlan)cand).getModelElement();
 //		}
+//		else if(cand.getClass().isAnnotationPresent(Plan.class))
+//		{
+//			mplan = mcapa.getPlan(cand.getClass().getName());
+//		}
+//		else if(cand instanceof MPlan)
+//		{
+//			mplan = (MPlan)cand;
+//		}
+//		else if(cand instanceof MPlanInfo)
+//		{
+//			mplan = ((MPlanInfo)cand).getMPlan();
+//		}
+////		else if(cand instanceof MGoal)
+////		{
+////			mgoal = (MGoal)cand;
+////		}
 		
 		return mplan!=null? mplan.getPriority(): 0;
 	}
@@ -750,6 +787,11 @@ public class APL
 	{
 		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		ExcludeMode exclude = mpe.getExcludeMode();
+		
+		// always delete the rplan because the candidate can be reused
+		Object cand = rplan.getCandidate();
+		if(cand instanceof CandidateInfoMPlan)
+			((CandidateInfoMPlan)cand).removePlan();
 
 		// Do nothing if APL exclude is never
 		if(MProcessableElement.ExcludeMode.Never.equals(exclude))
@@ -764,9 +806,9 @@ public class APL
 	 *  Checks precondition and evaluates bindings (if any).
 	 *  @return List of plan info objects.
 	 */
-	public static List<MPlanInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan, RProcessableElement element)
+	public static List<ICandidateInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan, RProcessableElement element)
 	{
-		List<MPlanInfo> ret = new ArrayList<MPlanInfo>();
+		List<ICandidateInfo> ret = new ArrayList<ICandidateInfo>();
 		
 		List<Map<String, Object>> bindings = calculateBindingElements(agent, mplan, element);
 		
@@ -774,13 +816,13 @@ public class APL
 		{
 			for(Map<String, Object> binding: bindings)
 			{
-				ret.add(new MPlanInfo(mplan, binding));
+				ret.add(new CandidateInfoMPlan(new MPlanInfo(mplan, binding), element, agent));
 			}
 		}
 		// No binding: generate one candidate.
 		else
 		{
-			ret.add(new MPlanInfo(mplan, null));
+			ret.add(new CandidateInfoMPlan(new MPlanInfo(mplan, null), element, agent));
 		}
 		
 		return ret;
@@ -791,9 +833,9 @@ public class APL
 	 *  Checks precondition and evaluates bindings (if any).
 	 *  @return List of goal info objects.
 	 */
-	public static List<MGoalInfo> createMGoalCandidates(IInternalAccess agent, MGoal mgoal, RProcessableElement element)
+	public static List<ICandidateInfo> createMGoalCandidates(IInternalAccess agent, MGoal mgoal, RProcessableElement element)
 	{
-		List<MGoalInfo> ret = new ArrayList<MGoalInfo>();
+		List<ICandidateInfo> ret = new ArrayList<ICandidateInfo>();
 		
 		List<Map<String, Object>> bindings = calculateBindingElements(agent, mgoal, element);
 		
@@ -801,13 +843,13 @@ public class APL
 		{
 			for(Map<String, Object> binding: bindings)
 			{
-				ret.add(new MGoalInfo(mgoal, binding));
+				ret.add(new CandidateInfoMGoal(new MGoalInfo(mgoal, binding), element, agent));
 			}
 		}
 		// No binding: generate one candidate.
 		else
 		{
-			ret.add(new MGoalInfo(mgoal, null));
+			ret.add(new CandidateInfoMGoal(new MGoalInfo(mgoal, null), element, agent));
 		}
 		
 		return ret;
@@ -1026,6 +1068,372 @@ public class APL
 		public void setBinding(Map<String, Object> binding)
 		{
 			this.binding = binding;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CandidateInfoMPlan implements ICandidateInfo
+	{
+		/** The mplan info. */
+		protected MPlanInfo mplaninfo;
+		
+		/** The rplan. */
+		protected RPlan rplan;
+		
+		/** The element. */
+		protected RProcessableElement element;
+		
+		/** The agent. */
+		protected IInternalAccess agent;
+
+		/**
+		 * 
+		 * @param mplaninfo
+		 * @param element
+		 */
+		public CandidateInfoMPlan(MPlanInfo mplaninfo, RProcessableElement element, IInternalAccess agent)
+		{
+			this.mplaninfo = mplaninfo;
+			this.element = element;
+			this.agent = agent;
+		}
+
+		/**
+		 *  Get the plan instance.
+		 *  @return	The plan instance.
+		 */
+		public IInternalPlan getPlan()
+		{
+			if(rplan!=null)
+				System.out.println("access");
+			
+			if(rplan==null)
+				rplan = RPlan.createRPlan(getMPlan(), this, element, agent, mplaninfo.getBinding(), null);
+			return rplan;
+		}
+
+		/**
+		 *  Get the element this 
+		 *  candidate was selected for.
+		 *  @return	The processable element.
+		 */
+		public IElement getElement()
+		{
+			return element;
+		}
+		
+		/**
+		 *  Get the raw candidate.
+		 *  @return The raw candiate.
+		 */
+		public Object getRawCandidate()
+		{
+			return mplaninfo;
+		}
+		
+		/**
+		 *  Get the plan model element.
+		 *  @return The plan model element.
+		 */
+		public MPlan getMPlan()
+		{
+			return mplaninfo.getMPlan();
+		}
+		
+		/**
+		 *  Remove the rplan.
+		 */
+		public void removePlan()
+		{
+			this.rplan = null;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CandidateInfoPojoPlan implements ICandidateInfo
+	{
+		/** The mplan info. */
+		protected Object pojo;
+		
+		/** The rplan. */
+		private RPlan rplan;
+		
+		/** The mplan. */
+		protected MPlan mplan;
+		
+		/** The element. */
+		protected RProcessableElement element;
+		
+		/** The agent. */
+		protected IInternalAccess agent;
+
+		/**
+		 * @param mplaninfo
+		 * @param element
+		 */
+		public CandidateInfoPojoPlan(Object pojo, RProcessableElement element, IInternalAccess agent)
+		{
+			this.pojo = pojo;
+			this.element = element;
+			this.agent = agent;
+			
+			MCapability	mcapa = (MCapability)agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
+			this.mplan = mcapa.getPlan(pojo.getClass().getName());
+		}
+
+		/**
+		 *  Get the plan instance.
+		 *  @return	The plan instance.
+		 */
+		public IInternalPlan getPlan()
+		{
+			if(rplan!=null)
+				System.out.println("access: "+this);
+			
+			if(rplan==null)
+				rplan = RPlan.createRPlan(getMPlan(), this, element, agent, null, null);
+			return rplan;
+		}
+
+		/**
+		 *  Get the element this 
+		 *  candidate was selected for.
+		 *  @return	The processable element.
+		 */
+		public IElement getElement()
+		{
+			return element;
+		}
+		
+		/**
+		 *  Get the raw candidate.
+		 *  @return The raw candiate.
+		 */
+		public Object getRawCandidate()
+		{
+			return pojo;
+		}
+		
+		/**
+		 *  Get the plan model element.
+		 *  @return The plan model element.
+		 */
+		public MPlan getMPlan()
+		{
+			return mplan;
+		}
+		
+		/**
+		 *  Remove the rplan.
+		 */
+		public void removePlan()
+		{
+			this.rplan = null;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CandidateInfoMGoal implements ICandidateInfo
+	{
+		/** The mplan info. */
+		protected MGoalInfo mgoalinfo;
+		
+		/** The element. */
+		protected RProcessableElement element;
+
+		/** The agent. */
+		protected IInternalAccess agent;
+		
+		/** The goal (treated as plan). */
+		protected RGoal rgoal;
+		
+		/**
+		 * 
+		 * @param mplaninfo
+		 * @param element
+		 */
+		public CandidateInfoMGoal(MGoalInfo mgoalinfo, RProcessableElement element, IInternalAccess agent)
+		{
+			this.mgoalinfo = mgoalinfo;
+			this.element = element;
+			this.agent = agent;
+		}
+
+		/**
+		 *  Get the plan instance.
+		 *  @return	The plan instance.
+		 */
+		public IInternalPlan getPlan()
+		{
+			if(rgoal!=null)
+				System.out.println("access");
+			
+			RProcessableElement pae = (RProcessableElement)element;
+			RGoal pagoal = pae instanceof RGoal? (RGoal)pae: null;
+			Object pgoal = mgoalinfo.getMGoal().createPojoInstance(agent, pagoal);
+			rgoal = new RGoal(agent, mgoalinfo.getMGoal(), pgoal, pagoal, mgoalinfo.getBinding(), null, this);
+			return rgoal;
+		}
+
+		/**
+		 *  Get the element this 
+		 *  candidate was selected for.
+		 *  @return	The processable element.
+		 */
+		public IElement getElement()
+		{
+			return element;
+		}
+		
+		/**
+		 *  Get the raw candidate.
+		 *  @return The raw candiate.
+		 */
+		public Object getRawCandidate()
+		{
+			return mgoalinfo;
+		}
+		
+		/**
+		 *  Get the plan model element.
+		 *  @return The plan model element.
+		 */
+		public MPlan getMPlan()
+		{
+			return null;
+		}
+		
+		/**
+		 *  Remove the rplan.
+		 */
+		public void removePlan()
+		{
+			this.rgoal = null;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CandidateInfoRPlan implements ICandidateInfo
+	{
+		/** The mplan info. */
+		protected RPlan rplan;;
+		
+		/** The element. */
+		protected RProcessableElement element;
+		
+		/**
+		 * @param rplan
+		 * @param element
+		 */
+		public CandidateInfoRPlan(RPlan rplan, RProcessableElement element)
+		{
+			this.rplan = rplan;
+			this.element = element;
+		}
+
+		/**
+		 *  Get the plan instance.
+		 *  @return	The plan instance.
+		 */
+		public IInternalPlan getPlan()
+		{
+			return rplan;
+		}
+
+		/**
+		 *  Get the element this 
+		 *  candidate was selected for.
+		 *  @return	The processable element.
+		 */
+		public IElement getElement()
+		{
+			return element;
+		}
+		
+		/**
+		 *  Get the raw candidate.
+		 *  @return The raw candiate.
+		 */
+		public Object getRawCandidate()
+		{
+			return rplan;
+		}
+		
+		/**
+		 *  Get the plan model element.
+		 *  @return The plan model element.
+		 */
+		public MPlan getMPlan()
+		{
+			return (MPlan)rplan.getModelElement();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CandidateInfoWaitqueue implements ICandidateInfo
+	{
+		/** The mplan info. */
+		protected RPlan rplan;;
+		
+		/** The element. */
+		protected RProcessableElement element;
+		
+		/**
+		 * @param rplan
+		 * @param element
+		 */
+		public CandidateInfoWaitqueue(RPlan rplan, RProcessableElement element)
+		{
+			this.rplan = rplan;
+			this.element = element;
+		}
+
+		/**
+		 *  Get the plan instance.
+		 *  @return	The plan instance.
+		 */
+		public IInternalPlan getPlan()
+		{
+			return rplan;
+		}
+
+		/**
+		 *  Get the element this 
+		 *  candidate was selected for.
+		 *  @return	The processable element.
+		 */
+		public IElement getElement()
+		{
+			return element;
+		}
+		
+		/**
+		 *  Get the raw candidate.
+		 *  @return The raw candiate.
+		 */
+		public Object getRawCandidate()
+		{
+			return rplan.getWaitqueue();
+		}
+		
+		/**
+		 *  Get the plan model element.
+		 *  @return The plan model element.
+		 */
+		public MPlan getMPlan()
+		{
+			return (MPlan)rplan.getModelElement();
 		}
 	}
 }

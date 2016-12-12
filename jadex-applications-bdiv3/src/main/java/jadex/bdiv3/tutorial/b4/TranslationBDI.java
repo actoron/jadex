@@ -62,7 +62,7 @@ public class TranslationBDI
 	{
 		try
 		{
-			bdi.adoptPlan(new TranslatePlan("dog")).get();
+			System.out.println(bdi.adoptPlan(new TranslatePlan("dog")).get());
 		}
 		catch(Exception e)
 		{
@@ -97,8 +97,8 @@ public class TranslationBDI
 		@PlanBody
 		public String translateEnglishGerman()
 		{
-			throw new PlanFailureException();
-//			return wordtable.get(gword);
+//			throw new PlanFailureException();
+			return wordtable.get(gword);
 		}
 		
 		/**

@@ -36,6 +36,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.EasyDeliberationStrategy;
 import jadex.bdiv3.runtime.IDeliberationStrategy;
 import jadex.bdiv3.runtime.impl.APL;
+import jadex.bdiv3.runtime.impl.APL.CandidateInfoMPlan;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3.runtime.impl.RCapability;
@@ -45,6 +46,7 @@ import jadex.bdiv3.runtime.impl.RParameterElement.RParameterSet;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.RInternalEvent;
@@ -380,14 +382,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						for(Map<String, Object> binding: bindings)
 						{
-							RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null, cplan);
+							RPlan rplan = RPlan.createRPlan(mplan, new CandidateInfoMPlan(new MPlanInfo(mplan, binding), null, component), null, component, null, cplan);
 							barrier.addFuture(RPlan.executePlan(rplan, component));
 						}
 					}
 					// No binding: generate one candidate.
 					else
 					{
-						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null, cplan);
+						RPlan rplan = RPlan.createRPlan(mplan, new CandidateInfoMPlan(new MPlanInfo(mplan, null), null, component), null, component, null, cplan);
 						barrier.addFuture(RPlan.executePlan(rplan, component));
 					}
 				}
@@ -540,14 +542,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						{
 							for(Map<String, Object> binding: bindings)
 							{
-								RGoal rgoal = new RGoal(component, mgoal, null, null, binding, cgoal);
+								RGoal rgoal = new RGoal(component, mgoal, null, null, binding, cgoal, null);
 								barrier.addFuture(dispatchTopLevelGoal(rgoal));//.addResultListener(goallis);
 							}
 						}
 						// No binding: generate one candidate.
 						else
 						{
-							RGoal rgoal = new RGoal(component, mgoal, goal, null, null, cgoal);
+							RGoal rgoal = new RGoal(component, mgoal, goal, null, null, cgoal, null);
 							barrier.addFuture(dispatchTopLevelGoal(rgoal));//.addResultListener(goallis);
 						}
 					}
@@ -1161,14 +1163,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									{
 										for(Map<String, Object> binding: bindings)
 										{
-											RGoal rgoal = new RGoal(component, mgoal, null, null, binding, null);
+											RGoal rgoal = new RGoal(component, mgoal, null, null, binding, null, null);
 											dispatchTopLevelGoal(rgoal).addResultListener(goallis);
 										}
 									}
 									// No binding: generate one candidate.
 									else
 									{
-										RGoal rgoal = new RGoal(component, mgoal, null, null, null, null);
+										RGoal rgoal = new RGoal(component, mgoal, null, null, null, null, null);
 										dispatchTopLevelGoal(rgoal).addResultListener(goallis);
 									}
 									
@@ -1613,17 +1615,17 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					public IFuture<Void> execute(final IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						// Create all binding plans
-						List<MPlanInfo> cands = APL.createMPlanCandidates(component, mplan, null);
+						List<ICandidateInfo> cands = APL.createMPlanCandidates(component, mplan, null);
 
-						final CollectionResultListener<MPlanInfo> lis = new CollectionResultListener<MPlanInfo>(cands.size(), 
-							new IResultListener<Collection<MPlanInfo>>()
+						final CollectionResultListener<ICandidateInfo> lis = new CollectionResultListener<ICandidateInfo>(cands.size(), 
+							new IResultListener<Collection<ICandidateInfo>>()
 						{
-							public void resultAvailable(final Collection<MPlanInfo> result)
+							public void resultAvailable(final Collection<ICandidateInfo> result)
 							{
-								for(MPlanInfo mplaninfo: result)
+								for(ICandidateInfo ci: result)
 								{
 //									System.out.println("Create plan 1: "+mplan);
-									RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, mplaninfo.getBinding(), null);
+									RPlan rplan = RPlan.createRPlan(mplan, new CandidateInfoMPlan(new MPlanInfo(mplan, null), null, component), new ChangeEvent(event), component, ((MPlanInfo)ci.getRawCandidate()).getBinding(), null);
 //									System.out.println("Create plan 2: "+mplan);
 									RPlan.executePlan(rplan, component);
 								}
@@ -1634,16 +1636,16 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							}
 						});
 						
-						for(final MPlanInfo mplan: cands)
+						for(final ICandidateInfo cand: cands)
 						{
 							// check precondition
-							APL.checkMPlan(component, mplan, null).addResultListener(new IResultListener<Boolean>()
+							APL.checkMPlan(component, cand, null).addResultListener(new IResultListener<Boolean>()
 							{
 								public void resultAvailable(Boolean result)
 								{
 									if(result.booleanValue())
 									{
-										lis.resultAvailable(mplan);
+										lis.resultAvailable(cand);
 									}
 									else
 									{

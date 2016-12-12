@@ -21,7 +21,7 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 	 */
 	public void suspend(Future<?> future, long timeout, boolean realtime)
 	{
-		if(timeout==-2)//Timeout.UNSET)
+		if(timeout==Future.UNSET)
 			timeout = getDefaultTimeout();
 		
 		synchronized(this)
