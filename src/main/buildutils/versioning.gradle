@@ -37,7 +37,7 @@ class VersionLoader {
     }
 }
 
-if (binding.variables.containsKey("project")) {
+if (binding.variables.get("project")) {
     // check if running inside gradle
     if (project.hasProperty('workspaceRootDir')) {
         VersionLoader.workspaceRootDir = ext.workspaceRootDir

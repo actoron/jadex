@@ -37,6 +37,7 @@ stage('preparation') {
     nodeWithVersion(versionSuffix) {
         sh "./gradlew createVersionInfo"
         def versioning = load 'src/main/buildutils/versioning.gradle'
+        print "getVersion"
         def myVersion = versioning.VersionLoader.getVersion()
         println myVersion
 
