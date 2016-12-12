@@ -31,11 +31,12 @@ stage('preparation') {
         // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
         versionSuffix = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
         echo "version suffix:" + versionSuffix
+    }
 
-        // for testing, tag here:
-
+    // TODO for testing, tag here:
+    nodeWithVersion(versionSuffix) {
         sh "./gradlew createVersionInfo"
-        def versioning = load '${rootDir}/src/main/buildutils/versioning.gradle'
+        def versioning = load 'src/main/buildutils/versioning.gradle'
         println versioning.version
 
         def props = readProperties([file: 'build/jadexversion.properties'])
