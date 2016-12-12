@@ -29,7 +29,10 @@ stage('preparation') {
         // for testing, tag here:
 
         sh "./gradlew createVersionInfo"
-        jadexVersion = sh (script: "cat build/jadexversion.properties", returnStdout: true).trim()
+        jadexVersion = readProperties([file: 'build/jadexversion.properties']).jadexversion
+//        readProperties([file: 'build/jadexversion.properties']).jadexversion_major
+//        readProperties([file: 'build/jadexversion.properties']).jadexversion_minor
+//        readProperties([file: 'build/jadexversion.properties']).jadexversion_patch
         println "building version: ${jadexVersion}"
         def branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
 //        println "On branch: ${env.BRANCH_NAME}"
