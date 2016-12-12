@@ -41,7 +41,7 @@ buildscript
     {
         //mavenLocal()
         mavenCentral()
-        //jcenter()
+        jcenter() // for current android build tools 2.2.2
     }
     
     dependencies
@@ -81,7 +81,6 @@ allprojects
 	    {
 			mavenLocal()
 	    	mavenCentral()
-			maven { url "https://jcenter.bintray.com" }
 	        maven { url "http://nexus.actoron.com/content/repositories/oss-nightlies/"}
 	    }
 	}
