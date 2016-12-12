@@ -34,8 +34,8 @@ stage('preparation') {
         def branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
 //        println "On branch: ${env.BRANCH_NAME}"
         println "On branch: ${branchName}"
-        sh "git tag -a ${jadexVersion} -m \"build version ${completeVersion}\""
-//        sh "git push ${completeVersion}" // TODO uncomment for push tag
+        sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
+//        sh "git push ${jadexVersion}" // TODO uncomment for push tag
     }
 
     nodeWithVersion(versionSuffix) {
