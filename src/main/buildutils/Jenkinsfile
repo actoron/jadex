@@ -213,8 +213,8 @@ def revertVersion(failedVersion) {
     if (!revertedVersion) {
         Integer oldNumber = (failedVersion as Integer) -1;
         echo "resetting version from ${failedVersion} to ${oldNumber}"
-        oldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
-        echo "resetted version to: ${oldNumber}"
+        def generatedOldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
+        echo "resetted version to: ${generatedOldNumber}"
         revertedVersion = true
     }
 }
