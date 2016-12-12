@@ -122,7 +122,8 @@ stage ('publish and deploy') {
                 nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'compiled'
-                    sh './gradlew -Pdist=publishdists build' + defaultGradleArgs // TODO: add uploadArchives here
+                    // testing already done
+                    sh './gradlew -Pdist=publishdists build -x test' + defaultGradleArgs // TODO: add uploadArchives here
                     print "On branch: ${env.BRANCH_NAME}"
                     // TODO move tagging here
                 }
