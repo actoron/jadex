@@ -1,6 +1,6 @@
 //ext.buildTimestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
 
-class VersionLoader {
+public class VersionLoader {
 
     private static ProjectVersion version
 
@@ -37,20 +37,7 @@ class VersionLoader {
     }
 }
 
-def mProject = binding.variables.get("project");
-
-if (mProject) {
-    // check if running inside gradle
-    if (mProject.hasProperty('workspaceRootDir')) {
-        VersionLoader.workspaceRootDir = ext.workspaceRootDir
-    }
-
-    version = VersionLoader.getVersion(mProject.rootProject.rootDir)
-    mProject.ext.jadex_build_version = version.toString()
-}
-
-
-class ProjectVersion {
+public class ProjectVersion {
     public final Integer major
     public final Integer minor
     public final String patch

@@ -54,6 +54,14 @@ allprojects
 {
 	apply from: "$rootDir/src/main/buildutils/versioning.gradle"
 
+	// TODO:
+	if (project.hasProperty('workspaceRootDir')) {
+		VersionLoader.workspaceRootDir = ext.workspaceRootDir
+	}
+
+	version = VersionLoader.getVersion(mProject.rootProject.rootDir)
+	project.ext.jadex_build_version = version.toString()
+
     if(isCommercial(project))
     {
 	    group = 'com.actoron.jadex'
