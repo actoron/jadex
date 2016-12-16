@@ -202,9 +202,10 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 							return ret;
 						}
 						
-						for(Object c: allcands)
+						for(ICandidateInfo c: allcands)
 						{
-							if(!c.equals(cand))// && c instanceof MPlanInfo)
+							// avoid recursion by adding metagoal as candidate again
+							if(!c.equals(cand) && !c.getModelElement().equals(mgoal))// && c instanceof MPlanInfo)
 							{
 //								MPlanInfo pi = (MPlanInfo)c;
 //								final RPlan rplan = RPlan.createRPlan(pi.getMPlan(), c, element, ia, pi.getBinding(), null);

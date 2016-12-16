@@ -47,7 +47,7 @@ public class BDITest	extends	ComponentTestSuite
 //						"ServiceCallReasoning",
 			"3d",	// OpenGL problems on termination?
 			"ErrorMessages",
-			"MLRRetry", //broken
+			//"MLRRetry", //broken
 			
 			SReflect.isAndroid() ? "GUICloser" : NOEXCLUDE
 		};
