@@ -224,3 +224,9 @@ extAcc.scheduleStep(iAccess -> {
     return Future.DONE;
 });
 ```
+
+<x-hint title="Component Steps and Instance Methods">
+If you schedule a step on a remote component, Jadex will send the step instance to the remote platform, where they are re-instantiated. While normal inner classes have access to their surrounding instance, component steps do not! Be sure to only call static methods from inside a component step.
+</x-hint>
+
+
