@@ -504,8 +504,12 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 					/** Flag if published at least once. */
 					protected boolean published = false;
 					
+					/** Flag if finished. */
+					protected boolean finished = false;
+					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 					}
 
 					public void resultAvailable(
@@ -528,14 +532,18 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 							
 							public void exceptionOccurred(Exception exception)
 							{
+								if (finished && !published)
+								{
+									getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier());
+									ret.setException(exception);
+								}
 							}
 						});
 					}
 
 					public void finished()
 					{
-						if (!published)
-							getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier());
+						finished = true;
 					}
 				});
 //				SServiceProvider.getServices(getComponent(), IPublishService.class, pi.getPublishScope()).addResultListener(new IResultListener<Collection<IPublishService>>()
