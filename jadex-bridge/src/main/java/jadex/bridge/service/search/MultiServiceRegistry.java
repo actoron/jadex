@@ -81,7 +81,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	
 	/**
 	 *  Add a service to the registry.
-	 *  @param sid The service id.
+	 *  @param service The IService.
 	 */
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
@@ -91,7 +91,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	
 	/**
 	 *  Remove a service from the registry.
-	 *  @param sid The service id.
+	 *  @param service The IService.
 	 */
 	public void removeService(ClassInfo key, IService service)
 	{
@@ -101,7 +101,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	
 	/**
 	 *  Add an excluded component. 
-	 *  @param The component identifier.
+	 *  @param cid The component identifier.
 	 */
 	public void addExcludedComponent(IComponentIdentifier cid)
 	{
@@ -111,7 +111,7 @@ public class MultiServiceRegistry implements IServiceRegistry, IRegistryDataProv
 	
 	/**
 	 *  Remove an excluded component. 
-	 *  @param The component identifier.
+	 *  @param cid The component identifier.
 	 */
 	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
 	{

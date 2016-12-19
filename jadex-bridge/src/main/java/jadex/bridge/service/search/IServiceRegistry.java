@@ -38,14 +38,14 @@ public interface IServiceRegistry
 
 	/**
 	 *  Add a service to the registry.
-	 *  @param sid The service id.
+	 *  @param service The IService.
 	 */
 	// write
 	public IFuture<Void> addService(ClassInfo key, IService service);
 	
 	/**
 	 *  Remove a service from the registry.
-	 *  @param sid The service id.
+	 *  @param service The IService.
 	 */
 	// write
 	public void removeService(ClassInfo key, IService service);
@@ -133,14 +133,14 @@ public interface IServiceRegistry
 	
 	/**
 	 *  Add an excluded component. 
-	 *  @param The component identifier.
+	 *  @param cid The component identifier.
 	 */
 	// write
 	public void addExcludedComponent(IComponentIdentifier cid);
 	
 	/**
 	 *  Remove an excluded component. 
-	 *  @param The component identifier.
+	 *  @param cid The component identifier.
 	 */
 	// write
 	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid);
