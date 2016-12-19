@@ -275,7 +275,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		Tuple2<PathHandler, URI> tup = sidservers.get(sid);
 		if(tup!=null)
 		{
-			tup.getFirstEntity().removeSubhandler(null, tup.getSecondEntity().toString());
+			tup.getFirstEntity().removeSubhandler(null, tup.getSecondEntity().getPath());
 		}
 		return IFuture.DONE;
 	}
