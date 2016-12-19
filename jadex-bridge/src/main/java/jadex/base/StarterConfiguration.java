@@ -561,73 +561,7 @@ public class StarterConfiguration implements IStarterConfiguration {
         }
     }
 
-    /**
-     *  Parse an argument.
-     *  @param key The key.
-     *  @param stringValue The value.
-     */
-    public void parseArg(String key, String stringValue, Object value)
-    {
-        if(COMPONENT.equals(key))
-        {
-            addComponent((String) stringValue);
-        }
-        else if(DEBUGFUTURES.equals(key) && "true".equals(stringValue))
-        {
-            setDebugFutures(true);
-        }
-        else if(DEBUGSERVICES.equals(key) && "true".equals(stringValue))
-        {
-            setDebugServices(true);
-        }
-        else if(DEBUGSTEPS.equals(key) && "true".equals(stringValue))
-        {
-            setDebugSteps(true);
-        }
-        else if(DEFTIMEOUT.equals(key))
-        {
-        	value = SJavaParser.evaluateExpression(stringValue, null);
-//			BasicService.DEFTIMEOUT	= ((Number)stringValue).longValue();
-            long to	= ((Number)value).longValue();
-//			setLocalDefaultTimeout(platform, to);
-//			setRemoteDefaultTimeout(platform, to);
-            setDefaultTimeout(to);
 
-//			BasicService.setRemoteDefaultTimeout(to);
-//			BasicService.setLocalDefaultTimeout(to);
-//			System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
-        }
-        else if(NOSTACKCOMPACTION.equals(key) && "true".equals(stringValue))
-        {
-            setNoStackCompaction(true);
-        }
-        else if(OPENGL.equals(key) && "false".equals(stringValue))
-        {
-            setOpenGl(false);
-        }
-        else if(MONITORING.equals(key))
-        {
-            Object tmpmoni = getValue(StarterConfiguration.MONITORING);
-            IMonitoringService.PublishEventLevel moni = IMonitoringService.PublishEventLevel.OFF;
-            if(tmpmoni instanceof Boolean)
-            {
-                moni = ((Boolean)tmpmoni).booleanValue()? IMonitoringService.PublishEventLevel.FINE: IMonitoringService.PublishEventLevel.OFF;
-            }
-            else if(tmpmoni instanceof String)
-            {
-                moni = IMonitoringService.PublishEventLevel.valueOf((String)tmpmoni);
-            }
-            else if(tmpmoni instanceof IMonitoringService.PublishEventLevel)
-            {
-                moni = (IMonitoringService.PublishEventLevel)tmpmoni;
-            }
-            setMonitoring(moni);
-        }
-        else
-        {
-            setValue(key, value);
-        }
-    }
 
     /**
      * Checks this configuration for consistency errors.

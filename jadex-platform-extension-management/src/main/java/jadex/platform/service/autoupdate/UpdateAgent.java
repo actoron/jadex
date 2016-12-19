@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -55,6 +56,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.XMLWriterFactory;
+import javafx.application.Platform;
 
 
 /**
@@ -455,7 +457,10 @@ public class UpdateAgent implements IUpdateService
 		
 //		Starter.createPlatform(new String[]{"-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
 //		Starter.createPlatform(new String[]{"-deftimeout", "-1", "-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
-		Starter.createPlatform(new String[]{"-maven_dependencies", "false", "-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
+		PlatformConfiguration config = new PlatformConfiguration();
+		config.setMavenDependencies(false);
+		config.addComponent("jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")");
+		Starter.createPlatform(config)
 			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)

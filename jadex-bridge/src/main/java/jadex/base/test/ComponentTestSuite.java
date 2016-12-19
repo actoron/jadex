@@ -23,6 +23,7 @@ import java.util.zip.ZipFile;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
@@ -53,37 +54,41 @@ import junit.framework.TestSuite;
 public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 {
 	//-------- constants --------
-	
+
 	/**
-	 *  The default test platform arguments.
+	 *  The default test platform configuration.
 	 */
-	public static final String[]	DEFARGS	= new String[]
-	{
-		"-platformname", "testcases_*",
-//		"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
-		"-simulation", "true",
-		"-asyncexecution", "true",
-//		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
+	public static final PlatformConfiguration DEFCONFIG = new PlatformConfiguration();
+	static {
+		DEFCONFIG.setPlatformName("testcases_*");
+		DEFCONFIG.setSimulation(true);
+		DEFCONFIG.setAsyncExecution(true);
+		DEFCONFIG.setGui(false);
+		DEFCONFIG.setAwareness(false);
+		DEFCONFIG.setSaveOnExit(false);
+		DEFCONFIG.setWelcome(false);
+		DEFCONFIG.setAutoShutdown(false);
+		DEFCONFIG.setOpenGl(false);
+		DEFCONFIG.setCliConsole(false);
+		DEFCONFIG.setPrintPass(false);
+		//		"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
+
+
+		//		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
 //		"-logging", "true",
 //		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 //		"-logging_level", "java.util.logging.Level.WARNING",
 //		"-debugfutures", "true",
 //		"-nostackcompaction", "true",
-		"-gui", "false",
-		"-awareness", "false",
-		"-saveonexit", "false",
-		"-welcome", "false",
-		"-autoshutdown", "false",
-		"-opengl", "false",
-		"-cli", "false",
-//		"-persist", "true", // for testing persistence
+
+		//		"-persist", "true", // for testing persistence
 //		"-niotcptransport", "false",
 //		"-tcptransport", "true",
 //		"-deftimeout", "-1",
-		"-printpass", "false",
+
 		// Hack!!! include ssl transport if available
-		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
-	};
+		DEFCONFIG.setSslTcpTransport(SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? true : false);
+	}
 
 	//-------- attributes --------
 	
@@ -167,7 +172,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	 */
 	public ComponentTestSuite(File[][] roots, String[] tests, String[] excludes, boolean test, boolean load, boolean start) throws Exception
 	{
-		this(DEFARGS, roots, tests, excludes, test, load, start);
+		this(DEFCONFIG, roots, tests, excludes, test, load, start);
 	}
 	
 	protected void startTimer()
@@ -206,7 +211,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 	/**
 	 * Create a component test suite for components contained in a given path.
-	 * @param args	The platform arguments.
+	 * @param config	The platform configuration.
      * @param roots The paths to search for testcases in and to load classes from.
 	 *              Grouped by project, e.g. proj1/build/classes and proj1/build/resources
 	 *              should be both at index [0] of this array.
@@ -216,7 +221,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	 * @param load	Include broken components (will cause test failure if any).
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File[][] roots, String[] tests, String[] excludes, final boolean runtests, final boolean load, final boolean start) throws Exception
+	public ComponentTestSuite(PlatformConfiguration config, File[][] roots, String[] tests, String[] excludes, final boolean runtests, final boolean load, final boolean start) throws Exception
 	{
 		super(roots[0][0].toString());
 		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
@@ -231,7 +236,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		// Tests must be available after constructor execution.
 
 //		System.out.println("start platform");
-		platform	= Starter.createPlatform(args).get();
+		platform	= Starter.createPlatform(config).get();
 		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();

@@ -3,6 +3,7 @@ package jadex.base;
 import java.applet.Applet;
 import java.util.StringTokenizer;
 
+import jadex.CLIStarter;
 import jadex.commons.gui.BrowserLauncher2;
 
 /**
@@ -32,7 +33,7 @@ public class PlatformApplet extends Applet
 		
 		try
 		{
-			Starter.main(args);
+			CLIStarter.main(args);
 		}
 		catch(Exception e)
 		{

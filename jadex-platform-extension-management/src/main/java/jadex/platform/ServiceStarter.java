@@ -4,6 +4,7 @@ import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
 
+import jadex.CLIStarter;
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
@@ -165,8 +166,8 @@ public class ServiceStarter implements Daemon
 		{
 			PlatformConfiguration	config	= getConfig();
 			config.setProgramArguments(args);
-			config.parseArgs(args);
-			
+			CLIStarter.parseArgs(args, config);
+
 			platform = Starter.createPlatform(config).get();
 		}		
 	}

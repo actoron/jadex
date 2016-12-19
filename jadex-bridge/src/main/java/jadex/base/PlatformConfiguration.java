@@ -30,9 +30,9 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 		super(config);
 	}
 
-	public PlatformConfiguration(String[] args) {
-		super(args);
-	}
+//	public PlatformConfiguration(String[] args) {
+//		super(args);
+//	}
 
 	public PlatformConfiguration() {
 	}

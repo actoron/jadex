@@ -4,6 +4,7 @@ dependencies
 {
 	compile project(':jadex-bridge')
 	compile project(':jadex-commons:jadex-commons-gui')
+	compile project(':jadex-platform-standalone-cli') // for PlatformApplet
 	compile project(':jadex-tools-base')
 	compile project(':jadex-xml')
 }

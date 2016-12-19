@@ -130,15 +130,6 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	}
 	
 	/**
-	 * Sets platform options.
-	 * @param options
-	 * @deprecated use setPlatformConfiguration
-	 */
-	protected void setPlatformOptions(String options) {
-		this.platformConfiguration.enhanceWith(PlatformConfiguration.processArgs(options));
-	}
-	
-	/**
 	 * Sets the name of the platform that is started by this activity.
 	 * @param name
 	 * @deprecated use getPlatformConfiguration().setPlatformName() instead.
