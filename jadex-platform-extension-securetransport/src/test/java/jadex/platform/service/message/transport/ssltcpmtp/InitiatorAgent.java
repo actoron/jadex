@@ -248,9 +248,7 @@ public class InitiatorAgent extends TestAgent
 						}
 						else
 						{
-//							tr.setFailed("Sec transport did not work");
-							//test disabled, need build
-							tr.setSucceeded(true);
+							tr.setFailed("Sec transport did not work");
 						}
 						ret.setResult(tr);
 					}
