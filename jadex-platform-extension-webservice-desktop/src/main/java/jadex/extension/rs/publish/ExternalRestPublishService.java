@@ -213,7 +213,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 			};
 			if (ph.containsSubhandlerForExactUri(null, uri.getPath()))
 			{
-				System.out.println("The URL "+uri.getPath() + " is already published, unpublishing...");
+//				System.out.println("The URL "+uri.getPath() + " is already published, unpublishing...");
 				component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
 				ph.removeSubhandler(null, uri.getPath());
 			}
