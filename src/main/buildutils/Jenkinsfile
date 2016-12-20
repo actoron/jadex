@@ -32,10 +32,8 @@ stage('preparation') {
 //        versionSuffix = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', skipFailedBuilds: true])
 
         def result = build job: 'pipeline-generate-version-master'
-        println result
-        println result.getNumber()
-        versionSuffix = result.getBuildVariables().get('PATCH_VERSION');
-
+        // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
+        versionSuffix = result.rawBuild.environment.PATCH_VERSION;
 
         echo "version suffix:" + versionSuffix
     }
