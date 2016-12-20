@@ -1,7 +1,7 @@
 // configure here:
-performancetests = true;
-deployDists = true;
-publishArtifacts = true;
+//performanceTests = true;
+//deployDists = true;
+//publishArtifacts = true;
 
 defaultGradleArgs = " --info --stacktrace"
 
@@ -37,10 +37,12 @@ stage('preparation') {
         if ("master".equals(branchName)) {
             // generate version continuously
             versionSuffix = result.rawBuild.environment.PATCH_VERSION;
+            currentBuild.description = "build in master branch"
         }
         else {
             // so we append something to our version. but what?
             versionSuffix = "${result.rawBuild.environment.PATCH_VERSION}${branchName}"
+            currentBuild.description = "build in branch: ${branchName}"
         }
 
         echo "version suffix:" + versionSuffix
@@ -56,6 +58,7 @@ stage('preparation') {
         patch = props.jadexVersion_patch
 
         println "building version: ${jadexVersion}"
+        currentBuild.displayName = "${jadexVersion}"
 
         sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
 //        sh "git push ${jadexVersion}" // TODO uncomment for push tag
@@ -191,7 +194,7 @@ stage ('publish and deploy') {
     )
 }
 
-if (performancetests) {
+if (performanceTests) {
     stage ('performancetests') {
         nodeWithVersion(versionSuffix) {
             deleteDir()
