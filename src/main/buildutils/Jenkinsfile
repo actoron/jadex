@@ -33,7 +33,8 @@ stage('preparation') {
 
         def result = build job: 'pipeline-generate-version-master'
         println result
-        versionSuffix = result.environment.get.PATCH_VERSION
+        println result.getNumber()
+        versionSuffix = result.getBuildVariables().get('PATCH_VERSION');
 
 
         echo "version suffix:" + versionSuffix
