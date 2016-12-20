@@ -82,7 +82,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(new String[]{"-ssltcptransport", "true", "-logging", "false"}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		createPlatform(new String[]{"-ssltcptransport", "true", "-logging", "false", "-relaytransport", "false"}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -126,7 +126,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(new String[]{"-ssltcptransport", "false", "-logging", "false"}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		createPlatform(new String[]{"-ssltcptransport", "false", "-logging", "false", "-relaytransport", "false"}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
