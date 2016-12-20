@@ -240,7 +240,7 @@ Boolean revertedVersion = false
 
 def revertVersion(failedVersion) {
     if (!revertedVersion) {
-        Integer oldNumber = (failedVersion as Integer) -1;
+        Integer oldNumber = (failedVersion as Integer) -2;
         echo "reverting version from ${failedVersion} to ${oldNumber}"
         def generatedOldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
         echo "reverted version to: ${generatedOldNumber}"
