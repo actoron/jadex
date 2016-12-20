@@ -69,10 +69,10 @@ public class RSBankingService
 		
 		UriBuilder ub = uriinfo.getBaseUriBuilder();
 		ub.path("getAccountStatement");
-		String req = ub.build(null).toString();
+		String req = ub.build().toString();
 		ub = uriinfo.getBaseUriBuilder();
 		ub.path("addTransaction");
-		String add = ub.build(null).toString();
+		String add = ub.build().toString();
 		String ret = info.replace("$req", req);
 		ret = ret.replace("$add", add);
 		System.out.println(ret);

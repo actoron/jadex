@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
@@ -3143,10 +3144,10 @@ public class SUtil
 	/**
 	 *  Get the addresses to be used for transports.
 	 */
-	public static String[]	getNetworkAddresses() throws SocketException
+	public static InetAddress[]	getNetworkAddresses() throws SocketException
 	{
 		// Determine useful transport addresses.
-		Set<String>	addresses	= new HashSet<String>();	// global network addresses (uses all)
+		Set<InetAddress>	addresses	= new HashSet<InetAddress>();	// global network addresses (uses all)
 		Set<InetAddress>	sitelocal	= new HashSet<InetAddress>();	// local network addresses e.g. 192.168.x.x (use one v4 and one v6 if no global)
 		Set<InetAddress>	linklocal	= new HashSet<InetAddress>();	// link-local fallback addresses e.g. 169.254.x.x (use one v4 and one v6 if no global or local)
 		Set<InetAddress>	loopback	= new HashSet<InetAddress>();	// loopback addresses e.g. 127.0.0.1 (use one v4 and one v6 if no global or local or link-local)
@@ -3176,7 +3177,7 @@ public class SUtil
 				{
 					v4	= v4 || addr instanceof Inet4Address;
 					v6	= v6 || addr instanceof Inet6Address;
-					addresses.add(addr.getHostAddress());
+					addresses.add(addr);
 				}
 			}
 		}
@@ -3190,7 +3191,7 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				addresses.add(addr);
 			}
 		}
 		
@@ -3203,7 +3204,7 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				addresses.add(addr);
 			}
 		}
 		
@@ -3216,7 +3217,7 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				addresses.add(addr);
 			}
 		}
 		
@@ -3239,8 +3240,8 @@ public class SUtil
 //		}
 		
 //		System.out.println("addresses: "+addresses);
-		
-		return addresses.toArray(new String[addresses.size()]);		
+
+		return addresses.toArray(new InetAddress[addresses.size()]);
 	}
 	
 	/**
@@ -3346,7 +3347,27 @@ public class SUtil
 		}
 		return dir.delete();
 	}
-	
+
+	/**
+	 * Convert a scheme, InetAdress and port to a valid URI or throw.
+	 * @param schema
+	 * @param address
+	 * @param port
+     * @return URI
+     */
+	public static URI toURI(String scheme, InetAddress address, int port) {
+		if (scheme.endsWith("://")) {
+			scheme = scheme.substring(0, scheme.length()-3);
+		}
+		try {
+			return new URI(scheme, null, address.getHostAddress(), port, null, null, null);
+		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+			rethrowAsUnchecked(e);
+		}
+		return null;
+	}
+
 	/**
 	 *  An subclass of print stream to allow accessing the underlying stream.
 	 */
