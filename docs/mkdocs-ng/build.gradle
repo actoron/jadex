@@ -12,6 +12,10 @@ ext.workspaceRootDir = workspaceRootDir
 
 apply from: "${workspaceRootDir}/src/main/buildutils/versioning.gradle"
 
+ext.VersionLoader.workspaceRootDir = ext.workspaceRootDir
+version = ext.VersionLoader.getVersion(project.rootProject.rootDir)
+project.ext.jadex_build_version = version.toString()
+
 
 buildscript {
     repositories
