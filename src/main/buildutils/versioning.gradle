@@ -72,5 +72,3 @@ public class ProjectVersion {
 }
 
 ext.VersionLoader = VersionLoader
-
-return VersionLoader.getVersion()

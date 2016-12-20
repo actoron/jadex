@@ -12,12 +12,12 @@ import groovy.transform.Field
 @Field
 String jadexVersion
 
-//@Field
-//String jadexVersion_major
-//@Field
-//String jadexVersion_minor
-//@Field
-//String jadexVersion_patch
+@Field
+String major
+@Field
+String minor
+@Field
+String patch
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
@@ -36,15 +36,12 @@ stage('preparation') {
     // TODO for testing, tag here:
     nodeWithVersion(versionSuffix) {
         sh "./gradlew createVersionInfo"
-        ext = {}
-        def versioning = load 'src/main/buildutils/versioning.gradle'
-        print "getVersion"
-        println versioning
-//        def myVersion = new ProjectVersion(1,2,"3")
-//        println myVersion
-
         def props = readProperties([file: 'build/jadexversion.properties'])
         jadexVersion = props.jadexversion
+        major = props.jadexVersion_major
+        minor = props.jadexVersion_minor
+        patch = props.jadexVersion_patch
+
         println "building version: ${jadexVersion}"
         def branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
 //        println "On branch: ${env.BRANCH_NAME}"
