@@ -69,4 +69,6 @@ public class ProjectVersion {
     }
 }
 
-ext.VersionLoader = VersionLoader
+if (binding.variables.containsKey("ext")) {
+    binding.variables.get("ext").VersionLoader = VersionLoader
+}
