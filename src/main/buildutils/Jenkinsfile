@@ -5,9 +5,10 @@ publishArtifacts = true;
 
 defaultGradleArgs = " --info --stacktrace"
 
-def versionSuffix
 
 def branchName
+@Field
+String genVersion
 
 import groovy.transform.Field
 
@@ -18,6 +19,7 @@ String jadexVersion
 String major
 @Field
 String minor
+def versionSuffix
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
@@ -30,6 +32,7 @@ stage('preparation') {
 
         // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
         def result = build job: "pipeline-generate-version-${branchName}"
+        genVersion = result.rawBuild.environment.PATCH_VERSION;
 
         if ("master".equals(branchName)) {
             // generate version continuously
@@ -37,7 +40,7 @@ stage('preparation') {
         }
         else {
             // so we append something to our version. but what?
-            versionSuffix = "-${branchName}-${result.rawBuild.environment.PATCH_VERSION}"
+            versionSuffix = "${result.rawBuild.environment.PATCH_VERSION}${branchName}"
         }
 
         echo "version suffix:" + versionSuffix
@@ -237,7 +240,7 @@ def tryOrRevertVersion(version, cl) {
         cl()
     } catch (Exception e) {
         println "Build Exception: ${e.getMessage()}"
-        revertVersion(version)
+        revertVersion()
         throw e
     }
 }
@@ -245,10 +248,10 @@ def tryOrRevertVersion(version, cl) {
 @Field
 Boolean revertedVersion = false
 
-def revertVersion(failedVersion) {
+def revertVersion() {
     if (!revertedVersion) {
-        Integer oldNumber = (failedVersion as Integer) -1;
-        echo "reverting version from ${failedVersion} to ${oldNumber}"
+        Integer oldNumber = (genVersion as Integer) -1;
+        echo "reverting version from ${genVersion} to ${oldNumber}"
         def result = build job: 'pipeline-generate-version-master', parameters: [string(name: 'PATCH_VERSION', value: "${oldNumber}")], wait: true, propagate: true
 
         // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
