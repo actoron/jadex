@@ -1,5 +1,3 @@
-package jadex;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -10,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.base.AbstractPlatformConfiguration;
-import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.StarterConfiguration;
@@ -38,20 +35,22 @@ public class CLIStarter {
 //			e.printStackTrace();
 //		}
 
-        Options options = new Options();
-        DefaultParser parser = new DefaultParser();
-        CommandLine parse = parser.parse(options, args);
-
-        Map<String, String> results = new HashMap<String, String>();
-
-        Option[] parsedOptions = parse.getOptions();
-        for (Option o : parsedOptions) {
-            results.put(o.getArgName(), o.getValue());
-        }
+//        Options options = new Options();
+//        DefaultParser parser = new DefaultParser();
+//        CommandLine parse = parser.parse(options, args);
+//
+//        Map<String, String> results = new HashMap<String, String>();
+//
+//
+//        Option[] parsedOptions = parse.getOptions();
+//        for (Option o : parsedOptions) {
+//            results.put(o.getArgName(), o.getValue());
+//        }
 
 //        PlatformConfiguration config = new PlatformConfiguration();
-
         PlatformConfiguration config = processArgs(args);
+
+        // TODO: parse args with jadex
 
         Starter.createPlatform(config).get();
 
@@ -110,23 +109,23 @@ public class CLIStarter {
      */
     public static void parseArg(String key, String stringValue, Object value, AbstractPlatformConfiguration config)
     {
-        if(COMPONENT.equals(key))
+        if(IStarterConfiguration.COMPONENT.equals(key))
         {
             config.addComponent((String) stringValue);
         }
-        else if(DEBUGFUTURES.equals(key) && "true".equals(stringValue))
+        else if(IStarterConfiguration.DEBUGFUTURES.equals(key) && "true".equals(stringValue))
         {
             config.setDebugFutures(true);
         }
-        else if(DEBUGSERVICES.equals(key) && "true".equals(stringValue))
+        else if(IStarterConfiguration.DEBUGSERVICES.equals(key) && "true".equals(stringValue))
         {
             config.setDebugServices(true);
         }
-        else if(DEBUGSTEPS.equals(key) && "true".equals(stringValue))
+        else if(IStarterConfiguration.DEBUGSTEPS.equals(key) && "true".equals(stringValue))
         {
             config.setDebugSteps(true);
         }
-        else if(DEFTIMEOUT.equals(key))
+        else if(IStarterConfiguration.DEFTIMEOUT.equals(key))
         {
             value = SJavaParser.evaluateExpression(stringValue, null);
 //			BasicService.DEFTIMEOUT	= ((Number)stringValue).longValue();
@@ -139,15 +138,15 @@ public class CLIStarter {
 //			BasicService.setLocalDefaultTimeout(to);
 //			System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
         }
-        else if(NOSTACKCOMPACTION.equals(key) && "true".equals(stringValue))
+        else if(IStarterConfiguration.NOSTACKCOMPACTION.equals(key) && "true".equals(stringValue))
         {
             config.setNoStackCompaction(true);
         }
-        else if(OPENGL.equals(key) && "false".equals(stringValue))
+        else if(IStarterConfiguration.OPENGL.equals(key) && "false".equals(stringValue))
         {
             config.setOpenGl(false);
         }
-        else if(MONITORING.equals(key))
+        else if(IStarterConfiguration.MONITORING.equals(key))
         {
             IMonitoringService.PublishEventLevel moni = IMonitoringService.PublishEventLevel.OFF;
             if(value instanceof Boolean)
@@ -187,8 +186,7 @@ public class CLIStarter {
      */
     public static PlatformConfiguration processArgs(String[] args)
     {
-        PlatformConfiguration config = new PlatformConfiguration();
-        config.setProgramArguments(args);
+        PlatformConfiguration config = new PlatformConfiguration(args);
         if(args!=null)
         {
             for(int i=0; args!=null && i<args.length; i+=2)
