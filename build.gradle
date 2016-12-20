@@ -59,7 +59,7 @@ allprojects
 		ext.VersionLoader.workspaceRootDir = ext.workspaceRootDir
 	}
 
-	version = ext.VersionLoader.getVersion(mProject.rootProject.rootDir)
+	version = ext.VersionLoader.getVersion(project.rootProject.rootDir)
 	project.ext.jadex_build_version = version.toString()
 
     if(isCommercial(project))
