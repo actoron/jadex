@@ -4,7 +4,7 @@ public class VersionLoader {
 
     private static ProjectVersion version
 
-    static String workspaceRootDir
+    public static String workspaceRootDir
 
     static ProjectVersion getVersion(File rootDir) {
         if (version == null) {
@@ -68,3 +68,5 @@ public class ProjectVersion {
         fullVersion
     }
 }
+
+ext.VersionLoader = VersionLoader
