@@ -70,3 +70,4 @@ public class ProjectVersion {
 }
 
 ext.VersionLoader = VersionLoader
+ext.getVersion = VersionLoader.&getVersion
