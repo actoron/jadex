@@ -469,7 +469,7 @@ public class BDIClassReader extends MicroClassReader
 							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 							Publish p = provs[j].publish();
-							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(),
+							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
 								p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
 							
 							NameValue[] props = provs[j].properties();

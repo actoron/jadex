@@ -49,6 +49,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
@@ -496,23 +497,102 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //				e.printStackTrace();
 			}
 			
-			getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
-				.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
-				.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
+			if (pi.isMulti())
 			{
-				public void customResultAvailable(IPublishService ps)
+				SServiceProvider.getServices(getComponent(), IPublishService.class, pi.getPublishScope()).addResultListener(new IIntermediateResultListener<IPublishService>()
 				{
-					//System.out.println("Got publish service " + ps);
-					ps.publishService(service.getServiceIdentifier(), pi)
-						.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
-				}
-				public void exceptionOccurred(Exception exception)
+					/** Flag if published at least once. */
+					protected boolean published = false;
+					
+					/** Flag if finished. */
+					protected boolean finished = false;
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+
+					public void resultAvailable(
+							Collection<IPublishService> result)
+					{
+					}
+					
+					public void intermediateResultAvailable(final IPublishService result)
+					{
+						result.publishService(service.getServiceIdentifier(), pi).addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void vresult)
+							{
+								if (!published)
+								{
+									ret.setResult(null);
+									published = true;
+								}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if (finished && !published)
+								{
+									getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier());
+									ret.setException(exception);
+								}
+							}
+						});
+					}
+
+					public void finished()
+					{
+						finished = true;
+					}
+				});
+//				SServiceProvider.getServices(getComponent(), IPublishService.class, pi.getPublishScope()).addResultListener(new IResultListener<Collection<IPublishService>>()
+//				{
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+//						ret.setResult(null);
+//					}
+//					
+//					public void resultAvailable(Collection<IPublishService> result)
+//					{
+//						for (final IPublishService pubserv : result)
+//						{
+//							pubserv.publishService(service.getServiceIdentifier(), pi).addResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									getComponent().getLogger().severe("Could not publish to " + pubserv + ": "+service.getServiceIdentifier()+" "+exception.getMessage());
+//								}
+//							});
+//						}
+//					}
+//				});
+			}
+			else
+			{
+				getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
+					.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
+					.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 				{
-//					exception.printStackTrace();
-					getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
-					ret.setResult(null);
-				}
-			}));
+					public void customResultAvailable(IPublishService ps)
+					{
+						//System.out.println("Got publish service " + ps);
+						ps.publishService(service.getServiceIdentifier(), pi)
+							.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+	//					exception.printStackTrace();
+						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+						ret.setResult(null);
+					}
+				}));
+			}
 		}
 		else
 		{

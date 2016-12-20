@@ -320,7 +320,7 @@ public class AwarenessManagementAgentHelper
 	 * @param ia
 	 * @return
 	 */
-	private AwarenessManagementAgent getPojoAgent(IInternalAccess ia) {
-		return (AwarenessManagementAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+	private static AwarenessManagementAgent getPojoAgent(IInternalAccess ia) {
+		return (AwarenessManagementAgent) ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 	}
 }

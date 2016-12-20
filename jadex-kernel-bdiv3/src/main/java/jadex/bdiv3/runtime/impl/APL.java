@@ -1,6 +1,5 @@
 package jadex.bdiv3.runtime.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -12,8 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
@@ -31,7 +28,6 @@ import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bdiv3x.runtime.ICandidateInfo;
@@ -720,7 +716,7 @@ public class APL
 //			mplan = state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
 //		}
 		
-		MPlan mplan = cand.getMPlan();
+		MElement mplan = cand.getModelElement();
 		
 //		if(cand instanceof RPlan)
 //		{
@@ -743,7 +739,7 @@ public class APL
 ////			mgoal = (MGoal)cand;
 ////		}
 		
-		return mplan!=null? mplan.getPriority(): 0;
+		return mplan instanceof MPlan? ((MPlan)mplan).getPriority(): 0;
 	}
 
 	/**
@@ -1107,11 +1103,11 @@ public class APL
 		 */
 		public IInternalPlan getPlan()
 		{
-			if(rplan!=null)
-				System.out.println("access");
+//			if(rplan!=null)
+//				System.out.println("access");
 			
 			if(rplan==null)
-				rplan = RPlan.createRPlan(getMPlan(), this, element, agent, mplaninfo.getBinding(), null);
+				rplan = RPlan.createRPlan((MPlan)getModelElement(), this, element, agent, mplaninfo.getBinding(), null);
 			return rplan;
 		}
 
@@ -1138,7 +1134,7 @@ public class APL
 		 *  Get the plan model element.
 		 *  @return The plan model element.
 		 */
-		public MPlan getMPlan()
+		public MElement getModelElement()
 		{
 			return mplaninfo.getMPlan();
 		}
@@ -1196,7 +1192,7 @@ public class APL
 				System.out.println("access: "+this);
 			
 			if(rplan==null)
-				rplan = RPlan.createRPlan(getMPlan(), this, element, agent, null, null);
+				rplan = RPlan.createRPlan((MPlan)getModelElement(), this, element, agent, null, null);
 			return rplan;
 		}
 
@@ -1223,7 +1219,7 @@ public class APL
 		 *  Get the plan model element.
 		 *  @return The plan model element.
 		 */
-		public MPlan getMPlan()
+		public MElement getModelElement()
 		{
 			return mplan;
 		}
@@ -1272,8 +1268,8 @@ public class APL
 		 */
 		public IInternalPlan getPlan()
 		{
-			if(rgoal!=null)
-				System.out.println("access");
+//			if(rgoal!=null)
+//				System.out.println("access");
 			
 			RProcessableElement pae = (RProcessableElement)element;
 			RGoal pagoal = pae instanceof RGoal? (RGoal)pae: null;
@@ -1302,12 +1298,12 @@ public class APL
 		}
 		
 		/**
-		 *  Get the plan model element.
-		 *  @return The plan model element.
+		 *  Get the candidate model element.
+		 *  @return The candidate model element.
 		 */
-		public MPlan getMPlan()
+		public MElement getModelElement()
 		{
-			return null;
+			return mgoalinfo.getMGoal();
 		}
 		
 		/**
@@ -1372,9 +1368,9 @@ public class APL
 		 *  Get the plan model element.
 		 *  @return The plan model element.
 		 */
-		public MPlan getMPlan()
+		public MElement getModelElement()
 		{
-			return (MPlan)rplan.getModelElement();
+			return rplan.getModelElement();
 		}
 	}
 	
@@ -1431,9 +1427,9 @@ public class APL
 		 *  Get the plan model element.
 		 *  @return The plan model element.
 		 */
-		public MPlan getMPlan()
+		public MElement getModelElement()
 		{
-			return (MPlan)rplan.getModelElement();
+			return rplan.getModelElement();
 		}
 	}
 }

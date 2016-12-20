@@ -30,6 +30,10 @@ Jadex relies on the Java class loading mechanism. This means that normally Java 
 All Jadex components support the use of arguments. For BDI agents , beliefs can be marked as arguments. The JCC gui automatically creates input fields for these arguments. Programmatically, the arguments can e.g. be directly referenced via their associated beliefs.
 Take a look at [Component Arguments](../components/components/#component-arguments) for an example how to pass arguments.
 
+### I get a NullPointerException on a method called access$000
+When scheduling a component step on a remote platform, a NullPointerException is thrown in a method called ```...access$000```.
+This usally occurs when component steps try to access instance methods - please make sure methods called from inside a component step are static.
+
 # BDI Questions
 
 ### IllegalArgumentException: Can not set java.util.ArrayList field

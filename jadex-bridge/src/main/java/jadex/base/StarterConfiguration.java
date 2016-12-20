@@ -586,8 +586,8 @@ public class StarterConfiguration implements IStarterConfiguration {
         }
         else if(DEFTIMEOUT.equals(key))
         {
-//            Object value = SJavaParser.evaluateExpression(stringValue, null);
-//				BasicService.DEFTIMEOUT	= ((Number)stringValue).longValue();
+        	value = SJavaParser.evaluateExpression(stringValue, null);
+//			BasicService.DEFTIMEOUT	= ((Number)stringValue).longValue();
             long to	= ((Number)value).longValue();
 //			setLocalDefaultTimeout(platform, to);
 //			setRemoteDefaultTimeout(platform, to);

@@ -297,7 +297,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
@@ -358,6 +357,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
+		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
@@ -380,7 +380,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
@@ -438,6 +437,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
+		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	})
 })
 @Agent
