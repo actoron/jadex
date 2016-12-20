@@ -2360,7 +2360,7 @@ public class SUtil
 		try {
 			// by default, transporturis should be valid URIs.
 			ret = new URI(transporturi);
-			if (ret.getHost() == null) {
+			if (ret.getHost() == null) { // URI may not throw, but instead use the whole string as "authority" :(
 				throw new URISyntaxException(transporturi, "No hostname found while converting to URI");
 			}
 		} catch (URISyntaxException e) {
@@ -2381,7 +2381,7 @@ public class SUtil
 				}
 				try {
 					ret =  new URI(scheme, null, hostname, port, null, null, null);
-					System.out.println("silently converted wrongly formatted URI: " + transporturi);
+//					System.out.println("silently converted wrongly formatted URI: " + transporturi);
 				} catch (URISyntaxException e1) {
 					e1.printStackTrace();
 					rethrowAsUnchecked(e);

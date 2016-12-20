@@ -290,7 +290,7 @@ public class InitiatorAgent extends TestAgent
 //			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledLocalDefaultTimeout(agent.getComponentIdentifier(), 1.0/30));
 
 			// hard code timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(500);
+			ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);
