@@ -29,7 +29,13 @@ stage('preparation') {
 
         // TODO: reset version number on new minor (or patch?) release:
         // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
-        versionSuffix = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: ''])
+//        versionSuffix = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', skipFailedBuilds: true])
+
+        def result = build job: 'pipeline-generate-version-master'
+        println result
+        versionSuffix = result.environment.get.PATCH_VERSION
+
+
         echo "version suffix:" + versionSuffix
     }
 
@@ -239,10 +245,14 @@ Boolean revertedVersion = false
 
 def revertVersion(failedVersion) {
     if (!revertedVersion) {
-        Integer oldNumber = (failedVersion as Integer) -2;
+        Integer oldNumber = (failedVersion as Integer) -1;
         echo "reverting version from ${failedVersion} to ${oldNumber}"
-        def generatedOldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
-        echo "reverted version to: ${generatedOldNumber}"
+//        def generatedOldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
+//        echo "reverted version to: ${generatedOldNumber}"
+        def result = build job: 'pipeline-generate-version-master', parameters: [string(name: 'PATCH_VERSION', value: "${oldNumber}")], wait: true, propagate: true
+
+        println result
+
         revertedVersion = true
     }
 }
