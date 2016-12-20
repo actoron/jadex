@@ -42,6 +42,8 @@ public class ProjectVersion {
     public final Integer minor
     public final String patch
 
+    ProjectVersion() {
+    }
 
     ProjectVersion(String major, String minor, String patch) {
         this.major = Integer.parseInt(major)
@@ -70,4 +72,4 @@ public class ProjectVersion {
 }
 
 ext.VersionLoader = VersionLoader
-ext.versionForJenkins = VersionLoader.getVersion()
+ext.ProjectVersion = ProjectVersion

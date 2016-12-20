@@ -39,9 +39,7 @@ stage('preparation') {
         ext = {}
         def versioning = load 'src/main/buildutils/versioning.gradle'
         print "getVersion"
-        def myVersion2 = ext.versionForJenkins
-        println myVersion2
-        def myVersion = ext.VersionLoader.getVersion(null)
+        def myVersion = new ext.ProjectVersion(1,2,"3")
         println myVersion
 
         def props = readProperties([file: 'build/jadexversion.properties'])
