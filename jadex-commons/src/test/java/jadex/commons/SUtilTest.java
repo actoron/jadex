@@ -3,6 +3,7 @@ package jadex.commons;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.URI;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,5 +59,46 @@ public class SUtilTest //extends TestCase
 		Assert.assertEquals(SUtil.getHashCode(src, false), SUtil.getHashCode(dest, false));
 		
 		SUtil.deleteDirectory(dest.getParentFile());
+	}
+
+	@Test
+	public void toUri_correctFormat() {
+		URI uri = SUtil.toURI("tcp-mtp://[fe80:0:0:0:8cf:5aff:feeb:f199%eth0]:42716");
+		Assert.assertEquals("tcp-mtp", uri.getScheme());
+		Assert.assertEquals("[fe80:0:0:0:8cf:5aff:feeb:f199%eth0]", uri.getHost());
+		Assert.assertEquals(42716, uri.getPort());
+	}
+
+	@Test
+	public void toUri_correctFormat2() {
+		URI uri = SUtil.toURI("tcp-mtp://[fe80:0:0:0:8cf:5aff:feeb:f199]:42716");
+		Assert.assertEquals("tcp-mtp", uri.getScheme());
+		Assert.assertEquals("[fe80:0:0:0:8cf:5aff:feeb:f199]", uri.getHost());
+		Assert.assertEquals(42716, uri.getPort());
+	}
+
+	@Test
+	public void toUri_wrongButSupportedFormat() {
+		URI uri = SUtil.toURI("tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199%eth0:42716");
+		Assert.assertEquals("tcp-mtp", uri.getScheme());
+		Assert.assertEquals("[fe80:0:0:0:8cf:5aff:feeb:f199%eth0]", uri.getHost());
+		Assert.assertEquals(42716, uri.getPort());
+	}
+
+//	@Test
+//	public void toUri_wrongButSupportedFormat2() {
+//		URI uri = SUtil.toURI("tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199:42716");
+//		Assert.assertEquals("tcp-mtp", uri.getScheme());
+//		Assert.assertEquals("[fe80:0:0:0:8cf:5aff:feeb:f199]", uri.getHost());
+//		Assert.assertEquals(42716, uri.getPort());
+//	}
+
+	@Test
+	public void toUri_wrongUnsupportedFormat() {
+		try {
+			URI uri = SUtil.toURI("tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199:42716");
+			org.junit.Assert.fail("should have thrown");
+		} catch (Exception e) {
+		}
 	}
 }

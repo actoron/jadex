@@ -44,7 +44,7 @@ public class NIOTCPTransport implements ITransport
 	//-------- constants --------
 	
 	/** The schema name. */
-	public static final String[] SCHEMAS = new String[]{"tcp-mtp://"};
+	public static final String[] SCHEMAS = new String[]{"tcp-mtp://"}; // TODO: scheme without ://
 	
 	/** How long to keep connections alive (5 min). */
 	protected static final int	MAX_KEEPALIVE	= 300000;
@@ -321,18 +321,18 @@ public class NIOTCPTransport implements ITransport
 			{
 				if(address.startsWith(getServiceSchemas()[i]))
 				{
-						URI uri= new URI(address);
-						String hostname = uri.getHost();
-						int iport = uri.getPort();
+					URI uri = SUtil.toURI(address);
+					String hostname = uri.getHost();
+					int iport = uri.getPort();
 
-						if (iport == -1) iport = DEFAULT_PORT;
-						ret	= new InetSocketAddress(getAddress(hostname), iport);
+					if (iport == -1) iport = DEFAULT_PORT;
+					ret	= new InetSocketAddress(getAddress(hostname), iport);
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			SUtil.rethrowAsUnchecked(e);
+//			SUtil.rethrowAsUnchecked(e);
 		}
 
 		return ret;

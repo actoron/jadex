@@ -51,7 +51,7 @@ public class TCPTransport implements ITransport
 	//-------- constants --------
 	
 	/** The schema name. */
-	public final static String[] SCHEMAS = new String[]{"tcp-mtp://"};
+	public final static String[] SCHEMAS = new String[]{"tcp-mtp://"}; // TODO: scheme without ://
 	
 	/** Constant for asynchronous setting. */
 	public final static String ASYNCHRONOUS = "asynchronous";
@@ -594,7 +594,7 @@ public class TCPTransport implements ITransport
 
 		try
 		{
-			URI uri= new URI(address);
+			URI uri = SUtil.toURI(address);
 			String scheme = uri.getScheme();
 
 			for(int i=0; i<getServiceSchemas().length; i++)
