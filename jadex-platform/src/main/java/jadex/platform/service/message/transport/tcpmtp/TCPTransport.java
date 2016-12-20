@@ -106,8 +106,8 @@ public class TCPTransport implements ITransport
 	
 	/**
 	 *  Init the transport.
-	 *  @param platform The platform.
-	 *  @param settings The settings.
+	 *  @param component The platform component.
+	 *  @param port The port to listen for connections.
 	 */
 	public TCPTransport(final IInternalAccess component, int port)
 	{
@@ -117,8 +117,9 @@ public class TCPTransport implements ITransport
 	
 	/**
 	 *  Init the transport.
-	 *  @param platform The platform.
-	 *  @param settings The settings.
+	 *  @param component The platform component.
+	 *  @param port The port to listen for connections.
+	 *  @param async Flag for async mode.
 	 */
 	public TCPTransport(final IInternalAccess component, int port, final boolean async)
 	{
@@ -503,7 +504,7 @@ public class TCPTransport implements ITransport
 	
 	/**
 	 *  Get the connection.
-	 *  @param address
+	 *  @param addr
 	 *  @return a connection of this type
 	 */
 	protected IFuture<TCPOutputConnection> getConnection(String addr, boolean create)

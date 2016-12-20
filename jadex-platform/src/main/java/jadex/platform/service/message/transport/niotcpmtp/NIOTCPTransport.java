@@ -81,8 +81,9 @@ public class NIOTCPTransport implements ITransport
 	
 	/**
 	 *  Init the transport.
-	 *  @param platform The platform.
-	 *  @param settings The settings.
+	 *  @param component The platform component.
+	 *  @param port The port to listen for connections.
+	 *  @param logger The logger.
 	 */
 	public NIOTCPTransport(final IInternalAccess component, int port, Logger logger)
 	{
