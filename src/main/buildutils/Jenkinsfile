@@ -7,6 +7,8 @@ defaultGradleArgs = " --info --stacktrace"
 
 def versionSuffix
 
+def branchName
+
 import groovy.transform.Field
 
 @Field
@@ -16,24 +18,27 @@ String jadexVersion
 String major
 @Field
 String minor
-@Field
-String patch
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'jenkinsfile'
         echo "testing jenkins with pipeline"
 
-        // TODO determine version by checking how many commits since last release tag?
-        //   def v = version(readFile('pom.xml'))
+        branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+//        println "On branch: ${env.BRANCH_NAME}" // for multibranch projects, this works
+        println "On branch: ${branchName}"
 
-        // TODO: reset version number on new minor (or patch?) release:
-        // withEnv(['NEXT_BUILD_NUMBER=5']) { ... }
-//        versionSuffix = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', skipFailedBuilds: true])
-
-        def result = build job: 'pipeline-generate-version-master'
         // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
-        versionSuffix = result.rawBuild.environment.PATCH_VERSION;
+        def result = build job: "pipeline-generate-version-${branchName}"
+
+        if ("master".equals(branchName)) {
+            // generate version continuously
+            versionSuffix = result.rawBuild.environment.PATCH_VERSION;
+        }
+        else {
+            // so we append something to our version. but what?
+            versionSuffix = "-${branchName}-${result.rawBuild.environment.PATCH_VERSION}"
+        }
 
         echo "version suffix:" + versionSuffix
     }
@@ -41,16 +46,14 @@ stage('preparation') {
     // TODO for testing, tag here:
     nodeWithVersion(versionSuffix) {
         sh "./gradlew createVersionInfo"
-        def props = readProperties([file: 'build/jadexversion.properties'])
+        def props = readProperties file: 'build/jadexversion.properties'
         jadexVersion = props.jadexversion
         major = props.jadexVersion_major
         minor = props.jadexVersion_minor
         patch = props.jadexVersion_patch
 
         println "building version: ${jadexVersion}"
-        def branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
-//        println "On branch: ${env.BRANCH_NAME}"
-        println "On branch: ${branchName}"
+
         sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
 //        sh "git push ${jadexVersion}" // TODO uncomment for push tag
     }
@@ -246,11 +249,12 @@ def revertVersion(failedVersion) {
     if (!revertedVersion) {
         Integer oldNumber = (failedVersion as Integer) -1;
         echo "reverting version from ${failedVersion} to ${oldNumber}"
-//        def generatedOldNumber = VersionNumber([versionNumberString: '${BUILDS_ALL_TIME}', versionPrefix: '', overrideBuildsAllTime: "${oldNumber}"])
-//        echo "reverted version to: ${generatedOldNumber}"
         def result = build job: 'pipeline-generate-version-master', parameters: [string(name: 'PATCH_VERSION', value: "${oldNumber}")], wait: true, propagate: true
 
-        println result
+        // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
+        def generatedOldNumber = result.rawBuild.environment.PATCH_VERSION;
+
+        echo "reverted version to: ${generatedOldNumber}"
 
         revertedVersion = true
     }
