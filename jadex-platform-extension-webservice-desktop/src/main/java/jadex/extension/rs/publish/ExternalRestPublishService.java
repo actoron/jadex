@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.SpringLayout.Constraints;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -192,8 +193,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
 //	    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
 	    	}
-	       
-	        System.out.println("Adding http handler to server: "+uri.getPath());
+	    	
+	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
 	        
 	        PathHandler ph = (PathHandler)getHttpServer(uri, info);
 	        
@@ -210,6 +211,12 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
 				}
 			};
+			if (ph.containsSubhandlerForExactUri(null, uri.getPath()))
+			{
+//				System.out.println("The URL "+uri.getPath() + " is already published, unpublishing...");
+				component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
+				ph.removeSubhandler(null, uri.getPath());
+			}
 			ph.addSubhandler(null, uri.getPath(), rh);
 	        
 	        if(sidservers==null)
@@ -268,7 +275,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		Tuple2<PathHandler, URI> tup = sidservers.get(sid);
 		if(tup!=null)
 		{
-			tup.getFirstEntity().removeSubhandler(null, tup.getSecondEntity().toString());
+			tup.getFirstEntity().removeSubhandler(null, tup.getSecondEntity().getPath());
 		}
 		return IFuture.DONE;
 	}

@@ -11,8 +11,12 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 @Agent
+@RequiredServices(@RequiredService(name="ls", type=ILotteryService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
 public class PlayerAgent
 {
 	@Agent
@@ -21,7 +25,8 @@ public class PlayerAgent
 	@AgentBody
 	public void body()
 	{
-		final ILotteryService ls = SServiceProvider.getService(agent, ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
+//		final ILotteryService ls = SServiceProvider.getService(agent, ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
+		final ILotteryService ls = (ILotteryService)SServiceProvider.waitForService(agent, "ls", 3, 3000).get();
 		
 //		ILotteryService ls = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<ILotteryService>, Void>()
 //		{

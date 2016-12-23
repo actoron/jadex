@@ -26,10 +26,12 @@ import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
@@ -2325,6 +2327,71 @@ public class SUtil
 		}
 		return ret;
 	}
+
+
+	/**
+	 * Convert a scheme, InetAdress and port to a valid URI or throw.
+	 * @param scheme
+	 * @param address
+	 * @param port
+	 * @return URI
+	 */
+	public static URI toURI(String scheme, InetAddress address, int port) {
+		if (scheme.endsWith("://")) {
+			scheme = scheme.substring(0, scheme.length()-3);
+		}
+		try {
+			return new URI(scheme, null, address.getHostAddress(), port, null, null, null);
+		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+			rethrowAsUnchecked(e);
+		}
+		return null;
+	}
+
+
+	/**
+	 * Convert stringified URI (as used in transports for some weird reason) to URI.
+	 * @param transporturi Transport-style URI (tcp-mtp://hostpart:port or tcp-mtp://[h:o:s:t%scope]:port for ipv6)
+	 * @return URI
+	 */
+	public static URI toURI(String transporturi) {
+		URI ret = null;
+		try {
+			// by default, transporturis should be valid URIs.
+			ret = new URI(transporturi);
+			if (ret.getHost() == null) { // URI may not throw, but instead use the whole string as "authority" :(
+				throw new URISyntaxException(transporturi, "No hostname found while converting to URI");
+			}
+		} catch (URISyntaxException e) {
+			// for backword compatibility, handle wrongly formatted IPv6 transport "addresses"
+			// see https://www.ietf.org/rfc/rfc2732.txt for correct format.
+			if (transporturi.contains("%") && !transporturi.contains("[")) {
+//				tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199%eth0:42716
+				int schemaend = transporturi.indexOf("://");
+				int portdiv = transporturi.lastIndexOf(':');
+				int scopediv = transporturi.lastIndexOf('%');
+
+				String hostname = transporturi.substring(schemaend+3, portdiv);
+				String scheme = transporturi.substring(0, schemaend);
+				Integer port = null;
+				if(portdiv>scopediv) // has port
+				{
+					port = Integer.parseInt(transporturi.substring(portdiv+1));
+				}
+				try {
+					ret =  new URI(scheme, null, hostname, port, null, null, null);
+//					System.out.println("silently converted wrongly formatted URI: " + transporturi);
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+					rethrowAsUnchecked(e);
+				}
+			} else {
+				rethrowAsUnchecked(e);
+			}
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Sleep the current thread, ignore exceptions.
@@ -3143,10 +3210,10 @@ public class SUtil
 	/**
 	 *  Get the addresses to be used for transports.
 	 */
-	public static String[]	getNetworkAddresses() throws SocketException
+	public static InetAddress[]	getNetworkAddresses() throws SocketException
 	{
 		// Determine useful transport addresses.
-		Set<String>	addresses	= new HashSet<String>();	// global network addresses (uses all)
+		Set<InetAddress>	addresses	= new HashSet<InetAddress>();	// global network addresses (uses all)
 		Set<InetAddress>	sitelocal	= new HashSet<InetAddress>();	// local network addresses e.g. 192.168.x.x (use one v4 and one v6 if no global)
 		Set<InetAddress>	linklocal	= new HashSet<InetAddress>();	// link-local fallback addresses e.g. 169.254.x.x (use one v4 and one v6 if no global or local)
 		Set<InetAddress>	loopback	= new HashSet<InetAddress>();	// loopback addresses e.g. 127.0.0.1 (use one v4 and one v6 if no global or local or link-local)
@@ -3176,7 +3243,14 @@ public class SUtil
 				{
 					v4	= v4 || addr instanceof Inet4Address;
 					v6	= v6 || addr instanceof Inet6Address;
-					addresses.add(addr.getHostAddress());
+					if (addr instanceof  Inet6Address) {
+						try {
+							addr = Inet6Address.getByAddress(addr.getHostAddress(), addr.getAddress());
+						} catch (UnknownHostException e) {
+							e.printStackTrace();
+						}
+					}
+					addresses.add(addr);
 				}
 			}
 		}
@@ -3190,7 +3264,14 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				if (addr instanceof  Inet6Address) {
+					try {
+						addr = Inet6Address.getByAddress(addr.getHostAddress(), addr.getAddress());
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+				}
+				addresses.add(addr);
 			}
 		}
 		
@@ -3203,7 +3284,14 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				if (addr instanceof  Inet6Address) {
+					try {
+						addr = Inet6Address.getByAddress(addr.getHostAddress(), addr.getAddress());
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+				}
+				addresses.add(addr);
 			}
 		}
 		
@@ -3216,7 +3304,14 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				if (addr instanceof  Inet6Address) {
+					try {
+						addr = Inet6Address.getByAddress(addr.getHostAddress(), addr.getAddress());
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+				}
+				addresses.add(addr);
 			}
 		}
 		
@@ -3239,8 +3334,8 @@ public class SUtil
 //		}
 		
 //		System.out.println("addresses: "+addresses);
-		
-		return addresses.toArray(new String[addresses.size()]);		
+
+		return addresses.toArray(new InetAddress[addresses.size()]);
 	}
 	
 	/**
@@ -3346,7 +3441,7 @@ public class SUtil
 		}
 		return dir.delete();
 	}
-	
+
 	/**
 	 *  An subclass of print stream to allow accessing the underlying stream.
 	 */

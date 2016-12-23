@@ -1,6 +1,6 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.impl.IInternalPlan;
 
 /**
@@ -26,10 +26,11 @@ public interface ICandidateInfo
 	public IInternalPlan getPlan();
 	
 	/**
-	 *  Get the plan model element.
-	 *  @return The plan model element.
+	 *  Get the candidate model element.
+	 *  @return The candiate model element.
 	 */
-	public MPlan getMPlan();
+//	public MPlan getMPlan();
+	public MElement getModelElement();
 	
 	/**
 	 *  Get the element this 

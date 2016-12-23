@@ -18,7 +18,7 @@ public class CPULoadProperty extends NFRootProperty<Double, Void>
 	 */
 	public CPULoadProperty(final IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo(NAME, double.class, null, true, 10000, true, Target.Root));
+		super(comp, new NFPropertyMetaInfo(NAME, double.class, null, true, 3000, true, Target.Root));
 	}
 	
 	/**

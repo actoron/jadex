@@ -9,23 +9,20 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.APL.MGoalInfo;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.IInternalPlan;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.impl.RPlan.ResumeCommandArgs;
 import jadex.bdiv3.runtime.impl.RPlan.Waitqueue;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3x.runtime.ICandidateInfo;
-import jadex.bdiv3x.runtime.IElement;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -205,13 +202,14 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 							return ret;
 						}
 						
-						for(Object c: allcands)
+						for(ICandidateInfo c: allcands)
 						{
-							if(!c.equals(cand))// && c instanceof MPlanInfo)
+							// avoid recursion by adding metagoal as candidate again
+							if(!c.equals(cand) && !c.getModelElement().equals(mgoal))// && c instanceof MPlanInfo)
 							{
-								MPlanInfo pi = (MPlanInfo)c;
+//								MPlanInfo pi = (MPlanInfo)c;
 //								final RPlan rplan = RPlan.createRPlan(pi.getMPlan(), c, element, ia, pi.getBinding(), null);
-								final RPlan rplan = (RPlan)ca.getPlan();
+//								final RPlan rplan = (RPlan)ca.getPlan();
 								// find by type and direction?!
 								rgoal.getParameterSet("applicables").addValue(c);
 //								rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()
@@ -288,7 +286,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					{
 						// normal case when plan was waiting
 //						System.out.println("rplan resume command: "+rplan);
-						rplan.getResumeCommand().execute(new Tuple2<Boolean, Boolean>(null, Boolean.FALSE));
+						rplan.getResumeCommand().execute(new ResumeCommandArgs(null, Boolean.FALSE, null));
 					}
 					ret.setResult(null);
 				}

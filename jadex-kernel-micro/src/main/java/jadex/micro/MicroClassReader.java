@@ -525,7 +525,7 @@ public class MicroClassReader
 					NameValue[] props = p.properties();
 					UnparsedExpression[] exps = SNameValue.createUnparsedExpressions(props);
 					
-					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
+					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
 					
 					props = vals[i].properties();
 					List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
@@ -733,7 +733,7 @@ public class MicroClassReader
 								ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 									im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 								Publish p = provs[j].publish();
-								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(),
+								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
 									p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
 								
 								NameValue[] props = provs[j].properties();

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -43,7 +44,7 @@ public class NIOTCPTransport implements ITransport
 	//-------- constants --------
 	
 	/** The schema name. */
-	public static final String[] SCHEMAS = new String[]{"tcp-mtp://"};
+	public static final String[] SCHEMAS = new String[]{"tcp-mtp://"}; // TODO: scheme without ://
 	
 	/** How long to keep connections alive (5 min). */
 	protected static final int	MAX_KEEPALIVE	= 300000;
@@ -81,8 +82,9 @@ public class NIOTCPTransport implements ITransport
 	
 	/**
 	 *  Init the transport.
-	 *  @param platform The platform.
-	 *  @param settings The settings.
+	 *  @param component The platform component.
+	 *  @param port The port.
+	 *	@param logger The logger.
 	 */
 	public NIOTCPTransport(final IInternalAccess component, int port, Logger logger)
 	{
@@ -121,13 +123,13 @@ public class NIOTCPTransport implements ITransport
 			
 			ssc.register(selector, SelectionKey.OP_ACCEPT);
 			
-			String[]	addresses	= SUtil.getNetworkAddresses();
+			InetAddress[]	addresses	= SUtil.getNetworkAddresses();
 			this.addresses	= new String[addresses.length];
 			for(int i=0; i<addresses.length; i++)
 			{
 				for(int j=0; j<getServiceSchemas().length; j++)
 				{
-					this.addresses[i]	= getAddress(getServiceSchemas()[j], addresses[i], port);
+					this.addresses[i]	= SUtil.toURI(getServiceSchemas()[j], addresses[i], port).toString();
 				}
 			}
 			
@@ -304,17 +306,6 @@ public class NIOTCPTransport implements ITransport
 	//-------- helper methods --------
 	
 	/**
-	 *  Get the address of this transport.
-	 *  @param hostname The hostname.
-	 *  @param port The port.
-	 *  @return <scheme>:<hostname>:<port>
-	 */
-	protected String getAddress(String schema, String hostname, int port)
-	{
-		return schema+hostname+":"+port;
-	}
-	
-	/**
 	 *  Parse an address.
 	 *  @param address The address string.
 	 *  @return The parsed address.
@@ -324,34 +315,26 @@ public class NIOTCPTransport implements ITransport
 		InetSocketAddress	ret	= null;
 		address = address.toLowerCase();
 		
-		for(int i=0; i<getServiceSchemas().length; i++)
+		try
 		{
-			if(address.startsWith(getServiceSchemas()[i]))
-			{		
-				try
+			for(int i=0; i<getServiceSchemas().length; i++)
+			{
+				if(address.startsWith(getServiceSchemas()[i]))
 				{
-					int schemalen = getServiceSchemas()[i].length();
-					int div = address.lastIndexOf(':');
-					String hostname;
-					int port;
-					if(div>schemalen)
-					{
-						hostname = address.substring(schemalen, div);
-						port = Integer.parseInt(address.substring(div+1));
-					}
-					else
-					{
-						hostname = address.substring(schemalen);
-						port = DEFAULT_PORT;
-					}
-					ret	= new InetSocketAddress(getAddress(hostname), port);
-				}
-				catch(Exception e)
-				{ 
+					URI uri = SUtil.toURI(address);
+					String hostname = uri.getHost();
+					int iport = uri.getPort();
+
+					if (iport == -1) iport = DEFAULT_PORT;
+					ret	= new InetSocketAddress(getAddress(hostname), iport);
 				}
 			}
 		}
-		
+		catch(Exception e)
+		{
+//			SUtil.rethrowAsUnchecked(e);
+		}
+
 		return ret;
 	}
 	
