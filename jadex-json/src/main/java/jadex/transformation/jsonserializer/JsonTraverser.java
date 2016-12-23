@@ -67,6 +67,7 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLRUProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLocalDateTimeProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBigIntegerProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
 		
 		readprocs = new ArrayList<ITraverseProcessor>();
@@ -99,11 +100,12 @@ public class JsonTraverser extends Traverser
 		nestedreadprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonNestedMapProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMapProcessor());
 		int pos = readprocs.size();
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBigIntegerProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLocalDateTimeProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor());
 		
-		for (int i = pos; i < readprocs.size(); ++i)
+		for(int i = pos; i < readprocs.size(); ++i)
 			nestedreadprocs.add(readprocs.get(i));
 	}
 	

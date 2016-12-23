@@ -594,25 +594,47 @@ public class MicroClassReader
 			}
 			
 			// Take all but new overrides old
-			if(!resudone && isAnnotationPresent(cma, Results.class, cl))
+			if(!resudone)
 			{
-				Results val = (Results)getAnnotation(cma, Results.class, cl);
-				Result[] vals = val.value();
-				resudone = val.replace();
-				
-				Map<String, Object> res = getOrCreateMap("results", toset);
-				
-				IArgument[] tmpresults = new IArgument[vals.length];
-				for(int i=0; i<vals.length; i++)
+				if(isAnnotationPresent(cma, Results.class, cl))
 				{
-	//				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-					IArgument tmpresult = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
-						"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
+					Results val = (Results)getAnnotation(cma, Results.class, cl);
+					Result[] vals = val.value();
+					resudone = val.replace();
 					
-					if(!res.containsKey(vals[i].name()))
+					Map<String, Object> res = getOrCreateMap("results", toset);
+					
+					IArgument[] tmpresults = new IArgument[vals.length];
+					for(int i=0; i<vals.length; i++)
 					{
-						res.put(vals[i].name(), tmpresult);
+		//				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+						IArgument tmpresult = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
+							vals[i].description(), SReflect.getClassName(vals[i].clazz()),
+							"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
+						
+						if(!res.containsKey(vals[i].name()))
+						{
+							res.put(vals[i].name(), tmpresult);
+						}
+					}
+				}
+				
+				Field[] fields = cma.getDeclaredFields();
+				for(Field field: fields)
+				{
+					if(isAnnotationPresent(field, AgentResult.class, cl))
+					{
+						AgentResult res = (AgentResult)getAnnotation(field, AgentResult.class, cl);
+						{
+							Map<String, Object> resul = getOrCreateMap("results", toset);
+							
+							if(!resul.containsKey(field.getName()))
+							{
+								IArgument tmparg = new jadex.bridge.modelinfo.Argument(field.getName(), 
+									null, SReflect.getClassName(field.getType()), null);
+								resul.put(field.getName(), tmparg);
+							}
+						}
 					}
 				}
 			}
