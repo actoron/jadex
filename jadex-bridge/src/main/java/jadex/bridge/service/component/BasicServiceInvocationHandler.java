@@ -198,8 +198,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //		if(method.getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("call method ex");
 		
-		if(method.getName().indexOf("addB")!=-1)
-			System.out.println("call method add");
+//		if(method.getName().indexOf("addB")!=-1)
+//			System.out.println("call method add");
 		
 //		ServiceInvocationContext sicon = null;
 		
@@ -257,28 +257,31 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			else if(method.getReturnType().equals(void.class))
 			{
-				IFuture<Void>	myvoid	= sic.invoke(service, method, myargs);
+				IFuture<Void> myvoid = sic.invoke(service, method, myargs);
 				
-				// Check result and propagate exception, if any.
-				// Do not throw exception as user code should not defferentiate between local and remote case.
-	//			if(myvoid.isDone())
-	//			{
-	//				myvoid.get(null);	// throws exception, if any.
-	//			}
-	//			else
-				{
-					myvoid.addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							logger.warning("Exception in void method call: "+method+" "+getServiceIdentifier()+" "+exception);
-						}
-					});
-				}
+				// Wait for the call to return to be able to throw exceptions
+				myvoid.get();
+				
+//				// Check result and propagate exception, if any.
+//				// Do not throw exception as user code should not defferentiate between local and remote case.
+//	//			if(myvoid.isDone())
+//	//			{
+//	//				myvoid.get(null);	// throws exception, if any.
+//	//			}
+//	//			else
+//				{
+//					myvoid.addResultListener(new IResultListener<Void>()
+//					{
+//						public void resultAvailable(Void result)
+//						{
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							logger.warning("Exception in void method call: "+method+" "+getServiceIdentifier()+" "+exception);
+//						}
+//					});
+//				}
 			}
 			else
 			{
@@ -299,7 +302,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					}
 					else
 					{
-						logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
+//						logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
+						// Waiting for the call is ok because of component suspendable
 						ret = fut.get();
 					}
 				}
