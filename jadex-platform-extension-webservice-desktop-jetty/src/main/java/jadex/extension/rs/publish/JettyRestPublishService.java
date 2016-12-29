@@ -103,8 +103,8 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
                     throws IOException, ServletException
                 {
-                	if (service == null)
-                		service = (IService) SServiceProvider.getService(component, serviceid).get();
+                	if(service==null)
+                		service = (IService)SServiceProvider.getService(component, serviceid).get();
                 	
                     // Hack to enable multi-part
                     // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
@@ -156,7 +156,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 server.setHandler(collhandler);
 
                 server.start();
-//                server.join();
+//              server.join();
 
                 if(portservers==null)
                     portservers = new HashMap<Integer, Server>();
@@ -191,9 +191,38 @@ public class JettyRestPublishService extends AbstractRestPublishService
     /**
      *  Publish a static page (without ressources).
      */
-    public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
+    public IFuture<Void> publishHMTLPage(URI uri, String vhost, final String html)
     {
-        throw new UnsupportedOperationException();
+    	try
+        {
+        	//final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+        	
+            Server server = (Server)getHttpServer(uri, null);
+            System.out.println("Adding http handler to server: "+uri.getPath());
+
+            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
+
+            ContextHandler ch = new ContextHandler()
+            {
+                public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
+                    throws IOException, ServletException
+                {
+                	response.getWriter().write(html);
+                	
+//                  System.out.println("handler is: "+uri.getPath());
+                    baseRequest.setHandled(true);
+                }
+            };
+            ch.setContextPath(uri.getPath());
+            collhandler.addHandler(ch);
+            ch.start(); // must be started explicitly :-(((
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+        
+        return IFuture.DONE;
     }
 
     /**

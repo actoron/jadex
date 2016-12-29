@@ -4280,15 +4280,13 @@ public class SUtil
 	 */
 	public static String beanToString(Object bean, ClassLoader cl)
 	{
-		if (cl == null)
-		{
+		if(cl == null)
 			cl = SUtil.class.getClassLoader();
-		}
 		StringBuilder beanstr = new StringBuilder("[");
 		IBeanIntrospector is = BeanIntrospectorFactory.getInstance().getBeanIntrospector();
 		Map<String, BeanProperty> props = is.getBeanProperties(bean.getClass(), true, false);
 		boolean notfirst = false;
-		for (Map.Entry<String, BeanProperty> entry : props.entrySet())
+		for(Map.Entry<String, BeanProperty> entry : props.entrySet())
 		{
 			if (notfirst)
 			{
@@ -4315,11 +4313,21 @@ public class SUtil
 	 */
 	public static String readFile(String filename)
 	{
+		return readFile(filename, null);
+	}
+	
+	/**
+	 *  Read a file to string.
+	 *  @param filename The file name.
+	 *  @return The string.
+	 */
+	public static String readFile(String filename, ClassLoader cl)
+	{
 		String ret = null;
 		Scanner sc = null;
 		try
 		{
-			InputStream is = SUtil.getResource0(filename, null);
+			InputStream is = SUtil.getResource0(filename, cl);
 			if(is==null)
 				throw new RuntimeException("Resource not found: "+filename);
 			sc = new Scanner(is);
