@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 
 /**
- * 
+ *  Agent that provides a synchronous service.
  */
 @Agent(autoprovide=true)
 @Service
@@ -19,7 +20,7 @@ public class ProviderAgent implements ISynchronousExampleService
 	 */
 	public void doVoid()
 	{
-		System.out.println("do void");
+		throw new ServiceInvalidException("Test if void method can throw exception");
 	}
 	
 	/**
@@ -40,6 +41,4 @@ public class ProviderAgent implements ISynchronousExampleService
 		ret.add("def");
 		return ret;
 	}
-	
-	
 }

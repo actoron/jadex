@@ -5,7 +5,7 @@ import java.util.Collection;
 import jadex.bridge.service.annotation.Service;
 
 /**
- * 
+ *  Synchronous service interface.
  */
 @Service
 public interface ISynchronousExampleService
