@@ -27,6 +27,7 @@ public interface IWebPublishService extends IPublishService
 	 *  Publish a static page (without ressources).
 	 */
 	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
+//	public IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
 	
 	/**
 	 *  Publish file resources from the classpath.

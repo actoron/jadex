@@ -3,7 +3,7 @@ package jadex.commons;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Date;
+import java.net.URI;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,14 +60,45 @@ public class SUtilTest //extends TestCase
 		
 		SUtil.deleteDirectory(dest.getParentFile());
 	}
-	
+
 	@Test
-	public void	testISO8601() throws Exception
-	{
-		Date date = new Date();
-		String isostring = SUtil.dateToIso8601(date);
-		System.out.println("Date " + date + " converted to " + isostring);
-		Date date2 = SUtil.dateFromIso8601(isostring);
-		System.out.println("ISO8601 string " + isostring + " converted to " + date2);
+	public void toUri_correctFormat() {
+		URI uri = SUtil.toURI("tcp-mtp://[fe80:0:0:0:8cf:5aff:feeb:f199%eth0]:42716");
+		Assert.assertEquals("tcp-mtp", uri.getScheme());
+		Assert.assertEquals("[fe80:0:0:0:8cf:5aff:feeb:f199%eth0]", uri.getHost());
+		Assert.assertEquals(42716, uri.getPort());
+	}
+
+	@Test
+	public void toUri_correctFormat2() {
+		URI uri = SUtil.toURI("tcp-mtp://[fe80:0:0:0:8cf:5aff:feeb:f199]:42716");
+		Assert.assertEquals("tcp-mtp", uri.getScheme());
+		Assert.assertEquals("[fe80:0:0:0:8cf:5aff:feeb:f199]", uri.getHost());
+		Assert.assertEquals(42716, uri.getPort());
+	}
+
+	@Test
+	public void toUri_wrongButSupportedFormat() {
+		URI uri = SUtil.toURI("tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199%eth0:42716");
+		Assert.assertEquals("tcp-mtp", uri.getScheme());
+		Assert.assertEquals("[fe80:0:0:0:8cf:5aff:feeb:f199%eth0]", uri.getHost());
+		Assert.assertEquals(42716, uri.getPort());
+	}
+
+//	@Test
+//	public void toUri_wrongButSupportedFormat2() {
+//		URI uri = SUtil.toURI("tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199:42716");
+//		Assert.assertEquals("tcp-mtp", uri.getScheme());
+//		Assert.assertEquals("[fe80:0:0:0:8cf:5aff:feeb:f199]", uri.getHost());
+//		Assert.assertEquals(42716, uri.getPort());
+//	}
+
+	@Test
+	public void toUri_wrongUnsupportedFormat() {
+		try {
+			URI uri = SUtil.toURI("tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199:42716");
+			org.junit.Assert.fail("should have thrown");
+		} catch (Exception e) {
+		}
 	}
 }

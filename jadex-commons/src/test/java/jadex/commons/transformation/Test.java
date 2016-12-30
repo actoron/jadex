@@ -110,6 +110,7 @@ public abstract class Test extends TestCase
 
 				testByte();
 				testDouble();
+				testBigInteger();
 //				testBigData();
 					
 				testByteArray();
@@ -306,6 +307,16 @@ public abstract class Test extends TestCase
 //		System.out.println("test enum: "+(TestEnum.A instanceof Enum));
 		GregorianCalendar gc = new GregorianCalendar(1999, 12, 12, 12, 12);
 		doWriteAndRead(gc);
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBigInteger() throws Exception
+	{
+//		System.out.println("test enum: "+(TestEnum.A instanceof Enum));
+		BigInteger bi = new BigInteger("123456789");
+		doWriteAndRead(bi);
 	}
 	
 	/**
