@@ -37,6 +37,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
@@ -149,6 +151,33 @@ public class SUtil
 			return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 		}
 	};
+	
+	/** ISO8601 fallbacks assuming UTC. */
+	public static final String[] ISO8601UTCFALLBACKS;
+	static
+	{
+		ISO8601UTCFALLBACKS = new String[]
+		{
+			"yyyy-MM-dd'T'HH:mm:ss'Z'",
+			"yyyy-MM-dd' 'HH:mm:ss'+00:00'",
+			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+			"yyyy-MM-dd'T'HH:mm:ss.SSS",
+			"yyyy-MM-dd'T'HH:mm:ss"
+		};
+	}
+	
+	/** ISO8601 fallbacks with included timezone. */
+	public static final String[] ISO8601ZONEDFALLBACKS;
+	static
+	{
+		ISO8601ZONEDFALLBACKS = new String[]
+		{
+			"yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+			"yyyy-MM-dd'T'HH:mm:ss.SSSX",
+			"yyyy-MM-dd'T'HH:mm:ssZ",
+			"yyyy-MM-dd'T'HH:mm:ssX"
+		};
+	}
 	
 	/**
 	 * Mapping from single characters to encoded version for displaying on
@@ -2783,7 +2812,101 @@ public class SUtil
 			}
 		}
 		return file;
-	}	
+	}
+	
+	/**
+	 *  Creates an ISO 8601-compliant string out of a java Date object.
+	 *  
+	 *  @param date The date object.
+	 *  @return ISO 8601-compliant string.
+	 */
+	public static String dateToIso8601(Date date)
+	{
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return df.format(date);
+	}
+	
+	/**
+	 *  Attempts to create a date object in Java from an ISO 8601 string.
+	 *  
+	 *  @param isostring The ISO string, must contain enough data for the date object.
+	 *  @return Date object.
+	 */
+	public static Date dateFromIso8601(String isostring)
+	{
+		Date ret = null;
+		try
+		{
+			Class<?> datetimeformatter = Class.forName("java.time.format.DateTimeFormatter");
+			Method parse = datetimeformatter.getMethod("parse", CharSequence.class);
+			Object[] formatters = new Object[]
+			{
+				datetimeformatter.getField("ISO_INSTANT").get(null),
+				datetimeformatter.getField("ISO_DATE_TIME").get(null)
+			};
+			
+			Class<?> instantclass = Class.forName("java.time.Instant");
+			Method fromi = Date.class.getMethod("from", instantclass);
+			Class<?> temporalaccessorclass = Class.forName("java.time.temporal.TemporalAccessor");
+			Method fromta = instantclass.getMethod("from", temporalaccessorclass);
+			
+			for (int i = 0; i < formatters.length && ret == null; ++i)
+			{
+				try
+				{
+					Object temporalaccessor = parse.invoke(formatters[i], isostring);
+					Object instant = fromta.invoke(null, temporalaccessor);
+					ret = (Date) fromi.invoke(null, instant);
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		catch (Exception e)
+		{
+		}
+		
+		if (ret == null)
+		{
+			for (int i = 0; i < ISO8601UTCFALLBACKS.length && ret == null; ++i)
+			{
+				String fstr = ISO8601UTCFALLBACKS[i];
+				SimpleDateFormat df = new SimpleDateFormat(fstr);
+				df.setTimeZone(TimeZone.getTimeZone("UTC"));
+				try
+				{
+					ret = df.parse(isostring);
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		
+		if (ret == null)
+		{
+			for (int i = 0; i < ISO8601ZONEDFALLBACKS.length && ret == null; ++i)
+			{
+				String fstr = ISO8601ZONEDFALLBACKS[i];
+				SimpleDateFormat df = new SimpleDateFormat(fstr);
+				df.setTimeZone(TimeZone.getTimeZone("UTC"));
+				try
+				{
+					ret = df.parse(isostring);
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		
+		if (ret == null)
+			throw new RuntimeException(new ParseException("Failed to parse ISO 8601 date string: " + isostring, 0));
+		
+		return ret;
+	}
 
 	/**
 	 *  Add a listener to System.out.
