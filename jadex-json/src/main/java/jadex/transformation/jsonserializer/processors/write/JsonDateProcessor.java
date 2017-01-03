@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
@@ -44,13 +45,20 @@ public class JsonDateProcessor implements ITraverseProcessor
 	
 		Date d  = (Date)object;
 		
-		wr.write("{");
-		wr.writeNameValue("value", d.getTime());
-		if(wr.isWriteClass())
-			wr.write(",").writeClass(object.getClass());
-		if(wr.isWriteId())
-			wr.write(",").writeId();
-		wr.write("}");
+		if(!wr.isWriteClass() && !wr.isWriteId())
+		{
+			wr.writeString(SUtil.dateToIso8601(d));
+		}
+		else
+		{
+			wr.write("{");
+			wr.writeNameValue("value", d.getTime());
+			if(wr.isWriteClass())
+				wr.write(",").writeClass(object.getClass());
+			if(wr.isWriteId())
+				wr.write(",").writeId();
+			wr.write("}");
+		}
 	
 		return object;
 	}

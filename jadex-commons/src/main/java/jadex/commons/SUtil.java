@@ -2889,7 +2889,8 @@ public class SUtil
 	 */
 	public static String dateToIso8601(Date date)
 	{
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+//		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return df.format(date);
 	}
