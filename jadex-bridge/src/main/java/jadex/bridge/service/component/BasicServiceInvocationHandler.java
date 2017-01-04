@@ -255,15 +255,16 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					}
 				});
 			}
-			else if(method.getReturnType().equals(void.class))
-			{
-				IFuture<Void> myvoid = sic.invoke(service, method, myargs);
-				
-				// Wait for the call to return to be able to throw exceptions
-				myvoid.get();
-				
+//			else if(method.getReturnType().equals(void.class))
+//			{
+//				IFuture<Void> myvoid = sic.invoke(service, method, myargs);
+//				
+//				// Wait for the call to return to be able to throw exceptions
+//				myvoid.get();
+//				ret = sic.getResult();
+//				
 //				// Check result and propagate exception, if any.
-//				// Do not throw exception as user code should not defferentiate between local and remote case.
+//				// Do not throw exception as user code should not differentiate between local and remote case.
 //	//			if(myvoid.isDone())
 //	//			{
 //	//				myvoid.get(null);	// throws exception, if any.
@@ -282,13 +283,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //						}
 //					});
 //				}
-			}
+//			}
 			else
 			{
+				//if(method.getName().indexOf("Void")!=-1)
+				//	System.out.println("sdfdf");
 				IFuture<Void> fut = sic.invoke(service, method, myargs);
 				if(fut.isDone())
 				{
-					fut.get();	// Throw exception, if any.
+					//fut.get();	
 					ret = sic.getResult();
 				}
 				else
@@ -304,9 +307,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					{
 //						logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
 						// Waiting for the call is ok because of component suspendable
-						ret = fut.get();
+						fut.get();
+						ret = sic.getResult();
 					}
 				}
+				if(ret instanceof Throwable)
+					SUtil.rethrowAsUnchecked((Throwable)ret);
 			}
 		}
 		

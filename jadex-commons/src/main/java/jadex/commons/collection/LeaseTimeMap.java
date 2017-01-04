@@ -20,6 +20,20 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	/** Lease time map with keys. */
 	protected LeaseTimeCollection<K> times;
 	
+	/** Flag if touch on read. */
+	protected boolean touchonread;
+	
+	/** Flag if touch on read. */
+	protected boolean touchonwrite;
+	
+	/**
+	 *  Create a new lease time map.
+	 */
+	public LeaseTimeMap(long leasetime, boolean touchonread, boolean touchonwrite)
+	{
+		this(null, null, leasetime, null, touchonread, touchonwrite);
+	}
+	
 	/**
 	 *  Create a new lease time map.
 	 */
@@ -33,6 +47,16 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	 */
 	public LeaseTimeMap(Map<K, V> map, LeaseTimeCollection<K> times, long leasetime, final ICommand<K> removecmd)
 	{
+		this(null, null, leasetime, null, true, true);
+	}
+	
+	/**
+	 *  Create a new lease time map.
+	 */
+	public LeaseTimeMap(Map<K, V> map, LeaseTimeCollection<K> times, long leasetime, final ICommand<K> removecmd, boolean touchonread, boolean touchonwrite)
+	{
+		this.touchonread = touchonread;
+		this.touchonwrite = touchonwrite;
 		this.map = map!=null? map: new HashMap<K, V>();
 		ICommand<K> rcmd = new ICommand<K>()
 		{
@@ -86,6 +110,8 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	 */
 	public boolean containsKey(Object key)
 	{
+		if(touchonread)
+			touch((K)key);
 		return map.containsKey(key);
 	}
 
@@ -107,6 +133,8 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	 */
 	public boolean containsValue(Object value)
 	{
+//		if(touchonread)
+//			touch((K)key);
 		return map.containsValue(value);
 	}
 
@@ -127,6 +155,8 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	 */
 	public V get(Object key)
 	{
+		if(touchonread)
+			touch((K)key);
 		return map.get(key);
 	}
 
@@ -158,7 +188,8 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	{
 		if(map.containsKey(key))
 		{
-			times.touch(key);
+			if(touchonwrite)
+				touch((K)key);
 		}
 		else
 		{
@@ -171,7 +202,8 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	{
 		if(map.containsKey(key))
 		{
-			times.touch(key, leasetime);
+			if(touchonwrite)
+				times.touch(key, leasetime);
 		}
 		else
 		{

@@ -81,7 +81,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			sermap.put(ms[i].getName(), ms[i]);
 		}
 
-		if(config!=null)
+		if(config!=null && model.getConfiguration(config)!=null)
 		{
 			ConfigurationInfo cinfo = model.getConfiguration(config);
 			RequiredServiceInfo[] cs = cinfo.getRequiredServices();
