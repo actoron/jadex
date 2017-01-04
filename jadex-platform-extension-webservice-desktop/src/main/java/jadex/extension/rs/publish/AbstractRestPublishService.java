@@ -423,7 +423,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     		public void exceptionOccurred(Exception exception)
                     		{
                     			Object result = mapResult(method, exception);
-                    			writeResponse(exception, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
+                    			writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
 //                    			ctx.complete();
                     		}
 						});
