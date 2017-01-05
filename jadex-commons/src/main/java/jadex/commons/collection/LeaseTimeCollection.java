@@ -136,6 +136,14 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Create a lease time collection with java util timer.
 	 */
+	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, Object mutex)
+	{
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime, removecmd), mutex);
+	}
+	
+	/**
+	 *  Create a lease time collection with java util timer.
+	 */
 	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer, boolean sync)
 	{
 		return sync? new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime, removecmd, timer)): new LeaseTimeCollection(leasetime, removecmd, timer);
@@ -143,6 +151,14 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	
 	//-------- methods --------
 
+	/**
+	 *  Set the remove cmd.
+	 */
+	public void setRemoveCommand(ICommand<E> cmd)
+	{
+		this.removecmd = cmd;
+	}
+	
     public int size()
     {
     	return entries.size();
@@ -193,8 +209,8 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 
     public boolean remove(Object o)
     {
-    	times.remove(o);
     	boolean ret = entries.remove(o);
+    	times.remove(o);
     	
     	if(ret)
     		checkStale();
@@ -538,6 +554,14 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
             this.mutex = mutex;
         }
 
+        /**
+    	 *  Set the remove cmd.
+    	 */
+    	public void setRemoveCommand(ICommand<E> cmd)
+    	{
+    		synchronized (mutex) {c.setRemoveCommand(cmd);}
+    	}
+        
         public int size() 
         {
             synchronized (mutex) {return c.size();}

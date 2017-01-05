@@ -71,7 +71,7 @@ public class ServicePoolAgent implements IServicePoolService
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
 				Class<?> sertype = psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports());
 				if(sertype==null)
-					System.out.println("kaputt");
+					throw new RuntimeException("Could not resolve service class: "+psi.getServicetype());
 				addServiceType(sertype, str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
 			}
 		}

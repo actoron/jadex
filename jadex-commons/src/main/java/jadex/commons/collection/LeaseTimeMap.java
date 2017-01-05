@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.commons.ICommand;
+import jadex.commons.collection.LeaseTimeCollection.SynchronizedLeaseTimeCollection;
 
 /**
  *  Lease time map with supervised write/update access.
  *  For every entry a (potentially different) leasetime is used. 
- *  Calling get does not lead to leasetime updates.  
  */
 public class LeaseTimeMap<K, V> implements Map<K, V>
 {
@@ -18,21 +18,13 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	protected Map<K, V> map;
 	
 	/** Lease time map with keys. */
-	protected LeaseTimeCollection<K> times;
+	protected ILeaseTimeCollection<K> times;
 	
 	/** Flag if touch on read. */
 	protected boolean touchonread;
 	
 	/** Flag if touch on read. */
 	protected boolean touchonwrite;
-	
-	/**
-	 *  Create a new lease time map.
-	 */
-	public LeaseTimeMap(long leasetime, boolean touchonread, boolean touchonwrite)
-	{
-		this(null, null, leasetime, null, touchonread, touchonwrite);
-	}
 	
 	/**
 	 *  Create a new lease time map.
@@ -45,19 +37,28 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	/**
 	 *  Create a new lease time map.
 	 */
-	public LeaseTimeMap(Map<K, V> map, LeaseTimeCollection<K> times, long leasetime, final ICommand<K> removecmd)
+	public LeaseTimeMap(long leasetime, boolean touchonread, boolean touchonwrite)
 	{
-		this(null, null, leasetime, null, true, true);
+		this(null, null, leasetime, null, touchonread, touchonwrite);
 	}
 	
 	/**
 	 *  Create a new lease time map.
 	 */
-	public LeaseTimeMap(Map<K, V> map, LeaseTimeCollection<K> times, long leasetime, final ICommand<K> removecmd, boolean touchonread, boolean touchonwrite)
+	public LeaseTimeMap(Map<K, V> map, ILeaseTimeCollection<K> times, long leasetime, final ICommand<K> removecmd)
+	{
+		this(map, times, leasetime, null, true, true);
+	}
+	
+	/**
+	 *  Create a new lease time map.
+	 */
+	public LeaseTimeMap(Map<K, V> map, ILeaseTimeCollection<K> times, long leasetime, final ICommand<K> removecmd, boolean touchonread, boolean touchonwrite)
 	{
 		this.touchonread = touchonread;
 		this.touchonwrite = touchonwrite;
 		this.map = map!=null? map: new HashMap<K, V>();
+		
 		ICommand<K> rcmd = new ICommand<K>()
 		{
 			public void execute(K args)
@@ -68,7 +69,18 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 					removecmd.execute(args);
 			}
 		};
-		this.times = times!=null? times: new LeaseTimeCollection<K>(leasetime, rcmd);
+		
+		if(times!=null)
+		{
+			this.times = times;
+			this.times.setRemoveCommand(rcmd);
+		}
+		else
+		{
+			this.times = LeaseTimeCollection.createLeaseTimeCollection(leasetime, rcmd, this);
+		}
+		
+//		this.times = times!=null? times: new LeaseTimeCollection<K>(leasetime, rcmd);
 	}
 
 	//-------- Map methods --------
