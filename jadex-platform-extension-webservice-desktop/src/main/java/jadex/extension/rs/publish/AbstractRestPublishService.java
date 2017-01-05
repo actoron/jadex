@@ -72,6 +72,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -164,7 +165,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				return new String(data);
 			}
 		};
-		converters.add("application/x.json+jadex", jjsonc);
+		converters.add(STransformation.MediaType.APPLICATION_JSON_JADEX, jjsonc);
 		converters.add("*/*", jjsonc);
 		
 		IObjectStringConverter xmlc = new IObjectStringConverter()
@@ -936,15 +937,19 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        {
 	        	String ret = null;
 	        	String mt = null;
-	        	for(String mediatype: sr)
+	        	if (sr != null)
 	        	{
-	        		mt = mediatype;
-	        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
-	        		if(convs!=null && convs.size()>0)
-	        		{	
-	        			ret = convs.iterator().next().convertObject(result, null);
-	        			break;
-	        		}
+		        	for(String mediatype: sr)
+		        	{
+		        		mt = mediatype;
+		        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
+		        		if(convs!=null && convs.size()>0)
+		        		{	
+		        			Object input = result instanceof Response? ((Response) result).getEntity() : result;
+		        			ret = convs.iterator().next().convertObject(input, null);
+		        			break;
+		        		}
+		        	}
 	        	}
 	        	
 	        	if(mt!=null)

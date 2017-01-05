@@ -14,6 +14,11 @@ public class STransformation
 {
 	//-------- constants --------
 	
+	public static class MediaType
+	{
+		public static final String APPLICATION_JSON_JADEX = "application/x.json+jadex";
+	}
+	
 	/**
 	 *  Static map of known aliases used for decoding.
 	 */
