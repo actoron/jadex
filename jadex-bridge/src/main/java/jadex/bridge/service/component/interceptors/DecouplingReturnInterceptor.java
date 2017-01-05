@@ -38,7 +38,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 		{
 			public void customResultAvailable(Void result)
 			{
-//				if(sic.getMethod().getName().equals("destroyComponent"))
+//				if(sic.getMethod().getName().indexOf("Void")!=-1)
 //					System.out.println("decouplingret: "+sic.getArguments());
 				
 				final Object	res	= sic.getResult();

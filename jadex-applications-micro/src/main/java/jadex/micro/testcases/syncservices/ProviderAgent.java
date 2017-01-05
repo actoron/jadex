@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.undo.CannotUndoException;
+
+import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.ComponentTypes;
 
 /**
  * 
@@ -21,6 +23,7 @@ public class ProviderAgent implements ISynchronousExampleService
 	public void doVoid()
 	{
 		System.out.println("do void");
+		throw new ServiceInvalidException("doVoid()");
 	}
 	
 	/**
