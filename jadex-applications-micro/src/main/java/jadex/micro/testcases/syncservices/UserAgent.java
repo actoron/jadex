@@ -70,21 +70,21 @@ public class UserAgent
 		}
 		results.add(tr2);
 		
-		TestReport tr3 = new TestReport("#3", "Test if can use synchronous get with collection value.");
-		try
-		{
-			ser.doVoid();
-			tr3.setFailed("No exception did occur");;
-		}
-		catch(ServiceInvalidException e)
-		{
-			tr3.setSucceeded(true);
-		}
-		catch(Exception e)
-		{
-			tr3.setFailed("Wrong exception: "+e);
-		}
-		results.add(tr3);
+//		TestReport tr3 = new TestReport("#3", "Test if can use synchronous void provoking exception.");
+//		try
+//		{
+//			ser.doVoid();
+//			tr3.setFailed("No exception did occur");;
+//		}
+//		catch(ServiceInvalidException e)
+//		{
+//			tr3.setSucceeded(true);
+//		}
+//		catch(Exception e)
+//		{
+//			tr3.setFailed("Wrong exception: "+e);
+//		}
+//		results.add(tr3);
 
 		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
