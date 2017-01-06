@@ -6,11 +6,14 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.commons.ICommand;
-import jadex.commons.collection.LeaseTimeCollection.SynchronizedLeaseTimeCollection;
 
 /**
  *  Lease time map with supervised write/update access.
  *  For every entry a (potentially different) leasetime is used. 
+ *  
+ *  Note: The map internally uses a timer to prune expired entries.
+ *  It should thus be used as synchronized map besides it is used
+ *  with a specific timer that runs on same thread as normal access.
  */
 public class LeaseTimeMap<K, V> implements Map<K, V>
 {
@@ -18,7 +21,7 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	protected Map<K, V> map;
 	
 	/** Lease time map with keys. */
-	protected ILeaseTimeCollection<K> times;
+	protected ILeaseTimeSet<K> times;
 	
 	/** Flag if touch on read. */
 	protected boolean touchonread;
@@ -63,7 +66,7 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 			}
 		};
 		
-		this.times = LeaseTimeCollection.createLeaseTimeCollection(leasetime, rcmd, timer, sync, this);
+		this.times = LeaseTimeSet.createLeaseTimeCollection(leasetime, rcmd, timer, sync, this);
 	}
 	
 //	/**

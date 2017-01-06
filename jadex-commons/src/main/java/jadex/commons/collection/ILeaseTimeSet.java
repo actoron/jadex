@@ -7,7 +7,7 @@ import jadex.commons.ICommand;
 /**
  *  Special methods for a lease time collection.
  */
-public interface ILeaseTimeCollection<E> extends Collection<E>
+public interface ILeaseTimeSet<E> extends Collection<E>
 {
 	/**
 	 *  Add a new entry.
