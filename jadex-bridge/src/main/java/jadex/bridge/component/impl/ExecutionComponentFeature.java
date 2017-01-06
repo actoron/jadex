@@ -305,6 +305,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/**
 	 * Repeats a ComponentStep periodically, until terminate() is called on result future.
+	 * 
+	 * Warning: In order to avoid memory leaks, the returned subscription future does NOT store
+	 * values, requiring the addition of a listener within the same step the repeat
+	 * step was schedule.
+	 * 
 	 * @param initialDelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
@@ -323,7 +328,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				stillRepeating.set(Boolean.FALSE);
 			}
-		});
+		}, false);
 		
 		// schedule the initial step
 		waitForDelay(initialDelay, step)
