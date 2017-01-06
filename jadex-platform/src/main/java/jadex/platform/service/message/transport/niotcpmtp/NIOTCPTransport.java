@@ -229,58 +229,64 @@ public class NIOTCPTransport implements ITransport
 	 */
 	public void	sendMessage(String address, final ISendTask task)
 	{
-		IResultListener<NIOTCPOutputConnection>	lis	= new IResultListener<NIOTCPOutputConnection>()
+		// Silently ignore when non-parseable (old style -> w/o brackets) ipv6 address. (hack???)
+		InetSocketAddress	sa	= parseAddress(address);
+		if(sa!=null)
 		{
-			public void resultAvailable(final NIOTCPOutputConnection con)
+			IResultListener<NIOTCPOutputConnection>	lis	= new IResultListener<NIOTCPOutputConnection>()
 			{
-				IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
+				public void resultAvailable(final NIOTCPOutputConnection con)
 				{
-					public IFuture<Void> execute(Void args)
+					IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 					{
-						return selectorthread.sendMessage(con, task.getProlog(), task.getData());
-					}
-				};
-				task.ready(send);
-			}
-			public void exceptionOccurred(final Exception exception)
-			{
-				IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
+						public IFuture<Void> execute(Void args)
+						{
+							return selectorthread.sendMessage(con, task.getProlog(), task.getData());
+						}
+					};
+					task.ready(send);
+				}
+				public void exceptionOccurred(final Exception exception)
 				{
-					public IFuture<Void> execute(Void args)
+					IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 					{
-						return new Future<Void>(exception);
-					}
-				};
-				task.ready(send);
-			}
-		};
-		IFuture<NIOTCPOutputConnection>	con	= selectorthread.getConnection(parseAddress(address));
-		
-		// Inform listener immediately if future is done (avoids that niotcp drops behind other transports due to stack unwinding).
-		if(con.isDone())
-		{
-			NIOTCPOutputConnection	res	= null;
-			Exception	ex	= null;
-			try
+						public IFuture<Void> execute(Void args)
+						{
+							return new Future<Void>(exception);
+						}
+					};
+					task.ready(send);
+				}
+			};
+			
+			IFuture<NIOTCPOutputConnection>	con	= selectorthread.getConnection(sa);
+			
+			// Inform listener immediately if future is done (avoids that niotcp drops behind other transports due to stack unwinding).
+			if(con.isDone())
 			{
-				res	= con.get();
-			}
-			catch(Exception e)
-			{
-				ex	= e;
-			}
-			if(ex!=null)
-			{
-				lis.exceptionOccurred(ex);
+				NIOTCPOutputConnection	res	= null;
+				Exception	ex	= null;
+				try
+				{
+					res	= con.get();
+				}
+				catch(Exception e)
+				{
+					ex	= e;
+				}
+				if(ex!=null)
+				{
+					lis.exceptionOccurred(ex);
+				}
+				else
+				{
+					lis.resultAvailable(res);
+				}
 			}
 			else
 			{
-				lis.resultAvailable(res);
+				con.addResultListener(lis);
 			}
-		}
-		else
-		{
-			con.addResultListener(lis);
 		}
 	}
 
