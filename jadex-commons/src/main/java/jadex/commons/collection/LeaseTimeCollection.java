@@ -144,9 +144,9 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Create a lease time collection with java util timer.
 	 */
-	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer, boolean sync)
+	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer, boolean sync, Object mutex)
 	{
-		return sync? new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime, removecmd, timer)): new LeaseTimeCollection(leasetime, removecmd, timer);
+		return sync? new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime, removecmd, timer), mutex): new LeaseTimeCollection(leasetime, removecmd, timer);
 	}
 	
 	//-------- methods --------
@@ -465,61 +465,68 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 		 */
 		public void run()
 		{
-			long delta = -1;
-			
-			synchronized(LeaseTimeCollection.this)
+			try
 			{
-				if(checker==this)
+				long delta = -1;
+				
+				synchronized(LeaseTimeCollection.this)
 				{
-					while(true)
+					if(checker==this)
 					{
-						E first = entries.peek();
-						
-						if(first!=null)
+						while(true)
 						{
-//							System.out.println("first: "+first);
-//							System.out.println("times: "+times);
-//							System.out.println("entries: "+entries);
+							E first = entries.peek();
 							
-							long etime = times.get(first).longValue();
-							if(etime>0)
+							if(first!=null)
 							{
-								long curtime = getClockTime();
-								delta = etime-curtime;
-								if(delta<=0)
+								System.out.println("first: "+first);
+//								System.out.println("times: "+times);
+	//							System.out.println("entries: "+entries);
+								
+								long etime = times.get(first).longValue();
+								if(etime>0)
 								{
-//									System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
-									remove(first);
-	//								entryDeleted(first);
-									if(removecmd!=null)
-										removecmd.execute(first);
+									long curtime = getClockTime();
+									delta = etime-curtime;
+									if(delta<=0)
+									{
+										System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
+										remove(first);
+		//								entryDeleted(first);
+										if(removecmd!=null)
+											removecmd.execute(first);
+									}
+									else
+									{
+										System.out.println("delta is: "+delta+" "+first);
+										break;
+									}
 								}
 								else
 								{
-//									System.out.println("delta is: "+delta+" "+first);
+									System.out.println("save value: "+first);
 									break;
 								}
 							}
 							else
 							{
-//								System.out.println("save value: "+first);
 								break;
 							}
 						}
-						else
-						{
-							break;
-						}
+					}
+					else
+					{
+						System.out.println("end: "+this);
 					}
 				}
-//				else
-//				{
-//					System.out.println("end: "+this);
-//				}
+				
+				if(delta>0) 
+					cancel = doWaitFor(delta, this);
 			}
-			
-			if(delta>0) 
-				cancel = doWaitFor(delta, this);
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		/**

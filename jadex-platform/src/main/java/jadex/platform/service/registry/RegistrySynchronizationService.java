@@ -465,7 +465,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 					System.out.println("Remove subscription of: "+entry.getPlatformId());
 					getRegistry().removeSubregistry(entry.getPlatformId());
 				}
-			}, new AgentDelayRunner(component), false);
+			}, new AgentDelayRunner(component), false, null);
 		}
 		
 		subscribedto.update(info);
