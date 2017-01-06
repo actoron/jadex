@@ -286,8 +286,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //			}
 			else
 			{
-				//if(method.getName().indexOf("Void")!=-1)
-				//	System.out.println("sdfdf");
+//				if(method.getName().indexOf("Void")!=-1)
+//					System.out.println("sdfdf");
 				IFuture<Void> fut = sic.invoke(service, method, myargs);
 				if(fut.isDone())
 				{

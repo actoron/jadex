@@ -15,7 +15,7 @@ import jadex.commons.ICommand;
 /**
  *  Collection that remove elements after a lease time automatically.
  */
-public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
+public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 {
 	/** Constant for no leasetime. */
 	public static final long NONE = -1;
@@ -54,7 +54,16 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 //			return t1>0 && t2>0? (int)(t1-t2): t1<=0 && t2<=0? 0: t1>0? 1: -1;
 //			return (int)(t1-t2);
 		}
-	});
+	})
+	{
+		// Do not allow duplicates
+		public boolean add(E e) 
+		{
+	        if(contains(e))
+	        	return false;
+	        return super.add(e);
+	    }
+	};
 	
 	/** The timestamps. */
 	protected Map<E, Long> times = new HashMap<E, Long>();
@@ -76,7 +85,7 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	protected LeaseTimeCollection()
+	protected LeaseTimeSet()
 	{
 		this(5000);
 	}
@@ -84,7 +93,7 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	protected LeaseTimeCollection(long leasetime)
+	protected LeaseTimeSet(long leasetime)
 	{
 		this(leasetime, null);
 //		this.leasetime = leasetime;
@@ -93,7 +102,7 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	protected LeaseTimeCollection(ICommand<E> removecmd)
+	protected LeaseTimeSet(ICommand<E> removecmd)
 	{
 		// per default no general leasetime
 		this(UNSET, removecmd);
@@ -102,7 +111,7 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	protected LeaseTimeCollection(long leasetime, ICommand<E> removecmd)
+	protected LeaseTimeSet(long leasetime, ICommand<E> removecmd)
 	{
 		this(leasetime, removecmd, null);
 	}
@@ -110,7 +119,7 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	protected LeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer)
+	protected LeaseTimeSet(long leasetime, ICommand<E> removecmd, IDelayRunner timer)
 	{
 		this.leasetime = leasetime;
 		this.removecmd = removecmd;
@@ -120,29 +129,45 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Create a lease time collection with java util timer.
 	 */
-	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime)
+	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime)
 	{
-		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime));
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet(leasetime));
 	}
 	
 	/**
 	 *  Create a lease time collection with java util timer.
 	 */
-	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd)
+	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd)
 	{
-		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime, removecmd));
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet(leasetime, removecmd));
 	}
 	
 	/**
 	 *  Create a lease time collection with java util timer.
 	 */
-	public static <E> ILeaseTimeCollection<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer, boolean sync)
+	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, Object mutex)
 	{
-		return sync? new SynchronizedLeaseTimeCollection<E>(new LeaseTimeCollection(leasetime, removecmd, timer)): new LeaseTimeCollection(leasetime, removecmd, timer);
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet(leasetime, removecmd), mutex);
+	}
+	
+	/**
+	 *  Create a lease time collection with java util timer.
+	 */
+	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer, boolean sync, Object mutex)
+	{
+		return sync? new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet(leasetime, removecmd, timer), mutex): new LeaseTimeSet(leasetime, removecmd, timer);
 	}
 	
 	//-------- methods --------
 
+	/**
+	 *  Set the remove cmd.
+	 */
+	public void setRemoveCommand(ICommand<E> cmd)
+	{
+		this.removecmd = cmd;
+	}
+	
     public int size()
     {
     	return entries.size();
@@ -185,7 +210,7 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
     	times.put(e, getExpirationTime(leasetime));
     	boolean ret = entries.add(e);
     
-    	if(ret)
+    	//if(ret)
     		checkStale();
     	
     	return ret;
@@ -193,8 +218,8 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 
     public boolean remove(Object o)
     {
-    	times.remove(o);
     	boolean ret = entries.remove(o);
+    	times.remove(o);
     	
     	if(ret)
     		checkStale();
@@ -449,61 +474,68 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 		 */
 		public void run()
 		{
-			long delta = -1;
-			
-			synchronized(LeaseTimeCollection.this)
+			try
 			{
-				if(checker==this)
+				long delta = -1;
+				
+				synchronized(LeaseTimeSet.this)
 				{
-					while(true)
+					if(checker==this)
 					{
-						E first = entries.peek();
-						
-						if(first!=null)
+						while(true)
 						{
-//							System.out.println("first: "+first);
-//							System.out.println("times: "+times);
-//							System.out.println("entries: "+entries);
+							E first = entries.peek();
 							
-							long etime = times.get(first).longValue();
-							if(etime>0)
+							if(first!=null)
 							{
-								long curtime = getClockTime();
-								delta = etime-curtime;
-								if(delta<=0)
+//								System.out.println("first: "+first);
+//								System.out.println("times: "+times);
+	//							System.out.println("entries: "+entries);
+								
+								long etime = times.get(first).longValue();
+								if(etime>0)
 								{
-//									System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
-									remove(first);
-	//								entryDeleted(first);
-									if(removecmd!=null)
-										removecmd.execute(first);
+									long curtime = getClockTime();
+									delta = etime-curtime;
+									if(delta<=0)
+									{
+//										System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
+										remove(first);
+		//								entryDeleted(first);
+										if(removecmd!=null)
+											removecmd.execute(first);
+									}
+									else
+									{
+//										System.out.println("delta is: "+delta+" "+first);
+										break;
+									}
 								}
 								else
 								{
-//									System.out.println("delta is: "+delta+" "+first);
+//									System.out.println("save value: "+first);
 									break;
 								}
 							}
 							else
 							{
-//								System.out.println("save value: "+first);
 								break;
 							}
 						}
-						else
-						{
-							break;
-						}
 					}
+//					else
+//					{
+//						System.out.println("end: "+this);
+//					}
 				}
-//				else
-//				{
-//					System.out.println("end: "+this);
-//				}
+				
+				if(delta>0) 
+					cancel = doWaitFor(delta, this);
 			}
-			
-			if(delta>0) 
-				cancel = doWaitFor(delta, this);
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		/**
@@ -519,12 +551,12 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	/**
 	 *  Synchronized lease time collection.
 	 */
-    public static class SynchronizedLeaseTimeCollection<E> implements ILeaseTimeCollection<E>, Serializable 
+    public static class SynchronizedLeaseTimeCollection<E> implements ILeaseTimeSet<E>, Serializable 
     {
-        final ILeaseTimeCollection<E> c;  // Backing Collection
+        final ILeaseTimeSet<E> c;  // Backing Collection
         final Object mutex;     // Object on which to synchronize
 
-        public SynchronizedLeaseTimeCollection(ILeaseTimeCollection<E> c) 
+        public SynchronizedLeaseTimeCollection(ILeaseTimeSet<E> c) 
         {
             if (c==null)
                 throw new NullPointerException();
@@ -532,12 +564,20 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
             mutex = this;
         }
         
-        public SynchronizedLeaseTimeCollection(ILeaseTimeCollection<E> c, Object mutex) 
+        public SynchronizedLeaseTimeCollection(ILeaseTimeSet<E> c, Object mutex) 
         {
             this.c = c;
             this.mutex = mutex;
         }
 
+        /**
+    	 *  Set the remove cmd.
+    	 */
+    	public void setRemoveCommand(ICommand<E> cmd)
+    	{
+    		synchronized (mutex) {c.setRemoveCommand(cmd);}
+    	}
+        
         public int size() 
         {
             synchronized (mutex) {return c.size();}
@@ -659,7 +699,7 @@ public class LeaseTimeCollection<E> implements ILeaseTimeCollection<E>
 	public static void main(String[] args)
 	{
 //		LeaseTimeCollection<Integer> col = new LeaseTimeCollection<Integer>(3000);
-		ILeaseTimeCollection<Integer> col = createLeaseTimeCollection(3000);
+		ILeaseTimeSet<Integer> col = createLeaseTimeCollection(3000);
 		
 //		col.add(1);
 //		col.add(2);

@@ -63,8 +63,8 @@ import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.ILeaseTimeCollection;
-import jadex.commons.collection.LeaseTimeCollection;
+import jadex.commons.collection.ILeaseTimeSet;
+import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -199,7 +199,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         {
         	public java.util.Collection<AsyncContext> createCollection(final String callid) 
         	{
-        		return LeaseTimeCollection.createLeaseTimeCollection(to, new ICommand<AsyncContext>()
+        		return LeaseTimeSet.createLeaseTimeCollection(to, new ICommand<AsyncContext>()
     			{
         			public void execute(AsyncContext ctx)
         			{
@@ -1044,7 +1044,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		if(to>0)
 		{
 //			System.out.println("req timeout is: "+to);
-			((ILeaseTimeCollection<AsyncContext>)requestspercall.getCollection(callid)).touch(ctx, to);
+			((ILeaseTimeSet<AsyncContext>)requestspercall.getCollection(callid)).touch(ctx, to);
 		}
 		else
 		{

@@ -2,10 +2,12 @@ package jadex.commons.collection;
 
 import java.util.Collection;
 
+import jadex.commons.ICommand;
+
 /**
  *  Special methods for a lease time collection.
  */
-public interface ILeaseTimeCollection<E> extends Collection<E>
+public interface ILeaseTimeSet<E> extends Collection<E>
 {
 	/**
 	 *  Add a new entry.
@@ -40,4 +42,9 @@ public interface ILeaseTimeCollection<E> extends Collection<E>
 	 *  @param entry The entry.
 	 */
 	public void touch(E e, long leasetime);
+	
+	/**
+	 *  Set the remove cmd.
+	 */
+	public void setRemoveCommand(ICommand<E> cmd);
 }

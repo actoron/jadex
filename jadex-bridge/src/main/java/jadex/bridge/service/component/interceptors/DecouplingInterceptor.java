@@ -218,8 +218,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		
 		// Perform decoupling
 		
-		boolean scheduleable = SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType())
-			|| sic.getMethod().getReturnType().equals(void.class);
+		
+		boolean scheduleable = true;
+//		boolean scheduleable = SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType())
+//			|| sic.getMethod().getReturnType().equals(void.class);
 		
 //		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 //			|| sic.getMethod().getReturnType().equals(void.class);

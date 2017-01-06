@@ -33,8 +33,8 @@ import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
-import jadex.commons.collection.ILeaseTimeCollection;
-import jadex.commons.collection.LeaseTimeCollection;
+import jadex.commons.collection.ILeaseTimeSet;
+import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -56,7 +56,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
 	/** The platforms this registry has subscribed to. */
-	protected ILeaseTimeCollection<SubscriptionInfo> subscribedto;
+	protected ILeaseTimeSet<SubscriptionInfo> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
 	
 	
@@ -458,14 +458,14 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	{
 		if(subscribedto==null)
 		{
-			subscribedto = LeaseTimeCollection.createLeaseTimeCollection((long)(2.2*timelimit), new ICommand<SubscriptionInfo>()
+			subscribedto = LeaseTimeSet.createLeaseTimeCollection((long)(2.2*timelimit), new ICommand<SubscriptionInfo>()
 			{
 				public void execute(SubscriptionInfo entry) 
 				{
 					System.out.println("Remove subscription of: "+entry.getPlatformId());
 					getRegistry().removeSubregistry(entry.getPlatformId());
 				}
-			}, new AgentDelayRunner(component), false);
+			}, new AgentDelayRunner(component), false, null);
 		}
 		
 		subscribedto.update(info);
