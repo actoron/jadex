@@ -1,5 +1,5 @@
 Jadex
-Copyright (C) 2002-2015 Lars Braubach, Alexander Pokahr, Kai Jander
+Copyright (C) 2002-2017 Lars Braubach, Alexander Pokahr, Kai Jander
 University of Hamburg
 
 This program is free software: you can redistribute it and/or modify
@@ -30,3 +30,8 @@ options, however please note that if you do this you may not be able to use
 the full functionality of Jadex. By using Jadex, you consent to the processing
 of Jadex usage data about you by the Jadex Team in the manner and for the
 purposes set out above.
+
+Dependencies
+Jadex includes dependencies with their own separate licenses that are compatible
+with GPLv3 license of Jadex, meaning that there are no extra obligations beyond
+the ones of GPLv3. Please refer to jadex_3rd_party.txt for more information.
