@@ -2167,9 +2167,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 							}
 						}
 						if(!set)
-						{
 							throw new IllegalArgumentException("Unexpected type for event injection: "+event+", "+ptypes[i]);
-						}
 						
 //							else if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
 //							{
@@ -2184,7 +2182,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					{
 						MBelief	mbel	= bdif.getBDIModel().getCapability().getBelief(source);
 						ret[i]	= mbel.getValue(component);
-
 					}
 				}
 				else if(anns[i][j] instanceof CheckNotNull)
