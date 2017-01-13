@@ -2099,6 +2099,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					}
 				}
 			}
+			
+			// Special case service call
 			if(rpe.getPojoElement() instanceof InvocationInfo)
 			{
 				vals.add(((InvocationInfo)rpe.getPojoElement()).getParams());
@@ -2108,11 +2110,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		// Fill in values from annotated events or using parameter guesser.
 		boolean[] notnulls = new boolean[ptypes.length];
 		
-		Object[]	ret	= new Object[ptypes.length];
+		Object[] ret = new Object[ptypes.length];
 		SimpleParameterGuesser	g	= new SimpleParameterGuesser(vals);
 		for(int i=0; i<ptypes.length; i++)
 		{
 			boolean	done	= false;
+			
 			for(int j=0; !done && anns!=null && j<anns[i].length; j++)
 			{
 				if(anns[i][j] instanceof Event)
@@ -2187,6 +2190,16 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				else if(anns[i][j] instanceof CheckNotNull)
 				{
 					notnulls[i] = true;
+				}
+			}
+			
+			if(!done && rpe.getPojoElement() instanceof InvocationInfo)
+			{
+				Object[] serviceparams = ((InvocationInfo)rpe.getPojoElement()).getParams();
+				if(SReflect.isSupertype(ptypes[i], serviceparams[i].getClass()))
+				{
+					ret[i] = serviceparams[i];
+					done = true;
 				}
 			}
 			
