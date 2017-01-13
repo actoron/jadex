@@ -1197,8 +1197,8 @@ public class APL
 		 */
 		public IInternalPlan getPlan()
 		{
-			if(rplan!=null)
-				System.out.println("access: "+this);
+//			if(rplan!=null)
+//				System.out.println("access: "+this);
 			
 			if(rplan==null)
 				rplan = RPlan.createRPlan((MPlan)getModelElement(), this, element, agent, null, null);

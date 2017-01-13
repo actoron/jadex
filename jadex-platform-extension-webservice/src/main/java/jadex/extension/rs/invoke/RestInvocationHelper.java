@@ -44,16 +44,12 @@ public class RestInvocationHelper
 	/** Use daemon threads for REST call. */
 	public static boolean USE_THREADS = true;
 	
-	/** The client */
-	protected Client client;
-	
 	/** Creates the helper.
 	 * 
 	 *  @param component The component using this helper. 
 	 */
 	public RestInvocationHelper()
 	{
-		client = ClientBuilder.newClient();
 	}
 	
 	/**
@@ -101,7 +97,7 @@ public class RestInvocationHelper
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public void run()
 			{
-				performRequest(exta, client, uri, path, headers, params, postplainjson, resttype, inurlparams, ret);
+				performRequest(exta, uri, path, headers, params, postplainjson, resttype, inurlparams, ret);
 			}
 		};
 		if (USE_THREADS)
@@ -153,7 +149,6 @@ public class RestInvocationHelper
 	 * 
 	 */
 	public static final void performRequest(IExternalAccess exta,
-											Client client,
 											final String uri,
 								 			final String path,
 								 			final Map<String, Object> headers,
@@ -163,86 +158,121 @@ public class RestInvocationHelper
 								 			final boolean inurlparams,
 								 			final Future<String> ret)
 	{
-		WebTarget wt = client.target(uri).path(path);
-		
-		Entity<?> data = null;
-		if (params != null)
+		int status = 500;
+		String reqcontent = null;
+		Response res = null;
+		Client client = null;
+		try
 		{
-			if(inurlparams)
+			client = ClientBuilder.newClient();
+			WebTarget wt = client.target(uri).path(path);
+			
+			Entity<?> data = null;
+			if (params != null)
 			{
-				for (Map.Entry<String, Object> entry : params.entrySet())
+				if(inurlparams)
 				{
-					if (entry.getValue() instanceof Collection)
+					for (Map.Entry<String, Object> entry : params.entrySet())
 					{
-						Collection<Object> coll = (Collection<Object>) entry.getValue();
-						for (Object obj : coll)
+						if (entry.getValue() instanceof Collection)
 						{
-							wt.queryParam(entry.getKey(), obj);
+							Collection<Object> coll = (Collection<Object>) entry.getValue();
+							for (Object obj : coll)
+							{
+								wt.queryParam(entry.getKey(), obj);
+							}
 						}
+						else
+							wt = wt.queryParam(entry.getKey(), entry.getValue());
 					}
-					else
-						wt = wt.queryParam(entry.getKey(), entry.getValue());
 				}
+				else
+				{
+					MultivaluedMap datamap = new MultivaluedHashMap();
+					for (Map.Entry<String, Object> entry : params.entrySet())
+					{
+						if (entry.getValue() instanceof Collection)
+						{
+							Collection<Object> coll = (Collection<Object>) entry.getValue();
+							datamap.put(entry.getKey(), coll instanceof List? (List) coll: new ArrayList<Object>(coll));
+							
+						}
+						else
+							datamap.put(entry.getKey(), Arrays.asList(new Object[] { entry.getValue() }));
+					}
+					data = Entity.form(datamap);
+				}
+			}
+			if (postplainjson != null)
+			{
+				data = Entity.json(postplainjson);
+			}
+			
+			Invocation.Builder ib = wt.request("application/json");
+			
+			if (headers != null)
+			{
+				for (Map.Entry<String, Object> entry : headers.entrySet())
+				{
+					ib.header(entry.getKey(), entry.getValue());
+				}
+			}
+			ib.accept("application/json");
+	//		ib.header("Content-Type", "application/json");
+			if(POST.class.equals(resttype))
+			{
+				res = ib.post(data);
+			}
+			else if(PUT.class.equals(resttype))
+			{
+				res = ib.put(data);
+			}
+			else if(HEAD.class.equals(resttype))
+			{
+				res = ib.head();
+			}
+			else if(OPTIONS.class.equals(resttype))
+			{
+				res = ib.options();
+			}
+			else if(DELETE.class.equals(resttype))
+			{
+				res = ib.delete();
 			}
 			else
+				res = ib.get();
+			status = res.getStatus();
+			reqcontent = res.readEntity(String.class);
+		}
+		catch (Exception e)
+		{
+			status = 500;
+		}
+		final int statuscode = status;
+		final String content = reqcontent;
+		
+		if (res != null)
+		{
+			try
 			{
-				MultivaluedMap datamap = new MultivaluedHashMap();
-				for (Map.Entry<String, Object> entry : params.entrySet())
-				{
-					if (entry.getValue() instanceof Collection)
-					{
-						Collection<Object> coll = (Collection<Object>) entry.getValue();
-						datamap.put(entry.getKey(), coll instanceof List? (List) coll: new ArrayList<Object>(coll));
-						
-					}
-					else
-						datamap.put(entry.getKey(), Arrays.asList(new Object[] { entry.getValue() }));
-				}
-				data = Entity.form(datamap);
+				res.close();
+			}
+			catch (Exception e)
+			{
 			}
 		}
-		if (postplainjson != null)
-		{
-			data = Entity.json(postplainjson);
-		}
 		
-		Invocation.Builder ib = wt.request("application/json");
-		
-		if (headers != null)
+		if (client != null)
 		{
-			for (Map.Entry<String, Object> entry : headers.entrySet())
+			try
 			{
-				ib.header(entry.getKey(), entry.getValue());
+				client.close();
+			}
+			catch (Exception e)
+			{
 			}
 		}
-		ib.accept("application/json");
-//		ib.header("Content-Type", "application/json");
-		Response res = null;
-		if(POST.class.equals(resttype))
-		{
-			res = ib.post(data);
-		}
-		else if(PUT.class.equals(resttype))
-		{
-			res = ib.put(data);
-		}
-		else if(HEAD.class.equals(resttype))
-		{
-			res = ib.head();
-		}
-		else if(OPTIONS.class.equals(resttype))
-		{
-			res = ib.options();
-		}
-		else if(DELETE.class.equals(resttype))
-		{
-			res = ib.delete();
-		}
-		else
-			res = ib.get();
-		final int statuscode = res.getStatus();
-		final String content = res.readEntity(String.class);
-		res.close();
+		
 		exta.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
