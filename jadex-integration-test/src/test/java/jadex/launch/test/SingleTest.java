@@ -24,9 +24,9 @@ public class SingleTest extends	ComponentTestSuite
 	public SingleTest(String... tests) throws Exception
 	{
 		super(findOutputDirs(
-				"jadex-platform-extension-securetransport",
-				"jadex-applications-bdi",
-				"jadex-applications-bdiv3",
+//				"jadex-platform-extension-securetransport",
+//				"jadex-applications-bdi",
+//				"jadex-applications-bdiv3",
 				"jadex-applications-micro",
 				"jadex-applications-bpmn"), tests, new String[0]);
 	}

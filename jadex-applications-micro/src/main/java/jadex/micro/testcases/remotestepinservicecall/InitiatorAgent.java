@@ -138,8 +138,9 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Call the service methods.
 	 */
-	protected IFuture<TestReport> callService(IComponentIdentifier cid, int testno)
+	protected IFuture<TestReport> callService(final IComponentIdentifier cid, final int testno)
 	{
+		System.out.println("calling0: "+cid+", #"+testno);
 		final Future<TestReport> ret = new Future<TestReport>();
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if remote scheduling inside a service call works " + (testno == 1? "(local case)." : "(remote case)."));
@@ -152,8 +153,11 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(final ITestService ts)
 			{
 				IFuture<Void> fut;
+				System.out.println("calling1: "+cid+", #"+testno);
 				fut = ts.method(agent.getExternalAccess());
+				System.out.println("calling2: "+cid+", #"+testno);
 				fut.get();
+				System.out.println("calling3: "+cid+", #"+testno);
 
 				tr.setSucceeded(true);
 				ret.setResult(tr);
