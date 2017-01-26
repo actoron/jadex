@@ -33,6 +33,8 @@ public class ProviderAgent implements ITestService
 	 */
 	public IFuture<Void> method(IExternalAccess exta)
 	{
+		ServiceCall	sc	= ServiceCall.getCurrentInvocation();
+		
 		if (ServiceCall.getCurrentInvocation() == null) {
 			return new Future<Void>(new RuntimeException("current service call before schedule is NULL. This was not really the purpose of this test."));
 		}
@@ -47,8 +49,8 @@ public class ProviderAgent implements ITestService
 			}
 		}).get();
 
-		if (ServiceCall.getCurrentInvocation() == null) {
-			return new Future<Void>(new RuntimeException("Current service call after schedule internal is null."));
+		if (ServiceCall.getCurrentInvocation() != sc) {
+			return new Future<Void>(new RuntimeException("Current service call after schedule internal has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
 		IComponentManagementService	cms	= SServiceProvider.getLocalService(agent.getComponentIdentifier(), IComponentManagementService.class, Binding.SCOPE_PLATFORM);
@@ -63,10 +65,21 @@ public class ProviderAgent implements ITestService
 			}
 		}).get();
 
-		if (ServiceCall.getCurrentInvocation() == null) {
-			return new Future<Void>(new RuntimeException("Current service call after schedule local is null."));
+		if (ServiceCall.getCurrentInvocation() != sc) {
+			return new Future<Void>(new RuntimeException("Current service call after schedule external local has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
+		cms	= SServiceProvider.getService(exta, IComponentManagementService.class, Binding.SCOPE_PLATFORM).get();
+		cms.getComponentDescription(exta.getComponentIdentifier()).get();
+		if (ServiceCall.getCurrentInvocation() != sc) {
+			return new Future<Void>(new RuntimeException("Current service call has changed after remote CMS call: "+ServiceCall.getCurrentInvocation()+", "+sc));
+		}
+		
+		ITestService	ts	= SServiceProvider.getService(exta, ITestService.class, Binding.SCOPE_LOCAL).get();
+		ts.method(agent.getExternalAccess()).get();
+		if (ServiceCall.getCurrentInvocation() != sc) {
+			return new Future<Void>(new RuntimeException("Current service call has changed after remote callback: "+ServiceCall.getCurrentInvocation()+", "+sc));
+		}
 		
 		exta.scheduleStep(new IComponentStep<Void>() {
 			@Override
@@ -78,8 +91,8 @@ public class ProviderAgent implements ITestService
 			}
 		}).get();
 
-		if (ServiceCall.getCurrentInvocation() == null) {
-			return new Future<Void>(new RuntimeException("Current service call after schedule external is null."));
+		if (ServiceCall.getCurrentInvocation() != sc) {
+			return new Future<Void>(new RuntimeException("Current service call after schedule external remote has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
 		return IFuture.DONE;
