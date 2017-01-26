@@ -11,6 +11,9 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.*;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -25,7 +28,8 @@ import java.util.Collection;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-public class InitiatorAgent extends TestAgent
+@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+public class InitiatorAgent extends TestAgent	 implements ITestService
 {
 	/**
 	 *  Perform the tests.
@@ -164,5 +168,14 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Nop for callback testing.
+	 */
+	@Override
+	public IFuture<Void> method(IExternalAccess exta)
+	{
+		return IFuture.DONE;
 	}
 }
