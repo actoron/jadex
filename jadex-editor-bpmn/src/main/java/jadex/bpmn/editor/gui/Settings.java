@@ -1101,10 +1101,8 @@ public class Settings
 //						System.out.println("found interfaces: "+ifacecache.size());
 						
 						Set<String> sclasses = getSuperClasses(filename, rcl);
-						if (sclasses.contains("java/lang/Exception"))
-						{
+						if(sclasses.contains("java/lang/Exception"))
 							cf.exception.add(new ClassInfo(cname));
-						}
 						
 						InputStream is = rcl.getResourceAsStream(filename);
 						try
@@ -1134,9 +1132,7 @@ public class Settings
 								public AnnotationVisitor visitAnnotation(String desc, boolean visible)
 								{
 									if("Ljadex/bpmn/model/task/annotation/Task;".equals(desc))
-									{
 										cf.task.add(new ClassInfo(cname));
-									}
 									return super.visitAnnotation(desc, visible);
 								}
 							};

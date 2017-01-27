@@ -2870,7 +2870,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 	
 	/**
-	 * 
+	 *  Create an event type.
 	 */
 	public static EventType createEventType(RawEvent rawev)
 	{

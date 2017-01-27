@@ -1510,7 +1510,16 @@ public class SUtil
 		int quality = 0;
 		for(int i = 0; i<urls.length; i++)
 		{
-			String cp = urls[i].getFile();
+			String cp = null;
+			try
+			{
+				cp = URLDecoder.decode(urls[i].getFile(), "UTF-8");
+			}
+			catch(Exception e)
+			{
+				rethrowAsUnchecked(e);
+			}
+			
 			stok = new StringTokenizer(cp, "/!"); // Exclamation mark to support
 													// jar files.
 			int cplen = stok.countTokens();
