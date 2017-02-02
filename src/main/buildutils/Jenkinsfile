@@ -19,6 +19,9 @@ String jadexVersion
 String major
 @Field
 String minor
+@Field
+String patch
+
 def versionSuffix
 
 stage('preparation') {
@@ -27,22 +30,49 @@ stage('preparation') {
         echo "testing jenkins with pipeline"
 
         branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
-//        println "On branch: ${env.BRANCH_NAME}" // for multibranch projects, this works
+//        println "On branch: ${env.BRANCH_NAME}" // for multibranch projects, this works?
         println "On branch: ${branchName}"
 
-        // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
-        def result = build job: "pipeline-generate-version-${branchName}"
-        genVersion = result.rawBuild.environment.PATCH_VERSION;
+        // parse last git tag
+        git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
+        def groups = (git_tag =~ /(\d+)\.(\d+).(\d+)(?:(\w*)-(\d+))?/)
+        major = groups[0][1]
+        minor = groups[0][2]
+        patch = groups[0][3]
 
         if ("master".equals(branchName)) {
             // generate version continuously
-            versionSuffix = result.rawBuild.environment.PATCH_VERSION;
+            //def result = build job: "pipeline-generate-version-${branchName}"
+            // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
+            //genVersion = result.rawBuild.environment.PATCH_VERSION;
+
             currentBuild.description = "build in master branch"
-        }
-        else {
-            // so we append something to our version. but what?
-            versionSuffix = "${result.rawBuild.environment.PATCH_VERSION}${branchName}"
+            // increase patch leve
+            patch = patch as Integer
+            patch++
+            versionSuffix = "${patch}"
+
+            // TODO: handle problem where last master tag is a tag from a branch (is that even a problem?)
+        } else {
             currentBuild.description = "build in branch: ${branchName}"
+            def branchBuildVersion
+            if (groups[0].size() > 4) {
+                if (groups[0][4].equals(branchName)) {
+                    throw new RuntimeException("Something went wrong, expected last tag to be for branch: ${branchName}, but got tag: ${git_tag}")
+                }
+                branchBuildVersion = groups[0][5] as Integer;
+                branchBuildVersion++
+            } else {
+                // no branch build yet
+                branchBuildVersion = 1
+            }
+            versionSuffix = "${patch}${branchName}-${branchBuildVersion}"
+            // so we append something to our version. but what?
+            //versionSuffix = "${result.rawBuild.environment.PATCH_VERSION}${branchName}"
+        }
+
+        if (!groups.matches()) {
+            throw new RuntimeException("Could not find version pattern in last git tag: " + git_tag)
         }
 
         echo "version suffix:" + versionSuffix
