@@ -81,7 +81,6 @@ stage('preparation') {
         echo "version suffix:" + versionSuffix
     }
 
-    // TODO for testing, tag here:
     nodeWithVersion(versionSuffix) {
         sh "./gradlew createVersionInfo"
         def props = readProperties file: 'build/jadexversion.properties'
@@ -92,9 +91,6 @@ stage('preparation') {
 
         println "building version: ${jadexVersion}"
         currentBuild.displayName = "${jadexVersion}"
-
-        sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
-//        sh "git push ${jadexVersion}" // TODO uncomment for push tag
     }
 
     nodeWithVersion(versionSuffix) {
@@ -182,10 +178,13 @@ stage ('publish and deploy') {
                     deleteDir()
                     unstash 'compiled'
                     // testing already done
-                    sh './gradlew -Pdist=publishdists build -x test' + defaultGradleArgs // TODO: add uploadArchives here
-                    print "On branch: ${env.BRANCH_NAME}"
-                    // TODO move tagging here
+                    sh './gradlew -P repo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ -P repo_commercial= -Pdist=publishdists build -x test uploadArchives ' + defaultGradleArgs
+//                    print "On branch: ${env.BRANCH_NAME}"
                 }
+            }
+            nodeWithVersion(versionSuffix) {
+                sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
+    //        sh "git push ${jadexVersion}" // TODO uncomment for push tag
             }
         },
 
