@@ -173,18 +173,17 @@ if (deployDists) {
 stage ('publish and deploy') {
     parallel (
         'publish and tag': {
-            if (publishArtifacts) {
-                nodeWithVersion(versionSuffix) {
+            nodeWithVersion(versionSuffix) {
+                if (publishArtifacts) {
                     deleteDir()
                     unstash 'compiled'
                     // testing already done
                     sh './gradlew -P repo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ -P repo_commercial= -Pdist=publishdists build -x test uploadArchives ' + defaultGradleArgs
 //                    print "On branch: ${env.BRANCH_NAME}"
                 }
-            }
-            nodeWithVersion(versionSuffix) {
                 sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
-    //        sh "git push ${jadexVersion}" // TODO uncomment for push tag
+                // TODO cannot tag here, not inside git repo
+                //        sh "git push ${jadexVersion}" // TODO uncomment for push tag
             }
         },
 
