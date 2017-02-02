@@ -34,8 +34,15 @@ stage('preparation') {
         println "On branch: ${branchName}"
 
         // parse last git tag
-        git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
+        def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
+        println git_tag
+
         def groups = (git_tag =~ /(\d+)\.(\d+).(\d+)(?:(\w*)-(\d+))?/)
+
+        if (!groups.matches()) {
+            throw new RuntimeException("Could not find version pattern in last git tag: " + git_tag)
+        }
+
         major = groups[0][1]
         minor = groups[0][2]
         patch = groups[0][3]
@@ -69,10 +76,6 @@ stage('preparation') {
             versionSuffix = "${patch}${branchName}-${branchBuildVersion}"
             // so we append something to our version. but what?
             //versionSuffix = "${result.rawBuild.environment.PATCH_VERSION}${branchName}"
-        }
-
-        if (!groups.matches()) {
-            throw new RuntimeException("Could not find version pattern in last git tag: " + git_tag)
         }
 
         echo "version suffix:" + versionSuffix
