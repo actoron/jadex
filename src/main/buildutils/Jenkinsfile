@@ -63,7 +63,7 @@ stage('preparation') {
         } else {
             currentBuild.description = "build in branch: ${branchName}"
             def branchBuildVersion
-            if (groups[0].size() > 4) {
+            if (groups[0][4]) {
                 if (groups[0][4].equals(branchName)) {
                     throw new RuntimeException("Something went wrong, expected last tag to be for branch: ${branchName}, but got tag: ${git_tag}")
                 }
