@@ -7,8 +7,8 @@ defaultGradleArgs = " --info --stacktrace"
 
 
 def branchName
-@Field
-String genVersion
+//@Field
+//String genVersion
 
 import groovy.transform.Field
 
@@ -79,9 +79,11 @@ stage('preparation') {
         }
 
         echo "version suffix:" + versionSuffix
+        // TODO: stash?
     }
 
     nodeWithVersion(versionSuffix) {
+        // TODO: unstash?
         sh "./gradlew createVersionInfo"
         def props = readProperties file: 'build/jadexversion.properties'
         jadexVersion = props.jadexversion
@@ -91,12 +93,10 @@ stage('preparation') {
 
         println "building version: ${jadexVersion}"
         currentBuild.displayName = "${jadexVersion}"
-    }
 
-    nodeWithVersion(versionSuffix) {
-//        error("Build failed because i want it to..")
         sh './gradlew gendeplist'
         stash name: 'sources'
+        stash includes: '**/.git', name: 'git', useDefaultExcludes: false
     }
 }
 
@@ -173,16 +173,20 @@ if (deployDists) {
 stage ('publish and deploy') {
     parallel (
         'publish and tag': {
-            nodeWithVersion(versionSuffix) {
-                deleteDir()
-                unstash 'compiled'
-                if (publishArtifacts) {
+            if (publishArtifacts) {
+                nodeWithVersion(versionSuffix) {
+                    deleteDir()
+                    unstash 'compiled'
                     // testing already done
                     sh './gradlew -P repo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ -P repo_commercial= -Pdist=publishdists build -x test uploadArchives ' + defaultGradleArgs
 //                    print "On branch: ${env.BRANCH_NAME}"
                 }
+            }
+
+            nodeWithVersion(versionSuffix) {
+                deleteDir()
+                unstash 'git'
                 sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
-                // TODO cannot tag here, not inside git repo
                 //        sh "git push ${jadexVersion}" // TODO uncomment for push tag
             }
         },
@@ -274,7 +278,7 @@ def tryOrRevertVersion(version, cl) {
         cl()
     } catch (Exception e) {
         println "Build Exception: ${e.getMessage()}"
-        revertVersion()
+//        revertVersion()
         throw e
     }
 }
@@ -283,18 +287,18 @@ def tryOrRevertVersion(version, cl) {
 Boolean revertedVersion = false
 
 def revertVersion() {
-    if (!revertedVersion) {
-        Integer oldNumber = (genVersion as Integer) -1;
-        echo "reverting version from ${genVersion} to ${oldNumber}"
-        def result = build job: 'pipeline-generate-version-master', parameters: [string(name: 'PATCH_VERSION', value: "${oldNumber}")], wait: true, propagate: true
-
-        // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
-        def generatedOldNumber = result.rawBuild.environment.PATCH_VERSION;
-
-        echo "reverted version to: ${generatedOldNumber}"
-
-        revertedVersion = true
-    }
+//    if (!revertedVersion) {
+//        Integer oldNumber = (genVersion as Integer) -1;
+//        echo "reverting version from ${genVersion} to ${oldNumber}"
+//        def result = build job: 'pipeline-generate-version-master', parameters: [string(name: 'PATCH_VERSION', value: "${oldNumber}")], wait: true, propagate: true
+//
+//        // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
+//        def generatedOldNumber = result.rawBuild.environment.PATCH_VERSION;
+//
+//        echo "reverted version to: ${generatedOldNumber}"
+//
+//        revertedVersion = true
+//    }
 }
 
 def compareDist(String distribution) {
