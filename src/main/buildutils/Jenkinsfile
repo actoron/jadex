@@ -96,7 +96,7 @@ stage('preparation') {
 
         sh './gradlew gendeplist'
         stash name: 'sources'
-        stash includes: '**/.git', name: 'git', useDefaultExcludes: false
+        stash includes: '.git/**', name: 'git', useDefaultExcludes: false // .git is excluded by default
     }
 }
 
