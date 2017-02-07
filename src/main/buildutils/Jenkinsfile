@@ -26,7 +26,7 @@ String patch
 def versionSuffix
 
 stage('preparation') {
-    node { // a node is a step with workspace, can be distributed
+    node('initial') { // a node is a step with workspace, can be distributed
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
         echo "testing jenkins with pipeline"
 
@@ -38,6 +38,16 @@ stage('preparation') {
         def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
         println git_tag
 
+        // current git tag:
+//        git describe --abbrev=0 --tags --exact-match
+
+        // find tag name of HEAD:
+
+//        String git_headTag = sh(returnStdout: true, script: 'git tag --points-at HEAD').trim()
+//        println git_headTag
+
+        boolean headIsLastVersionTag = runCmdAndSplit('git tag --points-at HEAD').contains(git_tag)
+
         def groups = (git_tag =~ /(\d+)\.(\d+).(\d+)(?:(\w*)-(\d+))?/)
 
         if (!groups.matches()) {
@@ -48,43 +58,46 @@ stage('preparation') {
         minor = groups[0][2]
         patch = groups[0][3]
 
+        currentBuild.description = "build in branch: ${branchName}"
+
         if ("master".equals(branchName)) {
             // generate version continuously
             //def result = build job: "pipeline-generate-version-${branchName}"
             // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
             //genVersion = result.rawBuild.environment.PATCH_VERSION;
 
-            currentBuild.description = "build in master branch"
-            // increase patch leve
             patch = patch as Integer
-            patch++
+            if (!headIsLastVersionTag) {
+                // increase patch level if at least one commit is between last tag and HEAD
+                patch++
+            }
             versionSuffix = "${patch}"
 
             // TODO: handle problem where last master tag is a tag from a branch (is that even a problem?)
         } else {
-            currentBuild.description = "build in branch: ${branchName}"
-            def branchBuildVersion
+            Integer branchPatch
             if (groups[0][4]) {
                 if (groups[0][4].equals(branchName)) {
                     throw new RuntimeException("Something went wrong, expected last tag to be for branch: ${branchName}, but got tag: ${git_tag}")
                 }
-                branchBuildVersion = groups[0][5] as Integer;
-                branchBuildVersion++
+                branchPatch = groups[0][5] as Integer;
+                if (!headIsLastVersionTag) {
+                    // increase patch level if at least one commit is between last tag and HEAD
+                    branchPatch++
+                }
             } else {
                 // no branch build yet
-                branchBuildVersion = 1
+                branchPatch = 1
             }
-            versionSuffix = "${patch}${branchName}-${branchBuildVersion}"
+            versionSuffix = "${patch}${branchName}-${branchPatch}"
             // so we append something to our version. but what?
             //versionSuffix = "${result.rawBuild.environment.PATCH_VERSION}${branchName}"
         }
 
         echo "version suffix:" + versionSuffix
-        // TODO: stash?
     }
 
-    nodeWithVersion(versionSuffix) {
-        // TODO: unstash?
+    nodeWithVersion('initial', versionSuffix) { // label initial to run on same node as checkout
         sh "./gradlew createVersionInfo"
         def props = readProperties file: 'build/jadexversion.properties'
         jadexVersion = props.jadexversion
@@ -257,9 +270,12 @@ String[] runCmdAndSplit(command) {
 
 def nodeWithVersion(String label = '', version, cl) {
     node(label) {
-        tryOrRevertVersion(version) {
-            withEnv(['BUILD_VERSION_SUFFIX='+version]) {
+        withEnv(['BUILD_VERSION_SUFFIX='+version]) {
+            try {
                 cl()
+            } catch (Exception e) {
+                println "Build Exception: ${e.getMessage()}"
+                throw e
             }
         }
     }
@@ -272,34 +288,6 @@ def withJUnit(cl){
         junit '**/test-results/*.xml'
         throw e
     }
-}
-
-def tryOrRevertVersion(version, cl) {
-    try {
-        cl()
-    } catch (Exception e) {
-        println "Build Exception: ${e.getMessage()}"
-//        revertVersion()
-        throw e
-    }
-}
-
-@Field
-Boolean revertedVersion = false
-
-def revertVersion() {
-//    if (!revertedVersion) {
-//        Integer oldNumber = (genVersion as Integer) -1;
-//        echo "reverting version from ${genVersion} to ${oldNumber}"
-//        def result = build job: 'pipeline-generate-version-master', parameters: [string(name: 'PATCH_VERSION', value: "${oldNumber}")], wait: true, propagate: true
-//
-//        // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
-//        def generatedOldNumber = result.rawBuild.environment.PATCH_VERSION;
-//
-//        echo "reverted version to: ${generatedOldNumber}"
-//
-//        revertedVersion = true
-//    }
 }
 
 def compareDist(String distribution) {
