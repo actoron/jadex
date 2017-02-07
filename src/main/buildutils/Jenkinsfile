@@ -209,13 +209,17 @@ stage ('publish and deploy') {
                     sh cmd
 //                    print "On branch: ${env.BRANCH_NAME}"
                 }
-            }
 
-            nodeWithVersion(versionSuffix) {
-                deleteDir()
-                unstash 'git'
-                sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
-                //        sh "git push ${jadexVersion}" // TODO uncomment for push tag
+                nodeWithVersion(versionSuffix) {
+                    deleteDir()
+                    unstash 'git'
+                    sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
+                    if (!publishToDummy) {
+                        sh "git push ${jadexVersion}"
+                    } else {
+                        println "not pushing tag as this is only dummy publishing"
+                    }
+                }
             }
         },
 
