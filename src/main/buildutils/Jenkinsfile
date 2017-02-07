@@ -1,7 +1,8 @@
-// configure here:
+// params set from jenkins job:
 //performanceTests = true;
 //deployDists = true;
 //publishArtifacts = true;
+//branchToBuild = "master";
 
 defaultGradleArgs = " --info --stacktrace"
 
@@ -26,7 +27,7 @@ def versionSuffix
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
-        git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: 'jenkinsfile'
+        git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
         echo "testing jenkins with pipeline"
 
         branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
