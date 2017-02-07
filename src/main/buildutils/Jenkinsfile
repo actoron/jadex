@@ -19,6 +19,13 @@ String jadexVersion
 
 def versionSuffix
 
+// convert parameters to booleans:
+performanceTests = performanceTests.toBoolean()
+publishArtifacts = publishArtifacts.toBoolean()
+deployDists = deployDists.toBoolean()
+publishToDummy = publishToDummy.toBoolean()
+publishCommercial = publishCommercial.toBoolean()
+
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
 
