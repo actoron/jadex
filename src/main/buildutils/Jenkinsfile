@@ -29,7 +29,8 @@ publishCommercial = publishCommercial.toBoolean()
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
 
-        println """Build params: branchToBuild: ${branchToBuild}, 
+        println """Build params: 
+                branchToBuild: ${branchToBuild}, 
                 performanceTests: ${performanceTests}, 
                 publishArtifacts: ${publishArtifacts}, 
                 publishToDummy: ${publishToDummy}, 
@@ -60,8 +61,8 @@ stage('preparation') {
         for (int i = 0; i < tags.length; i++) {
             if (git_tag.equals(tags[i])) {
                 headIsLastVersionTag = true
-                println """The last tag that was found on this branch points at HEAD, so nothing new happened since then.
-                        We will assume no new version number is needed, using the old one again..."""
+                println "The last tag that was found on this branch points at HEAD, so nothing new happened since then."
+                println "We will assume no new version number is needed, using the old one again..."
             }
         }
 
