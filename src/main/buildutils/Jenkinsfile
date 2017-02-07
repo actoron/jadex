@@ -28,11 +28,11 @@ String patch
 def versionSuffix
 
 stage('preparation') {
-    node('initial') { // a node is a step with workspace, can be distributed
+    node { // a node is a step with workspace, can be distributed
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
         echo "testing jenkins with pipeline"
 
-        branchName = sh (script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+        branchName = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
 //        println "On branch: ${env.BRANCH_NAME}" // for multibranch projects, this works?
         println "On branch: ${branchName}"
 
@@ -97,22 +97,23 @@ stage('preparation') {
         }
 
         echo "version suffix:" + versionSuffix
-    }
 
-    nodeWithVersion('initial', versionSuffix) { // label initial to run on same node as checkout
-        sh "./gradlew createVersionInfo"
-        def props = readProperties file: 'build/jadexversion.properties'
-        jadexVersion = props.jadexversion
-        major = props.jadexVersion_major
-        minor = props.jadexVersion_minor
-        patch = props.jadexVersion_patch
+        withEnv(['BUILD_VERSION_SUFFIX=' + version]) {
+            sh "./gradlew createVersionInfo"
+            def props = readProperties file: 'build/jadexversion.properties'
+            jadexVersion = props.jadexversion
+            major = props.jadexVersion_major
+            minor = props.jadexVersion_minor
+            patch = props.jadexVersion_patch
 
-        println "building version: ${jadexVersion}"
-        currentBuild.displayName = "${jadexVersion}"
+            println "building version: ${jadexVersion}"
+            currentBuild.displayName = "${jadexVersion}"
 
-        sh './gradlew gendeplist'
-        stash name: 'sources'
-        stash includes: '.git/**', name: 'git', useDefaultExcludes: false // .git is excluded by default
+            sh './gradlew gendeplist'
+
+            stash name: 'sources'
+            stash includes: '.git/**', name: 'git', useDefaultExcludes: false // .git is excluded by default
+        }
     }
 }
 
