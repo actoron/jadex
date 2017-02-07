@@ -32,7 +32,7 @@ stage('preparation') {
         println "Build params: branchToBuild: ${branchToBuild}, " +
                 "performanceTests: ${performanceTests}, " +
                 "publishArtifacts: ${publishArtifacts}, " +
-                "publishToDummy: ${publishArtifacts}, " +
+                "publishToDummy: ${publishToDummy}, " +
                 "publishCommercial: ${publishCommercial}, " +
                 "deployDists: ${deployDists}"
 
