@@ -21,6 +21,14 @@ def versionSuffix
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
+
+        println "Build params: branchToBuild: ${branchToBuild}, " +
+                "performanceTests: ${performanceTests}, " +
+                "publishArtifacts: ${publishArtifacts}, " +
+                "publishToDummy: ${publishArtifacts}, " +
+                "publishCommercial: ${publishCommercial}, " +
+                "deployDists: ${deployDists}"
+
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
         echo "testing jenkins with pipeline"
 
