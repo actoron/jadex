@@ -61,7 +61,10 @@ stage('preparation') {
         for (int i = 0; i < tags.length; i++) {
             if (git_tag.equals(tags[i])) {
                 headIsLastVersionTag = true
-                println "The last tag that was found on this branch points at HEAD, so nothing new happened since then. \n We will assume no new version number is needed, using the old one again..."
+                println "The last tag that was found on this branch points at HEAD, so nothing new happened since then."
+                timeout(time:1, unit: 'HOURS') {
+                    input(id: 'noNewCommits', message: 'Do you want to proceed anyway? This will lead in publish and/or tag pushing errors!')
+                }
             }
         }
 
@@ -303,12 +306,14 @@ String[] runCmdAndSplit(command) {
 
 def nodeWithVersion(String label = '', version, cl) {
     node(label) {
-        withEnv(['BUILD_VERSION_SUFFIX='+version]) {
-            try {
-                cl()
-            } catch (Exception e) {
-                println "Build Exception: ${e.getMessage()}"
-                throw e
+        timeout(time:1, unit: 'HOURS') {
+            withEnv(['BUILD_VERSION_SUFFIX=' + version]) {
+                try {
+                    cl()
+                } catch (Exception e) {
+                    println "Build Exception: ${e.getMessage()}"
+                    throw e
+                }
             }
         }
     }
