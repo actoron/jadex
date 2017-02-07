@@ -215,7 +215,7 @@ stage ('publish and deploy') {
                     unstash 'git'
                     sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
                     if (!publishToDummy) {
-                        sh "git push ${jadexVersion}"
+                        sh "git push origin ${jadexVersion}"
                     } else {
                         println "not pushing tag as this is only dummy publishing"
                     }
