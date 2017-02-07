@@ -104,7 +104,7 @@ stage('preparation') {
 
         echo "version suffix:" + versionSuffix
 
-        withEnv(['BUILD_VERSION_SUFFIX=' + version]) {
+        withEnv(['BUILD_VERSION_SUFFIX=' + versionSuffix]) {
             sh "./gradlew createVersionInfo"
             def props = readProperties file: 'build/jadexversion.properties'
             jadexVersion = props.jadexversion
