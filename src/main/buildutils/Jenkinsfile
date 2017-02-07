@@ -34,7 +34,7 @@ stage('preparation') {
                 publishArtifacts: ${publishArtifacts}, 
                 publishToDummy: ${publishToDummy}, 
                 publishCommercial: ${publishCommercial},
-                deployDists: ${deployDists}""".stripIndent()
+                deployDists: ${deployDists}"""
 
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
         echo "testing jenkins with pipeline"
@@ -61,7 +61,7 @@ stage('preparation') {
             if (git_tag.equals(tags[i])) {
                 headIsLastVersionTag = true
                 println """The last tag that was found on this branch points at HEAD, so nothing new happened since then.
-                        We will assume no new version number is needed, using the old one again...""".stripIndent()
+                        We will assume no new version number is needed, using the old one again..."""
             }
         }
 
