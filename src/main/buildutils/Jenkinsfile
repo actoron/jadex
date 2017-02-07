@@ -5,6 +5,7 @@
 //branchToBuild = "master";
 
 //publishToDummy = true
+// publishCommercial = true;
 
 defaultGradleArgs = " --info --stacktrace"
 
@@ -182,11 +183,15 @@ stage ('publish and deploy') {
                     deleteDir()
                     unstash 'compiled'
                     // testing already done
+                    def cmd = './gradlew -Pdist=publishdists build -x test uploadArchives '
                     if (publishToDummy) {
-                        sh './gradlew -P repo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ -P repo_commercial= -Pdist=publishdists build -x test uploadArchives ' + defaultGradleArgs
-                    } else {
-                        sh './gradlew -Pdist=publishdists build -x test uploadArchives ' + defaultGradleArgs
+                        cmd += '-P repo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ -P repo_commercial= '
                     }
+                    if (!publishCommercial) {
+                        cmd += '-P repo_commercial= '
+                    }
+                    cmd += defaultGradleArgs
+                    sh cmd
 //                    print "On branch: ${env.BRANCH_NAME}"
                 }
             }
