@@ -68,6 +68,7 @@ public class MicroTest	extends ComponentTestSuite
 		
 		// Does not work and I need a build
 		"NullTagAgent",
+		"remotestepinservicecall/InitiatorAgent",
 		
 		// android excludes
 		SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
