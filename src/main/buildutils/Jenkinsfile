@@ -61,8 +61,7 @@ stage('preparation') {
         for (int i = 0; i < tags.length; i++) {
             if (git_tag.equals(tags[i])) {
                 headIsLastVersionTag = true
-                println "The last tag that was found on this branch points at HEAD, so nothing new happened since then."
-                println "We will assume no new version number is needed, using the old one again..."
+                println "The last tag that was found on this branch points at HEAD, so nothing new happened since then. \n We will assume no new version number is needed, using the old one again..."
             }
         }
 
@@ -83,13 +82,11 @@ stage('preparation') {
                 patch++
             }
             versionSuffix = "${patch}"
-
-            // TODO: handle problem where last master tag is a tag from a branch (is that even a problem?)
         } else {
             Integer branchPatch
             if (versionsFromTag.branchName) {
-                if (versionsFromTag.branchName.equals(branchName)) {
-                    throw new RuntimeException("Something went wrong, expected last tag to be for branch: ${branchName}, but got tag: ${git_tag}")
+                if (!versionsFromTag.branchName.equals(branchName)) {
+                    error ("Something went wrong, expected last tag to be for branch: ${branchName}, but got tag: ${git_tag}")
                 }
                 branchPatch = versionsFromTag.branchPatch as Integer;
                 if (!headIsLastVersionTag) {
