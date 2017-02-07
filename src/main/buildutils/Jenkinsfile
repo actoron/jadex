@@ -45,7 +45,7 @@ stage('preparation') {
 
         // parse last git tag
         def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
-        println git_tag
+        println "The tag used for generating a new version is: ${git_tag}"
 
         // current git tag:
 //        git describe --abbrev=0 --tags --exact-match
@@ -60,6 +60,8 @@ stage('preparation') {
         for (int i = 0; i < tags.length; i++) {
             if (git_tag.equals(tags[i])) {
                 headIsLastVersionTag = true
+                println "The last tag that was found on this branch points at HEAD, so nothing new happened since then." +
+                        "We will assume no new version number is needed, using the old one again..."
             }
         }
 
