@@ -48,7 +48,13 @@ stage('preparation') {
 //        String git_headTag = sh(returnStdout: true, script: 'git tag --points-at HEAD').trim()
 //        println git_headTag
 
-        boolean headIsLastVersionTag = runCmdAndSplit('git tag --points-at HEAD').contains(git_tag)
+        boolean headIsLastVersionTag = false
+        def tags = runCmdAndSplit('git tag --points-at HEAD')
+        for (int i = 0; i < tags.length; i++) {
+            if (git_tag.equals(tags[i])) {
+                headIsLastVersionTag = true
+            }
+        }
 
         def groups = (git_tag =~ /(\d+)\.(\d+).(\d+)(?:(\w*)-(\d+))?/)
 
