@@ -399,7 +399,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				};
 
 				// For local call: fetch timeout to decide if undone. ignored for remote.
-				final long timeout = !sic.isRemoteCall() ? sic.getNextServiceCall().getTimeout() : Timeout.NONE;
+				final long timeout = (!sic.isRemoteCall() && !((IFuture) res).isDone()) ? sic.getNextServiceCall().getTimeout() : Timeout.NONE;
 
 				FutureFunctionality func = new FutureFunctionality(ia.getLogger())
 				{
