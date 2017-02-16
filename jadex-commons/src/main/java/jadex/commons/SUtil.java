@@ -3119,6 +3119,8 @@ public class SUtil
 		
 		return OUT_FOR_SYSTEM_IN;
 	}
+
+	public static final String INTERFACE_NAME="eth0";
 	
 	/**
 	 *  Get a IPV4 address of the local host.
@@ -3133,12 +3135,15 @@ public class SUtil
 		{
 			for(NetworkInterface ni: getNetworkInterfaces())
 			{
-				Enumeration e2 = ni.getInetAddresses();
-				while(e2.hasMoreElements() && ret==null)
+				if (INTERFACE_NAME != NULL && ni.getName().equals(INTERFACE_NAME))
 				{
-					InetAddress tmp = (InetAddress)e2.nextElement();
-					if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
-						ret = (InetAddress)tmp;
+					Enumeration e2 = ni.getInetAddresses();
+					while(e2.hasMoreElements() && ret==null)
+					{
+						InetAddress tmp = (InetAddress)e2.nextElement();
+						if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+							ret = (InetAddress)tmp;
+					}
 				}
 			}
 			
