@@ -285,7 +285,7 @@ public class SUtil
 			tmp += it.next();
 		seps	= tmp;
 		
-		List<IResultCommand<ResourceInfo, URLConnection>>	mappers	= new ArrayList();
+		List<IResultCommand<ResourceInfo, URLConnection>>	mappers	= new ArrayList<IResultCommand<ResourceInfo, URLConnection>>();
 		String	custommappers	= System.getProperty("jadex.resourcemappers");
 		if(custommappers!=null)
 		{
@@ -295,7 +295,7 @@ public class SUtil
 				String	mapper	= stok.nextToken().trim();
 				try
 				{
-					Class	clazz	= SReflect.classForName(mapper, SUtil.class.getClassLoader());
+					Class<IResultCommand<ResourceInfo, URLConnection>> clazz = (Class<IResultCommand<ResourceInfo, URLConnection>>)SReflect.classForName(mapper, SUtil.class.getClassLoader());
 					mappers.add((IResultCommand<ResourceInfo, URLConnection>)clazz.newInstance());
 				}
 				catch(Exception e)
@@ -316,7 +316,7 @@ public class SUtil
 				{
 					try
 					{
-						long	modified	= 0;
+						long modified = 0;
 						String	filename	= con.getURL().getFile();
 						JarURLConnection juc = (JarURLConnection)con;
 						// System.out.println("Jar file:     "+juc.getJarFile());
@@ -335,17 +335,15 @@ public class SUtil
 	
 						try
 						{
-							ret = new ResourceInfo(filename,
-									con.getInputStream(), modified);
+							ret = new ResourceInfo(filename, con.getInputStream(), modified);
 						}
 						catch(NullPointerException e)
 						{
 							// Workaround for Java bug #5093378 !?
 							// Maybe this is only a race condition???
 							String jarfilename = juc.getJarFile().getName();
-							ret = new ResourceInfo(filename, new JarFile(
-									jarfilename).getInputStream(juc
-									.getJarEntry()), modified);
+							ret = new ResourceInfo(filename, new JarFile(jarfilename)
+								.getInputStream(juc.getJarEntry()), modified);
 							// System.err.println("loaded with workaround: "+url);
 						}
 	
@@ -489,8 +487,8 @@ public class SUtil
 	 */
 	public static Object cutArrays(Object a1, Object a2)
 	{
-		List ar1 = arrayToList(a1);
-		List ar2 = arrayToList(a2);
+		List<Object> ar1 = arrayToList(a1);
+		List<Object> ar2 = arrayToList(a2);
 		List<Object> ret = new ArrayList<Object>();
 		Object tmp;
 
@@ -503,7 +501,7 @@ public class SUtil
 			}
 		}
 		return ret.toArray((Object[])Array.newInstance(a1.getClass()
-				.getComponentType(), ret.size()));
+			.getComponentType(), ret.size()));
 	}
 
 	/**
@@ -515,8 +513,8 @@ public class SUtil
 	 */
 	public static Object substractArrays(Object a1, Object a2)
 	{
-		List ar1 = arrayToList(a1);
-		List ar2 = arrayToList(a2);
+		List<Object> ar1 = arrayToList(a1);
+		List<Object> ar2 = arrayToList(a2);
 		Object tmp;
 
 		for(int i = 0; i < ar2.size(); i++)
@@ -528,7 +526,7 @@ public class SUtil
 			}
 		}
 		return ar1.toArray((Object[])Array.newInstance(a1.getClass()
-				.getComponentType(), ar1.size()));
+			.getComponentType(), ar1.size()));
 	}
 
 	/**
@@ -539,14 +537,14 @@ public class SUtil
 	 */
 	public static <T> List<T> arrayToList(Object a)
 	{
-		ArrayList ret = null;
+		ArrayList<T> ret = null;
 		if(a!=null)
 		{
 			int l = Array.getLength(a);
 			ret = SCollection.createArrayList();
 			for(int i = 0; i < l; i++)
 			{
-				ret.add(Array.get(a, i));
+				ret.add((T)Array.get(a, i));
 			}
 		}
 		return ret;
@@ -561,10 +559,10 @@ public class SUtil
 	public static <T> Set<T> arrayToSet(Object a)
 	{
 		int l = Array.getLength(a);
-		Set ret = SCollection.createHashSet();
+		Set<T> ret = SCollection.createHashSet();
 		for(int i = 0; i < l; i++)
 		{
-			ret.add(Array.get(a, i));
+			ret.add((T)Array.get(a, i));
 		}
 		return ret;
 	}
@@ -582,9 +580,9 @@ public class SUtil
 	/**
 	 * Transform an iterator to a list.
 	 */
-	public static List iteratorToList(Iterator it)
+	public static <T> List<T> iteratorToList(Iterator<T> it)
 	{
-		List ret = new ArrayList();
+		List<T> ret = new ArrayList<T>();
 		while(it.hasNext())
 			ret.add(it.next());
 		return ret;
@@ -593,10 +591,10 @@ public class SUtil
 	/**
 	 * Transform an iterator to a list.
 	 */
-	public static List iteratorToList(Iterator it, List ret)
+	public static <T> List<T> iteratorToList(Iterator<T> it, List<T> ret)
 	{
 		if(ret == null)
-			ret = new ArrayList();
+			ret = new ArrayList<T>();
 		while(it.hasNext())
 			ret.add(it.next());
 		return ret;
@@ -605,9 +603,9 @@ public class SUtil
 	/**
 	 * Transform an iterator to an array.
 	 */
-	public static Object[] iteratorToArray(Iterator it, Class clazz)
+	public static <T> Object[] iteratorToArray(Iterator<T> it, Class<T> clazz)
 	{
-		List list = iteratorToList(it);
+		List<T> list = iteratorToList(it);
 		return list.toArray((Object[])Array.newInstance(clazz, list.size()));
 	}
 
@@ -636,7 +634,7 @@ public class SUtil
 	public static int getArrayDimension(Object array) 
 	{
 		int ret = 0;
-		Class arrayClass = array.getClass();
+		Class<?> arrayClass = array.getClass();
 		while(arrayClass.isArray()) 
 		{
 			ret++;
@@ -766,7 +764,7 @@ public class SUtil
 	{
 		String sing = s;
 		if(s.endsWith("shes") || s.endsWith("ches") || s.endsWith("xes")
-				|| s.endsWith("ses"))
+			|| s.endsWith("ses"))
 		{
 			sing = s.substring(0, s.length() - 2);
 		}
@@ -909,34 +907,33 @@ public class SUtil
 		return buf.toString();
 	}
 
-
-	/** Constant for sorting up. */
-	public static final int	SORT_UP		= 0;
-
-	/** Constant for sorting down. */
-	public static final int	SORT_DOWN	= 1;
-
-	/**
-	 * Remove the least element form a collection.
-	 */
-	protected static int getExtremeElementIndex(Vector source, int direction)
-	{
-		String ret = (String)source.elementAt(0);
-		int retidx = 0;
-		int size = source.size();
-		for(int i = 0; i < size; i++)
-		{
-			String tmp = (String)source.elementAt(i);
-			int res = tmp.compareTo(ret);
-			if((res < 0 && direction == SORT_UP)
-					|| (res > 0 && direction == SORT_DOWN))
-			{
-				ret = tmp;
-				retidx = i;
-			}
-		}
-		return retidx;
-	}
+//	/** Constant for sorting up. */
+//	public static final int	SORT_UP		= 0;
+//
+//	/** Constant for sorting down. */
+//	public static final int	SORT_DOWN	= 1;
+//
+//	/**
+//	 * Remove the least element form a collection.
+//	 */
+//	protected static int getExtremeElementIndex(Vector source, int direction)
+//	{
+//		String ret = (String)source.elementAt(0);
+//		int retidx = 0;
+//		int size = source.size();
+//		for(int i = 0; i < size; i++)
+//		{
+//			String tmp = (String)source.elementAt(i);
+//			int res = tmp.compareTo(ret);
+//			if((res < 0 && direction == SORT_UP)
+//					|| (res > 0 && direction == SORT_DOWN))
+//			{
+//				ret = tmp;
+//				retidx = i;
+//			}
+//		}
+//		return retidx;
+//	}
 
 	/**
 	 * Convert an output to html/wml conform presentation.
@@ -1115,8 +1112,7 @@ public class SUtil
 	 * @param old The string to replace.
 	 * @param newstring The string to use as replacement.
 	 */
-	public static void replace(String source, StringBuffer dest, String old,
-			String newstring)
+	public static void replace(String source, StringBuffer dest, String old, String newstring)
 	{
 		int last = 0;
 		int index;
@@ -1154,8 +1150,7 @@ public class SUtil
 	 * @return The input stream for the resource.
 	 * @throws IOException when the resource was not found.
 	 */
-	public static InputStream getResource(String name, ClassLoader classloader)
-			throws IOException
+	public static InputStream getResource(String name, ClassLoader classloader) throws IOException
 	{
 		InputStream is = getResource0(name, classloader);
 		if(is == null)
@@ -1173,8 +1168,7 @@ public class SUtil
 	 * @return The input stream for the resource or null when the resource was
 	 *         not found.
 	 */
-	public synchronized static InputStream getResource0(String name,
-			ClassLoader classloader)
+	public synchronized static InputStream getResource0(String name, ClassLoader classloader)
 	{
 		InputStream is = null;
 		File file;
@@ -1268,7 +1262,7 @@ public class SUtil
 					try
 					{
 						ret = new ResourceInfo(file.getCanonicalPath(),
-								new FileInputStream(file), file.lastModified());
+							new FileInputStream(file), file.lastModified());
 					}
 					catch(FileNotFoundException e)
 					{
@@ -1502,7 +1496,7 @@ public class SUtil
 		if(!fpath.isDirectory())
 			path = fpath.getParent();
 
-		java.util.List toks = SCollection.createArrayList();
+		List<String> toks = SCollection.createArrayList();
 		StringTokenizer stok = new StringTokenizer(path, File.separator);
 		while(stok.hasMoreTokens())
 			toks.add(stok.nextToken());
@@ -1627,9 +1621,12 @@ public class SUtil
 
 		Set<URL> cps = new LinkedHashSet<URL>(); 
 	
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			cps.addAll(androidUtils().collectDexPathUrls(classloader));
-		} else {
+		} 
+		else 
+		{
 			StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
 			while(stok.hasMoreTokens())
 			{
