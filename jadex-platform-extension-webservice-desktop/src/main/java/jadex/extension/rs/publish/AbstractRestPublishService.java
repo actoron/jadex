@@ -497,7 +497,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     /**
      *  Publish a static page (without ressources).
      */
-    public abstract IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
+    public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
 
     /**
      *  Publish file resources from the classpath.

@@ -191,10 +191,12 @@ public class JettyRestPublishService extends AbstractRestPublishService
     /**
      *  Publish a static page (without ressources).
      */
-    public IFuture<Void> publishHMTLPage(URI uri, String vhost, final String html)
+    public IFuture<Void> publishHMTLPage(String pid, String vhost, final String html)
     {
     	try
         {
+    		String clpid = pid.replace("[", "").replace("]", "");
+    		URI uri = new URI(clpid);
         	//final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
         	
             Server server = (Server)getHttpServer(uri, null);

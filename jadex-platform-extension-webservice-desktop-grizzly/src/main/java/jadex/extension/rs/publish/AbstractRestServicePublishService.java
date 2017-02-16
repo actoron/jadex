@@ -413,7 +413,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	/**
 	 *  Publish an html page.
 	 */
-	public abstract IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
+	public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
 	
 //	/**
 //	 *  Publish a resource.
