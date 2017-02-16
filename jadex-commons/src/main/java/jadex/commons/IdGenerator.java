@@ -1,4 +1,4 @@
-package jadex.bpmn.model.io;
+package jadex.commons;
 
 import java.util.HashSet;
 import java.util.Random;

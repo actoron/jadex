@@ -1,6 +1,6 @@
 package jadex.bpmn.model;
 
-import jadex.bpmn.model.io.IdGenerator;
+import jadex.commons.IdGenerator;
 
 /**
  *  Base model element with an id. 
