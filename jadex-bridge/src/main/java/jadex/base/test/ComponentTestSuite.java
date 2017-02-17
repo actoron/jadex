@@ -575,11 +575,11 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			}
 		}
 	}
-
-	@Override
-	public void addTest(Test test)
-	{
-		System.out.println("Test added: "+test);
-		super.addTest(test);
-	}
+//
+//	@Override
+//	public void addTest(Test test)
+//	{
+//		System.out.println("Test added: "+test);
+//		super.addTest(test);
+//	}
 }
