@@ -294,6 +294,16 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 	}
 
 	@Override
+	public String getAwaNetworkIfaceName() {
+		return getRootConfig().getAwaNetworkIfaceName();
+	}
+
+	@Override
+	public void setAwaNetworkIface(String ifacename) {
+		getRootConfig().setAwaNetworkIface(ifacename);
+	}
+
+	@Override
 	public long getAwaDelay() {
 		return getRootConfig().getAwaDelay();
 	}

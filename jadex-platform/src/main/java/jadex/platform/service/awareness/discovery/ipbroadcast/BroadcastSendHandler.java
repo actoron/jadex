@@ -80,7 +80,7 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	{
 		int ret = 0;
 		
-		InetAddress address = SUtil.getInetAddress();
+		InetAddress address = SUtil.getInetAddress(agent.getNetworkiface());
 		
 		if(address instanceof Inet4Address)
 		{
@@ -162,7 +162,7 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	 */
 	public void sendToMaster(byte[] data)
 	{
-		send(data, SUtil.getInetAddress(), getAgent().getPort());
+		send(data, SUtil.getInetAddress(agent.getNetworkiface()), getAgent().getPort());
 	}
 	
 	/**

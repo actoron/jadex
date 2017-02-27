@@ -95,14 +95,14 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 		int ret = 0;
 		try
 		{
-			InetAddress iadr = SUtil.getInetAddress();
+			InetAddress iadr = SUtil.getInetAddress(agent.getNetworkiface());
 			
 			if(iadr instanceof Inet4Address)
 			{
 				short sublen = SUtil.getNetworkPrefixLength(iadr);
 				if(sublen==-1) // Guess C class if nothing can be determined.
 					sublen = 24;
-				byte[] byinet = SUtil.getInetAddress().getAddress();
+				byte[] byinet = SUtil.getInetAddress(agent.getNetworkiface()).getAddress();
 				int hostbits = 32-sublen;
 				int numips = (int)Math.pow(2, hostbits);
 				
@@ -146,7 +146,7 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 	 */
 	public void sendToMaster(byte[] data)
 	{
-		send(data, SUtil.getInetAddress(), getAgent().getPort());
+		send(data, SUtil.getInetAddress(agent.getNetworkiface()), getAgent().getPort());
 	}
 	
 	/**

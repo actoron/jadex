@@ -54,22 +54,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.ComponentType;
-import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.Properties;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
+import jadex.micro.annotation.*;
 
 
 /**
@@ -82,6 +67,7 @@ import jadex.micro.annotation.RequiredServices;
 //	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
 	@Argument(name="mechanisms", clazz=String.class, description="The discovery mechanisms."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
+	@Argument(name="networkiface", clazz=String.class, description = "The network interface for awareness mechanisms"),
 	@Argument(name="fast", clazz=boolean.class, defaultvalue="false", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="autocreate", clazz=boolean.class, defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
 	@Argument(name="autodelete", clazz=boolean.class, defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
@@ -131,6 +117,10 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	
 	/** The send delay. */
 	protected long delay;
+
+	/** The network interface. */
+	@AgentArgument
+	protected String networkiface;
 	
 	/** Flag for enabling fast startup awareness (pingpong send behavior). */
 	protected boolean fast;
@@ -239,6 +229,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 									Map<String, Object> args = new HashMap<String, Object>();
 									args.put("delay", Long.valueOf(getDelay()));
 									args.put("fast", Boolean.valueOf(isFastAwareness()));
+									args.put("networkiface", networkiface);
 									args.put("includes", getIncludes());
 									args.put("excludes", getExcludes());
 									info.setArguments(args);
@@ -344,7 +335,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	
 	/**
 	 *  Announce the discovered components.
-	 *  @param infos The infos.
+	 *  @param info The infos.
 	 */
 	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info)
 	{

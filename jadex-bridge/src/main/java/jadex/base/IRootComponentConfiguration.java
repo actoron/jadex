@@ -198,6 +198,9 @@ public interface IRootComponentConfiguration {
     // Relay,
     // Local"
 
+    /** Specify the network interface names for awamechanisms (broadcast, scanner, registry) to use **/
+    public static final String AWANETWORKIFACE      = "awanetworkiface";
+
     /** The awareness delay in milliseconds **/
     public static final String	AWADELAY			= "awadelay";								// class:
     // long
@@ -600,6 +603,10 @@ public interface IRootComponentConfiguration {
     RootComponentConfiguration.AWAMECHANISM[] getAwaMechanisms();
 
     void setAwaMechanisms(RootComponentConfiguration.AWAMECHANISM... values);
+
+    String getAwaNetworkIfaceName();
+
+    void setAwaNetworkIface(String ifacename);
 
     long getAwaDelay();
 

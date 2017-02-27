@@ -3193,6 +3193,22 @@ public class SUtil
 		
 		return ret;
 	}
+
+
+	/**
+	 *  Get an address of the local host.
+	 *  Tries to get a IPV4 address and if not available
+	 *  tries to get a IPV6 address.
+	 *  @param iface Name of the interface to get the IP address for (e.g. 'eth0').
+	 *  @return IPV4 or IPV6 address of the given interface OR THE FIRST ADDRESS FOUND, if the interface does not exist.
+	 */
+	public static InetAddress getInetAddress(String iface) {
+		InetAddress addr = getInetAddressForInterface(iface);
+		if (addr == null) {
+			addr = getFirstInetAddress();
+		}
+		return addr;
+	}
 	
 	/**
 	 *  Get an address of the local host.
@@ -3200,11 +3216,56 @@ public class SUtil
 	 *  tries to get a IPV6 address.
 	 *  @return First found IPV4 or IPV6 address.
 	 */
-	public static InetAddress getInetAddress()
+	public static InetAddress getFirstInetAddress()
 	{
 		InetAddress ret = getInet4Address();
 		if(ret==null)
 			ret = getInet6Address();
+		return ret;
+	}
+
+	/**
+	 *  Get an address of the local host.
+	 *  Tries to get a IPV4 address and if not available
+	 *  tries to get a IPV6 address.
+	 *  @param iface Name of the interface to get the IP address for (e.g. 'eth0').
+	 *  @return IPV4 or IPV6 address of the given interface or null, if the interface does not exist.
+	 */
+	public static InetAddress getInetAddressForInterface(String iface)
+	{
+		InetAddress ret = null;
+
+		try {
+			NetworkInterface ni = NetworkInterface.getByName(iface);
+			Enumeration<InetAddress> inetAddresses = ni.getInetAddresses();
+
+			// look for ipv4 first
+			while(inetAddresses.hasMoreElements() && ret==null)
+			{
+				InetAddress tmp = inetAddresses.nextElement();
+				if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+					ret = tmp;
+			}
+
+			// now ipv6
+			if (ret == null)
+			while(inetAddresses.hasMoreElements() && ret==null)
+			{
+				InetAddress tmp = inetAddresses.nextElement();
+				if(tmp instanceof Inet6Address && !tmp.isLoopbackAddress())
+					ret = tmp;
+			}
+
+			// some weird backup method
+			if(ret==null)
+			{
+				InetAddress tmp = InetAddress.getLocalHost();
+				if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+					ret = tmp;
+			}
+		} catch (Exception e) {
+		}
+
 		return ret;
 	}
 	

@@ -48,7 +48,10 @@ import jadex.platform.service.message.MapSendTask;
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
 	@Argument(name="fast", clazz=boolean.class, defaultvalue="false", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="includes", clazz=String[].class, description="A list of platforms/IPs/hostnames to include. Matches start of platform/IP/hostname."),
-	@Argument(name="excludes", clazz=String[].class, description="A list of platforms/IPs/hostnames to exclude. Matches start of platform/IP/hostname.")
+	@Argument(name="excludes", clazz=String[].class, description="A list of platforms/IPs/hostnames to exclude. Matches start of platform/IP/hostname."),
+	@Argument(name="networkiface", clazz=String.class, description = "The network interface to listen on (for master instances)."),
+	@Argument(name="", clazz=String[].class, description="A list of platforms/IPs/hostnames to exclude. Matches start of platform/IP/hostname.")
+
 })
 /*@Configurations(
 {
@@ -81,6 +84,10 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	/** Flag for enabling fast startup awareness (pingpong send behavior). */
 	@AgentArgument
 	protected boolean fast;
+
+	/** The network iface to listen on. **/
+	@AgentArgument
+	protected String networkiface;
 	
 	/** The includes list. */
 	@AgentArgument
@@ -259,7 +266,15 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  Create the receive handler.
 	 */
 	public abstract ReceiveHandler createReceiveHandler();
-	
+
+	/**
+	 * Get the network interface.
+	 * @return
+	 */
+	public String getNetworkiface() {
+		return networkiface;
+	}
+
 	/**
 	 *  Get the includes.
 	 *  @return the includes.

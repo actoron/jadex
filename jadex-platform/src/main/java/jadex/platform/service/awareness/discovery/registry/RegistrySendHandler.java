@@ -193,7 +193,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 	public void sendToMaster(byte[] data)
 	{
 //		System.out.println("sent to master: "+SUtil.getInet4Address()+" "+getAgent().getPort());
-		send(data, SUtil.getInetAddress(), getAgent().getPort());
+		send(data, SUtil.getInetAddress(agent.getNetworkiface()), getAgent().getPort());
 	}
 	
 	/**

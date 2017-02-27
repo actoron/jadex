@@ -1,5 +1,6 @@
 package jadex.platform;
 
+import static jadex.base.IRootComponentConfiguration.AWANETWORKIFACE;
 import static jadex.base.RootComponentConfiguration.ADDRESS;
 import static jadex.base.RootComponentConfiguration.ASYNCEXECUTION;
 import static jadex.base.RootComponentConfiguration.AWADELAY;
@@ -150,6 +151,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
 	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
 	@Argument(name=AWAFAST, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=AWANETWORKIFACE, clazz=String.class, defaultvalue="null"),
 
 	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),
@@ -343,7 +345,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 				@NameValue(name="delay", value="$args.awadelay"),
 				@NameValue(name="fast", value="$args.awafast"),
 				@NameValue(name="includes", value="$args.awaincludes"),
-				@NameValue(name="excludes", value="$args.awaexcludes")}),
+				@NameValue(name="excludes", value="$args.awaexcludes"),
+				@NameValue(name="networkiface", value="$args.awanetworkiface")}),
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 			arguments={

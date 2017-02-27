@@ -53,7 +53,7 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 		
 		if(getAgent().isMaster())
 		{
-			if(address.equals(SUtil.getInetAddress()))
+			if(address.equals(SUtil.getInetAddress(agent.networkiface)))
 			{
 //				System.out.println("from slave: "+address);
 				

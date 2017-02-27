@@ -91,7 +91,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String createMasterId()
 	{
-		return isMaster()? createMasterId(SUtil.getInetAddress(),
+		return isMaster()? createMasterId(SUtil.getInetAddress(networkiface),
 			getSocket().getLocalPort()): null;
 	}
 	
@@ -100,7 +100,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String getMyMasterId()
 	{
-		return createMasterId(SUtil.getInetAddress(), port);
+		return createMasterId(SUtil.getInetAddress(networkiface), port);
 	}
 	
 	/**
@@ -169,7 +169,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 //					socket.bind(new InetSocketAddress(port));
 					socket.setBroadcast(true);
 //					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port+"; "+socket.isConnected()+"; "+socket.isClosed());
-					getMicroAgent().getLogger().info("local master at: "+SUtil.getInetAddress()+" "+port);
+					getMicroAgent().getLogger().info("local master at: "+SUtil.getInetAddress(networkiface)+" "+port);
 				}
 				catch(Exception e)
 				{
@@ -198,13 +198,13 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						{
 							public void resultAvailable(AwarenessInfo info)
 							{
-								InetAddress address = SUtil.getInetAddress();
+								InetAddress address = SUtil.getInetAddress(networkiface);
 //								AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
 //								byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
 								byte[] data = DiscoveryAgent.encodeObject(info, getDefaultCodecs(), getMicroAgent().getClassLoader());
 								((BroadcastSendHandler)sender).send(data, address, port);
 //								System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
-								getMicroAgent().getLogger().info("local slave at: "+SUtil.getInetAddress()+" "+socket.getLocalPort());
+								getMicroAgent().getLogger().info("local slave at: "+SUtil.getInetAddress(networkiface)+" "+socket.getLocalPort());
 							}
 
 							public void exceptionOccurred(Exception exception)

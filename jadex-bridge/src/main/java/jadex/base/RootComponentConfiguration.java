@@ -1,5 +1,6 @@
 package jadex.base;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 
 
@@ -344,6 +346,16 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 			semi = ",";
 		}
 		setValue(AWAMECHANISMS, sb.toString());
+	}
+
+	@Override
+	public String getAwaNetworkIfaceName() {
+		return (String) getValue(AWANETWORKIFACE);
+	}
+
+	@Override
+	public void setAwaNetworkIface(String ifacename) {
+		setValue(AWANETWORKIFACE, ifacename);
 	}
 
 	@Override
@@ -949,6 +961,13 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 		if(errorText.length() != 0)
 		{
 			throw new RuntimeException("Configuration consistency error: \n" + errorText.toString());
+		}
+
+		if (getAwaNetworkIfaceName() != null) {
+			InetAddress addr = SUtil.getInetAddressForInterface(getAwaNetworkIfaceName());
+			if (addr == null) {
+				throw new RuntimeException("No IP address for interface with name " + getAwaNetworkIfaceName() + " found!");
+			}
 		}
 	}
 

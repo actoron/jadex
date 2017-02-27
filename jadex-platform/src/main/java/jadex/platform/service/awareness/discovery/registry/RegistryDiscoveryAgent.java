@@ -28,6 +28,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 {
 //	@Argument(name="address", clazz=String.class, defaultvalue="\"192.168.56.1\"", description="The ip address of registry."),
 	@Argument(name="address", clazz=String.class, defaultvalue="\"134.100.11.233\"", description="The ip address of registry."),
+	@Argument(name="networkiface", clazz=String.class, description = "The network interface to listen on (for master instances)."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55699", description="The port used for finding other agents.")
 })
 @Properties(@NameValue(name="system", value="true"))
@@ -42,7 +43,8 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	/** The receiver port. */
 	@AgentArgument
 	protected int port;
-	
+
+
 //	/** The known platforms. */
 //	protected LeaseTimeHandler knowns;
 		
@@ -131,7 +133,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 			if(s!=null)
 			{
 //				System.out.println("a: "+s.getLocalPort()+" "+port+" "+address+" "+SUtil.getInet4Address());
-				ret = isRegistry(SUtil.getInetAddress(), s.getLocalPort());
+				ret = isRegistry(SUtil.getInetAddress(networkiface), s.getLocalPort());
 			}
 		}
 		catch(Exception e) 
@@ -162,7 +164,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String createMasterId()
 	{
-		return isMaster()? createMasterId(SUtil.getInetAddress(),
+		return isMaster()? createMasterId(SUtil.getInetAddress(networkiface),
 			getSocket().getLocalPort()): null;
 	}
 	
@@ -171,7 +173,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String getMyMasterId()
 	{
-		return createMasterId(SUtil.getInetAddress(), port);
+		return createMasterId(SUtil.getInetAddress(networkiface), port);
 	}
 	
 	/**
@@ -231,8 +233,8 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 				{
 					// First one on dest ip becomes master.
 					socket = new DatagramSocket(port);
-					getMicroAgent().getLogger().info((address.equals(SUtil.getInetAddress())? 
-						"registry: ": "master: ")+SUtil.getInetAddress()+" "+port);
+					getMicroAgent().getLogger().info((address.equals(SUtil.getInetAddress(networkiface))?
+						"registry: ": "master: ")+SUtil.getInetAddress(networkiface)+" "+port);
 				}
 				catch(Exception e)
 				{
