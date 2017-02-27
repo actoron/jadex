@@ -26,6 +26,7 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
@@ -398,6 +399,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					}
 				};
 
+				long totmp = Timeout.NONE;
 				// For local call: fetch timeout to decide if undone. ignored for remote.
 				ServiceCall nextServiceCall = sic.getNextServiceCall();
 				if (nextServiceCall == null) {
@@ -405,13 +407,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						System.err.println("NextCall is null: " +sic.toString());
 						System.err.println("Is remoteCall: " + sic.isRemoteCall());
 						System.err.println("res is done: " + ((IFuture) res).isDone());
-						throw new RuntimeException("Will try to call getTimeout() on null object! ");
-					} else {
-						System.err.println("NextCall is null, but workaround is working ;) : " +sic.toString());
+						System.err.println("Workaround: not calling getTimeout on null object. This may lead to bugs.");
 					}
+				} else {
+					totmp = (!sic.isRemoteCall() && !((IFuture) res).isDone()) ? nextServiceCall.getTimeout() : Timeout.NONE;
 				}
 
-				final long timeout = (!sic.isRemoteCall() && !((IFuture) res).isDone()) ? nextServiceCall.getTimeout() : Timeout.NONE;
+				final long timeout = totmp;
 
 				FutureFunctionality func = new FutureFunctionality(ia.getLogger())
 				{
