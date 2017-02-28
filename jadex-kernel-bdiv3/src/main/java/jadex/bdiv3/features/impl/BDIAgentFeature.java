@@ -2016,7 +2016,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	// todo: support parameter names via annotation in guesser (guesser with meta information)
 	/**
 	 *  Get parameter values for injection into method and constructor calls.
-	 *  @return A valid assigment or null if no assignment could be found.
+	 *  @return A valid assignment or null if no assignment could be found.
 	 */
 	public static Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs, IInternalAccess component)
 	{
@@ -2190,7 +2190,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				}
 			}
 			
-			if(!done && rpe.getPojoElement() instanceof InvocationInfo)
+			if(!done && rpe!=null && rpe.getPojoElement() instanceof InvocationInfo)
 			{
 				Object[] serviceparams = ((InvocationInfo)rpe.getPojoElement()).getParams();
 				if(SReflect.isSupertype(ptypes[i], serviceparams[i].getClass()))
