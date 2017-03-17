@@ -1,12 +1,8 @@
-package jadex.bpmn.model.io;
+package jadex.commons;
 
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-
-import jadex.commons.Base64;
-import jadex.commons.IResultCommand;
-import jadex.commons.SUtil;
 
 /**
  *  A configurable Id generator.
@@ -37,7 +33,7 @@ public class IdGenerator
 	 */
 	public IdGenerator()
 	{
-		this(DEFAULT_ID_SIZE, false);
+		this(DEFAULT_ID_SIZE, false, null);
 	}
 	
 	/**
@@ -47,7 +43,7 @@ public class IdGenerator
 	 */
 	public IdGenerator(int idsize)
 	{
-		this(idsize, false);
+		this(idsize, false, null);
 	}
 	
 	/**
@@ -60,7 +56,16 @@ public class IdGenerator
 	 */
 	public IdGenerator(boolean collisionfree)
 	{
-		this(DEFAULT_ID_SIZE, collisionfree);
+		this(DEFAULT_ID_SIZE, collisionfree, null);
+	}
+	
+	/**
+	 *  Creates a new ID generator.
+	 *  
+	 */
+	public IdGenerator(int idsize, Random random)
+	{
+		this(DEFAULT_ID_SIZE, false, random);
 	}
 	
 	/**
@@ -72,9 +77,9 @@ public class IdGenerator
 	 *  					 most use cases due to the extremely low probability of collisions at reasonable
 	 *  					 ID sizes.
 	 */
-	public IdGenerator(int idsize, boolean collisionfree)
+	public IdGenerator(int idsize, boolean collisionfree, Random random)
 	{
-		random = new Random();
+		this.random = random == null ? new Random() : random;
 		this.idsize = idsize;
 		if (collisionfree)
 		{
@@ -146,6 +151,7 @@ public class IdGenerator
 				public String execute(byte[] args)
 				{
 					String id = new String(Base64.toCharArray(args));
+//					String id = new String(args, SUtil.ASCII);
 					return id;
 				}
 			};
