@@ -264,56 +264,63 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	/**
 	 *  Publish an html page.x	
 	 */
-	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
+	public IFuture<Void> publishHMTLPage(String pid, String vhost, String html)
 	{
-		Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
-		
-//        ServerConfiguration sc = server.getServerConfiguration();
-//        Map<HttpHandler, String[]>	handlers	= sc.getHttpHandlers();
-//        HtmlHandler	htmlh	= null;
-//        for(Map.Entry<HttpHandler, String[]> entry: handlers.entrySet())
-//        {
-//        	if(entry.getKey() instanceof HtmlHandler)
-//        	{
-//        		if(Arrays.asList(entry.getValue()).contains(uri.getPath()))
-//        		{
-//	        		htmlh	= (HtmlHandler)entry.getKey();
-//	        		break;
-//        		}
-//        	}
-//        }
-		
-		if (servertuple.getFirstEntity().containsSubhandlerForExactUri(vhost, uri.getPath()))
+		try
 		{
-			return new Future<Void>(new IllegalArgumentException("Cannot publish HTML, URI already bound: " + uri.toString()));
+			URI uri = new URI(pid);
+			Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
+			
+	//        ServerConfiguration sc = server.getServerConfiguration();
+	//        Map<HttpHandler, String[]>	handlers	= sc.getHttpHandlers();
+	//        HtmlHandler	htmlh	= null;
+	//        for(Map.Entry<HttpHandler, String[]> entry: handlers.entrySet())
+	//        {
+	//        	if(entry.getKey() instanceof HtmlHandler)
+	//        	{
+	//        		if(Arrays.asList(entry.getValue()).contains(uri.getPath()))
+	//        		{
+	//	        		htmlh	= (HtmlHandler)entry.getKey();
+	//	        		break;
+	//        		}
+	//        	}
+	//        }
+			
+			if (servertuple.getFirstEntity().containsSubhandlerForExactUri(vhost, uri.getPath()))
+			{
+				return new Future<Void>(new IllegalArgumentException("Cannot publish HTML, URI already bound: " + uri.toString()));
+			}
+	        
+	//        if(htmlh==null)
+	//        {
+			HtmlHandler htmlh	= new HtmlHandler()
+		    {
+		    	public void service(Request request, Response response)
+		    	{
+		    		// Hack!!! required for investment planner
+		    		// Todo: make accessible to outside
+		    		response.addHeader("Access-Control-Allow-Origin", "*");
+		    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+		    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+		    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+		    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+	
+		    		super.service(request, response);
+		    	}
+		    };
+		    htmlh.addMapping(vhost, html);
+		    
+	//		sc.addHttpHandler(htmlh, uri.getPath());
+	//        }
+	        
+	       	servertuple.getFirstEntity().addSubhandler(vhost, uri.getPath(), htmlh);
+			
+	//		System.out.println("published at: "+uri.getPath());
 		}
-        
-//        if(htmlh==null)
-//        {
-		HtmlHandler htmlh	= new HtmlHandler()
-	    {
-	    	public void service(Request request, Response response)
-	    	{
-	    		// Hack!!! required for investment planner
-	    		// Todo: make accessible to outside
-	    		response.addHeader("Access-Control-Allow-Origin", "*");
-	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
-	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
-	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
-
-	    		super.service(request, response);
-	    	}
-	    };
-	    htmlh.addMapping(vhost, html);
-	    
-//		sc.addHttpHandler(htmlh, uri.getPath());
-//        }
-        
-       	servertuple.getFirstEntity().addSubhandler(vhost, uri.getPath(), htmlh);
-		
-//		System.out.println("published at: "+uri.getPath());
-		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		return IFuture.DONE;
 	}
 	

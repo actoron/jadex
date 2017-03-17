@@ -45,9 +45,9 @@ import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.MTask;
-import jadex.bpmn.model.io.IdGenerator;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.IdGenerator;
 
 /**
  *  Methods for creating model objects.

@@ -497,7 +497,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     /**
      *  Publish a static page (without ressources).
      */
-    public abstract IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
+    public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
 
     /**
      *  Publish file resources from the classpath.
@@ -1316,6 +1316,25 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						produced = PARAMETER_MEDIATYPES;
 					
 					Class<?>[] ptypes = method.getParameterTypes();
+					String[]	pnames	= new String[ptypes.length];
+					java.lang.annotation.Annotation[][]	pannos	= method.getParameterAnnotations();
+					
+					// Find parameter names
+					for(int p=0; p<ptypes.length; p++)
+					{
+						for(int a=0; a<pannos[p].length; a++)
+						{
+							if(pannos[p][a] instanceof ParameterInfo)
+							{
+								pnames[p]	= ((ParameterInfo)pannos[p][a]).value();
+							}
+						}
+						
+						if(pnames[p]==null)
+						{
+							pnames[p]	= "arg"+p;
+						}
+					}
 					
 					ret.append("<div class=\"method\">");
 					ret.append("\n");
@@ -1331,6 +1350,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						for(int j=0; j<ptypes.length; j++)
 						{
 							ret.append(SReflect.getUnqualifiedClassName(ptypes[j]));
+							ret.append(" ");
+							ret.append(pnames[j]);
 							if(j+1<ptypes.length)
 								ret.append(", ");
 						}
@@ -1412,8 +1433,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						
 						for(int j=0; j<ptypes.length; j++)
 						{
-							ret.append("arg").append(j).append(": ");
-							ret.append("<input name=\"arg").append(j).append("\" type=\"text\" />");
+							ret.append(pnames[j]).append(": ");
+							ret.append("<input name=\"").append(pnames[j]).append("\" type=\"text\" />");
 //							.append(" accept=\"").append(cons[0]).append("\" />");
 						}
 						

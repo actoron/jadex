@@ -42,6 +42,7 @@ import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
+import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
@@ -224,7 +225,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 		if (tests != null) {
 			for (int i = 0; i < tests.length; i++) {
-				tests[i] = tests[i].replaceAll("\\.", "/");
+				tests[i] = tests[i].replace('.', File.separatorChar);
 			}
 		}
 
@@ -574,4 +575,11 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			}
 		}
 	}
+//
+//	@Override
+//	public void addTest(Test test)
+//	{
+//		System.out.println("Test added: "+test);
+//		super.addTest(test);
+//	}
 }

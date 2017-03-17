@@ -206,12 +206,12 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	        	
 				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 				{
-					if (service == null)
+					if(service == null)
 						service = (IService) SServiceProvider.getService(component, serviceid).get();
 					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
 				}
 			};
-			if (ph.containsSubhandlerForExactUri(null, uri.getPath()))
+			if(ph.containsSubhandlerForExactUri(null, uri.getPath()))
 			{
 //				System.out.println("The URL "+uri.getPath() + " is already published, unpublishing...");
 				component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
@@ -283,9 +283,46 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	/**
 	 *  Publish a static page (without ressources).
 	 */
-	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
+	public IFuture<Void> publishHMTLPage(String pid, String vhost, final String html)
 	{
-	    throw new UnsupportedOperationException();
+		try
+	    {
+			URI uri = null;
+	    	if(pid.startsWith("["))
+	    	{
+	    		pid = pid.substring(pid.indexOf("]")+1);
+	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
+//		    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+	    	}
+	    	else
+	    	{
+	    		uri = new URI(pid);
+	    	}
+	    	
+	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
+	        
+	        PathHandler ph = (PathHandler)getHttpServer(uri, null);
+	        
+	        IRequestHandler rh = new IRequestHandler()
+			{
+				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
+				{
+					response.getWriter().write(html);
+				}
+			};
+			if(ph.containsSubhandlerForExactUri(null, uri.getPath()))
+			{
+				component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
+				ph.removeSubhandler(null, uri.getPath());
+			}
+			ph.addSubhandler(null, uri.getPath(), rh);
+	    }
+	    catch(Exception e)
+	    {
+	        throw new RuntimeException(e);
+	    }
+	    
+	    return IFuture.DONE;
 	}
 	
 	/**
