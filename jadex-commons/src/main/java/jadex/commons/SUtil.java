@@ -4235,12 +4235,15 @@ public class SUtil
 	 */
 	public static void close(Closeable closeable)
 	{
-		try
+		if (closeable != null)
 		{
-			closeable.close();
-		}
-		catch (IOException e)
-		{
+			try
+			{
+				closeable.close();
+			}
+			catch (IOException e)
+			{
+			}
 		}
 	}
 	
