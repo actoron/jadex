@@ -1,6 +1,7 @@
 package jadex.commons;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -4223,6 +4224,23 @@ public class SUtil
 		catch (Exception e)
 		{
 			rethrowAsUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Attempt to close a Closeable (e.g. on error recovery)
+	 *  ignoring any error.
+	 *  
+	 *  @param closeable The closeable.
+	 */
+	public static void close(Closeable closeable)
+	{
+		try
+		{
+			closeable.close();
+		}
+		catch (IOException e)
+		{
 		}
 	}
 	
