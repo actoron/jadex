@@ -4168,6 +4168,65 @@ public class SUtil
 	}
 	
 	/**
+	 *  Fills buffer from an input stream.
+	 *  Note: This only works for sizes smaller than 2GiB.
+	 *  
+	 *  @param buf The buffer.
+	 * 	@param is The InputStream.
+	 */
+	public static void readStream(byte[] buf, InputStream is)
+	{
+		readStream(buf, 0, buf.length, is, 0);
+	}
+	
+	/**
+	 *  Reads part of an input stream into a buffer.
+	 *  Note: This only works for sizes smaller than 2GiB.
+	 *  
+	 *  @param buf The buffer.
+	 *  @param off Offset for writing into the buffer.
+	 *  @param len Number of bytes to read from stream, set to -1 to fill the rest of the buffer.
+	 * 	@param is The InputStream.
+	 */
+	public static void readStream(byte[] buf, int off, int len, InputStream is)
+	{
+		readStream(buf, off, len, is, 0);
+	}
+	
+	/**
+	 *  Reads part of an input stream into a buffer.
+	 *  Note: This only works for sizes smaller than 2GiB.
+	 *  
+	 *  @param buf The buffer.
+	 *  @param off Offset for writing into the buffer.
+	 *  @param len Number of bytes to read from stream, set to -1 to fill the rest of the buffer.
+	 * 	@param is The InputStream.
+	 *  @param skip Skip this number of bytes from the stream before reading, skip<=0 for no skip.
+	 */
+	public static void readStream(byte[] buf, int off, int len, InputStream is, long skip)
+	{
+		try
+		{
+			if (skip > 0)
+				is.skip(skip);
+			
+			if (len < 0)
+				len = buf.length - off;
+			
+			int read = 0;
+			while (read < len)
+			{
+				read = is.read(buf, off, len - read);
+				off += read;
+			}
+		}
+		catch (Exception e)
+		{
+			rethrowAsUnchecked(e);
+		}
+	}
+	
+	/**
 	 *  Get the exception stack trace as string. 
 	 *  @param e The exception.
 	 *  @return The string.
