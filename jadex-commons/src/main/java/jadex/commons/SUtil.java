@@ -2642,15 +2642,11 @@ public class SUtil
 //	}
 
 	/**
-	 *  Convert bytes to an integer.
+	 *  Convert bytes to a long.
 	 */
 	public static long bytesToLong(byte[] buffer)
 	{
 		assert buffer.length == 8;
-//		if(buffer.length != 8)
-//		{
-//			throw new IllegalArgumentException("Buffer length must be 8 bytes: "+arrayToString(buffer));
-//		}
 
 		long value = (0xFFL & buffer[0]) << 56L;
 		value |= (0xFFL & buffer[1]) << 48L;
@@ -2663,9 +2659,26 @@ public class SUtil
 
 		return value;
 	}
+	
+	/**
+	 *  Convert bytes to a long.
+	 */
+	public static long bytesToLong(byte[] buffer, int offset)
+	{
+		long value = (0xFFL & buffer[offset++]) << 56L;
+		value |= (0xFFL & buffer[offset++]) << 48L;
+		value |= (0xFFL & buffer[offset++]) << 40L;
+		value |= (0xFFL & buffer[offset++]) << 32L;
+		value |= (0xFFL & buffer[offset++]) << 24L;
+		value |= (0xFFL & buffer[offset++]) << 16L;
+		value |= (0xFFL & buffer[offset++]) << 8L;
+		value |= (0xFFL & buffer[offset++]);
+
+		return value;
+	}
 
 	/**
-	 *  Convert an integer to bytes.
+	 *  Convert a long to bytes.
 	 */
 	public static byte[] longToBytes(long val)
 	{
@@ -2681,6 +2694,29 @@ public class SUtil
 		buffer[7] = (byte)(val & 0xFF);
 
 		return buffer;
+	}
+	
+	/**
+	 *  Convert a long to bytes.
+	 */
+	public static void longIntoBytes(long val, byte[] buffer)
+	{
+		longIntoBytes(val, buffer, 0);
+	}
+	
+	/**
+	 *  Convert a long to bytes.
+	 */
+	public static void longIntoBytes(long val, byte[] buffer, int offset)
+	{
+		buffer[offset++] = (byte)((val >>> 56) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 48) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 40) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 32) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 24) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 16) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 8) & 0xFF);
+		buffer[offset++] = (byte)(val & 0xFF);
 	}
 	
 	/**
