@@ -8,7 +8,7 @@
 // publishCommercial = true;
 
 // TODO: remove minimal!
-defaultGradleArgs = "-Pdist=minimal --info --stacktrace"
+defaultGradleArgs = " -Pdist=minimal --info --stacktrace"
 
 
 def branchName
@@ -38,7 +38,8 @@ stage('preparation') {
                 publishArtifacts: ${publishArtifacts}, 
                 publishToDummy: ${publishToDummy}, 
                 publishCommercial: ${publishCommercial},
-                deployDists: ${deployDists}"""
+                deployDists: ${deployDists},
+                resetPatchVersion: ${resetPatchVersion}"""
 
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
         echo "testing jenkins with pipeline"
