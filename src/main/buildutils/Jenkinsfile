@@ -254,20 +254,20 @@ stage ('publish and deploy') {
                     sh 'mkdir schemas'
                     sh 'mv **/build/schemas/* schemas/'
 
-                    sh 'mkdir webapps'
-                    sh 'mv **/build/libs/*.war webapps/'
-                    dir('webapps') {
-                        sh 'mv jadex-applications-web-*.war jadex-applications-web.war'
-                        sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
-                        sh 'mv jadex-servletfilter-web-*.war webapi.war'
-                    }
+                    // TODO uncomment when publishdists is reactivated:
+//                    sh 'mkdir webapps'
+//                    sh 'mv **/build/libs/*.war webapps/'
+//                    dir('webapps') {
+//                        sh 'mv jadex-applications-web-*.war jadex-applications-web.war'
+//                        sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
+//                        sh 'mv jadex-servletfilter-web-*.war webapi.war'
+//                    }
 
                     unstash 'dists'
 
                     // todo deploy webapps over ssh
 
                     // deploy schemas to actoron downloads
-
                     sh 'scp -i .ssh/pushuser.key -P 20000 -r schemas/*.* webpush@download.actoron.com:/www/'
 
                     // deploy mkdocs (html + pdf)
