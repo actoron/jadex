@@ -26,6 +26,8 @@ deployDists = deployDists.toBoolean()
 publishToDummy = publishToDummy.toBoolean()
 publishCommercial = publishCommercial.toBoolean()
 
+resetPatchVersion = resetPatchVersion.toBoolean()
+
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
 
@@ -73,18 +75,21 @@ stage('preparation') {
 
         currentBuild.description = "build in branch: ${branchName}"
 
-        if ("master".equals(branchName)) {
+        if ("master".equals(branchName) || "stable".equals(branchName)) {
             // generate version continuously
             //def result = build job: "pipeline-generate-version-${branchName}"
             // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
             //genVersion = result.rawBuild.environment.PATCH_VERSION;
 
             patch = patch as Integer
-            if (!headIsLastVersionTag) {
+            if (resetPatchVersion) {
+                patch = 0;
+            } else if (!headIsLastVersionTag) {
                 // increase patch level if at least one commit is between last tag and HEAD
                 patch++
             }
             versionSuffix = "${patch}"
+
         } else {
             Integer branchPatch
             if (versionsFromTag.branchName) {
