@@ -228,11 +228,11 @@ stage ('publish and deploy') {
                 nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'git'
-                    sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
                     if (!publishToDummy) {
+                        sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
                         sh "git push origin ${jadexVersion}"
                     } else {
-                        println "not pushing tag as this is only dummy publishing"
+                        println "not tagging as this is only dummy publishing"
                     }
                 }
             }
