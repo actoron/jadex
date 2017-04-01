@@ -282,15 +282,15 @@ stage ('publish and deploy') {
 //                      # adjust latest symlink
 //                  ln -sfT "jadex-${jadexversion}" "/www/docs/nightlies/latest"
 
-                    copyDownloads 'docs/*.pdf' "/www/docs/nightlies/jadex-${jadexVersion}"
+                    copyDownloads 'docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
 
                     // schemadoc
-                    copyDownloads 'schemadoc/*.*' "/www/docs/nightlies/jadex-${jadexVersion}"
+                    copyDownloads 'schemadoc/*.*', "/www/docs/nightlies/jadex-${jadexVersion}"
 
                     // deploy distributions + exampleprojects to download
-                    copyDownloads 'build/distributions/commercial/*.zip' "/www/tmp/pro/${jadexVersion}"
-                    copyDownloads 'build/distributions/noncommercial/*.zip' "/www/tmp/oss/${jadexVersion}"
-                    copyDownloads 'build/distributions/exampleprojects/*.zip' "/www/tmp/oss/${jadexVersion}/exampleprojects/"
+                    copyDownloads 'build/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
+                    copyDownloads 'build/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
+                    copyDownloads 'build/distributions/exampleprojects/*.zip', "/www/tmp/oss/${jadexVersion}/exampleprojects/"
 
                     // TODO move to correct location and adjust symlink
                     // distributions:
