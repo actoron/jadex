@@ -257,14 +257,6 @@ stage ('publish and deploy') {
                     sh 'mkdir deployment/schemas'
                     sh 'mv **/build/schemas/* deployment/schemas/'
 
-                    sh 'mkdir deployment/distributions'
-                    // TODO uncomment when publishdists is reactivated:
-//                    sh 'mv build/distributions/commercial deployment/distributions/'
-                    sh 'mv build/distributions/noncommercial deployment/distributions/'
-                    sh 'mv build/distributions/exampleprojects deployment/distributions/'
-                    sh 'mv build/*.properties deployment/'
-
-
                     // TODO uncomment when publishdists is reactivated:
 //                    sh 'mkdir deployment/webapps'
 //                    sh 'mv **/build/libs/*.war deployment/webapps/'
@@ -273,9 +265,17 @@ stage ('publish and deploy') {
 //                        sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
 //                        sh 'mv jadex-servletfilter-web-*.war webapi.war'
 //                    }
-                    deleteDir()
 
                     unstash 'dists'
+
+                    sh 'mkdir deployment/distributions'
+                    // TODO uncomment when publishdists is reactivated:
+//                    sh 'mv build/distributions/commercial deployment/distributions/'
+                    sh 'mv build/distributions/noncommercial deployment/distributions/'
+                    sh 'mv build/distributions/exampleprojects deployment/distributions/'
+                    sh 'mv build/*.properties deployment/'
+
+                    deleteDir()
 
                     // todo deploy webapps over ssh
 
