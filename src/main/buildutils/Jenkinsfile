@@ -288,6 +288,10 @@ stage ('publish and deploy') {
                     copyDownloads 'schemadoc/*.*', "/www/docs/nightlies/jadex-${jadexVersion}"
 
                     // deploy distributions + exampleprojects to download
+                    sshDownloads 'mkdir -p /www/tmp/oss'
+                    sshDownloads 'mkdir -p /www/tmp/pro'
+                    sshDownloads """mkdir -p /www/tmp/oss
+                    mkdir -p /www/tmp/pro"""
                     // TODO uncomment when publishdists is reactivated:
                     //copyDownloads 'build/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
                     copyDownloads 'build/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
@@ -457,3 +461,6 @@ def copyDownloads(src, dest) {
     sh "scp -i ~/.ssh/pushuser.key -P 20000 -r ${src} webpush@download.actoron.com:${dest}"
 }
 
+def sshDownloads(cmd) {
+    sh """ssh -i ~/.ssh/pushuser.key -p 20000 webpush@download.actoron.com "${cmd}" """
+}
