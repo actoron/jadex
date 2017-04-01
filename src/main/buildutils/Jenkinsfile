@@ -268,10 +268,10 @@ stage ('publish and deploy') {
                     // todo deploy webapps over ssh
 
                     // deploy schemas to actoron downloads
-                    sh 'scp -i .ssh/pushuser.key -P 20000 -r schemas/*.* webpush@download.actoron.com:/www/'
+                    sh 'scp -i ~/.ssh/pushuser.key -P 20000 -r schemas/*.* webpush@download.actoron.com:/www/'
 
                     // deploy mkdocs (html + pdf)
-                    sh 'scp -i .ssh/pushuser.key -P 20000 -r docs/*.zip webpush@download.actoron.com:/www/docs/nightlies/'
+                    sh 'scp -i ~/.ssh/pushuser.key -P 20000 -r docs/*.zip webpush@download.actoron.com:/www/docs/nightlies/'
                     // todo extract and adjust links
 //                    unzip -o /www/docs/nightlies/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexversion}/
 //                            rm /www/docs/nightlies/jadex-mkdocs-*.zip
@@ -453,6 +453,6 @@ def compareDist(String distribution) {
 }
 
 def copyDownloads(src, dest) {
-    sh "scp -i .ssh/pushuser.key -P 20000 -r ${src} webpush@download.actoron.com:${dest}"
+    sh "scp -i ~/.ssh/pushuser.key -P 20000 -r ${src} webpush@download.actoron.com:${dest}"
 }
 
