@@ -244,19 +244,30 @@ stage ('publish and deploy') {
                     deleteDir()
                     // gather artifacts:
                     unstash 'docs'
-                    sh 'mv docs/mkdocs-ng/build/*.zip docs/mkdocs-ng/build/*.pdf docs/'
-                    sh 'mv build/distributions/*.zip docs/'
+
+                    sh 'mkdir -p deployment/docs'
+
+                    sh 'mv docs/mkdocs-ng/build/*.zip docs/mkdocs-ng/build/*.pdf deployment/docs/'
+                    sh 'mv build/distributions/*.zip deployment/docs/'
 
                     unstash 'compiled'
-                    sh 'mkdir schemadoc'
-                    sh 'mv **/build/schemadocs/* schemadoc/'
+                    sh 'mkdir deployment/schemadoc'
+                    sh 'mv **/build/schemadocs/* deployment/schemadoc/'
 
-                    sh 'mkdir schemas'
-                    sh 'mv **/build/schemas/* schemas/'
+                    sh 'mkdir deployment/schemas'
+                    sh 'mv **/build/schemas/* deployment/schemas/'
+
+                    sh 'mkdir deployment/distributions'
+                    sh 'mv build/distributions/commercial deployment/distributions/'
+                    sh 'mv build/distributions/noncommercial deployment/distributions/'
+                    sh 'mv build/distributions/exampleprojects deployment/distributions/'
+                    sh 'mv build/*.properties deployment/'
+
+                    deleteDir()
 
                     // TODO uncomment when publishdists is reactivated:
-//                    sh 'mkdir webapps'
-//                    sh 'mv **/build/libs/*.war webapps/'
+//                    sh 'mkdir deployment/webapps'
+//                    sh 'mv **/build/libs/*.war deployment/webapps/'
 //                    dir('webapps') {
 //                        sh 'mv jadex-applications-web-*.war jadex-applications-web.war'
 //                        sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
@@ -267,11 +278,17 @@ stage ('publish and deploy') {
 
                     // todo deploy webapps over ssh
 
+                    // create directories
+                    sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/exampleprojects/
+                                    mkdir -p /www/tmp/pro/${jadexVersion}/
+                                    mkdir -p /www/schemas/
+                                    mkdir -p /www/docs/nightlies/jadex-${jadexVersion}"""
+
                     // deploy schemas to actoron downloads
-                    sh 'scp -i ~/.ssh/pushuser.key -P 20000 -r schemas/*.* webpush@download.actoron.com:/www/'
+                    copyDownloads 'deployment/schemas/*.*', '/www/schemas/'
 
                     // deploy mkdocs (html + pdf)
-                    sh 'scp -i ~/.ssh/pushuser.key -P 20000 -r docs/*.zip webpush@download.actoron.com:/www/docs/nightlies/'
+                    copyDownloads 'deployment/docs/*.zip', '/www/docs/nightlies/'
                     // todo extract and adjust links
 //                    unzip -o /www/docs/nightlies/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexversion}/
 //                            rm /www/docs/nightlies/jadex-mkdocs-*.zip
@@ -282,18 +299,17 @@ stage ('publish and deploy') {
 //                      # adjust latest symlink
 //                  ln -sfT "jadex-${jadexversion}" "/www/docs/nightlies/latest"
 
-                    copyDownloads 'docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
+                    copyDownloads 'deployment/docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
 
                     // schemadoc
-                    copyDownloads 'schemadoc/*.*', "/www/docs/nightlies/jadex-${jadexVersion}"
+                    copyDownloads 'deployment/schemadoc/*.*', "/www/docs/nightlies/jadex-${jadexVersion}"
 
                     // deploy distributions + exampleprojects to download
-                    sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/exampleprojects/
-                                    mkdir -p /www/tmp/pro/${jadexVersion}/"""
+
                     // TODO uncomment when publishdists is reactivated:
-                    //copyDownloads 'build/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
-                    copyDownloads 'build/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
-                    copyDownloads 'build/distributions/exampleprojects/*.zip', "/www/tmp/oss/${jadexVersion}/exampleprojects/"
+                    //copyDownloads 'deployment/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
+                    copyDownloads 'deployment/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
+                    copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/tmp/oss/${jadexVersion}/exampleprojects/"
 
                     // TODO move to correct location and adjust symlink
                     // distributions:
