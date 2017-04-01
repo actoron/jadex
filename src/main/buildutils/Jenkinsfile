@@ -288,7 +288,8 @@ stage ('publish and deploy') {
                     copyDownloads 'schemadoc/*.*', "/www/docs/nightlies/jadex-${jadexVersion}"
 
                     // deploy distributions + exampleprojects to download
-                    copyDownloads 'build/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
+                    // TODO uncomment when publishdists is reactivated:
+                    //copyDownloads 'build/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
                     copyDownloads 'build/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
                     copyDownloads 'build/distributions/exampleprojects/*.zip', "/www/tmp/oss/${jadexVersion}/exampleprojects/"
 
