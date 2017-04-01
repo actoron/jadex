@@ -160,7 +160,7 @@ if (deployDists) {
                             sh './gradlew -Pdist=minimal distZips' + defaultGradleArgs
                         }
                     }
-                    stash name: 'dists', includes: 'build/distributions/**'
+                    stash name: 'dists', includes: 'build/distributions/**, build/*.properties'
                 }
             }
 
@@ -273,7 +273,7 @@ stage ('publish and deploy') {
 //                    sh 'mv build/distributions/commercial deployment/distributions/'
                     sh 'mv build/distributions/noncommercial deployment/distributions/'
                     sh 'mv build/distributions/exampleprojects deployment/distributions/'
-                    sh 'mv build/*.properties deployment/'
+                    sh 'mv build/*.properties deployment/' // TODO needed?
 
                     deleteDir()
 
