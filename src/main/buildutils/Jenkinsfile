@@ -275,8 +275,6 @@ stage ('publish and deploy') {
                     sh 'mv build/distributions/exampleprojects deployment/distributions/'
                     sh 'mv build/*.properties deployment/' // TODO needed?
 
-                    deleteDir()
-
                     // todo deploy webapps over ssh
 
                     // create directories
