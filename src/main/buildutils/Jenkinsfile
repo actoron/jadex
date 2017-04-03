@@ -278,7 +278,7 @@ stage ('publish and deploy') {
                     // todo deploy webapps over ssh
 
                     // create directories
-                    sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/exampleprojects/ &&
+                    sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/ &&
                                     mkdir -p /www/tmp/pro/${jadexVersion}/ &&
                                     mkdir -p /www/tmp/docs/ &&
                                     mkdir -p /www/schemas/ &&
@@ -305,6 +305,7 @@ stage ('publish and deploy') {
 
                     // deploy distributions + exampleprojects to download
 
+                    sshDownloads "mkdir /www/snapshots/oss/${jadexVersion}/exampleprojects"
                     copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
 
                     // TODO uncomment when publishdists is reactivated:
