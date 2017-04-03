@@ -1,6 +1,4 @@
-
-//@Field
-//String jadexVersion
+def versionSuffix
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
@@ -22,5 +20,65 @@ stage('preparation') {
         def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
 
         println "On tag: ${git_tag}"
+
+        def rootDir = pwd()
+        def util = load "${rootDir}@script/JenkinsfileUtil.groovy "
+
+        def versionsFromTag = util.getVersionsFromTag(git_tag);
+        def patch = versionsFromTag.patch
+
+        versionSuffix = "${patch}"
+
+        echo "version suffix:" + versionSuffix
+
+//        util.withEnv(['BUILD_VERSION_SUFFIX=' + versionSuffix]) {
+//
+//        }
+    }
+
+    util.nodeWithVersion(versionSuffix) {
+        sh """./gradlew
+        -x test
+        -P dist=publishdists
+        -P repo_commercial=https://nexus.actoron.com/content/repositories/pro/
+        -P repo_noncommercial=https://nexus.actoron.com/content/repositories/oss/
+        -P xrepo_commercial=https://nexus.actoron.com/content/repositories/dummy/
+        -P xrepo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/
+        --info
+        --stacktrace
+        clean build """ // uploadArchives
+
+//        -x test
+//        -P dist=publishdists
+//        -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2/
+//        -P repo_commercial=
+//                -P repouser=Lars
+//        -P repopassword=lax
+//        --info
+//        --stacktrace
+//
+//        uploadArchives
+
+
+//        # copy oss snapshot
+//        if [ -d "/www/snapshots/oss/${RELEASE_VERSION}" ]; then
+//        cp -r "/www/snapshots/oss/${RELEASE_VERSION}" "/www/releases/oss/"
+//        fi
+//
+//        # copy pro snapshot
+//        if [ -d "/www/snapshots/pro/${RELEASE_VERSION}" ]; then
+//        cp -r "/www/snapshots/pro/${RELEASE_VERSION}" "/www/releases/pro/"
+//        fi
+//
+//        # copy docs
+//        if [ -d "/www/docs/nightlies/jadex-${RELEASE_VERSION}" ]; then
+//        cp -r "/www/docs/nightlies/jadex-${RELEASE_VERSION}" "/www/docs/releases/"
+//        fi
+//
+//        # adjust latest symlinks
+//        ln -sfT "${RELEASE_VERSION}" "/www/releases/oss/latest"
+//        ln -sfT "${RELEASE_VERSION}" "/www/releases/pro/latest"
+//
+//        ln -sfT "jadex-${RELEASE_VERSION}" "/www/docs/releases/latest"
     }
 }
