@@ -349,7 +349,7 @@ stage ('publish and deploy') {
 //                                    rmdir --ignore-fail-on-non-empty /www/tmp"""
 
                     // exampleprojects:
-                    sshDownloads "mkdir /www/snapshots/oss/${jadexVersion}/exampleprojects"
+                    sshDownloads "mkdir -p /www/snapshots/oss/${jadexVersion}/exampleprojects"
                     copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
 
                     sshDownloads """rmdir --ignore-fail-on-non-empty /www/tmp"""
