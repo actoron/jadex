@@ -311,10 +311,9 @@ stage ('publish and deploy') {
 
                     // distributions:
 
-                    sshDownloads """TYPE="oss"
-                                    TARGET="snapshots"
-                
-                                    # remove old snapshot with same version if exists
+                    def TYPE = 'oss'
+                    def TARGET = 'snapshots'
+                    sshDownloads """# remove old snapshot with same version if exists
                                     if [ -d "/www/$TARGET/$TYPE/${jadexVersion}" ]; then
                                         rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
                                     fi
