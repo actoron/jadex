@@ -303,10 +303,7 @@ stage ('publish and deploy') {
                     // schemadoc
                     copyDownloads 'deployment/schemadoc', "/www/docs/nightlies/jadex-${jadexVersion}/"
 
-                    // deploy distributions + exampleprojects to download
-
-                    sshDownloads "mkdir /www/snapshots/oss/${jadexVersion}/exampleprojects"
-                    copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
+                    // deploy distributions
 
                     // TODO uncomment when publishdists is reactivated:
                     //copyDownloads 'deployment/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
@@ -352,6 +349,8 @@ stage ('publish and deploy') {
 //                                    rmdir --ignore-fail-on-non-empty /www/tmp"""
 
                     // exampleprojects:
+                    sshDownloads "mkdir /www/snapshots/oss/${jadexVersion}/exampleprojects"
+                    copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
 
                     sshDownloads """rmdir --ignore-fail-on-non-empty /www/tmp"""
                 }
