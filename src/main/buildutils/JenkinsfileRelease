@@ -21,8 +21,8 @@ stage('preparation') {
 
         println "On tag: ${git_tag}"
 
-        def rootDir = pwd()
-        def util = load "${rootDir}@script/JenkinsfileUtil.groovy "
+        def util = fileLoader.fromGit('src/main/buildutils/JenkinsfileUtil.groovy',
+                'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', 'jenkinsfile', null, '')
 
         def versionsFromTag = util.getVersionsFromTag(git_tag);
         def patch = versionsFromTag.patch

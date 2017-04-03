@@ -337,8 +337,6 @@ stage ('publish and deploy') {
                     // exampleprojects:
                     sshDownloads "mkdir -p /www/snapshots/oss/${jadexVersion}/exampleprojects"
                     copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
-
-                    sshDownloads """rmdir --ignore-fail-on-non-empty /www/tmp"""
                 }
             }
         }
