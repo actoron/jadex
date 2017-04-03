@@ -7,8 +7,7 @@
 //publishToDummy = true
 // publishCommercial = true;
 
-// TODO: remove minimal!
-defaultGradleArgs = " -Pdist=minimal --info --stacktrace"
+defaultGradleArgs = " --info --stacktrace"
 
 
 def branchName
@@ -17,6 +16,12 @@ import groovy.transform.Field
 
 @Field
 String jadexVersion
+
+@Field
+Boolean isMasterBranch
+
+@Field
+Boolean isStableBranch
 
 def versionSuffix
 
@@ -76,8 +81,10 @@ stage('preparation') {
         def patch = versionsFromTag.patch
 
         currentBuild.description = "build in branch: ${branchName}"
+        isMasterBranch = "master".equals(branchName)
+        isStableBranch = "stable".equals(branchName)
 
-        if ("master".equals(branchName) || "stable".equals(branchName)) {
+        if (isMasterBranch || isStableBranch) {
             // generate version continuously
             //def result = build job: "pipeline-generate-version-${branchName}"
             // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
@@ -93,6 +100,7 @@ stage('preparation') {
             versionSuffix = "${patch}"
 
         } else {
+            // building some other branch
             Integer branchPatch
             if (versionsFromTag.branchName) {
                 if (!versionsFromTag.branchName.equals(branchName)) {
@@ -138,8 +146,7 @@ stage('build and test') {
 
         withX {
             withJUnit {
-                // TODO: replace with publishdists
-                sh './gradlew -Pdist=minimal clean build test -x javadoc' + defaultGradleArgs
+                sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
             }
         }
 
@@ -156,8 +163,7 @@ if (deployDists) {
                     unstash 'compiled'
                     withX {
                         withJUnit {
-                            // TODO: replace with publishdists
-                            sh './gradlew -Pdist=minimal distZips' + defaultGradleArgs
+                            sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
                         }
                     }
                     stash name: 'dists', includes: 'build/distributions/**, build/*.properties'
@@ -165,9 +171,8 @@ if (deployDists) {
             }
 
             stage('checkDists') {
-                // TODO: add dists
-//                def dists = ['minimal', 'standard', 'pro', 'android', 'relaystandalone']
-                def dists = ['minimal']
+                def dists = ['minimal', 'standard', 'pro', 'android', 'relaystandalone']
+//                def dists = ['minimal']
                 def checkDists = [:];
 
                 for (int i = 0; i < dists.size(); i++) {
@@ -212,8 +217,7 @@ stage ('publish and deploy') {
                     deleteDir()
                     unstash 'compiled'
                     // testing already done
-                    // TODO: replace with publishdists
-                    def cmd = './gradlew -Pdist=minimal build -x test uploadArchives '
+                    def cmd = './gradlew -Pdist=publishdists build -x test uploadArchives '
                     if (publishToDummy) {
                         cmd += '-P repo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ -P repo_commercial= '
                     }
@@ -257,20 +261,18 @@ stage ('publish and deploy') {
                     sh 'mkdir deployment/schemas'
                     sh 'mv **/build/schemas/* deployment/schemas/'
 
-                    // TODO uncomment when publishdists is reactivated:
-//                    sh 'mkdir deployment/webapps'
-//                    sh 'mv **/build/libs/*.war deployment/webapps/'
-//                    dir('webapps') {
-//                        sh 'mv jadex-applications-web-*.war jadex-applications-web.war'
-//                        sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
-//                        sh 'mv jadex-servletfilter-web-*.war webapi.war'
-//                    }
+                    sh 'mkdir deployment/webapps'
+                    sh 'mv **/build/libs/*.war deployment/webapps/'
+                    dir('deployment/webapps') {
+                        sh 'mv jadex-applications-web-*.war jadex-applications-web.war'
+                        sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
+                        sh 'mv jadex-servletfilter-web-*.war webapi.war'
+                    }
 
                     unstash 'dists'
 
                     sh 'mkdir deployment/distributions'
-                    // TODO uncomment when publishdists is reactivated:
-//                    sh 'mv build/distributions/commercial deployment/distributions/'
+                    sh 'mv build/distributions/commercial deployment/distributions/'
                     sh 'mv build/distributions/noncommercial deployment/distributions/'
                     sh 'mv build/distributions/exampleprojects deployment/distributions/'
                     sh 'mv build/*.properties deployment/' // TODO needed?
@@ -294,9 +296,12 @@ stage ('publish and deploy') {
                                     rm /www/tmp/docs/jadex-mkdocs-*.zip &&
                                     unzip -o /www/tmp/docs/*-javadoc.zip -d /www/docs/nightlies/jadex-${jadexVersion}/ &&
                                     rm /www/tmp/docs/*-javadoc.zip &&
-                                    rmdir /www/tmp/docs &&
-                                    # adjust latest symlink &&
-                                    ln -sfT "jadex-${jadexVersion}" "/www/docs/nightlies/latest" """
+                                    rmdir /www/tmp/docs"""
+
+                    if (isMasterBranch) {
+                        // adjust latest symlink
+                        sshDownloads """ln -sfT "jadex-${jadexVersion}" "/www/docs/nightlies/latest" """
+                    }
 
                     copyDownloads 'deployment/docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
 
@@ -305,48 +310,29 @@ stage ('publish and deploy') {
 
                     // deploy distributions
 
-                    // TODO uncomment when publishdists is reactivated:
-                    //copyDownloads 'deployment/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
+                    copyDownloads 'deployment/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
                     copyDownloads 'deployment/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
 
                     // distributions:
 
-                    def TYPE = 'oss'
                     def TARGET = 'snapshots'
-                    sshDownloads """# remove old snapshot with same version if exists
-                                    if [ -d "/www/$TARGET/$TYPE/${jadexVersion}" ]; then
-                                        rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
-                                    fi
-                
-                                    mv /www/tmp/$TYPE/${jadexVersion} /www/$TARGET/$TYPE/ &&
-                                    echo "${jadexVersion}" > /www/$TARGET/$TYPE/${jadexVersion}/version.txt &&
-                
-                                    # adjust latest symlink
-                                    ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest" &&
-                
-                                    # rm tmp dir
-                                    rmdir /www/tmp/$TYPE &&
-                                    rmdir --ignore-fail-on-non-empty /www/tmp"""
-
-                    // TODO uncomment when publishdists is reactivated:
-//                    sshDownloads """TYPE="pro"
-//                                    TARGET="snapshots"
-//
-//                                    # remove old snapshot with same version if exists
-//                                    if [ -d "/www/$TARGET/$TYPE/${jadexVersion}" ]; then
-//                                        rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
-//                                    fi
-//
-//                                    mv /www/tmp/$TYPE/${jadexVersion} /www/$TARGET/$TYPE/
-//
-//                                            echo "${jadexVersion}" > /www/$TARGET/$TYPE/${jadexVersion}/version.txt
-//
-//                                    # adjust latest symlink
-//                                    ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest"
-//
-//                                    # rm tmp dir
-//                                    rmdir /www/tmp/$TYPE
-//                                    rmdir --ignore-fail-on-non-empty /www/tmp"""
+                    for (TYPE in ['oss', 'pro']) {
+                        sshDownloads """# remove old snapshot with same version if exists
+                                        if [ -d "/www/$TARGET/$TYPE/${jadexVersion}" ]; then
+                                            rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
+                                        fi
+                    
+                                        mv /www/tmp/$TYPE/${jadexVersion} /www/$TARGET/$TYPE/ &&
+                                        echo "${jadexVersion}" > /www/$TARGET/$TYPE/${jadexVersion}/version.txt &&
+                    
+                                        # rm tmp dir
+                                        rmdir /www/tmp/$TYPE &&
+                                        rmdir --ignore-fail-on-non-empty /www/tmp"""
+                        if (isMasterBranch) {
+                            // adjust latest symlink
+                            sshDownloads """ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest" """
+                        }
+                    }
 
                     // exampleprojects:
                     sshDownloads "mkdir -p /www/snapshots/oss/${jadexVersion}/exampleprojects"
