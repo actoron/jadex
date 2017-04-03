@@ -278,10 +278,10 @@ stage ('publish and deploy') {
                     // todo deploy webapps over ssh
 
                     // create directories
-                    sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/exampleprojects/
-                                    mkdir -p /www/tmp/pro/${jadexVersion}/
-                                    mkdir -p /www/tmp/docs/
-                                    mkdir -p /www/schemas/
+                    sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/exampleprojects/ &&
+                                    mkdir -p /www/tmp/pro/${jadexVersion}/ &&
+                                    mkdir -p /www/tmp/docs/ &&
+                                    mkdir -p /www/schemas/ &&
                                     mkdir -p /www/docs/nightlies/jadex-${jadexVersion}"""
 
                     // deploy schemas to actoron downloads
@@ -290,24 +290,26 @@ stage ('publish and deploy') {
                     // deploy mkdocs (html + pdf)
                     copyDownloads 'deployment/docs/*.zip', '/www/tmp/docs/'
 
-                    sshDownloads """unzip -o /www/tmp/docs/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexVersion}/
-                                    rm /www/tmp/docs/jadex-mkdocs-*.zip
-                                    unzip -o /www/tmp/docs/*-javadoc.zip -d /www/docs/nightlies/jadex-${jadexVersion}/
-                                    rm /www/tmp/docs/nightlies/*-javadoc.zip
-                                    # adjust latest symlink
+                    sshDownloads """unzip -o /www/tmp/docs/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexVersion}/ &&
+                                    rm /www/tmp/docs/jadex-mkdocs-*.zip &&
+                                    unzip -o /www/tmp/docs/*-javadoc.zip -d /www/docs/nightlies/jadex-${jadexVersion}/ &&
+                                    rm /www/tmp/docs/*-javadoc.zip &&
+                                    rmdir /www/tmp/docs &&
+                                    # adjust latest symlink &&
                                     ln -sfT "jadex-${jadexVersion}" "/www/docs/nightlies/latest" """
 
                     copyDownloads 'deployment/docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
 
                     // schemadoc
-                    copyDownloads 'deployment/schemadoc/*.*', "/www/docs/nightlies/jadex-${jadexVersion}"
+                    copyDownloads 'deployment/schemadoc', "/www/docs/nightlies/jadex-${jadexVersion}/"
 
                     // deploy distributions + exampleprojects to download
+
+                    copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
 
                     // TODO uncomment when publishdists is reactivated:
                     //copyDownloads 'deployment/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
                     copyDownloads 'deployment/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
-                    copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/tmp/oss/${jadexVersion}/exampleprojects/"
 
                     // distributions:
 
@@ -318,14 +320,14 @@ stage ('publish and deploy') {
                                         rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
                                     fi
                 
-                                    mv /www/tmp/$TYPE/${jadexVersion} /www/$TARGET/$TYPE/
-                                    echo "${jadexVersion}" > /www/$TARGET/$TYPE/${jadexVersion}/version.txt
+                                    mv /www/tmp/$TYPE/${jadexVersion} /www/$TARGET/$TYPE/ &&
+                                    echo "${jadexVersion}" > /www/$TARGET/$TYPE/${jadexVersion}/version.txt &&
                 
                                     # adjust latest symlink
-                                    ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest"
+                                    ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest" &&
                 
                                     # rm tmp dir
-                                    rmdir /www/tmp/$TYPE
+                                    rmdir /www/tmp/$TYPE &&
                                     rmdir --ignore-fail-on-non-empty /www/tmp"""
 
                     // TODO uncomment when publishdists is reactivated:
@@ -350,12 +352,7 @@ stage ('publish and deploy') {
 
                     // exampleprojects:
 
-                    sshDownloads """mv /www/tmp/oss/${jadexVersion}/exampleprojects/*.zip /www/snapshots/oss/${jadexVersion}/
-                                    # rm tmp dir
-                                    rmdir /www/tmp/oss/${jadexVersion}/exampleprojects
-                                    rmdir /www/tmp/oss/${jadexVersion}
-                                    rmdir /www/tmp/oss
-                                    rmdir --ignore-fail-on-non-empty /www/tmp"""
+                    sshDownloads """rmdir --ignore-fail-on-non-empty /www/tmp"""
                 }
             }
         }
