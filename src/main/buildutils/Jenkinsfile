@@ -24,7 +24,8 @@ Boolean isMasterBranch
 Boolean isStableBranch
 
 def versionSuffix
-def util
+
+util = ""
 
 // convert parameters to booleans:
 performanceTests = performanceTests.toBoolean()
