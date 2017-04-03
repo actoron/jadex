@@ -280,6 +280,7 @@ stage ('publish and deploy') {
                     // create directories
                     sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/exampleprojects/
                                     mkdir -p /www/tmp/pro/${jadexVersion}/
+                                    mkdir -p /www/tmp/docs/
                                     mkdir -p /www/schemas/
                                     mkdir -p /www/docs/nightlies/jadex-${jadexVersion}"""
 
@@ -287,16 +288,14 @@ stage ('publish and deploy') {
                     copyDownloads 'deployment/schemas/*.*', '/www/schemas/'
 
                     // deploy mkdocs (html + pdf)
-                    copyDownloads 'deployment/docs/*.zip', '/www/docs/nightlies/'
-                    // todo extract and adjust links
-//                    unzip -o /www/docs/nightlies/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexversion}/
-//                            rm /www/docs/nightlies/jadex-mkdocs-*.zip
-//
-//                    unzip -o /www/docs/nightlies/*-javadoc.zip -d /www/docs/nightlies/jadex-${jadexversion}/
-//                      rm /www/docs/nightlies/*-javadoc.zip
-//
-//                      # adjust latest symlink
-//                  ln -sfT "jadex-${jadexversion}" "/www/docs/nightlies/latest"
+                    copyDownloads 'deployment/docs/*.zip', '/www/tmp/docs/'
+
+                    sshDownloads """unzip -o /www/tmp/docs/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexversion}/
+                                    rm /www/tmp/docs/jadex-mkdocs-*.zip
+                                    unzip -o /www/tmp/docs/*-javadoc.zip -d /www/docs/nightlies/jadex-${jadexversion}/
+                                    rm /www/tmp/docs/nightlies/*-javadoc.zip
+                                    # adjust latest symlink
+                                    ln -sfT "jadex-${jadexversion}" "/www/docs/nightlies/latest" """
 
                     copyDownloads 'deployment/docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
 
