@@ -1,0 +1,26 @@
+
+//@Field
+//String jadexVersion
+
+stage('preparation') {
+    node { // a node is a step with workspace, can be distributed
+
+        println """Build params: 
+                    jadexVersion: ${jadexVersion}"""
+
+        checkout scm: [$class: 'GitSCM',
+            userRemoteConfigs: [[url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex']],
+            branches: [[name: "refs/tags/${jadexVersion}"]]], changelog: false, poll: false
+
+        echo "testing jenkins with pipeline"
+
+        branchName = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+//        println "On branch: ${env.BRANCH_NAME}" // for multibranch projects, this works?
+        println "On branch: ${branchName}"
+
+        // parse last git tag
+        def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
+
+        println "On tag: ${git_tag}"
+    }
+}
