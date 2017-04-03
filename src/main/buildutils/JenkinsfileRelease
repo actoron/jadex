@@ -38,15 +38,15 @@ stage('preparation') {
     }
 
     util.nodeWithVersion(versionSuffix) {
-        sh """./gradlew
-        -x test
-        -P dist=publishdists
-        -P repo_commercial=https://nexus.actoron.com/content/repositories/pro/
-        -P repo_noncommercial=https://nexus.actoron.com/content/repositories/oss/
-        -P xrepo_commercial=https://nexus.actoron.com/content/repositories/dummy/
-        -P xrepo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/
-        --info
-        --stacktrace
+        sh """./gradlew \
+        -x test \
+        -P dist=publishdists \
+        -P repo_commercial=https://nexus.actoron.com/content/repositories/pro/ \
+        -P repo_noncommercial=https://nexus.actoron.com/content/repositories/oss/ \
+        -P xrepo_commercial=https://nexus.actoron.com/content/repositories/dummy/ \
+        -P xrepo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ \
+        --info \
+        --stacktrace \
         clean build """ // uploadArchives
 
 //        -x test
