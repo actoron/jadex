@@ -1,4 +1,5 @@
 def versionSuffix
+def util
 
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
@@ -21,7 +22,7 @@ stage('preparation') {
 
         println "On tag: ${git_tag}"
 
-        def util = fileLoader.fromGit('src/main/buildutils/JenkinsfileUtil.groovy',
+        util = fileLoader.fromGit('src/main/buildutils/JenkinsfileUtil.groovy',
                 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', 'jenkinsfile', null, '')
 
         def versionsFromTag = util.getVersionsFromTag(git_tag);

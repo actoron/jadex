@@ -24,6 +24,7 @@ Boolean isMasterBranch
 Boolean isStableBranch
 
 def versionSuffix
+def util
 
 // convert parameters to booleans:
 performanceTests = performanceTests.toBoolean()
@@ -46,6 +47,9 @@ stage('preparation') {
                 deployDists: ${deployDists},
                 resetPatchVersion: ${resetPatchVersion}"""
 
+        util = fileLoader.fromGit('src/main/buildutils/JenkinsfileUtil.groovy',
+                'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', 'jenkinsfile', null, '')
+
         git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
         echo "testing jenkins with pipeline"
 
@@ -66,7 +70,7 @@ stage('preparation') {
         println git_headTag
 
         boolean headIsLastVersionTag = false
-        def tags = runCmdAndSplit('git tag --points-at HEAD')
+        def tags = util.runCmdAndSplit('git tag --points-at HEAD')
         for (int i = 0; i < tags.length; i++) {
             if (git_tag.equals(tags[i])) {
                 headIsLastVersionTag = true
@@ -77,7 +81,7 @@ stage('preparation') {
             }
         }
 
-        def versionsFromTag = getVersionsFromTag(git_tag);
+        def versionsFromTag = util.getVersionsFromTag(git_tag);
         def patch = versionsFromTag.patch
 
         currentBuild.description = "build in branch: ${branchName}"
@@ -139,13 +143,13 @@ stage('preparation') {
 }
 
 stage('build and test') {
-    nodeWithVersion(versionSuffix) {
-        withJUnit {
+    util.nodeWithVersion(versionSuffix) {
+        util.withJUnit {
             sh './gradlew -Pdist=addongradleplugin clean build test install -x javadoc' + defaultGradleArgs
         }
 
-        withX {
-            withJUnit {
+        util.withX {
+            util.withJUnit {
                 sh './gradlew -Pdist=publishdists clean build test -x javadoc' + defaultGradleArgs
             }
         }
@@ -158,11 +162,11 @@ if (deployDists) {
     parallel (
         'create distributions': {
             stage('createDists') {
-                nodeWithVersion(versionSuffix) {
+                util.nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'compiled'
-                    withX {
-                        withJUnit {
+                    util.withX {
+                        util.withJUnit {
                             sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
                         }
                     }
@@ -178,7 +182,7 @@ if (deployDists) {
                 for (int i = 0; i < dists.size(); i++) {
                     def distName = dists[i];
                     checkDists["checkdist${distName}"] = {
-                        nodeWithVersion(versionSuffix) {
+                        util.nodeWithVersion(versionSuffix) {
                             deleteDir()
                             unstash 'dists'
                             dir('build/distributions') {
@@ -195,7 +199,7 @@ if (deployDists) {
 
         'docs': {
             stage ('docs') {
-                nodeWithVersion(versionSuffix) {
+                util.nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'sources'
                     sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
@@ -213,7 +217,7 @@ stage ('publish and deploy') {
     parallel (
         'publish and tag': {
             if (publishArtifacts) {
-                nodeWithVersion(versionSuffix) {
+                util.nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'compiled'
                     // testing already done
@@ -229,7 +233,7 @@ stage ('publish and deploy') {
 //                    print "On branch: ${env.BRANCH_NAME}"
                 }
 
-                nodeWithVersion(versionSuffix) {
+                util.nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'git'
                     if (!publishToDummy) {
@@ -244,7 +248,7 @@ stage ('publish and deploy') {
 
         'deploy': {
             if (deployDists) {
-                nodeWithVersion(versionSuffix) {
+                util.nodeWithVersion(versionSuffix) {
                     deleteDir()
                     // gather artifacts:
                     unstash 'docs'
@@ -280,19 +284,19 @@ stage ('publish and deploy') {
                     // todo deploy webapps over ssh
 
                     // create directories
-                    sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/ &&
+                    util.sshDownloads """mkdir -p /www/tmp/oss/${jadexVersion}/ &&
                                     mkdir -p /www/tmp/pro/${jadexVersion}/ &&
                                     mkdir -p /www/tmp/docs/ &&
                                     mkdir -p /www/schemas/ &&
                                     mkdir -p /www/docs/nightlies/jadex-${jadexVersion}"""
 
                     // deploy schemas to actoron downloads
-                    copyDownloads 'deployment/schemas/*.*', '/www/schemas/'
+                    util.copyDownloads 'deployment/schemas/*.*', '/www/schemas/'
 
                     // deploy mkdocs (html + pdf)
-                    copyDownloads 'deployment/docs/*.zip', '/www/tmp/docs/'
+                    util.copyDownloads 'deployment/docs/*.zip', '/www/tmp/docs/'
 
-                    sshDownloads """unzip -o /www/tmp/docs/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexVersion}/ &&
+                    util.sshDownloads """unzip -o /www/tmp/docs/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexVersion}/ &&
                                     rm /www/tmp/docs/jadex-mkdocs-*.zip &&
                                     unzip -o /www/tmp/docs/*-javadoc.zip -d /www/docs/nightlies/jadex-${jadexVersion}/ &&
                                     rm /www/tmp/docs/*-javadoc.zip &&
@@ -300,24 +304,24 @@ stage ('publish and deploy') {
 
                     if (isMasterBranch) {
                         // adjust latest symlink
-                        sshDownloads """ln -sfT "jadex-${jadexVersion}" "/www/docs/nightlies/latest" """
+                        util.sshDownloads """ln -sfT "jadex-${jadexVersion}" "/www/docs/nightlies/latest" """
                     }
 
-                    copyDownloads 'deployment/docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
+                    util.copyDownloads 'deployment/docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
 
                     // schemadoc
-                    copyDownloads 'deployment/schemadoc', "/www/docs/nightlies/jadex-${jadexVersion}/"
+                    util.copyDownloads 'deployment/schemadoc', "/www/docs/nightlies/jadex-${jadexVersion}/"
 
                     // deploy distributions
 
-                    copyDownloads 'deployment/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
-                    copyDownloads 'deployment/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
+                    util.copyDownloads 'deployment/distributions/commercial/*.zip', "/www/tmp/pro/${jadexVersion}"
+                    util.copyDownloads 'deployment/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
 
                     // distributions:
 
                     def TARGET = 'snapshots'
                     for (TYPE in ['oss', 'pro']) {
-                        sshDownloads """# remove old snapshot with same version if exists
+                        util.sshDownloads """# remove old snapshot with same version if exists
                                         if [ -d "/www/$TARGET/$TYPE/${jadexVersion}" ]; then
                                             rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
                                         fi
@@ -330,13 +334,13 @@ stage ('publish and deploy') {
                                         rmdir --ignore-fail-on-non-empty /www/tmp"""
                         if (isMasterBranch) {
                             // adjust latest symlink
-                            sshDownloads """ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest" """
+                            util.sshDownloads """ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest" """
                         }
                     }
 
                     // exampleprojects:
-                    sshDownloads "mkdir -p /www/snapshots/oss/${jadexVersion}/exampleprojects"
-                    copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
+                    util.sshDownloads "mkdir -p /www/snapshots/oss/${jadexVersion}/exampleprojects"
+                    util.copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
                 }
             }
         }
@@ -345,67 +349,16 @@ stage ('publish and deploy') {
 
 if (performanceTests) {
     stage ('performancetests') {
-        nodeWithVersion(versionSuffix) {
+        util.nodeWithVersion(versionSuffix) {
             deleteDir()
             unstash 'compiled'
-            withJUnit {
+            util.withJUnit {
                 sh './gradlew performanceTest' + defaultGradleArgs
             }
         }
     }
 }
 
-// ------- Helper functions --------
-
-@NonCPS // cannot serialize regex.Matcher
-def getVersionsFromTag(gittag) {
-    def groups = (gittag =~ /(\d+)\.(\d+).(\d+)(?:(\w*)-(\d+))?/)
-    if (!groups.matches()) {
-        throw new RuntimeException("Could not find version pattern in last git tag: " + gittag)
-    }
-    return [
-            major: groups[0][1],
-            minor: groups[0][2],
-            patch: groups[0][3],
-            branchName: groups[0][4],
-            branchPatch: groups[0][5]
-    ]
-}
-
-def withX(func) {
-    wrap([$class: 'Xvnc', useXauthority: true]) {
-        func()
-    }
-}
-
-String[] runCmdAndSplit(command) {
-    def stdout = sh (script: command, returnStdout: true).trim()
-    return stdout.split("\n")
-}
-
-def nodeWithVersion(String label = '', version, cl) {
-    node(label) {
-        timeout(time:1, unit: 'HOURS') {
-            withEnv(['BUILD_VERSION_SUFFIX=' + version]) {
-                try {
-                    cl()
-                } catch (Exception e) {
-                    println "Build Exception: ${e.getMessage()}"
-                    throw e
-                }
-            }
-        }
-    }
-}
-
-def withJUnit(cl){
-    try {
-        cl()
-    } catch (Exception e) {
-        junit '**/test-results/*.xml'
-        throw e
-    }
-}
 
 def compareDist(String distribution) {
     //sh 'if [ -d "sources" ]; then rm -r "sources";fi'
@@ -423,7 +376,7 @@ def compareDist(String distribution) {
     //list zips:
     // list content of distzip (jars): file (no file size)
 
-    String[] files = runCmdAndSplit("ls jadex-${distribution}*.zip")
+    String[] files = util.runCmdAndSplit("ls jadex-${distribution}*.zip")
     println "listing contents of dist: ${files}"
 
     for (int i = 0; i < files.length; i++) {
@@ -432,7 +385,7 @@ def compareDist(String distribution) {
     }
 
     // sources: length, crc32, name
-    files = runCmdAndSplit("ls jadex-${distribution}*-sources.zip")
+    files = util.runCmdAndSplit("ls jadex-${distribution}*-sources.zip")
     println "listing contents of sources: ${files}"
     for (int i = 0; i < files.length; i++) {
         def it = files[i]
@@ -440,7 +393,7 @@ def compareDist(String distribution) {
     }
 
     // rebuild dist
-    files = runCmdAndSplit("ls rebuild/jadex-${distribution}*.zip")
+    files = util.runCmdAndSplit("ls rebuild/jadex-${distribution}*.zip")
     println "listing contents of rebuild dist: ${files}"
     for (int i = 0; i < files.length; i++) {
         def it = files[i]
@@ -448,7 +401,7 @@ def compareDist(String distribution) {
     }
 
     // rebuild sources
-    files = runCmdAndSplit("ls rebuild/jadex-${distribution}*-sources.zip")
+    files = util.runCmdAndSplit("ls rebuild/jadex-${distribution}*-sources.zip")
     println "listing contents of rebuild sources: ${files}"
     for (int i = 0; i < files.length; i++) {
         def it = files[i]
@@ -456,20 +409,12 @@ def compareDist(String distribution) {
     }
 
     // now compare
-    files = runCmdAndSplit("ls compare/*.lst")
+    files = util.runCmdAndSplit("ls compare/*.lst")
     for (int i = 0; i < files.length; i++) {
         def it = files[i]
         echo "checking for difference in ${it} ..."
         sh "diff -w '${it}' '${it}-rebuild' > '${it}'.diff || echo 'rebuild distribution differs from original: ${it.substring(0,it.length()-5)}'"
         // jenkins aborts here if there is a difference.
     }
-
 }
 
-def copyDownloads(src, dest) {
-    sh "scp -i ~/.ssh/pushuser.key -P 20000 -r ${src} webpush@download.actoron.com:${dest}"
-}
-
-def sshDownloads(cmd) {
-    sh """ssh -i ~/.ssh/pushuser.key -p 20000 webpush@download.actoron.com "${cmd}" """
-}

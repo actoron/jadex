@@ -28,4 +28,33 @@ def nodeWithVersion(String label = '', version, cl) {
     }
 }
 
+def withX(func) {
+    wrap([$class: 'Xvnc', useXauthority: true]) {
+        func()
+    }
+}
+
+String[] runCmdAndSplit(command) {
+    def stdout = sh (script: command, returnStdout: true).trim()
+    return stdout.split("\n")
+}
+
+def withJUnit(cl){
+    try {
+        cl()
+    } catch (Exception e) {
+        junit '**/test-results/*.xml'
+        throw e
+    }
+}
+
+def copyDownloads(src, dest) {
+    sh "scp -i ~/.ssh/pushuser.key -P 20000 -r ${src} webpush@download.actoron.com:${dest}"
+}
+
+def sshDownloads(cmd) {
+    sh """ssh -i ~/.ssh/pushuser.key -p 20000 webpush@download.actoron.com "${cmd}" """
+}
+
+
 return this
