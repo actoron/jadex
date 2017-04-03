@@ -1,6 +1,8 @@
 def versionSuffix
 def util
 
+defaultGradleArgs = " -x test -P dist=publishdists --info --stacktrace"
+
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
 
@@ -32,54 +34,45 @@ stage('preparation') {
 
         echo "version suffix:" + versionSuffix
 
-//        util.withEnv(['BUILD_VERSION_SUFFIX=' + versionSuffix]) {
-//
-//        }
     }
 
     util.nodeWithVersion(versionSuffix) {
-        sh """./gradlew \
-        -x test \
-        -P dist=publishdists \
+        sh """./gradlew ${defaultGradleArgs} \
         -P repo_commercial=https://nexus.actoron.com/content/repositories/pro/ \
         -P repo_noncommercial=https://nexus.actoron.com/content/repositories/oss/ \
         -P xrepo_commercial=https://nexus.actoron.com/content/repositories/dummy/ \
         -P xrepo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ \
-        --info \
-        --stacktrace \
-        clean build """ // uploadArchives
+        clean build uploadArchives """
 
-//        -x test
-//        -P dist=publishdists
-//        -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2/
-//        -P repo_commercial=
-//                -P repouser=Lars
-//        -P repopassword=lax
-//        --info
-//        --stacktrace
-//
-//        uploadArchives
+    util.nodeWithVersion(versionSuffix) {
+        sh """./gradlew ${defaultGradleArgs} \
+        -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2/ \
+        -P repo_commercial= \
+        -P repouser=Lars \
+        -P repopassword=lax \
+        uploadArchives"""
+    }
 
 
-//        # copy oss snapshot
-//        if [ -d "/www/snapshots/oss/${RELEASE_VERSION}" ]; then
-//        cp -r "/www/snapshots/oss/${RELEASE_VERSION}" "/www/releases/oss/"
-//        fi
-//
-//        # copy pro snapshot
-//        if [ -d "/www/snapshots/pro/${RELEASE_VERSION}" ]; then
-//        cp -r "/www/snapshots/pro/${RELEASE_VERSION}" "/www/releases/pro/"
-//        fi
-//
-//        # copy docs
-//        if [ -d "/www/docs/nightlies/jadex-${RELEASE_VERSION}" ]; then
-//        cp -r "/www/docs/nightlies/jadex-${RELEASE_VERSION}" "/www/docs/releases/"
-//        fi
-//
-//        # adjust latest symlinks
-//        ln -sfT "${RELEASE_VERSION}" "/www/releases/oss/latest"
-//        ln -sfT "${RELEASE_VERSION}" "/www/releases/pro/latest"
-//
-//        ln -sfT "jadex-${RELEASE_VERSION}" "/www/docs/releases/latest"
+    util.sshDownloads """
+        # copy oss snapshot
+        if [ -d "/www/snapshots/oss/${jadexVersion}" ]; then
+            cp -r "/www/snapshots/oss/${jadexVersion}" "/www/releases/oss/"
+        fi
+
+        # copy pro snapshot
+        if [ -d "/www/snapshots/pro/${jadexVersion}" ]; then
+            cp -r "/www/snapshots/pro/${jadexVersion}" "/www/releases/pro/"
+        fi
+
+        # copy docs
+        if [ -d "/www/docs/nightlies/jadex-${jadexVersion}" ]; then
+            cp -r "/www/docs/nightlies/jadex-${jadexVersion}" "/www/docs/releases/"
+        fi
+
+        # adjust latest symlinks
+        ln -sfT "${jadexVersion}" "/www/releases/oss/latest" &&
+        ln -sfT "${jadexVersion}" "/www/releases/pro/latest" &&
+        ln -sfT "jadex-${jadexVersion}" "/www/docs/releases/latest" """
     }
 }
