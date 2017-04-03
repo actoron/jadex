@@ -290,12 +290,12 @@ stage ('publish and deploy') {
                     // deploy mkdocs (html + pdf)
                     copyDownloads 'deployment/docs/*.zip', '/www/tmp/docs/'
 
-                    sshDownloads """unzip -o /www/tmp/docs/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexversion}/
+                    sshDownloads """unzip -o /www/tmp/docs/jadex-mkdocs-*.zip -d /www/docs/nightlies/jadex-${jadexVersion}/
                                     rm /www/tmp/docs/jadex-mkdocs-*.zip
-                                    unzip -o /www/tmp/docs/*-javadoc.zip -d /www/docs/nightlies/jadex-${jadexversion}/
+                                    unzip -o /www/tmp/docs/*-javadoc.zip -d /www/docs/nightlies/jadex-${jadexVersion}/
                                     rm /www/tmp/docs/nightlies/*-javadoc.zip
                                     # adjust latest symlink
-                                    ln -sfT "jadex-${jadexversion}" "/www/docs/nightlies/latest" """
+                                    ln -sfT "jadex-${jadexVersion}" "/www/docs/nightlies/latest" """
 
                     copyDownloads 'deployment/docs/*.pdf', "/www/docs/nightlies/jadex-${jadexVersion}"
 
@@ -309,37 +309,54 @@ stage ('publish and deploy') {
                     copyDownloads 'deployment/distributions/noncommercial/*.zip', "/www/tmp/oss/${jadexVersion}"
                     copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/tmp/oss/${jadexVersion}/exampleprojects/"
 
-                    // TODO move to correct location and adjust symlink
                     // distributions:
 
-//                    TYPE="pro"
-//                    TARGET="snapshots"
+                    sshDownloads """TYPE="oss"
+                                    TARGET="snapshots"
+                
+                                    # remove old snapshot with same version if exists
+                                    if [ -d "/www/$TARGET/$TYPE/${jadexVersion}" ]; then
+                                        rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
+                                    fi
+                
+                                    mv /www/tmp/$TYPE/${jadexVersion} /www/$TARGET/$TYPE/
+                                    echo "${jadexVersion}" > /www/$TARGET/$TYPE/${jadexVersion}/version.txt
+                
+                                    # adjust latest symlink
+                                    ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest"
+                
+                                    # rm tmp dir
+                                    rmdir /www/tmp/$TYPE
+                                    rmdir --ignore-fail-on-non-empty /www/tmp"""
+
+                    // TODO uncomment when publishdists is reactivated:
+//                    sshDownloads """TYPE="pro"
+//                                    TARGET="snapshots"
 //
-//                    # remove old snapshot with same date if exists
-//                    if [ -d "/www/$TARGET/$TYPE/${jadexversion}" ]; then
-//                    rm -r "/www/$TARGET/$TYPE/${jadexversion}"
-//                    fi
+//                                    # remove old snapshot with same version if exists
+//                                    if [ -d "/www/$TARGET/$TYPE/${jadexVersion}" ]; then
+//                                        rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
+//                                    fi
 //
-//                    mv /www/tmp/$TYPE/${jadexversion} /www/$TARGET/$TYPE/
+//                                    mv /www/tmp/$TYPE/${jadexVersion} /www/$TARGET/$TYPE/
 //
-//                            echo "${jadexversion}" > /www/$TARGET/$TYPE/${jadexversion}/version.txt
+//                                            echo "${jadexVersion}" > /www/$TARGET/$TYPE/${jadexVersion}/version.txt
 //
-//                    # adjust latest symlink
-//                    ln -sfT "${jadexversion}" "/www/$TARGET/$TYPE/latest"
+//                                    # adjust latest symlink
+//                                    ln -sfT "${jadexVersion}" "/www/$TARGET/$TYPE/latest"
 //
-//                    # rm tmp dir
-//                    rmdir /www/tmp/$TYPE
-//                    rmdir --ignore-fail-on-non-empty /www/tmp
+//                                    # rm tmp dir
+//                                    rmdir /www/tmp/$TYPE
+//                                    rmdir --ignore-fail-on-non-empty /www/tmp"""
 
                     // exampleprojects:
 
-                    // mv /www/tmp/oss/${jadexversion}/exampleprojects/*.zip /www/snapshots/oss/${jadexversion}/
-                    //
-                    //# rm tmp dir
-                    //rmdir /www/tmp/oss/${jadexversion}/exampleprojects
-                    //rmdir /www/tmp/oss/${jadexversion}
-                    //rmdir /www/tmp/oss
-                    //rmdir --ignore-fail-on-non-empty /www/tmp
+                    sshDownloads """mv /www/tmp/oss/${jadexVersion}/exampleprojects/*.zip /www/snapshots/oss/${jadexVersion}/
+                                    # rm tmp dir
+                                    rmdir /www/tmp/oss/${jadexVersion}/exampleprojects
+                                    rmdir /www/tmp/oss/${jadexVersion}
+                                    rmdir /www/tmp/oss
+                                    rmdir --ignore-fail-on-non-empty /www/tmp"""
                 }
             }
         }
