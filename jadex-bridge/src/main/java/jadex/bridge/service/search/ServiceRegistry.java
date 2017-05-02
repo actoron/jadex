@@ -48,7 +48,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	protected Map<ClassInfo, Set<IService>> services;
 	
 	/** The service indexer. */
-	protected ServiceIndexer indexer;
+	protected ServiceIndexer<IService> indexer;
 	
 	/** The excluded components. */
 //	protected Set<IComponentIdentifier> excluded;
@@ -69,7 +69,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public ServiceRegistry()//RegistrySearchFunctionality searchfunc)
 	{
-		this.indexer = new ServiceIndexer(ServiceQuery.KEY_TYPE_INTERFACE, ServiceQuery.KEY_TYPE_TAGS, ServiceQuery.KEY_TYPE_PROVIDER);
+		this.indexer = new ServiceIndexer<IService>(new JadexServiceKeyExtractor(), JadexServiceKeyExtractor.SERVICE_KEY_TYPES);
 	}
 	
 	/**
@@ -158,7 +158,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					lis = new CounterResultListener<Void>(exs.size(), new DelegationResultListener<Void>(ret));
 					for(IService ser: exs)
 					{
-						checkQueries(ser).addResultListener(lis);
+						checkQueries(ser, false).addResultListener(lis);
 					}
 				}
 			}
@@ -208,7 +208,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			exsers.add(service);
 		}
 		
-		checkQueries(service);
+		checkQueries(service, false);
 		
 		notifyListeners(new RegistryListenerEvent(RegistryListenerEvent.Type.ADDED, key, service));
 
@@ -224,7 +224,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public void removeService(ClassInfo key, IService service)
 	{
 		indexer.removeService(service);
-		checkQueries(service);
+		checkQueries(service, true);
 	}
 	
 	/**

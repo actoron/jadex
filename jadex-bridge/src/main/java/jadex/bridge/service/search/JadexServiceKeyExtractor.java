@@ -11,7 +11,7 @@ import java.util.Set;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 
-public class JadexServiceKeyExtractor
+public class JadexServiceKeyExtractor implements IKeyExtractor
 {
 	/** Key type for the service interface. */
 	public static final String KEY_TYPE_INTERFACE = "interface";
