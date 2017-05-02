@@ -16,7 +16,7 @@ public class RequiredServiceInfo
 {
 	//-------- constants --------
 	
-	/** None component scope (nothing will be searched). */
+	/** None component scope (nothing will be searched, forces required service creation). */
 	public static final String SCOPE_NONE = "none";
 	
 	/** Local component scope. */

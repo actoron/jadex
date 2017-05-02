@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
@@ -33,11 +34,14 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -66,6 +70,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -76,9 +81,13 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.spongycastle.util.Pack;
+
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.ErrorException;
+import jadex.commons.random.FastThreadedRandom;
+import jadex.commons.random.Xoroshiro128Random;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -208,6 +217,23 @@ public class SUtil
 			return null;
 		}
 	};
+	
+	public static final SecureRandom SECURE_RANDOM;
+	static
+	{
+		SecureRandom secrand = null;
+		try
+		{
+			Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
+			Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
+			secrand = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
+		}
+		catch (Exception e)
+		{
+			secrand = new SecureRandom();
+		}
+		SECURE_RANDOM = secrand;
+	}
 
 	/** An empty string array. */
 	public static final String[] EMPTY_STRING_ARRAY	= new String[0];
@@ -1982,7 +2008,7 @@ public class SUtil
 
 	/** The counter for conversation ids. */
 	protected static AtomicLong convidcnt = new AtomicLong();
-
+	
 	/**
 	 * Create a globally unique conversation id.
 	 * 
@@ -1990,14 +2016,68 @@ public class SUtil
 	 */
 	public static String createUniqueId(String name)
 	{
-//		synchronized(SUtil.class)
-//		{
-			// return
-			// "id_"+name+"_"+System.currentTimeMillis()+"_"+Math.random()+"_"+(++convidcnt);
-			// return "id_"+name+"_"+Math.random()+"_"+(++convidcnt);
-			return name + "_" + Math.random() + "_" + (convidcnt.incrementAndGet());
-//		}
+		char[] nchars = name.toCharArray();
+		char[] chars = new char[nchars.length + 45];
+		System.arraycopy(nchars, 0, chars, 0, nchars.length);
+		int o = nchars.length;
+//		int o = 0;
+		chars[o++] = '_';
+		
+		byte[] precached = new byte[32];
+		SECURE_RANDOM.nextBytes(precached);
+
+		long rndlong = SUtil.bytesToLong(precached, 0);
+		for (int i = 0; i < 11; ++i)
+			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+		o += 11;
+		rndlong = SUtil.bytesToLong(precached, 8);
+		for (int i = 0; i < 11; ++i)
+			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+		o += 11;
+		rndlong = SUtil.bytesToLong(precached, 16);
+		for (int i = 0; i < 11; ++i)
+			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+		o += 11;
+		rndlong = SUtil.bytesToLong(precached, 24);
+		for (int i = 0; i < 11; ++i)
+			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+		
+		String ret = new String(chars);
+		return ret;
 	}
+	
+	public static final Field strval;
+	static
+	{
+		Field f = null;
+		try
+		{
+			f = String.class.getDeclaredField("value");
+			f.setAccessible(true);
+		}
+		catch (Exception e)
+		{
+			
+		}
+		
+		strval = f;
+	}
+	
+	/**
+	 * Create a globally unique conversation id.
+	 * 
+	 * @return The conversation id.
+	 */
+//	public static String createUniqueId(String name)
+//	{
+////		synchronized(SUtil.class)
+////		{
+//			// return
+//			// "id_"+name+"_"+System.currentTimeMillis()+"_"+Math.random()+"_"+(++convidcnt);
+//			// return "id_"+name+"_"+Math.random()+"_"+(++convidcnt);
+//			return name + "_" + Math.random() + "_" + (convidcnt.incrementAndGet());
+////		}
+//	}
 
 	/**
 	 * Create a globally unique conversation id.
@@ -2608,6 +2688,19 @@ public class SUtil
 
 		return value;
 	}
+	
+	/**
+	 *  Convert bytes to an integer.
+	 */
+	public static int bytesToInt(byte[] buffer, int offset)
+	{
+		int value = (0xFF & buffer[offset]) << 24;
+		value |= (0xFF & buffer[offset+1]) << 16;
+		value |= (0xFF & buffer[offset+2]) << 8;
+		value |= (0xFF & buffer[offset+3]);
+
+		return value;
+	}
 
 	/**
 	 *  Convert an integer to bytes.
@@ -2622,6 +2715,17 @@ public class SUtil
 		buffer[3] = (byte)(val & 0xFF);
 
 		return buffer;
+	}
+	
+	/**
+	 *  Convert a long to bytes.
+	 */
+	public static void intIntoBytes(int val, byte[] buffer, int offset)
+	{
+		buffer[offset++] = (byte)((val >>> 24) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 16) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 8) & 0xFF);
+		buffer[offset++] = (byte)(val & 0xFF);
 	}
 	
 //	/**

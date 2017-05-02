@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
@@ -163,7 +165,24 @@ public class Starter
 //			e.printStackTrace();
 //		}
 		
-		createPlatform(args).get();
+		createPlatform(args).get().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				String remoteaddr = "tcp-mtp://"+"ec2-54-190-58-166.us-west-2.compute.amazonaws.com"+":36000";
+				String platformname = "Allie-Jadex_720F614FB6ED061A";
+				IComponentIdentifier	remotecid	= new ComponentIdentifier(platformname, new String[]{remoteaddr});
+				
+				// Create proxy for remote platform such that remote services are found
+				Map<String, Object>	args = new HashMap<String, Object>();
+				args.put("component", remotecid);
+				CreationInfo ci = new CreationInfo(args);
+				ci.setDaemon(true);
+				IComponentManagementService	cms	= SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
+				return IFuture.DONE;
+			}
+		});
 		
 //		IExternalAccess access	= createPlatform(args).get();
 //				Runtime.getRuntime().addShutdownHook(new Thread()
@@ -385,7 +404,7 @@ public class Starter
 //					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
 					if(config.getRegistrySync())
 					{
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(true, new MultiServiceRegistry()));
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(true, new MultiServiceRegistry(cid)));
 					}
 					else
 					{

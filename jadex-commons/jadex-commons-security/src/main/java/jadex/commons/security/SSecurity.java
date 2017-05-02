@@ -45,6 +45,7 @@ import org.spongycastle.x509.X509V1CertificateGenerator;
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.security.random.SecureThreadedRandom;
 
 
 /**
@@ -64,6 +65,10 @@ public class SSecurity
 	/** Common secure random number source. */
 	protected static volatile SecureRandom RANDOM;
 	
+	protected static volatile SecureRandom HIGHLY_SECURE_SEED_RANDOM;
+	
+	protected static volatile SecureRandom SEED_RANDOM;
+	
 	/**
 	 *  Gets access to the common secure PRNG.
 	 *  @return Common secure PRNG.
@@ -76,7 +81,7 @@ public class SSecurity
 			{
 				if(RANDOM == null)
 				{
-					RANDOM = generateSecureRandom();
+					RANDOM = new SecureThreadedRandom();
 				}
 			}
 		}
@@ -84,89 +89,31 @@ public class SSecurity
 	}
 	
 	/**
-	 *  Generates a secure PRNG. The setup attempts to prepare a PRNG that avoids relying
-	 *  on a single approach.
+	 *  Generates a fast secure PRNG. The setup attempts to prepare a PRNG that is fast and secure.
 	 *  @return Secure PRNG.
 	 */
 	public static final SecureRandom generateSecureRandom()
 	{
+		return new SecureThreadedRandom();
+	}
+	
+	/**
+	 *  Generates a secure PRNG. The setup attempts to prepare a PRNG that avoids relying
+	 *  on a single approach.
+	 *  @return Secure PRNG.
+	 */
+	public static final SecureRandom generateHighlySecureRandom()
+	{
 		SecureRandom ret = null;
+		
 		EntropySourceProvider esp = new EntropySourceProvider()
 		{
-			/** One random number source. */
-			private SecureRandom seedrandom = new SecureRandom();
-			
 			public EntropySource get(int bitsRequired)
 			{
 				// Convert to bytes.
 				int numbytes = (int) Math.ceil(bitsRequired / 8.0);
-				byte[] seed = null;
-				File urandom = new File("/dev/urandom");
-				if (urandom.exists())
-				{
-					// Using /dev/urandom as seed source
-					byte[] urseed = new byte[numbytes];
-					int offset = 0;
-					FileInputStream urandomin = null;
-					try
-					{
-						urandomin = new FileInputStream(urandom);
-						while (offset != urseed.length)
-						{
-							offset += urandomin.read(urseed, offset, urseed.length - offset);
-						}
-						urandomin.close();
-						seed = urseed;
-					}
-					catch (Exception e)
-					{
-						if (urandomin != null)
-						{
-							try
-							{
-								urandomin.close();
-							}
-							catch (Exception e1)
-							{
-							}
-						}
-					}
-				}
-				
-				// For Windows, use Windows API to gather seed data
-				String osname = System.getProperty("os.name");
-				String osversion = System.getProperty("os.version");
-				int minmajwinversion = 6;
-				if (osname != null &&
-					osname.startsWith("Windows") &&
-					osversion != null &&
-					osversion.contains(".") &&
-					Integer.parseInt(osversion.substring(0, osversion.indexOf('.'))) >= minmajwinversion &&
-					seed == null)
-				{
-					try
-					{
-						seed = WinCrypt.getRandomFromWindows(numbytes);
-					}
-					catch(Throwable e)
-					{
-					}
-				}
-				
-				if (seed == null)
-				{
-					// Fallback to Java mechanism
-					seed = seedrandom.generateSeed(numbytes);
-				}
-				
-				/** Beef it up with some Java PRNG data to avoid single failure point */
-				final byte[] fseed = seed;
-				seed = new byte[fseed.length];
-				seedrandom.nextBytes(seed);
-				for (int i = 0; i < seed.length; ++i)
-				{
-					fseed[i] = (byte) (fseed[i] ^ seed[i]);
-				}
+				final byte[] fseed = new byte[numbytes];
+				getHighlySecureSeedRandom().nextBytes(fseed);;
 				
 				EntropySource ret = new EntropySource()
 				{
@@ -189,20 +136,29 @@ public class SSecurity
 			}
 		};
 		
-		// Combine AES-CTR-DRBG, AES-HMAC-DRBG
+		// Combine PRNGs / paranoid
 		List<SecureRandom> prngs = new ArrayList<SecureRandom>();
+		
 		SP800SecureRandomBuilder builder = new SP800SecureRandomBuilder(esp);
 		AESFastEngine eng = new AESFastEngine();
 		prngs.add(builder.buildCTR(eng, 256, esp.get(128).getEntropy(), false));
+		System.out.println(prngs.get(prngs.size() - 1));
 		
 		Mac m = new HMac(new SHA512Digest());
 		prngs.add(builder.buildHMAC(m, esp.get(512).getEntropy(), false));
+		System.out.println(prngs.get(prngs.size() - 1));
+		
+		prngs.add(generateSecureRandom());
+		System.out.println(prngs.get(prngs.size() - 1));
+		
+		prngs.add(new SecureRandom());
+		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
 		ret = new SecureRandom()
 		{
 			/** ID */
-			private static final long serialVersionUID = -3198322750442762871L;
+			private static final long serialVersionUID = -3198322750446562871L;
 			
 			public synchronized void nextBytes(byte[] bytes)
 			{
@@ -213,15 +169,154 @@ public class SSecurity
 					for (int i = 1; i < randsources.length; ++i)
 					{
 						randsources[i].nextBytes(addbytes);
-						for (int j = 0; j < bytes.length; ++j)
-						{
-							bytes[j] = (byte) (bytes[j] ^ addbytes[j]);
-						}
+						xor(bytes, addbytes);
 					}
 				}
 			}
 		};
 		return ret;
+	}
+	
+	/**
+	 *  XORs two byte arrays.
+	 *  
+	 *  @param op1result First array and output array.
+	 *  @param op2 Second array.
+	 *  @return Modified first array.
+	 */
+	public static final byte[] xor(byte[] op1result, byte[] op2)
+	{
+		int max = Math.max(op1result.length, op2.length);
+		for (int i = 0; i < max; ++i)
+		{
+			op1result[i] = (byte) (op1result[i] ^ op2[i]);
+		}
+		return op1result;
+	}
+	
+	/**
+	 *  Gets a secure random seed value that received additional strengthening.
+	 *  
+	 *  @param numbytes number of seed bytes needed.
+	 *  @return Secure seed.
+	 */
+	public static SecureRandom getHighlySecureSeedRandom()
+	{
+		if (HIGHLY_SECURE_SEED_RANDOM == null)
+		{
+			synchronized (SSecurity.class)
+			{
+				if (HIGHLY_SECURE_SEED_RANDOM == null)
+				{
+					HIGHLY_SECURE_SEED_RANDOM = new SecureRandom()
+					{
+						public synchronized void nextBytes(byte[] bytes)
+						{
+							
+							byte[] addent = SecureRandom.getSeed(bytes.length);
+							getSeedRandom().nextBytes(bytes);;
+							
+							xor(bytes, addent);
+						}
+						
+						public byte[] generateSeed(int numbytes)
+						{
+							byte[] ret = new byte[numbytes];
+							nextBytes(ret);
+							return ret;
+						}
+					};
+				}
+			}
+		}
+		return HIGHLY_SECURE_SEED_RANDOM;
+	}
+	
+	/**
+	 *  Gets a secure random seed value from OS or other sources.
+	 *  
+	 *  @param numbytes number of seed bytes needed.
+	 *  @return Secure seed.
+	 */
+	public static SecureRandom getSeedRandom()
+	{
+		if (SEED_RANDOM == null)
+		{
+			synchronized (SSecurity.class)
+			{
+				if (SEED_RANDOM == null)
+				{
+					SEED_RANDOM = new SecureRandom()
+					{
+						private static final long serialVersionUID = -8238246099124227737L;
+						
+						protected long bytecounter = 0;
+
+						public synchronized void nextBytes(byte[] ret)
+						{
+							boolean noseed = true;
+							File urandom = new File("/dev/urandom");
+							InputStream urandomin = null;
+							try
+							{
+								urandomin = new FileInputStream(urandom);
+								if (urandom.exists())
+								{
+									SUtil.readStream(ret, urandomin);
+									noseed = false;
+									SUtil.close(urandomin);
+								}
+							}
+							catch (Exception e)
+							{
+								SUtil.close(urandomin);
+							}
+							
+							if (noseed)
+							{
+								// For Windows, use Windows API to gather seed data
+								String osname = System.getProperty("os.name");
+								String osversion = System.getProperty("os.version");
+								int minmajwinversion = 6;
+								if (osname != null &&
+									osname.startsWith("Windows") &&
+									osversion != null &&
+									osversion.contains(".") &&
+									Integer.parseInt(osversion.substring(0, osversion.indexOf('.'))) >= minmajwinversion)
+								{
+									try
+									{
+										ret = WinCrypt.getRandomFromWindows(ret.length);
+										noseed = false;
+									}
+									catch(Throwable e)
+									{
+									}
+								}
+							}
+							
+							if (noseed)
+							{
+								ret = SecureRandom.getSeed(ret.length);
+							}
+							
+							bytecounter += ret.length;
+							System.out.println("Seed consumption: " + bytecounter);
+						}
+						
+						public byte[] generateSeed(int numbytes)
+						{
+							byte[] ret = new byte[numbytes];
+							nextBytes(ret);
+							return ret;
+						}
+					};
+				}
+			}
+		}
+		
+		
+		return SEED_RANDOM;
 	}
 	
 	/**

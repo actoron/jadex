@@ -48,7 +48,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
  *  These methods will hinder the writer to update the registry - can
  *  only update when the last reader has left).
  */
-public class SynchronizedServiceRegistry implements IServiceRegistry
+public class SynchronizedServiceRegistry implements IMultiServiceRegistry
 {
 	/** The reader count. */
 	protected int readercnt; 
@@ -617,7 +617,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Get the registry from a component.
 	 */
-	public static SynchronizedServiceRegistry getRegistry(IComponentIdentifier platform)
+	public static IQueryServiceRegistry getRegistry(IComponentIdentifier platform)
 	{
 		return (SynchronizedServiceRegistry)PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_SERVICEREGISTRY);
 	}
@@ -625,7 +625,7 @@ public class SynchronizedServiceRegistry implements IServiceRegistry
 	/**
 	 *  Get the registry from a component.
 	 */
-	public static SynchronizedServiceRegistry getRegistry(IInternalAccess ia)
+	public static IQueryServiceRegistry getRegistry(IInternalAccess ia)
 	{
 		return getRegistry(ia.getComponentIdentifier());
 	}
