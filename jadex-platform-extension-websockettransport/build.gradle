@@ -4,9 +4,15 @@ dependencies
 {
 	compile project(':jadex-platform')
 	//compile 'org.eclipse.jetty.websocket:websocket-client:9.4.4.v20170414'
-	//compile 'com.neovisionaries:nv-websocket-client:2.2'
-	compile 'org.glassfish.tyrus:tyrus-client:1.13.1'
-	compile 'org.glassfish.tyrus:tyrus-container-grizzly-client:1.13.1'
+	
+	// NV client
+	compile 'com.neovisionaries:nv-websocket-client:2.2'
+	
+	// Tyrus client
+	//compile 'org.glassfish.tyrus:tyrus-client:1.13.1'
+	//compile 'org.glassfish.tyrus:tyrus-container-grizzly-client:1.13.1'
+	
+	// Tyrus server
 	//compile 'org.glassfish.tyrus:tyrus-server:1.13.1'
 	//compile 'org.glassfish.tyrus:tyrus-container-grizzly-server:1.13.1'
 }
