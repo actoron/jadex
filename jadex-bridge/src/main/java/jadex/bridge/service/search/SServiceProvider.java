@@ -772,6 +772,17 @@ public class SServiceProvider
 	 */
 	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess component, final Class<T> type, final String scope, final IAsyncFilter<T> filter, final boolean proxy)
 	{
+		return getServices(component, component.getComponentIdentifier(), type, scope, filter, proxy);
+	}
+	
+	/**
+	 *  Get all services of a type.
+//	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess component, final IComponentIdentifier cid, final Class<T> type, final String scope, final IAsyncFilter<T> filter, final boolean proxy)
+	{
 		final TerminableIntermediateDelegationFuture<T> ret = new TerminableIntermediateDelegationFuture<T>();
 		
 		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
@@ -782,7 +793,7 @@ public class SServiceProvider
 				{
 					if(filter==null)
 					{
-						Collection<T> sers = SynchronizedServiceRegistry.getRegistry(component).searchServices(new ClassInfo(type), component.getComponentIdentifier(), scope);
+						Collection<T> sers = SynchronizedServiceRegistry.getRegistry(component).searchServices(new ClassInfo(type), cid, scope);
 						if(proxy)
 							sers = createRequiredProxies(component, sers, type);
 						ret.setResult(sers==null? Collections.EMPTY_SET: sers);
@@ -790,14 +801,14 @@ public class SServiceProvider
 					else
 					{
 						IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret); 
-						SynchronizedServiceRegistry.getRegistry(component).searchServices(new ClassInfo(type), component.getComponentIdentifier(), scope, filter)
+						SynchronizedServiceRegistry.getRegistry(component).searchServices(new ClassInfo(type), cid, scope, filter)
 							.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
 					}
 				}
 				else
 				{
 					IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret); 
-					ISubscriptionIntermediateFuture<T> fut = SynchronizedServiceRegistry.getRegistry(component).searchGlobalServices(new ClassInfo(type), component.getComponentIdentifier(), filter);
+					ISubscriptionIntermediateFuture<T> fut = SynchronizedServiceRegistry.getRegistry(component).searchGlobalServices(new ClassInfo(type), cid, filter);
 					fut.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
 				}
 			}

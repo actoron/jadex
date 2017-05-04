@@ -181,7 +181,8 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
 		{
 			public void firstResultAvailable(E result) 
 			{
-				firstListener.resultAvailable(result);
+				if(firstListener!=null)
+					firstListener.resultAvailable(result);
 			}
 
 			public void secondResultAvailable(F result) 

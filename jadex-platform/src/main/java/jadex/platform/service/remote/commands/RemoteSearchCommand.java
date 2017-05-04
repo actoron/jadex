@@ -3,6 +3,7 @@ package jadex.platform.service.remote.commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,10 +12,13 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.SynchronizedServiceRegistry;
+import jadex.bridge.service.search.SServiceProvider.IntermediateProxyResultListener;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.IAsyncFilter;
@@ -25,6 +29,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.transformation.annotations.Alias;
@@ -246,7 +251,19 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 									{
 										Class<?> cl = type!=null ? type.getType(cloader, ia.getModel().getAllImports()) : null;
 
-										ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(ia, cl, scope, (IAsyncFilter)filter, false);
+//										if(cl.getName().indexOf("IMessage")!=-1)
+//											System.out.println("oooooooo");
+										
+										// not possible because scope should be global without starting a global search
+//										ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(ia, caller, cl, scope, (IAsyncFilter)filter, false);
+
+										// todo: add case that filter is null
+//										if(filter==null)
+//										{
+//											Collection<IService> sers = SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).searchServices(type, caller, RequiredServiceInfo.SCOPE_GLOBAL);
+//											ret.setResult(sers==null? Collections.EMPTY_SET: sers);
+//										}
+										ITerminableIntermediateFuture<IService> res = SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).searchServices(type, caller, RequiredServiceInfo.SCOPE_GLOBAL, filter);
 										res.addResultListener(new IIntermediateResultListener<IService>()
 										{
 											int cnt = 0;	
@@ -442,6 +459,24 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	public String getCallId()
 	{
 		return callid;
+	}
+
+	/**
+	 *  Get the caller.
+	 *  @return The caller.
+	 */
+	public IComponentIdentifier getCaller() 
+	{
+		return caller;
+	}
+
+	/**
+	 *  Set the caller.
+	 *  @param caller The caller.
+	 */
+	public void setCaller(IComponentIdentifier caller) 
+	{
+		this.caller = caller;
 	}
 
 	/**

@@ -318,8 +318,8 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public <T> IFuture<T> searchService(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			return new Future<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
+//		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+//			return new Future<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
 		return searchfunc.searchService(type, cid, scope, filter);
 	}
 	
@@ -328,8 +328,9 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			return new SubscriptionIntermediateFuture<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
+		// commented out for running remote search command with scope global on local call
+//		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+//			return new SubscriptionIntermediateFuture<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
 		return searchfunc.searchServices(type, cid, scope, filter);
 	}
 	
