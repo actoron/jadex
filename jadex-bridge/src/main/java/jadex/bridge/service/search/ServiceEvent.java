@@ -19,7 +19,7 @@ public class ServiceEvent<T>
 	public static final int SERVICE_REMOVED = 1;
 	
 	/** Event type. */
-	protected int eventtype;
+	protected int type;
 	
 	/** The service. */
 	protected T service;
@@ -44,9 +44,9 @@ public class ServiceEvent<T>
 	 *
 	 *  @return The event type.
 	 */
-	public int getEventType()
+	public int getType()
 	{
-		return eventtype;
+		return type;
 	}
 
 	/**
@@ -54,9 +54,9 @@ public class ServiceEvent<T>
 	 *
 	 *  @param eventtype The event type.
 	 */
-	public void setEventType(int eventtype)
+	public void setType(int type)
 	{
-		this.eventtype = eventtype;
+		this.type = type;
 	}
 
 	/**

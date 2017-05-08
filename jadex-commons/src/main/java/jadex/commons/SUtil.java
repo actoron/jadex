@@ -2016,7 +2016,7 @@ public class SUtil
 	 */
 	public static String createUniqueId(String name)
 	{
-		char[] nchars = name.toCharArray();
+		char[] nchars = name == null ? new char[0] : name.toCharArray();
 		char[] chars = new char[nchars.length + 45];
 		System.arraycopy(nchars, 0, chars, 0, nchars.length);
 		int o = nchars.length;

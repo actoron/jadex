@@ -27,6 +27,12 @@ public interface IServiceIdentifier
 	 *  @return The service type name.
 	 */
 	public ClassInfo getServiceType();
+	
+	/**
+	 *  Get the service super types.
+	 *  @return The service super types.
+	 */
+	public ClassInfo[] getServiceSuperTypes();
 
 	/** 
 	 *  Get the resource identifier.

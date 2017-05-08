@@ -16,14 +16,14 @@ public interface IRegistryEvent
 	 *  Get the addedservices.
 	 *  @return The addedservices
 	 */
-	public Map<ClassInfo, Set<IService>> getAddedServices();
+	public Set<IService> getAddedServices();
 //	public Set<IServiceIdentifier> getAddedServices();
 
 	/**
 	 *  Get the removedservices.
 	 *  @return The removedservices
 	 */
-	public Map<ClassInfo, Set<IService>> getRemovedServices();
+	public Set<IService> getRemovedServices();
 //	public Set<IServiceIdentifier> getAddedServices();
 	
 	/**

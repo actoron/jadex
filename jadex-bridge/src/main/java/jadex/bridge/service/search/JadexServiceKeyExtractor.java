@@ -3,11 +3,13 @@ package jadex.bridge.service.search;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 
@@ -72,9 +74,14 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 		Set<String> ret = null;
 		if (KEY_TYPE_INTERFACE.equals(keytype))
 		{
-			final String typename = service.getServiceIdentifier().getServiceType().getGenericTypeName();
-			ret = new SetWrapper<String>(typename);
-//			ret = new HashSet<String> { service.getServiceIdentifier().getServiceType().getGenericTypeName() };
+			ret = new HashSet<String>();
+			ret.add(service.getServiceIdentifier().getServiceType().toString());
+			ClassInfo[] supertypes = service.getServiceIdentifier().getServiceSuperTypes();
+			if (supertypes != null)
+			{
+				for (ClassInfo supertype : supertypes)
+					ret.add(supertype.toString());
+			}
 		}
 		else if (KEY_TYPE_TAGS.equals(keytype))
 		{

@@ -1,12 +1,10 @@
 package jadex.bridge.service.search;
 
 import java.util.Collection;
-import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -19,17 +17,24 @@ public interface IServiceRegistry
 {
 	/**
 	 *  Add a service to the registry.
-	 *  @param sid The service id.
+	 *  @param service The service.
 	 */
 	// write
-	public IFuture<Void> addService(ClassInfo key, IService service);
+	public IFuture<Void> addService(IService service);
 	
 	/**
 	 *  Remove a service from the registry.
-	 *  @param sid The service id.
+	 *  @param service The service.
 	 */
 	// write
-	public void removeService(ClassInfo key, IService service);
+	public void removeService(IService service);
+	
+	/**
+	 *  Remove services of a platform from the registry.
+	 *  @param platform The platform.
+	 */
+	// write
+	public void removeServices(IComponentIdentifier platform);
 	
 	/**
 	 *  Search for services.

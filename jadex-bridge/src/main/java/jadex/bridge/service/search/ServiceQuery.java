@@ -59,9 +59,46 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
 	public ServiceQuery(Class<T> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
 		this(new ClassInfo(servicetype), scope, filter, provider, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this(new ClassInfo(servicetype), scope, filter, provider, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(ClassInfo servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this.returntype = servicetype;
+		this.servicetype = servicetype;
+		this.scope = scope;
+		this.filter = filter;
+		this.provider = provider;
+		this.owner = owner;
 	}
 	
 	/**

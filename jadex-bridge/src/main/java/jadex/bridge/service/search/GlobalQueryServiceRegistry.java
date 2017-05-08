@@ -35,16 +35,13 @@ import jadex.commons.transformation.annotations.Classname;
  *  Registry that allows for adding global queries with local registry.
  *  Uses remote searches to emulate the persistent query.
  */
-public class GlobalQueryServiceRegistry implements IServiceRegistry
+public class GlobalQueryServiceRegistry extends ServiceRegistry
 {
 	/** The timer. */
 	protected Timer timer;
 	
 	/** The global query delay. */
 	protected long delay;
-	
-	/** The local registry. */
-	protected IServiceRegistry localregistry;
 
 	/**
 	 *  Create a new GlobalQueryServiceRegistry.
@@ -52,43 +49,6 @@ public class GlobalQueryServiceRegistry implements IServiceRegistry
 	public GlobalQueryServiceRegistry(long delay)
 	{
 		this.delay = delay;
-		this.localregistry = new ServiceRegistry();
-	}
-	
-	/**
-	 *  Add a service to the registry.
-	 *  @param sid The service id.
-	 */
-	// write
-	public IFuture<Void> addService(ClassInfo key, IService service)
-	{
-		return localregistry.addService(key, service);
-	}
-	
-	/**
-	 *  Remove a service from the registry.
-	 *  @param sid The service id.
-	 */
-	// write
-	public void removeService(ClassInfo key, IService service)
-	{
-		localregistry.removeService(key, service);
-	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> T searchServiceSync(ServiceQuery<T> query)
-	{
-		return localregistry.searchServiceSync(query);
-	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> Collection<T> searchServicesSync(ServiceQuery<T> query)
-	{
-		return localregistry.searchServicesSync(query);
 	}
 	
 	/**
@@ -97,31 +57,49 @@ public class GlobalQueryServiceRegistry implements IServiceRegistry
 	public <T> IFuture<T> searchServiceAsync(final ServiceQuery<T> query)
 	{
 		final Future<T> ret = new Future<T>();
-		localregistry.searchServiceAsync(query).addResultListener(new IResultListener<T>()
+		super.searchServiceAsync(query).addResultListener(new IResultListener<T>()
 		{
 			public void resultAvailable(T result)
 			{
-				if (result == null && RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
-				{
-					final ITerminableIntermediateFuture<T> sfut = searchRemoteServices(query);
-					sfut.addIntermediateResultListener(new IntermediateDefaultResultListener<T>()
-					{
-						public void intermediateResultAvailable(T result)
-						{
-							ret.setResult(result);
-							sfut.terminate();
-						};
-					});
-				}
-				else
-					ret.setResult(result);
+				ret.setResult(result);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				resultAvailable(null);
+				if (RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
+				{
+					final ITerminableIntermediateFuture<T> sfut = searchRemoteServices(query);
+					sfut.addIntermediateResultListener(new IIntermediateResultListener<T>()
+					{
+						protected boolean done = false; 
+						
+						public void intermediateResultAvailable(T result)
+						{
+							ret.setResult(result);
+							sfut.terminate();
+							done = true;
+						};
+						
+						public void finished()
+						{
+							if (!done)
+								ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
+						}
+
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+
+						public void resultAvailable(Collection<T> result)
+						{
+						};
+					});
+				}
+				else
+					ret.setException(exception);
 			};
 		});
+		
 		return ret;
 	}
 	
@@ -144,20 +122,10 @@ public class GlobalQueryServiceRegistry implements IServiceRegistry
 			}
 		};
 		
-		localregistry.searchServicesAsync(query).addIntermediateResultListener(reslis);
+		super.searchServicesAsync(query).addIntermediateResultListener(reslis);
 		searchRemoteServices(query).addIntermediateResultListener(reslis);
 		
 		return ret;
-	}
-	
-	/**
-	 *  Search for services.
-	 */
-//	// read
-	@Deprecated
-	public <T> T searchService(ServiceQuery<T> query, boolean excluded)
-	{
-		return localregistry.searchService(query, excluded);
 	}
 
 	/**
@@ -168,7 +136,7 @@ public class GlobalQueryServiceRegistry implements IServiceRegistry
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
-		localregistry.addQuery(query).addIntermediateResultListener(new IntermediateDelegationResultListener<T>(ret));
+		super.addQuery(query).addIntermediateResultListener(new IntermediateDelegationResultListener<T>(ret));
 			
 		// Emulate persistent query by searching periodically
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
@@ -185,71 +153,15 @@ public class GlobalQueryServiceRegistry implements IServiceRegistry
 			{
 				public void run()
 				{
-//					Class<T> mytype = query.getType()==null? null: (Class<T>)query.getType().getType0();
-//					searchRemoteServices(query.getOwner(), mytype, query.getFilter()).addIntermediateResultListener(lis);
-//					searchRemoteServices(query.getOwner(), query.getType(), (IAsyncFilter<T>) query.getFilter()).addIntermediateResultListener(lis);
 					searchRemoteServices(query).addIntermediateResultListener(lis);
 					
 					if(!ret.isDone())
 						waitForDelay(delay, this);
-//					else
-//						System.out.println("stopping global query polling: "+query);
 				}
 			});
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Remove a service query from the registry.
-	 *  @param query ServiceQuery.
-	 */
-	// write
-	public <T> void removeQuery(ServiceQuery<T> query)
-	{
-		localregistry.removeQuery(query);
-	}
-	
-	/**
-	 *  Remove all service queries of a specific component from the registry.
-	 *  @param owner The query owner.
-	 */
-	// write
-	public void removeQueries(IComponentIdentifier owner)
-	{
-		localregistry.removeQueries(owner);
-	}
-	
-	/**
-	 *  Add an excluded component. 
-	 *  @param The component identifier.
-	 */
-	// write
-	public void addExcludedComponent(IComponentIdentifier cid)
-	{
-		localregistry.addExcludedComponent(cid);
-	}
-	
-	/**
-	 *  Remove an excluded component. 
-	 *  @param The component identifier.
-	 */
-	// write
-	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
-	{
-		return localregistry.removeExcludedComponent(cid);
-	}
-	
-	/**
-	 *  Test if a service is included.
-	 *  @param ser The service.
-	 *  @return True if is included.
-	 */
-	// read
-	public boolean isIncluded(IComponentIdentifier cid, IService ser)
-	{
-		return localregistry.isIncluded(cid, ser);
 	}
 	
 	/**
@@ -346,23 +258,41 @@ public class GlobalQueryServiceRegistry implements IServiceRegistry
 	/**
 	 *  Searches for a service by class in local registry.
 	 */
+	@SuppressWarnings("unchecked")
 	protected <T> T getLocalServiceByClass(ClassInfo clazz)
 	{
-		// Use global scope to avoid checks on the (fake) provider.
-		// Scope is naturally limited by registry selection.
-		ServiceQuery<T> query = new ServiceQuery<T>(clazz, RequiredServiceInfo.SCOPE_GLOBAL, null, new BasicComponentIdentifier("localsearch"), null);
-		return localregistry.searchServiceSync(query);
+		rwlock.readLock().lock();
+		T ret = null;
+		try
+		{
+			Set<IService> servs = indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_INTERFACE, clazz.getGenericTypeName());
+			if (servs != null && servs.size() > 0)
+				ret = (T) servs.iterator().next();
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Searches for services by class in local registry.
 	 */
+	@SuppressWarnings("unchecked")
 	protected <T> Collection<T> getLocalServicesByClass(ClassInfo clazz)
 	{
-		// Use global scope to avoid checks on the (fake) provider.
-		// Scope is naturally limited by registry selection.
-		ServiceQuery<T> query = new ServiceQuery<T>(clazz, RequiredServiceInfo.SCOPE_GLOBAL, null, new BasicComponentIdentifier("localsearch"), null);
-		return localregistry.searchServicesSync(query);
+		rwlock.readLock().lock();
+		Set<T> ret = null;
+		try
+		{
+			ret = (Set<T>) indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_INTERFACE, clazz.getGenericTypeName());
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
+		return ret;
 	}
 	
 	/**

@@ -39,6 +39,8 @@ import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -635,59 +637,100 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-				.addResultListener(new IResultListener<IExecutionService>()
+			ServiceQuery<IExecutionService> query = new ServiceQuery<IExecutionService>(IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier());
+			IExecutionService exe = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+			// Hack!!! service is foudn before it is started, grrr.
+			if (exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
-				public void resultAvailable(IExecutionService exe)
+				if(bootstrap)
 				{
-					// Hack!!! service is foudn before it is started, grrr.
-					if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
-					{
-						if(bootstrap)
-						{
-							// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-							available	= true;
-						}
-						else
-						{
-							exe.execute(ExecutionComponentFeature.this);
-						}
-					}
-					else
-					{
-						exceptionOccurred(null);
-					}
+					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+					available	= true;
 				}
-				
-				public void exceptionOccurred(Exception exception)
+				else
 				{
-					available	= false;
-					
-					// Happens during platform bootstrapping -> execute on platform rescue thread.
-					if(!bootstrap)
+					exe.execute(ExecutionComponentFeature.this);
+				}
+			}
+			else
+			{
+				available	= false;
+				// Happens during platform bootstrapping -> execute on platform rescue thread.
+				if(!bootstrap)
+				{
+					bootstrap	= true;
+					Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
 					{
-						bootstrap	= true;
-						Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+						public void run()
 						{
-							public void run()
+							boolean	again	= true;
+							while(!available && again)
 							{
-								boolean	again	= true;
-								while(!available && again)
-								{
-									again	= execute();
-								}
-								bootstrap	= false;
-								
-								if(again)
-								{		
-									// Bootstrapping finished -> do real kickoff
-									wakeup();
-								}
+								again	= execute();
 							}
-						});
-					}
+							bootstrap	= false;
+							
+							if(again)
+							{		
+								// Bootstrapping finished -> do real kickoff
+								wakeup();
+							}
+						}
+					});
 				}
-			});
+			}
+//			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+//				.addResultListener(new IResultListener<IExecutionService>()
+//			{
+//				public void resultAvailable(IExecutionService exe)
+//				{
+//					// Hack!!! service is foudn before it is started, grrr.
+//					if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+//					{
+//						if(bootstrap)
+//						{
+//							// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+//							available	= true;
+//						}
+//						else
+//						{
+//							exe.execute(ExecutionComponentFeature.this);
+//						}
+//					}
+//					else
+//					{
+//						exceptionOccurred(null);
+//					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					available	= false;
+//					// Happens during platform bootstrapping -> execute on platform rescue thread.
+//					if(!bootstrap)
+//					{
+//						bootstrap	= true;
+//						Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+//						{
+//							public void run()
+//							{
+//								boolean	again	= true;
+//								while(!available && again)
+//								{
+//									again	= execute();
+//								}
+//								bootstrap	= false;
+//								
+//								if(again)
+//								{		
+//									// Bootstrapping finished -> do real kickoff
+//									wakeup();
+//								}
+//							}
+//						});
+//					}
+//				}
+//			});
 		}
 	}
 	

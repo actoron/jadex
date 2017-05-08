@@ -133,7 +133,11 @@ public class ServiceIndexer<T>
 		Set<T> ret = null;
 		Map<String, Set<T>> index = indexedservices.get(keytype);
 		if (index != null)
+		{
 			 ret = index.get(key);
+			 if (ret != null)
+				 ret = new LinkedHashSet<T>(ret);
+		}
 		else
 		{
 			for (T serv : services)
@@ -167,15 +171,18 @@ public class ServiceIndexer<T>
 			for (Map.Entry<String, Map<String, Set<T>>> entry : indexedservices.entrySet())
 			{
 				Set<String> keys = keyextractor.getKeys(entry.getKey(), service);
-				for (String key : keys)
+				if (keys != null)
 				{
-					Set<T> servset = entry.getValue().get(key);
-					if (servset == null)
+					for (String key : keys)
 					{
-						servset = new HashSet<T>();
-						entry.getValue().put(key, servset);
+						Set<T> servset = entry.getValue().get(key);
+						if (servset == null)
+						{
+							servset = new HashSet<T>();
+							entry.getValue().put(key, servset);
+						}
+						servset.add(service);
 					}
-					servset.add(service);
 				}
 			}
 		}
@@ -233,5 +240,15 @@ public class ServiceIndexer<T>
 		}
 		
 		return true;
+	}
+	
+	/**
+	 *  Clears all contained services.
+	 */
+	public void clear()
+	{
+		for (Map<String, Set<T>> index : indexedservices.values())
+			index.clear();
+		services.clear();
 	}
 }

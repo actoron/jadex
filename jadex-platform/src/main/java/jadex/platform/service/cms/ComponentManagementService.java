@@ -49,7 +49,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -593,7 +592,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
-																	SynchronizedServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
+																	ServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
@@ -705,7 +704,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Started component: "+cid.getName());
 
-																			SynchronizedServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																			ServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
 																			
 		//																	System.out.println("created: "+ad);
 																			

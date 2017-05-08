@@ -142,17 +142,17 @@ public class SSecurity
 		SP800SecureRandomBuilder builder = new SP800SecureRandomBuilder(esp);
 		AESFastEngine eng = new AESFastEngine();
 		prngs.add(builder.buildCTR(eng, 256, esp.get(128).getEntropy(), false));
-		System.out.println(prngs.get(prngs.size() - 1));
+//		System.out.println(prngs.get(prngs.size() - 1));
 		
 		Mac m = new HMac(new SHA512Digest());
 		prngs.add(builder.buildHMAC(m, esp.get(512).getEntropy(), false));
-		System.out.println(prngs.get(prngs.size() - 1));
+//		System.out.println(prngs.get(prngs.size() - 1));
 		
 		prngs.add(generateSecureRandom());
-		System.out.println(prngs.get(prngs.size() - 1));
+//		System.out.println(prngs.get(prngs.size() - 1));
 		
 		prngs.add(new SecureRandom());
-		System.out.println(prngs.get(prngs.size() - 1));
+//		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
 		ret = new SecureRandom()
@@ -250,7 +250,7 @@ public class SSecurity
 					{
 						private static final long serialVersionUID = -8238246099124227737L;
 						
-						protected long bytecounter = 0;
+//						protected long bytecounter = 0;
 
 						public synchronized void nextBytes(byte[] ret)
 						{
@@ -300,8 +300,8 @@ public class SSecurity
 								ret = SecureRandom.getSeed(ret.length);
 							}
 							
-							bytecounter += ret.length;
-							System.out.println("Seed consumption: " + bytecounter);
+//							bytecounter += ret.length;
+//							System.out.println("Seed consumption: " + bytecounter);
 						}
 						
 						public byte[] generateSeed(int numbytes)
