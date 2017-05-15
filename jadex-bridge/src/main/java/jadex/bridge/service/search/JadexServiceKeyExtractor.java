@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -85,7 +86,9 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 		}
 		else if (KEY_TYPE_TAGS.equals(keytype))
 		{
-			ret = (Set<String>) service.getPropertyMap().get(TagProperty.SERVICE_PROPERTY_NAME);
+			Map<String, Object> sprops = service.getPropertyMap();
+			if (sprops != null)
+				ret = (Set<String>) sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
 		}
 		else if (KEY_TYPE_PROVIDER.equals(keytype))
 		{

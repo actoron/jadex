@@ -201,14 +201,17 @@ public class ServiceIndexer<T>
 			for (Map.Entry<String, Map<String, Set<T>>> entry : indexedservices.entrySet())
 			{
 				Set<String> keys = keyextractor.getKeys(entry.getKey(), service);
-				for (String key : keys)
+				if (keys != null)
 				{
-					Set<T> servset = entry.getValue().get(key);
-					if (servset != null)
+					for (String key : keys)
 					{
-						servset.remove(service);
-						if (servset.isEmpty())
-							entry.getValue().remove(key);
+						Set<T> servset = entry.getValue().get(key);
+						if (servset != null)
+						{
+							servset.remove(service);
+							if (servset.isEmpty())
+								entry.getValue().remove(key);
+						}
 					}
 				}
 			}

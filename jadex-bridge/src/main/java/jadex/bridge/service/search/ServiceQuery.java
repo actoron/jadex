@@ -34,20 +34,23 @@ public class ServiceQuery<T>
 	/** The search scope. */
 	protected String scope;
 	
+	/** The query owner. */
+	protected IComponentIdentifier owner;
+	
 	/** The service provider. */
 	protected IComponentIdentifier provider;
 	
 	/** The service platform. */
 	protected IComponentIdentifier platform;
 	
+	/** Flag, if service by the owner should be excluded. */
+	protected boolean excludeowner;
+	
 	/** 
 	 *  Filter for checking further service attributes.
 	 *  Either IAsyncFilter<T> or IFilter<T>.
 	 */
 	protected Object filter;
-	
-	/** The query owner. */
-	protected IComponentIdentifier owner;
 	
 	/**
 	 *  Create a new service query.
@@ -273,6 +276,26 @@ public class ServiceQuery<T>
 	public void setOwner(IComponentIdentifier owner)
 	{
 		this.owner = owner;
+	}
+	
+	/**
+	 *  Checks if service of the query owner should be excluded.
+	 *  
+	 *  @return True, if the services should be excluded.
+	 */
+	public boolean isExcludeOwner()
+	{
+		return excludeowner;
+	}
+	
+	/**
+	 *  Sets if service of the query owner should be excluded.
+	 *  
+	 *  @param excludeowner True, if the services should be excluded.
+	 */
+	public void setExcludeOwner(boolean excludeowner)
+	{
+		this.excludeowner = excludeowner;
 	}
 	
 	/**

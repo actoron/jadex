@@ -2,31 +2,34 @@ package jadex.bridge.service.search;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.ServiceRegistry.UnlimitedIntermediateDelegationResultListener;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.DuplicateRemovalIntermediateResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
@@ -163,6 +166,7 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 		
 		return ret;
 	}
+	static boolean disable = false; 
 	
 	/**
 	 *  Search for services on remote platforms.
@@ -173,6 +177,160 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 	protected <T> ISubscriptionIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+		if (disable)
+		{
+			ret.setFinishedIfUndone();
+			return ret;
+		}
+		final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
+		if(rms!=null)
+		{
+			// Get all proxy agents (represent other platforms)
+			Collection<IService> sers = getLocalServicesByClass(new ClassInfo(IProxyAgentService.class));
+//			System.out.println("LOCAL:" + ((IService) rms).getServiceIdentifier().getProviderId().getRoot() + " SERS: " + sers);
+			if(sers!=null && sers.size()>0)
+			{
+				FutureBarrier<ITransportComponentIdentifier> bar = new FutureBarrier<ITransportComponentIdentifier>();
+				for(IService ser: sers)
+				{					
+					IProxyAgentService pas = (IProxyAgentService) ser;
+					
+					bar.addFuture(pas.getRemoteComponentIdentifier());
+//					System.out.println("PROVID: " + ser.getServiceIdentifier().getProviderId());
+				}
+				bar.waitForResultsIgnoreFailures(null).addResultListener(new IResultListener<Collection<ITransportComponentIdentifier>>()
+				{
+					public void resultAvailable(Collection<ITransportComponentIdentifier> result)
+					{
+						if (result != null)
+							result.remove(((IService)rms).getServiceIdentifier().getProviderId().getRoot());
+						
+						if (result != null && result.size() > 0)
+						{
+							FutureBarrier<Void> finishedbar = new FutureBarrier<Void>();
+							for (ITransportComponentIdentifier platid : result)
+							{
+								final Future<Set<T>> remotesearch = new Future<Set<T>>();
+								final ServiceQuery<T> remotequery = new ServiceQuery<T>(query);
+								// Disable filter, we do that locally.
+								remotequery.setFilter(null);
+								
+								rms.getExternalAccessProxy(platid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Set<T>>(remotesearch)
+								{
+									public void customResultAvailable(IExternalAccess result) throws Exception
+									{
+										try
+										{
+											result.scheduleStep(new IComponentStep<Set<T>>()
+											{
+												@Classname("GlobalQueryRegSearch")
+												public IFuture<Set<T>> execute(IInternalAccess ia)
+												{
+													Set<T> remres = ServiceRegistry.getRegistry(ia.getComponentIdentifier()).searchServicesSync(query);
+													return new Future<Set<T>>(remres);
+												}
+											}).addResultListener(new DelegationResultListener<Set<T>>(remotesearch));
+										}
+										catch (Exception e)
+										{
+											remotesearch.setResult(null);
+										}
+									}
+								});
+								
+								final Future<Void> remotefin = new Future<Void>();
+								
+								remotesearch.addResultListener(new IResultListener<Set<T>>()
+								{
+									@SuppressWarnings("unchecked")
+									public void resultAvailable(Set<T> result)
+									{
+										if (result != null)
+										{
+											if (query.getFilter() instanceof IAsyncFilter)
+											{
+												FutureBarrier<Boolean> filterbar = new FutureBarrier<Boolean>();
+												for (Iterator<T> it = result.iterator(); it.hasNext(); )
+												{
+													final T ser = it.next();
+													IFuture<Boolean> filterfut = ((IAsyncFilter<T>) query.getFilter()).filter(ser);
+													filterfut.addResultListener(new IResultListener<Boolean>()
+													{
+														public void resultAvailable(Boolean result)
+														{
+															if (Boolean.TRUE.equals(result))
+																ret.addIntermediateResultIfUndone(ser);
+														}
+														
+														public void exceptionOccurred(Exception exception)
+														{
+														}
+													});
+													filterbar.addFuture(filterfut);
+													filterbar.waitForIgnoreFailures(null).addResultListener(new DelegationResultListener<Void>(remotefin));
+												}
+											}
+											else
+											{
+												for (Iterator<T> it = result.iterator(); it.hasNext(); )
+												{
+													T ser = it.next();
+													if (query.getFilter() == null || ((IFilter<T>) query.getFilter()).filter(ser))
+													{
+														ret.addIntermediateResultIfUndone(ser);
+													}
+												}
+											}
+										}
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										remotefin.setResult(null);
+									}
+								});
+								finishedbar.addFuture(remotefin);
+							}
+							finishedbar.waitForIgnoreFailures(null).addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									ret.setFinishedIfUndone();
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+//									ret.setFinished();
+								}
+							});
+						}
+						else
+							ret.setFinishedIfUndone();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
+			}
+			else
+				ret.setFinished();
+		}
+		else
+			ret.setFinished();
+		return ret;
+	}
+	
+	/**
+	 *  Search for services on remote platforms.
+	 *  @param caller	The component that started the search.
+	 *  @param type The type.
+	 *  @param filter The filter.
+	 */
+	protected <T> ISubscriptionIntermediateFuture<T> searchRemoteServicesOld(final ServiceQuery<T> query)
+	{
+		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+		
 		// Must not find services twice (e.g. having two proxies for the same platform)
 		final Set<T> founds = new HashSet<T>();
 		
@@ -219,6 +377,14 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 								{
 									for(T t: result)
 									{
+										
+										if (query.isExcludeOwner())
+										{
+											Set<IService> ownerservices = indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString());
+											if (ownerservices.contains(t))
+												continue;
+										}
+										
 										if(!founds.contains(t))
 										{
 											ret.addIntermediateResult(t);

@@ -23,6 +23,7 @@ import java.util.zip.ZipFile;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
@@ -220,7 +221,39 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	public ComponentTestSuite(String[] args, File[][] roots, String[] tests, String[] excludes, final boolean runtests, final boolean load, final boolean start) throws Exception
 	{
 		super(roots[0][0].toString());
-		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
+		
+		/* Attempt to extract user command line args. */
+		String cmdline = System.getProperty("sun.java.command");
+//		System.out.println("COMMAND: " + cmdline);
+		if (cmdline != null)
+		{
+			String[] cmdlinetokens = cmdline.split(" ");
+			List<String> cmdargs = new ArrayList<String>();
+			for (int i = 1; i < cmdlinetokens.length; ++i)
+			{
+				if (cmdlinetokens[i].length() > 0)
+					if ("-version".equals(cmdlinetokens[i]))
+						break;
+					else
+						cmdargs.add(cmdlinetokens[i]);
+			}
+			int len = args != null? args.length : 0;
+			len += cmdargs.size();
+			String[] newargs = new String[len];
+			int pos = 0;
+			if (args != null)
+			{
+				System.arraycopy(args, pos, newargs, pos, args.length);
+				pos += args.length;
+			}
+			for (String cmdarg : cmdargs)
+				newargs[pos++] = cmdarg;
+			args = newargs;
+		}
+		
+		PlatformConfiguration conf = PlatformConfiguration.processArgs(args);
+//		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
+		this.timeout	= conf.getLocalDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();
 
 		if (tests != null) {
@@ -232,8 +265,8 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		// Tests must be available after constructor execution.
 
 //		System.out.println("start platform");
-		platform	= Starter.createPlatform(args).get();
-		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
+		platform	= Starter.createPlatform(conf).get();
+//		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		ILibraryService libsrv	= SServiceProvider.getService(platform, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();

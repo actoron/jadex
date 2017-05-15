@@ -1,8 +1,7 @@
 package jadex.bridge.service.search;
 
-import java.util.Collection;
+import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
@@ -44,7 +43,7 @@ public interface IServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> Collection<T> searchServicesSync(ServiceQuery<T> query);
+	public <T> Set<T> searchServicesSync(ServiceQuery<T> query);
 	
 	/**
 	 *  Search for services.

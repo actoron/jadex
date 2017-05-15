@@ -453,7 +453,7 @@ public class SServiceProvider
 			
 			public void customResultAvailable(Void result)
 			{
-				ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, filter, null, component.getComponentIdentifier());
+				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
 				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
 				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));;
 				
@@ -769,9 +769,20 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Void result)
 			{
-				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
-				IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret);
-				ServiceRegistry.getRegistry(component).searchServicesAsync(query).addIntermediateResultListener(new IntermediateComponentResultListener<T>(lis, component));
+				if(!(filter instanceof IAsyncFilter) && !RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+				{
+					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+					Collection<T> sers = ServiceRegistry.getRegistry(component).searchServicesSync(query);
+					if(proxy)
+						sers = createRequiredProxies(component, sers, type);
+					ret.setResult(sers==null? Collections.EMPTY_SET: sers);
+				}
+				else
+				{
+					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+					IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret);
+					ServiceRegistry.getRegistry(component).searchServicesAsync(query).addIntermediateResultListener(new IntermediateComponentResultListener<T>(lis, component));
+				}
 //				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 //				{
 //					if(filter==null)

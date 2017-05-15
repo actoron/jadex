@@ -73,6 +73,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// write
 	public IFuture<Void> addService(IService service)
 	{
+		IFuture<Void> ret = null;
 		Lock lock = rwlock.writeLock();
 		lock.lock();
 		try
@@ -93,20 +94,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				}
 				exsers.add(service);
 			}
-			
-			// Downgrade to read lock.
-			lock = rwlock.readLock();
-			lock.lock();
-			rwlock.writeLock().unlock();
-			
-			checkQueries(service, false);
+			else
+			{
+				lock.unlock();
+				lock = null;
+				
+				ret = checkQueries(service, false);
+			}
 		}
 		finally
 		{
-			lock.unlock();
+			if (lock != null)
+				lock.unlock();
 		}
 		
-		return IFuture.DONE;
+		return ret == null ? IFuture.DONE : ret;
 	}
 	
 	/**
@@ -122,16 +124,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			indexer.removeService(service);
 			
-			// Downgrade to read lock.
-			lock = rwlock.readLock();
-			lock.lock();
-			rwlock.writeLock().unlock();
+			lock.unlock();
+			lock = null;
 			
 			checkQueries(service, true);
 		}
 		finally
 		{
-			lock.unlock();
+			if (lock != null)
+				lock.unlock();
 		}
 	}
 	
@@ -184,12 +185,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			IFilter<T> filter = (IFilter<T>) query.getFilter();
 			filter = (IFilter<T>) (filter == null? IFilter.ALWAYS : filter);
 			
+			Set<IService> ownerservices = query.isExcludeOwner()? indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+			
 			if (sers!=null && !sers.isEmpty())
 			{
 				for (IService ser : sers)
 				{
 					if(checkSearchScope(query.getOwner(), ser, query.getScope(), false) &&
-					   checkPublicationScope(query.getProvider(), ser) &&
+					   checkPublicationScope(query.getOwner(), ser) &&
+					   (ownerservices == null || !ownerservices.contains(ser)) &&
 					   filter.filter((T) ser))
 					{
 						ret = (T)ser;
@@ -207,9 +211,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	// read
 	@SuppressWarnings("unchecked")
-	public <T> Collection<T> searchServicesSync(final ServiceQuery<T> query)
+	public <T> Set<T> searchServicesSync(final ServiceQuery<T> query)
 	{
-		Collection<T> ret = null;
+		Set<T> ret = null;
 		if (!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
 			if (query.getFilter() instanceof IAsyncFilter)
@@ -219,16 +223,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			IFilter<T> filter = (IFilter<T>) query.getFilter();
 			filter = (IFilter<T>) (filter == null? IFilter.ALWAYS : filter);
 			
+			Set<IService> ownerservices = query.isExcludeOwner()? indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+			
 			if (sers!=null && !sers.isEmpty())
 			{
 				for (Iterator<IService> it = sers.iterator(); it.hasNext(); )
 				{
 					IService ser = it.next();
-					if(!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) && checkPublicationScope(query.getProvider(), ser) && filter.filter((T) ser)))
+					if(!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) &&
+					   checkPublicationScope(query.getOwner(), ser) &&
+					   (ownerservices == null || !ownerservices.contains(ser)) &&
+					   filter.filter((T) ser)))
 						it.remove();
 				}
 			}
-			ret = (Collection<T>) sers;
+			ret = (Set<T>) sers;
 		}
 		
 		return ret;
@@ -271,8 +280,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 						
 						final ICommand<Iterator<IService>> cmd = this;
 						
+						Set<IService> ownerservices = query.isExcludeOwner()? indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+						
 						boolean passes = checkSearchScope(query.getOwner(), ser, query.getScope(), false);
-						passes &= checkPublicationScope(query.getProvider(), ser);
+						passes &= checkPublicationScope(query.getOwner(), ser);
+						passes &= (ownerservices == null || !ownerservices.contains(ser));
 						if (query.getFilter() instanceof IFilter)
 						{
 							passes &= ((IFilter<T>) query.getFilter()).filter(obj);
@@ -343,7 +355,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			IAsyncFilter<T> filter = new QueryFilter(query);
 			Set sers = getServices(query);
-			if (sers != null)
+			
+			if (query.isExcludeOwner())
+			{
+				Set<IService> ownerservices = indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString());
+				sers.removeAll(ownerservices);
+			}
+			
+			if (sers != null && sers.size() > 0)
 				ret = (SubscriptionIntermediateFuture<T>) checkAsyncFilters(filter, sers.iterator());
 			else
 			{
@@ -374,7 +393,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			while(it.hasNext())
 			{
 				IService ser = it.next();
-				if(checkSearchScope(query.getOwner(), ser, query.getScope(), excluded) && checkPublicationScope(query.getProvider(), ser))
+				if(checkSearchScope(query.getOwner(), ser, query.getScope(), excluded) && checkPublicationScope(query.getOwner(), ser))
 				{
 					ret = (T)ser;
 					break;

@@ -1,14 +1,9 @@
 package jadex.commons.security.random;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.security.SecureRandom;
 
-import org.spongycastle.crypto.engines.ChaChaEngine;
-import org.spongycastle.util.Arrays;
-import org.spongycastle.util.Pack;
-
 import jadex.commons.SUtil;
+import jadex.commons.security.ChaChaBlockGenerator;
 import jadex.commons.security.SSecurity;
 
 public class ChaCha20Random extends SecureRandom
@@ -19,9 +14,9 @@ public class ChaCha20Random extends SecureRandom
 	/** Seeding source, use SSecurity. */
 	protected SecureRandom seedrandom;
 	
-	/** ChaCha state */
-	protected int[] state = new int[16];
+	protected ChaChaBlockGenerator blockgen = new ChaChaBlockGenerator();
 	
+	/** The output block. */
 	protected byte[] outputblock = new byte[64];
 	
 	/** Pointer to unused output. */
@@ -71,49 +66,19 @@ public class ChaCha20Random extends SecureRandom
 	
 	protected void nextBlock()
 	{
-		if (state[12] < 0)
+		if (blockgen.getState()[12] < 0)
 			reseed();
-		++state[12];
-		int[] output = new int[16];
-		System.arraycopy(state, 0, output, 0, state.length);
-		ChaChaEngine.chachaCore(20, output, output);
-		Pack.intToLittleEndian(output, outputblock, 0);
+		
+		blockgen.nextBlock(outputblock);
+		
 		outptr = 0;
 	}
 	
 	public void reseed()
 	{
-		int i = 0;
-		state[i]   = 0x61707865;
-		state[++i] = 0x3320646e;
-		state[++i] = 0x79622d32;
-		state[++i] = 0x6b206574;
-		
-//		 = ctr;
 		byte[] seedstate = new byte[48];
 		seedrandom.nextBytes(seedstate);
-		IntBuffer buf = (ByteBuffer.wrap(seedstate)).asIntBuffer();
-		while (buf.hasRemaining())
-			state[++i] = buf.get();
-		
-		state[12] = 0;
-		
-//		RFC 7539 Test Vector
-//		state[++i] = 0x03020100;
-//		state[++i] = 0x07060504;
-//		state[++i] = 0x0b0a0908;
-//		state[++i] = 0x0f0e0d0c;
-//		state[++i] = 0x13121110;
-//		state[++i] = 0x17161514;
-//		state[++i] = 0x1b1a1918;
-//		state[++i] = 0x1f1e1d1c;
-//		state[++i] = 0x00000001;
-//		state[++i] = 0x09000000;
-//		state[++i] = 0x4a000000;
-//		state[++i] = 0x00000000;
-		
-		// Vector 2
-//		state[13] = 0x00000000;
+		blockgen.initState(seedstate);
 	}
 	
 //	public static void main(String[] args)
