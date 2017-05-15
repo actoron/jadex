@@ -414,7 +414,7 @@ public class ServiceInvocationContext
 	 */
 	public void setResult(Object result)
 	{
-		assert getMethod()==null || result==null || SReflect.isSupertype(getMethod().getReturnType(), result.getClass()) : "Incompatible types: "+getMethod()+", "+result.getClass();
+		assert getMethod()==null || result==null || result instanceof Throwable || SReflect.isSupertype(getMethod().getReturnType(), result.getClass()) : "Incompatible types: "+getMethod()+", "+result.getClass();
 		
 //		if(getMethod().getName().indexOf("subsc")!=-1)
 //			System.out.println("gotta");
@@ -428,8 +428,8 @@ public class ServiceInvocationContext
 	{
 		IFuture<Void> ret;
 		
-//		if(method.getName().equals("testResultReferences"))
-//			System.out.println("invoke: "+caller);
+		//if(method.getName().indexOf("Void")!=-1)
+		//	System.out.println("invoke: "+caller);
 		
 		push(object, method, args, null);
 		

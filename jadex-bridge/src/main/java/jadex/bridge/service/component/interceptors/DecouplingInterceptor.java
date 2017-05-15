@@ -15,19 +15,20 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
-import jadex.commons.SReflect;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -220,8 +221,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		
 		// Perform decoupling
 		
-		boolean scheduleable = SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType())
-			|| sic.getMethod().getReturnType().equals(void.class);
+		
+		boolean scheduleable = true;
+//		boolean scheduleable = SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType())
+//			|| sic.getMethod().getReturnType().equals(void.class);
 		
 //		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 //			|| sic.getMethod().getReturnType().equals(void.class);
@@ -397,7 +400,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return marshal.isLocalReference(object);
 					}
 				};
-				final long timeout = sic.getNextServiceCall().getTimeout();
+
+				// For local call: fetch timeout to decide if undone. ignored for remote.
+				final long timeout = !sic.isRemoteCall() ? sic.getNextServiceCall().getTimeout() : Timeout.NONE;
 
 				FutureFunctionality func = new FutureFunctionality(ia.getLogger())
 				{

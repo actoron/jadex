@@ -52,7 +52,7 @@ import jadex.platform.service.message.MapSendTask;
 @Agent
 @Arguments({
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+	@Argument(name="fast", clazz=boolean.class, defaultvalue="false", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="includes", clazz=String[].class, description="A list of platforms/IPs/hostnames to include. Matches start of platform/IP/hostname."),
 	@Argument(name="excludes", clazz=String[].class, description="A list of platforms/IPs/hostnames to exclude. Matches start of platform/IP/hostname.")
 })

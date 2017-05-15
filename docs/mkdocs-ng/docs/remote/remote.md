@@ -15,8 +15,8 @@ For more details, check out the Active Components User Guide about [Platform Awa
 Please refer to the [Configuration examples](../platform/platform/#configuration-examples) in the Platform chapter or visit the [Platform Awareness](../guides/ac/07 Platform Awareness/#configuration) section of the Active Components User Guide for awareness configuration. 
 
 ## Manually Connecting Platforms
-
-TODO: how to manually add remote platforms
+${SorryNotYetAvailable}
+<!--TODO: how to manually add remote platforms-->
 
 # Security
 
@@ -31,9 +31,8 @@ There are two kinds of passwords:
 
 ### Platform passwords
 By default, a Jadex platform is secured by a password which is generated at first startup and printed to the console. If a remote platform knows this password, it is able to find and invoke any services available on the local platform.  
-This password-protection may be switched off by setting ```RootComponentConfiguration.setUsePass(false)``` (**NOT recommended!**)
-
-Remote platforms can set platform passwords to access remote platforms within the [JCC Security Settings](../tools/05 Security Settings/#remote-platform-password-settings).
+This password-protection may be switched off by setting ```PlatformConfiguration.setUsePass(false)``` (**NOT recommended!**)  
+Remote platforms can set platform passwords to access remote platforms within the [JCC Security Settings](../tools/05 Security Settings/#remote-platform-password-settings) or by accessing the [ISecurityService](${URLJavaDoc/jadex/bridge/service/types/security/ISecurityService.html}) programmatically.
 
 ### Network passwords
 As your application may include several platforms, it is more convenient to set-up a trusted network.
@@ -63,10 +62,72 @@ public interface IPublicService {...
 By default, the security level for all services is ```Security.PASSWORD``` and requires a shared platform-level password.
 
 # Transports
-TODO
+After discovering remote platforms using awareness, Jadex Active Components needs a way to communicate with those platforms. This is where the *transports* come in, which provide the means to communicate with other platforms.
+
+Since all forms of communication (such as TCP/IP) may not be available or may be impeded by firewalls or similar, a number of transports are available of which the following are enabled by default:
+
+* The **LocalTransport** enables quick communication between components on the same platform. This is only relevant if raw messages are exchanged manually. It is not used for platform-scope service calls.
+* **NIOTCPTransport** implements communication based on TCP/IP streams using the java.nio.* API.
+* **HttpRelayTransport** uses the same external relay servers as the relay discovery to communicate with other platforms. Since this transport uses HTTP, it works under most circumstances.
+
+In addition, there are some additional transports that are *not enabled by default*:
+
+* **TCPTransport**: uses TCP/IP like the NIOTCPTransport but uses the java.io.* API. Since this approach requires more threads compared to NIOTCPTransport, it is not used by default
+* **SSLTCPTransport**: This transport offers authentication/encryption support using TLS/SSL. It is only included in the commercial 'pro' packages of Jadex Active Components.
+
+Jadex Active Components will use all available transports to ensure that a message gets delivered. The message is offered to all transports and one is chosen to actually transmit the message based on order of priority and if the transport is currently working.  
+If a transport fails to transmit a message, the other transports are tried before transmission is aborted. Therefore as long as at least one working transport is available to another platform, communication is maintained for the applications.
 
 # Serialization
-TODO
+When a remote service is called, the data of the call must be transmitted to the remote machine using a network connection. Critically, this data includes the method parameters of the call as well as the return values once the call is complete.
+
+Java objects like those in the parameters exist in the local computers memory. In order to send them over to the remote machine, they must be converted into a form that can be send over networks. This process is called *serialization*, which turns Java objects into binary or text representations that can be transmitted.
+
+Jadex Active Components includes a number of serialization approaches, the default being a compact binary format. However, not all objects can be sensible serialized, for example, it makes no sense to serialize a *java.lang.Thread* object, since it represents an execution thread only valid on the local machine. Therefore, in order for serialization to work, the classes you use in service calls must one of the following:
+
+* A number of classes, mostly standard Java library classes, are directly supported by Jadex Active Components. This includes primitive value (int, long, ...), Strings, Java collection classes (Lists, Sets, Maps, ...) as well as certain useful standard classes like Exceptions, Date, Image and URI/URL.
+* Classes that loosely follow the *JavaBean* conventions (see below).
+
+## Custom Classes
+The latter option allows you to easily implement your own classes that can be transmitted. The classes do not have to follow the full JavaBean specification, only two things are required:
+
+* The class must offer a "default constructor", which means it includes a constructor that has no arguments.
+* JavaBean-conforming accessor methods for each field you want transmitted.
+
+For example, the following example would conform to this:
+
+```java
+public class Customer {
+
+	private int id;
+	private String name;
+	
+	public Customer() {
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public String getName() {
+		return id;
+	}
+	
+	public void setName(int name) {
+		this.name = name;
+	}
+```
+
+As long as your classes conform to this pattern or are one of the directly supported types, they can be transmitted. You can also nest (use one of them as a field in another class) at will and even include (self-) references to other parts of the object graph and the object will be correctly recreated on the remote computer.
+
+<x-hint title="java.io.Serializable">
+Notice that the class does not implement the java.io.Serializable interface. It is not necessary because Jadex Active Components does not use the Java built-in serialization by default.  
+While the build-in Java serialization works and is quick, it has some serious drawbacks that makes it inflexible such as requiring implementing the java.io.Serialization marker interface in all classes nested in an object as well as lack of support for partially-matching class versions.
+</x-hint>
 
 # Advanced Topics 
 

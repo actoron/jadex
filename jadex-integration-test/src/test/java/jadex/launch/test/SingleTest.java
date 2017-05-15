@@ -23,17 +23,24 @@ public class SingleTest extends	ComponentTestSuite
 	 */
 	public SingleTest(String... tests) throws Exception
 	{
-		super(findOutputDirs("jadex-applications-bdi", "jadex-applications-bdiv3", "jadex-applications-micro", "jadex-applications-bpmn"), tests, new String[0]);
+		super(findOutputDirs(
+//				"jadex-platform-extension-securetransport",
+//				"jadex-applications-bdi",
+//				"jadex-applications-bdiv3",
+				"jadex-applications-micro",
+				"jadex-applications-bpmn"), tests, new String[0]);
 	}
 
-	private static File[] findOutputDirs(String... projects) {
-		List<File> list = new ArrayList<File>();
-		for (String project : projects) {
+	private static File[][] findOutputDirs(String... projects) {
+		File[][] projArr = new File[projects.length][];
+		for (int i=0; i < projects.length; i++) {
+			String project = projects[i];
+			List<File> list = new ArrayList<File>();
 			list.addAll(Arrays.asList(SUtil.findOutputDirs(project)));
+			projArr[i] = list.toArray(new File[list.size()]);
 		}
-		return list.toArray(new File[list.size()]);
+		return projArr;
 	}
-
 
 	/**
 	 * Implement this to adjust this SingleTest to your needs.
@@ -41,7 +48,8 @@ public class SingleTest extends	ComponentTestSuite
      */
 	public static SingleTest getSingleTest() throws Exception {
 		SingleTest test = null;
-//		test = new SingleTest("jadex.bdiv3.examples.puzzle.BenchmarkBDI");
+//		test = new SingleTest("jadex.bdi.examples.puzzle.Benchmark");
+//		test = new SingleTest("jadex.bdiv3.testcases.semiautomatic");
 //		test = new SingleTest("jadex.bdi.testcases.semiautomatic.Wakeup",
 //				"jadex.micro.testcases.servicequeries.User",
 //				"jadex.micro.testcases.threading.Initiator",
@@ -50,7 +58,9 @@ public class SingleTest extends	ComponentTestSuite
 //		test = new SingleTest(
 //				"jadex.micro.testcases.threading.Initiator"
 //		);
-
+//		test = new SingleTest("jadex.platform.service.message.transport.ssltcpmtp");
+//		test = new SingleTest("jadex.micro.testcases.longcall.Initiator");
+//		test = new SingleTest("jadex.micro.testcases.remotestepinservicecall.Initiator");
 		return test;
 	}
 

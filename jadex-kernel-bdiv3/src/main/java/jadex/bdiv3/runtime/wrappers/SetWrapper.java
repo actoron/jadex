@@ -12,7 +12,7 @@ import jadex.rules.eca.EventType;
 public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<T>
 {
 	/** The event publisher. */
-	protected EventPublisher publisher;
+	protected IEventPublisher publisher;
 	
 	/**
 	 *  Create a new set wrapper.
@@ -30,13 +30,37 @@ public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<
 		EventType addevent, EventType remevent, EventType changeevent, MElement mbel)
 	{
 		super(delegate);
-		this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, mbel);
+		if(agent!=null)
+			this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, mbel);
+		else
+			this.publisher = new InitEventPublisher(delegate, addevent, remevent, changeevent, mbel);
+
 		
 		int	i=0;
 		for(T entry: delegate)
 		{
 			publisher.entryAdded(entry, i++);
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void setAgent(IInternalAccess agent)
+	{
+		if(publisher instanceof InitEventPublisher)
+		{
+			InitEventPublisher pub = (InitEventPublisher)publisher;
+			this.publisher = new EventPublisher(agent, pub.addevent, pub.remevent, pub.changeevent, pub.melement);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isInitWrite()
+	{
+		return publisher instanceof InitEventPublisher;
 	}
 	
 	/**

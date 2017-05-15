@@ -28,19 +28,15 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceTerminatedException;
@@ -2161,7 +2157,7 @@ public class MessageService extends BasicService implements IMessageService
 			});
 		}
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -2193,7 +2189,7 @@ public class MessageService extends BasicService implements IMessageService
 
 					public void exceptionOccurred(Exception exception)
 					{
-						resultAvailable(null);
+						resultAvailable(null);							
 					}
 				});
 

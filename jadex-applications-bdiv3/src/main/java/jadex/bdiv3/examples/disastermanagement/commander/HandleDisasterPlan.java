@@ -59,7 +59,7 @@ public class HandleDisasterPlan
 //		System.out.println("aborted: "+e+" "+this);
 //		e.printStackTrace();
 	}
-//	
+	
 //	public void failed()
 //	{
 //		System.err.println("failed: "+this);

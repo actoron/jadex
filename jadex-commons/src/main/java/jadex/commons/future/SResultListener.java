@@ -2,9 +2,11 @@ package jadex.commons.future;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import jadex.commons.DebugException;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 /**
@@ -83,9 +85,36 @@ public class SResultListener {
 			}
 		};
     }
-    
+
+	/**
+	 * Creates a delegation from source to target, respecting future types.
+	 * @param source Delegation source.
+	 * @param target Delegation target.
+     */
+	public static <E> void delegateFromTo(IFuture<E> source, Future<E> target) {
+//		if (source instanceof ITuple2Future && target instanceof Tuple2Future)
+//		{
+//			// need special case for tuple?
+//			((ITuple2Future) source).addResultListener(delegate((Tuple2Future)target));
+//		}
+		if (source instanceof IIntermediateFuture && target instanceof IntermediateFuture)
+		{
+			((IIntermediateFuture) source).addIntermediateResultListener(delegate((IntermediateFuture)target));
+		}
+		else
+		{
+			source.addResultListener(delegate(target));
+		}
+		// TODO: needed for other *DelegationResultListeners ?
+	}
+
+	// -----------------------------------------------------
+	// ------------ default delegation methods
+	// -----------------------------------------------------
+
 	/**
      * Creates an {@link IResultListener} that delegates results and exceptions to a given Future.
+	 * Supports creating delegations for Future, IntermediateFuture and Tuple2Future.
      * 
      * @param delegate The future used for success delegation.
      * @return {@link IResultListener}
@@ -102,7 +131,7 @@ public class SResultListener {
      * @return {@link IResultListener}
      */
 	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone) {
-		return new DelegationResultListener<E>(delegate, undone);
+		return delegate(delegate, undone, null);
 	}
 	
 	/**
@@ -115,7 +144,7 @@ public class SResultListener {
 	public static <E> IResultListener<E> delegate(final Future<E> delegate, IFunctionalResultListener<E> customResultListener) {
 		return delegate(delegate, false, customResultListener);
 	}
-	
+
 	/**
      * Creates an {@link IResultListener} that delegates results and exceptions to a given Future.
      * 
@@ -124,10 +153,53 @@ public class SResultListener {
      * @param customResultListener Custom result listener that overwrites the delegation behaviour.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone, IFunctionalResultListener<E> customResultListener) {
+	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone, final IFunctionalResultListener<E> customResultListener) {
 		return new DelegationResultListener<E>(delegate, undone, customResultListener);
 	}
-	
+
+	// -----------------------------------------------------
+	// -------------- intermediate delegation methods ------
+	// -----------------------------------------------------
+
+	/**
+	 * Creates an {@link IIntermediateResultListener} that delegates results and exceptions to a given IntermediateFuture.
+	 *
+	 * @param delegate The future used for intermediate and final result delegation.
+	 * @return {@link IntermediateDelegationResultListener}
+	 */
+	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate) {
+		return delegate(delegate, false, null, null);
+	}
+
+	/**
+	 * Creates an {@link IIntermediateResultListener} that delegates results and exceptions to a given IntermediateFuture.
+	 *
+	 * @param delegate The future used for intermediate and final result delegation.
+	 * @param undone Flag if undone methods should be used.
+	 * @return {@link IntermediateDelegationResultListener}
+	 */
+	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate, boolean undone) {
+		return delegate(delegate, undone, null, null);
+	}
+
+	/**
+	 * Creates an {@link IIntermediateResultListener} that delegates results and exceptions to a given IntermediateFuture.
+	 *
+	 * @param delegate The future used for intermediate and final result delegation.
+	 * @param undone Flag if undone methods should be used.
+	 * @param customResultListener Custom result listener that overwrites the delegation behaviour.
+	 * @param customIntermediateResultListener Custom intermediate result listener that overwrites the delegation behaviour.
+	 * @return {@link IntermediateDelegationResultListener}
+	 */
+	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate, boolean undone, IFunctionalResultListener<Collection<E>> customResultListener, IFunctionalIntermediateResultListener<E> customIntermediateResultListener) {
+		return new IntermediateDelegationResultListener<E>(delegate, undone, customResultListener, customIntermediateResultListener);
+	}
+
+	// -----------------------------------------------------
+	// -------------- exception delegation methods ------
+	// -----------------------------------------------------
+
+
 	/**
      * Creates an {@link IResultListener} that delegates exceptions to a given Future
      * and results to a given SuccessListener.
@@ -150,7 +222,12 @@ public class SResultListener {
      * @return {@link IResultListener}
      */
     public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, boolean undone, final IFunctionalResultListener<E> customResultListener) {
-    	return new ExceptionDelegationResultListener<E, T>(delegate, undone, customResultListener);
+    	return new ExceptionDelegationResultListener<E, T>(delegate, undone) {
+			@Override
+			public void customResultAvailable(E result) {
+				customResultListener.resultAvailable(result);
+			}
+		};
     }
     
     /**

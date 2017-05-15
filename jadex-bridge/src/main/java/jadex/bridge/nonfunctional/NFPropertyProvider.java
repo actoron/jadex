@@ -213,7 +213,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 			{
 				prop.getValue().addResultListener(new DelegationResultListener<T>(ret));
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				ret.setException(e);
 			}

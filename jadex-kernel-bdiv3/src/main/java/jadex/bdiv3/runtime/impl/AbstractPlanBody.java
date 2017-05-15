@@ -13,7 +13,6 @@ import jadex.commons.future.IResultListener;
 
 /**
  *  Abstract base class for plan body implementations.
- *   
  */
 public abstract class AbstractPlanBody implements IPlanBody
 {
@@ -155,9 +154,18 @@ public abstract class AbstractPlanBody implements IPlanBody
 //				if(next==3)
 //					System.out.println("exe of: "+rplan.getId()+", "+next);
 				
+				if(rplan.getReason() instanceof RServiceCall)
+				{
+					RServiceCall sc = (RServiceCall)rplan.getReason();
+					InvocationInfo ii = sc.getInvocationInfo();
+					ii.setResult(exception);
+				}
+				
+//				System.out.println("setting ex on: "+rplan);
 				rplan.setException(exception);
 				
-				assert rplan.isFinishing() != (next==2);	// either finishing (due to abort) or failed.
+				assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+				assert rplan.isFinishing() != (next==2): SUtil.getExceptionStacktrace(exception);	// either finishing (due to abort) or failed.
 				if(next==2)
 				{
 					rplan.setFinishing();
@@ -218,7 +226,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 	}
 	
 	/**
-	 * 
+	 *  Invoke a plan part.
 	 */
 	protected IFuture<Object> internalInvokePart(int part)
 	{
@@ -321,7 +329,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 			}
 			else
 			{
-				ia.getLogger().warning("Plan '"+getBody()+"' threw exception: "+SUtil.getExceptionStacktrace(e));
+				// getBody() is not a good idea because it can be the reason for the exception
+//				ia.getLogger().warning("Plan '"+getBody()+"' threw exception: "+SUtil.getExceptionStacktrace(e));
+				ia.getLogger().warning("Plan '"+getRPlan().getModelElement().getName()+"' threw exception: "+SUtil.getExceptionStacktrace(e));
 				ret.setExceptionIfUndone(e instanceof Exception ? (Exception)e : new ErrorException((Error)e));
 			}
 		}

@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import jadex.bpmn.model.io.IdGenerator;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -22,6 +21,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.ICacheableModel;
+import jadex.commons.IdGenerator;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;

@@ -17,11 +17,11 @@ import jadex.bridge.service.IServiceIdentifier;
 public class RegistryEvent implements IRegistryEvent
 {
 	/** The added services. */
-	protected Map<ClassInfo, Set<IService>> addedservices;
+	protected Set<IService> addedservices;
 //	protected Set<IServiceIdentifier> addedservices;
 	
 	/** The removed services. */
-	protected Map<ClassInfo, Set<IService>> removedservices;
+	protected Set<IService> removedservices;
 //	protected Set<IServiceIdentifier> removedservices;
 
 	/** The number of events that must have occured before a remote message is sent. */
@@ -46,7 +46,7 @@ public class RegistryEvent implements IRegistryEvent
 	 *  @param addedservices The added services.
 	 *  @param removedservices The removed services.
 	 */
-	public RegistryEvent(Map<ClassInfo, Set<IService>> addedservices, Map<ClassInfo, Set<IService>> removedservices, int eventslimit, long timelimit)
+	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit)
 	{
 		this.eventslimit = eventslimit;
 		this.timelimit = timelimit;
@@ -59,7 +59,7 @@ public class RegistryEvent implements IRegistryEvent
 	 *  Get the addedservices.
 	 *  @return the addedservices
 	 */
-	public Map<ClassInfo, Set<IService>> getAddedServices()
+	public Set<IService> getAddedServices()
 	{
 		return addedservices;
 	}
@@ -67,7 +67,7 @@ public class RegistryEvent implements IRegistryEvent
 	/**
 	 *  Set the added services.
 	 */
-	public void setAddedServices(Map<ClassInfo, Set<IService>> services)
+	public void setAddedServices(Set<IService> services)
 	{
 		this.addedservices = services;
 //		if(services!=null && services.size()>0)
@@ -84,7 +84,7 @@ public class RegistryEvent implements IRegistryEvent
 	 *  Get the removedservices.
 	 *  @return the removedservices
 	 */
-	public Map<ClassInfo, Set<IService>> getRemovedServices()
+	public Set<IService> getRemovedServices()
 	{
 		return removedservices;
 	}
@@ -92,7 +92,7 @@ public class RegistryEvent implements IRegistryEvent
 	/**
 	 *  Set the removed services.
 	 */
-	public void setRemovedServices(Map<ClassInfo, Set<IService>> services)
+	public void setRemovedServices(Set<IService> services)
 	{
 		this.removedservices = services;
 //		if(services!=null && services.size()>0)
@@ -109,34 +109,22 @@ public class RegistryEvent implements IRegistryEvent
 	 *  Add an added service.
 	 *  @return True, if changed.
 	 */
-	public boolean addAddedService(ClassInfo type, IService service)
+	public boolean addAddedService(IService service)
 	{
 		if(addedservices==null)
-			addedservices = new HashMap<ClassInfo, Set<IService>>();
-		Set<IService> tmp = addedservices.get(type);
-		if(tmp==null)
-		{
-			tmp = new HashSet<IService>();
-			addedservices.put(type, tmp);
-		}
-		return tmp.add(service);
+			addedservices = new HashSet<IService>();
+		return addedservices.add(service);
 	}
 	
 	/**
 	 *  Add an added service.
 	 *  @return True, if changed.
 	 */
-	public boolean addRemovedService(ClassInfo type, IService service)
+	public boolean addRemovedService(IService service)
 	{
 		if(removedservices==null)
-			removedservices = new HashMap<ClassInfo, Set<IService>>();
-		Set<IService> tmp = removedservices.get(type);
-		if(tmp==null)
-		{
-			tmp = new HashSet<IService>();
-			removedservices.put(type, tmp);
-		}
-		return tmp.add(service);
+			removedservices = new HashSet<IService>();
+		return removedservices.add(service);
 	}
 	
 	/**
@@ -144,23 +132,24 @@ public class RegistryEvent implements IRegistryEvent
 	 */
 	public int size()
 	{
-		int	size = 0;
-		if(addedservices!=null)
-		{
-			for(Map.Entry<ClassInfo, Set<IService>> entry: addedservices.entrySet())
-			{
-				Collection<IService> coll = entry.getValue();
-				size += (coll != null ? coll.size() : 0);
-			}
-		}
-		if(removedservices!=null)
-		{
-			for(Map.Entry<ClassInfo, Set<IService>> entry: removedservices.entrySet())
-			{
-				Collection<IService> coll = entry.getValue();
-				size += (coll != null ? coll.size() : 0);
-			}
-		}
+		int	size = addedservices.size();
+		size += removedservices.size();
+//		if(addedservices!=null)
+//		{
+//			for(Map.Entry<ClassInfo, Set<IService>> entry: addedservices.entrySet())
+//			{
+//				Collection<IService> coll = entry.getValue();
+//				size += (coll != null ? coll.size() : 0);
+//			}
+//		}
+//		if(removedservices!=null)
+//		{
+//			for(Map.Entry<ClassInfo, Set<IService>> entry: removedservices.entrySet())
+//			{
+//				Collection<IService> coll = entry.getValue();
+//				size += (coll != null ? coll.size() : 0);
+//			}
+//		}
 		return size;
 	}
 	

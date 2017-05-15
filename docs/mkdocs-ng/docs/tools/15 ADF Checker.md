@@ -1,5 +1,4 @@
-Chapter 15 - Eclipse ADF Checker Plugin
-====================================================
+# Eclipse ADF Checker Plugin
 
 The Jadex ADF Checker is an eclipse plugin that allows checking Jadex *agent definition files* (ADFs), i.e. Jadex source files like *.component.xml*, *.agent.xml*, *.bpmn* etc. These files typically contain Java expressions, which are only interpreted by Jadex and thus usually not checked by Eclipse. The ADF Checker closes this gap by attaching itself to the project build process and loading all ADFs in the current project for adding problem markers in eclipse, to show where errors are found in the files.
 

@@ -9,6 +9,7 @@ import jadex.bridge.StepAborted;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ErrorException;
 import jadex.commons.future.Future;
@@ -40,7 +41,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			// a) the method is directly the business logic or
 			// b) the method jumps from required to provided interceptor chain
 				
-//			if(sic.getMethod().getName().indexOf("method")!=-1)
+//			if(sic.getMethod().getName().indexOf("addB")!=-1)
 //				System.out.println("ggggg");
 			
 			// Problem that the object could be an rmi proxy itself that delegates the call
@@ -150,28 +151,24 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 		}
 		catch(Exception e)
 		{
-//			System.out.println("e: "+sic.getMethod()+" "+sic.getObject()+" "+sic.getArgumentArray());
+//			if(sic.getMethod().getName().indexOf("Void")!=-1)
+//				System.out.println("e: "+sic.getMethod()+" "+sic.getObject()+" "+sic.getArgumentArray());
 
 			Throwable	t	= e instanceof InvocationTargetException
 					? ((InvocationTargetException)e).getTargetException() : e;
 			
 			if(DEBUG)
-			{
 				e.printStackTrace();
-			}
 			
 			// Re-throw exception when synchronous method or current step is aborted 
-			if(t instanceof StepAborted
-				|| !SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType()))
+			if(t instanceof StepAborted)
+				//|| !SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType()))
 			{
-				if(t instanceof Error)
-				{
-					throw (Error)t;
-				}
-				else
-				{
-					throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
-				}
+				throw SUtil.throwUnchecked(t);
+			}
+			else if(!SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType()))
+			{
+				sic.setResult(t);
 			}
 			else
 			{

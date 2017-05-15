@@ -6,12 +6,13 @@ import java.util.Date;
 import java.util.List;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
- * 
+ *  Processor for java util date.
  */ 
 public class JsonDateProcessor implements ITraverseProcessor
 {	
@@ -25,6 +26,7 @@ public class JsonDateProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
+		// Timestamp is handled separately
 		return SReflect.isSupertype(Date.class, clazz) && !SReflect.isSupertype(Timestamp.class, clazz);
 	}
 	
@@ -42,13 +44,20 @@ public class JsonDateProcessor implements ITraverseProcessor
 	
 		Date d  = (Date)object;
 		
-		wr.write("{");
-		wr.writeNameValue("value", d.getTime());
-		if(wr.isWriteClass())
-			wr.write(",").writeClass(object.getClass());
-		if(wr.isWriteId())
-			wr.write(",").writeId();
-		wr.write("}");
+		if(!wr.isWriteClass() && !wr.isWriteId())
+		{
+			wr.writeString(SUtil.dateToIso8601(d));
+		}
+		else
+		{
+			wr.write("{");
+			wr.writeNameValue("value", d.getTime());
+			if(wr.isWriteClass())
+				wr.write(",").writeClass(object.getClass());
+			if(wr.isWriteId())
+				wr.write(",").writeId();
+			wr.write("}");
+		}
 	
 		return object;
 	}

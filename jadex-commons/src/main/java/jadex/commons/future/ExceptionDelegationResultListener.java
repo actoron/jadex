@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /**
  *  Result listener that delegates calls to a future.
  */
-public class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
+public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -17,15 +17,13 @@ public class ExceptionDelegationResultListener<E, T> implements IResultListener<
 	/** Flag if undone methods should be used. */
 	protected boolean undone;
 
-	/** Custom functional result listener */
-	protected IFunctionalResultListener<E>	customResultListener;
-	
 //	protected DebugException	ex;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new listener.
+	 * @param future The delegation target.
 	 */
 	public ExceptionDelegationResultListener(Future<T> future)
 	{
@@ -33,33 +31,9 @@ public class ExceptionDelegationResultListener<E, T> implements IResultListener<
 	}
 	
 	/**
-	 * Create a new listener.
-	 * 
-	 * @param future The delegation target.
-	 * @param customResultListener Custom result listener that handles the
-	 *        result.
-	 */
-	public ExceptionDelegationResultListener(Future<T> future, IFunctionalResultListener<E> customResultListener)
-	{
-		this(future, false, customResultListener);
-	}
-
-	/**
-	 * Create a new listener.
-	 * 
+	 *  Create a new listener.
 	 * @param future The delegation target.
 	 * @param undone use undone methods.
-	 * @param customResultListener Custom result listener that handles the
-	 *        result.
-	 */
-	public ExceptionDelegationResultListener(Future<T> future, boolean undone, IFunctionalResultListener<E> customResultListener)
-	{
-		this(future, undone);
-		this.customResultListener = customResultListener;
-	}
-	
-	/**
-	 *  Create a new listener.
 	 */
 	public ExceptionDelegationResultListener(Future<T> future, boolean undone)
 	{
@@ -119,13 +93,7 @@ public class ExceptionDelegationResultListener<E, T> implements IResultListener<
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public void customResultAvailable(E result)	throws Exception
-	{
-		if(customResultListener != null)
-		{
-			customResultListener.resultAvailable(result);
-		}
-	}
+	public abstract void customResultAvailable(E result) throws Exception;
 
 	/**
 	 *  Called when an exception occurred.

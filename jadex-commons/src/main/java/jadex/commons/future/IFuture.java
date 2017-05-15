@@ -65,6 +65,13 @@ public interface IFuture<E>
 	 *  @return The future result.
 	 */
 	public E get();
+	
+	/**
+	 *  Get the result - blocking call.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+	 *  @return The future result.
+	 */
+	public E get(boolean realtime);
 
 	/**
 	 *  Get the result - blocking call.
@@ -72,6 +79,14 @@ public interface IFuture<E>
 	 *  @return The future result.
 	 */
 	public E get(long timeout);
+	
+	/**
+	 *  Get the result - blocking call.
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+	 *  @return The future result.
+	 */
+	public E get(long timeout, boolean realtimr);
 
 	/**
 	 *  @deprecated - From 3.0. Use the version without suspendable.

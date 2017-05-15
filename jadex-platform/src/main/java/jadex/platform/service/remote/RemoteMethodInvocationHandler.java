@@ -38,7 +38,6 @@ import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.Tuple2Future;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.platform.service.remote.commands.RemoteFutureBackwardCommand;
 import jadex.platform.service.remote.commands.RemoteFuturePullCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteMethodInvocationCommand;
@@ -144,15 +143,23 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		if(finalize.equals(method))
 		{
 //			System.out.println("Finalize called on: "+proxy);
-			rsms.component.scheduleStep(new IComponentStep<Void>()
+			try
 			{
-				@Classname("fin")
-				public IFuture<Void> execute(IInternalAccess ia)
+				rsms.component.scheduleStep(new IComponentStep<Void>()
 				{
-					rsms.getRemoteReferenceModule().decProxyCount(pr.getRemoteReference());
-					return IFuture.DONE;
-				}
-			});
+					@Classname("fin")
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						rsms.getRemoteReferenceModule().decProxyCount(pr.getRemoteReference());
+						return IFuture.DONE;
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				// Finalize is called internally -> Exception pop up to the console :-(
+				System.out.println("Warning, could not call finalize method: "+rsms.component.getComponentIdentifier()+" "+proxy);
+			}
 			return null;
 		}
 		

@@ -45,4 +45,11 @@ public interface IComponentFeature
 	 */
 	public IParameterGuesser	getParameterGuesser();
 
+	/**
+	 *  Check if the feature potentially executed user code in body.
+	 *  Allows blocking operations in user bodies by using separate steps for each feature.
+	 *  Non-user-body-features are directly executed for speed.
+	 *  If unsure just return true. ;-)
+	 */
+	public boolean	hasUserBody();
 }

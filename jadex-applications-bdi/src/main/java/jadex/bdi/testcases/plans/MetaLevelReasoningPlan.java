@@ -27,11 +27,14 @@ public class MetaLevelReasoningPlan extends Plan
 		double selval = -1;
 		for(int i=0; i<apps.length; i++)
 		{
-			double tmpval = ((Double)apps[i].getPlan().getParameter("importance").getValue()).doubleValue();
-			if(tmpval>selval)
+			if(apps[i].getPlan().hasParameter("importance"))
 			{
-				sel = apps[i];
-				selval = tmpval;
+				double tmpval = ((Double)apps[i].getPlan().getParameter("importance").getValue()).doubleValue();
+				if(tmpval>selval)
+				{
+					sel = apps[i];
+					selval = tmpval;
+				}
 			}
 		}
 

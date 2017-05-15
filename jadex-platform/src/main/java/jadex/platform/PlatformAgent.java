@@ -3,6 +3,7 @@ package jadex.platform;
 import static jadex.base.RootComponentConfiguration.ADDRESS;
 import static jadex.base.RootComponentConfiguration.ASYNCEXECUTION;
 import static jadex.base.RootComponentConfiguration.AWADELAY;
+import static jadex.base.RootComponentConfiguration.AWAFAST;
 import static jadex.base.RootComponentConfiguration.AWAEXCLUDES;
 import static jadex.base.RootComponentConfiguration.AWAINCLUDES;
 import static jadex.base.RootComponentConfiguration.AWAMECHANISMS;
@@ -16,7 +17,6 @@ import static jadex.base.RootComponentConfiguration.CLOCK;
 import static jadex.base.RootComponentConfiguration.CONTEXT;
 import static jadex.base.RootComponentConfiguration.CONTEXTSERVICECLASS;
 import static jadex.base.RootComponentConfiguration.DF;
-import static jadex.base.RootComponentConfiguration.DHT_PROVIDE;
 import static jadex.base.RootComponentConfiguration.REGISTRY_SYNC;
 import static jadex.base.RootComponentConfiguration.FILETRANSFER;
 import static jadex.base.RootComponentConfiguration.GUI;
@@ -102,7 +102,6 @@ import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
 import jadex.platform.service.df.DirectoryFacilitatorAgent;
-import jadex.platform.service.dht.DistributedServiceRegistryAgent;
 import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
@@ -150,6 +149,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
 	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
 	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
+	@Argument(name=AWAFAST, clazz=boolean.class, defaultvalue="false"),
 
 	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),
@@ -202,7 +202,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=DHT_PROVIDE, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=REGISTRY_SYNC, clazz=boolean.class, defaultvalue="false")
 })
 
@@ -243,7 +242,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
-	@ComponentType(name="distregistry", clazz=DistributedServiceRegistryAgent.class),
 	@ComponentType(name="registrysync", clazz=RegistrySynchronizationAgent.class),
 })
 
@@ -299,7 +297,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
@@ -344,6 +341,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
 				@NameValue(name="delay", value="$args.awadelay"),
+				@NameValue(name="fast", value="$args.awafast"),
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
@@ -358,8 +356,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.dhtprovide? 1 : 0"),
 		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
+		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
@@ -382,7 +380,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
@@ -439,8 +436,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="distregistry", type="distregistry", daemon=Boolean3.TRUE, number="$args.dhtprovide? 1 : 0"),
 		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
+		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	})
 })
 @Agent

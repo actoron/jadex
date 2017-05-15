@@ -49,8 +49,17 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	 */
 	public SubscriptionIntermediateFuture(ITerminationCommand terminate)
 	{
+		this(terminate, true);
+	}
+	
+	/**
+	 *  Create a new future.
+	 *  @param terminate The code to be executed in case of termination.
+	 */
+	public SubscriptionIntermediateFuture(ITerminationCommand terminate, boolean storeforfirst)
+	{
 		super(terminate);
-		this.storeforfirst = true;
+		this.storeforfirst = storeforfirst;
 	}
 	
 	//-------- methods --------
@@ -192,7 +201,8 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, UNSET);
+    	    		// todo: realtime as method parameter?!
+    				caller.suspend(this, UNSET, false);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.
@@ -280,7 +290,8 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, UNSET);
+    	    		// todo: realtime as method parameter?!
+    				caller.suspend(this, UNSET, false);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.

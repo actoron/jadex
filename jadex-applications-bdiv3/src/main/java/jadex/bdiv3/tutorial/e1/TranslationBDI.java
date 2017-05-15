@@ -5,6 +5,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentFeature;
 
 /**
  *  The translation agent e1.
@@ -15,11 +16,11 @@ import jadex.micro.annotation.AgentBody;
 public class TranslationBDI
 {
 	/** The agent. */
-	@Agent
-	protected IInternalAccess agent;
+	@AgentFeature
+	protected IBDIAgentFeature bdiFeature;
 	
 	@Capability
-	protected TranslationCapability capa = new TranslationCapability();
+	protected TranslationCapability capability = new TranslationCapability();
 	
 	/**
 	 *  The agent body.
@@ -28,7 +29,7 @@ public class TranslationBDI
 	public void body()
 	{
 		String eword = "dog";
-		String gword = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(capa.new Translate(eword)).get();
+		String gword = (String)bdiFeature.dispatchTopLevelGoal(capability.new Translate(eword)).get();
 		System.out.println("Translated: "+eword+" "+gword);
 	}
 }

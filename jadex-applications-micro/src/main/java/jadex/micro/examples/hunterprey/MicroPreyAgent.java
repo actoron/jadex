@@ -139,7 +139,7 @@ public class MicroPreyAgent
 	 */
 	protected void	act()
 	{
-//		System.out.println("nearest food for: "+getAgentName()+", "+food);
+//		System.out.println("nearest food for: "+agent.getComponentIdentifier().getLocalName()+", "+food);
 			
 		// Get current position.
 		IVector2	pos	= (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
@@ -206,6 +206,7 @@ public class MicroPreyAgent
 	 */
 	public void	setNearestFood(ISpaceObject food)
 	{
+//		System.out.println("setting food: "+food+" "+agent.getComponentIdentifier().getLocalName());
 		this.food	= food;
 	}
 }

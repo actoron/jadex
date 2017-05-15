@@ -82,7 +82,7 @@ import jadex.micro.annotation.RequiredServices;
 //	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
 	@Argument(name="mechanisms", clazz=String.class, description="The discovery mechanisms."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+	@Argument(name="fast", clazz=boolean.class, defaultvalue="false", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="autocreate", clazz=boolean.class, defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
 	@Argument(name="autodelete", clazz=boolean.class, defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
 	@Argument(name="proxydelay", clazz=long.class, defaultvalue="15000", description="The delay used by proxies."),
@@ -190,6 +190,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			public void customResultAvailable(TransportAddressBook addresses)
 			{
 				AwarenessManagementAgent.this.addresses = addresses;
+				AwarenessManagementAgent.this.root	= addresses.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
 				
 				IFuture<ISettingsService>	setfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("settings");
 				setfut.addResultListener(new IResultListener<ISettingsService>()
@@ -273,6 +274,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		this.delay = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
 		this.autocreate = ((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("autocreate")).booleanValue();
 		this.autodelete = ((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("autodelete")).booleanValue();
+		Boolean	bfast = (Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("fast");
+		fast	= bfast!=null ? bfast.booleanValue() : false;
 		
 		this.includes	= new ArrayList<String>();
 		StringTokenizer	stok	= new StringTokenizer((String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("includes"), ",");
@@ -300,15 +303,6 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		final Future<Void> ret = new Future<Void>();
 		
 		startRemoveBehaviour();
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Void>(ret)
-		{
-			public void customResultAvailable(ITransportComponentIdentifier tcid)
-			{
-				root = tcid;
-//				ret.setResult(null);
-			}
-		});
 		
 		return ret;
 	}
@@ -942,14 +936,14 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 					ci.setDaemon(true);
 //					ci.setParent(parent);
 					
-//					System.out.println("create proxy: "+(++cnt));
+//					System.out.println("create proxy: "+dif.getComponentIdentifier());
 					
 					cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/platform/service/remote/ProxyAgent.class", ci, 
 						agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(agent.getLogger())
 					{
 						public void resultAvailable(Collection<Tuple2<String, Object>> result)
 						{
-//									System.out.println("Proxy killed: "+source);
+//							System.out.println("Proxy killed: "+source);
 							dif.setProxy(null);
 							informListeners(dif);
 						}

@@ -317,45 +317,62 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		MethodInfo	mi	= model.getAgentMethod(ann);
 		if(mi!=null)
 		{
-			Method	method	= mi.getMethod(component.getClassLoader());
-			
-			// Try to guess parameters from given args or component internals.
-			IParameterGuesser	guesser	= args!=null ? new SimpleParameterGuesser(component.getParameterGuesser(), Arrays.asList(args)) : component.getParameterGuesser();
-			Object[]	iargs	= new Object[method.getParameterTypes().length];
-			for(int i=0; i<method.getParameterTypes().length; i++)
-			{
-				iargs[i]	= guesser.guessParameter(method.getParameterTypes()[i], false);
-			}
-			
+			Method	method	= null;
 			try
 			{
-				// It is now allowed to use protected/private agent created, body, terminate methods
-				method.setAccessible(true);
-				Object res = method.invoke(component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);
-				if(res instanceof IFuture)
+				method	= mi.getMethod(component.getClassLoader());
+				
+				// Try to guess parameters from given args or component internals.
+				IParameterGuesser	guesser	= args!=null ? new SimpleParameterGuesser(component.getParameterGuesser(), Arrays.asList(args)) : component.getParameterGuesser();
+				Object[]	iargs	= new Object[method.getParameterTypes().length];
+				for(int i=0; i<method.getParameterTypes().length; i++)
 				{
-					ret	= (IFuture<Void>)res;
+					iargs[i]	= guesser.guessParameter(method.getParameterTypes()[i], false);
 				}
-				else
+				
+				try
 				{
-					ret	= IFuture.DONE;
+					// It is now allowed to use protected/private agent created, body, terminate methods
+					method.setAccessible(true);
+					Object res = method.invoke(component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);
+					if(res instanceof IFuture)
+					{
+						ret	= (IFuture<Void>)res;
+					}
+					else
+					{
+						ret	= IFuture.DONE;
+					}
 				}
+				catch(Exception e)
+				{
+					if(e instanceof InvocationTargetException)
+					{
+						if(((InvocationTargetException)e).getTargetException() instanceof Exception)
+						{
+							e	= (Exception)((InvocationTargetException)e).getTargetException();
+						}
+						else if(((InvocationTargetException)e).getTargetException() instanceof Error)
+						{
+							// re-throw errors, e.g. StepAborted
+							throw (Error)((InvocationTargetException)e).getTargetException();
+						}
+					}
+					ret	= new Future<Void>(e);
+				}
+
 			}
 			catch(Exception e)
 			{
-				if(e instanceof InvocationTargetException)
+				// Error in method search or parameter guesser
+				if(method==null)
 				{
-					if(((InvocationTargetException)e).getTargetException() instanceof Exception)
-					{
-						e	= (Exception)((InvocationTargetException)e).getTargetException();
-					}
-					else if(((InvocationTargetException)e).getTargetException() instanceof Error)
-					{
-						// re-throw errors, e.g. StepAborted
-						throw (Error)((InvocationTargetException)e).getTargetException();
-					}
+					ret	= new Future<Void>(new RuntimeException("Cannot find method: "+mi, e));
 				}
-				ret	= new Future<Void>(e);
+				else
+				{
+					ret	= new Future<Void>(new RuntimeException("Cannot inject values for method: "+method, e));
+				}
 			}
 		}
 		else

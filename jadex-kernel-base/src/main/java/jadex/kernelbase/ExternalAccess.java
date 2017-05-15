@@ -1,9 +1,7 @@
 package jadex.kernelbase;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import jadex.base.Starter;
 import jadex.bridge.ComponentPersistedException;
@@ -21,15 +19,9 @@ import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
-import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -500,27 +492,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
+	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		if(step==null)
-		{
-			throw new NullPointerException("No step. Maybe decoding error?");
-		}
-		
-		Method	m	= SReflect.getMethod(step.getClass(), "execute", new Class[]{IInternalAccess.class});
-		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(m.getReturnType(), new FutureFunctionality((Logger)null)) : new Future<T>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else
-		{
-			IFuture<T>	fut	= ia.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
-			FutureFunctionality.connectDelegationFuture(ret, fut);
-		}
-		
-		return ret;
+		return ia.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 	}
 	
 	/**
@@ -529,149 +503,27 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public <T> IFuture<T> scheduleStep(int priority, final IComponentStep<T> step)
+	public <T> IFuture<T> scheduleStep(int priority, IComponentStep<T> step)
 	{
-		if(step==null)
-		{
-			throw new NullPointerException("No step. Maybe decoding error?");
-		}
-		
-		Method	m	= SReflect.getMethod(step.getClass(), "execute", new Class[]{IInternalAccess.class});
-		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(m.getReturnType(), new FutureFunctionality((Logger)null)) : new Future<T>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else
-		{
-			IFuture<T>	fut	= ia.getComponentFeature(IExecutionFeature.class).scheduleStep(priority, step);
-			FutureFunctionality.connectDelegationFuture(ret, fut);
-		}
-		
-		return ret;
-	}
-	
-//	/**
-//	 *  Execute some code on the component's thread.
-//	 *  Unlike scheduleStep(), the action will also be executed
-//	 *  while the component is suspended.
-//	 *  @param action	Code to be executed on the component's thread.
-//	 *  @return The result of the step.
-//	 */
-//	public <T>	IFuture<T> scheduleImmediate(final IComponentStep<T> step)
-//	{
-//		return ia.getComponentFeature(IExecutionFeature.class).scheduleImmediate(step);
-//	}
-	
-	/**
-	 *  Schedule a step of the component.
-	 *  May safely be called from external threads.
-	 *  @param step	Code to be executed as a step of the component.
-	 *  @param delay The delay to wait before step should be done.
-	 *  @return The result of the step.
-	 */
-	public <T>	IFuture<T> scheduleStep(final IComponentStep<T> step, final long delay)
-	{
-		final Future<T> ret = new Future<T>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else
-		{
-			SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
-			{
-				public void customResultAvailable(IClockService cs)
-				{
-					cs.createTimer(delay, new ITimedObject()
-					{
-						public void timeEventOccurred(long currenttime)
-						{
-							scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
-						}
-					});
-				}
-			}));
-		}
-		
-		return ret;
+		return ia.getComponentFeature(IExecutionFeature.class).scheduleStep(priority, step);
 	}
 	
 	/**
-	 *  Schedule a step of the component.
-	 *  May safely be called from external threads.
-	 *  @param step	Code to be executed as a step of the component.
-	 *  @param delay The delay to wait before step should be done.
-	 *  @return The result of the step.
+	 *  Wait for some time and execute a component step afterwards.
 	 */
-	public <T>	IFuture<T> scheduleStep(final int priority, final IComponentStep<T> step, final long delay)
+	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime)
 	{
-		final Future<T> ret = new Future<T>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else
-		{
-			SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
-			{
-				public void customResultAvailable(IClockService cs)
-				{
-					cs.createTimer(delay, new ITimedObject()
-					{
-						public void timeEventOccurred(long currenttime)
-						{
-							scheduleStep(step, priority).addResultListener(new DelegationResultListener<T>(ret));
-						}
-					});
-				}
-			}));
-		}
-		
-		return ret;
+		return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step, realtime);
+
 	}
-	
-//	/**
-//	 *  Execute some code on the component's thread.
-//	 *  Unlike scheduleStep(), the action will also be executed
-//	 *  while the component is suspended.
-//	 *  @param action	Code to be executed on the component's thread.
-//	 *  @param delay The delay to wait before step should be done.
-//	 *  @return The result of the step.
-//	 */
-//	public <T> IFuture<T> scheduleImmediate(final IComponentStep<T> step, final long delay)
-//	{
-//		final Future<T> ret = new Future<T>();
-//		
-//		if(!valid)
-//		{
-//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-//		}
-//		else
-//		{
-//			SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
-//			{
-//				public void customResultAvailable(IClockService cs)
-//				{
-//					cs.createTimer(delay, new ITimedObject()
-//					{
-//						public void timeEventOccurred(long currenttime)
-//						{
-//							scheduleImmediate(step).addResultListener(new DelegationResultListener<T>(ret));
-//						}
-//					});
-//				}
-//			}));
-//		}
-//		
-//		return ret;
-//	}
+
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
+	{
+		return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+	}
 	
 	// todo: move to external feature!?
 	/**
@@ -1463,13 +1315,39 @@ public class ExternalAccess implements IExternalAccess
 //	}
 	
 	/**
-	 * 
+	 *  Get the internal access.
+	 *  @return The internal access.
 	 */
 	public IInternalAccess getInternalAccess()
 	{
 		return ia;
 	}
 	
+	
+	/**
+	 *  Get the hashcode.
+	 *  @return The hashcode.
+	 */
+	public int hashCode()
+	{
+		return cid == null? 0 : cid.hashCode();
+	}
+
+	/**
+	 *  Test if an object equals this object.
+	 *  @param obj The object to test.
+	 *  @return True, if equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		
+		if(obj instanceof IExternalAccess)
+			ret = ((IExternalAccess)obj).getComponentIdentifier().equals(cid);
+		
+		return ret;
+	}
+
 	/**
 	 *  Get the string representation.
 	 */

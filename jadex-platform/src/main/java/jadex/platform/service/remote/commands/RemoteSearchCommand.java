@@ -87,7 +87,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/**
 	 *  Create a new remote search command.
 	 */
-	public RemoteSearchCommand(IComponentIdentifier providerid, Class<?> type, 
+	public RemoteSearchCommand(IComponentIdentifier providerid, ClassInfo type, 
 		boolean multiple, String scope, String callid, IAsyncFilter<IService> filter, IComponentIdentifier caller)
 	{
 //		if(type==null)
@@ -95,7 +95,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 //		if (caller instanceof ITransportComponentIdentifier)
 //			caller = new BasicComponentIdentifier(caller);
 		this.providerid = providerid;
-		this.type = new ClassInfo(type);
+		this.type = type;
 		this.multiple = multiple;
 		this.scope = scope;
 		this.callid = callid;

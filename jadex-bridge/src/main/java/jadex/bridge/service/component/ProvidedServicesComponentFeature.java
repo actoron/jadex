@@ -37,7 +37,6 @@ import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -49,6 +48,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
@@ -216,6 +216,17 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	}
 	
 	/**
+	 *  Check if the feature potentially executed user code in body.
+	 *  Allows blocking operations in user bodies by using separate steps for each feature.
+	 *  Non-user-body-features are directly executed for speed.
+	 *  If unsure just return true. ;-)
+	 */
+	public boolean	hasUserBody()
+	{
+		return false;
+	}
+	
+	/**
 	 *  Called when the feature is shutdowned.
 	 */
 	public IFuture<Void> shutdown()
@@ -264,7 +275,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		if(services==null)
 			services = Collections.synchronizedMap(new LinkedHashMap<Class<?>, Collection<IInternalService>>());
 		
-		FutureBarrier<Void> bar = new FutureBarrier<Void>();
+//		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(service);
+		
+//		FutureBarrier<Void> bar = new FutureBarrier<Void>();
 		
 		for(Class<?> servicetype: types)
 		{
@@ -277,10 +290,11 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			tmp.add(service);
 			
 			// Make service available immediately, even before start (hack???).
-			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
+//			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
 		}
 		
-		return bar.waitFor();
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(service);
+//		return bar.waitFor();
 	}
 	
 	/**
@@ -300,25 +314,11 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	protected void	removeService(IInternalService service)
 	{
-		// Find service types
-		Class<?>	type	= service.getServiceIdentifier().getServiceType().getType(component.getClassLoader(), component.getModel().getAllImports());
-		Set<Class<?>> types = new LinkedHashSet<Class<?>>();
-		types.add(type);
-		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))
-		{
-			if(sin.isAnnotationPresent(Service.class))
-			{
-				types.add(sin);
-			}
-		}
-
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		
 		if(registry!=null) // Maybe null on rescue thread (todo: why remove() on rescue thread?)
 		{
-			for(Class<?> servicetype: types)
-			{
-				registry.removeService(new ClassInfo(servicetype), service);
-			}
+			registry.removeService(service);
 		}
 	}
 	
@@ -485,22 +485,102 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //				e.printStackTrace();
 			}
 			
-			getPublishService(getComponent(), pi.getPublishType(), (Iterator<IPublishService>)null)
-				.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
-				.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
+			if (pi.isMulti())
 			{
-				public void customResultAvailable(IPublishService ps)
+				SServiceProvider.getServices(getComponent(), IPublishService.class, pi.getPublishScope()).addResultListener(new IIntermediateResultListener<IPublishService>()
 				{
-					ps.publishService(getComponent().getClassLoader(), service, pi)
-						.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
-				}
-				public void exceptionOccurred(Exception exception)
+					/** Flag if published at least once. */
+					protected boolean published = false;
+					
+					/** Flag if finished. */
+					protected boolean finished = false;
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+
+					public void resultAvailable(
+							Collection<IPublishService> result)
+					{
+					}
+					
+					public void intermediateResultAvailable(final IPublishService result)
+					{
+						result.publishService(service.getServiceIdentifier(), pi).addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void vresult)
+							{
+								if (!published)
+								{
+									ret.setResult(null);
+									published = true;
+								}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if (finished && !published)
+								{
+									getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier());
+									ret.setException(exception);
+								}
+							}
+						});
+					}
+
+					public void finished()
+					{
+						finished = true;
+					}
+				});
+//				SServiceProvider.getServices(getComponent(), IPublishService.class, pi.getPublishScope()).addResultListener(new IResultListener<Collection<IPublishService>>()
+//				{
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+//						ret.setResult(null);
+//					}
+//					
+//					public void resultAvailable(Collection<IPublishService> result)
+//					{
+//						for (final IPublishService pubserv : result)
+//						{
+//							pubserv.publishService(service.getServiceIdentifier(), pi).addResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									getComponent().getLogger().severe("Could not publish to " + pubserv + ": "+service.getServiceIdentifier()+" "+exception.getMessage());
+//								}
+//							});
+//						}
+//					}
+//				});
+			}
+			else
+			{
+				getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
+					.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
+					.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 				{
-//					exception.printStackTrace();
-					getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
-					ret.setResult(null);
-				}
-			}));
+					public void customResultAvailable(IPublishService ps)
+					{
+						//System.out.println("Got publish service " + ps);
+						ps.publishService(service.getServiceIdentifier(), pi)
+							.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+	//					exception.printStackTrace();
+						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+						ret.setResult(null);
+					}
+				}));
+			}
 		}
 		else
 		{
@@ -526,7 +606,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				{
 					final IServiceIdentifier sid = service.getServiceIdentifier();
 //					getPublishService(instance, pi.getPublishType(), null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
-					getPublishService(getComponent(), pi.getPublishType(), null).addResultListener(new IResultListener<IPublishService>()
+					getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), null).addResultListener(new IResultListener<IPublishService>()
 					{
 						public void resultAvailable(IPublishService ps)
 						{
@@ -558,18 +638,24 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param services The iterator of publish services (can be null).
 	 *  @return The publish service.
 	 */
-	public static IFuture<IPublishService> getPublishService(final IInternalAccess instance, final String type, final Iterator<IPublishService> services)
+	public static IFuture<IPublishService> getPublishService(final IInternalAccess instance, final String type, final String scope, final Iterator<IPublishService> services)
 	{
 		final Future<IPublishService> ret = new Future<IPublishService>();
 		
 		if(services==null)
 		{
-			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance, IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM, null);
+			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance, IPublishService.class, scope, null);
 			fut.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
 			{
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					// TODO Auto-generated method stub
+					super.exceptionOccurred(exception);
+					exception.printStackTrace();
+				}
 				public void customResultAvailable(Collection<IPublishService> result)
 				{
-					getPublishService(instance, type, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
+					getPublishService(instance, type, scope, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
 				}
 			}));
 		}
@@ -588,7 +674,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						}
 						else
 						{
-							getPublishService(instance, type, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
+							getPublishService(instance, type, scope, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
 						}
 					}
 				}));

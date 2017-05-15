@@ -1,25 +1,56 @@
 package jadex.bridge.service.search;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.sensor.service.TagProperty;
+import jadex.bridge.service.IService;
 import jadex.commons.IAsyncFilter;
+import jadex.commons.IFilter;
+import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  * 
  */
 public class ServiceQuery<T>
 {
+	/** The return type. */
+	protected ClassInfo returntype;
+	
 	/** The service type. */
-	protected ClassInfo type;
+	protected ClassInfo servicetype;
+	
+	/** Tags of the service. */
+	protected String[] servicetags;
 	
 	/** The search scope. */
 	protected String scope;
 	
-	/** Filter for checking further service attributes. */
-	protected IAsyncFilter<T> filter;
-	
 	/** The query owner. */
 	protected IComponentIdentifier owner;
+	
+	/** The service provider. */
+	protected IComponentIdentifier provider;
+	
+	/** The service platform. */
+	protected IComponentIdentifier platform;
+	
+	/** Flag, if service by the owner should be excluded. */
+	protected boolean excludeowner;
+	
+	/** 
+	 *  Filter for checking further service attributes.
+	 *  Either IAsyncFilter<T> or IFilter<T>.
+	 */
+	protected Object filter;
 	
 	/**
 	 *  Create a new service query.
@@ -31,38 +62,130 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<T> type, String scope, IAsyncFilter<T> filter, IComponentIdentifier owner)
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
-		this(new ClassInfo(type), scope, filter, owner);
+		this(servicetype, scope, (IFilter<T>) null, provider, owner);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo type, String scope, IAsyncFilter<T> filter, IComponentIdentifier owner)
+	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
-		this.type = type;
+		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this(new ClassInfo(servicetype), scope, filter, provider, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this(new ClassInfo(servicetype), scope, filter, provider, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(ClassInfo servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this.returntype = servicetype;
+		this.servicetype = servicetype;
 		this.scope = scope;
 		this.filter = filter;
+		this.provider = provider;
 		this.owner = owner;
 	}
-
+	
 	/**
-	 *  Get the type.
-	 *  @return The type
+	 *  Create a new service query.
 	 */
-	public ClassInfo getType()
+	public ServiceQuery(Class<T> returntype, Class<?> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
-		return type;
+		this(new ClassInfo(returntype), new ClassInfo(servicetype), scope, filter, provider, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this.returntype = servicetype;
+		this.servicetype = servicetype;
+		this.scope = scope;
+		this.filter = filter;
+		this.provider = provider;
+		this.owner = owner;
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(ClassInfo returntype, ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	{
+		this.returntype = returntype;
+		this.servicetype = servicetype;
+		this.scope = scope;
+		this.filter = filter;
+		this.provider = provider;
+		this.owner = owner;
+	}
+	
+	/**
+	 *  Shallow copy constructor.
+	 *  @param original Original query.
+	 */
+	public ServiceQuery(ServiceQuery<T> original)
+	{
+		this.returntype = original.returntype;
+		this.servicetype = original.servicetype;
+		this.scope = original.scope;
+		this.servicetags = original.servicetags;
+		this.filter = original.filter;
+		this.owner = original.owner;
 	}
 
 	/**
-	 *  Set the type.
-	 *  @param type The type to set
+	 *  Get the service type.
+	 *  @return The service type
 	 */
-	public void setType(ClassInfo type)
+	public ClassInfo getServiceType()
 	{
-		this.type = type;
+		return servicetype;
+	}
+
+	/**
+	 *  Set the service type.
+	 *  @param type The service type to set
+	 */
+	public void setServiceType(ClassInfo servicetype)
+	{
+		this.servicetype = servicetype;
+	}
+	
+	/**
+	 *  Get the return type.
+	 *  @return The return type
+	 */
+	public ClassInfo getReturnType()
+	{
+		return returntype;
+	}
+
+	/**
+	 *  Set the return type.
+	 *  @param type The return type to set
+	 */
+	public void setReturnType(ClassInfo returntype)
+	{
+		this.returntype = returntype;
 	}
 	
 	/**
@@ -82,25 +205,61 @@ public class ServiceQuery<T>
 	{
 		this.scope = scope;
 	}
-
+	
 	/**
 	 *  Get the filter.
 	 *  @return The filter
 	 */
-	public IAsyncFilter<T> getFilter()
+	public Object getFilter()
 	{
 		return filter;
+	}
+	
+	/**
+	 *  Set the filter.
+	 *  @param filter The filter to set
+	 */
+	public void setFilter(Object filter)
+	{
+		this.filter = filter;
+	}
+	
+	/**
+	 *  Set the filter.
+	 *  @param filter The filter to set
+	 */
+	public <ST> void setSyncFilter(IFilter<ST> filter)
+	{
+		this.filter = filter;
 	}
 
 	/**
 	 *  Set the filter.
 	 *  @param filter The filter to set
 	 */
-	public void setFilter(IAsyncFilter<T> filter)
+	public <ST> void setAsyncFilter(IAsyncFilter<ST> filter)
 	{
 		this.filter = filter;
 	}
 
+	/**
+	 *  Get the provider.
+	 *  @return The provider
+	 */
+	public IComponentIdentifier getProvider()
+	{
+		return provider;
+	}
+
+	/**
+	 *  Set the provider.
+	 *  @param provider The provider to set
+	 */
+	public void setProvider(IComponentIdentifier provider)
+	{
+		this.provider = provider;
+	}
+	
 	/**
 	 *  Get the owner.
 	 *  @return The owner
@@ -118,4 +277,116 @@ public class ServiceQuery<T>
 	{
 		this.owner = owner;
 	}
+	
+	/**
+	 *  Checks if service of the query owner should be excluded.
+	 *  
+	 *  @return True, if the services should be excluded.
+	 */
+	public boolean isExcludeOwner()
+	{
+		return excludeowner;
+	}
+	
+	/**
+	 *  Sets if service of the query owner should be excluded.
+	 *  
+	 *  @param excludeowner True, if the services should be excluded.
+	 */
+	public void setExcludeOwner(boolean excludeowner)
+	{
+		this.excludeowner = excludeowner;
+	}
+	
+	/**
+	 *  Gets the specification for the indexer.
+	 *  
+	 *  @return The specification for the indexer.
+	 */
+	public List<Tuple2<String, String[]>> getIndexerSearchSpec()
+	{
+		List<Tuple2<String, String[]>> ret = new ArrayList<Tuple2<String,String[]>>();
+		
+		if (platform != null)
+			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[] { platform.toString() }));
+		
+		if (provider != null)
+			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[] { provider.toString() }));
+		
+		if (servicetype != null)
+			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[] { servicetype.getGenericTypeName() }));
+		
+		if (servicetags != null && servicetags.length > 0)
+			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_TAGS, servicetags));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Tests if the query matches a service.
+	 *  
+	 *  @param service The service.
+	 *  @return True, if the service matches the keys.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected boolean matchesSync(IService service)
+	{
+		return (matchesKeys(service) && ((IFilter) filter).filter(service));
+	}
+	
+	/**
+	 *  Tests if the query matches a service.
+	 *  
+	 *  @param service The service.
+	 *  @return True, if the service matches the keys.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected IFuture<Boolean> matchesAsync(IService service)
+	{
+		IFuture<Boolean> ret = null;
+		if (matchesKeys(service))
+		{
+			ret = ((IAsyncFilter) filter).filter(service);
+		}
+		else
+			ret = new Future<Boolean>(false);
+		return ret;
+	}
+	
+	/**
+	 *  Tests if the query keys matches a service.
+	 *  
+	 *  @param service The service.
+	 *  @return True, if the service matches the keys.
+	 */
+	protected boolean matchesKeys(IService service)
+	{
+		if (servicetype != null && !service.getServiceIdentifier().getServiceType().getGenericTypeName().equals(servicetype))
+			return false;
+		
+		if (servicetags != null)
+		{
+			Set<String> tagsset = JadexServiceKeyExtractor.getKeysStatic(JadexServiceKeyExtractor.KEY_TYPE_TAGS, service);
+			if (tagsset == null)
+				return false;
+			
+			for (String tag : servicetags)
+			{
+				if (!tagsset.contains(tag))
+				{
+					return false;
+				}
+			}
+		}
+		
+		if (provider != null && !provider.equals(service.getServiceIdentifier().getProviderId()))
+			return false;
+		
+		if (platform != null && !platform.equals(service.getServiceIdentifier().getProviderId().getRoot()))
+			return false;
+		
+		return true;
+	}
+	
+	
 }

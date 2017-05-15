@@ -5,13 +5,13 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.Set;
 
 import javax.swing.JPanel;
 
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.collection.WeakSet;
 
 
 /**
@@ -24,7 +24,7 @@ public class BlocksworldPanel	extends JPanel
 	/** The block placement x variance as fraction of the total available space (0-1). */
 	protected static final double	XVARIANCE	= 0.2;
 
-	/** The block placement variance as fraction of the total available space (0-XVARIANCE). */
+	/** The block placement y variance as fraction of the total available space (0-XVARIANCE). */
 	protected static final double	YVARIANCE	= 0.04;
 
 	//-------- attributes --------
@@ -36,7 +36,7 @@ public class BlocksworldPanel	extends JPanel
 	protected PropertyChangeListener	pcl;
 
 	/** The known blocks. */
-	protected Map<Block, String>	blocks;
+	protected Set<Block>	blocks;
 
 	/** The block size (in pixels). */
 	protected int	blocksize;
@@ -56,7 +56,7 @@ public class BlocksworldPanel	extends JPanel
 		this.table	= table;
 		this.imaginary	= imaginary;
 		this.blocksize	= 100;
-		this.blocks	= new WeakHashMap<Block, String>();
+		this.blocks	= new WeakSet<Block>();
 
 		// Update gui when table changes.
 		this.pcl	= new PropertyChangeListener()
@@ -136,6 +136,13 @@ public class BlocksworldPanel	extends JPanel
 	 */
 	protected void	observeNewBlocks()
 	{
+		// Remove old listeners.
+		for(Block b: blocks)
+		{
+			b.removePropertyChangeListener(pcl);
+		}
+		blocks.clear();
+		
 		// Traverse all blocks.
 		Block[]	baseblocks	= (Block[])table.blocks.toArray(new Block[table.blocks.size()]);
 		for(int i=0; i<baseblocks.length; i++)
@@ -143,11 +150,8 @@ public class BlocksworldPanel	extends JPanel
 			Block	b	= baseblocks[i];
 			while(b!=null)
 			{
-				if(blocks.get(b)==null)
-				{
-					b.addPropertyChangeListener(pcl);
-					blocks.put(b, "drin");
-				}
+				b.addPropertyChangeListener(pcl);
+				blocks.add(b);
 				b	= b.upper;
 			}
 		}

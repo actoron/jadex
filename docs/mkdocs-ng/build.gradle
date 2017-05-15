@@ -45,14 +45,20 @@ task processDocs(type: Copy) {
     propfile.withInputStream {
         stream -> props.load(stream)
     }
-    props.each() { k, v ->
+    boolean liveBuild = project.hasProperty('livebuild') && project.property('livebuild').toLowerCase().equals("true");
+    props.each() { String k, v ->
+        if (k.endsWith("MASTER") && liveBuild) {
+            k = k.substring(0,k.length()-6);
+        } else if (k.endsWith("RELEASE") && !liveBuild) {
+            k = k.substring(0,k.length()-7);
+        }
         ant.properties[k] = v
     }
-    ant.properties['ireallyneedajadexversion'] = version.toString()
-    if (project.hasProperty('noVersion') && project.property('noVersion')) {
-        ant.properties['jadexversion'] = ''
+    ant.properties['jadexversion'] = version.toString()
+    if (liveBuild) {
+        ant.properties['jadexversiontitle'] = ''
     } else {
-        ant.properties['jadexversion'] = version.toString()
+        ant.properties['jadexversiontitle'] = version.toString()
     }
     into project.buildDir.getCanonicalPath() + "${File.separator}mkdocs"
 //    outputs.upToDateWhen {false}

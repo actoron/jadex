@@ -39,7 +39,7 @@ public class MicroModel extends CacheableKernelModel
 	protected Map<String, Tuple3<FieldInfo, String, String>> resultinjections;
 	
 	/** The service injection targets. */
-	protected MultiCollection<String, Object> serviceinjections;
+	protected MultiCollection<String, ServiceInjectionInfo> serviceinjections;
 	
 	/** The feature injection targets. */
 	protected List<FieldInfo> featureinjections;
@@ -171,11 +171,23 @@ public class MicroModel extends CacheableKernelModel
 	 *  @param name The name.
 	 *  @param field The field. 
 	 */
-	public void addServiceInjection(String name, FieldInfo field)
+	public void addServiceInjection(String name, FieldInfo field, boolean lazy)
 	{
 		if(serviceinjections==null)
-			serviceinjections = new MultiCollection<String, Object>();
-		serviceinjections.add(name, field);
+			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
+		serviceinjections.add(name, new ServiceInjectionInfo(field, lazy));
+	}
+	
+	/**
+	 *  Add an injection method.
+	 *  @param name The name.
+	 *  @param method The method. 
+	 */
+	public void addServiceInjection(String name, MethodInfo method)
+	{
+		if(serviceinjections==null)
+			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
+		serviceinjections.add(name, new ServiceInjectionInfo(method, false));
 	}
 	
 	/**
@@ -183,21 +195,21 @@ public class MicroModel extends CacheableKernelModel
 	 *  @param name The name.
 	 *  @param method The method. 
 	 */
-	public void addServiceInjection(String name, MethodInfo method)
+	public void addServiceInjection(String name, MethodInfo method, boolean query)
 	{
 		if(serviceinjections==null)
-			serviceinjections = new MultiCollection<String, Object>();
-		serviceinjections.add(name, method);
+			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
+		serviceinjections.add(name, new ServiceInjectionInfo(method, query));
 	}
 	
 	/**
 	 *  Get the service injection fields.
 	 *  @return The field or method infos.
 	 */
-	public Object[] getServiceInjections(String name)
+	public ServiceInjectionInfo[] getServiceInjections(String name)
 	{
-		Collection<Object> col = serviceinjections==null? null: serviceinjections.get(name);
-		return col==null? new Object[0]: (Object[])col.toArray(new Object[col.size()]);
+		Collection<ServiceInjectionInfo> col = serviceinjections==null? null: serviceinjections.get(name);
+		return col==null? new ServiceInjectionInfo[0]: (ServiceInjectionInfo[])col.toArray(new ServiceInjectionInfo[col.size()]);
 	}
 	
 	/**
@@ -326,5 +338,115 @@ public class MicroModel extends CacheableKernelModel
 	public MethodInfo	getAgentMethod(Class<? extends Annotation> ann)
 	{
 		return agentmethods!=null ? agentmethods.get(ann) : null;
+	}
+	
+	/**
+	 *  Struct for injection info.
+	 */
+	public static class ServiceInjectionInfo
+	{
+		/** The fieldinfo. */
+		protected FieldInfo fieldInfo;
+		
+		/** The methodinfo. */
+		protected MethodInfo methodInfo;
+		
+		/** The lazy flag. */
+		protected boolean lazy;
+		
+		/** The query flag. */
+		protected boolean query;
+
+		/**
+		 *  Create a new injection info.
+		 */
+		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy)
+		{
+			this.fieldInfo = fieldInfo;
+			this.lazy = lazy;
+		}
+		
+		/**
+		 *  Create a new injection info.
+		 */
+		public ServiceInjectionInfo(MethodInfo methodInfo, boolean query)
+		{
+			this.methodInfo = methodInfo;
+			this.query = query;
+		}
+
+
+
+		/**
+		 *  Get the fieldInfo.
+		 *  @return the fieldInfo
+		 */
+		public FieldInfo getFieldInfo()
+		{
+			return fieldInfo;
+		}
+
+		/**
+		 *  Set the fieldInfo.
+		 *  @param fieldInfo The fieldInfo to set
+		 */
+		public void setFieldInfo(FieldInfo fieldInfo)
+		{
+			this.fieldInfo = fieldInfo;
+		}
+
+		/**
+		 *  Get the methodInfo.
+		 *  @return the methodInfo
+		 */
+		public MethodInfo getMethodInfo()
+		{
+			return methodInfo;
+		}
+
+		/**
+		 *  Set the methodInfo.
+		 *  @param methodInfo The methodInfo to set
+		 */
+		public void setMethodInfo(MethodInfo methodInfo)
+		{
+			this.methodInfo = methodInfo;
+		}
+
+		/**
+		 *  Get the lazy.
+		 *  @return the lazy
+		 */
+		public boolean isLazy()
+		{
+			return lazy;
+		}
+
+		/**
+		 *  Set the lazy.
+		 *  @param lazy The lazy to set
+		 */
+		public void setLazy(boolean lazy)
+		{
+			this.lazy = lazy;
+		}
+
+		/**
+		 *  Get the query.
+		 *  @return the query
+		 */
+		public boolean isQuery()
+		{
+			return query;
+		}
+
+		/**
+		 *  Set the query.
+		 *  @param query The query to set
+		 */
+		public void setQuery(boolean query)
+		{
+			this.query = query;
+		}
 	}
 }

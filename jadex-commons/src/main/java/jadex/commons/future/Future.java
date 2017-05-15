@@ -79,7 +79,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	protected Exception exception;
 	
 	/** Flag indicating if result is available. */
-	protected boolean resultavailable;
+	protected volatile boolean resultavailable;
 	
 	/** The blocked callers (caller->state). */
 	protected Map<ISuspendable, String> callers;
@@ -148,7 +148,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      *  Test if done, i.e. result is available.
      *  @return True, if done.
      */
-    public synchronized boolean isDone()
+    public boolean isDone()
     {
     	return resultavailable;
     }
@@ -188,6 +188,17 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		//return get(UNSET); 
 		return get(NONE); 
 	}
+	
+	/**
+	 *  Get the result - blocking call.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+	 *  @return The future result.
+	 */
+	public E get(boolean realtime)
+	{
+		return get(NONE); 
+	}
+
 
 	/**
 	 *  Get the result - blocking call.
@@ -195,6 +206,20 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 *  @return The future result.
 	 */
 	public E get(long timeout)
+	{
+		// Default for realtime is false because normally waits should
+		// use the kind of wait of the internal clock. Outbound calls 
+		// might use explicitly realtime to avoid immediate simulation timeouts.
+		return get(timeout, false);
+	}
+	
+	/**
+	 *  Get the result - blocking call.
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
+	 *  @return The future result.
+	 */
+	public E get(long timeout, boolean realtime)
 	{
     	boolean suspend = false;
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
@@ -234,7 +259,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	    	   	callers.put(caller, CALLER_SUSPENDED);
     	    	   	try
     	    	   	{
-    	    	   		caller.suspend(this, timeout);
+    	    	   		caller.suspend(this, timeout, realtime);
     	    	   	}
     	    	   	finally
     	    	   	{

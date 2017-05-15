@@ -31,8 +31,9 @@ public interface IInternalExecutionFeature
 	/**
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.
+	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
 	 */
-	public void	block(final Object monitor, long timeout);
+	public void	block(final Object monitor, long timeout, boolean realtime);
 	
 	/**
 	 *  Unblock the thread waiting for the given monitor

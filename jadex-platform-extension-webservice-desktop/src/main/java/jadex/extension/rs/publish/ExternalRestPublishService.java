@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.SpringLayout.Constraints;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -14,6 +15,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -22,11 +24,35 @@ import jadex.commons.future.IFuture;
 
 /**
  *  Rest publish service that works with an external web server.
+ *  
+ *  In case of an external web server the host:port/context part of requests
+ *  are determined by the server.
+ *  
+ *  // todo: should store the published servers using hostname and port
+ *  // currently can get confused if mixed published ids are used (with and without [])
+ *  // leads to problems because different ports are used then for different handlers
+ *  // and the default handler (at port 0) is not found for a request coming on another port such as 8080
  */
 @Service
 public class ExternalRestPublishService extends AbstractRestPublishService implements IRequestHandlerService
 {
-	/** The servers per service id. */
+	// The default address is used to abstract from the concrete deployment address and context
+	// If services are published using brackets [] in the publish id, the external rest
+	// publish service will replace this first part using the default address
+	
+	/** The default host name. */
+	public static final String DEFAULT_HOST = "DEFAULTHOST";
+	
+	/** The default port. */
+	public static final int DEFAULT_PORT = 0;
+	
+	/** The default app name. */
+	public static final String DEFAULT_APP = "DEFAULTAPP";
+	
+	/** The default hostportappcontext. */
+	public static final String DEFAULT_COMPLETECONTEXT = "http://"+DEFAULT_HOST+":"+DEFAULT_PORT+"/"+DEFAULT_APP+"/";
+	
+	/** The servers per service id (for unpublishing). */
 	protected Map<IServiceIdentifier, Tuple2<PathHandler, URI>> sidservers;
 	
 	/** The servers per port. */
@@ -71,6 +97,11 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		if(portservers!=null)
 		{
 			PathHandler ph = portservers.get(Integer.valueOf(request.getLocalPort()));
+
+			// If tolerant mode (todo) use default server (one might not know the hostname port before deployment)
+			if(ph==null)
+				ph = portservers.get(0);
+			
 			if(ph!=null)
 			{
 				try
@@ -142,28 +173,55 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	 *  @param service The original service.
 	 *  @param pid The publish id (e.g. url or name).
 	 */
-	public IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info)
+	public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
 	{
 	    try
 	    {
-	        final URI uri = new URI(info.getPublishId());
-	        System.out.println("Adding http handler to server: "+uri.getPath());
+//	    	final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+	    	
+	    	String infopid = info.getPublishId();
+	    	if(infopid.endsWith("/"))
+	    		infopid = infopid.substring(0, infopid.length()-1);
+	    	
+	    	// If tolerant url notation cut off first part till real publish part
+	    	URI uri = new URI(infopid.replace("[", "").replace("]", ""));
+	    	
+	    	String pid = infopid;
+	    	if(pid.startsWith("["))
+	    	{
+	    		pid = pid.substring(pid.indexOf("]")+1);
+	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
+//	    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+	    	}
+	    	
+	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
+	        
 	        PathHandler ph = (PathHandler)getHttpServer(uri, info);
 	        
-	        final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
+	        final MultiCollection<String, MappingInfo> mappings = evaluateMapping(serviceid, info);
 	
 	        IRequestHandler rh = new IRequestHandler()
 			{
+	        	protected IService service = null;
+	        	
 				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 				{
+					if(service == null)
+						service = (IService) SServiceProvider.getService(component, serviceid).get();
 					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
 				}
 			};
+			if(ph.containsSubhandlerForExactUri(null, uri.getPath()))
+			{
+//				System.out.println("The URL "+uri.getPath() + " is already published, unpublishing...");
+				component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
+				ph.removeSubhandler(null, uri.getPath());
+			}
 			ph.addSubhandler(null, uri.getPath(), rh);
 	        
 	        if(sidservers==null)
 	            sidservers = new HashMap<IServiceIdentifier, Tuple2<PathHandler, URI>>();
-	        sidservers.put(service.getServiceIdentifier(), new Tuple2<PathHandler, URI>(ph, uri));
+	        sidservers.put(serviceid, new Tuple2<PathHandler, URI>(ph, uri));
 	    }
 	    catch(Exception e)
 	    {
@@ -217,7 +275,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		Tuple2<PathHandler, URI> tup = sidservers.get(sid);
 		if(tup!=null)
 		{
-			tup.getFirstEntity().removeSubhandler(null, tup.getSecondEntity().toString());
+			tup.getFirstEntity().removeSubhandler(null, tup.getSecondEntity().getPath());
 		}
 		return IFuture.DONE;
 	}
@@ -225,9 +283,46 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	/**
 	 *  Publish a static page (without ressources).
 	 */
-	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
+	public IFuture<Void> publishHMTLPage(String pid, String vhost, final String html)
 	{
-	    throw new UnsupportedOperationException();
+		try
+	    {
+			URI uri = null;
+	    	if(pid.startsWith("["))
+	    	{
+	    		pid = pid.substring(pid.indexOf("]")+1);
+	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
+//		    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+	    	}
+	    	else
+	    	{
+	    		uri = new URI(pid);
+	    	}
+	    	
+	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
+	        
+	        PathHandler ph = (PathHandler)getHttpServer(uri, null);
+	        
+	        IRequestHandler rh = new IRequestHandler()
+			{
+				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
+				{
+					response.getWriter().write(html);
+				}
+			};
+			if(ph.containsSubhandlerForExactUri(null, uri.getPath()))
+			{
+				component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
+				ph.removeSubhandler(null, uri.getPath());
+			}
+			ph.addSubhandler(null, uri.getPath(), rh);
+	    }
+	    catch(Exception e)
+	    {
+	        throw new RuntimeException(e);
+	    }
+	    
+	    return IFuture.DONE;
 	}
 	
 	/**
@@ -267,6 +362,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	}
 	
 	/**
+	 *  Produce overview site of published services.
 	 */
 	public String getServicesInfo(HttpServletRequest request, PathHandler ph)
 	{
@@ -307,8 +403,11 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 			for(Tuple2<String, String> key: subhandlers.keySet())
 			{
 				ret.append("<div class=\"method\">");
-				ret.append("Host: ").append(key.getFirstEntity()!=null? key.getFirstEntity(): "-").append(" Path: ").append(key.getSecondEntity()).append("<br/>");
-				String url = getServletHost(request)+key.getSecondEntity();
+				String path = key.getSecondEntity();
+				if(path.startsWith("/"+DEFAULT_APP))
+					path = path.replaceFirst("/"+DEFAULT_APP, request.getContextPath());
+				String url = getServletHost(request) + path;
+				ret.append("Host: ").append(key.getFirstEntity()!=null? key.getFirstEntity(): "-").append(" Path: ").append(path).append("<br/>");
 				ret.append("<a href=\"").append(url).append("\">").append(url).append("</a>");
 				ret.append("</div>");
 			}

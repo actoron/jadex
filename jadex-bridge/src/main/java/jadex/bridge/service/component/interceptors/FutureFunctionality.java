@@ -91,7 +91,7 @@ public class FutureFunctionality
 //		Thread.dumpStack();
 //		if(!undone && ! async)
 //		{
-//			throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+//			throw SUtil.throwUnchecked(e);
 //		}
 	}
 	
@@ -344,7 +344,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	}
 	
 	/**
-	 *  Overwritten to change result, if necessary.
+	 *  Overwritten to change result or undone, if necessary.
 	 */
 	@Override
 	protected boolean	doSetResult(Collection<Object> result, boolean undone)
@@ -358,6 +358,15 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		{
 			return doSetException(e, func.isUndone(undone));
 		}		
+	}
+	
+	/**
+	 *  Overwritten to change undone, if necessary.
+	 */
+	@Override
+	protected boolean	doSetException(Exception exception, boolean undone)
+	{
+		return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
 	/**
@@ -519,6 +528,15 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		{
 			return doSetException(e, func.isUndone(undone));
 		}		
+	}
+	
+	/**
+	 *  Overwritten to change undone, if necessary.
+	 */
+	@Override
+	protected boolean	doSetException(Exception exception, boolean undone)
+	{
+		return DelegatingPullIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
 	/**
@@ -684,6 +702,15 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	}
 	
 	/**
+	 *  Overwritten to change undone, if necessary.
+	 */
+	@Override
+	protected boolean	doSetException(Exception exception, boolean undone)
+	{
+		return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
+	}
+	
+	/**
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
@@ -830,6 +857,15 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	}
 	
 	/**
+	 *  Overwritten to change undone, if necessary.
+	 */
+	@Override
+	protected boolean	doSetException(Exception exception, boolean undone)
+	{
+		return DelegatingTerminableIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
+	}
+	
+	/**
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
@@ -971,6 +1007,15 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	}
 	
 	/**
+	 *  Overwritten to change undone, if necessary.
+	 */
+	@Override
+	protected boolean	doSetException(Exception exception, boolean undone)
+	{
+		return DelegatingTerminableDelegationFuture.super.doSetException(exception, func.isUndone(undone));
+	}
+	
+	/**
 	 *  Notify the listener.
 	 */
 	@Override
@@ -1065,6 +1110,15 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		{
 			return doSetException(e, func.isUndone(undone));
 		}		
+	}
+	
+	/**
+	 *  Overwritten to change undone, if necessary.
+	 */
+	@Override
+	protected boolean	doSetException(Exception exception, boolean undone)
+	{
+		return DelegatingIntermediateFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
 	/**
@@ -1167,6 +1221,15 @@ class DelegatingFuture extends Future<Object>
 	}
 	
 	/**
+	 *  Overwritten to change undone, if necessary.
+	 */
+	@Override
+	protected boolean	doSetException(Exception exception, boolean undone)
+	{
+		return DelegatingFuture.super.doSetException(exception, func.isUndone(undone));
+	}
+	
+	/**
 	 *  Notify the listener.
 	 */
 	@Override
@@ -1237,6 +1300,15 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		{
 			return doSetException(e, func.isUndone(undone));
 		}		
+	}
+	
+	/**
+	 *  Overwritten to change undone, if necessary.
+	 */
+	@Override
+	protected boolean	doSetException(Exception exception, boolean undone)
+	{
+		return DelegatingTupleFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
 	/**

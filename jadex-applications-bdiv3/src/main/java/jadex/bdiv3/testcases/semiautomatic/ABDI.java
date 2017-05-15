@@ -93,8 +93,14 @@ public class ABDI extends AABDI
 		
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
 		
-		fut1.get();
-		fut2.get();
+		try
+		{
+			fut1.get();
+			fut2.get();
+		}
+		catch (Exception e)
+		{
+		}
 		
 		return IFuture.DONE;
 	}

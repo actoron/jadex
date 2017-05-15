@@ -51,10 +51,11 @@ public class JsonToStringProcessor implements ITraverseProcessor
 				wr.addObject(wr.getCurrentInputObject());
 			
 			// Allow write boolean directly without class
-			if(!wr.isWriteClass() || object instanceof Boolean)// && !wr.isWriteId())
+			if(!wr.isWriteClass() || object instanceof Boolean || SReflect.isBasicType(SReflect.getClass(type)))// && !wr.isWriteId())
 			{
 				if(object instanceof Number
-					|| object instanceof Boolean)
+					|| object instanceof Boolean
+					|| SReflect.isBasicType(SReflect.getClass(type)))
 				{
 					wr.write(object.toString());
 				}

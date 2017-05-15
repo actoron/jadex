@@ -22,6 +22,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.message.IMessageService;
@@ -359,22 +361,21 @@ public class HttpRelayTransport implements ITransport
 							{
 								public void resultAvailable(Void result)
 								{
-									SServiceProvider.getService(ia, IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
-										.addResultListener(new IResultListener<IRelayAwarenessService>()
+									ServiceQuery<IRelayAwarenessService> query = new ServiceQuery<IRelayAwarenessService>(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM, null, ia.getComponentIdentifier());
+									IRelayAwarenessService ras	= ServiceRegistry.getRegistry(ia).searchService(query, true);
+//									IRelayAwarenessService ras	= SynchronizedServiceRegistry.getRegistry(ia)
+//										.searchService(new ClassInfo(IRelayAwarenessService.class), ia.getComponentIdentifier(), Binding.SCOPE_PLATFORM, true);
+									if(ras!=null)
 									{
-										public void resultAvailable(IRelayAwarenessService ras)
-										{
-											if(dead)
-												ras.disconnected(address);
-											else
-												ras.connected(address);
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											// No awa service -> ignore awa infos.
-										}
-									});
+										if(dead)
+											ras.disconnected(address);
+										else
+											ras.connected(address);
+									}
+									else
+									{
+										ia.getLogger().info("Relay transport connected. No relay discovery service found.");
+									}
 								}
 								
 								public void exceptionOccurred(Exception exception)

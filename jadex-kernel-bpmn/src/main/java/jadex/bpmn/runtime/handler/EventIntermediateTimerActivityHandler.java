@@ -51,6 +51,12 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 							// ignore outdated timers, e.g. when process was terminated with fatal error.
 						}
 					}
+					
+					@Override
+					public String toString()
+					{
+						return "Timer event for "+thread;
+					}
 				};
 				
 				ITimer timer; 

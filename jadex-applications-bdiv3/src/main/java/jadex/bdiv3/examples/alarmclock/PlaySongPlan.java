@@ -54,35 +54,40 @@ public class PlaySongPlan
 			public void run()
 			{
 				InputStream in = null;
-				try
-				{
-					in = new BufferedInputStream(song.openStream());
-				}
-				catch(Exception e)
+				if (song == null)
+					fut.setException(new IllegalArgumentException("No song specified."));
+				else
 				{
 					try
 					{
-						in = SUtil.getResource(song.getPath(), cl);
-					}
-					catch(Exception ex)
-					{
-						fut.setException(e);
-					}
-				}
-					
-				if(in!=null)
-				{
-					try
-					{
-						AudioDevice dev = FactoryRegistry.systemRegistry().createAudioDevice();
-						player = new Player(in, dev);
-						player.play();
-						fut.setResultIfUndone(null);	// Already set by interpreter, when plan aborted while waiting.
+						in = new BufferedInputStream(song.openStream());
 					}
 					catch(Exception e)
 					{
-//						e.printStackTrace();
-						fut.setExceptionIfUndone(e);	// Already set by interpreter, when plan aborted while waiting.
+						try
+						{
+							in = SUtil.getResource(song.getPath(), cl);
+						}
+						catch(Exception ex)
+						{
+							fut.setException(e);
+						}
+					}
+						
+					if(in!=null)
+					{
+						try
+						{
+							AudioDevice dev = FactoryRegistry.systemRegistry().createAudioDevice();
+							player = new Player(in, dev);
+							player.play();
+							fut.setResultIfUndone(null);	// Already set by interpreter, when plan aborted while waiting.
+						}
+						catch(Exception e)
+						{
+	//						e.printStackTrace();
+							fut.setExceptionIfUndone(e);	// Already set by interpreter, when plan aborted while waiting.
+						}
 					}
 				}
 			}

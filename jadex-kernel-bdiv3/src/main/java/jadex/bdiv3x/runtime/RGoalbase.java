@@ -86,7 +86,7 @@ public class RGoalbase extends RElement implements IGoalbase
 	public IGoal createGoal(String type)
 	{
 		MGoal mgoal = getCapability().getMCapability().getResolvedGoal(scope, type);
-		return new RGoal(getAgent(), mgoal, null, null, null, null);
+		return new RGoal(getAgent(), mgoal, null, null, null, null, null);
 	}
 
 	/**

@@ -250,7 +250,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Decode a message envelope.
 	 */
-	protected static MessageEnvelope decodeMessageEnvelope(byte[] rawmsg, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader cl, IErrorReporter rep)
+	public static MessageEnvelope decodeMessageEnvelope(byte[] rawmsg, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader cl, IErrorReporter rep)
 	{
 //		synchronized(lock)
 //		{
@@ -284,7 +284,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Decode a message.
 	 */
-	protected static Object decodeMessage(MessageEnvelope envelope, ITraverseProcessor[] postprocessors, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader cl, IErrorReporter rep)
+	public static Object decodeMessage(MessageEnvelope envelope, ITraverseProcessor[] postprocessors, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader cl, IErrorReporter rep)
 	{
 		Object ret = null;
 		try

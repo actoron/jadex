@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -36,6 +37,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonValue;
+
 //import org.objectweb.asm.ClassReader;
 //import org.objectweb.asm.Type;
 //import org.objectweb.asm.tree.ClassNode;
@@ -58,8 +63,8 @@ import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.ILeaseTimeCollection;
-import jadex.commons.collection.LeaseTimeCollection;
+import jadex.commons.collection.ILeaseTimeSet;
+import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -67,7 +72,10 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -76,6 +84,7 @@ import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -140,19 +149,31 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			public String convertObject(Object val, Object context)
 			{
-				System.out.println("write response in json");
-                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader());
+//				System.out.println("write response in json");
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null);
 				return new String(data);
 			}
 		};
 		converters.add(MediaType.APPLICATION_JSON, jsonc);
 		converters.add("*/*", jsonc);
 		
+		IObjectStringConverter jjsonc = new IObjectStringConverter()
+		{
+			public String convertObject(Object val, Object context)
+			{
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null);
+				return new String(data);
+			}
+		};
+		converters.add(STransformation.MediaType.APPLICATION_JSON_JADEX, jjsonc);
+		converters.add("*/*", jjsonc);
+		
 		IObjectStringConverter xmlc = new IObjectStringConverter()
 		{
 			public String convertObject(Object val, Object context)
 			{
-				System.out.println("write response in xml");
+//				System.out.println("write response in xml");
+				
 				byte[] data = JavaWriter.objectToByteArray(val, component.getClassLoader());
 				return new String(data);
 			}
@@ -178,7 +199,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         {
         	public java.util.Collection<AsyncContext> createCollection(final String callid) 
         	{
-        		return LeaseTimeCollection.createLeaseTimeCollection(to, new ICommand<AsyncContext>()
+        		return LeaseTimeSet.createLeaseTimeCollection(to, new ICommand<AsyncContext>()
     			{
         			public void execute(AsyncContext ctx)
         			{
@@ -229,7 +250,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     }
 
     /**
-     * 
+     *  Handle a web request.
      */
     public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {
@@ -403,7 +424,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     		public void exceptionOccurred(Exception exception)
                     		{
                     			Object result = mapResult(method, exception);
-                    			writeResponse(exception, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
+                    			writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
 //                    			ctx.complete();
                     		}
 						});
@@ -444,7 +465,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      *  @param service The original service.
      *  @param pid The publish id (e.g. url or name).
      */
-    public abstract IFuture<Void> publishService(ClassLoader cl, final IService service, final PublishInfo info);
+    public abstract IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info);
 
 //    /**
 //     * 
@@ -476,7 +497,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     /**
      *  Publish a static page (without ressources).
      */
-    public abstract IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
+    public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
 
     /**
      *  Publish file resources from the classpath.
@@ -565,8 +586,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	
 //	        if(sr.size()>0)
 //	            System.out.println("found acceptable in types: "+sr);
-	        if(sr.size()==0)
-	            System.out.println("found no acceptable in types.");
+//	        if(sr.size()==0)
+//	            System.out.println("found no acceptable in types.");
 	        
 	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: new Object[inparamsmap.size()];
 	        
@@ -583,7 +604,49 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        for(int i=0; i<inparams.length; i++)
 	        {
 	        	if(inparams[i] instanceof String)
-	        		inparams[i] = convertParameter(sr, (String)inparams[i]);
+	        		inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
+	        }
+	        
+	        String ct = request.getHeader("Content-Type");
+	        if (ct == null)
+	        	ct = request.getHeader("Accept");
+	        if ((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
+	        {
+	        	try
+	        	{
+	        		byte[] jsonbytes = SUtil.readStream(request.getInputStream());
+	        		
+	        		String json = new String(jsonbytes, SUtil.UTF8);
+	        		if (types.length == 1 && json.trim().startsWith("{"))
+	        		{
+	        			List<ITraverseProcessor> procs = null;
+	        			if (SReflect.isSupertype(Map.class, types[0]))
+		        			procs = JsonTraverser.nestedreadprocs;
+	        			inparams = new Object[] { JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], procs) };
+	        		}
+	        		else if (types.length == 1 && json.trim().startsWith("\""))
+	        		{
+	        			inparams = new Object[] { JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], null) };
+	        		}
+	        		else
+	        		{
+	        			JsonArray array = (JsonArray) Json.parse(json);
+	        			inparams = new Object[array.size()];
+	        			for(int i=0; i<array.size(); i++)
+	        			{
+	        				List<ITraverseProcessor> procs = null;
+		        			if (SReflect.isSupertype(Map.class, types[i]))
+			        			procs = JsonTraverser.nestedreadprocs;
+	        				JsonValue val = array.get(i);
+	        				inparams[i] = JsonTraverser.objectFromString(val.toString(), component.getClassLoader(), null, types[i], procs);
+	        			}
+	        			
+	        		}
+	        	}
+	        	catch (Exception e)
+	        	{
+	        		e.printStackTrace();
+	        	}
 	        }
 	 
 	        if(method.isAnnotationPresent(ParametersMapper.class))
@@ -681,7 +744,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      *  @param val The string value.
      *  @return The decoded object.
      */
-    protected Object convertParameter(List<String> sr, String val)
+    protected Object convertParameter(List<String> sr, String val, Class<?> targetclazz)
     {
     	Object ret = val;
         boolean done = false;
@@ -690,7 +753,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         {
         	try
         	{
-        		ret = JsonTraverser.objectFromByteArray(val.getBytes(), component.getClassLoader(), (IErrorReporter)null);
+        		ret = JsonTraverser.objectFromByteArray(val.getBytes(SUtil.UTF8), component.getClassLoader(), (IErrorReporter)null, null, targetclazz);
+//        		ret = JsonTraverser.objectFromByteArray(val.getBytes(), component.getClassLoader(), (IErrorReporter)null);
         		done = true;
         	}
         	catch(Exception e)
@@ -828,14 +892,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 sr.retainAll(cl);
             }
 
-            if(sr.size()==0)
+/*            if(sr.size()==0)
             {
                 System.out.println("found no acceptable return types.");
             }
             else
             {
             	System.out.println("acceptable return types: "+sr+" ("+cl+")");
-            }
+            }*/
             
             if(callid!=null)
             {
@@ -873,15 +937,19 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        {
 	        	String ret = null;
 	        	String mt = null;
-	        	for(String mediatype: sr)
+	        	if (sr != null)
 	        	{
-	        		mt = mediatype;
-	        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
-	        		if(convs!=null && convs.size()>0)
-	        		{
-	        			ret = convs.iterator().next().convertObject(result, null);
-	        			break;
-	        		}
+		        	for(String mediatype: sr)
+		        	{
+		        		mt = mediatype;
+		        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
+		        		if(convs!=null && convs.size()>0)
+		        		{	
+		        			Object input = result instanceof Response? ((Response) result).getEntity() : result;
+		        			ret = convs.iterator().next().convertObject(input, null);
+		        			break;
+		        		}
+		        	}
 	        	}
 	        	
 	        	if(mt!=null)
@@ -976,7 +1044,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		if(to>0)
 		{
 //			System.out.println("req timeout is: "+to);
-			((ILeaseTimeCollection<AsyncContext>)requestspercall.getCollection(callid)).touch(ctx, to);
+			((ILeaseTimeSet<AsyncContext>)requestspercall.getCollection(callid)).touch(ctx, to);
 		}
 		else
 		{
@@ -1248,6 +1316,25 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						produced = PARAMETER_MEDIATYPES;
 					
 					Class<?>[] ptypes = method.getParameterTypes();
+					String[]	pnames	= new String[ptypes.length];
+					java.lang.annotation.Annotation[][]	pannos	= method.getParameterAnnotations();
+					
+					// Find parameter names
+					for(int p=0; p<ptypes.length; p++)
+					{
+						for(int a=0; a<pannos[p].length; a++)
+						{
+							if(pannos[p][a] instanceof ParameterInfo)
+							{
+								pnames[p]	= ((ParameterInfo)pannos[p][a]).value();
+							}
+						}
+						
+						if(pnames[p]==null)
+						{
+							pnames[p]	= "arg"+p;
+						}
+					}
 					
 					ret.append("<div class=\"method\">");
 					ret.append("\n");
@@ -1263,6 +1350,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						for(int j=0; j<ptypes.length; j++)
 						{
 							ret.append(SReflect.getUnqualifiedClassName(ptypes[j]));
+							ret.append(" ");
+							ret.append(pnames[j]);
 							if(j+1<ptypes.length)
 								ret.append(", ");
 						}
@@ -1344,8 +1433,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						
 						for(int j=0; j<ptypes.length; j++)
 						{
-							ret.append("arg").append(j).append(": ");
-							ret.append("<input name=\"arg").append(j).append("\" type=\"text\" />");
+							ret.append(pnames[j]).append(": ");
+							ret.append("<input name=\"").append(pnames[j]).append("\" type=\"text\" />");
 //							.append(" accept=\"").append(cons[0]).append("\" />");
 						}
 						
@@ -1930,6 +2019,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the cleaned publish id. Square brackets for the 
+	 *  optional host and context part are removed.
+	 */
+	public String getCleanPublishId(String id)
+	{
+		return id!=null? id.replace("[", "").replace("]", ""): null;
 	}
 }
 

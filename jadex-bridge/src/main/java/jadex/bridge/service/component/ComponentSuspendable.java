@@ -48,8 +48,9 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 	 *  Suspend the execution of the suspendable.
 	 *  @param future	The future to wait for.
 	 *  @param timeout The timeout.
+	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
 	 */
-	public void suspend(Future<?> future, long timeout)
+	public void suspend(Future<?> future, long timeout, boolean realtime)
 	{
 //		System.out.println("ComponentSuspendable.suspend "+Thread.currentThread());
 		
@@ -64,7 +65,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 			{
 				COMSUPS.set(this);
 				((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
-					.block(this, timeout);
+					.block(this, timeout, realtime);
 			}
 //			catch(Error e)
 //			{

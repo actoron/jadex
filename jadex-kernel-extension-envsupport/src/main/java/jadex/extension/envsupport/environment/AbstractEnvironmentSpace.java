@@ -1712,12 +1712,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									desc.setName(cid);
 									desc.setLocalType(compotype);
 									setOwner(ret.getId(), desc);
+//									System.out.println("env create: "+cid);
 									IFuture	future	= cms.createComponent(cid.getLocalName(), filename,
 										new CreationInfo(null, null, getExternalAccess().getComponentIdentifier(), false, getExternalAccess().getModel().getAllImports()), null);
 									future.addResultListener(new IResultListener()
 									{
 										public void resultAvailable(Object result)
 										{
+//											System.out.println("env created: "+result);
 //											setOwner(ret.getId(), (IComponentIdentifier)result);
 										}
 										
@@ -2091,12 +2093,12 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		String	componenttype = comp.getLocalType();
 		synchronized(monitor)
 		{
-//					if(!percepttypes.containsKey(typename))
-//						throw new RuntimeException("Unknown percept type: "+typename);
+//			if(!percepttypes.containsKey(typename))
+//				throw new RuntimeException("Unknown percept type: "+typename);
 			
-//					System.out.println("New percept: "+typename+", "+data+", "+component);
+//			System.out.println("New percept: "+typename+", "+data+", "+comp.getName());
 			
-//					String	componenttype = ia.getComponentType(cid);
+//			String	componenttype = ia.getComponentType(cid);
 			List procs	= (List)perceptprocessors.get(componenttype);
 			IPerceptProcessor proc = null;
 			if(procs!=null)

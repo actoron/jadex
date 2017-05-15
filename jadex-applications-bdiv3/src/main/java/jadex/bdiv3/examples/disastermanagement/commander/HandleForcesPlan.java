@@ -11,6 +11,7 @@ import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescueForce;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.IService;
@@ -45,6 +46,9 @@ public abstract class HandleForcesPlan
 		while(true)
 		{
 			final ISpaceObject disaster = goal.getDisaster();
+			
+//			disaster.setProperty("active", true);
+			
 			IIntermediateFuture<IService> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(servicename);
 			Collection<IService> forces = (Collection<IService>)fut.get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
@@ -67,18 +71,21 @@ public abstract class HandleForcesPlan
 						goal.getUnits().add(force);
 					
 						SendRescueForce sendforce = capa.new SendRescueForce(disaster, force);
+//						System.out.println("sendforce: "+capa.getBusyEntities().size()+" "+force);
 						rplan.dispatchSubgoal(sendforce).addResultListener(new IResultListener<Object>()
 						{
 							public void resultAvailable(Object result)
 							{
 								goal.getUnits().remove(force);
 								capa.getBusyEntities().remove(provid);
+//								System.out.println("sendforce end ok: "+capa.getBusyEntities().size()+" "+force);
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
 								goal.getUnits().remove(force);
 								capa.getBusyEntities().remove(provid);
+//								System.out.println("sendforce end ex: "+capa.getBusyEntities().size()+" "+force+" "+exception);
 							}
 						});
 					}
@@ -86,6 +93,7 @@ public abstract class HandleForcesPlan
 			}
 			
 //			System.out.println("hf: "+disaster.getId()+" "+number+" "+getParameterSet("units").getValues().length+" "+as+" "+busy.size()+" "+SUtil.arrayToString(busy.getFacts()));
+//			System.out.println("hf: "+capa.getBusyEntities().size()+" "+disaster.getId()+" "+capa.getBusyEntities());
 			
 //			waitForFactRemoved("busy_entities");
 			rplan.waitFor(1000).get();
@@ -96,6 +104,8 @@ public abstract class HandleForcesPlan
 	@PlanFailed
 	public void failure(Exception e)
 	{
+//		goal.getDisaster().setProperty("active", false);
+
 //		System.out.println("aborted: "+this+" "+goal.getDisaster());
 //		e.printStackTrace();
 	}

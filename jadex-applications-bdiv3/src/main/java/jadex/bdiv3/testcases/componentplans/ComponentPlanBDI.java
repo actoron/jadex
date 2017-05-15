@@ -11,12 +11,10 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Result;
-import jadex.micro.annotation.Results;
+import jadex.micro.annotation.AgentResult;
 
 /**
  *  BDI agent that executes a subcomponent as plan
@@ -24,7 +22,7 @@ import jadex.micro.annotation.Results;
 @Agent(keepalive=Boolean3.FALSE)
 @Plans(@Plan(trigger=@Trigger(goals=ComponentPlanBDI.AchieveSuccess.class),
 	body=@Body(ComponentPlanAgent.class)))
-@Results(@Result(name="testresults", clazz=Testcase.class))
+//@Results(@Result(name="testresults", clazz=Testcase.class))
 public class ComponentPlanBDI
 {
 	//-------- attributes --------
@@ -32,6 +30,9 @@ public class ComponentPlanBDI
 	/** The success belief. */
 	@Belief
 	protected boolean	success;
+	
+	@AgentResult
+	protected Testcase	testresults;
 	
 	//-------- methods --------
 	
@@ -60,7 +61,7 @@ public class ComponentPlanBDI
 			tr.setFailed(e);
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		testresults	= new Testcase(1, new TestReport[]{tr});
 	}
 	
 	//-------- goals --------

@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IParameterElement;
 
 
@@ -12,7 +13,7 @@ public interface IInternalPlan extends IParameterElement
 	 *  Get the candidate.
 	 *  @return The candidate.
 	 */
-	public Object getCandidate();
+	public ICandidateInfo getCandidate();
 	
 	/**
 	 *  Test if plan has passed.

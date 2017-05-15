@@ -54,7 +54,7 @@ public @interface Goal
 	public boolean randomselection() default false;
 	
 	/**
-	 *  Rebuild the APL on each 
+	 *  Rebuild the APL on each retry;
 	 */
 	public boolean rebuild() default false;
 	

@@ -22,6 +22,7 @@ import jadex.extension.envsupport.math.Vector1Int;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 
 /**
  *  The firefly agent.
@@ -35,14 +36,14 @@ public class FireflyAgent
 	
 	//-------- methods --------
 
-//	/**
-//	 *  Init method.
-//	 */
-//	public IFuture agentCreated()
-//	{
-//		throw new RuntimeException();
-////		return super.agentCreated();
-//	}
+	/**
+	 *  Init method.
+	 */
+	@AgentCreated
+	public void agentCreated()
+	{
+		System.out.println("firefly created: "+agent.getComponentIdentifier());
+	}
 	
 	/**
 	 *  Execute an agent step.
@@ -50,6 +51,8 @@ public class FireflyAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
+		System.out.println("firefly body: "+agent.getComponentIdentifier());
+		
 		final Future<Void>	ret	= new Future<Void>();
 		
 		EnvironmentService.getSpace(agent, "mygc2dspace")

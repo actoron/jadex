@@ -18,6 +18,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.extension.rs.invoke.RSJAXAnnotationHelper;
@@ -42,7 +43,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	 *  @return The method infos.
 	 *  @throws Exception
 	 */
-	public List<RestMethodInfo> generateRestMethodInfos(IService service, ClassLoader classloader, 
+	public List<RestMethodInfo> generateRestMethodInfos(IServiceIdentifier serviceid, ClassLoader classloader, 
 		Class<?> baseclass, Map<String, Object> mapprops) throws Exception
 	{
 		List<RestMethodInfo> ret = new ArrayList<RestMethodInfo>();
@@ -51,7 +52,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 			((Boolean)mapprops.get(AbstractRestServicePublishService.GENERATE)).booleanValue(): true;
 		boolean geninfo = mapprops.get(AbstractRestServicePublishService.GENERATE_INFO)!=null? 
 			((Boolean)mapprops.get(AbstractRestServicePublishService.GENERATE_INFO)).booleanValue(): true;
-		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+		Class<?> iface = serviceid.getServiceType().getType(classloader);
 		
 		MediaType[] formats = AbstractRestServicePublishService.DEFAULT_FORMATS;
 		Object tmp = mapprops.get(AbstractRestServicePublishService.FORMATS);

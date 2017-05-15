@@ -66,22 +66,30 @@ public class RegistrySearchFunctionality
 		return provider.getQueries(type);
 	}
 	
+//	/**
+//	 *  Get services per type.
+//	 *  @param type The interface type. If type is null all services are returned.
+//	 *  @return First matching service or null.
+//	 */
+//	// read
+//	protected Iterator<IService> getServices(Class<?> type)
+//	{
+//		return getServices(type==null? null: new ClassInfo(type));
+//	}
+	
 	/**
-	 *  Get services per type.
-	 *  @param type The interface type. If type is null all services are returned.
-	 *  @return First matching service or null.
+	 *  Search for services.
 	 */
-	// read
-	protected Iterator<IService> getServices(Class<?> type)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
-		return getServices(type==null? null: new ClassInfo(type));
+		return searchService(type, cid, scope, false);
 	}
 	
 	/**
 	 *  Search for services.
 	 */
 	// read
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, boolean excluded)
 	{
 //		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
 //			System.out.println("search: "+type+" - "+cid);
@@ -93,7 +101,7 @@ public class RegistrySearchFunctionality
 			while(sers.hasNext())
 			{
 				IService ser = sers.next();
-				if(checkSearchScope(cid, ser, scope) && checkPublicationScope(cid, ser))
+				if(checkSearchScope(cid, ser, scope, excluded) && checkPublicationScope(cid, ser))
 				{
 //					if(ret!=null)
 //						System.out.println("found another: "+ser.getServiceIdentifier());
@@ -111,7 +119,7 @@ public class RegistrySearchFunctionality
 	 *  Search for services.
 	 */
 	// read
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope)
 	{
 		Set<T> ret = null;
 		Iterator<IService> sers = getServices(type);
@@ -121,7 +129,7 @@ public class RegistrySearchFunctionality
 			while(sers.hasNext())
 			{
 				IService ser = sers.next();
-				if(checkSearchScope(cid, ser, scope) && checkPublicationScope(cid, ser))
+				if(checkSearchScope(cid, ser, scope, false) && checkPublicationScope(cid, ser))
 				{
 					ret.add((T)ser);
 				}
@@ -135,12 +143,12 @@ public class RegistrySearchFunctionality
 	 *  Search for service.
 	 */
 	// read
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		T ret = null;
 		
-		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
-			System.out.println("search: "+type+" - "+cid);
+//		if(type!=null && type.getTypeName().indexOf("IRegistrySer")!=-1)
+//			System.out.println("search: "+type+" - "+cid);
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
@@ -148,17 +156,17 @@ public class RegistrySearchFunctionality
 			while(sers.hasNext())
 			{
 				T ser = sers.next();
-				if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+				if(checkSearchScope(cid, (IService)ser, scope, false) && checkPublicationScope(cid, (IService)ser))
 				{
 					try
 					{
 						if(filter==null || filter.filter(ser))
 						{
-							if(ret!=null)
-								System.out.println("found another: "+((IService)ser).getServiceIdentifier());
+//							if(ret!=null)
+//								System.out.println("found another: "+((IService)ser).getServiceIdentifier());
 							
 							ret = ser;
-							//break;
+							break;
 						}
 					}
 					catch(Exception e)
@@ -176,7 +184,7 @@ public class RegistrySearchFunctionality
 	 *  Search for service.
 	 */
 	// read
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter)
 	{
 		List<T> ret = new ArrayList<T>();
 		
@@ -189,7 +197,7 @@ public class RegistrySearchFunctionality
 			while(sers.hasNext())
 			{
 				T ser = sers.next();
-				if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+				if(checkSearchScope(cid, (IService)ser, scope, false) && checkPublicationScope(cid, (IService)ser))
 				{
 					try
 					{
@@ -213,11 +221,11 @@ public class RegistrySearchFunctionality
 	 *  Search for service.
 	 */
 	// read
-	public <T> IFuture<T> searchService(final Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<T> searchService(final ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 				
-//		if(type!=null && type.getName().indexOf("IRegistrySer")!=-1)
+//		if(type!=null && type.getTypeName().indexOf("IClient")!=-1)
 //			System.out.println("search: "+type+" - "+cid);
 		
 //		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
@@ -226,13 +234,13 @@ public class RegistrySearchFunctionality
 		Iterator<T> sers = (Iterator<T>)getServices(type);
 		if(sers!=null && sers.hasNext() && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
-			Collection<T> ssers = checkScope(sers, cid, scope, true);
+			Collection<T> ssers = checkScope(sers, cid, scope, false);
 			
 			checkAsyncFilters(filter, ssers.iterator()).addResultListener(new IIntermediateResultListener<T>()
 			{
 				public void intermediateResultAvailable(T result)
 				{
-					ret.setResult(result);
+					ret.setResultIfUndone(result);
 				}
 				
 				public void finished()
@@ -261,7 +269,7 @@ public class RegistrySearchFunctionality
 		}
 		else
 		{
-			ret.setException(new ServiceNotFoundException(type.getName()));
+			ret.setException(new ServiceNotFoundException(type.getTypeName()));
 		}
 		
 		return ret;
@@ -327,10 +335,8 @@ public class RegistrySearchFunctionality
 	 *  Search for services.
 	 */
 	// read
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
-		try
-		{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		Iterator<T> sers = (Iterator<T>)getServices(type);
@@ -348,12 +354,6 @@ public class RegistrySearchFunctionality
 			ret.setFinished();
 		}
 		return ret;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
 	}
 	
 //	/**
@@ -428,7 +428,7 @@ public class RegistrySearchFunctionality
 		while(it.hasNext())
 		{
 			final T ser = it.next();
-			if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+			if(checkSearchScope(cid, (IService)ser, scope, false) && checkPublicationScope(cid, (IService)ser))
 			{
 				ret.add(ser);
 				if(oneresult)
@@ -569,7 +569,7 @@ public class RegistrySearchFunctionality
 		IComponentIdentifier cid = queryinfo.getQuery().getOwner();
 		String scope = queryinfo.getQuery().getScope();
 		IAsyncFilter<IService> filter = (IAsyncFilter)queryinfo.getQuery().getFilter();
-		if(!checkSearchScope(cid, service, scope) || !checkPublicationScope(cid, service))
+		if(!checkSearchScope(cid, service, scope, false) || !checkPublicationScope(cid, service))
 		{
 			ret.setResult(Boolean.FALSE);
 		}
@@ -602,11 +602,11 @@ public class RegistrySearchFunctionality
 	/**
 	 *  Check if service is ok with respect to search scope of caller.
 	 */
-	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope)
+	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope, boolean excluded)
 	{
 		boolean ret = false;
 		
-		if(!provider.isIncluded(cid, ser))
+		if(!excluded && !provider.isIncluded(cid, ser))
 		{
 			return ret;
 		}

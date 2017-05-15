@@ -27,6 +27,8 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalProcessingState;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3x.runtime.ICandidateInfo;
+import jadex.bdiv3x.runtime.IElement;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
@@ -123,10 +125,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //	protected ICommand<Boolean> resumecommand;
 	
 	/** The blocking resume. */
-	protected ICommand<Tuple2<Boolean, Boolean>> resumecommand;
+	protected ICommand<ResumeCommandArgs> resumecommand;
 	
 	/** The non-blocking resumes. */
-	protected List<ICommand<Tuple2<Boolean, Boolean>>> resumecommands;
+	protected List<ICommand<ResumeCommandArgs>> resumecommands;
 	
 	/** The plan has exception attribute. */
 	protected Exception exception;
@@ -147,7 +149,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	protected IPlanBody body;
 	
 	/** The candidate from which this plan was created. Used for tried plans in proc elem. */
-	protected Object candidate;
+	protected ICandidateInfo candidate;
 	
 //	// hack?
 //	/** The internal access. */
@@ -171,7 +173,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  
 	 *  Reason is Object (not RProcessableElement) because it can be also ChangeEvent
 	 */
-	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia, Map<String, Object> binding, MConfigParameterElement config)
+	public static RPlan createRPlan(MPlan mplan, ICandidateInfo candidate, Object reason, IInternalAccess ia, Map<String, Object> binding, MConfigParameterElement config)
 	{
 		// Find parameter mappings for xml agents
 		Map<String, Object> mappingvals = binding;
@@ -232,9 +234,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		
 		IPlanBody body = null;
 
-		if(candidate.getClass().isAnnotationPresent(Plan.class))
+		if(candidate.getRawCandidate().getClass().isAnnotationPresent(Plan.class))
 		{
-			body = new ClassPlanBody(ia, rplan, candidate);
+			body = new ClassPlanBody(ia, rplan, candidate.getRawCandidate());
 		}
 		else if(mbody.getClazz()!=null && mbody.getServiceName()==null)
 		{
@@ -438,7 +440,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 *  Create a new plan.
 	 */
-	public RPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess agent, Map<String, Object> mappingvals, MConfigParameterElement config)
+	public RPlan(MPlan mplan, ICandidateInfo candidate, Object reason, IInternalAccess agent, Map<String, Object> mappingvals, MConfigParameterElement config)
 	{
 		super(mplan, agent, mappingvals, config);
 		this.candidate = candidate;
@@ -669,6 +671,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public void setException(Exception exception)
 	{
+//		System.out.println("setting ex: "+exception+" "+this);
 		this.exception = exception;
 	}
 	
@@ -694,7 +697,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  Get the candidate.
 	 *  @return The candidate.
 	 */
-	public Object getCandidate()
+	public ICandidateInfo getCandidate()
 	{
 		return candidate;
 	}
@@ -703,7 +706,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  Set the candidate.
 	 *  @param candidate The candidate to set.
 	 */
-	public void setCandidate(Object candidate)
+	public void setCandidate(ICandidateInfo candidate)
 	{
 		this.candidate = candidate;
 	}
@@ -841,6 +844,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void setFinishing()
 	{
 		assert finished==null;
+		assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		finished	= new Future<Void>();
 	}
 	
@@ -897,7 +901,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			if(!isFinished())
 			{
 	//			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
-				setException(new PlanAbortedException()); // todo: BodyAborted
+				Exception ex = new PlanAbortedException();
+				setException(ex); // remove? // todo: BodyAborted
 				
 				if(subgoals!=null)
 				{
@@ -925,20 +930,20 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							// the commands are to continue all listeners on hold
 							// This is not completely clean because the agent does not wait for these threads
 					
-							ICommand<Tuple2<Boolean, Boolean>> resc = getResumeCommand();
+							ICommand<ResumeCommandArgs> resc = getResumeCommand();
 							if(resc!=null)
 							{
 //								System.out.println("aborting5: "+this+", "+resc);
-								resc.execute(null);
+								resc.execute(new ResumeCommandArgs(null, null, ex));
 							}
-							List<ICommand<Tuple2<Boolean, Boolean>>> rescoms = getResumeCommands();
+							List<ICommand<ResumeCommandArgs>> rescoms = getResumeCommands();
 							if(rescoms!=null)
 							{
-								ICommand<Tuple2<Boolean, Boolean>>[] tmp = (ICommand<Tuple2<Boolean, Boolean>>[])rescoms.toArray(new ICommand[rescoms.size()]);
+								ICommand<ResumeCommandArgs>[] tmp = (ICommand<ResumeCommandArgs>[])rescoms.toArray(new ICommand[rescoms.size()]);
 //								System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
-								for(ICommand<Tuple2<Boolean, Boolean>> rescom: tmp)
+								for(ICommand<ResumeCommandArgs> rescom: tmp)
 								{
-									rescom.execute(null);
+									rescom.execute(new ResumeCommandArgs(null, null, ex));
 								}
 							}
 	//					}
@@ -1136,7 +1141,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getAgent(), mgoal, goal, null, null, null);
+		final RGoal rgoal = new RGoal(getAgent(), mgoal, goal, null, null, null, null);
 		rgoal.setParent(this);
 		
 		final ResumeCommand<E> rescom = new ResumeCommand<E>(ret, false);
@@ -1161,46 +1166,33 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 					{
 						public void resultAvailable(Void result)
 						{
-//							if(rescom.equals(getResumeCommand()))
+							if(getException()==null)
 							{
-								if(rgoal.isFinished() && getException()==null)
-								{
-//									Object o = RGoal.getGoalResult(goal, mgoal, getAgent().getClassLoader());
-									Object o = RGoal.getGoalResult(rgoal, getAgent().getClassLoader());
-									if(o==null)
-										o = goal;
-									setDispatchedElement(o);
-								}
-								else if(getException()==null)
-								{
-									setException(new PlanAbortedException());
-								}
-									
-								rescom.execute(null);
-//								System.out.println("on comp: "+getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread());
-//								RPlan.executePlan(RPlan.this, getAgent(), rescom);
+								Object o = RGoal.getGoalResult(rgoal, getAgent().getClassLoader());
+								if(o==null)
+									o = goal;
+								setDispatchedElement(o);
 								
-		//						if(!rgoal.isFinished() && (isAborted() || isFailed()))
-		//						{
-		//							setException(new PlanFailureException());
-		//						}
-		//						else
-		//						{
-		//							Object o = RGoal.getGoalResult(goal, mgoal, getAgent().getClassLoader());
-		//							ret.setResult((E)o);
-		//						}
+								// Non-maintain goal -> remove subgoal.
+								if(rgoal.isFinished())
+								{
+									removeSubgoal(rgoal);
+								}
 								
-								removeSubgoal(rgoal);
+								// else keep maintain goal until plan is finished
+								// todo: allow explicit removal / redispatch
 							}
+							
+							rescom.execute(null);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
 //							if(rescom.equals(getResumeCommand()))
 							{
-								setException(exception);
+//								setException(exception);
 //								RPlan.executePlan(RPlan.this, getAgent(), rescom);
-								rescom.execute(null);
+								rescom.execute(new ResumeCommandArgs(null, null, exception));
 								removeSubgoal(rgoal);
 							}
 						}
@@ -1518,7 +1510,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	public IFuture<ITimer> createTimer(long timeout, final IInternalAccess ia, final ICommand<Tuple2<Boolean, Boolean>> rescom)
+	public IFuture<ITimer> createTimer(long timeout, final IInternalAccess ia, final ICommand<ResumeCommandArgs> rescom)
 	{
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
@@ -1530,8 +1522,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				{
 //					if(rescom.equals(getResumeCommand()))
 //					{
-						setException(new TimeoutException());
-						rescom.execute(null);
+//						setException(new TimeoutException());
+						rescom.execute(new ResumeCommandArgs(null, null, new TimeoutException()));
 //						RPlan.executePlan(RPlan.this, ia, rescom);
 //					}
 				}
@@ -1681,7 +1673,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			// performs only cleanup without setting future
 //			System.out.println("afterblock rescom: "+getId()+" "+resumecommand);
-			resumecommand.execute(new Tuple2<Boolean, Boolean>(Boolean.FALSE, null));
+			resumecommand.execute(new ResumeCommandArgs(Boolean.FALSE, null, null));
+//			resumecommand.execute(new Tuple2<Boolean, Boolean>(Boolean.FALSE, null));
 			resumecommand = null;
 		}
 	}
@@ -1717,11 +1710,53 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		}
 	}
 
+	public static class ResumeCommandArgs
+	{
+		protected Boolean notify;
+		
+		protected Boolean abort;
+		
+		protected Exception exception;
+		
+		public ResumeCommandArgs(Boolean notify, Boolean abort, Exception exception)
+		{
+			this.notify = notify;
+			this.abort = abort;
+			this.exception = exception;
+		}
+
+		/**
+		 *  Get the notify.
+		 *  @return the notify
+		 */
+		public Boolean getNotify()
+		{
+			return notify;
+		}
+
+		/**
+		 *  Get the abort.
+		 *  @return the abort
+		 */
+		public Boolean getAbort()
+		{
+			return abort;
+		}
+
+		/**
+		 *  Get the exception.
+		 *  @return the exception
+		 */
+		public Exception getException()
+		{
+			return exception;
+		}
+	}
 	
 	/**
 	 * 
 	 */
-	public class ResumeCommand<T> implements ICommand<Tuple2<Boolean, Boolean>>
+	public class ResumeCommand<T> implements ICommand<ResumeCommandArgs>
 	{
 		protected ComponentSuspendable sus;
 		protected Future<T> waitfuture;
@@ -1758,11 +1793,13 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		 *  first Boolean: notify (default true)
 		 *  second Boolean: abort (default false)
 		 */
-		public void execute(Tuple2<Boolean, Boolean> args)
+		public void execute(ResumeCommandArgs args)
 		{
 			assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 
-//			System.out.println("exe: "+this+" "+RPlan.this.getId());
+//			System.out.println("exe: "+this+" "+RPlan.this.getId()+" "+this);
+
+			Exception ex = args!=null? args.getException(): null;
 			
 			if(rulename!=null)
 			{
@@ -1776,8 +1813,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			}
 			waitabstraction = null;
 			
-			boolean notify = args!=null && args.getFirstEntity()!=null? args.getFirstEntity().booleanValue(): true;
-			boolean abort = args!=null && args.getSecondEntity()!=null? args.getSecondEntity().booleanValue(): sus!=null;
+			boolean notify = args!=null && args.getNotify()!=null? args.getNotify().booleanValue(): true;
+			boolean abort = args!=null && args.getAbort()!=null? args.getAbort().booleanValue(): sus!=null;
 			
 			if(notify && RPlan.PlanProcessingState.WAITING.equals(getProcessingState()))
 			{
@@ -1798,18 +1835,20 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				{
 					if(!abort)//sus==null)
 					{
-						if(getException()!=null)
+						if(ex!=null)
 						{
 							if(waitfuture instanceof ITerminableFuture)
 							{
 //								System.out.println("notify1: "+getId());
-								((ITerminableFuture<?>)waitfuture).terminate();
+								((ITerminableFuture<?>)waitfuture).terminate(ex);
 							}
 							else
 							{
 //								System.out.println("notify2: "+getId());
-								waitfuture.setExceptionIfUndone(getException());
+								waitfuture.setExceptionIfUndone(ex);
 							}
+							
+//							setException(null);	// Allow plan to continue when exception is catched.
 						}
 						else
 						{
@@ -1854,10 +1893,11 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	public void addResumeCommand(ICommand<Tuple2<Boolean, Boolean>> rescom)
+	public void addResumeCommand(ICommand<ResumeCommandArgs> rescom)
 	{
+//		System.out.println("addResCom: "+this);
 		if(resumecommands==null)
-			resumecommands = new ArrayList<ICommand<Tuple2<Boolean, Boolean>>>();
+			resumecommands = new ArrayList<ICommand<ResumeCommandArgs>>();
 		resumecommands.add(rescom);
 	}
 	
@@ -1874,7 +1914,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  Get the resumecommands.
 	 *  @return The resumecommands.
 	 */
-	public List<ICommand<Tuple2<Boolean, Boolean>>> getResumeCommands()
+	public List<ICommand<ResumeCommandArgs>> getResumeCommands()
 	{
 		return resumecommands;
 	}
@@ -1883,7 +1923,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 *  Get the resumecommand.
 	 *  @return The resumecommand.
 	 */
-	public ICommand<Tuple2<Boolean, Boolean>> getResumeCommand()
+	public ICommand<ResumeCommandArgs> getResumeCommand()
 	{
 		return resumecommand;
 	}

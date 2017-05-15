@@ -71,6 +71,8 @@
 		<argument name="awamechanisms" class="String">"Broadcast, Multicast, Message, Relay, Local"</argument>
 		<!-- The awareness delay in milliseconds -->
 		<argument name="awadelay" class="long">20000</argument>
+		<!-- The fast awareness flag, i.e. try to connect during init. -->
+		<argument name="awafast" class="boolean">false</argument>
 		<!-- Include entries for awareness agent. -->
 		<argument name="awaincludes" class="String">""</argument>
 		<!-- Exclude entries for awareness agent. -->
@@ -176,8 +178,6 @@
 		<argument name="context" class="boolean">true</argument>
 		<!-- Flag if address component and service should be started.  -->
 		<argument name="address" class="boolean">true</argument>
-		<!-- Flag if dht storage ring should be provided. -->
-		<argument name="dhtprovide" class="boolean">false</argument>
 		<!-- Flag if registry synchronization should be used. -->
 		<argument name="registrysync" class="boolean">false</argument>
 	</arguments>
@@ -217,7 +217,6 @@
 		<componenttype filename="jadex/platform/service/context/Context.component.xml" name="context"/>
 		<componenttype filename="jadex/platform/service/address/TransportAddressAgent.class" name="address"/>
 		
-		<componenttype filename="jadex/platform/service/dht/DistributedServiceRegistryAgent.class" name="distregistry"/>
 		<componenttype filename="jadex/platform/service/registry/RegistrySynchronizationAgent.class" name="registrysync"/>
 	</componenttypes>
 	
@@ -311,7 +310,6 @@
 				<component name="settings" type="settings" daemon="true" number="Boolean.TRUE.equals($args.settings)? 1: 0"/>
 				
 				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
-			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="kernels" type="kernel_multi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;multi&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
@@ -365,6 +363,7 @@
 					<arguments>
 						<argument name="mechanisms">$args.awamechanisms</argument>
 						<argument name="delay">$args.awadelay</argument>
+						<argument name="fast">$args.awafast</argument>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
@@ -383,8 +382,8 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
-				<component name="distregistry" type="distregistry" daemon="true" number="Boolean.TRUE.equals($args.providedht)? 1: 0"/>
 				<component name="registrysync" type="registrysync" daemon="true" number="Boolean.TRUE.equals($args.registrysync)? 1: 0"/>
+			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 			</components>
 		</configuration>
 		
@@ -407,7 +406,6 @@
 				
 				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
 			  	<component name="system" type="system" daemon="true"/>
-			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="kernels" type="kernel_multi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;multi&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
@@ -477,8 +475,8 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
-				<component name="distregistry" type="distregistry" daemon="true" number="Boolean.TRUE.equals($args.providedht)? 1: 0"/>
 				<component name="registrysync" type="registrysync" daemon="true" number="Boolean.TRUE.equals($args.registrysync)? 1: 0"/>
+			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 			</components>
 		</configuration>
 		

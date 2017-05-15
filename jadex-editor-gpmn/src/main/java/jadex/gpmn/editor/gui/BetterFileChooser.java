@@ -11,6 +11,17 @@ import javax.swing.JOptionPane;
  */
 public class BetterFileChooser extends JFileChooser
 {
+	
+	public BetterFileChooser()
+	{
+		super();
+	}
+	
+	public BetterFileChooser(File file)
+	{
+		super(file);
+	}
+	
 	/**
      * Called by the UI when the user hits the Approve button
      * (labeled "Open" or "Save", by default). This can also be

@@ -16,7 +16,7 @@ public class RequiredServiceInfo
 {
 	//-------- constants --------
 	
-	/** None component scope (nothing will be searched). */
+	/** None component scope (nothing will be searched, forces required service creation). */
 	public static final String SCOPE_NONE = "none";
 	
 	/** Local component scope. */
@@ -35,7 +35,7 @@ public class RequiredServiceInfo
 	public static final String SCOPE_GLOBAL = "global";
 	
 	/** Global Application scope. */
-	public static final String SCOPE_GLOABL_APPLICATION = "global_application";
+	public static final String SCOPE_GLOBAL_APPLICATION = "global_application";
 	
 //	/** Upwards scope. */
 //	public static final String SCOPE_UPWARDS = "upwards";

@@ -30,9 +30,9 @@ public class TranslationBDI
 	
 	/** The bdi api. */
 	@AgentFeature
-	protected IBDIAgentFeature bdi;
+	protected IBDIAgentFeature bdiFeature;
 	
-	/** The current time. */
+	/** The wordtable. */
 	@Belief
 	protected Map<String, String> wordtable;// = new HashMap<String, String>();
 
@@ -104,7 +104,7 @@ public class TranslationBDI
 	public void body()
 	{
 		String eword = "cat";
-		Translate goal = (Translate)bdi.dispatchTopLevelGoal(new Translate(eword)).get();
+		Translate goal = (Translate) bdiFeature.dispatchTopLevelGoal(new Translate(eword)).get();
 		System.out.println("Translated: "+eword+" "+goal.getGWord());
 	}
 	

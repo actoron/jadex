@@ -10,6 +10,7 @@ import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
 
 
 /**
@@ -61,7 +62,7 @@ public class InvokeMethodTask extends AbstractTask
 		}
 		catch(InvocationTargetException e)
 		{
-			throw e.getTargetException() instanceof RuntimeException ? (RuntimeException)e.getTargetException() : new RuntimeException(e.getTargetException());
+			throw SUtil.throwUnchecked(e);
 		}
 		catch(RuntimeException e)
 		{

@@ -1,5 +1,4 @@
-Chapter 8 - Chat
-=============================
+# Chat
 
 ![08 Chat@chat.png](chat.png)
 

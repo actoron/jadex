@@ -26,8 +26,9 @@ public interface ISuspendable
 	 *  Suspend the execution of the suspendable.
 	 *  @param future The future to wait for.
 	 *  @param timeout The timeout (-1 for no timeout, -2 for default timeout).
+	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
 	 */
-	public void suspend(Future<?> future, long timeout);
+	public void suspend(Future<?> future, long timeout, boolean realtime);
 	
 	/**
 	 *  Resume the execution of the suspendable.

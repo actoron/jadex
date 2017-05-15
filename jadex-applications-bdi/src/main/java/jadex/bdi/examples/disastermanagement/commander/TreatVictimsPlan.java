@@ -26,7 +26,7 @@ public class TreatVictimsPlan extends Plan
 	{
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		ITreatVictimsService force = (ITreatVictimsService)getParameter("rescueforce").getValue();
-		tv	= force.treatVictims(disaster);
+		tv	= force.treatVictims(disaster.getId());
 		tv.get(Timeout.NONE);	// hack??? treating victims may take longer than default timeout
 	}
 	

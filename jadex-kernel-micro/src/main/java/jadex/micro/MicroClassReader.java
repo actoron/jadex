@@ -266,13 +266,13 @@ public class MicroClassReader
 	/**
 	 *  Fill the model details using annotation.
 	 */
-	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class<?> clazz, ClassLoader cl)
+	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, final Class<?> clazz, ClassLoader cl)
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		Class<?> cma = clazz;
 		
 		int cnt = 0;
-		Map toset = new HashMap();
+		Map<String, Object> toset = new HashMap<String, Object>();
 		boolean propdone = false;
 		boolean reqsdone = false;
 		boolean prosdone = false;
@@ -359,12 +359,7 @@ public class MicroClassReader
 			if(isAnnotationPresent(cma, Imports.class, cl))
 			{
 				String[] tmp = getAnnotation(cma, Imports.class, cl).value();
-				Set<String> imports = (Set<String>)toset.get("imports");
-				if(imports==null)
-				{
-					imports = new LinkedHashSet<String>();
-					toset.put("imports", imports);
-				}
+				Set<String> imports = (Set)getOrCreateSet("imports", toset);
 				for(int i=0; i<tmp.length; i++)
 				{
 					imports.add(tmp[i]);
@@ -373,12 +368,7 @@ public class MicroClassReader
 			
 			// Add package of current class to imports.
 			// Is a little hack because getAllImports() of ModelInfo add package again.
-			Set<String> imports = (Set<String>)toset.get("imports");
-			if(imports==null)
-			{
-				imports = new LinkedHashSet<String>();
-				toset.put("imports", imports);
-			}
+//			Set<String> imports = (Set)getOrCreateSet("imports", toset);
 			
 			// Take all, duplicates are eleminated
 			if(!featdone && isAnnotationPresent(cma, Features.class, cl))
@@ -411,12 +401,7 @@ public class MicroClassReader
 				NameValue[] vals = val.value();
 				propdone = val.replace();
 				
-				Map props = (Map)toset.get("properties");
-				if(props==null)
-				{
-					props = new LinkedHashMap();
-					toset.put("properties", props);
-				}
+				Map<String, Object> props = getOrCreateMap("properties", toset);
 				for(int i=0; i<vals.length; i++)
 				{
 					// Todo: clazz, language
@@ -432,12 +417,7 @@ public class MicroClassReader
 			{
 				NFProperties val = (NFProperties)getAnnotation(cma, NFProperties.class, cl);
 				
-				List nfps = (List)toset.get("nfproperties");
-				if(nfps==null)
-				{
-					nfps = new ArrayList();
-					toset.put("nfproperties", nfps);
-				}
+				List<Object> nfps = (List<Object>)getOrCreateList("nfproperties", toset);
 				
 				for(NFProperty prop: val.value())
 				{
@@ -457,34 +437,20 @@ public class MicroClassReader
 				GuiClass gui = (GuiClass)getAnnotation(cma, GuiClass.class, cl);
 				Class<?> gclazz = gui.value();
 				
-				Map props = (Map)toset.get("properties");
-				if(props==null)
-				{
-					props = new LinkedHashMap();
-					toset.put("properties", props);
-				}
+				Map<String, Object> props = getOrCreateMap("properties", toset);
 				
 				if(!props.containsKey("componentviewer.viewerclass"))
-				{
 					props.put("componentviewer.viewerclass", gclazz.getName());
-				}
 			}
 			else if(isAnnotationPresent(cma, GuiClassName.class, cl))
 			{
 				GuiClassName gui = (GuiClassName)getAnnotation(cma, GuiClassName.class, cl);
 				String clazzname = gui.value();
 				
-				Map props = (Map)toset.get("properties");
-				if(props==null)
-				{
-					props = new LinkedHashMap();
-					toset.put("properties", props);
-				}
+				Map<String, Object> props = getOrCreateMap("properties", toset);
 				
 				if(!props.containsKey("componentviewer.viewerclass"))
-				{
 					props.put("componentviewer.viewerclass", clazzname);
-				}
 			}
 			
 			// Take all (if not replace)
@@ -494,12 +460,7 @@ public class MicroClassReader
 				breaksdone = val.replace();
 				String[] vals = val.value();
 				
-				List bps = (List)toset.get("breakpoints");
-				if(bps==null)
-				{
-					bps = new ArrayList();
-					toset.put("breakpoints", bps);
-				}
+				List<Object> bps = getOrCreateList("breakpoints", toset);
 				
 				for(int i=0; i<vals.length; i++)
 				{
@@ -509,41 +470,30 @@ public class MicroClassReader
 			}
 			
 			// Take all but new overrides old
-			if(!reqsdone && isAnnotationPresent(cma, RequiredServices.class, cl))
+			if(!reqsdone)
 			{
-				RequiredServices val = (RequiredServices)getAnnotation(cma, RequiredServices.class, cl);
-				RequiredService[] vals = val.value();
-				reqsdone = val.replace();
-				
-				Map rsers = (Map)toset.get("reqservices");
-				if(rsers==null)
+				if(isAnnotationPresent(cma, RequiredServices.class, cl))
 				{
-					rsers = new LinkedHashMap();
-					toset.put("reqservices", rsers);
-				}
-				
-				for(int i=0; i<vals.length; i++)
-				{
-					RequiredServiceBinding binding = createBinding(vals[i].binding());
-					List<NFRPropertyInfo> nfprops = createNFRProperties(vals[i].nfprops());
+					RequiredServices val = (RequiredServices)getAnnotation(cma, RequiredServices.class, cl);
+					RequiredService[] vals = val.value();
+					reqsdone = val.replace();
 					
-					for(NFRProperty prop: vals[i].nfprops())
-					{
-						nfprops.add(new NFRPropertyInfo(prop.name(), new ClassInfo(prop.value().getName()), 
-							new MethodInfo(prop.methodname(), prop.methodparametertypes())));
-					}
+					Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
 					
-					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
-						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding, nfprops, Arrays.asList(vals[i].tags()));
-					if(rsers.containsKey(vals[i].name()))
+					for(int i=0; i<vals.length; i++)
 					{
-						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
-						if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
-							throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
-					}
-					else
-					{
-						rsers.put(vals[i].name(), rsis);
+						RequiredServiceInfo rsis = createRequiredServiceInfo(vals[i], cl);
+					
+						if(rsers.containsKey(vals[i].name()))
+						{
+							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
+							if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
+						}
+						else
+						{
+							rsers.put(vals[i].name(), rsis);
+						}
 					}
 				}
 			}
@@ -555,12 +505,7 @@ public class MicroClassReader
 				ProvidedService[] vals = val.value();
 				prosdone = val.replace();
 				
-				Map psers = (Map)toset.get("proservices");
-				if(psers==null)
-				{
-					psers = new LinkedHashMap();
-					toset.put("proservices", psers);
-				}
+				Map<String, Object> psers = getOrCreateMap("proservices", toset);
 				
 				for(int i=0; i<vals.length; i++)
 				{
@@ -575,12 +520,12 @@ public class MicroClassReader
 							interceptors[j] = new UnparsedExpression(null, inters[j].clazz(), inters[j].value(), null);
 						}
 					}
-					ProvidedServiceImplementation impl = createImplementation(im);
+					ProvidedServiceImplementation impl = createImplementation(im, clazz);
 					Publish p = vals[i].publish();
 					NameValue[] props = p.properties();
 					UnparsedExpression[] exps = SNameValue.createUnparsedExpressions(props);
 					
-					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
+					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
 					
 					props = vals[i].properties();
 					List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
@@ -596,66 +541,100 @@ public class MicroClassReader
 			}
 			
 			// Take all but new overrides old
-			if(!argsdone && isAnnotationPresent(cma, Arguments.class, cl))
+			if(!argsdone)
 			{
-				Arguments val = (Arguments)getAnnotation(cma, Arguments.class, cl);
-				Argument[] vals = val.value();
-				argsdone = val.replace();
-				
-				Map args = (Map)toset.get("arguments");
-				if(args==null)
+				if(isAnnotationPresent(cma, Arguments.class, cl))
 				{
-					args = new LinkedHashMap();
-					toset.put("arguments", args);
+					Arguments val = (Arguments)getAnnotation(cma, Arguments.class, cl);
+					Argument[] vals = val.value();
+					argsdone = val.replace();
+					
+					Map<String, Object> args = getOrCreateMap("arguments", toset);
+					
+					for(int i=0; i<vals.length; i++)
+					{
+	//					try
+	//					{
+		//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+						IArgument tmparg = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
+							vals[i].description(), SReflect.getClassName(vals[i].clazz()),
+							"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
+						
+						if(!args.containsKey(vals[i].name()))
+						{
+							args.put(vals[i].name(), tmparg);
+						}
+	//					}
+	//					catch(Exception e)
+	//					{
+							// Currently a type not present exception can occur with the applications.mixed.ShopAgent
+	//						e.printStackTrace();
+	//					}
+					}
 				}
 				
-				for(int i=0; i<vals.length; i++)
+				Field[] fields = cma.getDeclaredFields();
+				for(Field field: fields)
 				{
-//					try
-//					{
-	//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-					IArgument tmparg = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
-						"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
-					
-					if(!args.containsKey(vals[i].name()))
+					if(isAnnotationPresent(field, AgentArgument.class, cl))
 					{
-						args.put(vals[i].name(), tmparg);
+						AgentArgument arg = (AgentArgument)getAnnotation(field, AgentArgument.class, cl);
+						{
+							Map<String, Object> args = getOrCreateMap("arguments", toset);
+							
+							if(!args.containsKey(field.getName()))
+							{
+								IArgument tmparg = new jadex.bridge.modelinfo.Argument(field.getName(), 
+									null, SReflect.getClassName(field.getType()), null);
+								args.put(field.getName(), tmparg);
+							}
+						}
 					}
-//					}
-//					catch(Exception e)
-//					{
-						// Currently a type not present exception can occur with the applications.mixed.ShopAgent
-//						e.printStackTrace();
-//					}
 				}
 			}
 			
 			// Take all but new overrides old
-			if(!resudone && isAnnotationPresent(cma, Results.class, cl))
+			if(!resudone)
 			{
-				Results val = (Results)getAnnotation(cma, Results.class, cl);
-				Result[] vals = val.value();
-				resudone = val.replace();
-				
-				Map res = (Map)toset.get("results");
-				if(res==null)
+				if(isAnnotationPresent(cma, Results.class, cl))
 				{
-					res = new LinkedHashMap();
-					toset.put("results", res);
+					Results val = (Results)getAnnotation(cma, Results.class, cl);
+					Result[] vals = val.value();
+					resudone = val.replace();
+					
+					Map<String, Object> res = getOrCreateMap("results", toset);
+					
+					IArgument[] tmpresults = new IArgument[vals.length];
+					for(int i=0; i<vals.length; i++)
+					{
+		//				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+						IArgument tmpresult = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
+							vals[i].description(), SReflect.getClassName(vals[i].clazz()),
+							"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
+						
+						if(!res.containsKey(vals[i].name()))
+						{
+							res.put(vals[i].name(), tmpresult);
+						}
+					}
 				}
 				
-				IArgument[] tmpresults = new IArgument[vals.length];
-				for(int i=0; i<vals.length; i++)
+				Field[] fields = cma.getDeclaredFields();
+				for(Field field: fields)
 				{
-	//				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-					IArgument tmpresult = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
-						"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
-					
-					if(!res.containsKey(vals[i].name()))
+					if(isAnnotationPresent(field, AgentResult.class, cl))
 					{
-						res.put(vals[i].name(), tmpresult);
+						AgentResult res = (AgentResult)getAnnotation(field, AgentResult.class, cl);
+						{
+							Map<String, Object> resul = getOrCreateMap("results", toset);
+							
+							if(!resul.containsKey(field.getName()))
+							{
+								IArgument tmparg = new jadex.bridge.modelinfo.Argument(field.getName(), 
+									null, SReflect.getClassName(field.getType()), null);
+								resul.put(field.getName(), tmparg);
+							}
+						}
 					}
 				}
 			}
@@ -668,12 +647,7 @@ public class MicroClassReader
 				compdone = tmp.replace();
 				ComponentType[] ctypes = tmp.value();
 				
-				Map res = (Map)toset.get("componenttypes");
-				if(res==null)
-				{
-					res = new LinkedHashMap();
-					toset.put("componenttypes", res);
-				}
+				Map<String, Object> res = getOrCreateMap("componenttypes", toset);
 				
 				for(int i=0; i<ctypes.length; i++)
 				{
@@ -694,12 +668,7 @@ public class MicroClassReader
 				Configuration[] configs = val.value();
 				confdone = val.replace();
 				
-				Map confs = (Map)toset.get("configurations");
-				if(confs==null)
-				{
-					confs = new LinkedHashMap();
-					toset.put("configurations", confs);
-				}
+				Map<String, Object> confs = getOrCreateMap("configurations", toset);
 				
 				for(Configuration config: configs)
 				{
@@ -764,7 +733,7 @@ public class MicroClassReader
 								ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 									im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 								Publish p = provs[j].publish();
-								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
+								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
 									p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
 								
 								NameValue[] props = provs[j].properties();
@@ -818,8 +787,37 @@ public class MicroClassReader
 				else if(isAnnotationPresent(fields[i], AgentService.class, cl))
 				{
 					AgentService ser = getAnnotation(fields[i], AgentService.class, cl);
-					String name = ser.name().length()>0? ser.name(): fields[i].getName();
-					micromodel.addServiceInjection(name, new FieldInfo(fields[i]));
+					RequiredService rs = ser.requiredservice();
+					
+					if(!rs.type().equals(Object.class))
+					{
+						if(ser.name().length()>0)
+							throw new IllegalArgumentException("Use 'name' to reference a required service OR use inline declaration of required service, not both.");
+						
+						Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+						
+						RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+						if(rsis.getName().length()==0)
+							rsis.setName(fields[i].getName());
+					
+						if(rsers.containsKey(rsis.getName()))
+						{
+							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
+							if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
+						}
+						else
+						{
+							rsers.put(rsis.getName(), rsis);
+						}
+						
+						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), ser.lazy());
+					}
+					else
+					{
+						String name = ser.name().length()>0? ser.name(): fields[i].getName();
+						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), ser.lazy());
+					}
 				}
 				else if(isAnnotationPresent(fields[i], AgentFeature.class, cl))
 				{
@@ -1064,6 +1062,68 @@ public class MicroClassReader
 		{
 			throw new RuntimeException("@"+ann.getSimpleName()+" method requires return type 'void' or 'IFuture<Void>': "+m);
 		}
+	}
+	
+	/**
+	 *  Create a required service info and add it to the map.
+	 */
+	protected RequiredServiceInfo createRequiredServiceInfo(RequiredService rs, ClassLoader cl)
+	{
+		RequiredServiceBinding binding = createBinding(rs.binding());
+		List<NFRPropertyInfo> nfprops = createNFRProperties(rs.nfprops());
+		
+		for(NFRProperty prop: rs.nfprops())
+		{
+			nfprops.add(new NFRPropertyInfo(prop.name(), new ClassInfo(prop.value().getName()), 
+				new MethodInfo(prop.methodname(), prop.methodparametertypes())));
+		}
+		
+		RequiredServiceInfo rsis = new RequiredServiceInfo(rs.name(), rs.type(), 
+			rs.multiple(), Object.class.equals(rs.multiplextype())? null: rs.multiplextype(), binding, nfprops, Arrays.asList(rs.tags()));
+		
+		return rsis;
+	}
+	
+	/**
+	 *  Get or create a map.
+	 */
+	protected Map<String, Object> getOrCreateMap(String name, Map<String, Object> map)
+	{
+		Map<String, Object> ret = (Map<String, Object>)map.get(name);
+		if(ret==null)
+		{
+			ret = new LinkedHashMap<String, Object>();
+			map.put(name, ret);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get or create a list.
+	 */
+	protected List<Object> getOrCreateList(String name, Map<String, Object> map)
+	{
+		List<Object> ret = (List<Object>)map.get(name);
+		if(ret==null)
+		{
+			ret = new ArrayList<Object>();
+			map.put(name, ret);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get or create a set.
+	 */
+	protected Set<Object> getOrCreateSet(String name, Map<String, Object> map)
+	{
+		Set<Object> ret = (Set<Object>)map.get(name);
+		if(ret==null)
+		{
+			ret = new LinkedHashSet<Object>();
+			map.put(name, ret);
+		}
+		return ret;
 	}
 	
 //	/**
@@ -1551,10 +1611,24 @@ public class MicroClassReader
 	/**
 	 *  Create a service implementation.
 	 */
-	protected ProvidedServiceImplementation createImplementation(Implementation impl)
+	protected ProvidedServiceImplementation createImplementation(Implementation impl, Class<?> cma)
 	{
-		return new ProvidedServiceImplementation(!impl.value().equals(Object.class)? impl.value(): null, 
-			impl.expression().length()>0? impl.expression(): null, impl.proxytype(), createBinding(impl.binding()), createUnparsedExpressions(impl.interceptors()));
+		Class<?> cl = impl.value();
+		String exp = impl.expression().length()>0? 
+			impl.expression(): null;
+		// If not specified (Object is default) or if user accidentally used pojo class -> ignore
+		if(cl.equals(Object.class))
+		{
+			cl = null;
+		}
+		else if(cl.equals(cma))
+		{
+			cl = null;
+			exp = "$pojoagent!=null? $pojoagent: $component";
+			System.out.println("Warning: ignoring implementation class because agent is service implementation");
+		}
+		return new ProvidedServiceImplementation(cl, exp, impl.proxytype(), createBinding(impl.binding()), 
+			createUnparsedExpressions(impl.interceptors()));
 	}
 	
 	/**
@@ -1982,6 +2056,45 @@ public class MicroClassReader
 		public void setOriginal(ClassLoader orig)
 		{
 			this.orig = orig;
+		}
+		
+		/**
+		 *  This method implements a fallback to the library service baseclassloader if
+		 *  a) a library service classloader is used and
+		 *  b) the class was not found in the DummyClassLoader
+		 *  
+		 *  This still limits the scope of loadable classes to avoid accidental loading of
+		 *  non-enhanced user code while allowing Jadex classesto be in the baseclassloader instead
+		 *  of the system classloader.
+		 */
+		protected Class<?>	loadClass(String name, boolean resolve)	throws ClassNotFoundException
+		{
+			Class<?> ret = null;
+			try
+			{
+				ret	= super.loadClass(name, resolve);
+			}
+			catch(ClassNotFoundException e)
+			{
+				ClassLoader bcl = null;
+				try
+				{
+					Method gbcl = orig.getClass().getDeclaredMethod("getBaseClassLoader", (Class<?>[]) null);
+					gbcl.setAccessible(true);
+					bcl = (ClassLoader)gbcl.invoke(orig, (Object[]) null);
+				}
+				catch (Exception e1)
+				{
+					throw e;
+				}
+				
+				ret = bcl.loadClass(name);
+				if(resolve)
+				{
+					resolveClass(ret);
+				}
+			}
+			return ret;
 		}
 		
 		/**

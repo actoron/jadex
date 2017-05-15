@@ -74,7 +74,7 @@ public class SReflect
 	
 	static
 	{
-		basictypes = Collections.synchronizedMap(new HashMap());
+		basictypes = new HashMap();
 		basictypes.put("boolean", boolean.class);
 		basictypes.put("int", int.class);
 		basictypes.put("double", double.class);
@@ -84,7 +84,7 @@ public class SReflect
 		basictypes.put("byte", byte.class);
 		basictypes.put("char", char.class);
 		
-		wrappedtypes = Collections.synchronizedMap(new HashMap());
+		wrappedtypes = new HashMap();
 		wrappedtypes.put(boolean.class, Boolean.class);
 		wrappedtypes.put(int.class, Integer.class);
 		wrappedtypes.put(double.class, Double.class);
@@ -93,8 +93,9 @@ public class SReflect
 		wrappedtypes.put(short.class, Short.class);
 		wrappedtypes.put(byte.class, Byte.class);
 		wrappedtypes.put(char.class, Character.class);
+		wrappedtypes.put(void.class, Void.class);
 		
-		convertabletypes = Collections.synchronizedSet(new HashSet());
+		convertabletypes = new HashSet();
 		convertabletypes.add(String.class);
 		convertabletypes.add(int.class);
 		convertabletypes.add(Integer.class);
@@ -127,13 +128,15 @@ public class SReflect
 	public	static	Class<?>	getWrappedType(Class<?> clazz)
 	{
 		if(clazz==null)
-			throw new IllegalArgumentException("Clazz must not null");
+			throw new IllegalArgumentException("Clazz must not be null");
 
 		// (jls) there are the following primitive types:
-		// byte, short, int, long, char, float, double, boolean
+		// byte, short, int, long, char, float, double, boolean, AND void!
 
-		Class<?>	result	= (Class<?>)wrappedtypes.get(clazz);
-		return result==null ? clazz : result;
+		if (clazz.isPrimitive()) {
+			clazz = (Class<?>) wrappedtypes.get(clazz);
+		}
+		return clazz;
 	}
 	
 	/**
@@ -2018,7 +2021,14 @@ public class SReflect
 	
 	/** Cached flag for android check. */
 	protected static volatile Boolean isAndroid;
-	
+
+	/** private setter that can be made accessible for robolectric testcases. **/
+	private static void setAndroid(boolean value) {
+		synchronized (SReflect.class) {
+			isAndroid = value;
+		}
+	}
+
 	/**
 	 *  Test if running on android.
 	 */
@@ -2030,16 +2040,14 @@ public class SReflect
 			{
 				if (isAndroid==null)
 				{
-					try
-					{
-						SReflect.class.getClassLoader().loadClass("android.app.Activity");
-						isAndroid = Boolean.TRUE;
-					}
-					catch(Exception e)
-					{
-						isAndroid = Boolean.FALSE;
-					}
-//					isAndroid	= Boolean.valueOf(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
+					String vmName = System.getProperty("java.vm.name");
+					String vmVendor = System.getProperty("java.vm.vendor");
+					String vendorUrl = System.getProperty("java.vendor.url");
+
+					isAndroid =
+							("Dalvik".equalsIgnoreCase(vmName) ||
+							"The Android Project".equalsIgnoreCase(vmVendor) ||
+							"http://www.android.com".equalsIgnoreCase(vendorUrl));
 				}
 			}
 		}

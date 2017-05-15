@@ -24,6 +24,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IComponentStep;
@@ -34,7 +35,10 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -63,17 +67,21 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/** The child plan. */
 	protected RPlan childplan;
 	
+	/** The candidate from which this plan was created. Used for tried plans in proc elem. */
+	protected ICandidateInfo candidate;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal, Map<String, Object> vals, MConfigParameterElement config)
+	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal, Map<String, Object> vals, MConfigParameterElement config, ICandidateInfo candidate)
 	{
 		super(mgoal, goal, agent, vals, config);
 		this.parentgoal = parentgoal;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
+		this.candidate = candidate;
 	}
 
 	//-------- methods --------
@@ -454,6 +462,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
 //			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+			
 			abortPlans().addResultListener(new IResultListener<Void>()
 			{
 				@Override
@@ -782,11 +791,11 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 						{
 							if(getMGoal().isRebuild())
 							{
-								ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(this), getMGoal().getRetryDelay());
+								ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new FindApplicableCandidatesAction(this));
 							}
 							else
 							{
-								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this), getMGoal().getRetryDelay());
+								ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new SelectCandidatesAction(this));
 							}
 						}
 						else
@@ -821,7 +830,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 						setProcessingState(ia, GoalProcessingState.PAUSED);
 						if(getMGoal().getRecurDelay()>-1)
 						{
-							ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+							ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRecurDelay(),
+								new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
@@ -834,7 +844,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 									}
 									return IFuture.DONE;
 								}
-							}, getMGoal().getRecurDelay());
+							});
 						}
 					}
 					else
@@ -1130,32 +1140,36 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //		System.out.println("Goal target triggered: "+RGoal.this);
 		if(getMGoal().getConditions(MGoal.CONDITION_MAINTAIN)!=null)
 		{
-			abortPlans().addResultListener(new IResultListener<Void>()
+			// Change maintain goal rule so it does not consider target condition triggered unless we move from false to true (not just true to true)
+			if (GoalProcessingState.INPROCESS.equals(getProcessingState()))
 			{
-				@Override
-				public void resultAvailable(Void result)
+				abortPlans().addResultListener(new IResultListener<Void>()
 				{
-					setProcessingState(ia, GoalProcessingState.IDLE);
-					// Hack! Notify finished listeners to allow for waiting via waitForGoal
-					// Cannot use notifyListeners() because it checks isSucceeded
-					if(getListeners()!=null)
+					@Override
+					public void resultAvailable(Void result)
 					{
-						for(IResultListener<Void> lis: getListeners())
+						setProcessingState(ia, GoalProcessingState.IDLE);
+						// Hack! Notify finished listeners to allow for waiting via waitForGoal
+						// Cannot use notifyListeners() because it checks isSucceeded
+						if(getListeners()!=null)
 						{
-							lis.resultAvailable(null);
+							for(IResultListener<Void> lis: getListeners())
+							{
+								lis.resultAvailable(null);
+							}
 						}
+						listeners = null;
 					}
-					listeners = null;
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					// Should not fail?
-					exception.printStackTrace();
-					resultAvailable(null);	// safety-net: continue anyways
-				}
-			});
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						// Should not fail?
+						exception.printStackTrace();
+						resultAvailable(null);	// safety-net: continue anyways
+					}
+				});
+			}
 		}
 		else
 		{
@@ -1214,6 +1228,59 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				throw new RuntimeException(e);
 			}
 		}
+	}
+	
+	/**
+	 *  Call the user finished method if available.
+	 */
+	public IFuture<Void> callFinishedMethod()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		Object pojo = getPojoElement();
+		if(pojo!=null)
+		{
+			MGoal mgoal = (MGoal)getModelElement();
+			MethodInfo mi = mgoal.getFinishedMethod(getAgent().getClassLoader());
+			if(mi!=null)
+			{
+				Method m = mi.getMethod(getAgent().getClassLoader());
+				try
+				{
+					m.setAccessible(true);
+					Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), getModelElement(), null, null, this, getAgent());
+					Object res = m.invoke(pojo, params);
+					if(res instanceof IFuture)
+					{
+						((IFuture<Object>)res).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								ret.setResult(null);
+							}
+						});
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 //	/**
@@ -1399,15 +1466,6 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	// IInternalPlan extra methods
 	
 	/**
-	 *  Get the candidate.
-	 *  @return The candidate.
-	 */
-	public Object getCandidate()
-	{
-		return getModelElement();
-	}
-	
-	/**
 	 *  Test if plan has passed.
 	 */
 	public boolean isPassed()
@@ -1526,5 +1584,23 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //		System.out.println("querygoal check: "+ret+" "+goal);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the candidate.
+	 *  @return The candidate.
+	 */
+	public ICandidateInfo getCandidate()
+	{
+		return candidate;
+	}
+
+	/**
+	 *  Set the candidate.
+	 *  @param candidate The candidate to set.
+	 */
+	public void setCandidate(ICandidateInfo candidate)
+	{
+		this.candidate = candidate;
 	}
 }

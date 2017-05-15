@@ -71,7 +71,7 @@ public class ComponentStartTest extends	ComponentTest
 			final IComponentIdentifier	cid	= fut.getFirstResult();
 			
 			// Wait some time (simulation and real time) and kill the component afterwards.
-			final IResultListener<Void>	lis	= new CounterResultListener<Void>(2, new DefaultResultListener<Void>()
+			final IResultListener<Void>	lis	= new CounterResultListener<Void>(1, new DefaultResultListener<Void>()
 			{
 				public synchronized void resultAvailable(Void result)
 				{
@@ -86,6 +86,12 @@ public class ComponentStartTest extends	ComponentTest
 //						if(cid.getName().indexOf("ParentProcess")!=-1)
 //							System.out.println("destroying2 "+cid);
 					}
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					System.err.println("COULD NOT STOP COMPONENT!! Exception:");
+					super.exceptionOccurred(exception);
 				}
 			});
 //			{

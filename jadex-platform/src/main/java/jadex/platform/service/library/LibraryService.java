@@ -609,9 +609,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<URL>> getAllURLs()
 	{
-//		final long	start	= System.currentTimeMillis();
+		final long	start	= System.currentTimeMillis();
 		
 		final Future<List<URL>> ret = new Future<List<URL>>();
+		
 		getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, List<URL>>(ret)
 		{
 			public void customResultAvailable(List<IResourceIdentifier> result)
@@ -1476,6 +1477,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected void	collectManifestURLs(URI url, Set<URI> set, Set<String> jarnames)
 	{
+//		System.out.println("collectMainifestUrls: "+url);
+		
 		File	file	= SUtil.urlToFile(url.toString());
 		if(file!=null && file.exists() && !file.isDirectory())	// Todo: load manifest also from directories!?
 		{

@@ -38,10 +38,12 @@ public class ProducerPlan extends Plan
 			{
 				// Wait for a request.
 				IMessageEvent req = waitForMessageEvent("request_production");
-	
-				ISpaceObject ot = ((RequestProduction)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
+				
+//				ISpaceObject ot = ((RequestProduction)req.getParameter(SFipa.CONTENT).getValue()).getTarget();
+				
 				IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-				ISpaceObject target = env.getSpaceObject(ot.getId());
+				ISpaceObject target = env.getSpaceObject(((RequestProduction)req.getParameter(SFipa.CONTENT).getValue()).getTarget());
+				
 	
 				// Producing ore here.
 				IGoal produce_ore = createGoal("produce_ore");
@@ -77,7 +79,7 @@ public class ProducerPlan extends Plan
 			//System.out.println("Carry Agent: Found Carry Agents: "+carriers.length);
 
 			RequestCarry rc = new RequestCarry();
-			rc.setTarget(target);
+			rc.setTarget(target.getId());
 			//Action action = new Action();
 			//action.setAction(rc);
 			//action.setActor(new AID("dummy", true)); // Hack!! What to do with more than one receiver?

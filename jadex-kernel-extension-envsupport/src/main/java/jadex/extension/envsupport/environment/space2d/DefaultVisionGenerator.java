@@ -87,6 +87,8 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 */
 	public void dispatchEnvironmentEvent(EnvironmentEvent event)
 	{
+//		System.out.println("vision gen: "+event);
+		
 		Space2D	space = (Space2D)event.getSpace();
 		IVector1 maxrange = getDefaultRange();
 		

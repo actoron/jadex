@@ -47,7 +47,7 @@ public class JavaWrapperAgent	implements	IJavaWrapperService
 	protected IInternalAccess	agent;
 	
 	/** The thread pool service. */
-	@AgentService
+	@AgentService(lazy=false)
 	protected IThreadPoolService	tpservice;
 	
 	/** The library service. */

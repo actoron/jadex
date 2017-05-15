@@ -92,7 +92,7 @@ public class WatchdogAgent	implements IWatchdogService
 								
 								public void exceptionOccurred(Exception exception)
 								{
-//									throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
+//									throw SUtil.throwUnchecked(exception);
 									agent.getLogger().warning("Exception occurred: "+exception);
 								}
 							});
@@ -100,7 +100,7 @@ public class WatchdogAgent	implements IWatchdogService
 						
 						public void exceptionOccurred(Exception exception)
 						{
-//							throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
+//							throw SUtil.throwUnchecked(exception);
 							agent.getLogger().warning("Exception occurred: "+exception);
 						}
 					});

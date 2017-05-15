@@ -1,7 +1,6 @@
 package jadex.bdi.examples.marsworld;
 
 import jadex.bridge.fipa.IComponentAction;
-import jadex.extension.envsupport.environment.ISpaceObject;
 
 
 /**
@@ -11,8 +10,8 @@ public class RequestCarry implements IComponentAction
 {
 	//-------- attributes ----------
 
-	/** Attribute for slot target. */
-	protected ISpaceObject	target;
+	/** Attribute for slot target id. */
+	protected Object	target;
 
 	//-------- constructors --------
 
@@ -28,7 +27,7 @@ public class RequestCarry implements IComponentAction
 	 *  Default Constructor.
 	 *  Create a new RequestCarry.
 	 */
-	public RequestCarry(ISpaceObject target)
+	public RequestCarry(Object target)
 	{
 		this();
 		setTarget(target);
@@ -40,7 +39,7 @@ public class RequestCarry implements IComponentAction
 	 *  Get the target of this RequestCarry.
 	 * @return target
 	 */
-	public ISpaceObject getTarget()
+	public Object getTarget()
 	{
 		return this.target;
 	}
@@ -49,7 +48,7 @@ public class RequestCarry implements IComponentAction
 	 *  Set the target of this RequestCarry.
 	 * @param target the value to be set
 	 */
-	public void setTarget(ISpaceObject target)
+	public void setTarget(Object target)
 	{
 		this.target = target;
 	}

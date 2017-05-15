@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import jadex.base.Starter;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -26,6 +27,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
@@ -87,7 +89,9 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(IComponentIdentifier component, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
-		return SynchronizedServiceRegistry.getRegistry(component.getRoot()).searchService(type, component, scope, filter);
+//		return ServiceRegistry.getRegistry(component.getRoot()).searchService(new ClassInfo(type), component, scope, filter);
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component);
+		return ServiceRegistry.getRegistry(component.getRoot()).searchServiceSync(query);
 	}
 	
 	/**
@@ -202,7 +206,8 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		if(ret==null)
 			throw new ServiceNotFoundException(type.getName());
 		return proxy? createRequiredProxy(component, ret, type): ret;
@@ -219,7 +224,8 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		return proxy && ret!=null? createRequiredProxy(component, ret, type): ret;
 	}
 	
@@ -233,14 +239,15 @@ public class SServiceProvider
 	public static <T> T getLocalService(final IInternalAccess component, final Class<T> type, final IComponentIdentifier target, boolean proxy)
 	{
 		checkThreadAccess(component, proxy);
-
-		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+		
+		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
 		{
 			public boolean filter(T obj) 
 			{
 				return ((IService)obj).getServiceIdentifier().getProviderId().equals(target);
 			}
-		});
+		}, null, component.getComponentIdentifier());
+		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		if(ret==null)
 			throw new ServiceNotFoundException(type.getName());
 		
@@ -278,8 +285,9 @@ public class SServiceProvider
 	public static <T> Collection<T> getLocalServices(final IInternalAccess component, final Class<T> type, final String scope, final IFilter<T> filter, boolean proxy)
 	{
 		checkThreadAccess(component, proxy);
-
-		Collection<T> ret = SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter);
+		
+		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, filter, null, component.getComponentIdentifier());
+		Collection<T> ret = ServiceRegistry.getRegistry(component).searchServicesSync(query);
 		
 		// Fixing the bug by changing createRequiredProxy -> createRequiredProxies leads to not compiling the main class
 		return proxy? createRequiredProxies(component, ret, type): ret;
@@ -440,61 +448,46 @@ public class SServiceProvider
 	public static <T> IFuture<T> getService(final IInternalAccess component, final Class<T> type, final String scope, final IAsyncFilter<T> filter, final boolean proxy)
 	{
 		final Future<T> ret = new Future<T>();
-		
 		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
 		{
+			
 			public void customResultAvailable(Void result)
 			{
-				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-				{
-					if(filter==null)
-					{
-						IServiceRegistry reg = ServiceRegistry.getRegistry(component);
-						T ser = reg==null? null: reg.searchService(type, component.getComponentIdentifier(), scope);
-//						T ser = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope);
-						if(ser!=null)
-						{
-							if(proxy)
-								ser = createRequiredProxy(component, ser, type);
-							ret.setResult(ser);
-						}
-						else
-						{
-							ret.setException(new ServiceNotFoundException(type.getName()));
-//							{
-//								public void printStackTrace(java.io.PrintStream s)
-//								{
-//									Thread.dumpStack();
-//									super.printStackTrace(s);
-//								}
-//								
-//								public void printStackTrace(java.io.PrintWriter s)
-//								{
-//									Thread.dumpStack();
-//									super.printStackTrace(s);									
-//								}
-//								
-//								public void printStackTrace()
-//								{
-//									Thread.dumpStack();
-//									super.printStackTrace();
-//								}
-//							});
-						}
-					}
-					else
-					{
-						IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
-						SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter)
-							.addResultListener(new ComponentResultListener<T>(lis, component));
-					}
-				}
-				else
-				{
-					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
-					SynchronizedServiceRegistry.getRegistry(component).searchGlobalService(type, component.getComponentIdentifier(), filter)
-						.addResultListener(new ComponentResultListener<T>(lis, component));
-				}
+				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
+				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));;
+				
+//				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+//				{
+//					if(filter==null)
+//					{
+//						IServiceRegistry reg = ServiceRegistry.getRegistry(component);
+//						T ser = reg==null? null: (T)reg.searchService(new ClassInfo(type), component.getComponentIdentifier(), scope);
+////						T ser = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope);
+//						if(ser!=null)
+//						{
+//							if(proxy)
+//								ser = createRequiredProxy(component, ser, type);
+//							ret.setResult(ser);
+//						}
+//						else
+//						{
+//							ret.setException(new ServiceNotFoundException(type.getName()));
+//						}
+//					}
+//					else
+//					{
+//						IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
+//						SynchronizedServiceRegistry.getRegistry(component).searchService(new ClassInfo(type), component.getComponentIdentifier(), scope, filter)
+//							.addResultListener(new ComponentResultListener<T>(lis, component));
+//					}
+//				}
+//				else
+//				{
+//					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
+//					SynchronizedServiceRegistry.getRegistry(component).searchGlobalService(new ClassInfo(type), component.getComponentIdentifier(), filter)
+//						.addResultListener(new ComponentResultListener<T>(lis, component));
+//				}
 			}
 		});
 		
@@ -639,8 +632,8 @@ public class SServiceProvider
 					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
 					
 					IRemoteServiceManagementService rms	= SServiceProvider.getLocalService(component, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-					rms.getServiceProxy(component.getComponentIdentifier(), cid, type, scope, null)
-						.addResultListener(new ComponentResultListener<T>(lis, component));
+					IFuture<T> fut = rms.getServiceProxy(component.getComponentIdentifier(), cid, new ClassInfo(type), scope, null);
+					fut.addResultListener(new ComponentResultListener<T>(lis, component));
 				}
 			}
 		});
@@ -724,7 +717,7 @@ public class SServiceProvider
 					
 					final IServiceIdentifier fsid = sid;
 					
-					rms.getServiceProxy(component.getComponentIdentifier(), cid, type, RequiredServiceInfo.SCOPE_LOCAL, new IAsyncFilter<T>()
+					rms.getServiceProxy(component.getComponentIdentifier(), cid, new ClassInfo(type), RequiredServiceInfo.SCOPE_LOCAL, new IAsyncFilter<T>()
 					{
 						@Classname("getServicePerServiceIdentifier")
 						public IFuture<Boolean> filter(T obj)
@@ -776,28 +769,42 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Void result)
 			{
-				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+				if(!(filter instanceof IAsyncFilter) && !RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 				{
-					if(filter==null)
-					{
-						Collection<T> sers = SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope);
-						if(proxy)
-							sers = createRequiredProxies(component, sers, type);
-						ret.setResult(sers==null? Collections.EMPTY_SET: sers);
-					}
-					else
-					{
-						IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret); 
-						SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter)
-							.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
-					}
+					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+					Collection<T> sers = ServiceRegistry.getRegistry(component).searchServicesSync(query);
+					if(proxy)
+						sers = createRequiredProxies(component, sers, type);
+					ret.setResult(sers==null? Collections.EMPTY_SET: sers);
 				}
 				else
 				{
-					IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret); 
-					ISubscriptionIntermediateFuture<T> fut = SynchronizedServiceRegistry.getRegistry(component).searchGlobalServices(type, component.getComponentIdentifier(), filter);
-					fut.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
+					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+					IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret);
+					ServiceRegistry.getRegistry(component).searchServicesAsync(query).addIntermediateResultListener(new IntermediateComponentResultListener<T>(lis, component));
 				}
+//				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+//				{
+//					if(filter==null)
+//					{
+//						Collection<T> sers = SynchronizedServiceRegistry.getRegistry(component).searchServices(new ClassInfo(type), component.getComponentIdentifier(), scope);
+//						if(proxy)
+//							sers = createRequiredProxies(component, sers, type);
+//						ret.setResult(sers==null? Collections.EMPTY_SET: sers);
+//					}
+//					else
+//					{
+//						IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret); 
+//						SynchronizedServiceRegistry.getRegistry(component).searchServices(new ClassInfo(type), component.getComponentIdentifier(), scope, filter)
+//							.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
+//					}
+//				}
+//				else
+//				{
+//					IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret); 
+//					ISubscriptionIntermediateFuture<T> fut = SynchronizedServiceRegistry.getRegistry(component).searchGlobalServices(new ClassInfo(type), component.getComponentIdentifier(), filter);
+//					fut.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
+//				}
 			}
 		});
 		
@@ -1204,6 +1211,14 @@ public class SServiceProvider
 	}
 	
 	/**
+	 *  Create a required service proxy.
+	 */
+	protected static <T> T createRequiredProxy(IInternalAccess component, T ser, ClassInfo type)
+	{
+		return createRequiredProxy(component, ser, type.getType(component.getClassLoader()));
+	}
+	
+	/**
 	 *  Create a required service proxies.
 	 */
 	protected static <T> Collection<T> createRequiredProxies(IInternalAccess component, Collection<T> sers, Class<?> type)
@@ -1220,6 +1235,14 @@ public class SServiceProvider
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Create a required service proxies.
+	 */
+	protected static <T> Collection<T> createRequiredProxies(IInternalAccess component, Collection<T> sers, ClassInfo type)
+	{
+		return createRequiredProxies(component, sers, type.getType(component.getClassLoader()));
 	}
 	
 	/**
@@ -1335,6 +1358,44 @@ public class SServiceProvider
 	/**
 	 *  Get the service call service with delay.
 	 */
+	public static <T> IFuture<T> waitForService(final IInternalAccess agent, final String reqservicename, final int max, final int delay)
+	{
+		IResultCommand<IFuture<T>, Void> searchcmd = new IResultCommand<IFuture<T>, Void>()
+		{
+			public IFuture<T> execute(Void args)
+			{
+				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(reqservicename);
+			}
+		};
+		
+		return waitForService(agent, searchcmd, max, delay);
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
+	public static <T> IFuture<T> waitForService(final IExternalAccess agent, final String reqservicename, final int max, final int delay)
+	{
+		IResultCommand<IFuture<T>, Void> searchcmd = new IResultCommand<IFuture<T>, Void>()
+		{
+			public IFuture<T> execute(Void args)
+			{
+				return agent.scheduleStep(new IComponentStep<T>()
+				{
+					public IFuture<T> execute(IInternalAccess ia)
+					{
+						return ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(reqservicename);
+					}
+				});
+			}
+		};
+		
+		return waitForService(agent, searchcmd, max, delay);
+	}
+	
+	/**
+	 *  Get the service call service with delay.
+	 */
 	public static <T> IFuture<T> waitForService(final IExternalAccess agent, final IResultCommand<IFuture<T>, Void> searchcmd, final int max, final int delay)
 	{
 		return agent.scheduleStep(new IComponentStep<T>()
@@ -1388,6 +1449,808 @@ public class SServiceProvider
 		});
 		
 		return ret;
+	}
+	
+	//--------------------------------------------------
+	// A copy of methods with classinfo instead of class
+	//--------------------------------------------------
+	
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(IComponentIdentifier component, ClassInfo type)
+	{
+		return getLocalService(component, type, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(IComponentIdentifier component, ClassInfo type, final String scope)
+	{
+		return getLocalService(component, type, scope, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(IComponentIdentifier component, final ClassInfo type, final String scope, final IFilter<T> filter)
+	{
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component);
+		return ServiceRegistry.getRegistry(component.getRoot()).searchServiceSync(query);
+//		return SynchronizedServiceRegistry.getRegistry(component.getRoot()).searchService(type, component, scope, filter);
+	}
+	
+	/**
+	 *  Get one service of a type. 
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, final ClassInfo type)
+	{
+		return getLocalService(component, type, (String)null, true);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, final ClassInfo type, final String scope)
+	{
+		return getLocalService(component, type, scope, null, true);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param component The internal access.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, final ClassInfo type, final String scope, final IFilter<T> filter)
+	{
+		return getLocalService(component, type, scope, filter, true);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param component The internal access.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, final ClassInfo type, final IComponentIdentifier target)
+	{
+		return getLocalService(component, type, target, true);
+	}
+
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess component, final ClassInfo type)
+	{
+		return getLocalServices(component, type, null, true);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess component, final ClassInfo type, final String scope)
+	{
+		return getLocalServices(component, type, scope, null, true);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess component, final ClassInfo type, final String scope, final IFilter<T> filter)
+	{
+		return getLocalServices(component, type, scope, filter, true);
+	}
+	
+	/**
+	 *  Get one service of a type. 
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, final ClassInfo type, boolean proxy)
+	{
+		return getLocalService(component, type, (String)null, proxy);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, final ClassInfo type, final String scope, boolean proxy)
+	{
+		return getLocalService(component, type, scope, null, proxy);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param component The internal access.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, final ClassInfo type, final String scope, final IFilter<T> filter, boolean proxy)
+	{
+		checkThreadAccess(component, proxy);
+		
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+//		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
+		if(ret==null)
+			throw new ServiceNotFoundException(type.getTypeName());
+		return proxy? createRequiredProxy(component, ret, type): ret;
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param component The internal access.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService0(final IInternalAccess component, final ClassInfo type, final String scope, final IFilter<T> filter, boolean proxy)
+	{
+		checkThreadAccess(component, proxy);
+		
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+//		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
+		return proxy && ret!=null? createRequiredProxy(component, ret, type): ret;
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param component The internal access.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, final ClassInfo type, final IComponentIdentifier target, boolean proxy)
+	{
+		checkThreadAccess(component, proxy);
+		
+		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, (IFilter<T>) null, target, component.getComponentIdentifier());
+		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+//		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+//		{
+//			public boolean filter(T obj) 
+//			{
+//				return ((IService)obj).getServiceIdentifier().getProviderId().equals(target);
+//			}
+//		});
+		if(ret==null)
+			throw new ServiceNotFoundException(type.getTypeName());
+		
+		return proxy? createRequiredProxy(component, ret, type): ret;
+	}
+
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess component, final ClassInfo type, boolean proxy)
+	{
+		return getLocalServices(component, type, null, proxy);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess component, final ClassInfo type, final String scope, boolean proxy)
+	{
+		return getLocalServices(component, type, scope, null, proxy);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess component, final ClassInfo type, final String scope, final IFilter<T> filter, boolean proxy)
+	{
+		checkThreadAccess(component, proxy);
+
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		Collection<T> ret = ServiceRegistry.getRegistry(component).searchServicesSync(query);
+//		Collection<T> ret = SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter);
+		
+		// Fixing the bug by changing createRequiredProxy -> createRequiredProxies leads to not compiling the main class
+		return proxy? createRequiredProxies(component, ret, type): ret;
+	}
+	
+	
+	//-------- async methods --------
+
+	/**
+		 *  Get one service of a type.
+//		 *  (Returns required service proxy).
+		 *  @param type The class.
+		 *  @return The corresponding service.
+		 */
+	public static <T> IFuture<T> getService(IInternalAccess component, ClassInfo type)
+	{
+		return getService(component, type, null, true);
+	}
+	
+	/**
+		 *  Get one service of a type.
+//		 *  (Returns required service proxy).
+		 *  @param type The class.
+		 *  @return The corresponding service.
+		 */
+	public static <T> IFuture<T> getService(IInternalAccess component, ClassInfo type, String scope)
+	{
+		return getService(component, type, scope, (IAsyncFilter<T>)null, true);
+	}
+	
+	/**
+		 *  Get one service of a type.
+//		 *  (Returns required service proxy).
+		 *  @param type The class.
+		 *  @return The corresponding service.
+		 */
+	public static <T> IFuture<T> getService(final IInternalAccess component, final ClassInfo type, final String scope, final IAsyncFilter<T> filter)
+	{
+		return getService(component, type, scope, filter, true);
+	}
+	
+	
+	/**
+	 *  Get a service from a specific component.
+	 *  @param component The component.
+	 *  @param cid The target component identifier.
+	 *  @param type The service type.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(final IInternalAccess component, final IComponentIdentifier cid, final ClassInfo type)
+	{
+		return getService(component, cid, type, true);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(IInternalAccess component, ClassInfo type)
+	{
+		return getServices(component, type, null, true);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(IInternalAccess component, ClassInfo type, String scope)
+	{
+		return getServices(component, type, scope, (IAsyncFilter<T>)null, true);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(IInternalAccess component, ClassInfo type, String scope, IAsyncFilter<T> filter)
+	{
+		return getServices(component, type, scope, filter, true);
+	}
+	
+//		/**
+//		 *  Get one service of a type and only search upwards (parents).
+//		 *  @param type The class.
+//		 *  @return The corresponding service.
+//		 */
+//		public static <T> IFuture<T> getServiceUpwards(IInternalAccess provider, Class<T> type)
+//		{
+//			return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
+//		}
+	
+	/**
+	 *  Get all declared services of the given provider.
+	 *  @return The corresponding services.
+	 */
+	public static <T> IFuture<T> getDeclaredService(IInternalAccess component, ClassInfo type)
+	{
+		return getService(component, type, RequiredServiceInfo.SCOPE_LOCAL, true);
+	}
+	
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IInternalAccess component, ClassInfo type, boolean proxy)
+	{
+		return getService(component, type, null, proxy);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IInternalAccess component, ClassInfo type, String scope, boolean proxy)
+	{
+		return getService(component, type, scope, (IAsyncFilter<T>)null, proxy);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(final IInternalAccess component, final ClassInfo type, final String scope, final IAsyncFilter<T> filter, final boolean proxy)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
+				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));
+//				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+//				{
+//					if(filter==null)
+//					{
+//						IServiceRegistry reg = ServiceRegistry.getRegistry(component);
+//						T ser = reg==null? null: (T)reg.searchService(type, component.getComponentIdentifier(), scope);
+////							T ser = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope);
+//						if(ser!=null)
+//						{
+//							if(proxy)
+//								ser = createRequiredProxy(component, ser, type);
+//							ret.setResult(ser);
+//						}
+//						else
+//						{
+//							ret.setException(new ServiceNotFoundException(type.getTypeName()));
+//						}
+//					}
+//					else
+//					{
+//						IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
+//						SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter)
+//							.addResultListener(new ComponentResultListener<T>(lis, component));
+//					}
+//				}
+//				else
+//				{
+//					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
+//					SynchronizedServiceRegistry.getRegistry(component).searchGlobalService(type, component.getComponentIdentifier(), filter)
+//						.addResultListener(new ComponentResultListener<T>(lis, component));
+//				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a service from a specific component.
+	 *  @param component The component.
+	 *  @param cid The target component identifier.
+	 *  @param type The service type.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(final IInternalAccess component, final IComponentIdentifier cid, final ClassInfo type, final boolean proxy)
+	{
+		return getService(component, cid, RequiredServiceInfo.SCOPE_LOCAL, type, proxy);
+	}
+	
+	/**
+	 *  Get a service from a specific component.
+	 *  @param component The component.
+	 *  @param cid The target component identifier.
+	 *  @param type The service type.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(final IInternalAccess component, final IComponentIdentifier cid, final String scope, final ClassInfo type, final boolean proxy)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				// component itself?
+				if(cid.equals(component.getComponentIdentifier()))
+				{
+					T res = (T)component.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type.getType(component.getClassLoader()));
+					if(res!=null)
+					{
+						if(proxy)
+							res = createRequiredProxy(component, res, type);
+						ret.setResult(res);
+					}
+					else
+					{
+						ret.setException(new ServiceNotFoundException(""+type));
+					}
+				}
+				
+				// local component?
+				else if(cid.getRoot().equals(component.getComponentIdentifier().getRoot()))
+				{
+					SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+					{
+						public void customResultAvailable(IComponentManagementService cms)
+						{
+							cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+							{
+								public void customResultAvailable(IExternalAccess ea)
+								{
+									final Class<T>	ftype = (Class)type.getType(component.getClassLoader());
+									IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, ftype): new DelegationResultListener<T>(ret);
+									
+									final IComponentIdentifier	fcid	= cid;
+									
+									ea.scheduleStep(new ImmediateComponentStep<T>()
+									{
+										@Classname("getService(final IInternalAccess provider, final IComponentIdentifier cid, final Class<T> type)")
+										
+										public IFuture<T> execute(IInternalAccess ia)
+										{
+											return getService(ia, fcid, ftype, false);
+										}
+									}).addResultListener(new ComponentResultListener<T>(lis, component));
+								}
+							});
+						}
+					});
+				}
+					
+				// For remote use rms, to allow correct security settings due to not using getExternalAccess()
+				else
+				{
+					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
+					
+					IRemoteServiceManagementService rms	= SServiceProvider.getLocalService(component, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					IFuture<T> fut = rms.getServiceProxy(component.getComponentIdentifier(), cid, type, scope, null);
+					fut.addResultListener(new ComponentResultListener<T>(lis, component));
+				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(IInternalAccess component, ClassInfo type, boolean proxy)
+	{
+		return getServices(component, type, null, proxy);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(IInternalAccess component, ClassInfo type, String scope, boolean proxy)
+	{
+		return getServices(component, type, scope, (IAsyncFilter<T>)null, proxy);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess component, final ClassInfo type, final String scope, final IAsyncFilter<T> filter, final boolean proxy)
+	{
+		final TerminableIntermediateDelegationFuture<T> ret = new TerminableIntermediateDelegationFuture<T>();
+		
+		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+				IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new IntermediateDelegationResultListener<T>(ret);
+				ServiceRegistry.getRegistry(component).searchServicesAsync(query).addResultListener(new IntermediateComponentResultListener<T>(lis, component));
+//				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+//				{
+//					if(filter==null)
+//					{
+//						Collection<T> sers = SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope);
+//						if(proxy)
+//							sers = createRequiredProxies(component, sers, type);
+//						ret.setResult(sers==null? Collections.EMPTY_SET: sers);
+//					}
+//					else
+//					{
+//						IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new IntermediateDelegationResultListener<T>(ret); 
+//						SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter)
+//							.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
+//					}
+//				}
+//				else
+//				{
+//					IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new IntermediateDelegationResultListener<T>(ret); 
+//					ISubscriptionIntermediateFuture<T> fut = SynchronizedServiceRegistry.getRegistry(component).searchGlobalServices(type, component.getComponentIdentifier(), filter);
+//					fut.addResultListener(new IntermediateComponentResultListener<T>(lis, component));
+//				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get all declared services of the given provider.
+//	 *  (Returns required service proxy).
+	 *  @return The corresponding services.
+	 */
+	public static <T> IFuture<T> getDeclaredService(IInternalAccess component, ClassInfo type, boolean proxy)
+	{
+		return getService(component, type, RequiredServiceInfo.SCOPE_LOCAL, proxy);
+	}
+	
+	//-------- external access method duplicates --------
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IExternalAccess provider, ClassInfo type)
+	{
+		return getService(provider, type, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IExternalAccess provider, ClassInfo type, String scope)
+	{
+		return getService(provider, type, scope, (IAsyncFilter<T>)null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IExternalAccess provider, final ClassInfo type, final String scope, final IAsyncFilter<T> filter)
+	{
+		return provider.scheduleStep(new ImmediateComponentStep<T>()
+		{
+			@Classname("getService(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)")
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return getService(ia, type, scope, filter, false);
+			}
+		});
+	}
+	
+	/**
+	 *  Get a service from a specific component.
+	 *  @param access The external access.
+	 *  @param cid The target component identifier.
+	 *  @param type The service type.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IExternalAccess access, final IComponentIdentifier cid, final ClassInfo type)
+	{
+		return access.scheduleStep(new ImmediateComponentStep<T>()
+		{
+			@Classname("getService(IExternalAccess provider, final IComponentIdentifier cid, final Class<T> type)")
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return getService(ia, cid, type, false);
+			}
+		});
+	}
+	
+	/**
+	 *  Get a service from a specific component with defined scope.
+	 *  @param access The external access.
+	 *  @param cid The target component identifier.
+	 *  @param scope The search scope.
+	 *  @param type The service type.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IExternalAccess access, final IComponentIdentifier cid, final String scope, final ClassInfo type)
+	{
+		return access.scheduleStep(new ImmediateComponentStep<T>()
+		{
+			@Classname("getService(IExternalAccess provider, final IComponentIdentifier cid, final String scope, final Class<T> type)")
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return getService(ia, cid, scope, type, false);
+			}
+		});
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(IExternalAccess provider, ClassInfo type)
+	{
+		return getServices(provider, type, null);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(IExternalAccess provider, ClassInfo type, String scope)
+	{
+		return getServices(provider, type, scope, (IAsyncFilter<T>)null);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(IExternalAccess provider, final ClassInfo type, final String scope, final IAsyncFilter<T> filter)
+	{
+		return (ITerminableIntermediateFuture<T>)provider.scheduleStep(new ImmediateComponentStep<Collection<T>>()
+		{
+			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)")
+			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
+			{
+				return getServices(ia, type, scope, filter);
+			}
+		});
+	}
+	
+	/**
+	 *  Get all declared services of the given provider.
+	 *  @return The corresponding services.
+	 */
+	public static <T> IFuture<T> getDeclaredService(IExternalAccess provider, ClassInfo type)
+	{
+		return getService(provider, type, RequiredServiceInfo.SCOPE_LOCAL);
+	}
+	
+	/**
+	 *  Get a service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> IFuture<T> getTaggedService(IExternalAccess provider, final ClassInfo type, final String scope, final String... tags)
+	{
+		return (IFuture<T>)provider.scheduleStep(new ImmediateComponentStep<T>()
+		{
+			@Classname("getService(IExternalAccess provider, final Class<T> type, final String scope, final String... args)")
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return getTaggedService(ia, type, scope, tags);
+			}
+		});
+	}
+	
+	/**
+	 *  Find service by type and tags. Service must have all the tags.
+	 *  @param component The component.
+	 *  @param type The service type.
+	 *  @param scope The search scope.
+	 *  @param tags The tags.
+	 *  @return A matching service
+	 */
+	public static <T> IFuture<T> getTaggedService(final IInternalAccess component, ClassInfo type, String scope, final String... tags)
+	{
+		return getService(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+	}
+	
+	/**
+	 *  Get all services of a type and tags. Services must have all the tags.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(IExternalAccess component, final ClassInfo type, final String scope, final String... tags)
+	{
+		return (ITerminableIntermediateFuture<T>)component.scheduleStep(new ImmediateComponentStep<Collection<T>>()
+		{
+			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final String... args)")
+			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
+			{
+				return getTaggedServices(ia, type, scope, tags);
+			}
+		});
+	}
+	
+	/**
+	 *  Find services by type and tags. Service must have all the tags.
+	 *  @param component The component.
+	 *  @param type The service type.
+	 *  @param scope The search scope.
+	 *  @param tags The tags.
+	 *  @return A matching service
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(final IInternalAccess component, ClassInfo type, String scope, final String... tags)
+	{
+		return getServices(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IInternalAccess component, Class<T> type, String scope, IAsyncFilter<T> filter)
+	{
+		return addQuery(component.getComponentIdentifier(), type, scope, filter);
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IExternalAccess component, Class<T> type, String scope, IAsyncFilter<T> filter)
+	{
+		return addQuery(component.getComponentIdentifier(), type, scope, filter);
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IComponentIdentifier cid, Class<T> type, String scope, IAsyncFilter<T> filter)
+	{
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, cid);
+		
+		return ServiceRegistry.getRegistry(cid).addQuery(query);
+//		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, cid);
+		
+//		return SynchronizedServiceRegistry.getRegistry(cid).addQuery(query);
 	}
 }
 

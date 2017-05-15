@@ -67,7 +67,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		return ret;
@@ -101,7 +101,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 						Object newval = traverser.doTraverse(val, sot, postprocessors, processors, mode, targetcl, context);
 //						Object newval = traverser.doTraverse(val, sot, rsionprocessors, postprocessors, mode, targetcl, context)
 //						Object newval = traverser.doTraverse(val, sot, cloned, null, processors, postprocessors, clone, targetcl, context);
-						
+
 						if(newval != Traverser.IGNORE_RESULT && (object!=ret || val!=newval))
 						{
 //							if ("result".equals(prop.getName()))
@@ -114,7 +114,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 			}
 			catch(Exception e)
 			{
-				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+				throw SUtil.throwUnchecked(e);
 			}
 		}
 		
@@ -139,7 +139,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 //			}
 //			catch(Exception e)
 //			{
-//				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+//				throw SUtil.throwUnchecked(e);
 //			}
 //		}
 	}
@@ -203,7 +203,8 @@ public class JsonBeanProcessor implements ITraverseProcessor
 			// Autoconvert basic from string
 			if(value instanceof String)
 			{
-				IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(targetclazz);
+//				IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(targetclazz);
+				IStringObjectConverter conv = BasicTypeConverter.getExtendedStringConverter(targetclazz);
 				if(conv!=null)
 				{
 					try

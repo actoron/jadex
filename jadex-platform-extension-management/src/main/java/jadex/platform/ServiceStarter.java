@@ -4,6 +4,7 @@ import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 
@@ -162,8 +163,21 @@ public class ServiceStarter implements Daemon
 	{
 		if(platform==null)
 		{
-			platform = Starter.createPlatform(args).get();
+			PlatformConfiguration	config	= getConfig();
+			config.setProgramArguments(args);
+			config.parseArgs(args);
+			
+			platform = Starter.createPlatform(config).get();
 		}		
+	}
+	
+	/**
+	 *  Get the platform configuration.
+	 *  Subclass and override for specific use cases.
+	 */
+	protected PlatformConfiguration	getConfig()
+	{
+		return PlatformConfiguration.getDefaultNoGui();
 	}
 
 	/**

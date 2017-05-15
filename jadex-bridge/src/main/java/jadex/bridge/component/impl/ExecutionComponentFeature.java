@@ -39,6 +39,8 @@ import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -173,6 +175,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	}
 	
 	/**
+	 *  Check if the feature potentially executed user code in body.
+	 *  Allows blocking operations in user bodies by using separate steps for each feature.
+	 *  Non-user-body-features are directly executed for speed.
+	 *  If unsure just return true. ;-)
+	 */
+	public boolean	hasUserBody()
+	{
+		return false;
+	}
+	
+	/**
 	 *  Kill is only invoked, when shutdown of some (e.g. other) feature does not return due to timeout.
 	 *  The feature should do any kind of possible cleanup, but no asynchronous operations.
 	 */
@@ -294,6 +307,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/**
 	 * Repeats a ComponentStep periodically, until terminate() is called on result future.
+	 * 
+	 * Warning: In order to avoid memory leaks, the returned subscription future does NOT store
+	 * values, requiring the addition of a listener within the same step the repeat
+	 * step was schedule.
+	 * 
 	 * @param initialDelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
@@ -312,7 +330,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				stillRepeating.set(Boolean.FALSE);
 			}
-		});
+		}, false);
 		
 		// schedule the initial step
 		waitForDelay(initialDelay, step)
@@ -373,6 +391,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		final Future<T> ret = new Future<T>();
 		
+		// todo: support getLocal... with proxy==false
 //		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
@@ -383,6 +402,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					public void timeEventOccurred(long currenttime)
 					{
+//						System.out.println("step: "+step);
 						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 					}
 					
@@ -617,59 +637,100 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-				.addResultListener(new IResultListener<IExecutionService>()
+			ServiceQuery<IExecutionService> query = new ServiceQuery<IExecutionService>(IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier());
+			IExecutionService exe = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+			// Hack!!! service is foudn before it is started, grrr.
+			if (exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
-				public void resultAvailable(IExecutionService exe)
+				if(bootstrap)
 				{
-					// Hack!!! service is foudn before it is started, grrr.
-					if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
-					{
-						if(bootstrap)
-						{
-							// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-							available	= true;
-						}
-						else
-						{
-							exe.execute(ExecutionComponentFeature.this);
-						}
-					}
-					else
-					{
-						exceptionOccurred(null);
-					}
+					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+					available	= true;
 				}
-				
-				public void exceptionOccurred(Exception exception)
+				else
 				{
-					available	= false;
-					
-					// Happens during platform bootstrapping -> execute on platform rescue thread.
-					if(!bootstrap)
+					exe.execute(ExecutionComponentFeature.this);
+				}
+			}
+			else
+			{
+				available	= false;
+				// Happens during platform bootstrapping -> execute on platform rescue thread.
+				if(!bootstrap)
+				{
+					bootstrap	= true;
+					Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
 					{
-						bootstrap	= true;
-						Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+						public void run()
 						{
-							public void run()
+							boolean	again	= true;
+							while(!available && again)
 							{
-								boolean	again	= true;
-								while(!available && again)
-								{
-									again	= execute();
-								}
-								bootstrap	= false;
-								
-								if(again)
-								{		
-									// Bootstrapping finished -> do real kickoff
-									wakeup();
-								}
+								again	= execute();
 							}
-						});
-					}
+							bootstrap	= false;
+							
+							if(again)
+							{		
+								// Bootstrapping finished -> do real kickoff
+								wakeup();
+							}
+						}
+					});
 				}
-			});
+			}
+//			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+//				.addResultListener(new IResultListener<IExecutionService>()
+//			{
+//				public void resultAvailable(IExecutionService exe)
+//				{
+//					// Hack!!! service is foudn before it is started, grrr.
+//					if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+//					{
+//						if(bootstrap)
+//						{
+//							// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+//							available	= true;
+//						}
+//						else
+//						{
+//							exe.execute(ExecutionComponentFeature.this);
+//						}
+//					}
+//					else
+//					{
+//						exceptionOccurred(null);
+//					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					available	= false;
+//					// Happens during platform bootstrapping -> execute on platform rescue thread.
+//					if(!bootstrap)
+//					{
+//						bootstrap	= true;
+//						Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+//						{
+//							public void run()
+//							{
+//								boolean	again	= true;
+//								while(!available && again)
+//								{
+//									again	= execute();
+//								}
+//								bootstrap	= false;
+//								
+//								if(again)
+//								{		
+//									// Bootstrapping finished -> do real kickoff
+//									wakeup();
+//								}
+//							}
+//						});
+//					}
+//				}
+//			});
 		}
 	}
 	
@@ -762,11 +823,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 	}
 	
+	
 	/**
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.
+	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
 	 */
-	public void	block(final Object monitor, long timeout)
+ 	public void	block(final Object monitor, long timeout, boolean realtime)
 	{
 		if(!isComponentThread())
 		{
@@ -775,7 +838,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(parenta!=null)
 		{
-			parenta.block(monitor, timeout);
+			parenta.block(monitor, timeout, realtime);
 		}
 		else
 		{
@@ -806,14 +869,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			if(timeout!=Timeout.NONE)
 			{
 				final Exception ex	= Future.DEBUG ? new DebugException("Timeout: "+timeout) : null;
-				waitForDelay(timeout)
+				waitForDelay(timeout, realtime)
 					.addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
 						if(!unblocked[0])
 						{
-							unblock(monitor, new TimeoutException(null, ex));
+							unblock(monitor, new TimeoutException(Future.DEBUG ? "" : "Use PlatformConfiguration.setDebugFutures(true) for timeout cause.", ex));
 						}
 					}
 					
@@ -921,8 +984,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public boolean execute()
 	{
-		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getComponent()));
-		
 		synchronized(this)
 		{
 			if(executing)
@@ -1468,6 +1529,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		IInternalExecutionFeature.LOCAL.set(getComponent());
 		ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(component.getClassLoader());
+		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getComponent()));
 		return cl;
 	}
 	

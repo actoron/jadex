@@ -36,16 +36,21 @@ public class GoalParameterBDI
 	 * 
 	 */
 	@Goal(excludemode=ExcludeMode.WhenFailed)
-	public class TestGoal
+	public static class TestGoal
 	{
+//		static
+//		{
+//			System.out.println("tg: "+TestGoal.class.getClassLoader());
+//		}
+		
 		@GoalParameter
 		protected int cnt;
 		
 //		@GoalParameter
 //		protected List<String> elems = new ArrayList<String>();
 
-		
-		@GoalTargetCondition(parameters="cnt")
+		@GoalTargetCondition
+//		@GoalTargetCondition(parameters="cnt")
 //		@GoalTargetCondition(parameters="elems")
 //		@GoalTargetCondition(rawevents=ChangeEvent.PARAMETERCHANGED+".jadex.bdiv3.testcases.goals.GoalParameterBDI$TestGoal.cnt")
 //		@GoalTargetCondition(rawevents=ChangeEvent.PARAMETERCHANGED+".*")

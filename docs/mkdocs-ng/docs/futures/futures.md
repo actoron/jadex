@@ -283,35 +283,6 @@ fut.addIntermediateResultListener(new IntermediateDefaultResultListener<String>(
 fut.pullIntermediateResult();
 ```
 
-# Special Result Listeners
-
-TODO: introduction
-## Counting
-
-TODO: no IFunctionalResultListener.
-```java
-        Future<String> fut1 = new Future<String>();
-        Future<String> fut2 = new Future<String>();
-        Future<String> fut3 = new Future<String>();
-
-        CounterResultListener<String> res = SResultListener.countResults(3, new IFunctionalResultListener<Void>() {
-            @Override
-            public void resultAvailable(Void result) {
-                successTarget.setResult("completed");
-            }
-        });
-
-        fut1.addResultListener(res);
-        fut2.addResultListener(res);
-        fut3.addResultListener(res);
-```
-
-TODO: can also be used by manually calling resultAvailable(null).
-
-## Delegation
-TODO
-
-
 # Common Pitfalls
 This section discusses problems frequently encountered in the Jadex Active Components community. 
 
@@ -333,6 +304,56 @@ Calling *get()* on the main thread may result in a hung-up program.
 
 # Advanced Topics
 
+## Special Result Listeners
+
+For some generic, re-occuring tasks, Jadex includes special result listeners.
+Some of the most useful types are introduced below, for a complete list check out the ```IResultListener``` [subtypes](${URLJavaDoc}/jadex/commons/future/IResultListener.html).
+
+### Delegation
+As Futures, respectively the corresponding asynchronous calls, get nested, we need way to delegate results from one Future to the other.
+E.g., in the following method, we want to add two integers and then convert them to a string.  
+The ```ExceptionDelegationResultListener``` forwards exceptions to the given future and allows to implement a custom result handling.  
+The ```DelegationResultListener``` forwards results and exceptions to the given future.
+```java
+public IFuture<String> addAndToString(int a, int b) {
+	Future<String> res = new Future<String>();
+	addService.add(a,b).addResultListener(new ExceptionDelegationResultListener<Integer, String>(res) {
+		@Override
+		public void customResultAvailable(Integer result) throws Exception {
+			toStringService.toString(result).addResultListener(new DelegationResultListener<String>(res));
+		}
+	});
+	return res;
+}
+```
+
+Additionally, with Java 8 Lambda Expressions, you can also use ```SResultListener.delegate``` and ```SResultListener.delegateExceptions```:
+```java
+addService.add(a,b).addResultListener(SResultListener.delegateExceptions(res, 
+	sum -> toStringService.toString(sum).addResultListener(SResultListener.delegate(res))));
+```
+
+### Counting
+In many cases, one wants to wait for multiple asynchronous calls to be completed.
+This can simply be implemented using a ```CounterResultListener```:
+
+```java
+				final Future<Void> completionFuture = new Future<Void>();
+				Future<String> call1 = new Future<String>();
+				Future<String> call2 = new Future<String>();
+				Future<String> call3 = new Future<String>();
+
+				CounterResultListener<String> res = new CounterResultListener(3, new DelegationResultListener<Void>(completionFuture));
+
+				call1.addResultListener(res);
+				call2.addResultListener(res);
+				call3.addResultListener(res);
+				completionFuture.get();
+```
+
+This will make completionFuture.get() block until all three Futures/Calls are done. 
+It is also possible to manually advance the counter by calling ```res.resultAvailable(null)``` for more flexibility.
+
 ## SResultListener
 When using Java 8 and [functional result listeners](#java-8-features), there is no need to create inner classes, even if you want to delegate results to another future or count results with a *CounterResultListener*.  
 Instead, you can use the static methods of ```SResultListener```:
@@ -346,5 +367,6 @@ fut.addResultListener(res -> ... , SResultListener.delegate(myFut));
 // delegate results, use exceptions:
 fut.addResultListener(SResultListener.delegate(myFut), ex -> ...);
 
-// count results and 
+// count results
+CounterResultListener<> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
 ```

@@ -118,7 +118,7 @@ public class ProviderAgent implements ITestService
 
 		System.out.println("Timeout is: " + to);
 	
-		final long wait = to>0? to*3: 0;
+		final long wait = to>0? to*2: 0;
 		final long startwait = System.currentTimeMillis();
 //		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()

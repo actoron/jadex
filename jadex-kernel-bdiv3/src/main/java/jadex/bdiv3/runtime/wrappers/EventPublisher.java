@@ -21,7 +21,7 @@ import jadex.rules.eca.RuleSystem;
 /**
  *  Helper object for publishing change events (beliefs, parameters).
  */
-public class EventPublisher
+public class EventPublisher implements IEventPublisher
 {
 	/** The agent interpreter. */
 	protected IInternalAccess agent;

@@ -3,6 +3,7 @@ package jadex.micro.examples.hunterprey;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -34,29 +35,29 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 	 */
 	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentDescription agent, final ISpaceObject avatar)
 	{
-		SServiceProvider.getService(space.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(space.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IComponentManagementService ces)
 			{
-				IComponentManagementService ces = (IComponentManagementService)result;
-				ces.getExternalAccess(agent.getName()).addResultListener(new IResultListener()
+				ces.getExternalAccess(agent.getName()).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void exceptionOccurred(Exception exception)
 					{
 						// May happen when agent has been killed concurrently.
 //						exception.printStackTrace();
 					}
-					public void resultAvailable(Object result)
+					public void resultAvailable(IExternalAccess exta)
 					{
 						final Space2D	space2d	= (Space2D)space;
-						final IExternalAccess	exta	= (IExternalAccess)result;
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("food")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								MicroPreyAgent	mp	= (MicroPreyAgent)ia;
-								ISpaceObject	nearfood	= mp.getNearestFood();
+								MicroPreyAgent mp = (MicroPreyAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+								
+								ISpaceObject nearfood	= mp.getNearestFood();
 								
 								// Remember new food only if nearer than other known food (if any).
 								if(type.equals("food_seen"))
@@ -68,6 +69,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 											space2d.getDistance((IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION),
 												(IVector2)((ISpaceObject)percept).getProperty(Space2D.PROPERTY_POSITION))))
 									{
+//										System.out.println("setting food: "+percept+" "+agent.getName());
 										mp.setNearestFood((ISpaceObject)percept);
 									}
 								}

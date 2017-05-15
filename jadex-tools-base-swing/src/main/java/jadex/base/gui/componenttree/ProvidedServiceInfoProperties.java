@@ -9,13 +9,16 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -65,22 +68,29 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 
 		if(service.getType().getType0()==null)
 		{
-			SServiceProvider.getService(ea, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
+			ea.scheduleStep(new IComponentStep<Void>()
 			{
-				public void customResultAvailable(ILibraryService ls)
+				public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 				{
-					ls.getClassLoader(sid.getResourceIdentifier())
-						.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+					SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 					{
-						public void customResultAvailable(ClassLoader cl)
+						public void customResultAvailable(ILibraryService ls)
 						{
-							Class type = service.getType().getType(cl);
-//							System.out.println("Found: "+service.getType().getTypeName()+" "+cl+" "+type);
-							internalSetService(type);
+							ls.getClassLoader(sid.getResourceIdentifier())
+								.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+							{
+								public void customResultAvailable(ClassLoader cl)
+								{
+									Class<?> type = service.getType().getType(cl);
+		//							System.out.println("Found: "+service.getType().getTypeName()+" "+cl+" "+type);
+									internalSetService(type);
+								}
+							});
 						}
 					});
-				}
+					
+					return IFuture.DONE;				}
 			});
 		}
 		else

@@ -13,6 +13,7 @@ import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.MObjectType;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -75,13 +76,16 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 		fetcher.setValue("$object", this);
 	}
 	
-	/**
-	 *  Bean constructor.
-	 */
-	public SpaceObject()
-	{
-		super(null, new Object());
-	}
+	// HACK constructor!!!
+	// For what purpose space objects must be sent via service calls?
+	// Makes it easy to create 'wrong' space objects
+//	/**
+//	 *  Bean constructor.
+//	 */
+//	public SpaceObject()
+//	{
+//		super(null, new Object());
+//	}
 	
 	//-------- methods --------
 	
@@ -111,13 +115,13 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 */
 	public void setProperty(String name, Object value)
 	{
-//		if(getType().equals("waste") && name.equals(Space2D.PROPERTY_POSITION))
+//		if(getType().equals("prey") && name.equals(Space2D.PROPERTY_POSITION))
 //			System.out.println("Setting: "+name+" "+value);
 		
 		Object	oldvalue;
 //		synchronized(getMonitor())
 //		{
-		oldvalue	= super.getProperty(name); 
+		oldvalue = super.getProperty(name); 
 		super.setProperty(name, value);
 //		}
 		

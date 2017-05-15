@@ -27,8 +27,14 @@ public class ExtinguishFirePlan extends Plan
 	{
 		Space2D	space	= (Space2D)getBeliefbase().getBelief("environment").getFact();
 		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		ISpaceObject	disaster	= (ISpaceObject)getParameter("disaster").getValue();
-		
+		Object	disasterId	= getParameter("disasterId").getValue();
+		ISpaceObject disaster = space.getSpaceObject0(disasterId);
+//		if (disaster == null) {
+//			System.out.println("skipping plan, no disaster with id="+disasterId);
+//			return;
+//		}
+
+
 		// Move to disaster location
 		myself.setProperty("state", "moving_to_disaster");
 		IVector2	targetpos	= DisasterType.getFireLocation(disaster);
@@ -52,7 +58,7 @@ public class ExtinguishFirePlan extends Plan
 	 */
 	public void failed()
 	{
-		System.err.println("Plan failed: "+this);
-		getException().printStackTrace();
+//		System.err.println("Plan failed: "+this);
+//		getException().printStackTrace();
 	}
 }

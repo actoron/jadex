@@ -30,7 +30,8 @@ public class JsonLRUProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(LRU.class, clazz));
+//		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(LRU.class, clazz));
+		return object instanceof JsonObject && SReflect.isSupertype(LRU.class, clazz);
 	}
 	
 	/**

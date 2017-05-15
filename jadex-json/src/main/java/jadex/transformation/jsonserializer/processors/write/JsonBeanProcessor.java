@@ -72,7 +72,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			SUtil.rethrowAsUnchecked(e);
+			throw SUtil.throwUnchecked(e);
 		}
 		
 		wr.write("}");
@@ -123,7 +123,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 			}
 			catch(Exception e)
 			{
-				throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+				throw SUtil.throwUnchecked(e);
 			}
 		}
 	}

@@ -158,8 +158,7 @@ public class SubscriptionInfo
 		Store store = null;
 		try
 		{
-			Properties props = System.getProperties();
-			props.setProperty("mail.store.protocol", account.getReceiveProtocol());
+			Properties props = account.getProperties();
 			Session session = Session.getDefaultInstance(props, null);
 			store = session.getStore(account.getReceiveProtocol());
 			// Warning this is a blocking call that may block the agent several seconds
@@ -248,8 +247,7 @@ public class SubscriptionInfo
 		}
 		catch(Exception e)
 		{
-			throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
-//			e.printStackTrace();
+			throw SUtil.throwUnchecked(e);
 		}
 		finally
 		{

@@ -1,9 +1,10 @@
 package jadex.commons.transformation.traverser;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+
+import jadex.commons.SUtil;
 
 /**
  *  This class is a struct for saving data about an inspected bean property.
@@ -302,11 +303,7 @@ public class BeanProperty
 			}
 			catch(Exception e)
 			{
-				Throwable	ex	= e;
-				if(ex instanceof InvocationTargetException)
-					ex	= ((InvocationTargetException)e).getTargetException();
-				
-				throw (ex instanceof RuntimeException) ? (RuntimeException)ex : new RuntimeException(ex);
+				throw SUtil.throwUnchecked(e);
 			}
 		}
 		else
@@ -320,11 +317,7 @@ public class BeanProperty
 			}
 			catch (Exception e)
 			{
-				Throwable	ex	= e;
-				if(ex instanceof InvocationTargetException)
-					ex	= ((InvocationTargetException)e).getTargetException();
-				
-				throw (ex instanceof RuntimeException) ? (RuntimeException)ex : new RuntimeException(ex);
+				throw SUtil.throwUnchecked(e);
 			}
 		}
 	}

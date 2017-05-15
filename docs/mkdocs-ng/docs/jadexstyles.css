@@ -10,10 +10,6 @@
 	color: #2C6700;
 }
 
-.hljs-keyword {
-	color:#6F0000;
-}
-
 .hljs-attribute {
 	color: #800080;
 }
@@ -25,6 +21,14 @@
 
 .hljs-tag .hljs-title {
 	color:#008080;
+}
+
+.java.hljs .hljs-keyword {
+	color:#6F0000;
+}
+
+.java.hljs .hljs-annotation {
+	color:#646464;
 }
 
 p {
@@ -144,6 +148,13 @@ pre code {
 	font-weight: bold;
 }
 
+/* sub-subitems */
+.wy-menu-vertical ul > li.toctree-l1.current > ul > li > a.toctree-l4 {
+	padding: 0.4045em 4.2em;
+	font-size: 80%;
+}
+
+/** subnav styles (chapter with many files) **/
 /* current menu item (is subitem) */
 .wy-menu-vertical ul.subnav > li.toctree-l1.current > a {
 	font-weight: unset;
@@ -155,11 +166,12 @@ pre code {
 	padding: 0.4045em 3.7em;
 }
 
-/* sub-subitems */
-.wy-menu-vertical ul > li.toctree-l1.current > ul > li > a.toctree-l4 {
-	padding: 0.4045em 4.2em;
+/* sub-subitems in subnav */
+.wy-menu-vertical ul.subnav > li.toctree-l1.current > ul > li > a.toctree-l4 {
+	padding: 0.4045em 5.2em;
 	font-size: 80%;
 }
+/** subnav styles end **/
 
 /* default link color */
 .wy-menu-vertical li ul li a {
@@ -213,6 +225,17 @@ pre code {
     border: 1px solid grey;
     width: 100%;
 	background: #e7f2fa;
+	display: block;
+}
+
+.rst-content x-attention {
+	padding: 12px;
+	font-size:100%;
+	font-weight:bold;
+    border-radius: 5px;
+    border: 1px dashed black;
+    width: 100%;
+	background: #ff6666;
 	display: block;
 }
 

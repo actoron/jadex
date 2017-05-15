@@ -1,24 +1,10 @@
 package jadex.micro.testcases.nfservicetags;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.TagProperty;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.IAsyncFilter;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.ProvidedService;
@@ -28,7 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @Arguments(
 	//@Argument(name=TagProperty.NAME, clazz=String.class, defaultvalue="new String[]{\"mytag1\",\"mytag2\"}")
-	@Argument(name=TagProperty.NAME, clazz=String.class, defaultvalue=TagProperty.PLATFORM_NAME)
+	@Argument(name=TagProperty.NAME, clazz=String[].class, defaultvalue="new String[]{jadex.bridge.sensor.service.TagProperty.PLATFORM_NAME, null}")
 //	@Argument(name=TagProperty.NAME, clazz=String.class, defaultvalue="new String[]{"+TagProperty.PLATFORM_NAME+","+TagProperty.JADEX_VERSION+"}")
 )
 @ProvidedServices(@ProvidedService(type=ITestService.class))

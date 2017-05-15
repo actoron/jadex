@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
@@ -27,12 +29,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.search.DistributedServiceRegistry;
 import jadex.bridge.service.search.GlobalQueryServiceRegistry;
-import jadex.bridge.service.search.MultiServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -165,7 +164,24 @@ public class Starter
 //			e.printStackTrace();
 //		}
 		
-		createPlatform(args).get();
+		createPlatform(args).get().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				String remoteaddr = "tcp-mtp://"+"ec2-54-190-58-166.us-west-2.compute.amazonaws.com"+":36000";
+				String platformname = "Allie-Jadex_720F614FB6ED061A";
+				IComponentIdentifier	remotecid	= new ComponentIdentifier(platformname, new String[]{remoteaddr});
+				
+				// Create proxy for remote platform such that remote services are found
+				Map<String, Object>	args = new HashMap<String, Object>();
+				args.put("component", remotecid);
+				CreationInfo ci = new CreationInfo(args);
+				ci.setDaemon(true);
+				IComponentManagementService	cms	= SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
+				return IFuture.DONE;
+			}
+		});
 		
 //		IExternalAccess access	= createPlatform(args).get();
 //				Runtime.getRuntime().addShutdownHook(new Thread()
@@ -218,7 +234,9 @@ public class Starter
 	 *  Create the platform.
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
+	 *  @deprecated since 3.0.7. Use other createPlatform methods instead.
 	 */
+	@Deprecated
 	public static IFuture<IExternalAccess> createPlatform(Map<String, String> args)
 	{
 		PlatformConfiguration config = PlatformConfiguration.processArgs(args);
@@ -382,20 +400,15 @@ public class Starter
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 
-					if(config.getDht() || config.getDhtProvide()) 
-					{
-						boolean providedhtonly = !config.getDht();
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new DistributedServiceRegistry(component.getInternalAccess(), providedhtonly));						
-					} 
 //					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
-					else if(config.getRegistrySync())
+					if(config.getRegistrySync())
 					{
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(true, new MultiServiceRegistry()));
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new ServiceRegistry());
 					}
 					else
 					{
 						// ServiceRegistry cannot handle backport for polling in case of global queries
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(false, new GlobalQueryServiceRegistry(5000))); 
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new GlobalQueryServiceRegistry(5000)); 
 					}
 					
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());
@@ -454,16 +467,21 @@ public class Starter
 			}
 		}
 
-		if (printExceptions) {
-			ret.addResultListener(new IResultListener<IExternalAccess>() {
-				public void exceptionOccurred(Exception exception) {
+		if(printExceptions) 
+		{
+			ret.addResultListener(new IResultListener<IExternalAccess>() 
+			{
+				public void exceptionOccurred(Exception exception) 
+				{
 					System.out.println(exception.getMessage());
-					if (Future.DEBUG) {
+					if(Future.DEBUG) 
+					{
 						exception.printStackTrace();
 					}
 				}
 
-				public void resultAvailable(IExternalAccess result) {
+				public void resultAvailable(IExternalAccess result) 
+				{
 				}
 			});
 		}

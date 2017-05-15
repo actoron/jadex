@@ -20,6 +20,12 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	/** Custom functional result listener */
 	protected IIntermediateResultListener<E>	delegate;
 
+	/** Custom functional result listener */
+	protected IFunctionalResultListener<Collection<E>>	customResultListener;
+
+	/** Custom functional intermediate result listener */
+	protected IFunctionalIntermediateResultListener<E>	customIntermediateResultListener;
+
 	// -------- constructors --------
 
 //	public IntermediateDelegationResultListener(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener,
@@ -70,7 +76,18 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future)
 	{
-		this(future, false);
+		this(future, null, null);
+	}
+
+	/**
+	 * Create a new listener.
+	 * @param future The delegation target.
+	 * @param customResultListener Custom result listener that overwrites the delegation behaviour.
+	 * @param customIntermediateResultListener Custom intermediate result listener that overwrites the delegation behaviour.
+	 */
+	public IntermediateDelegationResultListener(IntermediateFuture<E> future, IFunctionalResultListener<Collection<E>> customResultListener, IFunctionalIntermediateResultListener<E> customIntermediateResultListener)
+	{
+		this(future, false, customResultListener, customIntermediateResultListener);
 	}
 
 	/**
@@ -78,10 +95,22 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 * @param future The delegation target.
 	 * @param undone use undone methods.
 	 */
-	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone)
+	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone) {
+		this(future, undone, null, null);
+	}
+	/**
+	 * Create a new listener.
+	 * @param future The delegation target.
+	 * @param undone use undone methods.
+	 * @param customResultListener Custom result listener that overwrites the delegation behaviour.
+	 * @param customIntermediateResultListener Custom intermediate result listener that overwrites the delegation behaviour.
+	 */
+	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone, IFunctionalResultListener<Collection<E>> customResultListener, IFunctionalIntermediateResultListener<E> customIntermediateResultListener)
 	{
 		this.future = future;
 		this.undone = undone;
+		this.customResultListener = customResultListener;
+		this.customIntermediateResultListener = customIntermediateResultListener;
 	}
 
 	// -------- methods --------
@@ -191,26 +220,24 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customResultAvailable(Collection<E> result)
 	{
-		if(delegate != null)
+		if(customResultListener != null)
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
-			{
-				((IUndoneIntermediateResultListener)delegate).resultAvailableIfUndone(result);
-			}
-			else
-			{
-				delegate.resultAvailable(result);
-			}
+			customResultListener.resultAvailable(result);
 		}
 		else
 		{
-			if(undone)
-			{
-				future.setResultIfUndone(result);
-			}
-			else
-			{
-				future.setResult(result);
+			if (delegate != null) {
+				if (undone && delegate instanceof IUndoneResultListener) {
+					((IUndoneResultListener) delegate).resultAvailableIfUndone(result);
+				} else {
+					delegate.resultAvailable(result);
+				}
+			} else {
+				if (undone) {
+					future.setResultIfUndone(result);
+				} else {
+					future.setResult(result);
+				}
 			}
 		}
 	}
@@ -223,9 +250,9 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	{
 		if(delegate != null)
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
+			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneIntermediateResultListener)delegate).exceptionOccurredIfUndone(exception);
+				((IUndoneResultListener)delegate).exceptionOccurredIfUndone(exception);
 			}
 			else
 			{
@@ -251,26 +278,24 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{
-		if(delegate != null)
+		if (customIntermediateResultListener != null)
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
-			{
-				((IUndoneIntermediateResultListener)delegate).intermediateResultAvailableIfUndone(result);
-			}
-			else
-			{
-				delegate.intermediateResultAvailable(result);
-			}
+			customIntermediateResultListener.intermediateResultAvailable(result);
 		}
 		else
 		{
-			if(undone)
-			{
-				future.addIntermediateResultIfUndone(result);
-			}
-			else
-			{
-				future.addIntermediateResult(result);
+			if (delegate != null) {
+				if (undone && delegate instanceof IUndoneIntermediateResultListener) {
+					((IUndoneIntermediateResultListener) delegate).intermediateResultAvailableIfUndone(result);
+				} else {
+					delegate.intermediateResultAvailable(result);
+				}
+			} else {
+				if (undone) {
+					future.addIntermediateResultIfUndone(result);
+				} else {
+					future.addIntermediateResult(result);
+				}
 			}
 		}
 	}
@@ -356,9 +381,9 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		}
 		else
 		{
-			if(undone && delegate instanceof IUndoneIntermediateResultListener)
+			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneIntermediateResultListener)delegate).exceptionOccurredIfUndone(e);
+				((IUndoneResultListener)delegate).exceptionOccurredIfUndone(e);
 			}
 			else
 			{

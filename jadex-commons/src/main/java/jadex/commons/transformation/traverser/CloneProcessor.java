@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -45,7 +46,7 @@ public class CloneProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 	}
 }

@@ -114,7 +114,7 @@ public class UserAgent extends TestAgent
 			for(int i=0; i<cnt; i++)
 			{
 				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", ci);
-				cids[i] = fut.getFirstResult();
+				cids[i] = fut.getFirstResult(Future.UNSET, true);
 			}
 			
 			// Wait some time and then terminate query

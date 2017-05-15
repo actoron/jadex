@@ -486,10 +486,16 @@ public class ClockService extends BasicService implements IClockService, IProper
 			long	delta	= props.getLongProperty("delta");
 			double	dilation	= props.getDoubleProperty("dilation");
 			
+			String	oldstate	= clock.getState();
 			setClock(type, threadpool);
 			clock.setDelta(delta);
 			if(clock instanceof ContinuousClock)
 				((ContinuousClock)clock).setDilation(dilation);
+			
+			if(IClock.STATE_RUNNING.equals(oldstate))
+			{
+				clock.start();
+			}
 		}
 		
 		return IFuture.DONE;

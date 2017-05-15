@@ -59,6 +59,7 @@ public class TreatVictimPlan
 		IVector2	targetpos	= DisasterType.getVictimLocation(disaster);
 		Move move = capa.getMoveCapa().new Move(targetpos);
 		rplan.dispatchSubgoal(move).get();
+//		System.out.println("disaster reached: "+goal);
 		
 		// Treat victim.
 		myself.setProperty("state", "treating_victim");
@@ -70,12 +71,14 @@ public class TreatVictimPlan
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		space.addTaskListener(taskid, myself.getId(), lis);
 		fut.get();
+//		System.out.println("victim treated: "+goal);
 		
 		// Move to hospital
 		myself.setProperty("state", "moving_to_hospital");
 		move = capa.getMoveCapa().new Move(home);
 		rplan.dispatchSubgoal(move).get();
-		
+//		System.out.println("moved to hospital: "+goal);
+
 		//  Deliver patient.
 		myself.setProperty("state", "delivering_patient");
 		props = new HashMap();
@@ -85,6 +88,8 @@ public class TreatVictimPlan
 		lis = new DelegationResultListener<Void>(fut, true);
 		space.addTaskListener(taskid, myself.getId(), lis);
 		fut.get();
+//		System.out.println("patient delivered (end): "+goal);
+
 	}
 	
 	/**
@@ -94,7 +99,7 @@ public class TreatVictimPlan
 	@PlanAborted
 	public void failed(Exception e)
 	{
-//		System.out.println("Plan failed: "+this);
+//		System.out.println("Plan failed for: "+goal+" "+e);
 //		e.printStackTrace();
 	}
 }

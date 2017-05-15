@@ -244,65 +244,74 @@ public class ControlCenter
 		final Future<Void>	ret	= new Future<Void>();
 //		System.out.println("Fetching JCC properties.");
 		
-		ret.addResultListener(new IResultListener<Void>()
+		// can happen when save settings is called before init (immediate shutdown)
+		if(pcc==null)
 		{
-			public void resultAvailable(Void result)
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("Could not save settings: "+exception);
-			}
-		});
-		
-		// Get properties of latest platform panel.
-//		pcc.getProperties().addResultListener(new TimeoutResultListener<Properties>(5000, jccaccess, new SwingDelegationResultListener(ret)
-		pcc.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+			ret.setResult(null);
+		}
+		else
 		{
-			public void customResultAvailable(Object result)
-			{
-//				System.out.println("Fetched JCC properties.");
-				final Properties	props	= (Properties)result;
 			
-				// Store window appearance
-				Properties windowprops = new Properties();
-				windowprops.addProperty(new Property("width", Integer.toString(window.getWidth())));
-				windowprops.addProperty(new Property("height", Integer.toString(window.getHeight())));
-				windowprops.addProperty(new Property("x", Integer.toString(window.getX())));
-				windowprops.addProperty(new Property("y", Integer.toString(window.getY())));
-				// getExtendedState() deadlocks when shutdown hook is triggered.
-				windowprops.addProperty(new Property("extendedState", Integer.toString(window.getCachedState())));
-				windowprops.addProperty(new Property("jccexit", jccexit != null? jccexit : JCC_EXIT_ASK));
-				windowprops.addProperty(new Property("saveonexit", Boolean.toString(saveonexit)));
-				props.removeSubproperties("window");
-				props.addSubproperties("window", windowprops);
-				
-				getPCC().getClassLoader(null).addResultListener(new SwingDelegationResultListener(ret)
+			ret.addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
 				{
-					public void customResultAvailable(Object result)
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("Could not save settings: "+exception);
+				}
+			});
+			
+			// Get properties of latest platform panel.
+	//		pcc.getProperties().addResultListener(new TimeoutResultListener<Properties>(5000, jccaccess, new SwingDelegationResultListener(ret)
+			pcc.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+	//				System.out.println("Fetched JCC properties.");
+					final Properties	props	= (Properties)result;
+				
+					// Store window appearance
+					Properties windowprops = new Properties();
+					windowprops.addProperty(new Property("width", Integer.toString(window.getWidth())));
+					windowprops.addProperty(new Property("height", Integer.toString(window.getHeight())));
+					windowprops.addProperty(new Property("x", Integer.toString(window.getX())));
+					windowprops.addProperty(new Property("y", Integer.toString(window.getY())));
+					// getExtendedState() deadlocks when shutdown hook is triggered.
+					windowprops.addProperty(new Property("extendedState", Integer.toString(window.getCachedState())));
+					windowprops.addProperty(new Property("jccexit", jccexit != null? jccexit : JCC_EXIT_ASK));
+					windowprops.addProperty(new Property("saveonexit", Boolean.toString(saveonexit)));
+					props.removeSubproperties("window");
+					props.addSubproperties("window", windowprops);
+					
+					getPCC().getClassLoader(null).addResultListener(new SwingDelegationResultListener(ret)
 					{
-						ClassLoader cl = (ClassLoader)result;
-						try
+						public void customResultAvailable(Object result)
 						{
-//							System.out.println("Writing properties.");
-							FileOutputStream os = new FileOutputStream(file);
-//							PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
-//							PropertiesXMLHelper.getPropertyWriter().write(props, os, getPCC().getClassLoader(null), null);
-							PropertiesXMLHelper.write(props, os, cl);
-							os.close();
-							window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
-							ret.setResult(null);
+							ClassLoader cl = (ClassLoader)result;
+							try
+							{
+	//							System.out.println("Writing properties.");
+								FileOutputStream os = new FileOutputStream(file);
+	//							PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
+	//							PropertiesXMLHelper.getPropertyWriter().write(props, os, getPCC().getClassLoader(null), null);
+								PropertiesXMLHelper.write(props, os, cl);
+								os.close();
+								window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
+								ret.setResult(null);
+							}
+							catch(Exception e)
+							{
+	//							e.printStackTrace();
+								throw new RuntimeException(e);
+							}
 						}
-						catch(Exception e)
-						{
-//							e.printStackTrace();
-							throw new RuntimeException(e);
-						}
-					}
-				});
-			}
-		});
+					});
+				}
+			});
+		}
 		
 		return ret;
 	}

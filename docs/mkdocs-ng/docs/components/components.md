@@ -79,7 +79,7 @@ System.out.println("Started component: " + cid);
 
 <x-hint title="Future types">
 Notice how you get a different Future object this time?
-A ```Tuple2Future``` represents a promise that two different results are going to be available. In this case, the first is the ```ComponentIdentifier```, which is used to identify the instantiated component. The second result is a Map that can be filled by the component (TODO: correct?) and is only returned upon termination of the component. Take a look at [Futures](../futures/futures/#future-types) for different future types.
+A ```Tuple2Future``` represents a promise that two different results are going to be available. In this case, the first is the ```ComponentIdentifier```, which is used to identify the instantiated component. The second result is a Map that can be filled by the component and is only returned upon termination of the component. Take a look at [Futures](../futures/futures/#future-types) for different future types.
 </x-hint>
 
 Now that you know how to start your own components, you can read more about [Services](../services/services), as they provide a way for components to interact with each other.
@@ -92,13 +92,39 @@ Map<String,Object> results = cms.destroyComponent(cid).get();
 ```
 If the component has any results, they are contained in the returned map.
 
-## Creation Info
-TODO
+## Component Arguments
 
-# Arguments and Results
-TODO:
+### Declaring Arguments
+Components can declare arguments that can be passed during creation.
+To declare arguments, use the ```@Arguments``` Annotation:
+```java
+@Arguments(@Argument(name="myName", description = "Name of this agent", clazz=String.class, defaultvalue = "Hugo"))
+public class MyAgent ...
+```
+
+To access this argument from inside the agent, inject it into a field using the ```@AgentArgument``` annotation:
+```java
 @AgentArgument
-IArgumentsResultsFeature
+protected String myName;
+```
+
+<x-hint title="Agent Argument names">
+Note that the field and argument name must match. If you want your field to have another name, specify the argument name as parameter when using the annotation:
+```@AgentArgument("myName")```.
+</x-hint>
+Another way to access the arguments of an agent is by using the [IArgumentsResultsFeature](#component-features).
+
+### Passing Arguments
+When you created a component as explained above, the last parameter of```createComponent``` was null.
+Instead, you can create your own ```CreationInfo``` object containing your component's arguments and pass it in *createComponent*:
+```java
+CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"myName"}, new Object[]{"Harald"}))
+```
+	
+<!--TODO: Component results doc-->
+<!--## Component Results-->
+<!--### Passing Results-->
+<!--### Receiving Results-->
 
 # Component Features
 
@@ -109,19 +135,28 @@ By default, all components have a certain set of features, which can be injected
 IExecutionFeature exeFeat;
 ```
 
+<!--final long delay = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();-->
+
 Below is a list of important features commonly available for all components.
 For features specific to a component-type, take a look at [component types](../component-types/component-types).
 
 | Feature Name | Description |
 |--------------|-------------|
-|IArgumentsResultsFeature| TODO |
-|IExecutionFeature| TODO |
-|IMessageFeature| TODO |
-|IMonitoringComponentFeature| TODO |
+|IArgumentsResultsFeature| Provides access to agent arguments and can take agent results. |
+|IExecutionFeature| Provides access to the execution model to schedule component steps and provide wait functions. |
+|IMessageFeature| Handles sending and reception of messages between components. |
+|IMonitoringComponentFeature| Components can publish monitoring events with this feature. |
 |IRequiredServicesFeature | See [Services](../services/services#accessing-services) |
 |IProvidedServicesFeature | See [Services](../services/services#accessing-services) |
 
-You can even define new component features. Please refer to [TODO](TODO) to see how.
+<!-- TODO: describe all default features -->
+<!--PropertiesComponentFeature-->
+<!--ISubcomponentsFeature-->
+<!--NFPropertyComponentFeature-->
+<!--ComponentLifecycleFeature-->
+
+<!-- TODO: defining custom component features -->
+<!--You can even define new component features. Please refer to [TODO](TODO) to see how.-->
 
 # Component Lifecycle
 The Jadex Active Components Platform and the CMS implement a specific lifecycle for components. 
@@ -142,40 +177,56 @@ All annotations also allow for methods with parameters, see [Parameter Guesser](
 |**@AgentBody** | A method marked with this annotation will be called after creation of the agent is complete. At this point, all fields and required services are available and can be used.|
 |**@AgentKilled** | A method marked with this annotation will be called just before the component is removed from the platform.|  
 
-
+<!-- TODO: keepalive=true, damit agent nach body nicht beendet wird. Agent wird beendet, wenn body ein future returned - nicht bei void. -->
 
 # Advanced Topics
-
 
 This section discusses some of the more advanced topics regarding components.
 
 ## More Annotations
 The most important annotations common to all components were already discussed.
-The following is an uncomplete list of other potentially useful annotations. 
 For a full reference, have a look at the [jadex.micro.annotation](${URLJavaDoc}/jadex/micro/annotation/package-summary.html) package.
 
-InternalAccess
-TODO:
-| **@Agent** | fields | Injects the ```IExternalAccess``` of the component.|
-TODO:
-| **@Parent** | fields | TODO |
+<!--InternalAccess?-->
+<!--| **@Agent** | fields | Injects the ```IExternalAccess``` of the component.|-->
+<!--| **@Parent** | fields | |-->
 
-## Messaging
-TODO
+<!--## Messaging-->
+<!--TODO: Messaging-->
 
-|Annotation|Description|Method declaration|
-|----------|-----------|------------------|
-| **@AgentMessageArrived** | Methods annotated with this will be called when the component receives messages.| void messageArrived(Map<String, Object> msg, MessageType mt)
-| **@AgentStreamArrived** | Methods annotated with this will be called when the component receives a new message stream. | TODO method header?
+<!--|Annotation|Description|Method declaration|-->
+<!--|----------|-----------|------------------|-->
+<!--| **@AgentMessageArrived** | Methods annotated with this will be called when the component receives messages.| void messageArrived(Map<String, Object> msg, MessageType mt)-->
+<!--| **@AgentStreamArrived** | Methods annotated with this will be called when the component receives a new message stream. | method header?-->
 
-## Composition
-TODO
+<!--## Composition-->
+<!--TODO: Component Composition!-->
+
 
 ## Parameter Guesser
-What can be guessed: TODO
+Each Jadex Active Component has a *Parameter Guesser* that is used for annotation-based injections, e.g. when using ```@ServiceComponent``` inside Services or ```@AgentFeature``` inside Components.  
+When using one of these annotations on methods or fields, fields and method parameters declared with the following types are filled with values, if possible:
 
-- component features
-- agent capabilities
-- IInternalAccess
-- IExternalAccess
-- Agent Pojo
+-  IInternalAccess
+-  IExternalAccess
+-  Subtypes of IComponentFeature (see [Component Features](#component-features))
+-  Subtypes of ICapability (for bdiv3 components)
+-  Type of your Component - to inject the Component POJO
+
+<!-- TODO: for which annotations does the parameter guesser work? -->
+
+## Scheduling steps
+The [concurrency model](../guides/ac/05 Services/#concurrency) of Jadex Active Components is based on single-threaded components.
+If you want to execute your code on a component's thread from outside, you can call [scheduleStep](${URLJavaDoc}/jadex/bridge/IExternalAccess.html#scheduleStep-jadex.bridge.IComponentStep-) on the IExternalAccess of a component:
+```java
+extAcc.scheduleStep(iAccess -> {
+    // now you are on the component's thread
+    return Future.DONE;
+});
+```
+
+<x-hint title="Component Steps and Instance Methods">
+If you schedule a step on a remote component, Jadex will send the step instance to the remote platform, where they are re-instantiated. While normal inner classes have access to their surrounding instance, component steps **do not**! Be sure to only call static methods from inside a component step.
+</x-hint>
+
+

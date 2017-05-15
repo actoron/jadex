@@ -198,8 +198,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //		if(method.getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("call method ex");
 		
-//		if(method.getName().indexOf("calculate")!=-1)
-//			System.out.println("call method child");
+//		if(method.getName().indexOf("addB")!=-1)
+//			System.out.println("call method add");
 		
 //		ServiceInvocationContext sicon = null;
 		
@@ -255,37 +255,43 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					}
 				});
 			}
-			else if(method.getReturnType().equals(void.class))
-			{
-				IFuture<Void>	myvoid	= sic.invoke(service, method, myargs);
-				
-				// Check result and propagate exception, if any.
-				// Do not throw exception as user code should not defferentiate between local and remote case.
-	//			if(myvoid.isDone())
-	//			{
-	//				myvoid.get(null);	// throws exception, if any.
-	//			}
-	//			else
-				{
-					myvoid.addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							logger.warning("Exception in void method call: "+method+" "+getServiceIdentifier()+" "+exception);
-						}
-					});
-				}
-			}
+//			else if(method.getReturnType().equals(void.class))
+//			{
+//				IFuture<Void> myvoid = sic.invoke(service, method, myargs);
+//				
+//				// Wait for the call to return to be able to throw exceptions
+//				myvoid.get();
+//				ret = sic.getResult();
+//				
+//				// Check result and propagate exception, if any.
+//				// Do not throw exception as user code should not differentiate between local and remote case.
+//	//			if(myvoid.isDone())
+//	//			{
+//	//				myvoid.get(null);	// throws exception, if any.
+//	//			}
+//	//			else
+//				{
+//					myvoid.addResultListener(new IResultListener<Void>()
+//					{
+//						public void resultAvailable(Void result)
+//						{
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							logger.warning("Exception in void method call: "+method+" "+getServiceIdentifier()+" "+exception);
+//						}
+//					});
+//				}
+//			}
 			else
 			{
+//				if(method.getName().indexOf("Void")!=-1)
+//					System.out.println("sdfdf");
 				IFuture<Void> fut = sic.invoke(service, method, myargs);
 				if(fut.isDone())
 				{
-					fut.get();	// Throw exception, if any.
+					//fut.get();	
 					ret = sic.getResult();
 				}
 				else
@@ -299,10 +305,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					}
 					else
 					{
-						logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
-						ret = fut.get();
+//						logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
+						// Waiting for the call is ok because of component suspendable
+						fut.get();
+						ret = sic.getResult();
 					}
 				}
+				if(ret instanceof Throwable)
+					SUtil.rethrowAsUnchecked((Throwable)ret);
 			}
 		}
 		

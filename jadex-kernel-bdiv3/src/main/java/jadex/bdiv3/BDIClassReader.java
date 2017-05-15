@@ -213,7 +213,7 @@ public class BDIClassReader extends MicroClassReader
 	 *  Fill the model details using annotation.
 	 *  // called with dummy classloader (that was used to load cma first time)
 	 */
-	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, Class<?> cma, ClassLoader cl,  IResourceIdentifier rid, IComponentIdentifier root, List<IComponentFeatureFactory> features)
+	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, Class<?> cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root, List<IComponentFeatureFactory> features)
 	{
 //		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
@@ -277,7 +277,7 @@ public class BDIClassReader extends MicroClassReader
 					}
 					catch(Exception e)
 					{
-						throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+						throw SUtil.throwUnchecked(e);
 					}
 				}
 			}
@@ -469,7 +469,7 @@ public class BDIClassReader extends MicroClassReader
 							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 							Publish p = provs[j].publish();
-							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
+							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
 								p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
 							
 							NameValue[] props = provs[j].properties();
@@ -564,10 +564,12 @@ public class BDIClassReader extends MicroClassReader
 		
 		for(Class<?> agcl: agtcls)
 		{
-//			Class<?> acl =
-			try {
+			try 
+			{
 				gen.generateBDIClass(agcl.getName(), bdimodel, cl);
-			} catch (JadexBDIGenerationException e) {
+			} 
+			catch (JadexBDIGenerationException e) 
+			{
 				throw new JadexBDIGenerationRuntimeException("Could not read bdi agent: " + agcl, e);
 			}
 //			System.out.println("genclazz: "+agcl.getName()+" "+agcl.hashCode()+" "+agcl.getClassLoader());
@@ -1009,10 +1011,17 @@ public class BDIClassReader extends MicroClassReader
 		{
 			if(isAnnotationPresent(m, GoalCreationCondition.class, cl))
 			{
-				GoalCreationCondition c = getAnnotation(m, GoalCreationCondition.class, cl);
-				MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_CREATION, 
-					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
-				mgoal.addCondition(MGoal.CONDITION_CREATION, mcond);
+				if(Modifier.isStatic(m.getModifiers()))
+				{
+					GoalCreationCondition c = getAnnotation(m, GoalCreationCondition.class, cl);
+					MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_CREATION, 
+						c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
+					mgoal.addCondition(MGoal.CONDITION_CREATION, mcond);
+				}
+				else
+				{
+					throw new RuntimeException("Goal creation condition methods need to be static: "+m);
+				}
 			}
 			else if(isAnnotationPresent(m, GoalDropCondition.class, cl))
 			{

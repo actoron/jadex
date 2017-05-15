@@ -1,27 +1,23 @@
 package jadex.bridge.service.search;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import jadex.base.PlatformConfiguration;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.registry.IRegistryListener;
-import jadex.bridge.service.types.registry.RegistryListenerEvent;
-import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -31,11 +27,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 
 /**
@@ -44,109 +38,504 @@ import jadex.commons.future.TerminationCommand;
  *  - Search fetches services by types and excludes some according to the scope. 
  *  - Allows for adding persistent queries.
  */
-public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider // extends AbstractServiceRegistry
+public class ServiceRegistry implements IServiceRegistry // extends AbstractServiceRegistry
 {
 	//-------- attributes --------
 	
-	/** The map of published services sorted by type. */
-	protected Map<ClassInfo, Set<IService>> services;
+	/** Read-Write Lock */
+	protected ReadWriteLock rwlock;
 	
-	/** The excluded components. */
-	protected Set<IComponentIdentifier> excluded;
-	
-	/** The persistent service queries. */
-	protected Map<ClassInfo, Set<ServiceQueryInfo<?>>> queries;
+	/** The service indexer. */
+	protected ServiceIndexer<IService> indexer;
 	
 	/** The excluded services cache. */
 	protected Map<IComponentIdentifier, Set<IService>> excludedservices;
 	
-	/** The registry listeners. */
-	protected List<IRegistryListener> listeners;
-	
-	/** The search functionality. */
-	protected RegistrySearchFunctionality searchfunc;
+	/** The persistent service queries. */
+	protected QueryInfoContainer queries;
 	
 	//-------- methods --------
 	
 	/**
 	 *  Create a new registry.
 	 */
-	public ServiceRegistry()//RegistrySearchFunctionality searchfunc)
+	public ServiceRegistry()
 	{
-		this.searchfunc = new RegistrySearchFunctionality(this);
-		this.excluded = new HashSet<IComponentIdentifier>();
+		rwlock = new ReentrantReadWriteLock(true);
+		queries = new QueryInfoContainer();
+		this.indexer = new ServiceIndexer<IService>(new JadexServiceKeyExtractor(), JadexServiceKeyExtractor.SERVICE_KEY_TYPES);
 	}
 	
 	/**
-	 *  Get a service per type.
-	 *  @param type The interface type.
-	 *  @return First matching service or null.
+	 *  Add a service to the registry.
+	 *  @param service The service.
 	 */
-	protected <T> T getService(Class<T> type)
+	// write
+	public IFuture<Void> addService(IService service)
 	{
-		Set<T> sers = services==null? null: (Set<T>)services.get(new ClassInfo(type));
-		return sers==null || sers.size()==0? null: (T)sers.iterator().next();
-	}
-
-	/**
-	 *  Get services per type.
-	 *  @param type The interface type. If type is null all services are returned.
-	 *  @return First matching service or null.
-	 */
-	public Iterator<IService> getServices(ClassInfo type)
-	{
-		Set<IService> ret = null;
-		
-//		if(type!=null && type.getTypeName().indexOf("IRegistrySer")!=-1)
-//			System.out.println("search: "+type.getTypeName());
-		
-		if(services!=null)
+		IFuture<Void> ret = null;
+		Lock lock = rwlock.writeLock();
+		lock.lock();
+		try
 		{
-			if(type!=null)
+			indexer.addService(service);
+			
+			// If services belongs to excluded component cache them
+			IComponentIdentifier cid = service.getServiceIdentifier().getProviderId();
+			if(excludedservices!=null && excludedservices.containsKey(cid))
 			{
-				// todo: clone?! is only internal method
-				ret = services.get(type);
+				if(excludedservices==null)
+					excludedservices = new HashMap<IComponentIdentifier, Set<IService>>();
+				Set<IService> exsers = excludedservices.get(cid);
+				if(exsers==null)
+				{
+					exsers = new HashSet<IService>();
+					excludedservices.put(cid, exsers);
+				}
+				exsers.add(service);
 			}
 			else
 			{
-				// Return all if type is null
-				ret = new HashSet<IService>();
-				for(ClassInfo t: services.keySet())
+				lock.unlock();
+				lock = null;
+				
+				ret = checkQueries(service, false);
+			}
+		}
+		finally
+		{
+			if (lock != null)
+				lock.unlock();
+		}
+		
+		return ret == null ? IFuture.DONE : ret;
+	}
+	
+	/**
+	 *  Remove a service from the registry.
+	 *  @param sid The service id.
+	 */
+	// write
+	public void removeService(IService service)
+	{
+		Lock lock = rwlock.writeLock();
+		lock.lock();
+		try
+		{
+			indexer.removeService(service);
+			
+			lock.unlock();
+			lock = null;
+			
+			checkQueries(service, true);
+		}
+		finally
+		{
+			if (lock != null)
+				lock.unlock();
+		}
+	}
+	
+	/**
+	 *  Remove services of a platform from the registry.
+	 *  @param platform The platform.
+	 */
+	// write
+	public void removeServices(IComponentIdentifier platform)
+	{
+		Lock lock = rwlock.writeLock();
+		lock.lock();
+		try
+		{
+			Set<IService> pservs = indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PLATFORM, platform.toString());
+			if (pservs != null)
+			{
+				for (IService serv : pservs)
+					indexer.removeService(serv);
+			}
+			
+			// Downgrade to read lock.
+			lock = rwlock.readLock();
+			lock.lock();
+			rwlock.writeLock().unlock();
+			
+			for (IService serv : pservs)
+				checkQueries(serv, true);
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	@SuppressWarnings("unchecked")
+	public <T> T searchServiceSync(final ServiceQuery<T> query)
+	{
+		T ret = null;
+		if (!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		{
+			if (query.getFilter() instanceof IAsyncFilter)
+				throw new IllegalArgumentException("Synchronous search call with asynchronous filter in query: " + query);
+			
+			Set<IService> sers = getServices(query);
+			IFilter<T> filter = (IFilter<T>) query.getFilter();
+			filter = (IFilter<T>) (filter == null? IFilter.ALWAYS : filter);
+			
+			Set<IService> ownerservices = query.isExcludeOwner()? indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+			
+			if (sers!=null && !sers.isEmpty())
+			{
+				for (IService ser : sers)
 				{
-					ret.addAll(services.get(t));
+					if(checkSearchScope(query.getOwner(), ser, query.getScope(), false) &&
+					   checkPublicationScope(query.getOwner(), ser) &&
+					   (ownerservices == null || !ownerservices.contains(ser)) &&
+					   filter.filter((T) ser))
+					{
+						ret = (T)ser;
+						break;
+					}
 				}
 			}
 		}
 		
-		return ret==null? null: ret.iterator();
+		return ret;
 	}
 	
 	/**
-	 *  Test if a service is included.
-	 *  @param ser The service.
-	 *  @return True if is included.
+	 *  Search for services.
 	 */
-	public boolean isIncluded(IComponentIdentifier cid, IService ser)
+	// read
+	@SuppressWarnings("unchecked")
+	public <T> Set<T> searchServicesSync(final ServiceQuery<T> query)
 	{
-		boolean ret = true;
-		if(excluded!=null && excluded.contains(ser.getServiceIdentifier().getProviderId()) && cid!=null)
+		Set<T> ret = null;
+		if (!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
-			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			if(target!=null)
-				ret = RegistrySearchFunctionality.getDotName(cid).endsWith(RegistrySearchFunctionality.getDotName(target));
+			if (query.getFilter() instanceof IAsyncFilter)
+				throw new IllegalArgumentException("Synchronous search call with asynchronous filter in query: " + query);
+			
+			Set<IService> sers = getServices(query);
+			IFilter<T> filter = (IFilter<T>) query.getFilter();
+			filter = (IFilter<T>) (filter == null? IFilter.ALWAYS : filter);
+			
+			Set<IService> ownerservices = query.isExcludeOwner()? indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+			
+			if (sers!=null && !sers.isEmpty())
+			{
+				for (Iterator<IService> it = sers.iterator(); it.hasNext(); )
+				{
+					IService ser = it.next();
+					if(!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) &&
+					   checkPublicationScope(query.getOwner(), ser) &&
+					   (ownerservices == null || !ownerservices.contains(ser)) &&
+					   filter.filter((T) ser)))
+						it.remove();
+				}
+			}
+			ret = (Set<T>) sers;
 		}
+		
 		return ret;
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	public <T> IFuture<T> searchServiceAsync(final ServiceQuery<T> query)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		if (RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		{
+			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
+		}
+		else
+		{
+			Set<IService> sers = getServices(query);
+			if (sers != null)
+			{
+				final Iterator<IService> it = sers.iterator();
+				
+				(new ICommand<Iterator<IService>>()
+				{
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					public void execute(final Iterator<IService> it)
+					{
+						IService ser = it.next();
+						
+						T tmp = null;
+						if (query.getReturnType() != null && query.getReturnType().getTypeName().equals(ServiceEvent.CLASSINFO.getTypeName()))
+						{
+							tmp = (T) new ServiceEvent(ser, ServiceEvent.SERVICE_ADDED);
+						}
+						else
+							tmp = (T) ser;
+						final T obj = tmp;
+						
+						final ICommand<Iterator<IService>> cmd = this;
+						
+						Set<IService> ownerservices = query.isExcludeOwner()? indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+						
+						boolean passes = checkSearchScope(query.getOwner(), ser, query.getScope(), false);
+						passes &= checkPublicationScope(query.getOwner(), ser);
+						passes &= (ownerservices == null || !ownerservices.contains(ser));
+						if (query.getFilter() instanceof IFilter)
+						{
+							passes &= ((IFilter<T>) query.getFilter()).filter(obj);
+						}
+						
+						if (passes)
+						{
+							if (query.getFilter() instanceof IAsyncFilter)
+							{
+								((IAsyncFilter<T>) query.getFilter()).filter(obj).addResultListener(new IResultListener<Boolean>()
+								{
+									public void resultAvailable(Boolean result)
+									{
+										if (Boolean.TRUE.equals(result))
+											ret.setResult(obj);
+										else
+											exceptionOccurred(null);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										if (it.hasNext())
+											cmd.execute(it);
+										else
+											ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
+									}
+								});
+							}
+							else
+								ret.setResult(obj);
+						}
+						else
+						{
+							if (it.hasNext())
+								cmd.execute(it);
+							else
+								ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
+						}
+					};
+				}).execute(it);
+			}
+			else
+			{
+//				System.out.println("FAILED: " + (query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()) + " " + query.getOwner());
+//				(new RuntimeException()).printStackTrace();
+				ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsync(final ServiceQuery<T> query)
+	{	
+		SubscriptionIntermediateFuture<T> ret = null;
+		
+		if (RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		{
+			ret = new SubscriptionIntermediateFuture<T>();
+			ret.setFinished();
+		}
+		else
+		{
+			IAsyncFilter<T> filter = new QueryFilter(query);
+			Set sers = getServices(query);
+			
+			if (query.isExcludeOwner())
+			{
+				Set<IService> ownerservices = indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString());
+				sers.removeAll(ownerservices);
+			}
+			
+			if (sers != null && sers.size() > 0)
+				ret = (SubscriptionIntermediateFuture<T>) checkAsyncFilters(filter, sers.iterator());
+			else
+			{
+				ret = new SubscriptionIntermediateFuture<T>();
+				ret.setFinished();
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	// read
+	@Deprecated
+	@SuppressWarnings("unchecked")
+	public <T> T searchService(ServiceQuery<T> query, boolean excluded)
+	{
+		if (RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+			return null;
+		
+		T ret = null;
+		Set<IService> sers = getServices(query);
+		if(sers!=null)
+		{
+			Iterator<IService> it = sers.iterator();
+			while(it.hasNext())
+			{
+				IService ser = it.next();
+				if(checkSearchScope(query.getOwner(), ser, query.getScope(), excluded) && checkPublicationScope(query.getOwner(), ser))
+				{
+					ret = (T)ser;
+					break;
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param query ServiceQuery.
+	 */
+	// write
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
+	{
+		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+		
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				removeQuery(query);
+			}
+		});
+		
+		rwlock.writeLock().lock();
+		Set<T> sers = null;
+		try
+		{
+			queries.addQueryInfo(new ServiceQueryInfo<T>(query, ret));
+			
+			// We need the write lock during read for consistency
+			// This works because rwlock is reentrant.
+			// deliver currently available services
+			sers = (Set<T>)getServices(query);
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		
+		if(sers!=null)
+		{
+			IAsyncFilter<T> filter = new IAsyncFilter<T>()
+			{
+				public IFuture<Boolean> filter(T ser)
+				{
+					Future<Boolean> ret = null;
+					if (!checkScope(ser, query.getOwner(), query.getScope()))
+					{
+						ret = new Future<Boolean>(Boolean.FALSE);
+					}
+					else if (query.getFilter() instanceof IAsyncFilter)
+					{
+						ret = (Future<Boolean>) ((IAsyncFilter) query.getFilter()).filter(ser);
+					}
+					else if (query.getFilter() instanceof IFilter)
+					{
+						ret = new Future<Boolean>(((IFilter) query.getFilter()).filter(ser));
+					}
+					else
+					{
+						ret = new Future<Boolean>(Boolean.TRUE);
+					}
+					
+					return ret;
+				}
+			};
+			Iterator it = sers.iterator();
+			checkAsyncFilters(filter, it).addIntermediateResultListener(new UnlimitedIntermediateDelegationResultListener<T>(ret));;
+		}
+		
+	
+		return ret;
+	}
+	
+	/**
+	 *  Remove a service query from the registry.
+	 *  @param query ServiceQuery.
+	 */
+	// write
+	public <T> void removeQuery(ServiceQuery<T> query)
+	{
+		rwlock.writeLock().lock();
+		ServiceQueryInfo<?> qinfo = null;
+		try
+		{
+			qinfo = queries.removeQuery(query);
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		if (qinfo != null)
+			qinfo.getFuture().setFinished();
+	}
+	
+	/**
+	 *  Remove all service queries of a specific component from the registry.
+	 *  @param owner The query owner.
+	 */
+	// write
+	public void removeQueries(IComponentIdentifier owner)
+	{
+		rwlock.writeLock().lock();
+		Set<ServiceQueryInfo<?>> qinfos = null;
+		try
+		{
+			qinfos = queries.removeQueries(owner);
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		if (qinfos != null)
+		{
+			for (ServiceQueryInfo<?> qinfo : qinfos)
+				qinfo.getFuture().setFinished();
+		}
 	}
 	
 	/**
 	 *  Add an excluded component. 
 	 *  @param The component identifier.
 	 */
+	// write
 	public void addExcludedComponent(IComponentIdentifier cid)
 	{
-//		if(excluded==null)
-//			excluded = new HashSet<IComponentIdentifier>();
-		excluded.add(cid);
+		rwlock.writeLock().lock();
+		try
+		{
+			if (excludedservices == null)
+				excludedservices = new HashMap<IComponentIdentifier, Set<IService>>();
+			excludedservices.put(cid, null);
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
 	}
 	
 	/**
@@ -160,29 +549,28 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		Future<Void> ret = new Future<Void>();
 		IResultListener<Void> lis = null;
 		
-//		if(excluded!=null)
-//		{
-			if(excluded.remove(cid))
+		rwlock.readLock().lock();
+		try
+		{
+			if(excludedservices!=null)
 			{
-				if(excludedservices!=null)
+				Set<IService> exs = excludedservices.remove(cid);
+				
+				// Get and remove services from cache
+				if(exs!=null)
 				{
-					Set<IService> exs = excludedservices.remove(cid);
-					
-					if(queries!=null && queries.size()>0)
+					lis = new CounterResultListener<Void>(exs.size(), new DelegationResultListener<Void>(ret));
+					for(IService ser: exs)
 					{
-						// Get and remove services from cache
-						if(exs!=null)
-						{
-							lis = new CounterResultListener<Void>(exs.size(), new DelegationResultListener<Void>(ret));
-							for(IService ser: exs)
-							{
-								searchfunc.checkQueries(ser).addResultListener(lis);
-							}
-						}
+						checkQueries(ser, false).addResultListener(lis);
 					}
 				}
 			}
-//		}
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
 		
 		if(lis==null)
 			ret.setResult(null);
@@ -191,542 +579,208 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	}
 	
 	/**
-	 *  Add a service to the registry.
-	 *  @param sid The service id.
+	 *  Test if a service is included.
+	 *  @param ser The service.
+	 *  @return True if is included.
 	 */
-	public IFuture<Void> addService(ClassInfo key, IService service)
+	// read
+	public boolean isIncluded(IComponentIdentifier cid, IService ser)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IRegistrySer")!=-1)
-//			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
-			
-		if(services==null)
-			services = new HashMap<ClassInfo, Set<IService>>();
-		
-		Set<IService> sers = services.get(key);
-		if(sers==null)
+		boolean ret = true;
+		rwlock.readLock().lock();
+		try
 		{
-			sers = new HashSet<IService>();
-			services.put(key, sers);
-		}
-		
-		sers.add(service);
-		
-		// If services belongs to excluded component cache them
-		IComponentIdentifier cid = service.getServiceIdentifier().getProviderId();
-		if(excluded!=null && excluded.contains(cid))
-		{
-			if(excludedservices==null)
-				excludedservices = new HashMap<IComponentIdentifier, Set<IService>>();
-			Set<IService> exsers = excludedservices.get(cid);
-			if(exsers==null)
+			if(excludedservices!=null && ser == null && cid != null && excludedservices.containsKey(cid))
 			{
-				exsers = new HashSet<IService>();
-				excludedservices.put(cid, exsers);
+				ret = false;
 			}
-			exsers.add(service);
+			else if(excludedservices!=null && excludedservices.containsKey(ser.getServiceIdentifier().getProviderId()) && cid!=null)
+			{
+				IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
+				if(target!=null)
+					ret = getDotName(cid).endsWith(getDotName(target));
+			}
 		}
-		
-		notifyListeners(new RegistryListenerEvent(RegistryListenerEvent.Type.ADDED, key, service));
-
-//		System.out.println("sers: "+services.size());
-		
-		return searchfunc.checkQueries(service);
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
+		return ret;
 	}
 	
 	/**
-	 *  Remove a service from the registry.
-	 *  @param sid The service id.
+	 *  Check the persistent queries for a new service.
+	 *  @param ser The service.
 	 */
-	public void removeService(ClassInfo key, IService service)
+	// read
+	protected IFuture<Void> checkQueries(IService ser, boolean removed)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IRegistrySer")!=-1)
-//			System.out.println("removed: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
+		Future<Void> ret = new Future<Void>();
 		
-		if(services!=null)
-		{
-			Set<IService> sers = services.get(key);
-			if(sers!=null)
+//		if(queries!=null)
+//		{
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			Set<ServiceQueryInfo<?>> sqis = null;
+			if (removed)
+				sqis = queries.getEventQueries(ser.getServiceIdentifier().getServiceType());
+			else
+				sqis = queries.getQueries(ser.getServiceIdentifier().getServiceType());
+			
+			if(sqis!=null)
 			{
-				sers.remove(service);
-				if(sers.size()==0)
-					services.remove(key);
+				// Clone the data to not need to synchronize async
+				Set<ServiceQueryInfo<?>> clone = new LinkedHashSet<ServiceQueryInfo<?>>(sqis);
 				
-				notifyListeners(new RegistryListenerEvent(RegistryListenerEvent.Type.REMOVED, key, service));
+				checkQueriesLoop(clone.iterator(), ser, removed).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else
+				ret.setResult(null);
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+//		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check the persistent queries against a new service.
+	 *  @param it The queries.
+	 *  @param service the service.
+	 */
+	// read
+	protected IFuture<Void> checkQueriesLoop(final Iterator<ServiceQueryInfo<?>> it, final IService service, final boolean removed)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(it.hasNext())
+		{
+			final ServiceQueryInfo<?> sqi = it.next();
+//			IComponentIdentifier cid = sqi.getQuery().getOwner();
+//			String scope = sqi.getQuery().getScope();
+//			IAsyncFilter<IService> filter = (IAsyncFilter)sqi.getQuery().getFilter();
+			
+			checkQuery(sqi, service, removed).addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
 			{
-				System.out.println("Could not remove service from registry: "+key+", "+service.getServiceIdentifier());
-			}
+				@SuppressWarnings({ "unchecked", "rawtypes" })
+				public void customResultAvailable(Boolean result) throws Exception
+				{
+					if(result.booleanValue())
+					{
+						Object ires = null;
+						if (ServiceEvent.CLASSINFO.equals(sqi.getQuery().getReturnType()))
+							ires = new ServiceEvent(service, removed ? ServiceEvent.SERVICE_REMOVED : ServiceEvent.SERVICE_ADDED);
+						else
+							ires = service;
+						((IntermediateFuture)sqi.getFuture()).addIntermediateResult(ires);
+					}
+					checkQueriesLoop(it, service, removed).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
 		}
 		else
 		{
-			System.out.println("Could not remove service from registry: "+key+", "+service.getServiceIdentifier());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
-	 *  Search for services.
+	 *  Check the services according the the scope.
+	 *  @param it The services.
+	 *  @param cid The component id.
+	 *  @param scope The scope.
+	 *  @return The services that fit to the scope.
 	 */
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
+	protected <T> boolean checkScope(final T ser, final IComponentIdentifier cid, final String scope)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return searchfunc.searchService(type, cid, scope);
+		return checkSearchScope(cid, (IService)ser, scope, false) && checkPublicationScope(cid, (IService)ser);
 	}
 	
 	/**
-	 *  Search for services.
+	 *  Check the async filter.
+	 *  @param filter The filter
+	 *  @param it The services.
+	 *  @return The services that pass the filter.
 	 */
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
-	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalServices has to be used.");
-		return searchfunc.searchServices(type, cid, scope);
-	}
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
-	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return searchfunc.searchService(type, cid, scope, filter);
-	}
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
-	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
-		return searchfunc.searchServices(type, cid, scope, filter);
-	}
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
-	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			return new Future<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
-		return searchfunc.searchService(type, cid, scope, filter);
-	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
-	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
-			return new SubscriptionIntermediateFuture<T>(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
-		return searchfunc.searchServices(type, cid, scope, filter);
-	}
-	
-	/**
-	 *  Add a service query to the registry.
-	 *  @param query ServiceQuery.
-	 */
-	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
+	// read -> Async is error prone when lock is held longer time spans
+	protected  <T> ISubscriptionIntermediateFuture<T> checkAsyncFilters(final IAsyncFilter<T> filter, final Iterator<T> it)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
-		ret.setTerminationCommand(new TerminationCommand()
+		if(it.hasNext())
 		{
-			public void terminated(Exception reason)
+			final T ser = it.next();
+			if(filter==null)
 			{
-				removeQuery(query);
+				ret.addIntermediateResult(ser);
+				checkAsyncFilters(filter, it).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 			}
-		});
-		
-		if(queries==null)
-			queries = new HashMap<ClassInfo, Set<ServiceQueryInfo<?>>>();
-		
-		Set<ServiceQueryInfo<T>> mqs = (Set)queries.get(query.getType());
-		if(mqs==null)
-		{
-			mqs = new HashSet<ServiceQueryInfo<T>>();
-			queries.put(query.getType(), (Set)mqs);
-		}
-		mqs.add(new ServiceQueryInfo<T>(query, ret));
-		
-		// deliver currently available services
-		Iterator<T> sers = (Iterator<T>)getServices(query.getType());
-		if(sers!=null)
-		{
-			// Creates a new collection so that filter check must NOT be locked
-			Collection<T> ssers = searchfunc.checkScope(sers, query.getOwner(), query.getScope(), false);
-			
-//			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
-			searchfunc.checkAsyncFilters(query.getFilter(), ssers.iterator())
-				.addIntermediateResultListener(new UnlimitedIntermediateDelegationResultListener<T>(ret));
-		}
-	
-		return ret;
-	}
-	
-	/**
-	 *  Remove a service query from the registry.
-	 *  @param query ServiceQuery.
-	 */
-	public <T> void removeQuery(ServiceQuery<T> query)
-	{
-		if(queries!=null)
-		{
-			Set<ServiceQueryInfo<T>> mqs = (Set)queries.get(query.getType());
-			if(mqs!=null)
+			else
 			{
-				for(ServiceQueryInfo<T> sqi: mqs)
+				filter.filter(ser).addResultListener(new IResultListener<Boolean>()
 				{
-					if(sqi.getQuery().equals(query))
+					public void resultAvailable(Boolean result)
 					{
-						sqi.getFuture().terminate();
-						mqs.remove(sqi);
-						break;
-					}
-				}
-				if(mqs.size()==0)
-					queries.remove(query.getType());
-			}
-		}
-	}
-	
-	/**
-	 *  Remove all service queries of a specific component from the registry.
-	 *  @param owner The query owner.
-	 */
-	public void removeQueries(IComponentIdentifier owner)
-	{
-		if(queries!=null)
-		{
-			for(Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>> entry: queries.entrySet())
-			{
-				for(ServiceQueryInfo<?> query: entry.getValue().toArray(new ServiceQueryInfo<?>[entry.getValue().size()]))
-				{
-					if(owner.equals(query.getQuery().getOwner()))
-					{
-						removeQuery(query.getQuery());
-//						entry.getValue().remove(query);
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 *  Get queries per type.
-	 *  @param type The interface type. If type is null all services are returned.
-	 *  @return The queries.
-	 */
-	public <T> Set<ServiceQueryInfo<T>> getQueries(ClassInfo type)
-	{
-		return queries==null? Collections.EMPTY_SET: queries.get(type);
-	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
-	{
-		final Future<T> ret = new Future<T>();
-		final IComponentIdentifier	lcid	= IComponentIdentifier.LOCAL.get();
-		
-		searchService(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IResultListener<T>()
-		{
-			public void resultAvailable(T result)
-			{
-				ret.setResult(result);
-			}
-
-			public void exceptionOccurred(Exception exception)
-			{
-				searchRemoteService(lcid, type, filter).addResultListener(new DelegationResultListener<T>(ret));						
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
-	{		
-		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
-		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, true, new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				ret.setFinished();
-			}
-		});
-		
-		searchServices(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IntermediateDefaultResultListener<T>()
-		{
-			public void intermediateResultAvailable(T result)
-			{
-				ret.addIntermediateResult(result);
-			}
-			
-			public void finished()
-			{
-				lis.resultAvailable(null);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				lis.resultAvailable(null);
-			}
-		});
-		
-		searchRemoteServices(IComponentIdentifier.LOCAL.get(), type, filter).addResultListener(new IntermediateDefaultResultListener<T>()
-		{
-			public void intermediateResultAvailable(T result)
-			{
-				ret.addIntermediateResult(result);
-			}
-			
-			public void finished()
-			{
-				lis.resultAvailable(null);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				lis.resultAvailable(null);
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Search for services on remote platforms.
-	 *  @param caller	The component that started the search.
-	 *  @param type The type.
-	 *  @param filter The filter.
-	 */
-	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final IComponentIdentifier caller, final Class<T> type, final IAsyncFilter<T> filter)
-	{
-		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
-		// Must not find services twice (e.g. having two proxies for the same platform)
-		final Set<T> founds = new HashSet<T>();
-		
-		if(services!=null)
-		{
-			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
-			if(rms!=null)
-			{
-				// Get all proxy agents (represent other platforms)
-				
-				Set<IService> sers = services.get(new ClassInfo(IProxyAgentService.class));
-				if(sers!=null && sers.size()>0)
-				{
-					final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
-					{
-						public void customResultAvailable(Void result)
+						if(result!=null && result.booleanValue())
 						{
-							ret.setFinished();
+							ret.addIntermediateResult(ser);
 						}
-					});
-					
-					for(IService ser: sers)
-					{
-						IProxyAgentService ps = (IProxyAgentService)ser;
-						
-						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
-						{
-							public void resultAvailable(ITransportComponentIdentifier rcid)
-							{
-								// User RMS getServiceProxies() to fetch services
-								
-								IFuture<Collection<T>> rsers = rms.getServiceProxies(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
-								rsers.addResultListener(new IResultListener<Collection<T>>()
-								{
-									public void resultAvailable(Collection<T> result)
-									{
-										for(T t: result)
-										{
-											if(!founds.contains(t))
-											{
-												ret.addIntermediateResult(t);
-											}
-											founds.add(t);
-										}
-										clis.resultAvailable(null);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										clis.resultAvailable(null);
-									}
-								});
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								clis.resultAvailable(null);
-							}
-						});
+						checkAsyncFilters(filter, it).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 					}
-				}
-				else
-				{
-					ret.setFinished();					
-				}
-			}
-			else
-			{
-				ret.setFinished();
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						checkAsyncFilters(filter, it).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+					}
+				});
 			}
 		}
 		else
 		{
+//			System.out.println("searchLoopEnd");
 			ret.setFinished();
 		}
 		
-//		ret.addResultListener(new IntermediateDefaultResultListener<T>()
-//		{
-//			public void intermediateResultAvailable(T result)
-//			{
-//				System.out.println("found: "+result);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("ex: "+exception);
-//			}
-//		});
-		
 		return ret;
 	}
 	
 	/**
-	 *  Search for services on remote platforms.
-	 *  @param type The type.
-	 *  @param scope The scope.
+	 *  Check a persistent query with one service.
+	 *  @param queryinfo The query.
+	 *  @param service The service.
+	 *  @return True, if services matches to query.
 	 */
-	protected <T> IFuture<T> searchRemoteService(final IComponentIdentifier caller, final Class<T> type, final IAsyncFilter<T> filter)
+	// read
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected IFuture<Boolean> checkQuery(final ServiceQueryInfo<?> queryinfo, final IService service, final boolean removed)
 	{
-		final Future<T> ret = new Future<T>();
 		
-//		if(type.toString().indexOf("IServiceCall")!=-1)
-//			System.out.println("Search global services: "+type);
 		
-		if(services!=null)
-		{
-			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
-			if(rms!=null)
-			{
-				Iterator<IService> sers = getServices(new ClassInfo(IProxyAgentService.class));
-				if(sers!=null && sers.hasNext())
-				{
-					Set<IService> smap = getServiceMap().get(new ClassInfo(IProxyAgentService.class));
-					int size = smap==null? 0: smap.size();
-					
-					final CounterResultListener<Void> clis = new CounterResultListener<Void>(size,
-						new ExceptionDelegationResultListener<Void, T>(ret)
-					{
-						public void customResultAvailable(Void result)
-						{
-							ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
-						}
-					});
-					
-					while(sers.hasNext())
-					{
-						IService ser = sers.next();
-						
-						IProxyAgentService ps = (IProxyAgentService)ser;
-						
-						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
-						{
-							public void resultAvailable(ITransportComponentIdentifier rcid)
-							{
-								IFuture<T> rsers = rms.getServiceProxy(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
-								rsers.addResultListener(new IResultListener<T>()
-								{
-									public void resultAvailable(T result)
-									{
-										ret.setResultIfUndone(result);
-										clis.resultAvailable(null);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										clis.resultAvailable(null);
-									}
-								});
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								clis.resultAvailable(null);
-							}
-						});
-					}
-				}
-				else
-				{
-					ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
-				}
-			}
-			else
-			{
-				ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
-			}
-		}
+		final Future<Boolean> ret = new Future<Boolean>();
+//		IComponentIdentifier cid = queryinfo.getQuery().getOwner();
+//		String scope = queryinfo.getQuery().getScope();
+//		@SuppressWarnings("unchecked")
+		
+		if (removed && !ServiceEvent.CLASSINFO.equals(queryinfo.getQuery().getReturnType()))
+			ret.setResult(Boolean.FALSE);
 		else
 		{
-			ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get a subregistry.
-	 *  @param cid The platform id.
-	 *  @return The registry.
-	 */
-	public IServiceRegistry getSubregistry(IComponentIdentifier cid)
-	{
-		return null;
-	}
-	
-	/**
-	 *  Remove a subregistry.
-	 *  @param cid The platform id.
-	 */
-	// write
-	public void removeSubregistry(IComponentIdentifier cid)
-	{
-	}
-	
-	/**
-	 *  Get the service map. (The original map cannot be used because 
-	 *  registry is accessed concurrently and other threads could change the map
-	 *  even in between of onging operations such as serialization)
-	 *  @return A clone of the service map.
-	 */
-	public Map<ClassInfo, Set<IService>> getServiceMap()
-	{
-		// Does not work because the contained services are cloned also 
-//		return services==null? null: (Map<ClassInfo, Set<IService>>)Traverser.traverseObject(services, Traverser.getDefaultProcessors(), true, null);
-	
-		// Needs a deep clone except the services
-		
-		Map<ClassInfo, Set<IService>> ret = null;
-		
-		if(services!=null)
-		{
-			ret = new HashMap<ClassInfo, Set<IService>>();
-			for(Map.Entry<ClassInfo, Set<IService>> entry: services.entrySet())
+			IAsyncFilter filter = new QueryFilter(queryinfo.getQuery());
+			filter.filter(service).addResultListener(new IResultListener<Boolean>()
 			{
-				ret.put(entry.getKey(), new HashSet<IService>(entry.getValue()));
-			}
+				public void resultAvailable(Boolean result)
+				{
+					ret.setResult(result!=null && result.booleanValue()? Boolean.TRUE: Boolean.FALSE);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setResult(Boolean.FALSE);
+				}
+			});
 		}
 		
 		return ret;
@@ -735,52 +789,136 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Check if service is ok with respect to search scope of caller.
 	 */
-	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope)
+	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope, boolean excluded)
 	{
-		if(!isIncluded(cid, ser))
+		boolean ret = false;
+		
+		if(!excluded && !isIncluded(cid, ser))
 		{
-			return false;
+			return ret;
 		}
-		else
+		
+		if(scope==null)
 		{
-			return searchfunc.checkSearchScope(cid, ser, scope);
+			scope = RequiredServiceInfo.SCOPE_APPLICATION;
 		}
+		
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		{
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		{
+			// Test if searcher and service are on same platform
+			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
+		}
+		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		{
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = sercid.getPlatformName().equals(cid.getPlatformName())
+				&& getApplicationName(sercid).equals(getApplicationName(cid));
+		}
+		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		{
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = getDotName(sercid).endsWith(getDotName(cid));
+		}
+		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		{
+			// only the component itself
+			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
+		}
+		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		{
+			// check if parent of searcher reaches the service
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			String subname = getSubcomponentName(cid);
+			ret = sercid.getName().endsWith(subname);
+		}
+		
+		return ret;
 	}
-
+	
 	/**
-	 *  Notify the event listeners (if any).
-	 *  @param event The event.
+	 *  Check if service is ok with respect to publication scope.
 	 */
-	protected void notifyListeners(RegistryListenerEvent event)
+	protected boolean checkPublicationScope(IComponentIdentifier cid, IService ser)
 	{
-		if(listeners!=null)
+		boolean ret = false;
+		
+		String scope = ser.getServiceIdentifier().getScope()!=null? ser.getServiceIdentifier().getScope(): RequiredServiceInfo.SCOPE_GLOBAL;
+		
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
-			for(IRegistryListener listener: listeners)
-			{
-				listener.registryChanged(event);
-			}
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		{
+			// Test if searcher and service are on same platform
+			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
+		}
+		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		{
+			// todo: special case platform service with app scope
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = sercid.getPlatformName().equals(cid.getPlatformName())
+				&& getApplicationName(sercid).equals(getApplicationName(cid));
+		}
+		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		{
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = getDotName(cid).endsWith(getDotName(sercid));
+		}
+		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		{
+			// only the component itself
+			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
+		}
+		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		{
+			// check if parent of service reaches the searcher
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			String subname = getSubcomponentName(sercid);
+			ret = getDotName(cid).endsWith(subname);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get all services.
+	 *  @return The services.
+	 */
+	protected Set<IService> getServices()
+	{
+		rwlock.readLock().lock();
+		try
+		{
+			return indexer.getAllServices();
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
 		}
 	}
 	
 	/**
-	 *  Add an event listener.
-	 *  @param listener The listener.
+	 *  Get services per query.
+	 *  @param query The query.
+	 *  @return First matching service or null.
 	 */
-	public void addEventListener(IRegistryListener listener)
+	protected Set<IService> getServices(final ServiceQuery<?> query)
 	{
-		if(listeners==null)
-			listeners = new ArrayList<IRegistryListener>();
-		listeners.add(listener);
-	}
-	
-	/**
-	 *  Remove an event listener.
-	 *  @param listener The listener.
-	 */
-	public void removeEventListener(IRegistryListener listener)
-	{
-		if(listeners!=null)
-			listeners.remove(listener);
+		rwlock.readLock().lock();
+		try
+		{
+			Set<IService> ret = indexer.getServices(query.getIndexerSearchSpec());
+			return ret;
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
 	}
 	
 	/**
@@ -797,6 +935,56 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public static IServiceRegistry getRegistry(IInternalAccess ia)
 	{
 		return getRegistry(ia.getComponentIdentifier());
+	}
+	
+	/**
+	 *  Get the application name. Equals the local component name in case it is a child of the platform.
+	 *  broadcast@awa.plat1 -> awa
+	 *  @return The application name.
+	 */
+	public static String getApplicationName(IComponentIdentifier cid)
+	{
+		String ret = cid.getName();
+		int idx;
+		// If it is a direct subcomponent
+		if((idx = ret.lastIndexOf('.')) != -1)
+		{
+			// cut off platform name
+			ret = ret.substring(0, idx);
+			// cut off local name 
+			if((idx = ret.indexOf('@'))!=-1)
+				ret = ret.substring(idx + 1);
+			if((idx = ret.indexOf('.'))!=-1)
+				ret = ret.substring(idx + 1);
+		}
+		else
+		{
+			ret = cid.getLocalName();
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the subcomponent name.
+	 *  @param cid The component id.
+	 *  @return The subcomponent name.
+	 */
+	public static String getSubcomponentName(IComponentIdentifier cid)
+	{
+		String ret = cid.getName();
+		int idx;
+		if((idx = ret.indexOf('@'))!=-1)
+			ret = ret.substring(idx + 1);
+		return ret;
+	}
+	
+	/**
+	 *  Get the name without @ replaced by dot.
+	 */
+	public static String getDotName(IComponentIdentifier cid)
+	{
+		return cid.getName().replace('@', '.');
+//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
 	}
 	
 	/**
@@ -837,4 +1025,51 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		}
 	}
 	
+	/**
+	 *  Async filter for checking queries in one go.
+	 */
+	protected class QueryFilter<T> implements IAsyncFilter<T>
+	{
+		/** The query. */
+		protected ServiceQuery<T> query;
+		
+		/**
+		 *  Create filter. 
+		 *  @param query The query.
+		 */
+		public QueryFilter(ServiceQuery<T> query)
+		{
+			this.query = query;
+		}
+		
+		/**
+		 *  Filter.
+		 */
+		@SuppressWarnings("unchecked")
+		public IFuture<Boolean> filter(T obj)
+		{
+			Future<Boolean> fret = new Future<Boolean>();
+			
+			IService ser = (IService) obj;
+			if (!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) && checkPublicationScope(query.getProvider(), ser)))
+			{
+				fret.setResult(Boolean.FALSE);
+			}
+			else if (query.getFilter() instanceof IAsyncFilter)
+			{
+				((IAsyncFilter<T>) query.getFilter()).filter(obj).addResultListener(new DelegationResultListener<Boolean>(fret));
+			}
+			else if (query.getFilter() instanceof IFilter)
+			{
+				fret.setResult(((IFilter<T>) query.getFilter()).filter(obj));
+			}
+			else
+			{
+				fret.setResult(Boolean.TRUE);
+			}
+			
+			return fret;
+		}
+		
+	}
 }

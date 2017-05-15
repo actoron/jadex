@@ -13,5 +13,5 @@ public interface IClearChemicalsService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public ITerminableFuture<Void> clearChemicals(ISpaceObject disaster);
+	public ITerminableFuture<Void> clearChemicals(Object disasterid);
 }

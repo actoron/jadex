@@ -95,7 +95,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	//-------- methods --------
 	
 	/**
-	 * 
+	 *  Get or create the body.
 	 */
 	public Object getBody()
 	{

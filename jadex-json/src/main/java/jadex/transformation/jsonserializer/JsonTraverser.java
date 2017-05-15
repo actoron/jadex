@@ -26,6 +26,8 @@ import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 /**
  *  The JsonTraverser converts a preparsed JsonValue object to
  *  a corresponding Java object.
+ *  
+ *  todo: introduce boolean in traverser that checks if read a json object in map is ok
  */
 public class JsonTraverser extends Traverser
 {
@@ -40,6 +42,7 @@ public class JsonTraverser extends Traverser
 
 	public static List<ITraverseProcessor> writeprocs;
 	public static List<ITraverseProcessor> readprocs;
+	public static List<ITraverseProcessor> nestedreadprocs;
 	
 	static
 	{
@@ -68,6 +71,7 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLRUProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLocalDateTimeProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBigIntegerProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
 		
 		readprocs = new ArrayList<ITraverseProcessor>();
@@ -96,10 +100,17 @@ public class JsonTraverser extends Traverser
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassInfoProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveObjectProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLRUProcessor());
+		nestedreadprocs = new ArrayList<ITraverseProcessor>(readprocs);
+		nestedreadprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonNestedMapProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMapProcessor());
+		int pos = readprocs.size();
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBigIntegerProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLocalDateTimeProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor());
+		
+		for(int i = pos; i < readprocs.size(); ++i)
+			nestedreadprocs.add(readprocs.get(i));
 	}
 	
 	/**
@@ -243,21 +254,21 @@ public class JsonTraverser extends Traverser
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
 	{
-		return objectToByteArray(val, classloader, enc, writeclass, excludes, null, processors);
+		return objectToByteArray(val, classloader, enc, writeclass, true, excludes, processors);
 	}
 	
 	/**
 	 *  Convert to a byte array.
 	 */
-	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors)
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, boolean writeid, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
 	{
 		Traverser traverser = getWriteTraverser();
-		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
+		JsonWriteContext wr = new JsonWriteContext(writeclass, writeid, excludes);
 		
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			traverser.traverse(val, null, preprocessors, processors!=null? processors: writeprocs, Traverser.MODE.PREPROCESS, classloader, wr);
+			traverser.traverse(val, null, processors, processors!=null? processors: writeprocs, Traverser.MODE.PREPROCESS, classloader, wr);
 			byte[] ret = enc==null? wr.getString().getBytes(SUtil.UTF8): wr.getString().getBytes(enc);
 			bos.close();
 			return ret;

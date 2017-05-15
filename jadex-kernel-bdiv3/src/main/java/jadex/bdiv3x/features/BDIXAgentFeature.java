@@ -99,7 +99,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 {
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIXAgentFeature.class, BDIXAgentFeature.class,  
 //		new Class[]{IMicroLifecycleFeature.class}, null);
-		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class}, new Class<?>[]{IInternalBDIAgentFeature.class});
+		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class}, IInternalBDIAgentFeature.class);
 	
 	/** The bdi model. */
 	protected IBDIModel bdimodel;
@@ -151,8 +151,8 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 
 	/**
 	 *  Initialize the feature.
-	 *  Empty implementation that can be overridden.
 	 */
+	@Override
 	public IFuture<Void> init()
 	{
 		RBeliefbase bb = new RBeliefbase(getComponent());
@@ -180,6 +180,48 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		return IFuture.DONE;
 	}
 	
+	/**
+	 *  Check if the feature potentially executed user code in body.
+	 *  Allows blocking operations in user bodies by using separate steps for each feature.
+	 *  Non-user-body-features are directly executed for speed.
+	 *  If unsure just return true. ;-)
+	 */
+	public boolean	hasUserBody()
+	{
+		return false;
+	}
+	
+	/**
+	 *  Called on shutdown after successful init.
+	 */
+	@Override
+	public IFuture<Void> shutdown()
+	{
+		doCleanup();
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Called on init failure.
+	 */
+	@Override
+	public void kill()
+	{
+		doCleanup();
+	}
+	
+	/**
+	 *  Cleanup the beliefs in kill and shutdown.
+	 */
+	protected void	doCleanup()
+	{
+		// Cleanup beliefs when value is (auto)closeable
+		List<MBelief> beliefs = ((IBDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
+		for(MBelief belief: beliefs)
+		{
+			belief.cleanup(getComponent());
+		}
+	}
 	
 //	/**
 //	 *  Init beliefbase after services have been created.
@@ -232,7 +274,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		}
 		catch(Exception e)
 		{
-			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 	}
 	
@@ -717,7 +759,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 //				}
 //				catch(Exception e)
 //				{
-//					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+//					throw SUtil.throwUnchecked(e);
 //				}
 //				
 ////				injectAgent(getComponent(), capa, caps[i].getSecondEntity(), globalname);

@@ -463,7 +463,7 @@ public class ReflectNode	extends ExpressionNode
 				catch(Exception e)
 				{
 					e.printStackTrace();
-					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+					throw SUtil.throwUnchecked(e);
 				}
 			}
 		}

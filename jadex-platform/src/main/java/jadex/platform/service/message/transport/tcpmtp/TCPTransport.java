@@ -1,8 +1,11 @@
 package jadex.platform.service.message.transport.tcpmtp;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +51,7 @@ public class TCPTransport implements ITransport
 	//-------- constants --------
 	
 	/** The schema name. */
-	public final static String[] SCHEMAS = new String[]{"tcp-mtp://"};
+	public final static String[] SCHEMAS = new String[]{"tcp-mtp://"}; // TODO: scheme without ://
 	
 	/** Constant for asynchronous setting. */
 	public final static String ASYNCHRONOUS = "asynchronous";
@@ -106,8 +109,8 @@ public class TCPTransport implements ITransport
 	
 	/**
 	 *  Init the transport.
-	 *  @param platform The platform.
-	 *  @param settings The settings.
+	 *  @param component The platform component.
+	 *  @param port The port.
 	 */
 	public TCPTransport(final IInternalAccess component, int port)
 	{
@@ -117,8 +120,9 @@ public class TCPTransport implements ITransport
 	
 	/**
 	 *  Init the transport.
-	 *  @param platform The platform.
-	 *  @param settings The settings.
+	 *  @param component The platform component.
+	 *  @param port The port.
+     *  @param async true for async mode.
 	 */
 	public TCPTransport(final IInternalAccess component, int port, final boolean async)
 	{
@@ -156,14 +160,14 @@ public class TCPTransport implements ITransport
 			// If port==0 -> any free port
 			this.serversocket = createServerSocket();
 			this.port = serversocket.getLocalPort();
-			
-			String[]	addresses	= SUtil.getNetworkAddresses();
+
+			InetAddress[]	addresses	= SUtil.getNetworkAddresses();
 			this.addresses	= new String[addresses.length];
 			for(int i=0; i<addresses.length; i++)
 			{
 				for(int j=0; j<getServiceSchemas().length; j++)
 				{
-					this.addresses[i]	= getAddress(getServiceSchemas()[j], addresses[i], port);
+					this.addresses[i]	= SUtil.toURI(getServiceSchemas()[j], addresses[i], port).toString();
 				}
 			}
 			
@@ -491,19 +495,8 @@ public class TCPTransport implements ITransport
 	//-------- helper methods --------
 	
 	/**
-	 *  Get the address of this transport.
-	 *  @param hostname The hostname.
-	 *  @param port The port.
-	 *  @return <scheme>:<hostname>:<port>
-	 */
-	protected String getAddress(String schema, String hostname, int port)
-	{
-		return schema+hostname+":"+port;
-	}
-	
-	/**
 	 *  Get the connection.
-	 *  @param address
+	 *  @param addr
 	 *  @return a connection of this type
 	 */
 	protected IFuture<TCPOutputConnection> getConnection(String addr, boolean create)
@@ -598,32 +591,24 @@ public class TCPTransport implements ITransport
 		Future<TCPOutputConnection>  ret = new Future<TCPOutputConnection>();
 		
 		address = address.toLowerCase();
-		
-		for(int i=0; i<getServiceSchemas().length; i++)
+
+		try
 		{
-			if(address.startsWith(getServiceSchemas()[i]))
+			URI uri = SUtil.toURI(address);
+			String scheme = uri.getScheme();
+
+			for(int i=0; i<getServiceSchemas().length; i++)
 			{
-				// Parse the address
-				// todo: handle V6 ip adresses (0:0:0:0 ...)
-				try
+				if(getServiceSchemas()[i].equals(scheme + "://"))
 				{
-					int schemalen = getServiceSchemas()[i].length();
-					int div = address.indexOf(':', schemalen);
-					String hostname;
-					int iport;
-					if(div>0)
-					{
-						hostname = address.substring(schemalen, div);
-						iport = Integer.parseInt(address.substring(div+1));
-					}
-					else
-					{
-						hostname = address.substring(schemalen);
-						iport = DEFAULT_PORT;
-					}
-	
+					// Parse the address
+					String hostname = uri.getHost();
+					int iport = uri.getPort();
+
+					if (iport == -1) iport = DEFAULT_PORT;
+
 //					System.out.println("created output con: "+hostname+" "+iport);
-					
+
 					// todo: which resource identifier to use for outgoing connections?
 //					ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address), createClientSocket());
 					TCPOutputConnection con = new TCPOutputConnection(new Cleaner(address), createClientSocket(hostname, iport));
@@ -632,20 +617,19 @@ public class TCPTransport implements ITransport
 //					ret.setResult(con);
 					break;
 				}
-				catch(Exception e)
-				{
+			}
+		}
+		catch(Exception e)
+		{
 //					if(connections!=null)	// May be already shut down.
 //					{
 //						connections.put(address, new TCPDeadConnection());
 //					}
-					ret.setException(e);
-					break;
-	//				logger.warning("Could not create connection: "+e.getMessage());
-					//e.printStackTrace();
-				}
-			}
+			ret.setException(e);
+//				logger.warning("Could not create connection: "+e.getMessage());
+			//e.printStackTrace();
 		}
-		
+
 		return ret;
 	}
 	

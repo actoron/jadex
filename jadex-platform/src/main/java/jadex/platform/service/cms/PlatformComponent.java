@@ -84,7 +84,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	protected List<IComponentFeature>	ifeatures;
 	
 	/** The logger. */
-	protected Logger	logger;
+	protected Logger logger;
 	
 	/** The failure reason (if any). */
 	protected Exception	exception;
@@ -92,8 +92,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/** The combined value fetcher (cached for speed). */
 	protected IValueFetcher	fetcher;
 	
-//	/** The component lifecycle state (init, body, end). */
-//	protected ComponentLifecycleState state = ComponentLifecycleState.CREATE;
+	/** The shutdown flag (set on start of shutdown). */
+	protected boolean shutdown;
 	
 	//-------- IPlatformComponentAccess interface --------
 	
@@ -172,6 +172,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void>	shutdown()
 	{
+		shutdown	= true;
 //		state = ComponentLifecycleState.END;
 		
 //		System.out.println("shutdown component features start: "+getComponentIdentifier());
@@ -286,7 +287,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		while(ret.isDone() && ret.getException()==null && features.hasNext())
 		{
 			IComponentFeature	cf	= features.next();
-//			if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+//			if(getComponentIdentifier().getName().indexOf("Custom")!=-1)
 //				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
 			ifeatures.add(cf);
 			ret	= cf.init();
@@ -315,7 +316,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //				System.out.println("Initing of "+getComponentIdentifier()+" failed due to "+fut.getException());
 				
 				// Init failed: remove failed feature.
-				ifeatures.remove(ifeatures.size()-1);
+				IComponentFeature	feature	= ifeatures.remove(ifeatures.size()-1);
+				feature.kill();	// Kill failed feature. Other features will be shutdowned.
 			}
 			else
 			{
@@ -336,12 +338,28 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		List<IFuture<Void>>	undones	= new ArrayList<IFuture<Void>>();
 		IFuture<Void>	ret	= IFuture.DONE;
-		while(ret.getException()==null && features.hasNext())
+		while(!shutdown && ret.getException()==null && features.hasNext())
 		{
-			IComponentFeature	cf	= features.next();
-//			if(getComponentIdentifier().getName().indexOf("Interceptor")!=-1)
-//				System.out.println("Starting "+cf+" of "+getComponentIdentifier());
-			ret	= cf.body();
+			final IComponentFeature	cf	= features.next();
+//			if(getComponentIdentifier().getName().indexOf("Custom")!=-1)
+//				System.out.println("Body "+cf+" of "+getComponentIdentifier());
+			
+			// Execute user body on separate step to allow blocking get() and still execute the other bodies.
+			if(cf.hasUserBody())
+			{
+				ret	= getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				{
+					@Override
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						return cf.body();
+					}
+				});
+			}
+			else
+			{
+				ret	= cf.body();
+			}
 			
 			if(!ret.isDone())
 			{
@@ -349,7 +367,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			}
 		}
 		
-		if(ret.getException()==null)
+		// Check if need to kill due to no keepalive.
+		if(!shutdown && ret.getException()==null)
 		{
 			// Body already finished -> kill if not keep alive
 			if(undones.isEmpty())
@@ -943,13 +962,13 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				}
 				
 				if(!found && ((exact && IInternalAccess.class.equals(type))
-					|| (!exact && SReflect.isSupertype(IInternalAccess.class, type))))
+					|| (!exact && SReflect.isSupertype(type, IInternalAccess.class))))
 				{
 					ret	= getInternalAccess();
 					found	= true;
 				}
 				else if(!found && ((exact && IExternalAccess.class.equals(type))
-					|| (!exact && SReflect.isSupertype(IExternalAccess.class, type))))
+					|| (!exact && SReflect.isSupertype(type, IExternalAccess.class))))
 				{
 					ret	= getExternalAccess();
 					found	= true;

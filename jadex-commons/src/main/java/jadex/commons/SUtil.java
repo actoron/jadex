@@ -1,6 +1,7 @@
 package jadex.commons;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,6 +17,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -25,17 +28,23 @@ import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,8 +66,11 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -69,8 +81,13 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.spongycastle.util.Pack;
+
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
+import jadex.commons.future.ErrorException;
+import jadex.commons.random.FastThreadedRandom;
+import jadex.commons.random.Xoroshiro128Random;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -147,6 +164,33 @@ public class SUtil
 		}
 	};
 	
+	/** ISO8601 fallbacks assuming UTC. */
+	public static final String[] ISO8601UTCFALLBACKS;
+	static
+	{
+		ISO8601UTCFALLBACKS = new String[]
+		{
+			"yyyy-MM-dd'T'HH:mm:ss'Z'",
+			"yyyy-MM-dd' 'HH:mm:ss'+00:00'",
+			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+			"yyyy-MM-dd'T'HH:mm:ss.SSS",
+			"yyyy-MM-dd'T'HH:mm:ss"
+		};
+	}
+	
+	/** ISO8601 fallbacks with included timezone. */
+	public static final String[] ISO8601ZONEDFALLBACKS;
+	static
+	{
+		ISO8601ZONEDFALLBACKS = new String[]
+		{
+			"yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+			"yyyy-MM-dd'T'HH:mm:ss.SSSX",
+			"yyyy-MM-dd'T'HH:mm:ssZ",
+			"yyyy-MM-dd'T'HH:mm:ssX"
+		};
+	}
+	
 	/**
 	 * Mapping from single characters to encoded version for displaying on
 	 * xml-style interfaces.
@@ -173,6 +217,23 @@ public class SUtil
 			return null;
 		}
 	};
+	
+	public static final SecureRandom SECURE_RANDOM;
+	static
+	{
+		SecureRandom secrand = null;
+		try
+		{
+			Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
+			Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
+			secrand = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
+		}
+		catch (Exception e)
+		{
+			secrand = new SecureRandom();
+		}
+		SECURE_RANDOM = secrand;
+	}
 
 	/** An empty string array. */
 	public static final String[] EMPTY_STRING_ARRAY	= new String[0];
@@ -251,7 +312,7 @@ public class SUtil
 			tmp += it.next();
 		seps	= tmp;
 		
-		List<IResultCommand<ResourceInfo, URLConnection>>	mappers	= new ArrayList();
+		List<IResultCommand<ResourceInfo, URLConnection>>	mappers	= new ArrayList<IResultCommand<ResourceInfo, URLConnection>>();
 		String	custommappers	= System.getProperty("jadex.resourcemappers");
 		if(custommappers!=null)
 		{
@@ -261,7 +322,7 @@ public class SUtil
 				String	mapper	= stok.nextToken().trim();
 				try
 				{
-					Class	clazz	= SReflect.classForName(mapper, SUtil.class.getClassLoader());
+					Class<IResultCommand<ResourceInfo, URLConnection>> clazz = (Class<IResultCommand<ResourceInfo, URLConnection>>)SReflect.classForName(mapper, SUtil.class.getClassLoader());
 					mappers.add((IResultCommand<ResourceInfo, URLConnection>)clazz.newInstance());
 				}
 				catch(Exception e)
@@ -282,7 +343,7 @@ public class SUtil
 				{
 					try
 					{
-						long	modified	= 0;
+						long modified = 0;
 						String	filename	= con.getURL().getFile();
 						JarURLConnection juc = (JarURLConnection)con;
 						// System.out.println("Jar file:     "+juc.getJarFile());
@@ -301,17 +362,15 @@ public class SUtil
 	
 						try
 						{
-							ret = new ResourceInfo(filename,
-									con.getInputStream(), modified);
+							ret = new ResourceInfo(filename, con.getInputStream(), modified);
 						}
 						catch(NullPointerException e)
 						{
 							// Workaround for Java bug #5093378 !?
 							// Maybe this is only a race condition???
 							String jarfilename = juc.getJarFile().getName();
-							ret = new ResourceInfo(filename, new JarFile(
-									jarfilename).getInputStream(juc
-									.getJarEntry()), modified);
+							ret = new ResourceInfo(filename, new JarFile(jarfilename)
+								.getInputStream(juc.getJarEntry()), modified);
 							// System.err.println("loaded with workaround: "+url);
 						}
 	
@@ -455,8 +514,8 @@ public class SUtil
 	 */
 	public static Object cutArrays(Object a1, Object a2)
 	{
-		List ar1 = arrayToList(a1);
-		List ar2 = arrayToList(a2);
+		List<Object> ar1 = arrayToList(a1);
+		List<Object> ar2 = arrayToList(a2);
 		List<Object> ret = new ArrayList<Object>();
 		Object tmp;
 
@@ -469,7 +528,7 @@ public class SUtil
 			}
 		}
 		return ret.toArray((Object[])Array.newInstance(a1.getClass()
-				.getComponentType(), ret.size()));
+			.getComponentType(), ret.size()));
 	}
 
 	/**
@@ -481,8 +540,8 @@ public class SUtil
 	 */
 	public static Object substractArrays(Object a1, Object a2)
 	{
-		List ar1 = arrayToList(a1);
-		List ar2 = arrayToList(a2);
+		List<Object> ar1 = arrayToList(a1);
+		List<Object> ar2 = arrayToList(a2);
 		Object tmp;
 
 		for(int i = 0; i < ar2.size(); i++)
@@ -494,7 +553,7 @@ public class SUtil
 			}
 		}
 		return ar1.toArray((Object[])Array.newInstance(a1.getClass()
-				.getComponentType(), ar1.size()));
+			.getComponentType(), ar1.size()));
 	}
 
 	/**
@@ -505,14 +564,14 @@ public class SUtil
 	 */
 	public static <T> List<T> arrayToList(Object a)
 	{
-		ArrayList ret = null;
+		ArrayList<T> ret = null;
 		if(a!=null)
 		{
 			int l = Array.getLength(a);
 			ret = SCollection.createArrayList();
 			for(int i = 0; i < l; i++)
 			{
-				ret.add(Array.get(a, i));
+				ret.add((T)Array.get(a, i));
 			}
 		}
 		return ret;
@@ -527,10 +586,10 @@ public class SUtil
 	public static <T> Set<T> arrayToSet(Object a)
 	{
 		int l = Array.getLength(a);
-		Set ret = SCollection.createHashSet();
+		Set<T> ret = SCollection.createHashSet();
 		for(int i = 0; i < l; i++)
 		{
-			ret.add(Array.get(a, i));
+			ret.add((T)Array.get(a, i));
 		}
 		return ret;
 	}
@@ -548,9 +607,9 @@ public class SUtil
 	/**
 	 * Transform an iterator to a list.
 	 */
-	public static List iteratorToList(Iterator it)
+	public static <T> List<T> iteratorToList(Iterator<T> it)
 	{
-		List ret = new ArrayList();
+		List<T> ret = new ArrayList<T>();
 		while(it.hasNext())
 			ret.add(it.next());
 		return ret;
@@ -559,10 +618,10 @@ public class SUtil
 	/**
 	 * Transform an iterator to a list.
 	 */
-	public static List iteratorToList(Iterator it, List ret)
+	public static <T> List<T> iteratorToList(Iterator<T> it, List<T> ret)
 	{
 		if(ret == null)
-			ret = new ArrayList();
+			ret = new ArrayList<T>();
 		while(it.hasNext())
 			ret.add(it.next());
 		return ret;
@@ -571,9 +630,9 @@ public class SUtil
 	/**
 	 * Transform an iterator to an array.
 	 */
-	public static Object[] iteratorToArray(Iterator it, Class clazz)
+	public static <T> Object[] iteratorToArray(Iterator<T> it, Class<T> clazz)
 	{
-		List list = iteratorToList(it);
+		List<T> list = iteratorToList(it);
 		return list.toArray((Object[])Array.newInstance(clazz, list.size()));
 	}
 
@@ -602,7 +661,7 @@ public class SUtil
 	public static int getArrayDimension(Object array) 
 	{
 		int ret = 0;
-		Class arrayClass = array.getClass();
+		Class<?> arrayClass = array.getClass();
 		while(arrayClass.isArray()) 
 		{
 			ret++;
@@ -732,7 +791,7 @@ public class SUtil
 	{
 		String sing = s;
 		if(s.endsWith("shes") || s.endsWith("ches") || s.endsWith("xes")
-				|| s.endsWith("ses"))
+			|| s.endsWith("ses"))
 		{
 			sing = s.substring(0, s.length() - 2);
 		}
@@ -875,34 +934,33 @@ public class SUtil
 		return buf.toString();
 	}
 
-
-	/** Constant for sorting up. */
-	public static final int	SORT_UP		= 0;
-
-	/** Constant for sorting down. */
-	public static final int	SORT_DOWN	= 1;
-
-	/**
-	 * Remove the least element form a collection.
-	 */
-	protected static int getExtremeElementIndex(Vector source, int direction)
-	{
-		String ret = (String)source.elementAt(0);
-		int retidx = 0;
-		int size = source.size();
-		for(int i = 0; i < size; i++)
-		{
-			String tmp = (String)source.elementAt(i);
-			int res = tmp.compareTo(ret);
-			if((res < 0 && direction == SORT_UP)
-					|| (res > 0 && direction == SORT_DOWN))
-			{
-				ret = tmp;
-				retidx = i;
-			}
-		}
-		return retidx;
-	}
+//	/** Constant for sorting up. */
+//	public static final int	SORT_UP		= 0;
+//
+//	/** Constant for sorting down. */
+//	public static final int	SORT_DOWN	= 1;
+//
+//	/**
+//	 * Remove the least element form a collection.
+//	 */
+//	protected static int getExtremeElementIndex(Vector source, int direction)
+//	{
+//		String ret = (String)source.elementAt(0);
+//		int retidx = 0;
+//		int size = source.size();
+//		for(int i = 0; i < size; i++)
+//		{
+//			String tmp = (String)source.elementAt(i);
+//			int res = tmp.compareTo(ret);
+//			if((res < 0 && direction == SORT_UP)
+//					|| (res > 0 && direction == SORT_DOWN))
+//			{
+//				ret = tmp;
+//				retidx = i;
+//			}
+//		}
+//		return retidx;
+//	}
 
 	/**
 	 * Convert an output to html/wml conform presentation.
@@ -1081,8 +1139,7 @@ public class SUtil
 	 * @param old The string to replace.
 	 * @param newstring The string to use as replacement.
 	 */
-	public static void replace(String source, StringBuffer dest, String old,
-			String newstring)
+	public static void replace(String source, StringBuffer dest, String old, String newstring)
 	{
 		int last = 0;
 		int index;
@@ -1120,8 +1177,7 @@ public class SUtil
 	 * @return The input stream for the resource.
 	 * @throws IOException when the resource was not found.
 	 */
-	public static InputStream getResource(String name, ClassLoader classloader)
-			throws IOException
+	public static InputStream getResource(String name, ClassLoader classloader) throws IOException
 	{
 		InputStream is = getResource0(name, classloader);
 		if(is == null)
@@ -1139,8 +1195,7 @@ public class SUtil
 	 * @return The input stream for the resource or null when the resource was
 	 *         not found.
 	 */
-	public synchronized static InputStream getResource0(String name,
-			ClassLoader classloader)
+	public synchronized static InputStream getResource0(String name, ClassLoader classloader)
 	{
 		InputStream is = null;
 		File file;
@@ -1234,7 +1289,7 @@ public class SUtil
 					try
 					{
 						ret = new ResourceInfo(file.getCanonicalPath(),
-								new FileInputStream(file), file.lastModified());
+							new FileInputStream(file), file.lastModified());
 					}
 					catch(FileNotFoundException e)
 					{
@@ -1468,7 +1523,7 @@ public class SUtil
 		if(!fpath.isDirectory())
 			path = fpath.getParent();
 
-		java.util.List toks = SCollection.createArrayList();
+		List<String> toks = SCollection.createArrayList();
 		StringTokenizer stok = new StringTokenizer(path, File.separator);
 		while(stok.hasMoreTokens())
 			toks.add(stok.nextToken());
@@ -1476,7 +1531,16 @@ public class SUtil
 		int quality = 0;
 		for(int i = 0; i<urls.length; i++)
 		{
-			String cp = urls[i].getFile();
+			String cp = null;
+			try
+			{
+				cp = URLDecoder.decode(urls[i].getFile(), "UTF-8");
+			}
+			catch(Exception e)
+			{
+				rethrowAsUnchecked(e);
+			}
+			
 			stok = new StringTokenizer(cp, "/!"); // Exclamation mark to support
 													// jar files.
 			int cplen = stok.countTokens();
@@ -1584,9 +1648,12 @@ public class SUtil
 
 		Set<URL> cps = new LinkedHashSet<URL>(); 
 	
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			cps.addAll(androidUtils().collectDexPathUrls(classloader));
-		} else {
+		} 
+		else 
+		{
 			StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
 			while(stok.hasMoreTokens())
 			{
@@ -1937,9 +2004,11 @@ public class SUtil
 		return ret;
 	}
 
-	/** The counter for conversation ids. */
-	protected static long convidcnt;
+//	protected static long convidcnt;
 
+	/** The counter for conversation ids. */
+	protected static AtomicLong convidcnt = new AtomicLong();
+	
 	/**
 	 * Create a globally unique conversation id.
 	 * 
@@ -1947,14 +2016,68 @@ public class SUtil
 	 */
 	public static String createUniqueId(String name)
 	{
-		synchronized(SUtil.class)
-		{
-			// return
-			// "id_"+name+"_"+System.currentTimeMillis()+"_"+Math.random()+"_"+(++convidcnt);
-			// return "id_"+name+"_"+Math.random()+"_"+(++convidcnt);
-			return name + "_" + Math.random() + "_" + (++convidcnt);
-		}
+		char[] nchars = name == null ? new char[0] : name.toCharArray();
+		char[] chars = new char[nchars.length + 45];
+		System.arraycopy(nchars, 0, chars, 0, nchars.length);
+		int o = nchars.length;
+//		int o = 0;
+		chars[o++] = '_';
+		
+		byte[] precached = new byte[32];
+		SECURE_RANDOM.nextBytes(precached);
+
+		long rndlong = SUtil.bytesToLong(precached, 0);
+		for (int i = 0; i < 11; ++i)
+			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+		o += 11;
+		rndlong = SUtil.bytesToLong(precached, 8);
+		for (int i = 0; i < 11; ++i)
+			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+		o += 11;
+		rndlong = SUtil.bytesToLong(precached, 16);
+		for (int i = 0; i < 11; ++i)
+			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+		o += 11;
+		rndlong = SUtil.bytesToLong(precached, 24);
+		for (int i = 0; i < 11; ++i)
+			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+		
+		String ret = new String(chars);
+		return ret;
 	}
+	
+	public static final Field strval;
+	static
+	{
+		Field f = null;
+		try
+		{
+			f = String.class.getDeclaredField("value");
+			f.setAccessible(true);
+		}
+		catch (Exception e)
+		{
+			
+		}
+		
+		strval = f;
+	}
+	
+	/**
+	 * Create a globally unique conversation id.
+	 * 
+	 * @return The conversation id.
+	 */
+//	public static String createUniqueId(String name)
+//	{
+////		synchronized(SUtil.class)
+////		{
+//			// return
+//			// "id_"+name+"_"+System.currentTimeMillis()+"_"+Math.random()+"_"+(++convidcnt);
+//			// return "id_"+name+"_"+Math.random()+"_"+(++convidcnt);
+//			return name + "_" + Math.random() + "_" + (convidcnt.incrementAndGet());
+////		}
+//	}
 
 	/**
 	 * Create a globally unique conversation id.
@@ -2320,6 +2443,71 @@ public class SUtil
 		}
 		return ret;
 	}
+
+
+	/**
+	 * Convert a scheme, InetAdress and port to a valid URI or throw.
+	 * @param scheme
+	 * @param address
+	 * @param port
+	 * @return URI
+	 */
+	public static URI toURI(String scheme, InetAddress address, int port) {
+		if (scheme.endsWith("://")) {
+			scheme = scheme.substring(0, scheme.length()-3);
+		}
+		try {
+			return new URI(scheme, null, address.getHostAddress(), port, null, null, null);
+		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+			rethrowAsUnchecked(e);
+		}
+		return null;
+	}
+
+
+	/**
+	 * Convert stringified URI (as used in transports for some weird reason) to URI.
+	 * @param transporturi Transport-style URI (tcp-mtp://hostpart:port or tcp-mtp://[h:o:s:t%scope]:port for ipv6)
+	 * @return URI
+	 */
+	public static URI toURI(String transporturi) {
+		URI ret = null;
+		try {
+			// by default, transporturis should be valid URIs.
+			ret = new URI(transporturi);
+			if (ret.getHost() == null) { // URI may not throw, but instead use the whole string as "authority" :(
+				throw new URISyntaxException(transporturi, "No hostname found while converting to URI");
+			}
+		} catch (URISyntaxException e) {
+			// for backword compatibility, handle wrongly formatted IPv6 transport "addresses"
+			// see https://www.ietf.org/rfc/rfc2732.txt for correct format.
+			if (transporturi.contains("%") && !transporturi.contains("[")) {
+//				tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199%eth0:42716
+				int schemaend = transporturi.indexOf("://");
+				int portdiv = transporturi.lastIndexOf(':');
+				int scopediv = transporturi.lastIndexOf('%');
+
+				String hostname = transporturi.substring(schemaend+3, portdiv);
+				String scheme = transporturi.substring(0, schemaend);
+				Integer port = null;
+				if(portdiv>scopediv) // has port
+				{
+					port = Integer.parseInt(transporturi.substring(portdiv+1));
+				}
+				try {
+					ret =  new URI(scheme, null, hostname, port, null, null, null);
+//					System.out.println("silently converted wrongly formatted URI: " + transporturi);
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+					rethrowAsUnchecked(e);
+				}
+			} else {
+				rethrowAsUnchecked(e);
+			}
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Sleep the current thread, ignore exceptions.
@@ -2532,14 +2720,14 @@ public class SUtil
 	}
 	
 	/**
-	 *  Convert an integer into a byte array.
+	 *  Convert a long to bytes.
 	 */
 	public static void intIntoBytes(int val, byte[] buffer, int offset)
 	{
-		buffer[offset] = (byte)((val >>> 24) & 0xFF);
-		buffer[offset+1] = (byte)((val >>> 16) & 0xFF);
-		buffer[offset+2] = (byte)((val >>> 8) & 0xFF);
-		buffer[offset+3] = (byte)(val & 0xFF);
+		buffer[offset++] = (byte)((val >>> 24) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 16) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 8) & 0xFF);
+		buffer[offset++] = (byte)(val & 0xFF);
 	}
 	
 //	/**
@@ -2560,15 +2748,11 @@ public class SUtil
 //	}
 
 	/**
-	 *  Convert bytes to an integer.
+	 *  Convert bytes to a long.
 	 */
 	public static long bytesToLong(byte[] buffer)
 	{
 		assert buffer.length == 8;
-//		if(buffer.length != 8)
-//		{
-//			throw new IllegalArgumentException("Buffer length must be 8 bytes: "+arrayToString(buffer));
-//		}
 
 		long value = (0xFFL & buffer[0]) << 56L;
 		value |= (0xFFL & buffer[1]) << 48L;
@@ -2581,9 +2765,26 @@ public class SUtil
 
 		return value;
 	}
+	
+	/**
+	 *  Convert bytes to a long.
+	 */
+	public static long bytesToLong(byte[] buffer, int offset)
+	{
+		long value = (0xFFL & buffer[offset++]) << 56L;
+		value |= (0xFFL & buffer[offset++]) << 48L;
+		value |= (0xFFL & buffer[offset++]) << 40L;
+		value |= (0xFFL & buffer[offset++]) << 32L;
+		value |= (0xFFL & buffer[offset++]) << 24L;
+		value |= (0xFFL & buffer[offset++]) << 16L;
+		value |= (0xFFL & buffer[offset++]) << 8L;
+		value |= (0xFFL & buffer[offset++]);
+
+		return value;
+	}
 
 	/**
-	 *  Convert an integer to bytes.
+	 *  Convert a long to bytes.
 	 */
 	public static byte[] longToBytes(long val)
 	{
@@ -2599,6 +2800,29 @@ public class SUtil
 		buffer[7] = (byte)(val & 0xFF);
 
 		return buffer;
+	}
+	
+	/**
+	 *  Convert a long to bytes.
+	 */
+	public static void longIntoBytes(long val, byte[] buffer)
+	{
+		longIntoBytes(val, buffer, 0);
+	}
+	
+	/**
+	 *  Convert a long to bytes.
+	 */
+	public static void longIntoBytes(long val, byte[] buffer, int offset)
+	{
+		buffer[offset++] = (byte)((val >>> 56) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 48) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 40) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 32) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 24) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 16) & 0xFF);
+		buffer[offset++] = (byte)((val >>> 8) & 0xFF);
+		buffer[offset++] = (byte)(val & 0xFF);
 	}
 	
 	/**
@@ -2804,7 +3028,102 @@ public class SUtil
 			}
 		}
 		return file;
-	}	
+	}
+	
+	/**
+	 *  Creates an ISO 8601-compliant string out of a java Date object.
+	 *  
+	 *  @param date The date object.
+	 *  @return ISO 8601-compliant string.
+	 */
+	public static String dateToIso8601(Date date)
+	{
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+//		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return df.format(date);
+	}
+	
+	/**
+	 *  Attempts to create a date object in Java from an ISO 8601 string.
+	 *  
+	 *  @param isostring The ISO string, must contain enough data for the date object.
+	 *  @return Date object.
+	 */
+	public static Date dateFromIso8601(String isostring)
+	{
+		Date ret = null;
+		try
+		{
+			Class<?> datetimeformatter = Class.forName("java.time.format.DateTimeFormatter");
+			Method parse = datetimeformatter.getMethod("parse", CharSequence.class);
+			Object[] formatters = new Object[]
+			{
+				datetimeformatter.getField("ISO_INSTANT").get(null),
+				datetimeformatter.getField("ISO_DATE_TIME").get(null)
+			};
+			
+			Class<?> instantclass = Class.forName("java.time.Instant");
+			Method fromi = Date.class.getMethod("from", instantclass);
+			Class<?> temporalaccessorclass = Class.forName("java.time.temporal.TemporalAccessor");
+			Method fromta = instantclass.getMethod("from", temporalaccessorclass);
+			
+			for (int i = 0; i < formatters.length && ret == null; ++i)
+			{
+				try
+				{
+					Object temporalaccessor = parse.invoke(formatters[i], isostring);
+					Object instant = fromta.invoke(null, temporalaccessor);
+					ret = (Date) fromi.invoke(null, instant);
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		catch (Exception e)
+		{
+		}
+		
+		if (ret == null)
+		{
+			for (int i = 0; i < ISO8601UTCFALLBACKS.length && ret == null; ++i)
+			{
+				String fstr = ISO8601UTCFALLBACKS[i];
+				SimpleDateFormat df = new SimpleDateFormat(fstr);
+				df.setTimeZone(TimeZone.getTimeZone("UTC"));
+				try
+				{
+					ret = df.parse(isostring);
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		
+		if (ret == null)
+		{
+			for (int i = 0; i < ISO8601ZONEDFALLBACKS.length && ret == null; ++i)
+			{
+				String fstr = ISO8601ZONEDFALLBACKS[i];
+				SimpleDateFormat df = new SimpleDateFormat(fstr);
+				df.setTimeZone(TimeZone.getTimeZone("UTC"));
+				try
+				{
+					ret = df.parse(isostring);
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		
+		if (ret == null)
+			throw new RuntimeException(new ParseException("Failed to parse ISO 8601 date string: " + isostring, 0));
+		
+		return ret;
+	}
 
 	/**
 	 *  Add a listener to System.out.
@@ -3164,10 +3483,10 @@ public class SUtil
 	/**
 	 *  Get the addresses to be used for transports.
 	 */
-	public static String[]	getNetworkAddresses() throws SocketException
+	public static InetAddress[]	getNetworkAddresses() throws SocketException
 	{
 		// Determine useful transport addresses.
-		Set<String>	addresses	= new HashSet<String>();	// global network addresses (uses all)
+		Set<InetAddress>	addresses	= new HashSet<InetAddress>();	// global network addresses (uses all)
 		Set<InetAddress>	sitelocal	= new HashSet<InetAddress>();	// local network addresses e.g. 192.168.x.x (use one v4 and one v6 if no global)
 		Set<InetAddress>	linklocal	= new HashSet<InetAddress>();	// link-local fallback addresses e.g. 169.254.x.x (use one v4 and one v6 if no global or local)
 		Set<InetAddress>	loopback	= new HashSet<InetAddress>();	// loopback addresses e.g. 127.0.0.1 (use one v4 and one v6 if no global or local or link-local)
@@ -3197,7 +3516,14 @@ public class SUtil
 				{
 					v4	= v4 || addr instanceof Inet4Address;
 					v6	= v6 || addr instanceof Inet6Address;
-					addresses.add(addr.getHostAddress());
+					if (addr instanceof  Inet6Address) {
+						try {
+							addr = Inet6Address.getByAddress(addr.getHostAddress(), addr.getAddress());
+						} catch (UnknownHostException e) {
+							e.printStackTrace();
+						}
+					}
+					addresses.add(addr);
 				}
 			}
 		}
@@ -3211,7 +3537,14 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				if (addr instanceof  Inet6Address) {
+					try {
+						addr = Inet6Address.getByAddress(addr.getHostAddress(), addr.getAddress());
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+				}
+				addresses.add(addr);
 			}
 		}
 		
@@ -3224,7 +3557,14 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				if (addr instanceof  Inet6Address) {
+					try {
+						addr = Inet6Address.getByAddress(addr.getHostAddress(), addr.getAddress());
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+				}
+				addresses.add(addr);
 			}
 		}
 		
@@ -3237,7 +3577,14 @@ public class SUtil
 			{
 				v4	= v4 || addr instanceof Inet4Address;
 				v6	= v6 || addr instanceof Inet6Address;
-				addresses.add(addr.getHostAddress());
+				if (addr instanceof  Inet6Address) {
+					try {
+						addr = Inet6Address.getByAddress(addr.getHostAddress(), addr.getAddress());
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+				}
+				addresses.add(addr);
 			}
 		}
 		
@@ -3260,8 +3607,8 @@ public class SUtil
 //		}
 		
 //		System.out.println("addresses: "+addresses);
-		
-		return addresses.toArray(new String[addresses.size()]);		
+
+		return addresses.toArray(new InetAddress[addresses.size()]);
 	}
 	
 	/**
@@ -3367,7 +3714,7 @@ public class SUtil
 		}
 		return dir.delete();
 	}
-	
+
 	/**
 	 *  An subclass of print stream to allow accessing the underlying stream.
 	 */
@@ -3964,26 +4311,81 @@ public class SUtil
 	}
 	
 	/**
-	 *  Reads a set number of bytes from input stream.
+	 *  Fills buffer from an input stream.
+	 *  Note: This only works for sizes smaller than 2GiB.
 	 *  
+	 *  @param buf The buffer.
 	 * 	@param is The InputStream.
-	 *  @param buffer The buffer to write into.
-	 *  @param offset Buffer offset
-	 *  @param len Number of bytes to read, buffer.length-offset is used when negative.
 	 */
-	public static void readStream(InputStream is, byte[] buffer, int offset, int len)
+	public static void readStream(byte[] buf, InputStream is)
 	{
-		len = len < 0? buffer.length:len + offset;
+		readStream(buf, 0, buf.length, is, 0);
+	}
+	
+	/**
+	 *  Reads part of an input stream into a buffer.
+	 *  Note: This only works for sizes smaller than 2GiB.
+	 *  
+	 *  @param buf The buffer.
+	 *  @param off Offset for writing into the buffer.
+	 *  @param len Number of bytes to read from stream, set to -1 to fill the rest of the buffer.
+	 * 	@param is The InputStream.
+	 */
+	public static void readStream(byte[] buf, int off, int len, InputStream is)
+	{
+		readStream(buf, off, len, is, 0);
+	}
+	
+	/**
+	 *  Reads part of an input stream into a buffer.
+	 *  Note: This only works for sizes smaller than 2GiB.
+	 *  
+	 *  @param buf The buffer.
+	 *  @param off Offset for writing into the buffer.
+	 *  @param len Number of bytes to read from stream, set to -1 to fill the rest of the buffer.
+	 * 	@param is The InputStream.
+	 *  @param skip Skip this number of bytes from the stream before reading, skip<=0 for no skip.
+	 */
+	public static void readStream(byte[] buf, int off, int len, InputStream is, long skip)
+	{
 		try
 		{
-			while(offset<len) 
+			if (skip > 0)
+				is.skip(skip);
+			
+			if (len < 0)
+				len = buf.length - off;
+			
+			int read = 0;
+			while (read < len)
 			{
-				offset += is.read(buffer, offset, len-offset);
+				read = is.read(buf, off, len - read);
+				off += read;
 			}
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			rethrowAsUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Attempt to close a Closeable (e.g. on error recovery)
+	 *  ignoring any error.
+	 *  
+	 *  @param closeable The closeable.
+	 */
+	public static void close(Closeable closeable)
+	{
+		if (closeable != null)
+		{
+			try
+			{
+				closeable.close();
+			}
+			catch (IOException e)
+			{
+			}
 		}
 	}
 	
@@ -4230,15 +4632,13 @@ public class SUtil
 	 */
 	public static String beanToString(Object bean, ClassLoader cl)
 	{
-		if (cl == null)
-		{
+		if(cl == null)
 			cl = SUtil.class.getClassLoader();
-		}
 		StringBuilder beanstr = new StringBuilder("[");
 		IBeanIntrospector is = BeanIntrospectorFactory.getInstance().getBeanIntrospector();
 		Map<String, BeanProperty> props = is.getBeanProperties(bean.getClass(), true, false);
 		boolean notfirst = false;
-		for (Map.Entry<String, BeanProperty> entry : props.entrySet())
+		for(Map.Entry<String, BeanProperty> entry : props.entrySet())
 		{
 			if (notfirst)
 			{
@@ -4265,11 +4665,21 @@ public class SUtil
 	 */
 	public static String readFile(String filename)
 	{
+		return readFile(filename, null);
+	}
+	
+	/**
+	 *  Read a file to string.
+	 *  @param filename The file name.
+	 *  @return The string.
+	 */
+	public static String readFile(String filename, ClassLoader cl)
+	{
 		String ret = null;
 		Scanner sc = null;
 		try
 		{
-			InputStream is = SUtil.getResource0(filename, null);
+			InputStream is = SUtil.getResource0(filename, cl);
 			if(is==null)
 				throw new RuntimeException("Resource not found: "+filename);
 			sc = new Scanner(is);
@@ -4549,6 +4959,35 @@ public class SUtil
 		return sw.toString();
 	}
 	
+	/**
+	 *  Convert a throwable to an unchecked exception (i.e. error or runtime exception).
+	 *  Also unpacks InvocationTargeteException and ErrorException.
+	 *  @param t	The throwable.
+	 *  @return Dummy return value as exception will be thrown inside. Use as <code>throw SUtil.throwUnchecked(t);</code> to avoid compilation errors.
+	 */
+	public static RuntimeException throwUnchecked(Throwable t)	throws Error,	RuntimeException
+	{
+		if(t instanceof InvocationTargetException)
+		{
+			throw throwUnchecked(((InvocationTargetException)t).getTargetException());
+		}
+		else if(t instanceof ErrorException)
+		{
+			throw throwUnchecked(((ErrorException)t).getError());
+		}
+		else if(t instanceof Error)
+		{
+			throw (Error)t;
+		}
+		else if(t instanceof RuntimeException)
+		{
+			throw (RuntimeException)t;
+		}
+		else
+		{
+			throw new RuntimeException(t);
+		}
+	}
 
 	/**
 	 *  Guess the mime type by the file name.
@@ -4643,12 +5082,13 @@ public class SUtil
 	/**
 	 *  Get the hash code for a file or directory.
 	 */
-	public static String	getHashCode(File f)
+	public static String	getHashCode(File f, boolean flat)
 	{
 //		long	start0	= System.nanoTime();
+		
 		try
 		{
-			String	path	= f.getCanonicalPath();
+			String	path	= f.getAbsolutePath();	// Not canonical, because we want to ignore symlinks.
 			Tuple2<Long, String>	entry	= HASHES.get(path);
 			String	hash	=	entry!=null ? entry.getSecondEntity() : null; 
 			
@@ -4662,46 +5102,53 @@ public class SUtil
 				}
 				else
 				{
-					ZipFile	zf	= null;
-					try
+					if(!flat)
 					{
-						// Try zip file as directory.
-						zf	= new ZipFile(f);
-						List<ZipEntry>	entries	= new ArrayList<ZipEntry>();
-						Enumeration<? extends ZipEntry>	en	= zf.entries();
-						while(en.hasMoreElements())
+						ZipFile	zf	= null;
+						try
 						{
-							ZipEntry	ze	= en.nextElement();
-							if(!ze.isDirectory() && !ze.getName().startsWith("META-INF/"))
+							// Try zip file as directory.
+							zf	= new ZipFile(f);
+							List<ZipEntry>	entries	= new ArrayList<ZipEntry>();
+							Enumeration<? extends ZipEntry>	en	= zf.entries();
+							while(en.hasMoreElements())
 							{
-								entries.add(ze);
+								ZipEntry	ze	= en.nextElement();
+								if(!ze.isDirectory() && !ze.getName().startsWith("META-INF/"))
+								{
+									entries.add(ze);
+								}
+							}
+							Collections.sort(entries, new Comparator<ZipEntry>()
+							{
+								public int compare(ZipEntry o1, ZipEntry o2)
+								{
+									return o1.getName().compareTo(o2.getName());
+								}
+							});
+							for(ZipEntry ze: entries)
+							{
+	//							System.out.println("Zip entry: "+ze.getName());
+								md.update(ze.getName().getBytes("UTF-8"));
+								hashStream(zf.getInputStream(ze), md);
 							}
 						}
-						Collections.sort(entries, new Comparator<ZipEntry>()
+						catch(ZipException ze)
 						{
-							public int compare(ZipEntry o1, ZipEntry o2)
+							// Treat as flat file.
+							hashStream(new FileInputStream(f), md);					
+						}
+						finally
+						{
+							if(zf!=null)
 							{
-								return o1.getName().compareTo(o2.getName());
+								zf.close();
 							}
-						});
-						for(ZipEntry ze: entries)
-						{
-//							System.out.println("Zip entry: "+ze.getName());
-							md.update(ze.getName().getBytes("UTF-8"));
-							hashStream(zf.getInputStream(ze), md);
 						}
 					}
-					catch(ZipException ze)
+					else
 					{
-						// Treat as flat file.
-						hashStream(new FileInputStream(f), md);					
-					}
-					finally
-					{
-						if(zf!=null)
-						{
-							zf.close();
-						}
+						hashStream(new FileInputStream(f), md);
 					}
 				}
 				hash	= new String(Base64.encode(md.digest()), "UTF-8");
@@ -4835,14 +5282,7 @@ public class SUtil
 			// -> have to implement our own portable comparator for matching hash values on all systems. 
 			public int compare(File o1, File o2)
 			{
-				try
-				{
-					return o1.getCanonicalPath().compareTo(o2.getCanonicalPath());
-				}
-				catch(IOException e)
-				{
-					throw new RuntimeException(e);
-				}
+				return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());	// Not canonical, because we want to ignore symlinks.
 			}
 		});
 		
@@ -4857,11 +5297,19 @@ public class SUtil
 			}
 			else
 			{
-				String	fpath	= f.getCanonicalPath();
+				String	fpath	= f.getAbsolutePath(); 	// Not canonical, because we want to ignore symlinks.
 				assert fpath.startsWith(root);
-				String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
+				if(root.length()+1>fpath.length())
+				{
+					// Shouldn't happen (bugfix for 3.0.0), left here for testing -> remove when confirmed working with symlinks
+					System.out.println("root: "+root+", fpath: "+fpath);
+				}
+				else
+				{
+					String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
+					md.update(entry.getBytes("UTF-8"));
+				}
 //				System.out.println("Dir entry: "+entry);
-				md.update(entry.getBytes("UTF-8"));
 				hashStream(new FileInputStream(f), md);
 			}
 		}

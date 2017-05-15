@@ -1,11 +1,15 @@
 package jadex.bdiv3.actions;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
+import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.annotation.GoalParent;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.Direction;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
@@ -15,6 +19,9 @@ import jadex.bdiv3.runtime.impl.RParameterElement.RParameterSet;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RProcessableElement.State;
+import jadex.bdiv3.runtime.wrappers.ListWrapper;
+import jadex.bdiv3.runtime.wrappers.MapWrapper;
+import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IConditionalComponentStep;
@@ -81,6 +88,47 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 //			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			// todo: observe class and goal itself!
 //			goal.observeGoal(ia);
+			
+			// inject agent in static inner class goals
+			MGoal mgoal = (MGoal)goal.getModelElement();
+			Class<?> gcl = mgoal.getTargetClass(agent.getClassLoader());
+			if(gcl!=null)// && gcl.isMemberClass() && Modifier.isStatic(gcl.getModifiers()))
+			{
+				try
+				{
+					Field f = gcl.getDeclaredField(IBDIClassGenerator.AGENT_FIELD_NAME);
+					f.set(goal.getPojoElement(), agent);
+
+					// Init goal parameter list/map/set wrappers with the agent
+					List<MParameter> mps = mgoal.getParameters();
+					if(mps!=null)
+					{
+						for(MParameter mp: mps)
+						{
+							Object val = mp.getValue(goal.getPojoElement(), agent.getClassLoader());
+							if(val instanceof ListWrapper && ((ListWrapper<?>)val).isInitWrite())
+							{
+								((ListWrapper<?>)val).setAgent(agent);
+							}
+							else if(val instanceof MapWrapper && ((MapWrapper<?,?>)val).isInitWrite())
+							{
+								((MapWrapper<?,?>)val).setAgent(agent);
+							}
+							else if(val instanceof SetWrapper && ((SetWrapper<?>)val).isInitWrite())
+							{
+								((SetWrapper<?>)val).setAgent(agent);
+							}
+						}
+					}
+					
+					// Perform init writes means that the events of constructor parameter changes are thrown
+					BDIAgentFeature.performInitWrites(agent, goal.getPojoElement());
+				}
+				catch(Exception e)
+				{
+					// nop
+				}
+			}
 			
 			// inject goal elements
 			if(goal.getPojoElement()!=null)

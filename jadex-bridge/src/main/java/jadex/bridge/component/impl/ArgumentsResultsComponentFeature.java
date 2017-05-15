@@ -28,7 +28,7 @@ import jadex.javaparser.SJavaParser;
 /**
  *  This feature provides arguments.
  */
-public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher
+public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher, IInternalArgumentsResultsFeature
 {
 	//-------- attributes --------
 	
@@ -99,6 +99,18 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 
 		return IFuture.DONE;
 	}
+	
+	/**
+	 *  Check if the feature potentially executed user code in body.
+	 *  Allows blocking operations in user bodies by using separate steps for each feature.
+	 *  Non-user-body-features are directly executed for speed.
+	 *  If unsure just return true. ;-)
+	 */
+	public boolean	hasUserBody()
+	{
+		return false;
+	}
+
 
 	/**
 	 *  Init unset arguments from default values.
@@ -296,7 +308,18 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		});
 		return ret;
 	}
+
+	//-------- internal interface --------
 	
+	/**
+	 *  Check if there is somebody waiting for this component to finish.
+	 *  Used to decide if a fatal error needs to be printed to the console.
+	 */
+	public boolean	hasListener()
+	{
+		return resfuts!=null && !resfuts.isEmpty();
+	}
+
 	//-------- helper methods --------
 	
 	/**

@@ -1,5 +1,6 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jadex.bridge.IExternalAccess;
@@ -8,7 +9,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -47,19 +47,21 @@ public class ScenarioAgent
 					public void resultAvailable(List<IResourceIdentifier> result)
 					{
 						List<IResourceIdentifier> libs = (List<IResourceIdentifier>)result;
-						String[] libpaths = new String[libs.size()];
-						for(int i=0; i<libpaths.length; i++)
+						List<String> libpaths = new ArrayList<String>();
+						for(IResourceIdentifier rid: libs)
 						{
-							libpaths[i] = libs.get(i).getLocalIdentifier().getUri().toString();
+							String lib	= rid.getLocalIdentifier().getUri().toString();
+							if(lib.startsWith("file:"))	// Hack!!! excludes systemcprid.
+							{
+								libpaths.add(lib);
+							}
 						}
-//						String[] libpaths = (String[])((List)result).toArray(new String[0]);
-						StartScenario.startScenario(libpaths).addResultListener(
-							agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+						StartScenario.startScenario(libpaths.toArray(new String[libpaths.size()])).addResultListener(
+							agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess[]>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(IExternalAccess[] platforms)
 							{
 								System.out.println("Killing platforms");
-								IExternalAccess[] platforms = (IExternalAccess[])result;
 								for(int i=0; i<platforms.length; i++)
 									platforms[i].killComponent();
 							}

@@ -72,8 +72,14 @@ public class RelayServlet extends HttpServlet
 	{
 		if("/ping".equals(request.getServletPath()))
 		{
-			// somebody is checking, if the server is available, just return an empty http ok.
+			String	id	= request.getParameter("id");
+			// Id is set -> keepalive ping from platform. 
+			if(id!=null)
+			{
+				handler.handlePing(id);
+			}
 			
+			// somebody is checking, if the server is available, just return an empty http ok.			
 			// ..or disable platform connection
 			if(handler.getSettings().isNoConnections())
 			{

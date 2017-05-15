@@ -75,6 +75,9 @@ public final class PlatformInfo
 	/** The time when the connection was lost. */
 	protected Date	disconnect_time;
 	
+	/** The time when the last message was received or sent or the platform reconnected. */
+	protected Date	lastactive_time;
+	
 	/** The number of received bytes. */
 	protected double	bytes_received;
 	
@@ -159,6 +162,8 @@ public final class PlatformInfo
 			}).start();
 			hostnamefut	= fut;
 		}
+		
+		updateLastActiveTime();
 	}
 	
 	//-------- methods --------
@@ -368,22 +373,38 @@ public final class PlatformInfo
 		msg_cnt++;
 		bytes_received	+= bytes;
 		total_transmission_time	+= time / 1000000.0;
+		updateLastActiveTime();
 	}
 	
 	/**
 	 *  Platform with same id has reconnected.
 	 */
-	public void	reconnect(String hostip, String hostname)
+	public void	reconnect(String hostip, String hostname, String scheme, StatsDB db)
 	{
 		if(!hostip.equals(this.hostip))
 		{
 			throw new RuntimeException("Platform "+id+" already connected from different ip: "+this.hostip);
 		}
+		
+		// Save previous info when db present (hack???)
+		if(db!=null)
+		{
+			disconnect();
+			db.save(this);
+		}
+		
+		// Rest platform info
+		this.dbid	= null;
+		this.disconnect_time	= null;
+		this.msg_cnt	= 0;
+		this.bytes_received	= 0;
+		this.total_transmission_time	= 0;
+		setAwarenessInfo(null);
+		
 //		this.hostip	= hostip;
 		this.hostname	= hostname;
-//		this.connect_time	= new Date();
-		
-		setAwarenessInfo(null);
+		this.scheme	= scheme;
+		this.connect_time	= new Date();
 	}
 	
 	/**
@@ -512,5 +533,25 @@ public final class PlatformInfo
 	public void	setProperties(Map<String, String> props)
 	{
 		this.properties	= props;
+	}
+	
+	/**
+	 *  Update the last time, when activity occured.
+	 */
+	public void	updateLastActiveTime()
+	{
+		this.lastactive_time	= new Date();
+//		RelayHandler.getLogger().info("Activity update for: "+getId());
+
+	}
+	
+	/**
+	 *  Test if the platform did not show any activity within the timeout period.
+	 */
+	public boolean	testPlatformTimeout(long timeout)
+	{
+		long	idle	= lastactive_time!=null ? System.currentTimeMillis() - lastactive_time.getTime() : -1;
+//		RelayHandler.getLogger().info("Activity timeout test for "+getId()+": idle="+idle+" vs. timeout="+timeout);
+		return idle>timeout;
 	}
 }

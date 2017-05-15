@@ -7,7 +7,6 @@ import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
-
 /**
  * 
  */
@@ -45,8 +44,11 @@ public class JsonEnumProcessor implements ITraverseProcessor
 			wr.write(",").writeClass(object.getClass());
 		if(wr.isWriteId())
 			wr.write(",").writeId();
-		wr.write("}");
+
+		// Write an extra marker that this is an enum (for javascript side)
+		wr.write(",").writeNameValue("enum", true);
 		
+		wr.write("}");
 		return object;
 	}
 }

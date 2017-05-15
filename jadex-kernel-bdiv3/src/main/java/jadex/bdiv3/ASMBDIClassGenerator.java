@@ -47,6 +47,7 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.micro.MicroClassReader.DummyClassLoader;
 
 
@@ -82,7 +83,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public List<Class<?>> generateBDIClass(String clname, BDIModel model, ClassLoader dummycl) throws JadexBDIGenerationException {
+	public List<Class<?>> generateBDIClass(String clname, BDIModel model, ClassLoader dummycl) throws JadexBDIGenerationException 
+	{
 		return generateBDIClass(clname, model, dummycl, new HashMap<String, ClassNode>());
 	}
 	
@@ -90,13 +92,15 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	 *  Generate class.
 	 */
 	public List<Class<?>> generateBDIClass(final String clname, final BDIModel model, 
-		ClassLoader dummycl, final Map<String, ClassNode> done) throws JadexBDIGenerationException {
+		ClassLoader dummycl, final Map<String, ClassNode> done) throws JadexBDIGenerationException //final boolean isstatic
+	{
 		List<Class<?>> ret = new ArrayList<Class<?>>();
 		final ClassLoader cl = ((DummyClassLoader)dummycl).getOriginal();
 		
 //		System.out.println("Generating with cl: "+cl+" "+clname);
 		
 		final List<String> todo = new ArrayList<String>();
+//		final Set<String> statics = new HashSet<String>();
 		
 		try
 		{
@@ -117,6 +121,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			{
 				boolean isagentorcapa = false;
 				boolean isgoal = false;
+//				boolean iamstaticc = false;
 //				boolean isplan = false;
 //				Set<String> fields = new HashSet<String>();
 				
@@ -142,6 +147,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //						access = ~Opcodes.ACC_ABSTRACT & access;
 						access = access-Opcodes.ACC_ABSTRACT;
 					}
+//					iamstaticc = (access&Opcodes.ACC_STATIC)!=0;
 					super.visit(version, access, name, null, superName, interfaces);
 				}
 				
@@ -169,8 +175,58 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //			    			isplan = true;
 //			    		}
 			    	}
-			    	return super.visitAnnotation(desc, visible);
+//			    	return super.visitAnnotation(desc, visible);
+			    
+//			    	System.out.println("visA: "+desc);
+//			    	
+			    	return new AnnotationVisitor(api, super.visitAnnotation(desc, visible))
+					{
+			    		public AnnotationVisitor visitAnnotation(String name, String desc)
+			    		{
+//			    			System.out.println("visit: "+name+" "+desc);
+			    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? this: new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+							{
+			    				public void visit(String name, Object value)
+			    				{
+//			    					if("clazz".equals(name))
+//			    					{
+//			    						String cln = ((Type)value).getClassName();
+//			    						
+//			    						if(!done.containsKey(cln))
+//			    							todo.add(cln);
+//			    					}
+			    					super.visit(name, value);
+			    				}
+							};
+			    		}
+			    		
+			    		public AnnotationVisitor visitArray(String name)
+			    		{
+			    			return new AnnotationVisitor(api, super.visitArray(iclname))
+							{
+			    				public AnnotationVisitor visitAnnotation(String name, String desc)
+					    		{
+//					    			System.out.println("visit: "+name+" "+desc);
+					    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? this: new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+									{
+					    				public void visit(String name, Object value)
+					    				{
+					    					if("clazz".equals(name))
+					    					{
+					    						String cln = ((Type)value).getClassName();
+					    						
+					    						if(!done.containsKey(cln))
+					    							todo.add(cln);
+					    					}
+					    					super.visit(name, value);
+					    				}
+									};
+					    		}
+							};
+			    		}
+					};
 			    }
+			    
 
 			    public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
 				{
@@ -182,6 +238,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 						public void visitFieldInsn(int opcode, String owner, String name, String desc)
 						{
 							boolean enh = false;
+							
 							if(ophelper.isPutField(opcode))
 							{
 								// if is a putfield and is belief and not is in init (__agent field is not available)
@@ -279,12 +336,16 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public void visitInnerClass(String name, String outerName, String innerName, int access)
 				{
+					String icln = name.replace("/", ".");
+					
+//					if((access&Opcodes.ACC_STATIC)!=0)
+//						statics.add(icln);
+					
 					// Exclude non-relevant inner classes (that do not belong to the application code)
 					if(iclname!=null && (outerName!=null && iclname.startsWith(outerName)) 
 						|| (outerName==null && innerName==null)) // case in anonymous inner classes
 					{
 //						System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
-						String icln = name.replace("/", ".");
 						if(!done.containsKey(icln))
 							todo.add(icln);
 					}
@@ -297,7 +358,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public void visitEnd()
 				{
-					if(isagentorcapa)
+					if(isagentorcapa || (isgoal))// && (isstatic || iamstaticc)))
 						visitField(Opcodes.ACC_PUBLIC, AGENT_FIELD_NAME, Type.getDescriptor(IInternalAccess.class), null, null);
 					visitField(Opcodes.ACC_PUBLIC, GLOBALNAME_FIELD_NAME, Type.getDescriptor(String.class), null, null);
 					super.visitEnd();
@@ -343,12 +404,12 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				}
 				
 //				System.out.println("toClass: "+clname+" "+found);
-				Class<?> loadedClass = toClass(clname, data, found, null);
-				if(loadedClass != null) 
+				Class<?> loadedclass = toClass(clname, data, found, null);
+				if(loadedclass != null) 
 				{
 					// if it's null, we were not allowed to generate this class
 					// e.g. java.util.Map.Entry "subclasses" (in bdiv3.tutorial.c1.TranslationBDI)
-					ret.add(loadedClass);
+					ret.add(loadedclass);
 				}
 				
 //				if(ret.getName().indexOf("$")!=-1)
@@ -382,7 +443,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			for(String icl: todo)
 			{
-				List<Class<?>> classes = generateBDIClass(icl, model, dummycl, done);
+				List<Class<?>> classes = generateBDIClass(icl, model, dummycl, done);//, statics.contains(icl));
 				ret.addAll(classes);
 			}
 		}
@@ -1032,6 +1093,212 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		
 		return ret;
 	}
+	
+	/**
+	 *  Find parameters accessed in methods.
+	 */
+	protected Set<String> findParameters(ClassNode cn, MethodNode mn, BDIModel model, Map<String, ClassNode> others, MGoal mgoal)
+	{
+		Set<String> ret = new HashSet<String>();
+		
+		InsnList l = mn.instructions;
+		String refob = null;
+		
+		for(int i=0; i<l.size(); i++)
+		{
+			AbstractInsnNode node = l.get(i);
+			
+			// Find direct field accesses
+			if(node instanceof FieldInsnNode)
+			{
+				FieldInsnNode fnode = (FieldInsnNode)node;
+				//if(fnode.getOpcode()==Opcodes.GETFIELD)
+				
+				String pname = mgoal.hasParameterIgnoreCase(fnode.name);
+				if(pname!=null)
+				{
+					ret.add(fnode.name);
+				}
+				else if(fnode.name.startsWith("this$"))
+				{
+					refob = fnode.name;
+				}
+			}
+			// Find getter accesses
+			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("get"))
+			{
+				MethodInsnNode gnode = (MethodInsnNode)node;
+				String name = gnode.name.substring(3);
+				
+				String pname = mgoal.hasParameterIgnoreCase(name);
+				if(pname!=null)
+					ret.add(pname);
+			}
+			// Find boolean getter accesses
+			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("is"))
+			{
+				MethodInsnNode gnode = (MethodInsnNode)node;
+				String name = gnode.name.substring(2);
+				
+				String pname = mgoal.hasParameterIgnoreCase(name);
+				if(pname!=null)
+					ret.add(pname);
+			}
+			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("access$"))
+			{
+//				System.out.println("found access: "+((MethodInsnNode)node).name);
+				// found synthetic access to private field of e.g. outer class 
+				
+				// find the type of the field on which the access$ is performed
+				List<FieldNode> fns = cn.fields;
+				for(FieldNode fn: fns)
+				{
+					if(fn.name.equals(refob))
+					{
+						Type t = Type.getType(fn.desc);
+
+						// search the class (node) this$ refers to 
+						ClassNode ocl = others.get(t.getClassName());
+						if(ocl!=null)
+						{
+							// search the access$ method on that class
+							List<MethodNode> mnodes = ocl.methods;
+							for(MethodNode mnode: mnodes)
+							{
+								// add dependencies of that access$ method
+								if(mnode.name.equals(((MethodInsnNode)node).name))
+								{
+									ret.addAll(findParameters(ocl, mnode, model, others, mgoal));
+									break;
+								}
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+		
+//		System.out.println("Found belief accesses: "+cn.name+" "+ret+" in "+mn.name);
+		
+		return ret;
+	}
+	
+//	/**
+//	 *  Find parameters accessed in methods.
+//	 */
+//	protected Map<MGoal, Set<String>> findParameters(ClassNode cn, MethodNode mn, BDIModel model, Map<String, ClassNode> others)
+//	{
+//		Map<MGoal, Set<String>> ret = new HashMap<MGoal, Set<String>>();
+//		
+//		InsnList l = mn.instructions;
+//		String refob = null;
+//		
+//		for(int i=0; i<l.size(); i++)
+//		{
+//			AbstractInsnNode node = l.get(i);
+//			
+//			// Find direct field accesses
+//			if(node instanceof FieldInsnNode)
+//			{
+//				FieldInsnNode fnode = (FieldInsnNode)node;
+//				//if(fnode.getOpcode()==Opcodes.GETFIELD)
+//				
+//				addParameters(model, fnode.name, ret);
+//				
+//				// todo:
+////				String bname = model.getCapability().hasBeliefIgnoreCase(fnode.name);
+////				if(bname!=null)
+////				{
+////					ret.add(fnode.name);
+////				}
+////				else if(fnode.name.startsWith("this$"))
+////				{
+////					refob = fnode.name;
+////				}
+//			}
+//			// Find getter accesses
+//			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("get"))
+//			{
+//				MethodInsnNode gnode = (MethodInsnNode)node;
+//				String name = gnode.name.substring(3);
+//				
+//				addParameters(model, name, ret);
+//			}
+//			// Find boolean getter accesses
+//			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("is"))
+//			{
+//				MethodInsnNode gnode = (MethodInsnNode)node;
+//				String name = gnode.name.substring(2);
+//				
+//				addParameters(model, name, ret);
+//			}
+//			else if(node instanceof MethodInsnNode && ((MethodInsnNode)node).name.startsWith("access$"))
+//			{
+////				System.out.println("found access: "+((MethodInsnNode)node).name);
+//				// found synthetic access to private field of e.g. outer class 
+//				
+//				// find the type of the field on which the access$ is performed
+//				List<FieldNode> fns = cn.fields;
+//				for(FieldNode fn: fns)
+//				{
+//					if(fn.name.equals(refob))
+//					{
+//						Type t = Type.getType(fn.desc);
+//
+//						// search the class (node) this$ refers to 
+//						ClassNode ocl = others.get(t.getClassName());
+//						if(ocl!=null)
+//						{
+//							// search the access$ method on that class
+//							List<MethodNode> mnodes = ocl.methods;
+//							for(MethodNode mnode: mnodes)
+//							{
+//								// add dependencies of that access$ method
+//								if(mnode.name.equals(((MethodInsnNode)node).name))
+//								{
+//									ret.putAll(findParameters(ocl, mnode, model, others));
+//									break;
+//								}
+//							}
+//						}
+//						break;
+//					}
+//				}
+//			}
+//		}
+//		
+////		System.out.println("Found belief accesses: "+cn.name+" "+ret+" in "+mn.name);
+//		
+//		return ret;
+//	}
+	
+//	/**
+//	 *  
+//	 *  @param model
+//	 */
+//	protected void addParameters(BDIModel model, String name, Map<MGoal, Set<String>> res)
+//	{
+//		List<MGoal> mgoals = model.getCapability().getGoals();
+//		
+//		if(mgoals!=null)
+//		{
+//			for(MGoal mgoal: mgoals)
+//			{
+//				String param = mgoal.hasParameterIgnoreCase(name);
+//				if(param!=null)
+//				{
+//					Set<String> params = res.get(mgoal);
+//					if(params==null)
+//					{
+//						params = new HashSet<String>();
+//						res.put(mgoal, params);
+//					}
+//					params.add(param);
+//				}
+//			}
+//		}
+//	}
 	
 	/**
 	 * 

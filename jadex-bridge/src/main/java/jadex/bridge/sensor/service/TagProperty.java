@@ -34,6 +34,9 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 	/** The argument constant. */
 	public static final String ARGUMENT = "argument";
 	
+	/** The key used to store the tags in the service property map. */
+	public static final String SERVICE_PROPERTY_NAME = "__service_tags__";
+	
 	/** The platform name tag. */
 	private static final String PLATFORM_NAME_INTERNAL = "platform_name";
 	public static final String PLATFORM_NAME = "\""+PLATFORM_NAME_INTERNAL+"\"";
@@ -125,7 +128,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 	{
 		Collection<String> ret = null;
 		
-		if(obj instanceof String)
+		if(obj instanceof String || obj==null)
 		{
 			ret = new ArrayList<String>();
 			ret.add((String)obj);

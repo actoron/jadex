@@ -3,6 +3,7 @@ package jadex.xml.bean;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
@@ -303,6 +304,22 @@ public class JavaReader
 			));
 //				new ObjectInfo(Date.class), new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("time", null))}));
 			typeinfos.add(ti_calendar);	
+			
+			TypeInfo ti_biginteger = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.math", "BigInteger")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
+					{
+						byte[] bytes = Base64.decode(((String)rawattributes.get("byteArray")).getBytes("UTF-8"));
+						return new BigInteger(bytes);
+					}
+				}), new MappingInfo(null, 
+					new AttributeInfo[]{
+						new AttributeInfo(new AccessInfo("byteArray", null, AccessInfo.IGNORE_READWRITE)),
+						new AttributeInfo(new AccessInfo("class", null, AccessInfo.IGNORE_READWRITE))
+					}));
+
+			typeinfos.add(ti_biginteger);
 			
 			// java.lang.String
 			TypeInfo ti_string = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "String")}),

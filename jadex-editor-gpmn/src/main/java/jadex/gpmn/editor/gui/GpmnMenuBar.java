@@ -29,6 +29,7 @@ import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxStylesheet;
 
+import jadex.commons.SUtil;
 import jadex.gpmn.editor.GpmnEditor;
 import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetGrayscale;
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
@@ -215,7 +216,12 @@ public class GpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				BetterFileChooser fc = new BetterFileChooser();
+				BetterFileChooser fc = null;
+				if (modelcontainer.getFile() != null)
+					fc = new BetterFileChooser(modelcontainer.getFile());
+				else
+					fc = new BetterFileChooser();
+				
 				FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file", "gpmn");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
@@ -329,7 +335,12 @@ public class GpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				BetterFileChooser fc = new BetterFileChooser();
+				BetterFileChooser fc = null;
+				if (modelcontainer.getFile() != null)
+					fc = new BetterFileChooser(modelcontainer.getFile());
+				else
+					fc = new BetterFileChooser();
+				
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("EPS file", "eps");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
@@ -361,6 +372,13 @@ public class GpmnMenuBar extends JMenuBar
 							{
 								y = (int) geo.getY();
 							}
+							
+						}
+						
+						for (int i = 0; i < graph.getModel().getChildCount(graph.getDefaultParent()); ++i)
+						{
+							mxICell cell = (mxICell) graph.getModel().getChildAt(graph.getDefaultParent(), i);
+							mxRectangle geo = graph.getCellBounds(cell);
 							if (geo.getX() + geo.getWidth() - x > w)
 							{
 								w = (int) Math.ceil(geo.getX() + geo.getWidth() - x);
@@ -372,8 +390,10 @@ public class GpmnMenuBar extends JMenuBar
 						}
 						
 						// Avoid cutting off shadows.
-						w += 4;
-						h += 4;
+						x -= 2;
+						y -= 2;
+						w += 6;
+						h += 6;
 						
 						File tmpfile = File.createTempFile("export", ".eps");
 						//modelcontainer.getGraphComponent().paint(g)
@@ -391,7 +411,7 @@ public class GpmnMenuBar extends JMenuBar
 						{
 							file = new File(file.getAbsolutePath() + ext);
 						}
-			        	tmpfile.renameTo(file);
+			        	SUtil.moveFile(tmpfile, file);
 					}
 					catch (IOException e1)
 					{

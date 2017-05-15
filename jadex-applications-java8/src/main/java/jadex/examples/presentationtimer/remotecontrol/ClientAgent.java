@@ -4,6 +4,7 @@ import javax.swing.SwingUtilities;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.Future;
@@ -73,7 +74,7 @@ public class ClientAgent
 		}, () -> {
 			System.out.println("Search finished. Re-scheduling search.");
 
-			access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+			access.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 			{
 
 				@Override
@@ -82,7 +83,7 @@ public class ClientAgent
 					searchCdServices();
 					return Future.DONE;
 				}
-			}, 10000);
+			});
 		});
 //		searchServices.addResultListener(new IntermediateDefaultResultListener<ICountdownService>()
 //		{

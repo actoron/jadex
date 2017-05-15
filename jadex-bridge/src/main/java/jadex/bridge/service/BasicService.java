@@ -1,15 +1,19 @@
 package jadex.bridge.service;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
@@ -41,10 +45,10 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	protected IInternalAccess internalaccess;
 	
 	/** The started state. */
-	protected boolean started;
+	protected volatile boolean started;
 	
 	/** The shutdowned state. */
-	protected boolean shutdowned;
+	protected volatile boolean shutdowned;
 	
 	/** The service id. */
 	protected IServiceIdentifier sid;
@@ -238,9 +242,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
 	 *  
-	 *  todo: why is method synchronized?
 	 */
-	public synchronized IFuture<Boolean> isValid()
+	public IFuture<Boolean> isValid()
 	{
 //		if(getServiceIdentifier().getServiceName().indexOf("Decoupled")!=-1)
 //			System.out.println("isValid: "+getServiceIdentifier()+": "+(started && !shutdowned));
@@ -305,19 +308,38 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	protected IFuture<Void> initNFProperties()
 	{
+		final Future<Void> ret = new Future<Void>();
 		if(getInternalAccess().getComponentFeature0(INFPropertyComponentFeature.class)!=null)
 		{
-			INFPropertyComponentFeature nfcf = getInternalAccess().getComponentFeature(INFPropertyComponentFeature.class);
+			final INFPropertyComponentFeature nfcf = getInternalAccess().getComponentFeature(INFPropertyComponentFeature.class);
 			IProvidedServicesFeature psf = getInternalAccess().getComponentFeature(IProvidedServicesFeature.class);
 			IInternalService ser = (IInternalService)getInternalAccess().getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
 			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
 			// todo: make internal interface for initProperties
-			return ((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype);
+			((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+			{
+				public void customResultAvailable(Void result) throws Exception
+				{
+//					nfcf.getRequiredServicePropertyProvider(sid).getNFPropertyValue(TagProperty.NAME).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+//					{
+//						@SuppressWarnings("unchecked")
+//						public void customResultAvailable(Object result) throws Exception
+//						{
+//							Collection<String> coll = (Collection<String>) result;
+//							Set<String> tags = new LinkedHashSet<String>(coll);
+//							properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
+							ret.setResult(null);
+//						}
+//					});
+					
+				}
+			});
 		}
 		else
 		{
-			return IFuture.DONE;
+			ret.setResult(null);
 		}
+		return ret;
 	}
 
 	/**
@@ -365,8 +387,6 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		Future<Void> ret = new Future<Void>();
 		
 		boolean ex = false;
-		synchronized(this)
-		{
 			if(started)
 			{
 				ex = true;
@@ -375,8 +395,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			{
 				started = true;
 			}
-		}
-		
+
 		if(ex)
 		{
 			ret.setException(new RuntimeException("Already running."));

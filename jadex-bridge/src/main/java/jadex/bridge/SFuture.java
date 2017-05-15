@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
@@ -269,7 +270,7 @@ public class SFuture
 			}
 			else
 			{
-				throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+				throw SUtil.throwUnchecked(e);
 			}
 		}
 		

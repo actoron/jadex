@@ -16,471 +16,17 @@ import jadex.javaparser.SJavaParser;
 /**
  * Configuration of the root platform component.
  */
-public class RootComponentConfiguration
+public class RootComponentConfiguration implements IRootComponentConfiguration
 {
-	/** Tell starter to print welcome message. **/
-	public static final String	WELCOME				= "welcome";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	// ----- arguments set by starter for root or platform component -----
-
-	/** The IPlatformComponentAccess instance **/
-	public static final String	PLATFORM_ACCESS		= "platformaccess";
-
-	/** The component factory instance. */
-	public static final String	COMPONENT_FACTORY	= PlatformConfiguration.COMPONENT_FACTORY;
-
-	/** The saved program arguments. **/
-	public static final String	PROGRAM_ARGUMENTS	= "programarguments";						// class:
-																								// String[]
-																								// default:
-																								// emptyvalue
-
-	/** ======== Arguments used by platform components. ======== **/
-
-	/** Start the JCC agent to open the platform GUI? **/
-	public static final String	GUI					= "gui";									// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/**
-	 * Start the platform with command line interface (cli) activated? (requires
-	 * Jadex Pro add-on)
-	 **/
-	public static final String	CLI					= "cli";									// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Start cli with console in or not **/
-	public static final String	CLICONSOLE			= "cliconsole";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Save platform settings on shutdown? **/
-	public static final String	SAVEONEXIT			= "saveonexit";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Open JCC for specific remote platforms. **/
-	public static final String	JCCPLATFORMS		= "jccplatforms";							// class:
-																								// String
-																								// default:
-																								// null
-
-	/** Enable verbose logging (shortcut for setting logging_level to info). **/
-	public static final String	LOGGING				= "logging";								// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Logging level for platform. **/
-	public static final String	LOGGING_LEVEL		= "logging_level";							// class:
-																								// java.util.logging.Level
-																								// default:
-																								// java.util.logging.Level.SEVERE
-
-	/** Use simulation execution mode? **/
-	public static final String	SIMULATION			= "simulation";								// class:
-																								// Boolean
-																								// default:
-																								// emptyvalue
-
-	/** Use asynchronous execution mode? **/
-	public static final String	ASYNCEXECUTION		= "asyncexecution";							// class:
-																								// Boolean
-																								// default:
-																								// emptyvalue
-
-	/** Flag to enable component persistence. **/
-	public static final String	PERSIST				= "persist";								// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Flag if CIDs may be reused (true for not). **/
-	public static final String	UNIQUEIDS			= "uniqueids";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag for deferring thread creation/deletion in thread pool **/
-	public static final String	THREADPOOLDEFER		= "threadpooldefer";						// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/**
-	 * Additional library paths (classpath entries) for loading agent models and
-	 * classes.
-	 **/
-	public static final String	LIBPATH				= "libpath";								// class:
-																								// String
-																								// default:
-
-	/** The base classloader. **/
-	public static final String	BASECLASSLOADER		= "baseclassloader";						// class:
-																								// ClassLoader
-																								// default:
-
-	/**
-	 * Start the chat agent for instant messaging and file transfer with user
-	 * Jadex users.
-	 **/
-	public static final String	CHAT				= "chat";									// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Start the awareness agent (awa) for automatic platform discovery. **/
-	public static final String	AWARENESS			= "awareness";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Specify the awareness agent discovery mechanisms (comma separated). **/
-	public static final String	AWAMECHANISMS		= "awamechanisms";							// class:
-																								// String
-																								// default:
-																								// "Broadcast,
-																								// Multicast,
-																								// Message,
-																								// Relay,
-																								// Local"
-
-	/** The awareness delay in milliseconds **/
-	public static final String	AWADELAY			= "awadelay";								// class:
-																								// long
-																								// default:
-																								// 20000
-
-	/** Include entries for awareness agent. **/
-	public static final String	AWAINCLUDES			= "awaincludes";							// class:
-																								// String
-																								// default:
-																								// ""
-
-	/** Exclude entries for awareness agent. **/
-	public static final String	AWAEXCLUDES			= "awaexcludes";							// class:
-																								// String
-																								// default:
-																								// ""
-
-	/** Use a compact binary message format instead of XML by default. **/
-	public static final String	BINARYMESSAGES		= "binarymessages";							// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Fail on recoverable message decoding errors instead of ignoring. **/
-	public static final String	STRICTCOM			= "strictcom";								// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/**
-	 * Flag if the platform should be protected with password. If a value is
-	 * provided this value overrides the settings value.
-	 **/
-	public static final String	USEPASS				= "usepass";								// class:
-																								// Boolean
-																								// default:
-																								// emptyvalue
-
-	/** Flag if the platform password should be printed to the console. **/
-	public static final String	PRINTPASS			= "printpass";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if trusted lan should be used. **/
-	public static final String	TRUSTEDLAN			= "trustedlan";								// class:
-																								// Boolean
-																								// default:
-																								// emptyvalue
-
-	/** Network name. **/
-	public static final String	NETWORKNAME			= "networkname";							// class:
-																								// String
-																								// default:
-																								// emptyvalue
-
-	/** Network pass. **/
-	public static final String	NETWORKPASS			= "networkpass";							// class:
-																								// String
-																								// default:
-																								// emptyvalue
-
-	/** Virtual names that are used for authentication **/
-	public static final String	VIRTUALNAMES		= "virtualnames";							// class:
-																								// java.util.Map
-																								// default:
-																								// emptyvalue
-
-	/** The message validity duration (in minutes) **/
-	public static final String	VALIDITYDURATION	= "validityduration";						// class:
-																								// long
-																								// default:
-
-	/** Flag if local transport is enabled. **/
-	public static final String	LOCALTRANSPORT		= "localtransport";							// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if tcp transport is enabled. **/
-	public static final String	TCPTRANSPORT		= "tcptransport";							// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Port for TCP transport. **/
-	public static final String	TCPPORT				= "tcpport";								// class:
-																								// int
-																								// default:
-																								// 9876
-
-	/** Flag if niotcp transport is enabled. **/
-	public static final String	NIOTCPTRANSPORT		= "niotcptransport";						// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Port for NIOTCP transport. **/
-	public static final String	NIOTCPPORT			= "niotcpport";								// class:
-																								// int
-																								// default:
-																								// 8765
-
-	/** Flag if relay transport is enabled. **/
-	public static final String	RELAYTRANSPORT		= "relaytransport";							// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/**
-	 * Address(es) for relay transport (one or more addresses separated by
-	 * commas).
-	 **/
-	public static final String	RELAYADDRESS		= "relayaddress";							// class:
-																								// String
-																								// default:
-																								// jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
-
-	/** Flag if relay should use HTTPS for receiving messages. **/
-	public static final String	RELAYSECURITY		= "relaysecurity";							// class:
-																								// boolean
-																								// default:
-																								// $args.relayaddress.indexOf("https://")==-1
-																								// ?
-																								// false
-																								// :
-																								// true
-
-	/** Flag if only awareness messages should be sent through relay. **/
-	public static final String	RELAYAWAONLY		= "relayawaonly";							// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Flag if ssltcp transport should enabled (requires Jadex Pro add-on). **/
-	public static final String	SSLTCPTRANSPORT		= "ssltcptransport";						// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Port for SSL TCP transport. **/
-	public static final String	SSLTCPPORT			= "ssltcpport";								// class:
-																								// int
-																								// default:
-																								// 44334
-
-	/** Flag if web service publishing is enabled. **/
-	public static final String	WSPUBLISH			= "wspublish";								// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Flag if rest service publishing is enabled. **/
-	public static final String	RSPUBLISH			= "rspublish";								// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Optionally provide alternative rs publish implementation. **/
-	public static final String	RSPUBLISHCOMPONENT	= "rspublishcomponent";						// class:
-																								// String
-																								// default:
-																								// First
-																								// component
-																								// available
-																								// as
-																								// defined
-																								// in
-																								// IPublishService...
-
-	/**
-	 * The name(s) of kernel(s) to load (separated by comma). Currently supports
-	 * 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
-	 * Alternatively, the 'multi' can be used to start any available kernels on
-	 * demand. Specifying 'all' will start all available kernels directly.
-	 **/
-	public static final String	KERNELS				= "kernels";								// class:
-																								// String
-																								// default:
-																								// "multi"
-
-	/** <argument name="platform_shutdown_time">1000</argument> **/
-
-	/**
-	 * Flag to enable the Maven dependency service (requires Jadex Pro add-on).
-	 **/
-	public static final String	MAVEN_DEPENDENCIES	= "maven_dependencies";						// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Flag if global monitoring is turned on. **/
-	public static final String	MONITORINGCOMP		= "monitoringcomp";							// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if sensors are turned on. **/
-	public static final String	SENSORS				= "sensors";								// class:
-																								// boolean
-																								// default:
-																								// false
-
-	/** Optionally provide alternative thread pool implementation. **/
-	public static final String	THREADPOOLCLASS		= "threadpoolclass";						// class:
-																								// String
-																								// default:
-																								// null
-
-	/** Optionally provide alternative context service implementation. **/
-	public static final String	CONTEXTSERVICECLASS	= "contextserviceclass";					// class:
-																								// String
-																								// default:
-																								// null
-
-	/** Flag if df component and service should be started. **/
-	public static final String	DF					= "df";										// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if clock component and service should be started. **/
-	public static final String	CLOCK				= "clock";									// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if message component and service should be started. **/
-	public static final String	MESSAGE				= "message";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if simulation component and service should be started. **/
-	public static final String	SIMUL				= "simul";									// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if filetransfer component and service should be started. **/
-	public static final String	FILETRANSFER		= "filetransfer";							// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if marshal component and service should be started. **/
-	public static final String	MARSHAL				= "marshal";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if security component and service should be started. **/
-	public static final String	SECURITY			= "security";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if library component and service should be started. **/
-	public static final String	LIBRARY				= "library";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if settings component and service should be started. **/
-	public static final String	SETTINGS			= "settings";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if context component and service should be started. **/
-	public static final String	CONTEXT				= "context";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if address component and service should be started. **/
-	public static final String	ADDRESS				= "address";								// class:
-																								// boolean
-																								// default:
-																								// true
-
-	/** Flag if dht storage ring should be provided. **/
-	public static final String	DHT_PROVIDE			= PlatformConfiguration.DHT_PROVIDE;		// class:
-																								// boolean
-	/** Flag if registry synchronization should be used. **/
-	public static final String	REGISTRY_SYNC			= PlatformConfiguration.REGISTRY_SYNC;		// class:
-																							// default:
-																								// false
 
 	private IModelInfo			model;
 
-	void setModel(IModelInfo model)
+	public void setModel(IModelInfo model)
 	{
 		this.model = model;
 	}
 
-	private static final String[] BOOLEAN_ARGS = {
-			WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION, PERSIST,
-			UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM, USEPASS,
-			PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT, NIOTCPTRANSPORT, RELAYTRANSPORT,
-			RELAYSECURITY, RELAYAWAONLY, SSLTCPTRANSPORT, WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
-			MONITORINGCOMP, SENSORS, DF, CLOCK, MESSAGE, SIMUL, FILETRANSFER, MARSHAL, SECURITY,
-			LIBRARY, SETTINGS, CONTEXT, ADDRESS, DHT_PROVIDE, REGISTRY_SYNC
-	};
 
-//	private static final String[] OTHER_ARGS = {
-//			JCCPLATFORMS, LOGGING_LEVEL, LIBPATH, BASECLASSLOADER, AWAMECHANISMS, AWADELAY, AWAINCLUDES,
-//			AWAEXCLUDES, NETWORKNAME, NETWORKPASS, VIRTUALNAMES, VALIDITYDURATION, TCPPORT, NIOTCPPORT ,
-//			RELAYADDRESS, SSLTCPPORT, RSPUBLISHCOMPONENT, KERNELS, THREADPOOLCLASS, CONTEXTSERVICECLASS
-//	};
-
-	/**
-	 * Kernel names enum.
-	 */
-	public enum KERNEL
-	{
-		component, micro, bpmn, v3, bdi, bdibpmn, multi
-	}
-
-	/**
-	 * Discovery names enum.
-	 */
-	public enum AWAMECHANISM
-	{
-		broadcast, multicast, message, relay, local,
-		// bluetooth
-	}
 
 	/** All configured parameters as map. **/
 	private Map<String, Object>	rootargs;
@@ -537,27 +83,26 @@ public class RootComponentConfiguration
 		return val;
 	}
 
+	@Override
 	public Map<String, Object> getArgs()
 	{
 		return rootargs;
 	}
 
-	/**
-	 * Set program arguments to be available at runtime.
-	 * 
-	 * @param args
-	 */
-	protected void setProgramArguments(String[] args)
+	@Override
+	public void setProgramArguments(String[] args)
 	{
 		setValue(PROGRAM_ARGUMENTS, args);
 	}
 
 	// // internal
+	@Override
 	public boolean getWelcome()
 	{
 		return Boolean.TRUE.equals(getValue(WELCOME));
 	}
 
+	@Override
 	public void setWelcome(boolean value)
 	{
 		setValue(WELCOME, value);
@@ -568,12 +113,8 @@ public class RootComponentConfiguration
 	// {
 	// return (IPlatformComponentAccess)getValue(PLATFORM_ACCESS);
 	// }
-	/**
-	 * Set the platform access.
-	 * 
-	 * @param value
-	 */
-	protected void setPlatformAccess(IPlatformComponentAccess value)
+	@Override
+	public void setPlatformAccess(IPlatformComponentAccess value)
 	{
 		setValue(PLATFORM_ACCESS, value);
 	}
@@ -584,183 +125,213 @@ public class RootComponentConfiguration
 	// {
 	// return (IComponentFactory)getValue(COMPONENT_FACTORY);
 	// }
-	/**
-	 * Set the component factory.
-	 * 
-	 * @param value
-	 */
-	protected void setComponentFactory(IComponentFactory value)
+	@Override
+	public void setComponentFactory(IComponentFactory value)
 	{
 		setValue(COMPONENT_FACTORY, value);
 	}
 
 	// individual getters/setters
 
+	@Override
 	public boolean getGui()
 	{
 		return Boolean.TRUE.equals(getValue(GUI));
 	}
 
+	@Override
 	public void setGui(boolean value)
 	{
 		setValue(GUI, value);
 	}
 
+	@Override
 	public boolean getCli()
 	{
 		return Boolean.TRUE.equals(getValue(CLI));
 	}
 
+	@Override
 	public void setCli(boolean value)
 	{
 		setValue(CLI, value);
 	}
 
+	@Override
 	public boolean getCliConsole()
 	{
 		return Boolean.TRUE.equals(getValue(CLICONSOLE));
 	}
 
+	@Override
 	public void setCliConsole(boolean value)
 	{
 		setValue(CLICONSOLE, value);
 	}
 
+	@Override
 	public boolean getSaveOnExit()
 	{
 		return Boolean.TRUE.equals(getValue(SAVEONEXIT));
 	}
 
+	@Override
 	public void setSaveOnExit(boolean value)
 	{
 		setValue(SAVEONEXIT, value);
 	}
 
+	@Override
 	public String getJccPlatforms()
 	{
 		return (String)getValue(JCCPLATFORMS);
 	}
 
+	@Override
 	public void setJccPlatforms(String value)
 	{
 		setValue(JCCPLATFORMS, value);
 	}
 
+	@Override
 	public boolean getLogging()
 	{
 		return Boolean.TRUE.equals(getValue(LOGGING));
 	}
 
+	@Override
 	public void setLogging(boolean value)
 	{
 		setValue(LOGGING, value);
 	}
 
+	@Override
 	public Level getLoggingLevel()
 	{
 		return (Level)getValue(LOGGING_LEVEL);
 	}
 
+	@Override
 	public void setLoggingLevel(Level value)
 	{
 		setValue(LOGGING_LEVEL, value);
 	}
 
+	@Override
 	public boolean getSimulation()
 	{
 		return Boolean.TRUE.equals(getValue(SIMULATION));
 	}
 
+	@Override
 	public void setSimulation(boolean value)
 	{
 		setValue(SIMULATION, value);
 	}
 
+	@Override
 	public boolean getAsyncExecution()
 	{
 		return Boolean.TRUE.equals(getValue(ASYNCEXECUTION));
 	}
 
+	@Override
 	public void setAsyncExecution(boolean value)
 	{
 		setValue(ASYNCEXECUTION, value);
 	}
 
+	@Override
 	public boolean getPersist()
 	{
 		return Boolean.TRUE.equals(getValue(PERSIST));
 	}
 
+	@Override
 	public void setPersist(boolean value)
 	{
 		setValue(PERSIST, value);
 	}
 
+	@Override
 	public boolean getUniqueIds()
 	{
 		return Boolean.TRUE.equals(getValue(UNIQUEIDS));
 	}
 
+	@Override
 	public void setUniqueIds(boolean value)
 	{
 		setValue(UNIQUEIDS, value);
 	}
 
+	@Override
 	public boolean getThreadpoolDefer()
 	{
 		return Boolean.TRUE.equals(getValue(THREADPOOLDEFER));
 	}
 
+	@Override
 	public void setThreadpoolDefer(boolean value)
 	{
 		setValue(THREADPOOLDEFER, value);
 	}
 
+	@Override
 	public String getLibPath()
 	{
 		return (String)getValue(LIBPATH);
 	}
 
+	@Override
 	public void setLibPath(String value)
 	{
 		setValue(LIBPATH, value);
 	}
 
+	@Override
 	public ClassLoader getBaseClassloader()
 	{
 		return (ClassLoader)getValue(BASECLASSLOADER);
 	}
 
+	@Override
 	public void setBaseClassloader(ClassLoader value)
 	{
 		setValue(BASECLASSLOADER, value);
 	}
 
+	@Override
 	public boolean getChat()
 	{
 		return Boolean.TRUE.equals(getValue(CHAT));
 	}
 
+	@Override
 	public void setChat(boolean value)
 	{
 		setValue(CHAT, value);
 	}
 
+	@Override
 	public boolean getAwareness()
 	{
 		return Boolean.TRUE.equals(getValue(AWARENESS));
 	}
 
+	@Override
 	public void setAwareness(boolean value)
 	{
 		setValue(AWARENESS, value);
 	}
 
+	@Override
 	public AWAMECHANISM[] getAwaMechanisms()
 	{
 		return awamechanisms;
 	}
 
+	@Override
 	public void setAwaMechanisms(AWAMECHANISM... values)
 	{
 		awamechanisms = values;
@@ -775,274 +346,337 @@ public class RootComponentConfiguration
 		setValue(AWAMECHANISMS, sb.toString());
 	}
 
+	@Override
 	public long getAwaDelay()
 	{
 		return (Long)getValue(AWADELAY);
 	}
 
+	@Override
 	public void setAwaDelay(long value)
 	{
 		setValue(AWADELAY, value);
 	}
 
+	@Override
+	public boolean isAwaFast()
+	{
+		return (Boolean)getValue(AWAFAST);
+	}
+
+	@Override
+	public void setAwaFast(boolean value)
+	{
+		setValue(AWAFAST, value);
+	}
+
+	@Override
 	public String getAwaIncludes()
 	{
 		return (String)getValue(AWAINCLUDES);
 	}
 
+	@Override
 	public void setAwaIncludes(String value)
 	{
 		setValue(AWAINCLUDES, value);
 	}
 
+	@Override
 	public String getAwaExcludes()
 	{
 		return (String)getValue(AWAEXCLUDES);
 	}
 
+	@Override
 	public void setAwaExcludes(String value)
 	{
 		setValue(AWAEXCLUDES, value);
 	}
 
+	@Override
 	public boolean getBinaryMessages()
 	{
 		return Boolean.TRUE.equals(getValue(BINARYMESSAGES));
 	}
 
+	@Override
 	public void setBinaryMessages(boolean value)
 	{
 		setValue(BINARYMESSAGES, value);
 	}
 
+	@Override
 	public boolean getStrictCom()
 	{
 		return Boolean.TRUE.equals(getValue(STRICTCOM));
 	}
 
+	@Override
 	public void setStrictCom(boolean value)
 	{
 		setValue(STRICTCOM, value);
 	}
 
+	@Override
 	public boolean getUsePass()
 	{
 		return Boolean.TRUE.equals(getValue(USEPASS));
 	}
 
+	@Override
 	public void setUsePass(boolean value)
 	{
 		setValue(USEPASS, value);
 	}
 
+	@Override
 	public boolean getPrintPass()
 	{
 		return Boolean.TRUE.equals(getValue(PRINTPASS));
 	}
 
+	@Override
 	public void setPrintPass(boolean value)
 	{
 		setValue(PRINTPASS, value);
 	}
 
+	@Override
 	public boolean getTrustedLan()
 	{
 		return Boolean.TRUE.equals(getValue(TRUSTEDLAN));
 	}
 
+	@Override
 	public void setTrustedLan(boolean value)
 	{
 		setValue(TRUSTEDLAN, value);
 	}
 
+	@Override
 	public String getNetworkName()
 	{
 		return (String)getValue(NETWORKNAME);
 	}
 
+	@Override
 	public void setNetworkName(String value)
 	{
 		setValue(NETWORKNAME, value);
 	}
 
+	@Override
 	public String getNetworkPass()
 	{
 		return (String)getValue(NETWORKPASS);
 	}
 
+	@Override
 	public void setNetworkPass(String value)
 	{
 		setValue(NETWORKPASS, value);
 	}
 
+	@Override
 	public Map getVirtualNames()
 	{
 		return (Map)getValue(VIRTUALNAMES);
 	}
 
+	@Override
 	public void setVirtualNames(Map value)
 	{
 		setValue(VIRTUALNAMES, value);
 	}
 
+	@Override
 	public long getValidityDuration()
 	{
 		return (Long)getValue(VALIDITYDURATION);
 	}
 
+	@Override
 	public void setValidityDuration(long value)
 	{
 		setValue(VALIDITYDURATION, value);
 	}
 
+	@Override
 	public boolean getLocalTransport()
 	{
 		return Boolean.TRUE.equals(getValue(LOCALTRANSPORT));
 	}
 
+	@Override
 	public void setLocalTransport(boolean value)
 	{
 		setValue(LOCALTRANSPORT, value);
 	}
 
+	@Override
 	public boolean getTcpTransport()
 	{
 		return Boolean.TRUE.equals(getValue(TCPTRANSPORT));
 	}
 
+	@Override
 	public void setTcpTransport(boolean value)
 	{
 		setValue(TCPTRANSPORT, value);
 	}
 
+	@Override
 	public int getTcpPort()
 	{
 		return (Integer)getValue(TCPPORT);
 	}
 
+	@Override
 	public void setTcpPort(int value)
 	{
 		setValue(TCPPORT, value);
 	}
 
+	@Override
 	public boolean getNioTcpTransport()
 	{
 		return Boolean.TRUE.equals(getValue(NIOTCPTRANSPORT));
 	}
 
+	@Override
 	public void setNioTcpTransport(boolean value)
 	{
 		setValue(NIOTCPTRANSPORT, value);
 	}
 
+	@Override
 	public int getNioTcpPort()
 	{
 		return (Integer)getValue(NIOTCPPORT);
 	}
 
+	@Override
 	public void setNioTcpPort(int value)
 	{
 		setValue(NIOTCPPORT, value);
 	}
 
+	@Override
 	public boolean getRelayTransport()
 	{
 		return Boolean.TRUE.equals(getValue(RELAYTRANSPORT));
 	}
 
+	@Override
 	public void setRelayTransport(boolean value)
 	{
 		setValue(RELAYTRANSPORT, value);
 	}
 
+	@Override
 	public String getRelayAddress()
 	{
 		return (String)getValue(RELAYADDRESS);
 	}
 
+	@Override
 	public void setRelayAddress(String value)
 	{
 		setValue(RELAYADDRESS, value);
 	}
 
+	@Override
 	public boolean getRelaySecurity()
 	{
 		return Boolean.TRUE.equals(getValue(RELAYSECURITY));
 	}
 
+	@Override
 	public void setRelaySecurity(boolean value)
 	{
 		setValue(RELAYSECURITY, value);
 	}
 
+	@Override
 	public boolean getRelayAwaonly()
 	{
 		return Boolean.TRUE.equals(getValue(RELAYAWAONLY));
 	}
 
+	@Override
 	public void setRelayAwaonly(boolean value)
 	{
 		setValue(RELAYAWAONLY, value);
 	}
 
-	public boolean getSSLTCPTRANSPORT()
+	@Override
+	public boolean getSslTcpTransport()
 	{
 		return Boolean.TRUE.equals(getValue(SSLTCPTRANSPORT));
 	}
 
+	@Override
 	public void setSslTcpTransport(boolean value)
 	{
 		setValue(SSLTCPTRANSPORT, value);
 	}
 
+	@Override
 	public int getSslTcpPort()
 	{
 		return (Integer)getValue(SSLTCPPORT);
 	}
 
+	@Override
 	public void setSslTcpPort(int value)
 	{
 		setValue(SSLTCPPORT, value);
 	}
 
+	@Override
 	public boolean getWsPublish()
 	{
 		return Boolean.TRUE.equals(getValue(WSPUBLISH));
 	}
 
+	@Override
 	public void setWsPublish(boolean value)
 	{
 		setValue(WSPUBLISH, value);
 	}
 
+	@Override
 	public boolean getRsPublish()
 	{
 		return Boolean.TRUE.equals(getValue(RSPUBLISH));
 	}
 
+	@Override
 	public void setRsPublish(boolean value)
 	{
 		setValue(RSPUBLISH, value);
 	}
 
+	@Override
 	public String getRsPublishComponent()
 	{
 		return (String)getValue(RSPUBLISHCOMPONENT);
 	}
 
+	@Override
 	public void setRsPublishComponent(String value)
 	{
 		setValue(RSPUBLISHCOMPONENT, value);
 	}
 
+	@Override
 	public KERNEL[] getKernels()
 	{
 		return kernels;
 	}
 
-	/**
-	 * @param value
-	 */
+	@Override
 	public void setKernels(String... value)
 	{
 		List<KERNEL> kernelList = new ArrayList<KERNEL>();
@@ -1053,6 +687,7 @@ public class RootComponentConfiguration
 		setKernels(kernelList.toArray(new KERNEL[kernelList.size()]));
 	}
 
+	@Override
 	public void setKernels(KERNEL... value)
 	{
 		kernels = value;
@@ -1068,181 +703,205 @@ public class RootComponentConfiguration
 		setValue(KERNELS, sb.toString());
 	}
 
+	@Override
 	public boolean getMavenDependencies()
 	{
 		return Boolean.TRUE.equals(getValue(MAVEN_DEPENDENCIES));
 	}
 
+	@Override
 	public void setMavenDependencies(boolean value)
 	{
 		setValue(MAVEN_DEPENDENCIES, value);
 	}
 
+	@Override
 	public boolean getMonitoringComp()
 	{
 		return Boolean.TRUE.equals(getValue(MONITORINGCOMP));
 	}
 
+	@Override
 	public void setMonitoringComp(boolean value)
 	{
 		setValue(MONITORINGCOMP, value);
 	}
 
+	@Override
 	public boolean getSensors()
 	{
 		return Boolean.TRUE.equals(getValue(SENSORS));
 	}
 
+	@Override
 	public void setSensors(boolean value)
 	{
 		setValue(SENSORS, value);
 	}
 
+	@Override
 	public String getThreadpoolClass()
 	{
 		return (String)getValue(THREADPOOLCLASS);
 	}
 
+	@Override
 	public void setThreadpoolClass(String value)
 	{
 		setValue(THREADPOOLCLASS, value);
 	}
 
+	@Override
 	public String getContextServiceClass()
 	{
 		return (String)getValue(CONTEXTSERVICECLASS);
 	}
 
+	@Override
 	public void setContextServiceClass(String value)
 	{
 		setValue(CONTEXTSERVICECLASS, value);
 	}
 
+	@Override
 	public boolean getDf()
 	{
 		return Boolean.TRUE.equals(getValue(DF));
 	}
 
+	@Override
 	public void setDf(boolean value)
 	{
 		setValue(DF, value);
 	}
 
+	@Override
 	public boolean getClock()
 	{
 		return Boolean.TRUE.equals(getValue(CLOCK));
 	}
 
+	@Override
 	public void setClock(boolean value)
 	{
 		setValue(CLOCK, value);
 	}
 
+	@Override
 	public boolean getMessage()
 	{
 		return Boolean.TRUE.equals(getValue(MESSAGE));
 	}
 
+	@Override
 	public void setMessage(boolean value)
 	{
 		setValue(MESSAGE, value);
 	}
 
+	@Override
 	public boolean getSimul()
 	{
 		return Boolean.TRUE.equals(getValue(SIMUL));
 	}
 
+	@Override
 	public void setSimul(boolean value)
 	{
 		setValue(SIMUL, value);
 	}
 
+	@Override
 	public boolean getFiletransfer()
 	{
 		return Boolean.TRUE.equals(getValue(FILETRANSFER));
 	}
 
+	@Override
 	public void setFiletransfer(boolean value)
 	{
 		setValue(FILETRANSFER, value);
 	}
 
+	@Override
 	public boolean getMarshal()
 	{
 		return Boolean.TRUE.equals(getValue(MARSHAL));
 	}
 
+	@Override
 	public void setMarshal(boolean value)
 	{
 		setValue(MARSHAL, value);
 	}
 
+	@Override
 	public boolean getSecurity()
 	{
 		return Boolean.TRUE.equals(getValue(SECURITY));
 	}
 
+	@Override
 	public void setSecurity(boolean value)
 	{
 		setValue(SECURITY, value);
 	}
 
+	@Override
 	public boolean getLibrary()
 	{
 		return Boolean.TRUE.equals(getValue(LIBRARY));
 	}
 
+	@Override
 	public void setLibrary(boolean value)
 	{
 		setValue(LIBRARY, value);
 	}
 
+	@Override
 	public boolean getSettings()
 	{
 		return Boolean.TRUE.equals(getValue(SETTINGS));
 	}
 
+	@Override
 	public void setSettings(boolean value)
 	{
 		setValue(SETTINGS, value);
 	}
 
+	@Override
 	public boolean getContext()
 	{
 		return Boolean.TRUE.equals(getValue(CONTEXT));
 	}
 
+	@Override
 	public void setContext(boolean value)
 	{
 		setValue(CONTEXT, value);
 	}
 
+	@Override
 	public boolean getAddress()
 	{
 		return Boolean.TRUE.equals(getValue(ADDRESS));
 	}
 
+	@Override
 	public void setAddress(boolean value)
 	{
 		setValue(ADDRESS, value);
 	}
 
-	public boolean getDhtProvide()
-	{
-		return Boolean.TRUE.equals(getValue(DHT_PROVIDE));
-	}
-
-	public void setDhtProvide(boolean value)
-	{
-		setValue(DHT_PROVIDE, value);
-	}
-	
+	@Override
 	public boolean getRegistrySync()
 	{
 		return Boolean.TRUE.equals(getValue(REGISTRY_SYNC));
 	}
 
+	@Override
 	public void setRegistrySync(boolean value)
 	{
 		setValue(REGISTRY_SYNC, value);

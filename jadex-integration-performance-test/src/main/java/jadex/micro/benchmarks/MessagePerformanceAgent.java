@@ -31,6 +31,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -323,7 +324,7 @@ public class MessagePerformanceAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						throw (exception instanceof RuntimeException) ? (RuntimeException) exception : new RuntimeException(exception);
+						throw SUtil.throwUnchecked(exception);
 					}
 				});
 			}

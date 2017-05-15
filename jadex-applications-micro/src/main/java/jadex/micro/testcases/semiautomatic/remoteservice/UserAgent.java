@@ -1,5 +1,6 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -32,11 +33,11 @@ public class UserAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		final Future ret = new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
 		
-		final CounterResultListener lis = new CounterResultListener(2, new IResultListener()
+		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Void result)
 			{
 				ret.setResult(null);
 //				killAgent();
@@ -50,35 +51,32 @@ public class UserAgent
 		});
 		
 		// get remote management service 
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class)
-			.addResultListener(new IResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IComponentManagementService cms)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
 				// get remote management service and fetch service via rms.getProxy()
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class)
-					.addResultListener(new IResultListener()
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<IRemoteServiceManagementService>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IRemoteServiceManagementService rms)
 					{
-						IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-
 						IComponentIdentifier platid = new ComponentIdentifier("remote", 
 							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
 						// Search for remote service
-						rms.getServiceProxy(agent.getComponentIdentifier(), platid, IMathService.class, RequiredServiceInfo.SCOPE_PLATFORM, null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+						IFuture<IMathService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), platid, new ClassInfo(IMathService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
+						fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IMathService>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(IMathService service)
 							{
-								IMathService service = (IMathService)result;
 								invokeAddService("IMathService searched via rms.", service)
 									.addResultListener(lis);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
+								exception.printStackTrace();
 								lis.resultAvailable(null);
 							}
 						}));
@@ -97,11 +95,10 @@ public class UserAgent
 		
 		// search on local platform and find service via ProxyAgent to other platform
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			.addResultListener(new IResultListener()
+			.addResultListener(new IResultListener<IMathService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IMathService service)
 			{
-				IMathService service = (IMathService)result;
 				invokeAddService("IMathService searched via platform proxy.", service)
 					.addResultListener(lis);
 			}
@@ -117,9 +114,9 @@ public class UserAgent
 	/**
 	 *  Invoke some add methods for testing.
 	 */
-	protected IFuture invokeAddService(String info, IMathService service)
+	protected IFuture<Void> invokeAddService(String info, IMathService service)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(service==null)
 		{
@@ -128,13 +125,13 @@ public class UserAgent
 		}
 		else
 		{
-			final CounterResultListener lis = new CounterResultListener(2, new DelegationResultListener(ret));
+			final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
 			System.out.println("Found service: "+info);
 			// Execute non-blocking method call with future result
 //			System.out.println("Calling non-blocking addNB method.");
-			service.addNB(1, 2).addResultListener(new IResultListener()
+			service.addNB(1, 2).addResultListener(new IResultListener<Integer>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Integer result)
 				{
 					System.out.println("Invoked addNB: "+result);
 					lis.resultAvailable(null);
@@ -160,9 +157,9 @@ public class UserAgent
 			System.out.println("Invoked printMessage");
 			
 			System.out.println("Calling (non-blocking) exception throwing divZero method.");
-			service.divZero().addResultListener(new IResultListener()
+			service.divZero().addResultListener(new IResultListener<Void>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Void result)
 				{
 					System.out.println("Invoked divZero without exception");
 					lis.resultAvailable(null);

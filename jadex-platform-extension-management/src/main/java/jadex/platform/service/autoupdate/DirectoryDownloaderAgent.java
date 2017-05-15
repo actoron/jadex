@@ -80,7 +80,7 @@ public class DirectoryDownloaderAgent
 	protected long	interval;
 	
 	/** The thread pool for asynchronous download. */
-	@AgentService
+	@AgentService(lazy=false)
 	protected IDaemonThreadPoolService	tp;
 	
 	/** The connection manager for open connections. */

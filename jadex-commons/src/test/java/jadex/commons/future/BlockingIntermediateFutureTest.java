@@ -118,10 +118,11 @@ public class BlockingIntermediateFutureTest //extends TestCase
 			{
 				ISuspendable.SUSPENDABLE.set(new ThreadSuspendable()
 				{
-					public void suspend(Future<?> future, long timeout)
+					@Override
+					public void suspend(Future<?> future, long timeout, boolean realtime)
 					{
 						suspended	= true;
-						super.suspend(future, timeout);
+						super.suspend(future, timeout, realtime);
 					}
 				});
 				
@@ -214,10 +215,11 @@ public class BlockingIntermediateFutureTest //extends TestCase
 			{
 				ISuspendable.SUSPENDABLE.set(new ThreadSuspendable()
 				{
-					public void suspend(Future<?> future, long timeout)
+					@Override
+					public void suspend(Future<?> future, long timeout, boolean realtime)
 					{
 						suspended	= true;
-						super.suspend(future, timeout);
+						super.suspend(future, timeout, realtime);
 					}
 				});
 				Iterator<String>	it	= new IntermediateFutureIterator<String>(fut);

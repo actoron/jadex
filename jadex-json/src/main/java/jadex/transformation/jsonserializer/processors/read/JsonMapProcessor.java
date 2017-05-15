@@ -17,7 +17,7 @@ import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
- * 
+ *  Processor for reading maps.
  */
 public class JsonMapProcessor implements ITraverseProcessor
 {
@@ -31,7 +31,8 @@ public class JsonMapProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(Map.class, clazz));
+//		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(Map.class, clazz));
+		return object instanceof JsonObject && SReflect.isSupertype(Map.class, clazz);
 	}
 	
 	/**
@@ -70,7 +71,8 @@ public class JsonMapProcessor implements ITraverseProcessor
 				if(JsonTraverser.CLASSNAME_MARKER.equals(name) || JsonTraverser.ID_MARKER.equals(name))
 					continue;
 				Object val = obj.get(name);
-				Object newval = traverser.doTraverse(val, null, conversionprocessors, processors, mode, targetcl, context);
+				Class<?> valclazz = getValueClass(val, context);
+				Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, context);
 //				Object newval = traverser.doTraverse(val, null, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
 //				Class<?> valclazz = val!=null? val.getClass(): null;
 //				Object newval = traverser.doTraverse(val, valclazz, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
@@ -102,6 +104,18 @@ public class JsonMapProcessor implements ITraverseProcessor
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Returns the class of a map value.
+	 *  @param val The value.
+	 *  @param context The context.
+	 *  @return The value class.
+	 */
+	public Class<?> getValueClass(Object val, Object context)
+	{
+		Class<?> valclazz = val!=null? val.getClass(): null;
+		return valclazz;
 	}
 	
 	/**

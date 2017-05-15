@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -20,6 +23,7 @@ import java.util.zip.ZipFile;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
@@ -39,6 +43,7 @@ import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
+import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
@@ -102,13 +107,22 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	//-------- constructors --------
 
 	/**
+	 * Create a component test suite for components contained in class directories on the class path (i.e. not jars).
+	 * @param excludes	Files to exclude (if a pattern is contained in file path).
+	 */
+	public ComponentTestSuite(String[] excludes) throws Exception
+	{
+		this(findClassDirectories(), null, excludes);
+	}
+	
+	/**
 	 * Create a component test suite for components contained in a given path.
 	 * @param projectDir	The project directory.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path).
 	 */
 	public ComponentTestSuite(String projectDir, String[] excludes) throws Exception
 	{
-		this(SUtil.findOutputDirs(projectDir), null, excludes);
+		this(new File[][]{SUtil.findOutputDirs(projectDir)}, null, excludes);
 	}
 
 	/**
@@ -119,7 +133,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	 */
 	public ComponentTestSuite(String projectDir, String[] tests, String[] excludes) throws Exception
 	{
-		this(SUtil.findOutputDirs(projectDir), tests, excludes);
+		this(new File[][]{SUtil.findOutputDirs(projectDir)}, tests, excludes);
 	}
 	
 	/**
@@ -134,28 +148,28 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	
 	/**
 	 * Create a component test suite for components contained in a given path.
-	 * @param root	The classpath root corresponding to the path to look for test cases in.
+	 * @param roots The paths to search for testcases in and to load classes from.
 	 * @param tests	The tests (full qualified names) to include. Includes all, if null.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 */
-	public ComponentTestSuite(File[] root, String[] tests, String[] excludes) throws Exception
+	public ComponentTestSuite(File[][] roots, String[] tests, String[] excludes) throws Exception
 	{
-		this(root, tests, excludes, true, true, true);
-//		this(path, root, excludes, false, false, true);
+		this(roots, tests, excludes, true, true, true);
+//		this(path, roots, excludes, false, false, true);
 	}
 	
 	/**
 	 * Create a component test suite for components contained in a given path.
-	 * @param root	The classpath root corresponding to the path to look for test cases in.
+	 * @param roots The paths to search for testcases in and to load classes from.
 	 * @param tests	The tests (full qualified names) to include. Includes all, if null.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 * @param test	Run test components.
 	 * @param load	Include broken components (will cause test failure if any). Also shows loadable, but not startable components as succeeded tests.
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(File[] root, String[] tests, String[] excludes, boolean test, boolean load, boolean start) throws Exception
+	public ComponentTestSuite(File[][] roots, String[] tests, String[] excludes, boolean test, boolean load, boolean start) throws Exception
 	{
-		this(DEFARGS, root, tests, excludes, test, load, start);
+		this(DEFARGS, roots, tests, excludes, test, load, start);
 	}
 	
 	protected void startTimer()
@@ -195,55 +209,95 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	/**
 	 * Create a component test suite for components contained in a given path.
 	 * @param args	The platform arguments.
+     * @param roots The paths to search for testcases in and to load classes from.
+	 *              Grouped by project, e.g. proj1/build/classes and proj1/build/resources
+	 *              should be both at index [0] of this array.
 	 * @param tests	The tests (full qualified names) to include. Includes all, if null.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path).
 	 * @param runtests	Run test components.
 	 * @param load	Include broken components (will cause test failure if any).
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File roots[], String[] tests, String[] excludes, final boolean runtests, final boolean load, final boolean start) throws Exception
+	public ComponentTestSuite(String[] args, File[][] roots, String[] tests, String[] excludes, final boolean runtests, final boolean load, final boolean start) throws Exception
 	{
-		super(roots[0].toString());
-		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
+		super(roots[0][0].toString());
+		
+		/* Attempt to extract user command line args. */
+		String cmdline = System.getProperty("sun.java.command");
+//		System.out.println("COMMAND: " + cmdline);
+		if (cmdline != null)
+		{
+			String[] cmdlinetokens = cmdline.split(" ");
+			List<String> cmdargs = new ArrayList<String>();
+			for (int i = 1; i < cmdlinetokens.length; ++i)
+			{
+				if (cmdlinetokens[i].length() > 0)
+					if ("-version".equals(cmdlinetokens[i]))
+						break;
+					else
+						cmdargs.add(cmdlinetokens[i]);
+			}
+			int len = args != null? args.length : 0;
+			len += cmdargs.size();
+			String[] newargs = new String[len];
+			int pos = 0;
+			if (args != null)
+			{
+				System.arraycopy(args, pos, newargs, pos, args.length);
+				pos += args.length;
+			}
+			for (String cmdarg : cmdargs)
+				newargs[pos++] = cmdarg;
+			args = newargs;
+		}
+		
+		PlatformConfiguration conf = PlatformConfiguration.processArgs(args);
+//		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
+		this.timeout	= conf.getLocalDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();
 
 		if (tests != null) {
 			for (int i = 0; i < tests.length; i++) {
-				tests[i] = tests[i].replaceAll("\\.", "/");
+				tests[i] = tests[i].replace('.', File.separatorChar);
 			}
 		}
 
 		// Tests must be available after constructor execution.
-		// Todo: get rid of thread suspendable!?
 
 //		System.out.println("start platform");
-		platform	= Starter.createPlatform(args).get();
-		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
+		platform	= Starter.createPlatform(conf).get();
+//		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		ILibraryService libsrv	= SServiceProvider.getService(platform, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 
-		// Only works with x-rid hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
+		// Only works with x-rids hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
 //		final IResourceIdentifier	rid	= null;
 		long ctimeout = Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());	// Start with normal timeout for platform startup/shutdown.
-		IResourceIdentifier	rid	= null;
-		for(int root=0; root<roots.length; root++)
-		{
-			try
+
+		IResourceIdentifier[] rids = new IResourceIdentifier[roots.length];
+		for (int projectIndex=0; projectIndex < roots.length; projectIndex++) {
+			File[] project = roots[projectIndex];
+			IResourceIdentifier	parentRid	= null;
+			for(int rootIndex=0; rootIndex<project.length; rootIndex++)
 			{
-				URL url = roots[root].toURI().toURL();
-				if(rid==null)
+				try
 				{
-					rid	= libsrv.addURL(null, url).get();
+					URL url = project[rootIndex].toURI().toURL();
+					if(parentRid==null)
+					{
+						parentRid	= libsrv.addURL(null, url).get();
+						rids[projectIndex] = parentRid;
+					}
+					else
+					{
+						libsrv.addURL(parentRid, url).get();
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					libsrv.addURL(rid, url).get();
+					throw new RuntimeException(e);
 				}
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
 			}
 		}
 		this.classloader	= libsrv.getClassLoader(null).get();
@@ -252,141 +306,104 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		// disable Future debugging during testcase scan for performance reasons.
 		boolean originalDebug = Future.DEBUG;
 		Future.DEBUG = false;
-		for(int root=0; root<roots.length; root++)
-		{
-			// Scan for test cases.
-			List<String> scanForTestCases = getAllFiles(roots[root]);
-			this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getComponentIdentifier(), 1 + 0.05*scanForTestCases.size());	// Timeout for loading models.
-			startTimer();
-			Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + roots[root]+" (scan timeout: "+timeout+")");
-			for (String abspath : scanForTestCases)
-			{
-				boolean	exclude	= false;
-				boolean	include = (tests == null);
+		for (int projectIndex=0; projectIndex < roots.length; projectIndex++) {
+			File[] project = roots[projectIndex];
+			for (int rootIndex = 0; rootIndex < project.length; rootIndex++) {
+				// Scan for test cases.
+				List<String> scanForTestCases = getAllFiles(project[rootIndex]);
+				this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getComponentIdentifier(), 1 + 0.05 * scanForTestCases.size());    // Timeout for loading models.
+				startTimer();
+				Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + project[rootIndex] + " (scan timeout: " + timeout + ")");
+				for (String abspath : scanForTestCases) {
+					boolean exclude = false;
+					boolean include = (tests == null);
 
-				for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
-				{
-					exclude	= abspath.indexOf(excludes[i])!=-1;
-				}
+					for (int i = 0; !exclude && excludes != null && i < excludes.length; i++) {
+						exclude = abspath.indexOf(excludes[i]) != -1;
+					}
 
-				for(int i=0; !include && i<tests.length; i++)
-				{
-					include	= abspath.indexOf(tests[i])!=-1;
-				}
+					for (int i = 0; !include && i < tests.length; i++) {
+						include = abspath.indexOf(tests[i]) != -1;
+					}
 
-				if(!exclude && include)
-				{
-					try
-					{
-//						if(abspath.indexOf("BDI")!=-1)
-//						{
-//							System.out.println("Check: "+abspath);
-//						}
-						if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
-						{
-							//						System.out.println("Loadable: "+abspath);
-							//						if(abspath.indexOf("INeg")!=-1)
-							//							System.out.println("test");
-							boolean	startable	= ((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get()).booleanValue();
+					if (!exclude && include) {
+						try {
+							IResourceIdentifier rid = rids[projectIndex];
 
-							//						System.out.println("Startable: "+abspath+", "+startable);
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get();
-							boolean istest = false;
-							if(model!=null && model.getReport()==null && startable)
-							{
-								IArgument[]	results	= model.getResults();
-								for(int i=0; !istest && i<results.length; i++)
-								{
-									if(results[i].getName().equals("testresults") && Testcase.class.equals(
-											results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports())))
-									{
-										istest	= true;
+							if ((SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue()) {
+								boolean startable = SComponentFactory.isStartable(platform, abspath, rid).get().booleanValue();
+								IModelInfo model = SComponentFactory.loadModel(platform, abspath, rid).get();
+								boolean istest = false;
+								if (model != null && model.getReport() == null && startable) {
+									IArgument[] results = model.getResults();
+									for (int i = 0; !istest && i < results.length; i++) {
+										if (results[i].getName().equals("testresults") && Testcase.class.equals(
+												results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports()))) {
+											istest = true;
+										}
 									}
 								}
-							}
 
-							if(istest)
-							{
-								System.out.print(".");
-								//								System.out.println("Test: "+abspath);
-								if(runtests)
-								{
-									ComponentTest test = new ComponentTest(cms, model, this);
+								if (istest) {
+									System.out.print(".");
+									if (runtests) {
+										ComponentTest test = new ComponentTest(cms, model, this);
+										test.setName(abspath);
+										addTest(test);
+										if (ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE) {
+											ctimeout = Timeout.NONE;
+										} else {
+											ctimeout += test.getTimeout();
+										}
+									}
+								} else if (startable && model.getReport() == null) {
+									System.out.print(".");
+									if (start) {
+										ComponentStartTest test = new ComponentStartTest(cms, model, this);
+										test.setName(abspath);
+										addTest(test);
+										if (ctimeout == Timeout.NONE) {
+											ctimeout = Timeout.NONE;
+										} else {
+											// Delay instead of timeout as start test should be finished after that.
+											ctimeout += test.getTimeout();
+										}
+									}
+								} else if (load) {
+									System.out.print(".");
+									ComponentLoadTest test = new ComponentLoadTest(model, model.getReport());
 									test.setName(abspath);
 									addTest(test);
-									if(ctimeout==Timeout.NONE || test.getTimeout()==Timeout.NONE)
-									{
-										ctimeout	= Timeout.NONE;
-									}
-									else
-									{
-										ctimeout	+= test.getTimeout();
-									}
 								}
 							}
-							else if(startable && model.getReport()==null)
-							{
-								System.out.print(".");
-								//								System.out.println("Start: "+abspath);
-								if(start)
-								{
-									ComponentStartTest test = new ComponentStartTest(cms, model, this);
-									test.setName(abspath);
-									addTest(test);
-									if(ctimeout==Timeout.NONE)
-									{
-										ctimeout	= Timeout.NONE;
+						} catch (final RuntimeException e) {
+							if (load) {
+								ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport() {
+									public String getErrorText() {
+										StringWriter sw = new StringWriter();
+										e.printStackTrace(new PrintWriter(sw));
+										return "Error loading model: " + sw.toString();
 									}
-									else
-									{
-										// Delay instead of timeout as start test should be finished after that.
-										ctimeout	+= test.getTimeout();
+
+									public String getErrorHTML() {
+										return getErrorText();
 									}
-								}
-							}
-							else if(load)
-							{
-								System.out.print(".");
-								//							System.out.println("Load: "+abspath);
-								ComponentLoadTest test = new ComponentLoadTest(model, model.getReport());
+
+									public Map<String, String> getDocuments() {
+										return null;
+									}
+								});
 								test.setName(abspath);
 								addTest(test);
 							}
 						}
 					}
-					catch(final RuntimeException e)
-					{
-						if(load)
-						{
-							ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
-							{
-								public String getErrorText()
-								{
-									StringWriter	sw	= new StringWriter();
-									e.printStackTrace(new PrintWriter(sw));
-									return "Error loading model: "+sw.toString();
-								}
-
-								public String getErrorHTML()
-								{
-									return getErrorText();
-								}
-
-								public Map<String, String> getDocuments()
-								{
-									return null;
-								}
-							});
-							test.setName(abspath);
-							addTest(test);
-						}
-					}
 				}
-			}
 
-			stopTimer();
-			Future.DEBUG = originalDebug;
-			Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + roots[root]+", cumulated execution timeout is: "+ctimeout);
+				stopTimer();
+				Future.DEBUG = originalDebug;
+				Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + project[rootIndex] + ", cumulated execution timeout is: " + ctimeout);
+			}
 		}
 		this.timeout	= ctimeout;
 	}
@@ -403,7 +420,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	protected List<String> getAllFiles(File root)
 	{
 		List<String> result = new ArrayList<String>();
-		
+
 		if (SReflect.isAndroid())
 		{
 			try
@@ -423,7 +440,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 					}
 				}
 				zip.close();
-				
+
 				// Scan for classes in .dex
 				Enumeration<String> dexEntries = SUtil.androidUtils().getDexEntries(root);
 				String nextElement;
@@ -442,7 +459,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 						}
 					}
 				}
-				
+
 			}
 			catch (IOException e)
 			{
@@ -454,13 +471,13 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			List<File>	todo	= new LinkedList<File>();
 //			if(path.toString().indexOf("micro")!=-1)
 			todo.add(root);
-			
+
 			while(!todo.isEmpty())
 			{
 				File	file	= (File)todo.remove(0);
 				final String	abspath	= file.getAbsolutePath();
 	//			System.out.println("todo: "+abspath);
-				
+
 				if(file.isDirectory())
 				{
 					File[]	subs	= file.listFiles();
@@ -472,7 +489,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				}
 			}
 		}
-		
+
 		return result;
 		
 	}
@@ -548,4 +565,54 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		return classloader;
 	}
+	
+	/**
+	 *  Find class directories on classpath.
+	 */
+	public static File[][]	findClassDirectories()
+	{
+		Set<File>	dirs	= new LinkedHashSet<File>();
+		collectClasspathDirectories(ComponentTestSuite.class.getClassLoader(), dirs);
+		File[][]	ret	= new File[dirs.size()][];
+		
+		int	i=0;
+		for(File dir: dirs)
+		{
+			ret[i++]	= new File[]{dir};
+		}
+		return ret;
+	}
+
+	/**
+	 *  Collect all directory URLs belonging to a class loader.
+	 */
+	protected static void	collectClasspathDirectories(ClassLoader classloader, Set<File> set)
+	{
+		assert classloader!=null;
+		
+		if(classloader.getParent()!=null)
+		{
+			collectClasspathDirectories(classloader.getParent(), set);
+		}
+		
+		if(classloader instanceof URLClassLoader)
+		{
+			URL[] urls = ((URLClassLoader)classloader).getURLs();
+			for(int i=0; i<urls.length; i++)
+			{
+				File	file	= SUtil.getFile(urls[i]);
+				if(file.isDirectory())
+				{
+					set.add(file);
+				}
+			}
+		}
+	}
+//
+//	@Override
+//	public void addTest(Test test)
+//	{
+//		System.out.println("Test added: "+test);
+//		super.addTest(test);
+//	}
 }

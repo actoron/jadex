@@ -123,11 +123,13 @@ public class ResourceIdentifier implements IResourceIdentifier
 		this.lid = lid;
 		this.gid = gid;
 		
-		if(ENABLE_HASHES && gid==null && lid!=null)
-		{
-			File f	= new File(lid.getUri().getPath());
-			this.gid	= new GlobalResourceIdentifier("::"+SUtil.getHashCode(f), null, null);
-		}
+//		if(gid==null && lid!=null)
+//		{
+//			File f	= new File(lid.getUri().getPath());
+//			// Use SUtil.getHashCode(f, false) to test with directory and jar
+//			// Commented out due to excessive long time consumption on Jadex startup 
+////			this.gid	= new GlobalResourceIdentifier("::"+SUtil.getHashCode(f, true), null, null);
+//		}
 	}
 	
 	//-------- methods --------

@@ -9,6 +9,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.exttask.ExternalTaskWrapper;
 import jadex.bpmn.runtime.task.PojoTaskWrapper;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
 
 /**
@@ -103,8 +104,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				{
 					// Hack!!! Rethrow exception when task.execute() is synchronous
 					// and instance.notify() throws exception due to no suitable exception handlers in BPMN.
-					throw thread.getException() instanceof RuntimeException
-						? (RuntimeException)thread.getException() : new RuntimeException(thread.getException());
+					throw SUtil.throwUnchecked(thread.getException());
 				}
 			}
 		}

@@ -12,6 +12,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -214,7 +215,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 					}
 					else
 					{
-						throw res instanceof RuntimeException ? (RuntimeException)res : new RuntimeException(res);
+						throw SUtil.throwUnchecked(res);
 					}
 					ret.setResult(null);
 				}
@@ -407,7 +408,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 					}
 					else
 					{
-						throw res instanceof RuntimeException ? (RuntimeException)res : new RuntimeException(res);
+						throw SUtil.throwUnchecked(res);
 					}
 				}
 			}

@@ -1,5 +1,4 @@
-Chapter 3 - Starter
-================================
+# Starter
 
 The starter plugin is one of the core tools for managing applications. It allows for starting and stopping applications and components and also provides a view of the currently running components. The basic layout of the starter is shown in the screenshot below. It basically consists of three different areas. The left upper part contains a file view of component models. When a user selects a new model it will be loaded and displayed on the right hand side of the tool. Finally, in the lower left part the platform with the currently running components is displayed.
 
@@ -10,6 +9,18 @@ Component Models
 -----------------------------
 
 In the component models section a file system view on available active component models is displayed. To be able to view and select your own models here, you will first have to add the root path or jar file of your project. This can be done by clicking the add resource button ![03 Starter@add\_folder424.png](add_folder424.png) from the menu bar or by right clicking within a free space of the panel. This will also give you a popup menu with an add resource option. Activating add resource will give you a file chooser to select the project folder or jar file to add. After having confirmed the choice the folder will be displayed in the panel. You can now browse its contents and select a model to start. Please note that you cannot add any folder to the starter, as it has to be the classpath root of the contained resources, i.e. you should always add a bin or classes folder but not an internal package directly. Jadex will add the new resource automatically as classpath entry and if its not the correct folder you may encounter ClassNotFoundExceptions when selecting models. 
+
+<!-- Text moved from bdiv3 tutorial (maybe extract some useful parts and delete the rest):  
+Start the JCC and use the "Add Path" button explained above to add the root directory of your example package. Then open the folder until you can see your file "TranslationBDI". 
+The effect of selecting the input file is that the agent model is loaded.  
+When it contains no errors, the description of the model, taken from the @Description annotation, is shown in the description view. 
+In case there are errors in the model, correct the errors shown in the description view and restart the platform (class reloading is not supported).  
+Below the file name, the agent name and its default configuration are shown.
+After pressing the start button the new agent should appear in the agent tree (at the bottom left). 
+It is also possible to start an agent simply by double-clicking it in the model tree.
+-->
+
+<!--*Please note that when you use a double-click on the model name in the left tree view to start an agent, the settings on the right will be ignored.*-->
 
 ![03 Starter@roots.png](roots.png)  
 *Root entries are classpath entries*

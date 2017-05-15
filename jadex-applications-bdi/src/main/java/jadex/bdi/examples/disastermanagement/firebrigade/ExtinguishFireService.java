@@ -28,9 +28,9 @@ public class ExtinguishFireService implements IExtinguishFireService
 	
 	/**
 	 *  Extinguish a fire.
-	 *  @param disaster The disaster.
+	 *  @param disasterId The disasterId.
 	 */
-	public ITerminableFuture<Void> extinguishFire(final ISpaceObject disaster)
+	public ITerminableFuture<Void> extinguishFire(final Object disasterId)
 	{
 		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
 
@@ -62,7 +62,7 @@ public class ExtinguishFireService implements IExtinguishFireService
 			else
 			{
 				final IGoal exfire = (IGoal)capa.getGoalbase().createGoal("extinguish_fire");
-				exfire.getParameter("disaster").setValue(disaster);
+				exfire.getParameter("disasterId").setValue(disasterId);
 //				exfire.addGoalListener(new IGoalListener()
 //				{
 //					public void goalFinished(AgentEvent ae)

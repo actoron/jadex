@@ -32,9 +32,9 @@ import jadex.bpmn.editor.gui.Settings.FileFilter;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MTask;
-import jadex.bpmn.model.io.IdGenerator;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
+import jadex.commons.IdGenerator;
 
 /**
  * Container for the current model.
