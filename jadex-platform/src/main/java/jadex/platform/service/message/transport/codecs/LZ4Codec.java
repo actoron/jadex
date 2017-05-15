@@ -3,10 +3,8 @@ package jadex.platform.service.message.transport.codecs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import jadex.bridge.service.types.message.IBinaryCodec;
 import jadex.commons.SUtil;
 import net.jpountz.lz4.LZ4Compressor;
-import net.jpountz.lz4.LZ4Decompressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 
@@ -132,7 +130,7 @@ public class LZ4Codec extends AbstractCodec
 			int clen = SUtil.bytesToInt(buf, 0);
 			int ulen = SUtil.bytesToInt(buf, 4);
 			byte[] in = new byte[clen];
-			SUtil.readStream(bais, in, 0, -1);
+			SUtil.readStream(in, 0, -1, bais);
 			ret = new byte[ulen];
 			decompressor.decompress(in, 0, ret, 0, ret.length);
 		}

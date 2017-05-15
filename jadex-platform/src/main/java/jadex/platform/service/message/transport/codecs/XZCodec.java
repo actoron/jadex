@@ -127,7 +127,7 @@ public class XZCodec extends AbstractCodec
 			int len = SUtil.bytesToInt(buf);
 			ret = new byte[len];
 			XZInputStream xzis = new XZInputStream(bais);
-			SUtil.readStream(xzis, ret, 0, -1);
+			SUtil.readStream(ret, 0, -1, xzis);
 		}
 		catch(Exception e) 
 		{

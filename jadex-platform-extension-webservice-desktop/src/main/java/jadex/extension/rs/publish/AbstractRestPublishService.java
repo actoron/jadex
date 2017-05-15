@@ -150,8 +150,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			public String convertObject(Object val, Object context)
 			{
 //				System.out.println("write response in json");
-                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null);
-				return new String(data);
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null, null);
+                return new String(data);
 			}
 		};
 		converters.add(MediaType.APPLICATION_JSON, jsonc);
@@ -161,7 +161,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			public String convertObject(Object val, Object context)
 			{
-                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null);
+                byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null, null);
 				return new String(data);
 			}
 		};

@@ -7,12 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 import jadex.bridge.service.types.message.ISerializer;
+import jadex.commons.Base64;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -73,7 +72,7 @@ public class JadexJsonSerializer implements ISerializer
 	 */
 	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs)
 	{
-		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, true, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs);
+		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, true, true, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs);
 		
 		if(DEBUG)
 		{
@@ -168,7 +167,7 @@ public class JadexJsonSerializer implements ISerializer
 		{
 			JsonObject obj = (JsonObject)object;
 			
-			byte[] ret = Base64.decode(obj.get("__base64").asString());
+			byte[] ret = Base64.decode(obj.get("__base64").asString().getBytes(SUtil.UTF8));
 			
 			JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
 			if(idx!=null)

@@ -129,7 +129,7 @@ public class SnappyCodec extends AbstractCodec
 			int len = SUtil.bytesToInt(buf);
 			ret = new byte[len];
 			SnappyInputStream sis = new SnappyInputStream(bais);
-			SUtil.readStream(sis, ret, 0, -1);
+			SUtil.readStream(ret, 0, -1, sis);
 		}
 		catch(Exception e) 
 		{

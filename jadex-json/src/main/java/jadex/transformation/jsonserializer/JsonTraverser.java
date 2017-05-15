@@ -254,13 +254,13 @@ public class JsonTraverser extends Traverser
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
 	{
-		return objectToByteArray(val, classloader, enc, writeclass, true, excludes, processors);
+		return objectToByteArray(val, classloader, enc, writeclass, true, excludes, null, processors);
 	}
 	
 	/**
 	 *  Convert to a byte array.
 	 */
-	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, boolean writeid, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> processors)
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, boolean writeid, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors)
 	{
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, writeid, excludes);
@@ -268,7 +268,7 @@ public class JsonTraverser extends Traverser
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			traverser.traverse(val, null, processors, processors!=null? processors: writeprocs, Traverser.MODE.PREPROCESS, classloader, wr);
+			traverser.traverse(val, null, conversionprocessors, processors!=null? processors: writeprocs, Traverser.MODE.PREPROCESS, classloader, wr);
 			byte[] ret = enc==null? wr.getString().getBytes(SUtil.UTF8): wr.getString().getBytes(enc);
 			bos.close();
 			return ret;

@@ -124,7 +124,7 @@ public class GZIPCodec extends AbstractCodec
 			int len = SUtil.bytesToInt(buf);
 			ret = new byte[len];
 			GZIPInputStream gzis = new GZIPInputStream(bais);
-			SUtil.readStream(gzis, ret, 0, -1);
+			SUtil.readStream(ret, 0, -1, gzis);
 		}
 		catch(Exception e) 
 		{
