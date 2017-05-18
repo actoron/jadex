@@ -1,11 +1,8 @@
 package jadex.bridge.service.types.registry;
 
-import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 
 /**
  *  Interface for registry events.
@@ -27,8 +24,13 @@ public interface IRegistryEvent
 //	public Set<IServiceIdentifier> getAddedServices();
 	
 	/**
-	 *  Get the size of the event in terms of the number of subevents.
-	 *  @return The sumber of contained changes.
+	 *  Flag if event contains full registry content or only partial delta.
 	 */
-	public int size();
+	public boolean isDelta();
+	
+//	/**
+//	 *  Get the size of the event in terms of the number of subevents.
+//	 *  @return The number of contained changes.
+//	 */
+//	public int size();
 }

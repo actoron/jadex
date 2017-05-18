@@ -33,12 +33,24 @@ public class RegistryEvent implements IRegistryEvent
 	/** The time limit. */
 	protected long timelimit;
 	
+	/** Flag if is delta (or full) registry content. */
+	protected boolean delta;
+	
+//	/**
+//	 *  Create a new registry event.
+//	 */
+//	public RegistryEvent()
+//	{
+//		this.timestamp = System.currentTimeMillis();
+//	}
+	
 	/**
 	 *  Create a new registry event.
 	 */
-	public RegistryEvent()
+	public RegistryEvent(boolean delta)
 	{
 		this.timestamp = System.currentTimeMillis();
+		this.delta = delta;
 	}
 	
 	/**
@@ -46,11 +58,12 @@ public class RegistryEvent implements IRegistryEvent
 	 *  @param addedservices The added services.
 	 *  @param removedservices The removed services.
 	 */
-	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit)
+	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit, boolean delta)
 	{
 		this.eventslimit = eventslimit;
 		this.timelimit = timelimit;
 		this.timestamp = System.currentTimeMillis();
+		this.delta = delta;
 		setAddedServices(addedservices);
 		setRemovedServices(removedservices);
 	}
@@ -127,6 +140,24 @@ public class RegistryEvent implements IRegistryEvent
 		return removedservices.add(service);
 	}
 	
+	/**
+	 *  Get the delta.
+	 *  @return the delta
+	 */
+	public boolean isDelta()
+	{
+		return delta;
+	}
+
+	/**
+	 *  Set the delta.
+	 *  @param delta The delta to set
+	 */
+	public void setDelta(boolean delta)
+	{
+		this.delta = delta;
+	}
+
 	/**
 	 * Returns the number of elements added to this event.
 	 */

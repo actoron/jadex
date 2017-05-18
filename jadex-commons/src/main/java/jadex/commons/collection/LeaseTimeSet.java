@@ -127,7 +127,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	}
 	
 	/**
-	 *  Create a lease time collection with java util timer.
+	 *  Create a lease time collection.
 	 */
 	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime)
 	{
@@ -135,7 +135,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	}
 	
 	/**
-	 *  Create a lease time collection with java util timer.
+	 *  Create a lease time collection.
 	 */
 	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd)
 	{
@@ -143,7 +143,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	}
 	
 	/**
-	 *  Create a lease time collection with java util timer.
+	 *  Create a lease time collection.
 	 */
 	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, Object mutex)
 	{
@@ -151,7 +151,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	}
 	
 	/**
-	 *  Create a lease time collection with java util timer.
+	 *  Create a lease time collection.
 	 */
 	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<E> removecmd, IDelayRunner timer, boolean sync, Object mutex)
 	{

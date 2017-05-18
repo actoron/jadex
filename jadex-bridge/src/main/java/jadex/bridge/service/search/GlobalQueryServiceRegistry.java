@@ -69,7 +69,7 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				if (RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
+				if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
 				{
 					final ITerminableIntermediateFuture<T> sfut = searchRemoteServices(query);
 					sfut.addIntermediateResultListener(new IIntermediateResultListener<T>()
@@ -85,7 +85,7 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 						
 						public void finished()
 						{
-							if (!done)
+							if(!done)
 								ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 						}
 
@@ -118,7 +118,7 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 			
 			public void finished()
 			{
-				if (firstfinished)
+				if(firstfinished)
 					super.finished();
 				else
 					firstfinished = true;
@@ -166,7 +166,6 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 		
 		return ret;
 	}
-	static boolean disable = false; 
 	
 	/**
 	 *  Search for services on remote platforms.
@@ -177,11 +176,6 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 	protected <T> ISubscriptionIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		if (disable)
-		{
-			ret.setFinishedIfUndone();
-			return ret;
-		}
 		final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
 		if(rms!=null)
 		{
@@ -202,13 +196,13 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 				{
 					public void resultAvailable(Collection<ITransportComponentIdentifier> result)
 					{
-						if (result != null)
+						if(result != null)
 							result.remove(((IService)rms).getServiceIdentifier().getProviderId().getRoot());
 						
-						if (result != null && result.size() > 0)
+						if(result != null && result.size() > 0)
 						{
 							FutureBarrier<Void> finishedbar = new FutureBarrier<Void>();
-							for (ITransportComponentIdentifier platid : result)
+							for(ITransportComponentIdentifier platid : result)
 							{
 								final Future<Set<T>> remotesearch = new Future<Set<T>>();
 								final ServiceQuery<T> remotequery = new ServiceQuery<T>(query);
@@ -318,106 +312,6 @@ public class GlobalQueryServiceRegistry extends ServiceRegistry
 		}
 		else
 			ret.setFinished();
-		return ret;
-	}
-	
-	/**
-	 *  Search for services on remote platforms.
-	 *  @param caller	The component that started the search.
-	 *  @param type The type.
-	 *  @param filter The filter.
-	 */
-	protected <T> ISubscriptionIntermediateFuture<T> searchRemoteServicesOld(final ServiceQuery<T> query)
-	{
-		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
-		// Must not find services twice (e.g. having two proxies for the same platform)
-		final Set<T> founds = new HashSet<T>();
-		
-		final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-		if(rms!=null)
-		{
-			// Get all proxy agents (represent other platforms)
-			Collection<IService> sers = getLocalServicesByClass(new ClassInfo(IProxyAgentService.class));
-			if(sers!=null && sers.size()>0)
-			{
-				final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
-						ret.setFinished();
-					}
-				});
-				
-				for(IService ser: sers)
-				{
-					IProxyAgentService ps = (IProxyAgentService)ser;
-					
-					ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
-					{
-						public void resultAvailable(ITransportComponentIdentifier rcid)
-						{
-							// User RMS getServiceProxies() to fetch services
-							
-							final Object qfilter = query.getFilter();
-							@SuppressWarnings({ "unchecked", "rawtypes" })
-							IAsyncFilter<T> filter = qfilter instanceof IFilter ? new IAsyncFilter<T> ()
-							{
-								@Classname("GlobalQueryFilterWrapper")
-								public IFuture<Boolean> filter(T obj)
-								{
-									return new Future<Boolean>(((IFilter<T>) qfilter).filter(obj));
-								};
-							} : (IAsyncFilter) qfilter;
-							
-							IFuture<Collection<T>> rsers = rms.getServiceProxies(query.getProvider(), rcid, query.getServiceType(), RequiredServiceInfo.SCOPE_PLATFORM, filter);
-							rsers.addResultListener(new IResultListener<Collection<T>>()
-							{
-								public void resultAvailable(Collection<T> result)
-								{
-									for(T t: result)
-									{
-										
-										if (query.isExcludeOwner())
-										{
-											Set<IService> ownerservices = indexer.getServices(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString());
-											if (ownerservices.contains(t))
-												continue;
-										}
-										
-										if(!founds.contains(t))
-										{
-											ret.addIntermediateResult(t);
-										}
-										founds.add(t);
-									}
-									clis.resultAvailable(null);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									clis.resultAvailable(null);
-								}
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							clis.resultAvailable(null);
-						}
-					});
-				}
-			}
-			else
-			{
-				ret.setFinished();					
-			}
-		}
-		else
-		{
-			ret.setFinished();
-		}
-		
 		return ret;
 	}
 	
