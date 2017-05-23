@@ -1,35 +1,31 @@
 package jadex.bridge.service.types.transport;
 
 import java.util.Map;
+
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
  *  Interface for a transport service.
  *
  */
+@Service
 public interface ITransportService
-{
-	/**
-	 *  Priority of the transport.
-	 *  
-	 *  @return Transport priority.
-	 */
-	public IFuture<Integer> getPriority();
-	
+{	
 	/**
 	 *  Checks if the transport is ready.
 	 * 
-	 *  @param header <essage header.
-	 *  @return Null, when ready.
+	 *  @param header Message header.
+	 *  @return Transport priority, when ready
 	 */
-	public IFuture<Void> isReady(Map<String, Object> header);
+	public IFuture<Integer> isReady(Map<String, Object> header);
 	
 	/**
 	 *  Send a message.
 	 *  
 	 *  @param header Message header.
 	 *  @param body Message body.
-	 *  @return Null, when sent.
+	 *  @return Done, when sent, failure otherwise.
 	 */
 	public IFuture<Void> sendMessage(Map<String, Object> header, byte[] body);
 }
