@@ -18,11 +18,32 @@ public interface IMessageFeature
 	
 	/**
 	 *  Send a message and wait for a reply.
+	 *  
 	 *  @param receiver	The message receiver.
 	 *  @param message	The message.
 	 *  
+	 *  @return The reply.
 	 */
-	public IFuture<Void> sendMessageAndWait(IComponentIdentifier receiver, Object message);
+	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message);
+	
+	/**
+	 *  Send a message and wait for a reply.
+	 *  
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  @param timeout	The reply timeout.
+	 *  
+	 *  @return The reply.
+	 */
+	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message, Long timeout);
+	
+	/**
+	 *  Send a message reply.
+	 *  @param receivedmessageid	ID of the received message that is being replied to.
+	 *  @param message	The reply message.
+	 *  
+	 */
+	public IFuture<Void> sendReply(Object receivedmessageid, Object message);
 	
 	/**
 	 *  Add a message handler.

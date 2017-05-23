@@ -26,5 +26,5 @@ public interface IMessageHandler
 	 *  @param header The header.
 	 *  @param msg The message.
 	 */
-	public void handleMessage(IMsgSecurityInfos secinfos, Map<String, Object> header, Object msg);
+	public void handleMessage(IMsgSecurityInfos secinfos, Object messageid, Object msg);
 }

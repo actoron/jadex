@@ -47,6 +47,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	/** Message header key for the receiver. */
 	public static final String RECEIVER = "receiver";
 	
+	/** Message header key for the conversation ID. */
+	public static final String CONVERSATION_ID = "convid";
+	
 	//-------- attributes --------
 	
 	/** The platform ID. */
@@ -64,10 +67,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	/** Flag whether to allow receiving untrusted messages. */
 	protected boolean allowuntrusted;
 	
-	/**
-	 *  Messages awaiting reply.
-	 */
-	protected Map<String, Future<Void>> awaitingmessages;
+	/** Messages awaiting reply. */
+	protected Map<String, Future<Object>> awaitingmessages;
 	
 	//-------- constructors --------
 	
@@ -179,19 +180,35 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	/**
 	 *  Send a message and wait for a reply.
+	 *  
 	 *  @param receiver	The message receiver.
 	 *  @param message	The message.
 	 *  
+	 *  @return The reply.
 	 */
-	public IFuture<Void> sendMessageAndWait(IComponentIdentifier receiver, Object message)
+	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message)
 	{
-		final Future<Void> ret = new Future<Void>();
+		return sendMessageAndWait(receiver, message, null);
+	}
+	
+	/**
+	 *  Send a message and wait for a reply.
+	 *  
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  @param timeout	The reply timeout.
+	 *  
+	 *  @return The reply.
+	 */
+	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message, Long timeout)
+	{
+		final Future<Object> ret = new Future<Object>();
 		final String convid = SUtil.createUniqueId(component.getComponentIdentifier().toString());
-		WaitingMessage wmsg = new WaitingMessage(convid, message);
+		WaitingMessageWrapper wms = new WaitingMessageWrapper(convid, message);
 		if (awaitingmessages == null)
-			awaitingmessages = new HashMap<String, Future<Void>>();
+			awaitingmessages = new HashMap<String, Future<Object>>();
 		awaitingmessages.put(convid, ret);
-		sendMessage(receiver, wmsg).addResultListener(new IResultListener<Void>()
+		sendMessage(receiver, wms).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -200,16 +217,17 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				Future<Void> fut = awaitingmessages.remove(convid);
+				Future<Object> fut = awaitingmessages.remove(convid);
 				if (fut != null)
 					fut.setException(exception);
 			}
 		});
-		component.getComponentFeature0(IExecutionFeature.class).waitForDelay(PlatformConfiguration.getLocalDefaultTimeout(platformid), new IComponentStep<Void>()
+		timeout = timeout == null ? PlatformConfiguration.getLocalDefaultTimeout(platformid) : timeout;
+		component.getComponentFeature0(IExecutionFeature.class).waitForDelay(timeout, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				Future<Void> fut = awaitingmessages.remove(convid);
+				Future<Object> fut = awaitingmessages.remove(convid);
 				if (fut != null)
 				{
 					fut.setException(new TimeoutException("Failed to receive reply for message awaiting reply: " + convid));
@@ -218,6 +236,35 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Send a message reply.
+	 *  @param receivedmessageid	ID of the received message that is being replied to.
+	 *  @param message	The reply message.
+	 *  
+	 */
+	public IFuture<Void> sendReply(Object receivedmessageid, Object message)
+	{
+		if (!(receivedmessageid instanceof Map))
+			return new Future<Void>(new IllegalArgumentException("Cannot reply, illegal message ID or null."));
+		
+		@SuppressWarnings("unchecked")
+		Map<String, Object> oldmsgheader = (Map<String, Object>) receivedmessageid;
+		IComponentIdentifier rplyrec = (IComponentIdentifier) oldmsgheader.get(SENDER);
+		String convid = (String) oldmsgheader.get(CONVERSATION_ID);
+		if (rplyrec == null)
+			return new Future<Void>(new IllegalArgumentException("Cannot reply, reply receiver ID not found."));
+		if (convid == null)
+			return new Future<Void>(new IllegalArgumentException("Cannot reply, conversation ID not found."));
+		
+		Map<String, Object> header = new HashMap<String, Object>();
+		header.put(RECEIVER, rplyrec);
+		header.put(SENDER, component.getComponentIdentifier());
+		WaitingMessageWrapper wms = new WaitingMessageWrapper(convid, message);
+		wms.setReply(true);
+		
+		return sendMessage(rplyrec, wms);
 	}
 	
 	/**
@@ -290,33 +337,23 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void messageArrived(final IMsgSecurityInfos secinfos, final Map<String, Object> header, Object body)
 	{
-		if (body instanceof WaitingMessage)
+		if (body instanceof WaitingMessageWrapper)
 		{
-			final WaitingMessage wm = (WaitingMessage) body;
-			WaitingMessageAnswer answer = new WaitingMessageAnswer(((WaitingMessage) body).getConversationId());
-			sendMessage((IComponentIdentifier) header.get(SENDER), answer).addResultListener(new IResultListener<Void>()
+			final WaitingMessageWrapper wm = (WaitingMessageWrapper) body;
+			
+			if (wm.isReply())
 			{
-				public void resultAvailable(Void result)
-				{
-					handleMessage(secinfos, header, wm.getUserMessage());
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
+				Future<Object> fut = awaitingmessages.remove(wm.getConversationId());
+				if (fut != null)
+					fut.setResult(wm.getUserMessage());
+				return;
+			}
+			
+			body = wm.getUserMessage();
+			header.put(CONVERSATION_ID, wm.getConversationId());
 		}
-		else if (body instanceof WaitingMessageAnswer)
-		{
-			WaitingMessageAnswer answer = (WaitingMessageAnswer) body;
-			Future<Void> fut = awaitingmessages.remove(answer.getConversationId());
-			if (fut != null)
-				fut.setResult(null);
-		}
-		else
-		{
-			handleMessage(secinfos, header, body);
-		}
+		
+		handleMessage(secinfos, header, body);
 	}
 	
 	/**
@@ -382,24 +419,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			for (Iterator<ITransportService> it = coll.iterator(); it.hasNext(); )
 			{
 				final ITransportService tp = it.next();
-				tp.isReady(header).addResultListener(new IResultListener<Void>()
+				tp.isReady(header).addResultListener(new IResultListener<Integer>()
 				{
-					public void resultAvailable(Void result)
+					public void resultAvailable(Integer priority)
 					{
 						ret.setResultIfUndone(tp);
-						tp.getPriority().addResultListener(new IResultListener<Integer>()
-						{
-							public void resultAvailable(Integer result)
-							{
-								Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(receiverplatform);
-								if (tup == null || tup.getSecondEntity() < result)
-									getPlatformStateService().getTransportCache().put(receiverplatform, new Tuple2<ITransportService, Integer>(tp, result));
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-							}
-						});
+						Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(receiverplatform);
+						if (tup == null || tup.getSecondEntity() < priority)
+							getPlatformStateService().getTransportCache().put(receiverplatform, new Tuple2<ITransportService, Integer>(tp, priority));
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -501,33 +528,38 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //		}
 //	}
 	
-	
-	
 	/**
-	 *  Reply message for messages awaiting a reply.
+	 *  Message wrapper for messages awaiting a reply.
 	 *
 	 */
-	protected static class WaitingMessageAnswer
+	protected static class WaitingMessageWrapper
 	{
+		/** The user message object */
+		protected Object usermessage;
+		
 		/** The conversation ID */
 		protected String convid;
 		
+		/** Flag if message is a reply. */
+		protected boolean reply;
+		
 		/**
-		 *  Creates the WaitingMessageAnswer. (Bean)
-		 *  
+		 *  Creates the WaitingMessage. (Bean)
 		 */
-		public WaitingMessageAnswer()
+		public WaitingMessageWrapper()
 		{
 		}
 		
 		/**
-		 *  Creates the WaitingMessageAnswer.
+		 *  Creates the WaitingMessage.
 		 *  
+		 *  @param usermessage The user message.
 		 *  @param convid The conversation ID.
 		 */
-		public WaitingMessageAnswer(String convid)
+		public WaitingMessageWrapper(String convid, Object usermessage)
 		{
 			this.convid = convid;
+			this.usermessage = usermessage;
 		}
 		
 		/**
@@ -549,35 +581,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		{
 			this.convid = convid;
 		}
-	}
-	
-	/**
-	 *  Message wrapper for messages awaiting a reply.
-	 *
-	 */
-	protected static class WaitingMessage extends WaitingMessageAnswer
-	{
-		/** The user message object */
-		protected Object usermessage;
-		
-		/**
-		 *  Creates the WaitingMessage. (Bean)
-		 */
-		public WaitingMessage()
-		{
-		}
-		
-		/**
-		 *  Creates the WaitingMessage.
-		 *  
-		 *  @param usermessage The user message.
-		 *  @param convid The conversation ID.
-		 */
-		public WaitingMessage(String convid, Object usermessage)
-		{
-			super(convid);
-			this.usermessage = usermessage;
-		}
 		
 		/**
 		 *  Gets the user message.
@@ -597,6 +600,26 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		public void setUserMessage(Object usermessage)
 		{
 			this.usermessage = usermessage;
+		}
+		
+		/**
+		 *  Checks if the message is a reply.
+		 *  
+		 *  @return True, if message is a reply.
+		 */
+		public boolean isReply()
+		{
+			return reply;
+		}
+		
+		/**
+		 *  Sets if the message is a reply.
+		 *  
+		 *  @param reply Set true, if message is a reply.
+		 */
+		public void setReply(boolean reply)
+		{
+			this.reply = reply;
 		}
 	}
 }
