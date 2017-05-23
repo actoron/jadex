@@ -2,9 +2,7 @@ package jadex.bridge.component;
 
 import java.util.Map;
 
-import jadex.bridge.IMessageAdapter;
-import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.IFilter;
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
 
 /**
  *  Interface for message handlers.
@@ -12,16 +10,10 @@ import jadex.commons.IFilter;
 public interface IMessageHandler
 {
 	/**
-	 *  Get the filter.
-	 *  @return The filter.
+	 *  Test if handler should handle a message.
+	 *  @return True if it should handle the message. 
 	 */
-	public IFilter<IMessageAdapter> getFilter();
-	
-	/**
-	 *  Get the timeout.
-	 *  @return The timeout.
-	 */
-	public long getTimeout();
+	public boolean isHandling(IMsgSecurityInfos secinfos, Map<String, Object> header, Object msg);
 	
 	/**
 	 *  Test if handler should be removed.
@@ -30,22 +22,9 @@ public interface IMessageHandler
 	public boolean isRemove();
 	
 	/**
-	 *  Test if handler should be real time.
-	 *  @return True if it should be real time. 
-	 */
-	public boolean isRealtime();
-	
-	/**
 	 *  Handle the message.
-	 *  @param ia The internal access.
+	 *  @param header The header.
 	 *  @param msg The message.
-	 *  @param type The message type.
 	 */
-	public void handleMessage(Map<String, Object> msg, MessageType type);
-	
-	/**
-	 *  Timeout occurred.
-	 */
-	public void timeoutOccurred();
-
+	public void handleMessage(IMsgSecurityInfos secinfos, Map<String, Object> header, Object msg);
 }

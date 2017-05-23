@@ -8,7 +8,7 @@ import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZInputStream;
 import org.tukaani.xz.XZOutputStream;
 
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SUtil;
 
 /**
@@ -19,7 +19,7 @@ public class XZCodec extends AbstractCodec
 	//-------- constants --------
 	
 	/** The gzip codec id. */
-	public static final byte CODEC_ID = 1;
+	public static final int CODEC_ID = 1;
 
 	//-------- methods --------
 	
@@ -34,7 +34,7 @@ public class XZCodec extends AbstractCodec
 	 *  Get the codec id.
 	 *  @return The codec id.
 	 */
-	public byte getCodecId()
+	public int getCodecId()
 	{
 		return CODEC_ID;
 	}

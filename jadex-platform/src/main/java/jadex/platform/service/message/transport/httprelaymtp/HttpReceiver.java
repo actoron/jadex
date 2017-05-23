@@ -23,7 +23,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SUtil;
@@ -227,7 +227,7 @@ public class HttpReceiver
 	/**
 	 *  Post a received awareness info to awareness service (if any).
 	 */
-	protected void	postAwarenessInfo(final byte[] data, final int type, final Map<Byte, ISerializer> serializers, final Map<Byte, IBinaryCodec> codecs)
+	protected void	postAwarenessInfo(final byte[] data, final int type, final Map<Byte, ISerializer> serializers, final Map<Byte, ICodec> codecs)
 	{
 		if(shutdown)
 			return;
@@ -469,9 +469,9 @@ public class HttpReceiver
 			public void customResultAvailable(final IMessageService ms)
 			{
 //				System.err.println("getService: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
-				ms.getAllSerializersAndCodecs().addResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>, Void>(ret)
+				ms.getAllSerializersAndCodecs().addResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>, Map<Byte, ICodec>>, Void>(ret)
 				{
-					public void customResultAvailable(final Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>> sercodecs)
+					public void customResultAvailable(final Tuple2<Map<Byte, ISerializer>, Map<Byte, ICodec>> sercodecs)
 					{
 //						System.err.println("getAllCodecs: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 						transport.getThreadPool().execute(new Runnable()

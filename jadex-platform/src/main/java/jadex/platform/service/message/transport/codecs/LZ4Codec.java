@@ -19,7 +19,7 @@ public class LZ4Codec extends AbstractCodec
 	protected static final LZ4Factory LZ4FACTORY = LZ4Factory.fastestInstance();
 	
 	/** The gzip codec id. */
-	public static final byte CODEC_ID = 2;
+	public static final int CODEC_ID = 2;
 	
 	protected LZ4Compressor compressor = LZ4FACTORY.fastCompressor();
 	
@@ -38,7 +38,7 @@ public class LZ4Codec extends AbstractCodec
 	 *  Get the codec id.
 	 *  @return The codec id.
 	 */
-	public byte getCodecId()
+	public int getCodecId()
 	{
 		return CODEC_ID;
 	}

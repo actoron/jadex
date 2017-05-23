@@ -89,7 +89,7 @@ public class PingingAgent
 //					msg.put(SFipa.SENDER, getComponentIdentifier());
 					dif++;
 					sent.add(convid);
-					agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
+					agent.getComponentFeature(IMessageFeature.class).sendMessage(receiver, msg);
 					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout, this);
 				}
 				return IFuture.DONE;

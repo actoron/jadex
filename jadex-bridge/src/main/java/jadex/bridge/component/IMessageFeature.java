@@ -1,8 +1,6 @@
 package jadex.bridge.component;
 
-import java.util.Map;
-
-import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 
 /**
@@ -12,25 +10,19 @@ public interface IMessageFeature
 {
 	/**
 	 *  Send a message.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  
 	 */
-	public IFuture<Void> sendMessage(Map<String, Object> me, MessageType mt);
-	
-	/**
-	 *  Send a message.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
-	 */
-	public IFuture<Void> sendMessage(final Map<String, Object> me, final MessageType mt, final byte[] codecids);
+	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message);
 	
 	/**
 	 *  Send a message and wait for a reply.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  
 	 */
-	// Todo: supply reply message as future return value?
-	public IFuture<Void> sendMessageAndWait(final Map<String, Object> me, final MessageType mt, final IMessageHandler handler);
+	public IFuture<Void> sendMessageAndWait(IComponentIdentifier receiver, Object message);
 	
 	/**
 	 *  Add a message handler.

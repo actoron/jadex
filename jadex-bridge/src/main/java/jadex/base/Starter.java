@@ -1,5 +1,6 @@
 package jadex.base;
 
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
@@ -39,7 +40,10 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
@@ -415,6 +419,19 @@ public class Starter
 
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
+					
+					try
+					{
+						String classname = "jadex.platform.service.serialization.SerializationServices";
+						Class<?> codecclass = Class.forName(classname, true, Starter.class.getClassLoader());
+						Constructor<?> c = codecclass.getConstructor((Class<?>) null);
+						ISerializationServices serialserv = (ISerializationServices) c.newInstance((Object[]) null);
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERIALSERVICES, serialserv);
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 					
 					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, rootConfig.getArgs(), desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SUtil;
 
 /**
@@ -17,7 +17,7 @@ public class GZIPCodec extends AbstractCodec
 	//-------- constants --------
 	
 	/** The gzip codec id. */
-	public static final byte CODEC_ID = 0;
+	public static final int CODEC_ID = 0;
 
 	//-------- methods --------
 	
@@ -32,7 +32,7 @@ public class GZIPCodec extends AbstractCodec
 	 *  Get the codec id.
 	 *  @return The codec id.
 	 */
-	public byte getCodecId()
+	public int getCodecId()
 	{
 		return CODEC_ID;
 	}

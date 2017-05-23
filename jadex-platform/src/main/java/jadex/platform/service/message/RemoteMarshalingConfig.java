@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
@@ -30,7 +30,7 @@ public class RemoteMarshalingConfig
 	// have their own RemoteMarshalingConfig
 
 	/** The codec cache (id -> codec instance). */
-	protected Map<Byte, IBinaryCodec> codecs;
+	protected Map<Byte, ICodec> codecs;
 
 	/** The codec cache (id -> serializer instance). */
 	protected Map<Byte, ISerializer> serializers;
@@ -48,7 +48,7 @@ public class RemoteMarshalingConfig
 	protected byte[] default_ids; 
 	
 	/** The default codecs. */
-	protected volatile IBinaryCodec[] default_codecs;
+	protected volatile ICodec[] default_codecs;
 	
 	/** The serializer names, array index equals CODEC_ID. */
 	public static String[] SERIALIZER_NAMES = {"JadexBinarySerializer"};
@@ -125,7 +125,7 @@ public class RemoteMarshalingConfig
 		{
 			try
 			{
-				this.codecs.put((Byte)codecs[i].getField(IBinaryCodec.CODEC_ID).get(null), (IBinaryCodec) codecs[i].newInstance());
+				this.codecs.put((Byte)codecs[i].getField(ICodec.CODEC_ID).get(null), (ICodec) codecs[i].newInstance());
 			}
 			catch (Exception e)
 			{
@@ -302,7 +302,7 @@ public class RemoteMarshalingConfig
 	 *  Adds a new binary codec.
 	 *  @param codec The codec.
 	 */
-	public void addCodec(IBinaryCodec codec)
+	public void addCodec(ICodec codec)
 	{
 		codecs.put(codec.getCodecId(), codec);
 	}
@@ -311,7 +311,7 @@ public class RemoteMarshalingConfig
 	 *  Removes a new binary codec.
 	 *  @param codec The codec.
 	 */
-	public void removeCodec(IBinaryCodec codec)
+	public void removeCodec(ICodec codec)
 	{
 		removeCodec(codec.getCodecId());
 	}
@@ -329,9 +329,9 @@ public class RemoteMarshalingConfig
 	 *  Create a new default encoder.
 	 *  @return The new encoder.
 	 */
-	public IBinaryCodec getCodec(byte id)
+	public ICodec getCodec(byte id)
 	{
-		IBinaryCodec ret = codecs.get(id);
+		ICodec ret = codecs.get(id);
 		if (ret == null)
 			throw new IllegalArgumentException("Unknown codec id: "+id);
 		
@@ -341,9 +341,9 @@ public class RemoteMarshalingConfig
 	/**
 	 *  Get all codecs.
 	 */
-	public Map<Byte, IBinaryCodec> getAllCodecs()
+	public Map<Byte, ICodec> getAllCodecs()
 	{
-		Map<Byte, IBinaryCodec> ret = new HashMap<Byte, IBinaryCodec>(codecs);
+		Map<Byte, ICodec> ret = new HashMap<Byte, ICodec>(codecs);
 		
 		return ret;
 	}
@@ -352,7 +352,7 @@ public class RemoteMarshalingConfig
 	 *  Get the default codecs.
 	 *  @return The default codecs.
 	 */
-	public IBinaryCodec[] getDefaultCodecs()
+	public ICodec[] getDefaultCodecs()
 	{
 		if(default_codecs==null)
 		{
@@ -361,7 +361,7 @@ public class RemoteMarshalingConfig
 				if(default_codecs==null)
 				{
 					byte[] defids = getDefaultCodecIds();
-					default_codecs = new IBinaryCodec[defids.length];
+					default_codecs = new ICodec[defids.length];
 					for(int i=0; i<defids.length; i++)
 					{
 						default_codecs[i] = getCodec(defids[i]);
@@ -399,7 +399,7 @@ public class RemoteMarshalingConfig
 		byte ret = -1;
 		try
 		{
-			Field f = codec_class.getDeclaredField(IBinaryCodec.CODEC_ID);
+			Field f = codec_class.getDeclaredField(ICodec.CODEC_ID);
 			ret = f.getByte(null);
 		}
 		catch(Exception e)

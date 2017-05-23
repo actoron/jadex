@@ -1,8 +1,8 @@
 package jadex.platform.service.message.transport.codecs;
 
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 
-public abstract class AbstractCodec implements IBinaryCodec
+public abstract class AbstractCodec implements ICodec
 {
 	/**
 	 *  Decode data with the codec.

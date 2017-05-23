@@ -121,9 +121,9 @@ public class RemoteServiceManagementAgent
 			public void customResultAvailable(TransportAddressBook addresses)
 			{
 				rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
-				IMessageService msgser = SServiceProvider.getLocalService(agent.getComponentIdentifier(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				msgser.addPreprocessors(rms.getPreprocessors().toArray(new ITraverseProcessor[0])).get();
-				msgser.addPostprocessors(rms.getPostprocessors().toArray(new ITraverseProcessor[0])).get();
+//				IMessageService msgser = SServiceProvider.getLocalService(agent.getComponentIdentifier(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//				msgser.addPreprocessors(rms.getPreprocessors().toArray(new ITraverseProcessor[0])).get();
+//				msgser.addPostprocessors(rms.getPostprocessors().toArray(new ITraverseProcessor[0])).get();
 				agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 				ret.setResult(null);
 			}

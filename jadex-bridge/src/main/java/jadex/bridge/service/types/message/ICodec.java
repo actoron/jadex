@@ -3,7 +3,7 @@ package jadex.bridge.service.types.message;
 /**
  *  Encode and decode an object from a string representation.
  */
-public interface IBinaryCodec
+public interface ICodec
 {
 	/** Constant for accessing the codec id. */
 	public static final String CODEC_ID = "CODEC_ID";
@@ -12,7 +12,7 @@ public interface IBinaryCodec
 	 *  Get the codec id.
 	 *  @return The codec id.
 	 */
-	public byte getCodecId();
+	public int getCodecId();
 	
 	/**
 	 *  Encode data with the codec.

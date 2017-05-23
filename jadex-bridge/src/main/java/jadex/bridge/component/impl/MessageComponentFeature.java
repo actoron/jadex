@@ -1,32 +1,39 @@
 package jadex.bridge.component.impl;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import jadex.bridge.ComponentTerminatedException;
+import javax.management.ServiceNotFoundException;
+
+import jadex.base.PlatformConfiguration;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
-import jadex.bridge.component.MessageConversationFilter;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
-import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
-import jadex.commons.ComposedFilter;
-import jadex.commons.IFilter;
+import jadex.bridge.service.types.cms.SComponentManagementService;
+import jadex.bridge.service.types.platformstate.IPlatformStateService;
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityService;
+import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.bridge.service.types.transport.ITransportService;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.LRU;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.traverser.SCloner;
 
 /**
  *  Feature to send messages and receive messages via handlers.
@@ -34,10 +41,33 @@ import jadex.commons.future.IResultListener;
  */
 public class MessageComponentFeature extends AbstractComponentFeature implements IMessageFeature, IInternalMessageFeature
 {
+	/** Message header key for the sender. */
+	public static final String SENDER = "sender";
+	
+	/** Message header key for the receiver. */
+	public static final String RECEIVER = "receiver";
+	
 	//-------- attributes --------
+	
+	/** The platform ID. */
+	protected IComponentIdentifier platformid;
+	
+	/** Platform state service. */
+	protected IPlatformStateService pfstate;
 	
 	/** The list of message handlers. */
 	protected List<IMessageHandler> messagehandlers;
+	
+	/** The security service. */
+	protected ISecurityService secservice;
+	
+	/** Flag whether to allow receiving untrusted messages. */
+	protected boolean allowuntrusted;
+	
+	/**
+	 *  Messages awaiting reply.
+	 */
+	protected Map<String, Future<Void>> awaitingmessages;
 	
 	//-------- constructors --------
 	
@@ -47,6 +77,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public MessageComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
+		platformid = component.getComponentIdentifier().getRoot();
 	}
 	
 	/**
@@ -64,104 +95,129 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	/**
 	 *  Send a message.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  
 	 */
-	public IFuture<Void> sendMessage(Map<String, Object> me, MessageType mt)
+	public IFuture<Void> sendMessage(final IComponentIdentifier receiver, Object message)
 	{
-		return sendMessage(me, mt, null);
-	}
-	
-	/**
-	 *  Send a message.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
-	 */
-	public IFuture<Void> sendMessage(final Map<String, Object> me, final MessageType mt, 
-		final byte[] codecids)
-	{
+		if (receiver == null)
+			return new Future<Void>(new IllegalArgumentException("Messages must have a receiver."));
+		
 		final Future<Void> ret = new Future<Void>();
 		
-		try
+		final Map<String, Object> header = new HashMap<String, Object>();
+		header.put(SENDER, component.getComponentIdentifier());
+		header.put(RECEIVER, receiver);
+		
+		if (receiver.getRoot().equals(platformid))
 		{
-			IMessageService ms = SServiceProvider.getLocalService(getComponent(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-	//		System.err.println("send msg1: "+getComponentIdentifier()+" "+me.get(SFipa.CONTENT));
-			IFuture<Void> res = ms.sendMessage(me, mt, getComponent().getComponentIdentifier(),
-				getComponent().getModel().getResourceIdentifier(), null, null, codecids);
-			res.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
-	//		res.addResultListener(new IResultListener<Void>()
-	//		{
-	//			public void resultAvailable(Void result)
-	//			{
-	//				System.out.println("ok send: "+me.get(SFipa.RECEIVERS));
-	//			}
-	//			public void exceptionOccurred(Exception exception)
-	//			{
-	//				System.out.println("ex: "+exception);
-	//			}
-	//		});
+			// Direct local delivery.
+			ClassLoader cl = SComponentManagementService.getLocalClassLoader(receiver);
+			final Object clonedmsg = SCloner.clone(message, cl);
+			
+			SComponentManagementService.getLocalExternalAccess(receiver).scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					IInternalMessageFeature imf = ia.getComponentFeature0(IInternalMessageFeature.class);
+					
+					if (imf != null)
+					{
+						imf.messageArrived(null, header, clonedmsg);
+						return IFuture.DONE;
+					}
+					
+					return new Future<Void>(new RuntimeException("Receiver " + ia.getComponentIdentifier() + " has no messaging."));
+				}
+			}).addResultListener(new DelegationResultListener<Void>(ret));
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			ISerializationServices serialserv = getPlatformStateService().getSerializationServices();
+			byte[] body = serialserv.encode(receiver, component.getClassLoader(), message);
+			getSecurityService().encryptAndSign(receiver, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>(ret)
+			{
+				public void customResultAvailable(final byte[] body) throws Exception
+				{
+					IComponentIdentifier rplat = receiver.getRoot();
+					Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(rplat);
+					if (tup != null)
+					{
+						getPlatformStateService().getTransportCache().put(rplat, tup);
+						tup.getFirstEntity().sendMessage(header, body).addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+								ret.setResult(null);
+							};
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								selectTransportService(header, body).addResultListener(new IResultListener<ITransportService>()
+								{
+									public void resultAvailable(ITransportService result)
+									{
+										// Adding to cache done by select function.
+										result.sendMessage(header, body).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										ret.setException(exception);
+									}
+								});
+							};
+						});
+					}
+				}
+			});
 		}
+		
 		return ret;
 	}
 	
 	/**
 	 *  Send a message and wait for a reply.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  
 	 */
-	// Todo: supply reply message as future return value?
-	public IFuture<Void> sendMessageAndWait(final Map<String, Object> me, final MessageType mt, final IMessageHandler handler)
+	public IFuture<Void> sendMessageAndWait(IComponentIdentifier receiver, Object message)
 	{
-		boolean hasconvid = false;
-		ParameterSpecification[] ps = mt.getConversationIdentifiers();
-		for(int i=0; i<ps.length && !hasconvid; i++)
+		final Future<Void> ret = new Future<Void>();
+		final String convid = SUtil.createUniqueId(component.getComponentIdentifier().toString());
+		WaitingMessage wmsg = new WaitingMessage(convid, message);
+		if (awaitingmessages == null)
+			awaitingmessages = new HashMap<String, Future<Void>>();
+		awaitingmessages.put(convid, ret);
+		sendMessage(receiver, wmsg).addResultListener(new IResultListener<Void>()
 		{
-			if(me.get(ps[i].getName())!=null)
-				hasconvid = true;
-		}
-		if(!hasconvid)
-			throw new RuntimeException("Message has no conversation identifier set: "+me);
-		
-		addMessageHandler(new IMessageHandler()
-		{
-			IFilter<IMessageAdapter> filter = handler.getFilter()==null ? new MessageConversationFilter(me, mt)
-				: new ComposedFilter<IMessageAdapter>(new MessageConversationFilter(me, mt), handler.getFilter());
-				
-			public long getTimeout()
+			public void resultAvailable(Void result)
 			{
-				return handler.getTimeout();
-			}	
-				
-			public boolean isRemove()
-			{
-				return handler.isRemove();
+				// NOP
 			}
 			
-			public void handleMessage(Map<String, Object> msg, MessageType type)
+			public void exceptionOccurred(Exception exception)
 			{
-				handler.handleMessage(msg, type);
-			}
-			
-			public void timeoutOccurred()
-			{
-				handler.timeoutOccurred();
-			}
-			
-			public boolean isRealtime()
-			{
-				return handler.isRealtime();
-			}
-			
-			public IFilter<IMessageAdapter> getFilter()
-			{
-				return filter;
+				Future<Void> fut = awaitingmessages.remove(convid);
+				if (fut != null)
+					fut.setException(exception);
 			}
 		});
-		return sendMessage(me, mt);
+		component.getComponentFeature0(IExecutionFeature.class).waitForDelay(PlatformConfiguration.getLocalDefaultTimeout(platformid), new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				Future<Void> fut = awaitingmessages.remove(convid);
+				if (fut != null)
+				{
+					fut.setException(new TimeoutException("Failed to receive reply for message awaiting reply: " + convid));
+				}
+				return IFuture.DONE;
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -170,32 +226,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public IFuture<Void> addMessageHandler(final IMessageHandler handler)
 	{
-		if(handler.getFilter()==null)
-			throw new RuntimeException("Filter must not be null in handler: "+handler);
-			
-		if(messagehandlers==null)
-		{
-			messagehandlers = new ArrayList<IMessageHandler>();
-		}
-		if(handler.getTimeout()>0)
-		{
-			getComponent().getComponentFeature(IExecutionFeature.class).waitForDelay(handler.getTimeout(), new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					// Only call timeout when handler is still present
-					if(messagehandlers.contains(handler))
-					{
-						handler.timeoutOccurred();
-						if(handler.isRemove())
-						{
-							removeMessageHandler(handler);
-						}
-					}
-					return IFuture.DONE;
-				}
-			}, handler.isRealtime());
-		}
 		messagehandlers.add(handler);
 		
 		return IFuture.DONE;
@@ -218,174 +248,355 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	/**
 	 *  Inform the component that a message has arrived.
-	 *  @param message The message that arrived.
+	 *  
+	 *  @param header The message header.
+	 *  @param bodydata The encrypted message that arrived.
 	 */
-	public void messageArrived(IMessageAdapter message)
+	public void messageArrived(final Map<String, Object> header, final byte[] bodydata)
 	{
-		getComponent().getComponentFeature(IExecutionFeature.class)
-			.scheduleStep(createHandleMessageStep(message))
-			.addResultListener(new IResultListener<Void>()
+		if (header != null && bodydata != null)
 		{
-			public void resultAvailable(Void result)
+			getSecurityService().decryptAndAuth((IComponentIdentifier) header.get(SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
 			{
-				// NOP
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!(exception instanceof ComponentTerminatedException)
-					|| !((ComponentTerminatedException)exception).getComponentIdentifier().equals(component.getComponentIdentifier()))
+				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
 				{
-					// Todo: fail fast components?
-					StringWriter	sw	= new StringWriter();
-					exception.printStackTrace(new PrintWriter(sw));
-					getComponent().getLogger().severe("Exception during message processing\n"+sw);
+					// Check if SecurityService ok'd it at all.
+					if (result != null)
+					{
+						final IMsgSecurityInfos secinf = result.getFirstEntity();
+						
+						// Only accept messages we trust.
+						if (secinf.isTrustedPlatform() || allowuntrusted)
+						{
+							Object body = getPlatformStateService().getSerializationServices().decode(component.getClassLoader(), bodydata);
+							messageArrived(secinf, header, body);
+						}
+					}
+				};
+				
+				public void exceptionOccurred(Exception exception)
+				{
 				}
-			}
-		});
+			});
+		}
 	}
 	
 	/**
-	 *  Helper method to override stream handling.
-	 *  May be called from external threads.
+	 *  Inform the component that a message has arrived.
+	 *  
+	 *  @param secinfos The security meta infos.
+	 *  @param header The message header.
+	 *  @param body The message that arrived.
 	 */
-	protected IComponentStep<Void>	createHandleStreamStep(IConnection con)
+	public void messageArrived(final IMsgSecurityInfos secinfos, final Map<String, Object> header, Object body)
 	{
-		return new HandleStreamStep(con);
+		if (body instanceof WaitingMessage)
+		{
+			final WaitingMessage wm = (WaitingMessage) body;
+			WaitingMessageAnswer answer = new WaitingMessageAnswer(((WaitingMessage) body).getConversationId());
+			sendMessage((IComponentIdentifier) header.get(SENDER), answer).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					handleMessage(secinfos, header, wm.getUserMessage());
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
+		}
+		else if (body instanceof WaitingMessageAnswer)
+		{
+			WaitingMessageAnswer answer = (WaitingMessageAnswer) body;
+			Future<Void> fut = awaitingmessages.remove(answer.getConversationId());
+			if (fut != null)
+				fut.setResult(null);
+		}
+		else
+		{
+			handleMessage(secinfos, header, body);
+		}
+	}
+	
+	/**
+	 *  Handle message with user message handlers.
+	 *  
+	 *  @param secinf Security meta infos.
+	 *  @param header Message header.
+	 * @param body
+	 */
+	public void handleMessage(final IMsgSecurityInfos secinf, final Map<String, Object> header, final Object body)
+	{
+		for (Iterator<IMessageHandler> it = messagehandlers.iterator(); it.hasNext(); )
+		{
+			final IMessageHandler handler = it.next();
+			if (handler.isRemove())
+				it.remove();
+			else if (handler.isHandling(secinf, header, body))
+			{
+				component.getComponentFeature0(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						handler.handleMessage(secinf, header, body);
+						return IFuture.DONE;
+					}
+				});
+			}
+		}
 	}
 
 	/**
 	 *  Inform the component that a stream has arrived.
 	 *  @param con The stream that arrived.
 	 */
-	public void streamArrived(IConnection con)
-	{
-		getComponent().getComponentFeature(IExecutionFeature.class)
-			.scheduleStep(createHandleStreamStep(con))
-			.addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				// NOP
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// Todo: fail fast components?
-				StringWriter	sw	= new StringWriter();
-				exception.printStackTrace(new PrintWriter(sw));
-				getComponent().getLogger().severe("Exception during stream processing\n"+sw);
-			}
-		});
-	}
+//	public void streamArrived(IConnection con)
+//	{
+//		getComponent().getComponentFeature(IExecutionFeature.class)
+//			.scheduleStep(createHandleStreamStep(con))
+//			.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				// NOP
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				// Todo: fail fast components?
+//				StringWriter	sw	= new StringWriter();
+//				exception.printStackTrace(new PrintWriter(sw));
+//				getComponent().getLogger().severe("Exception during stream processing\n"+sw);
+//			}
+//		});
+//	}
 	
-	/**
-	 *  Helper method to override message handling.
-	 *  May be called from external threads.
-	 */
-	protected IComponentStep<Void>	createHandleMessageStep(IMessageAdapter message)
+	protected IFuture<ITransportService> selectTransportService(Map<String, Object> header, byte[] body)
 	{
-		return new HandleMessageStep(message);
-	}
-	
-	/**
-	 *  Step to handle a message.
-	 */
-	public class HandleMessageStep	implements IComponentStep<Void>
-	{
-		private final IMessageAdapter message;
-
-		public HandleMessageStep(IMessageAdapter message)
+		final Future<ITransportService> ret = new Future<ITransportService>();
+		Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		if (coll != null && coll.size() > 0)
 		{
-			this.message = message;
-		}
-
-		public IFuture<Void> execute(IInternalAccess ia)
-		{
-			invokeHandlers(message);
-			return IFuture.DONE;
-		}
-
-		/**
-		 *  Extracted to allow overriding behaviour.
-		 *  @return true, when at least one matching handler was found.
-		 */
-		protected boolean invokeHandlers(IMessageAdapter message)
-		{
-			boolean	ret	= false;
-			if(messagehandlers!=null)
+			final IComponentIdentifier receiverplatform = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
+			for (Iterator<ITransportService> it = coll.iterator(); it.hasNext(); )
 			{
-				for(int i=0; i<messagehandlers.size(); i++)
+				final ITransportService tp = it.next();
+				tp.isReady(header).addResultListener(new IResultListener<Void>()
 				{
-					IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
-					if(mh.getFilter().filter(message))
+					public void resultAvailable(Void result)
 					{
-						ret	= true;
-						mh.handleMessage(message.getParameterMap(), message.getMessageType());
-						if(mh.isRemove())
+						ret.setResultIfUndone(tp);
+						tp.getPriority().addResultListener(new IResultListener<Integer>()
 						{
-							messagehandlers.remove(i);
-						}
+							public void resultAvailable(Integer result)
+							{
+								Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(receiverplatform);
+								if (tup == null || tup.getSecondEntity() < result)
+									getPlatformStateService().getTransportCache().put(receiverplatform, new Tuple2<ITransportService, Integer>(tp, result));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+						});
 					}
-				}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
 			}
-			return ret;
 		}
-
-		public String toString()
-		{
-			return "messageArrived()_#"+this.hashCode();
-		}
+		else
+			ret.setException(new ServiceNotFoundException("No transport available."));
+		return ret;
+	}
+	
+	/**
+	 *  Gets the security service.
+	 *  
+	 *  @return The security service.
+	 */
+	protected ISecurityService getSecurityService()
+	{
+		if (secservice == null)
+			secservice = SServiceProvider.getLocalService(component, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return secservice;
+	}
+	
+	/**
+	 *  Returns the platform state service.
+	 *  
+	 *  @return Platform state service.
+	 */
+	protected IPlatformStateService getPlatformStateService()
+	{
+		if (pfstate == null)
+			SServiceProvider.getLocalService(component, IPlatformStateService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return pfstate;
+	}
+	
+	/**
+	 *  Creates a conversation ID.
+	 *  
+	 *  @return Large random conversation ID.
+	 */
+	protected static final long[] generateConversationId()
+	{
+		long[] convid = new long[4];
+		for (int i = 0; i < convid.length; ++i)
+			convid[i] = SUtil.SECURE_RANDOM.nextLong();
+		return convid;
 	}
 
 	/**
 	 *  Step to handle a stream.
 	 */
-	public class HandleStreamStep	implements IComponentStep<Void>
+//	public class HandleStreamStep	implements IComponentStep<Void>
+//	{
+//		private final IConnection con;
+//
+//		public HandleStreamStep(IConnection con)
+//		{
+//			this.con = con;
+//		}
+//
+//		public IFuture<Void> execute(IInternalAccess ia)
+//		{
+//			invokeHandlers(con);
+//			return IFuture.DONE;
+//		}
+//
+//		/**
+//		 *  Extracted to allow overriding behaviour.
+//		 *  @return true, when at least one matching handler was found.
+//		 */
+//		protected boolean invokeHandlers(IConnection con)
+//		{
+//			boolean	ret	= false;
+//			// Todo: Stream handlers?
+////			if(messagehandlers!=null)
+////			{
+////				for(int i=0; i<messagehandlers.size(); i++)
+////				{
+////					IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
+////					if(mh.getFilter().filter(message))
+////					{
+////						ret	= true;
+////						mh.handleMessage(message.getParameterMap(), message.getMessageType());
+////						if(mh.isRemove())
+////						{
+////							messagehandlers.remove(i);
+////						}
+////					}
+////				}
+////			}
+//			return ret;
+//		}
+//
+//		public String toString()
+//		{
+//			return "messageArrived()_#"+this.hashCode();
+//		}
+//	}
+	
+	
+	
+	/**
+	 *  Reply message for messages awaiting a reply.
+	 *
+	 */
+	protected static class WaitingMessageAnswer
 	{
-		private final IConnection con;
-
-		public HandleStreamStep(IConnection con)
-		{
-			this.con = con;
-		}
-
-		public IFuture<Void> execute(IInternalAccess ia)
-		{
-			invokeHandlers(con);
-			return IFuture.DONE;
-		}
-
+		/** The conversation ID */
+		protected String convid;
+		
 		/**
-		 *  Extracted to allow overriding behaviour.
-		 *  @return true, when at least one matching handler was found.
+		 *  Creates the WaitingMessageAnswer. (Bean)
+		 *  
 		 */
-		protected boolean invokeHandlers(IConnection con)
+		public WaitingMessageAnswer()
 		{
-			boolean	ret	= false;
-			// Todo: Stream handlers?
-//			if(messagehandlers!=null)
-//			{
-//				for(int i=0; i<messagehandlers.size(); i++)
-//				{
-//					IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
-//					if(mh.getFilter().filter(message))
-//					{
-//						ret	= true;
-//						mh.handleMessage(message.getParameterMap(), message.getMessageType());
-//						if(mh.isRemove())
-//						{
-//							messagehandlers.remove(i);
-//						}
-//					}
-//				}
-//			}
-			return ret;
 		}
-
-		public String toString()
+		
+		/**
+		 *  Creates the WaitingMessageAnswer.
+		 *  
+		 *  @param convid The conversation ID.
+		 */
+		public WaitingMessageAnswer(String convid)
 		{
-			return "messageArrived()_#"+this.hashCode();
+			this.convid = convid;
+		}
+		
+		/**
+		 *  Gets conversation ID.
+		 *  
+		 *  @return conversation ID.
+		 */
+		public String getConversationId()
+		{
+			return convid;
+		}
+		
+		/**
+		 *  Sets conversation ID.
+		 *  
+		 *  @param convid conversation ID.
+		 */
+		public void setConversationId(String convid)
+		{
+			this.convid = convid;
+		}
+	}
+	
+	/**
+	 *  Message wrapper for messages awaiting a reply.
+	 *
+	 */
+	protected static class WaitingMessage extends WaitingMessageAnswer
+	{
+		/** The user message object */
+		protected Object usermessage;
+		
+		/**
+		 *  Creates the WaitingMessage. (Bean)
+		 */
+		public WaitingMessage()
+		{
+		}
+		
+		/**
+		 *  Creates the WaitingMessage.
+		 *  
+		 *  @param usermessage The user message.
+		 *  @param convid The conversation ID.
+		 */
+		public WaitingMessage(String convid, Object usermessage)
+		{
+			super(convid);
+			this.usermessage = usermessage;
+		}
+		
+		/**
+		 *  Gets the user message.
+		 *  
+		 *  @return The user message.
+		 */
+		public Object getUserMessage()
+		{
+			return usermessage;
+		}
+		
+		/**
+		 *  Sets the user message.
+		 *  
+		 *  @param usermessage The user message.
+		 */
+		public void setUserMessage(Object usermessage)
+		{
+			this.usermessage = usermessage;
 		}
 	}
 }

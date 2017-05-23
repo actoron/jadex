@@ -19,7 +19,7 @@ import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
@@ -125,10 +125,10 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	protected Map<Byte, ISerializer> allserializers;
 	
 	/** The default codecs. */
-	protected IBinaryCodec[] defaultcodecs;
+	protected ICodec[] defaultcodecs;
 	
 	/** The map of all codecs. */
-	protected Map<Byte, IBinaryCodec> allcodecs;
+	protected Map<Byte, ICodec> allcodecs;
 	
 	//-------- methods --------
 	
@@ -145,14 +145,14 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 //		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
 		
 		final IMessageService msgser = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IBinaryCodec[], Void>(ret)
+		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
 		{
-			public void customResultAvailable(IBinaryCodec[] result)
+			public void customResultAvailable(ICodec[] result)
 			{
 				defaultcodecs = result;
-				msgser.getAllSerializersAndCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>,Map<Byte, IBinaryCodec>>, Void>(ret)
+				msgser.getAllSerializersAndCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>,Map<Byte, ICodec>>, Void>(ret)
 				{
-					public void customResultAvailable(Tuple2<Map<Byte, ISerializer>,Map<Byte, IBinaryCodec>> result)
+					public void customResultAvailable(Tuple2<Map<Byte, ISerializer>,Map<Byte, ICodec>> result)
 					{
 						allserializers = result.getFirstEntity();
 						allcodecs = result.getSecondEntity();
@@ -520,7 +520,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  Get the allcodecs.
 	 *  @return the allcodecs.
 	 */
-	public Map<Byte, IBinaryCodec> getAllCodecs()
+	public Map<Byte, ICodec> getAllCodecs()
 	{
 		return allcodecs;
 	}
@@ -529,7 +529,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  Get the defaultcodecs.
 	 *  @return the defaultcodecs.
 	 */
-	public IBinaryCodec[] getDefaultCodecs()
+	public ICodec[] getDefaultCodecs()
 	{
 		return defaultcodecs;
 	}

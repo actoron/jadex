@@ -10,7 +10,7 @@ import org.tukaani.xz.XZOutputStream;
 import org.xerial.snappy.SnappyInputStream;
 import org.xerial.snappy.SnappyOutputStream;
 
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SUtil;
 
 /**
@@ -21,7 +21,7 @@ public class SnappyCodec extends AbstractCodec
 	//-------- constants --------
 	
 	/** The gzip codec id. */
-	public static final byte CODEC_ID = 3;
+	public static final int CODEC_ID = 3;
 
 	//-------- methods --------
 	
@@ -36,7 +36,7 @@ public class SnappyCodec extends AbstractCodec
 	 *  Get the codec id.
 	 *  @return The codec id.
 	 */
-	public byte getCodecId()
+	public int getCodecId()
 	{
 		return CODEC_ID;
 	}

@@ -2,6 +2,7 @@ package jadex.micro.examples.ping;
 
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
@@ -35,7 +36,7 @@ public class PingAgent
 			reply.put(SFipa.CONTENT, "alive");
 			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
 			reply.put(SFipa.SENDER, agent.getComponentIdentifier());
-			agent.getComponentFeature(IMessageFeature.class).sendMessage(reply, mt);
+			agent.getComponentFeature(IMessageFeature.class).sendMessage(((IComponentIdentifier[]) reply.get(SFipa.RECEIVERS))[0], reply);
 		}
 		else
 		{

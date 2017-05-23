@@ -95,13 +95,13 @@ public interface IMessageService extends IService
 	 *  Add message codec.
 	 *  @param codec The codec.
 	 */
-	public IFuture<Void> addBinaryCodec(IBinaryCodec codec);
+	public IFuture<Void> addBinaryCodec(ICodec codec);
 	
 	/**
 	 *  Remove message codec.
 	 *  @param codec The codec.
 	 */
-	public IFuture<Void> removeBinaryCodec(IBinaryCodec codec);
+	public IFuture<Void> removeBinaryCodec(ICodec codec);
 	
 	/**
 	 *  Announce that addresses of transports might have changed.
@@ -146,17 +146,17 @@ public interface IMessageService extends IService
 	 *  Get the codecs with message codecs.
 	 *  @return The codec factory.
 	 */
-	public IFuture<Map<Byte, IBinaryCodec>> getAllCodecs();
+	public IFuture<Map<Byte, ICodec>> getAllCodecs();
 	
 	/**
 	 *  Get the serializers and codecs.
 	 *  @return The serializer and codecs.
 	 */
-	public IFuture<Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>> getAllSerializersAndCodecs();
+	public IFuture<Tuple2<Map<Byte, ISerializer>, Map<Byte, ICodec>>> getAllSerializersAndCodecs();
 	
 	/**
 	 *  Get the default codecs.
 	 *  @return The default codecs.
 	 */
-	public IFuture<IBinaryCodec[]> getDefaultCodecs();
+	public IFuture<ICodec[]> getDefaultCodecs();
 }

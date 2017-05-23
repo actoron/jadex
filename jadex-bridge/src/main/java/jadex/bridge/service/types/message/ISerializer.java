@@ -18,7 +18,7 @@ public interface ISerializer
 	 *  Get the serializer id.
 	 *  @return The serializer id.
 	 */
-	public byte getSerializerId();
+	public int getSerializerId();
 	
 	/**
 	 *  Encode data with the serializer.

@@ -10,6 +10,7 @@ import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.commons.ChangeEvent;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -210,6 +211,26 @@ public interface ISecurityService
 	 *  @param dur The request validity duration.
 	 */
 	public IFuture<Void>	preprocessRequest(IAuthorizable request, IComponentIdentifier target);
+	
+	//-------- message-level encryption/authentication -------
+	
+	/**
+	 *  Encrypts and signs the message for a receiver.
+	 *  
+	 *  @param receiver The receiver.
+	 *  @param content The content
+	 *  @return Encrypted/signed message.
+	 */
+	public IFuture<byte[]> encryptAndSign(IComponentIdentifier receiver, byte[] content);
+	
+	/**
+	 *  Decrypt and authenticates the message from a sender.
+	 *  
+	 *  @param sender The sender.
+	 *  @param content The content.
+	 *  @return Decrypted/authenticated message or null on invalid message.
+	 */
+	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content);
 
 	//-------- service call authentication --------
 	

@@ -107,6 +107,7 @@ import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
 import jadex.platform.service.message.MessageAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
+import jadex.platform.service.platformstate.PlatformStateAgent;
 import jadex.platform.service.registry.RegistrySynchronizationAgent;
 import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.security.SecurityAgent;
@@ -218,6 +219,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="kernel_bpmn", filename="jadex/micro/KernelBpmnAgent.class"),
 	@ComponentType(name="kernel_gpmn", filename="jadex/gpmn/KernelGPMN.component.xml"),
 	@ComponentType(name="kernel_multi", clazz=KernelMultiAgent.class), //filename="jadex/micro/KernelMultiAgent.class"),
+	@ComponentType(name="pfstate", clazz=PlatformStateAgent.class),
 	@ComponentType(name="rms", clazz=RemoteServiceManagementAgent.class), //filename="jadex/platform/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"),
 	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
@@ -294,6 +296,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
 		}),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
+		@Component(name="pfstate", type="pfstate", daemon=Boolean3.TRUE),
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
@@ -377,6 +380,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
 		}),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
+		@Component(name="pfstate", type="pfstate", daemon=Boolean3.TRUE),
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),

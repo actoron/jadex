@@ -10,7 +10,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
@@ -73,7 +73,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	 */
 	@SuppressWarnings("unchecked")
 	public MapSendTask(Map<String, Object> message, MessageType messagetype, ITransportComponentIdentifier[] receivers, IComponentIdentifier realrec, IResourceIdentifier rid,
-		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, IBinaryCodec[] codecs, ClassLoader classloader)//, SendManager manager)
+		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, ICodec[] codecs, ClassLoader classloader)//, SendManager manager)
 	{
 		super(receivers, transports, preprocessors, serializer, codecs, (Map<String, Object>)message.get(SFipa.X_NONFUNCTIONAL));
 		if(codecs==null)// || codecs.length==0)
@@ -195,7 +195,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	 *  Create the data.
 	 */
 	@SuppressWarnings("rawtypes")
-	protected byte[] createData(Object msg, ITraverseProcessor[] preprocessors, ISerializer serializer, IBinaryCodec[] codecs, ClassLoader cl)
+	protected byte[] createData(Object msg, ITraverseProcessor[] preprocessors, ISerializer serializer, ICodec[] codecs, ClassLoader cl)
 	{
 		MessageEnvelope	envelope = new MessageEnvelope(receivers, realrec, rid, messagetype.getName(), MESSAGE_TYPE_MAP);
 		envelope.setContentData(serializer.encode(msg, cl, preprocessors));
@@ -250,7 +250,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Decode a message envelope.
 	 */
-	public static MessageEnvelope decodeMessageEnvelope(byte[] rawmsg, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader cl, IErrorReporter rep)
+	public static MessageEnvelope decodeMessageEnvelope(byte[] rawmsg, Map<Byte, ISerializer> serializers, Map<Byte, ICodec> codecs, ClassLoader cl, IErrorReporter rep)
 	{
 //		synchronized(lock)
 //		{
@@ -284,7 +284,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Decode a message.
 	 */
-	public static Object decodeMessage(MessageEnvelope envelope, ITraverseProcessor[] postprocessors, Map<Byte, ISerializer> serializers, Map<Byte, IBinaryCodec> codecs, ClassLoader cl, IErrorReporter rep)
+	public static Object decodeMessage(MessageEnvelope envelope, ITraverseProcessor[] postprocessors, Map<Byte, ISerializer> serializers, Map<Byte, ICodec> codecs, ClassLoader cl, IErrorReporter rep)
 	{
 		Object ret = null;
 		try
@@ -307,10 +307,10 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Get the codecs that have been used for encoding the message.
 	 */
-	protected static IBinaryCodec[] getCodecs(byte[] rawmsg, Map<Byte, IBinaryCodec> codecs)
+	protected static ICodec[] getCodecs(byte[] rawmsg, Map<Byte, ICodec> codecs)
 	{
 		int	idx	= 1;	// Skip message type.
-		IBinaryCodec[] mcodecs = new IBinaryCodec[rawmsg[idx++]];
+		ICodec[] mcodecs = new ICodec[rawmsg[idx++]];
 		for(int i=0; i<mcodecs.length; i++)
 		{
 			mcodecs[i] = codecs.get(Byte.valueOf(rawmsg[idx++]));

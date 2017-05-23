@@ -18,7 +18,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -327,7 +327,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 *  Get the codecs. 
 	 *  @return The codecs.
 	 */
-	protected IBinaryCodec[] getCodecs()
+	protected ICodec[] getCodecs()
 	{
 		return ms.getBinaryCodecs(ms.getRemoteMarshalingConfig().getDefaultCodecIds());
 	}

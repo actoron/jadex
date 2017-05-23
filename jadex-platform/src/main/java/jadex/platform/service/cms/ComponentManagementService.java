@@ -2,6 +2,7 @@ package jadex.platform.service.cms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -172,7 +173,9 @@ public class ComponentManagementService implements IComponentManagementService
 		this.componentfactory = componentfactory;
 		this.uniqueids = uniqueids;
 		
-		this.components = SCollection.createHashMap();
+//		this.components = SCollection.createHashMap();
+		components = Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>());
+		PlatformConfiguration.putPlatformValue(access.getInternalAccess().getComponentIdentifier(), PlatformConfiguration.DATA_COMPONENTMAP, components);
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");

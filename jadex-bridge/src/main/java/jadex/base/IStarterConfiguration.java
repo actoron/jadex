@@ -32,7 +32,10 @@ public interface IStarterConfiguration {
 
     /** The transport address book data key. */
     String DATA_ADDRESSBOOK = "addressbook";
-
+    
+    /** The CMS component map. */
+    String DATA_COMPONENTMAP = "componentmap";
+    
     /** Constant for local default timeout name. */
     String DATA_DEFAULT_LOCAL_TIMEOUT = "default_local_timeout";
 

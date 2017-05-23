@@ -6,7 +6,7 @@ import java.util.Map;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
@@ -145,7 +145,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 *  Create a new manager send task.
 	 */
 	public StreamSendTask(byte type, Object message, int streamid, ITransportComponentIdentifier[] receivers, 
-		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, IBinaryCodec[] codecs, Integer seqnumber, Map<String, Object> nonfunc)
+		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, ICodec[] codecs, Integer seqnumber, Map<String, Object> nonfunc)
 	{
 		super(receivers, transports, preprocessors, serializer, codecs, nonfunc);
 		this.type = type;

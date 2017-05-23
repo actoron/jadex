@@ -11,7 +11,7 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.MessageFailureException;
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IResultCommand;
@@ -46,7 +46,7 @@ public abstract class AbstractSendTask implements ISendTask
 	protected byte[] codecids;
 	
 	/** The codecs. */
-	protected IBinaryCodec[] codecs;
+	protected ICodec[] codecs;
 	
 	/** The managed receivers. */
 	protected ITransportComponentIdentifier[] receivers;
@@ -76,11 +76,11 @@ public abstract class AbstractSendTask implements ISendTask
 	 *  Create a new task.
 	 */
 	public AbstractSendTask(ITransportComponentIdentifier[] receivers, 
-		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, IBinaryCodec[] codecs, Map<String, Object> nonfunc)
+		ITransport[] transports, ITraverseProcessor[] preprocessors, ISerializer serializer, ICodec[] codecs, Map<String, Object> nonfunc)
 	{
 		this.serializer = serializer;
 		this.preprocessors = preprocessors;
-		codecs = codecs==null? new IBinaryCodec[0]: codecs;
+		codecs = codecs==null? new ICodec[0]: codecs;
 
 		for(int i=0; i<receivers.length; i++)
 		{

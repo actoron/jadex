@@ -25,12 +25,11 @@ public class JadexBinarySerializer implements ISerializer
 	//-------- constants --------
 	
 	/** The JadexBinary serializer id. */
-	public static final byte SERIALIZER_ID = 0;
+	public static final int SERIALIZER_ID = 0;
 	
 	/** The debug flag. */
 	protected boolean DEBUG = false;
 	
-//	protected static SerializationConfig CONFIG = null;
 	protected static SerializationConfig CONFIG = new SerializationConfig(new String[] {
 		"doSendMessage",
 		"MapCodec.java",
@@ -226,7 +225,7 @@ public class JadexBinarySerializer implements ISerializer
 	 *  Get the serializer id.
 	 *  @return The serializer id.
 	 */
-	public byte getSerializerId()
+	public int getSerializerId()
 	{
 		return SERIALIZER_ID;
 	}

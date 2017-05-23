@@ -34,6 +34,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.bridge.service.types.serialization.IRemoteReferenceModule;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -60,7 +61,7 @@ import jadex.platform.service.remote.replacements.DefaultHashcodeMethodReplaceme
  *  - distributed garbage collection for target (remote) objects using reference counting
  *  - management of interfaceproperties for metadata such as exclusion or replacement of methods
  */
-public class RemoteReferenceModule
+public class RemoteReferenceModule implements IRemoteReferenceModule
 {
 	/** Debug flag. */
 	public static final boolean DEBUG = false;

@@ -57,7 +57,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.message.IBinaryCodec;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageListener;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.ISerializer;
@@ -615,7 +615,7 @@ public class MessageService extends BasicService implements IMessageService
 		final ISerializer serializer = serializerid != null
 				? remotemarshalingconfig.getSerializer(serializerid)
 				: remotemarshalingconfig.getDefaultSerializer();
-		final IBinaryCodec[] codecs = getBinaryCodecs(cids);
+		final ICodec[] codecs = getBinaryCodecs(cids);
 
 		final CounterResultListener<Void> crl = new CounterResultListener<Void>(
 				managers.size(), false,
@@ -645,9 +645,9 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 * Get array of binary codecs for codec ids.
 	 */
-	public IBinaryCodec[] getBinaryCodecs(byte[] codecids)
+	public ICodec[] getBinaryCodecs(byte[] codecids)
 	{
-		IBinaryCodec[] codecs = new IBinaryCodec[codecids.length];
+		ICodec[] codecs = new ICodec[codecids.length];
 		for (int i = 0; i < codecs.length; i++)
 		{
 			codecs[i] = remotemarshalingconfig.getCodec(codecids[i]);
@@ -671,9 +671,9 @@ public class MessageService extends BasicService implements IMessageService
 	 * 
 	 * @return The codec factory.
 	 */
-	public IFuture<Map<Byte, IBinaryCodec>> getAllCodecs()
+	public IFuture<Map<Byte, ICodec>> getAllCodecs()
 	{
-		return new Future<Map<Byte, IBinaryCodec>>(
+		return new Future<Map<Byte, ICodec>>(
 				remotemarshalingconfig.getAllCodecs());
 	}
 
@@ -682,12 +682,12 @@ public class MessageService extends BasicService implements IMessageService
 	 * 
 	 * @return The serializer and codecs.
 	 */
-	public IFuture<Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>> getAllSerializersAndCodecs()
+	public IFuture<Tuple2<Map<Byte, ISerializer>, Map<Byte, ICodec>>> getAllSerializersAndCodecs()
 	{
-		Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>> ret = new Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>(
+		Tuple2<Map<Byte, ISerializer>, Map<Byte, ICodec>> ret = new Tuple2<Map<Byte, ISerializer>, Map<Byte, ICodec>>(
 				remotemarshalingconfig.getAllSerializers(),
 				remotemarshalingconfig.getAllCodecs());
-		return new Future<Tuple2<Map<Byte, ISerializer>, Map<Byte, IBinaryCodec>>>(
+		return new Future<Tuple2<Map<Byte, ISerializer>, Map<Byte, ICodec>>>(
 				ret);
 	}
 
@@ -696,9 +696,9 @@ public class MessageService extends BasicService implements IMessageService
 	 * 
 	 * @return The default codecs.
 	 */
-	public IFuture<IBinaryCodec[]> getDefaultCodecs()
+	public IFuture<ICodec[]> getDefaultCodecs()
 	{
-		return new Future<IBinaryCodec[]>(
+		return new Future<ICodec[]>(
 				remotemarshalingconfig.getDefaultCodecs());
 	}
 
@@ -1167,7 +1167,7 @@ public class MessageService extends BasicService implements IMessageService
 	 * @param codec
 	 *            The codec.
 	 */
-	public IFuture<Void> addBinaryCodec(IBinaryCodec codec)
+	public IFuture<Void> addBinaryCodec(ICodec codec)
 	{
 		remotemarshalingconfig.addCodec(codec);
 		return IFuture.DONE;
@@ -1179,7 +1179,7 @@ public class MessageService extends BasicService implements IMessageService
 	 * @param codec
 	 *            The codec.
 	 */
-	public IFuture<Void> removeBinaryCodec(IBinaryCodec codec)
+	public IFuture<Void> removeBinaryCodec(ICodec codec)
 	{
 		remotemarshalingconfig.removeCodec(codec);
 		return IFuture.DONE;
@@ -1678,7 +1678,7 @@ public class MessageService extends BasicService implements IMessageService
 							rawmsg.length - idx);
 					for (int i = codec_ids.length - 1; i > -1; i--)
 					{
-						IBinaryCodec dec = remotemarshalingconfig
+						ICodec dec = remotemarshalingconfig
 								.getCodec(codec_ids[i]);
 						tdata = dec.decode(tdata);
 					}
@@ -1693,7 +1693,7 @@ public class MessageService extends BasicService implements IMessageService
 
 					for (int i = codec_ids.length - 1; i > -1; i--)
 					{
-						IBinaryCodec dec = remotemarshalingconfig
+						ICodec dec = remotemarshalingconfig
 								.getCodec(codec_ids[i]);
 						tmp = dec.decode(tmp);
 					}
