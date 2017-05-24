@@ -244,7 +244,7 @@ public interface ISecurityService
 	 *  
 	 *  @return Platform identifier if the platform was authenticated.
 	 */
-	public IFuture<IComponentIdentifier> verifyPlatformAuthenticator();
+	public IFuture<IComponentIdentifier> verifyPlatformAuthenticator(byte[] authenticator);
 	
 	//-------- service call authentication --------
 	

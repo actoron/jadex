@@ -263,7 +263,7 @@ public class SecurityService implements ISecurityService
 	 *  
 	 *  @return Platform identifier if the platform was authenticated.
 	 */
-	public IFuture<IComponentIdentifier> verifyPlatformAuthenticator()
+	public IFuture<IComponentIdentifier> verifyPlatformAuthenticator(byte[] authenticator)
 	{
 		return null;
 	}
