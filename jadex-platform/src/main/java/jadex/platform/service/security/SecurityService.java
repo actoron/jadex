@@ -40,6 +40,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.KeyStoreEntry;
 import jadex.bridge.service.types.security.MechanismInfo;
@@ -68,7 +69,7 @@ public class SecurityService implements ISecurityService
 	//-------- constants --------
 	
 	/** Properties id for the settings service. */
-	public static final String	PROEPRTIES_ID	= "securityservice";
+	public static final String	PROPERTIES_ID	= "securityservice";
 
 	//-------- attributes --------
 	
@@ -144,6 +145,9 @@ public class SecurityService implements ISecurityService
 	/** The network ips, cached for speed. */
 	protected List<InetAddress> networkips;
 	
+	/** CryptoSuite map for encryption and authentication */
+	protected Map<IComponentIdentifier, ICryptoSuite> cryptosuites;
+	
 	//-------- setup --------
 	
 	/**
@@ -213,6 +217,57 @@ public class SecurityService implements ISecurityService
 		}
 	}
 	
+	//-------- message-level encryption/authentication -------
+	
+	/**
+	 *  Encrypts and signs the message for a receiver.
+	 *  
+	 *  @param receiver The receiver.
+	 *  @param content The content
+	 *  @return Encrypted/signed message.
+	 */
+	public IFuture<byte[]> encryptAndSign(IComponentIdentifier receiver, byte[] content)
+	{
+		ICryptoSuite suite = cryptosuites.get(receiver.getRoot());
+		return null;
+//		if (suite == null)
+			// handshake
+			
+	}
+	
+	/**
+	 *  Decrypt and authenticates the message from a sender.
+	 *  
+	 *  @param sender The sender.
+	 *  @param content The content.
+	 *  @return Decrypted/authenticated message or null on invalid message.
+	 */
+	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content)
+	{
+		return null;
+		
+	}
+	
+	/**
+	 *  Creates an authenticator for the platform the security service is running on.
+	 *  
+	 *  @return The authenticator.
+	 */
+	public IFuture<byte[]> createPlatformAuthenticator()
+	{
+		return null;
+	}
+	
+	/**
+	 *  Verifies a platform authenticator.
+	 *  
+	 *  @return Platform identifier if the platform was authenticated.
+	 */
+	public IFuture<IComponentIdentifier> verifyPlatformAuthenticator()
+	{
+		return null;
+	}
+	
 	/**
 	 *  Start the service.
 	 */
@@ -250,7 +305,7 @@ public class SecurityService implements ISecurityService
 								}
 								else
 								{
-									settings.getProperties(PROEPRTIES_ID)
+									settings.getProperties(PROPERTIES_ID)
 										.addResultListener(new ExceptionDelegationResultListener<Properties, Void>(ret)
 									{
 										public void customResultAvailable(final Properties props)
@@ -272,7 +327,7 @@ public class SecurityService implements ISecurityService
 											
 											final IExternalAccess	access	= component.getExternalAccess();
 											
-											settings.registerPropertiesProvider(PROEPRTIES_ID, new IPropertiesProvider()
+											settings.registerPropertiesProvider(PROPERTIES_ID, new IPropertiesProvider()
 											{
 												public IFuture<Void> setProperties(final Properties props)
 												{
@@ -504,7 +559,7 @@ public class SecurityService implements ISecurityService
 		{
 			public void resultAvailable(ISettingsService settings)
 			{
-				settings.deregisterPropertiesProvider(PROEPRTIES_ID)
+				settings.deregisterPropertiesProvider(PROPERTIES_ID)
 					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)

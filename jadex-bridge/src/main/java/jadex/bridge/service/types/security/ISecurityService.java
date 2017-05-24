@@ -231,7 +231,21 @@ public interface ISecurityService
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
 	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content);
-
+	
+	/**
+	 *  Creates an authenticator for the platform the security service is running on.
+	 *  
+	 *  @return The authenticator.
+	 */
+	public IFuture<byte[]> createPlatformAuthenticator();
+	
+	/**
+	 *  Verifies a platform authenticator.
+	 *  
+	 *  @return Platform identifier if the platform was authenticated.
+	 */
+	public IFuture<IComponentIdentifier> verifyPlatformAuthenticator();
+	
 	//-------- service call authentication --------
 	
 	/**
