@@ -31,20 +31,11 @@ import jadex.micro.annotation.Binding;
 @Agent(autoprovide=true)
 public abstract class AbstractTransportAgent<Con> implements ITransportService
 {
-	//-------- constants --------
-	
-	/** The protocol name (key for transport address book). */
-	public static final String	TRANSPORT_NAME	= "tcp";
-	
 	//-------- arguments --------
 	
 	/** The default priority, when choosing a transport to communicate with a specific platform. */
 	@AgentArgument
 	protected int	priority	= 1000;
-	
-	/** The port, the transport should listen to (&lt;0: don't listen, 0: choose random port, >0: use given port). */
-	@AgentArgument
-	protected int	port	= 0;
 	
 	/**
 	 *  The keep-alive (group), i.e. an address, to which the transport should stay connected
@@ -73,9 +64,14 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	//-------- abstract methods to be provided by concrete transport --------
 	
 	/**
+	 *  Get the protocol name.
+	 */
+	public abstract String	getProtocolName();
+	
+	/**
 	 *  Create a connection to a given address.
 	 */
-	protected abstract IFuture<Con>	createConnection1(Map<String, Object> header, String address);
+	protected abstract IFuture<Con>	createConnection(String address);
 	
 	/**
 	 *  Close a previously opened connection.
@@ -86,6 +82,17 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	 *  Send a message over a given transport.
 	 */
 	protected abstract IFuture<Void>	doSendMessage(Con con, byte[] header, byte[] body);
+	
+	//-------- methods to be called by concrete transport --------
+	
+	/**
+	 *  Announce current local addresses, e.g. when the transport successfully opened a port.
+	 *  @param addresses	The address part of transport addresses, i.e., without protocol scheme.
+	 */
+	protected void	announceAddresses(String[] addresses)
+	{
+		
+	}
 	
 	//-------- life cycle --------
 	
@@ -116,7 +123,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 		}
 		else
 		{
-			createConnection(header).addResultListener(new ExceptionDelegationResultListener<Con, Integer>(ret)
+			createConnections(header).addResultListener(new ExceptionDelegationResultListener<Con, Integer>(ret)
 			{
 				@Override
 				public void customResultAvailable(Con con) throws Exception
@@ -164,7 +171,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 		else
 		{
 			// No connection -> create connection before send.
-			createConnection(header).addResultListener(new ExceptionDelegationResultListener<Con, Void>(ret)
+			createConnections(header).addResultListener(new ExceptionDelegationResultListener<Con, Void>(ret)
 			{
 				@Override
 				public void customResultAvailable(Con con) throws Exception
@@ -183,8 +190,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	/**
 	 *  Create a connection to a given platform.
 	 *  Tries all available addresses in parallel.
+	 *  Fails when no connection can be established.
 	 */
-	protected IFuture<Con>	createConnection(final Map<String, Object> header)
+	protected IFuture<Con>	createConnections(final Map<String, Object> header)
 	{
 		Future<Con>	ret;
 		
@@ -213,7 +221,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 					
 					for(String address: addresses)
 					{
-						IFuture<Con>	fcon	= createConnection1(header, address);
+						IFuture<Con>	fcon	= createConnection(address);
 						fcon.addResultListener(new IResultListener<Con>()
 						{
 							@Override
@@ -236,7 +244,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 								if((failed[0]++) == addresses.length)
 								{
 									// Use if undone in case of parallel reverse connection established.
-									fret.setExceptionIfUndone(new RuntimeException("No connection to any address possible for "+TRANSPORT_NAME+": "+header+", "+Arrays.toString(addresses)));
+									fret.setExceptionIfUndone(new RuntimeException("No connection to any address possible for "+getProtocolName()+": "+header+", "+Arrays.toString(addresses)));
 								}
 							}							
 						});
@@ -244,7 +252,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 				}
 				else
 				{
-					ret.setException(new RuntimeException("No addresses found for "+TRANSPORT_NAME+": "+header));
+					ret.setException(new RuntimeException("No addresses found for "+getProtocolName()+": "+header));
 				}
 			}
 		}
@@ -335,6 +343,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	{
 		IComponentIdentifier	rec	= (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);
 		TransportAddressBook	book	= (TransportAddressBook)PlatformConfiguration.getPlatformValue(rec, PlatformConfiguration.DATA_ADDRESSBOOK);
-		return book.getPlatformAddresses(rec, TRANSPORT_NAME);
+		return book.getPlatformAddresses(rec, getProtocolName());
 	}
 }
