@@ -26,7 +26,6 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -136,41 +135,12 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		else
 		{
 			ISerializationServices serialserv = getPlatformStateService().getSerializationServices();
-			byte[] body = serialserv.encode(receiver, component.getClassLoader(), message);
-			getSecurityService().encryptAndSign(receiver, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>(ret)
+			byte[] body = serialserv.encode(header, component.getClassLoader(), message);
+			getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 			{
 				public void customResultAvailable(final byte[] body) throws Exception
 				{
-					IComponentIdentifier rplat = receiver.getRoot();
-					Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(rplat);
-					if (tup != null)
-					{
-						getPlatformStateService().getTransportCache().put(rplat, tup);
-						tup.getFirstEntity().sendMessage(header, body).addResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-								ret.setResult(null);
-							};
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								selectTransportService(header, body).addResultListener(new IResultListener<ITransportService>()
-								{
-									public void resultAvailable(ITransportService result)
-									{
-										// Adding to cache done by select function.
-										result.sendMessage(header, body).addResultListener(new DelegationResultListener<Void>(ret));
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										ret.setException(exception);
-									}
-								});
-							};
-						});
-					}
+					sendToTransports(header, body).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -265,6 +235,54 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		wms.setReply(true);
 		
 		return sendMessage(rplyrec, wms);
+	}
+	
+	/**
+	 *  Forwards the prepared message to the transport layer.
+	 *  
+	 *  @param header The message header.
+	 *  @param encryptedbody The encrypted message body.
+	 *  @return Null, when done, exception if failed.
+	 */
+	public IFuture<Void> sendToTransports(final Map<String, Object> header, final byte[] encryptedbody)
+	{
+		final Future<Void> ret = new Future<Void>();
+		getTransportService(header).addResultListener(new ExceptionDelegationResultListener<ITransportService, Void>(ret)
+		{
+			public void customResultAvailable(ITransportService result) throws Exception
+			{
+				result.sendMessage(header, encryptedbody).addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						ret.setResult(null);
+					};
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// Flush cache, this may cause jitter due lack of synchronization, but should eventually recover.
+						IComponentIdentifier rplat = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
+						getPlatformStateService().getTransportCache().remove(rplat);
+						
+						getTransportService(header).addResultListener(new IResultListener<ITransportService>()
+						{
+							public void resultAvailable(ITransportService result)
+							{
+								// Adding to cache done by select function.
+								result.sendMessage(header, encryptedbody).addResultListener(new DelegationResultListener<Void>(ret));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
+					};
+				});
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -409,34 +427,61 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //		});
 //	}
 	
-	protected IFuture<ITransportService> selectTransportService(Map<String, Object> header, byte[] body)
+	/**
+	 *  Find a suitable transport service for a message.
+	 *  
+	 *  @param header The message header.
+	 *  @return A suitable transport service or exception if none is available.
+	 */
+	protected IFuture<ITransportService> getTransportService(Map<String, Object> header)
 	{
 		final Future<ITransportService> ret = new Future<ITransportService>();
-		Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		if (coll != null && coll.size() > 0)
+		IComponentIdentifier rplat = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
+		
+		Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(rplat);
+		if (tup != null)
 		{
-			final IComponentIdentifier receiverplatform = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
-			for (Iterator<ITransportService> it = coll.iterator(); it.hasNext(); )
-			{
-				final ITransportService tp = it.next();
-				tp.isReady(header).addResultListener(new IResultListener<Integer>()
-				{
-					public void resultAvailable(Integer priority)
-					{
-						ret.setResultIfUndone(tp);
-						Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(receiverplatform);
-						if (tup == null || tup.getSecondEntity() < priority)
-							getPlatformStateService().getTransportCache().put(receiverplatform, new Tuple2<ITransportService, Integer>(tp, priority));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-					}
-				});
-			}
+			getPlatformStateService().getTransportCache().put(rplat, tup);
 		}
 		else
-			ret.setException(new ServiceNotFoundException("No transport available."));
+		{
+			final Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			if (coll != null && coll.size() > 0)
+			{
+				final IComponentIdentifier receiverplatform = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
+				final int[] counter = new int[] { coll.size() };
+				for (Iterator<ITransportService> it = coll.iterator(); it.hasNext(); )
+				{
+					final ITransportService tp = it.next();
+					tp.isReady(header).addResultListener(new IResultListener<Integer>()
+					{
+						public void resultAvailable(Integer priority)
+						{
+							ret.setResultIfUndone(tp);
+							Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(receiverplatform);
+							if (tup == null || tup.getSecondEntity() < priority)
+								getPlatformStateService().getTransportCache().put(receiverplatform, new Tuple2<ITransportService, Integer>(tp, priority));
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							--counter[0];
+							if (counter[0] == 0)
+							{
+								String error = "Could not find working transport for receiver " + receiverplatform + ", tried:";
+								for (ITransportService tp : coll)
+								{
+									error += " " + tp.toString();
+								}
+								ret.setException(new RuntimeException(error));
+							}
+						}
+					});
+				}
+			}
+			else
+				ret.setException(new ServiceNotFoundException("No transport available."));
+		}
 		return ret;
 	}
 	

@@ -1,21 +1,11 @@
 package jadex.bridge.service.types.serialization;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
-import jadex.commons.transformation.traverser.IRootObjectContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Functionality for managing serialization.
