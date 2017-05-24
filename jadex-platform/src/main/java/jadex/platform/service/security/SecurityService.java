@@ -28,6 +28,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.SFuture;
+import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -226,8 +227,9 @@ public class SecurityService implements ISecurityService
 	 *  @param content The content
 	 *  @return Encrypted/signed message.
 	 */
-	public IFuture<byte[]> encryptAndSign(IComponentIdentifier receiver, byte[] content)
+	public IFuture<byte[]> encryptAndSign(Map<String, Object> header, byte[] content)
 	{
+		IComponentIdentifier receiver = (IComponentIdentifier) header.get(MessageComponentFeature.RECEIVER);
 		ICryptoSuite suite = cryptosuites.get(receiver.getRoot());
 		return null;
 //		if (suite == null)

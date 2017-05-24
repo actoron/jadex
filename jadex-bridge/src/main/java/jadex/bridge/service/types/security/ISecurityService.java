@@ -221,7 +221,7 @@ public interface ISecurityService
 	 *  @param content The content
 	 *  @return Encrypted/signed message.
 	 */
-	public IFuture<byte[]> encryptAndSign(IComponentIdentifier receiver, byte[] content);
+	public IFuture<byte[]> encryptAndSign(Map<String, Object> header, byte[] content);
 	
 	/**
 	 *  Decrypt and authenticates the message from a sender.

@@ -31,7 +31,7 @@ public interface ISerializationServices
 	 *  @param obj Object to be encoded.
 	 *  @return Encoded object.
 	 */
-	public byte[] encode(IComponentIdentifier receiver, ClassLoader cl, Object obj);
+	public byte[] encode(Map<String, Object> header, ClassLoader cl, Object obj);
 	
 	/**
 	 *  Decodes/deserializes an object.
