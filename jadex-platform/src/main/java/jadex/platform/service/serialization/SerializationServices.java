@@ -65,15 +65,17 @@ public class SerializationServices implements ISerializationServices
 	public SerializationServices()
 	{
 		rrmanagement = new RemoteReferenceManagement();
-		serializers = new ISerializer[2];
-		serializers[0] = new JadexBinarySerializer();
-		serializers[1] = new JadexJsonSerializer();
+		serializers = new ISerializer[]{
+			new JadexBinarySerializer()
+//			, new JadexJsonSerializer()
+		};
 		sendserializer = serializers[0];
-		codecs = new ICodec[4];
-		codecs[0] = new SnappyCodec();
-		codecs[1] = new GZIPCodec();
-		codecs[2] = new LZ4Codec();
-		codecs[3] = new XZCodec();
+		codecs = new ICodec[]{
+			new SnappyCodec()
+			, new GZIPCodec()
+//			, new LZ4Codec()
+			, new XZCodec()
+		};
 		sendcodecs = new ICodec[] { codecs[0] };
 		List<ITraverseProcessor> procs = createPreprocessors();
 		preprocessors = procs.toArray(new ITraverseProcessor[procs.size()]);

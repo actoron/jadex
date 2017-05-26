@@ -3280,21 +3280,21 @@ public class ComponentManagementService implements IComponentManagementService
 		return ret;
 	}
 	
-	/**
-	 *  Get the addresses.
-	 */
-	protected IFuture<String[]> getAddresses()
-	{
-		IMessageService ms = getMessageService0();
-		if(ms!=null)
-		{
-			return ms.getAddresses();
-		}
-		else
-		{
-			return new Future<String[]>((String[])null);
-		}
-	}
+//	/**
+//	 *  Get the addresses.
+//	 */
+//	protected IFuture<String[]> getAddresses()
+//	{
+//		IMessageService ms = getMessageService0();
+//		if(ms!=null)
+//		{
+//			return ms.getAddresses();
+//		}
+//		else
+//		{
+//			return new Future<String[]>((String[])null);
+//		}
+//	}
 	
 	/**
 	 *  Get the clock service without exception if not found.
@@ -3314,23 +3314,23 @@ public class ComponentManagementService implements IComponentManagementService
 		return ret;
 	}
 	
-	/**
-	 *  Get the message service without exception if not found.
-	 */
-	protected IMessageService getMessageService0()
-	{
-		IMessageService ret = null;
-		
-		try
-		{
-			ret = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		}
-		catch(ServiceNotFoundException e)
-		{
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the message service without exception if not found.
+//	 */
+//	protected IMessageService getMessageService0()
+//	{
+//		IMessageService ret = null;
+//		
+//		try
+//		{
+//			ret = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		}
+//		catch(ServiceNotFoundException e)
+//		{
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the init info for a component identifier.

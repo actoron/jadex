@@ -1,6 +1,5 @@
 package jadex.base;
 
-import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
@@ -13,9 +12,7 @@ import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
@@ -40,10 +37,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
-import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
@@ -168,24 +162,25 @@ public class Starter
 //			e.printStackTrace();
 //		}
 		
-		createPlatform(args).get().scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				String remoteaddr = "tcp-mtp://"+"ec2-54-190-58-166.us-west-2.compute.amazonaws.com"+":36000";
-				String platformname = "Allie-Jadex_720F614FB6ED061A";
-				IComponentIdentifier	remotecid	= new ComponentIdentifier(platformname, new String[]{remoteaddr});
-				
-				// Create proxy for remote platform such that remote services are found
-				Map<String, Object>	args = new HashMap<String, Object>();
-				args.put("component", remotecid);
-				CreationInfo ci = new CreationInfo(args);
-				ci.setDaemon(true);
-				IComponentManagementService	cms	= SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
-				return IFuture.DONE;
-			}
-		});
+		createPlatform(args).get();
+//			.scheduleStep(new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				String remoteaddr = "tcp-mtp://"+"ec2-54-190-58-166.us-west-2.compute.amazonaws.com"+":36000";
+//				String platformname = "Allie-Jadex_720F614FB6ED061A";
+//				IComponentIdentifier	remotecid	= new ComponentIdentifier(platformname, new String[]{remoteaddr});
+//				
+//				// Create proxy for remote platform such that remote services are found
+//				Map<String, Object>	args = new HashMap<String, Object>();
+//				args.put("component", remotecid);
+//				CreationInfo ci = new CreationInfo(args);
+//				ci.setDaemon(true);
+//				IComponentManagementService	cms	= SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
+//				return IFuture.DONE;
+//			}
+//		});
 		
 //		IExternalAccess access	= createPlatform(args).get();
 //				Runtime.getRuntime().addShutdownHook(new Thread()
@@ -419,19 +414,6 @@ public class Starter
 
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
-					
-					try
-					{
-						String classname = "jadex.platform.service.serialization.SerializationServices";
-						Class<?> codecclass = Class.forName(classname, true, Starter.class.getClassLoader());
-						Constructor<?> c = codecclass.getConstructor((Class<?>) null);
-						ISerializationServices serialserv = (ISerializationServices) c.newInstance((Object[]) null);
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERIALSERVICES, serialserv);
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
 					
 					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, rootConfig.getArgs(), desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();

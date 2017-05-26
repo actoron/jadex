@@ -376,11 +376,12 @@ public class TcpSelectorThread implements Runnable
 			// Normal connection operation.
 			if(key.attachment() instanceof TcpMessageBuffer)
 			{
+				TcpMessageBuffer	buf	= (TcpMessageBuffer)key.attachment();
 				// Read as much messages as available (if any).
-				for(byte[] msg=con.read(); msg!=null; msg=con.read())
+				for(Tuple2<byte[], byte[]> msg=buf.read(sc); msg!=null; msg=buf.read(sc))
 				{
-//					System.out.println("Read message from: "+con);
-					msgservice.deliverMessage(msg);
+					System.out.println("Read message from: "+sc);
+//					msgservice.deliverMessage(msg);
 				}
 			}
 			
