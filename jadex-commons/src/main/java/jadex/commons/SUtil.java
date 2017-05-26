@@ -3969,13 +3969,28 @@ public class SUtil
 	 */
 	public static List<byte[]> splitData(byte[] data)
 	{
+		return splitData(data, -1, -1);
+	}
+	
+	/**
+	 *  Primitive encoding approach: Splits a byte array
+	 *  that was encoded with mergeData().
+	 * 
+	 *  @param data The input data.
+	 *  @param offset Offset where the data is located.
+	 *  @param length Length of the data, rest of data used if length < 0.
+	 *  @return A list of byte arrays representing the original set.
+	 */
+	public static List<byte[]> splitData(byte[] data, int offset, int length)
+	{
 		List<byte[]> ret = new ArrayList<byte[]>();
-		int offset = 0;
-		while (offset < data.length)
+		offset = offset < 0 ? 0 : offset;
+		length = length < 0 ? data.length - offset : length;
+		while (offset < length)
 		{
 			int datalen = SUtil.bytesToInt(data, offset);
 			offset += 4;
-			if (offset + datalen > data.length)
+			if (offset + datalen > length)
 				throw new IllegalArgumentException("Invalid encoded data.");
 			byte[] datapart = new byte[datalen];
 			System.arraycopy(data, offset, datapart, 0, datalen);
