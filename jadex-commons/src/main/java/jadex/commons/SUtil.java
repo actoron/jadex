@@ -3937,6 +3937,55 @@ public class SUtil
 	}
 	
 	/**
+	 *  Primitive encoding approach: Merges multiple byte arrays
+	 *  into a single one so it can be split later.
+	 * 
+	 *  @param data The input data.
+	 *  @return A merged byte array.
+	 */
+	public static byte[] mergeData(byte[]... data)
+	{
+		int datasize = 0;
+		for (int i = 0; i < data.length; ++i)
+			datasize += data[i].length;
+		byte[] ret = new byte[datasize + (data.length << 2)];
+		int offset = 0;
+		for (int i = 0; i < data.length; ++i)
+		{
+			SUtil.intIntoBytes(data[i].length, ret, offset);
+			offset += 4;
+			System.arraycopy(data[i], 0, ret, offset, data[i].length);
+			offset += data[i].length;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Primitive encoding approach: Splits a byte array
+	 *  that was encoded with mergeData().
+	 * 
+	 *  @param data The input data.
+	 *  @return A list of byte arrays representing the original set.
+	 */
+	public static List<byte[]> splitData(byte[] data)
+	{
+		List<byte[]> ret = new ArrayList<byte[]>();
+		int offset = 0;
+		while (offset < data.length)
+		{
+			int datalen = SUtil.bytesToInt(data, offset);
+			offset += 4;
+			if (offset + datalen > data.length)
+				throw new IllegalArgumentException("Invalid encoded data.");
+			byte[] datapart = new byte[datalen];
+			System.arraycopy(data, offset, datapart, 0, datalen);
+			offset += datalen;
+			ret.add(datapart);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Convert char to hex vavlue.
 	 */
 	public static String hex(char ch) 
