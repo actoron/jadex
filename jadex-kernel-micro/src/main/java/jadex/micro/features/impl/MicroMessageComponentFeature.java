@@ -34,17 +34,12 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 	//-------- IInternalMessageFeature interface --------
 	
 	/**
-	 *  Inform the component that a message has arrived.
-	 *  
-	 *  @param secinfos The security meta infos.
-	 *  @param header The message header.
-	 *  @param body The message that arrived.
+	 *  Called for all messages without matching message handlers.
+	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
 	 */
-	public void messageArrived(IMsgSecurityInfos secinfos, Map<String, Object> header, Object body)
+	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final Map<String, Object> header, final Object body)
 	{
-		super.messageArrived(secinfos, header, body);
-		
-		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinfos, header, body, body != null ? body.getClass() : null});
+		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null});
 	}
 	
 	/**

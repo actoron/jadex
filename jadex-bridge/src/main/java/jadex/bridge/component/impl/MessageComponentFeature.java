@@ -3,8 +3,9 @@ package jadex.bridge.component.impl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.ServiceNotFoundException;
 
@@ -58,7 +59,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	protected IPlatformStateService pfstate;
 	
 	/** The list of message handlers. */
-	protected List<IMessageHandler> messagehandlers;
+	protected Set<IMessageHandler> messagehandlers;
 	
 	/** The security service. */
 	protected ISecurityService secservice;
@@ -120,11 +121,11 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IInternalMessageFeature imf = ia.getComponentFeature0(IInternalMessageFeature.class);
+					IMessageFeature imf = ia.getComponentFeature0(IMessageFeature.class);
 					
-					if (imf != null)
+					if (imf instanceof IInternalMessageFeature)
 					{
-						imf.messageArrived(null, header, clonedmsg);
+						((IInternalMessageFeature)imf).messageArrived(null, header, clonedmsg);
 						return IFuture.DONE;
 					}
 					
@@ -291,6 +292,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public IFuture<Void> addMessageHandler(final IMessageHandler handler)
 	{
+		if(messagehandlers==null)
+		{
+			messagehandlers	= new LinkedHashSet<IMessageHandler>();
+		}
 		messagehandlers.add(handler);
 		
 		return IFuture.DONE;
@@ -381,27 +386,46 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header Message header.
 	 * @param body
 	 */
-	public void handleMessage(final IMsgSecurityInfos secinf, final Map<String, Object> header, final Object body)
+	protected void handleMessage(final IMsgSecurityInfos secinf, final Map<String, Object> header, final Object body)
 	{
-		for (Iterator<IMessageHandler> it = messagehandlers.iterator(); it.hasNext(); )
+		boolean	handled	= false;
+		if(messagehandlers!=null)
 		{
-			final IMessageHandler handler = it.next();
-			if (handler.isRemove())
-				it.remove();
-			else if (handler.isHandling(secinf, header, body))
+			for(Iterator<IMessageHandler> it = messagehandlers.iterator(); it.hasNext(); )
 			{
-				component.getComponentFeature0(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				final IMessageHandler handler = it.next();
+				if (handler.isRemove())
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
+					it.remove();
+				}
+				else if (handler.isHandling(secinf, header, body))
+				{
+					handled	= true;
+					component.getComponentFeature0(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 					{
-						handler.handleMessage(secinf, header, body);
-						return IFuture.DONE;
-					}
-				});
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							handler.handleMessage(secinf, header, body);
+							return IFuture.DONE;
+						}
+					});
+				}
 			}
 		}
+		
+		processUnhandledMessage(secinf, header, body);
 	}
 
+	/**
+	 *  Called for all messages without matching message handlers.
+	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
+	 */
+	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final Map<String, Object> header, final Object body)
+	{
+		
+	}
+
+	
 	/**
 	 *  Inform the component that a stream has arrived.
 	 *  @param con The stream that arrived.
