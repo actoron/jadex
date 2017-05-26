@@ -231,7 +231,7 @@ public class SecurityService implements ISecurityService
 	{
 		IComponentIdentifier receiver = (IComponentIdentifier) header.get(MessageComponentFeature.RECEIVER);
 		ICryptoSuite suite = cryptosuites.get(receiver.getRoot());
-		return null;
+		return new Future<byte[]>(content);
 //		if (suite == null)
 			// handshake
 			
@@ -246,17 +246,30 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content)
 	{
-		return null;
-		
+		MsgSecurityInfos secinf = new MsgSecurityInfos();
+		secinf.setAuthplatform(true);
+		secinf.setTrustedPlatform(true);
+		secinf.setNetworks(networkpasses.keySet().toArray(new String[0]));
+		return new Future<Tuple2<IMsgSecurityInfos,byte[]>>(new Tuple2<IMsgSecurityInfos,byte[]>(secinf, content));
 	}
 	
 	/**
 	 *  Creates an authenticator for the platform the security service is running on.
 	 *  
+	 *  @param receiver Receiver of the authentication, if available.
 	 *  @return The authenticator.
 	 */
-	public IFuture<byte[]> createPlatformAuthenticator()
+	public IFuture<byte[]> createPlatformAuthenticator(IComponentIdentifier receiver)
 	{
+		Map<String, Object> authmap = new HashMap<String, Object>();
+		String localpfname = component.getComponentIdentifier().getRoot().toString();
+		
+		if (receiver != null)
+		{
+			String pfpass = platformpasses.get(receiver.getRoot());
+			
+		}
+		
 		return null;
 	}
 	

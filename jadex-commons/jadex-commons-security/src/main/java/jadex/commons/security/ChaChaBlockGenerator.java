@@ -25,9 +25,9 @@ public class ChaChaBlockGenerator
 	}
 	
 	/**
-	 *  State initialization.
+	 *  RFC 7539-style state initialization.
 	 *  
-	 *  @param rndstate The state, key followed by block count and nonce.
+	 *  @param rndstate The state, key followed by block count and nonce, block count is zeroed before use.
 	 */
 	public void initState(byte[] rndstate)
 	{

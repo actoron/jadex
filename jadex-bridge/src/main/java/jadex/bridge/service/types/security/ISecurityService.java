@@ -235,9 +235,10 @@ public interface ISecurityService
 	/**
 	 *  Creates an authenticator for the platform the security service is running on.
 	 *  
+	 *  @param receiver Receiver of the authentication, if available.
 	 *  @return The authenticator.
 	 */
-	public IFuture<byte[]> createPlatformAuthenticator();
+	public IFuture<byte[]> createPlatformAuthenticator(IComponentIdentifier receiver);
 	
 	/**
 	 *  Verifies a platform authenticator.
