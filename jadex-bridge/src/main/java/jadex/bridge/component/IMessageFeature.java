@@ -43,7 +43,7 @@ public interface IMessageFeature
 	 *  @param message	The reply message.
 	 *  
 	 */
-	public IFuture<Void> sendReply(Object receivedmessageid, Object message);
+	public IFuture<Void> sendReply(IMessageId receivedmessageid, Object message);
 	
 	/**
 	 *  Add a message handler.

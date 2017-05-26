@@ -17,6 +17,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
+import jadex.bridge.component.IMessageId;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.SComponentManagementService;
@@ -47,8 +48,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	/** Message header key for the receiver. */
 	public static final String RECEIVER = "receiver";
 	
-	/** Message header key for the conversation ID. */
-	public static final String CONVERSATION_ID = "convid";
+	/** Key for the message ID of reply messages. */
+	public static final String MESSAGE_ID = "msgid";
 	
 	//-------- attributes --------
 	
@@ -215,15 +216,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param message	The reply message.
 	 *  
 	 */
-	public IFuture<Void> sendReply(Object receivedmessageid, Object message)
+	public IFuture<Void> sendReply(IMessageId receivedmessageid, Object message)
 	{
-		if (!(receivedmessageid instanceof Map))
-			return new Future<Void>(new IllegalArgumentException("Cannot reply, illegal message ID or null."));
+//		if (!(receivedmessageid instanceof Map))
+//			return new Future<Void>(new IllegalArgumentException("Cannot reply, illegal message ID or null."));
 		
 		@SuppressWarnings("unchecked")
-		Map<String, Object> oldmsgheader = (Map<String, Object>) receivedmessageid;
+		Map<String, Object> oldmsgheader = (Map<String, Object>) ((WaitingMessageWrapper) receivedmessageid).getUserMessage();
 		IComponentIdentifier rplyrec = (IComponentIdentifier) oldmsgheader.get(SENDER);
-		String convid = (String) oldmsgheader.get(CONVERSATION_ID);
+		String convid = (String) ((WaitingMessageWrapper) receivedmessageid).getConversationId();
 		if (rplyrec == null)
 			return new Future<Void>(new IllegalArgumentException("Cannot reply, reply receiver ID not found."));
 		if (convid == null)
@@ -373,7 +374,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			
 			body = wm.getUserMessage();
-			header.put(CONVERSATION_ID, wm.getConversationId());
+			
+			wm.setUserMessage(null);
+			
+			header.put(MESSAGE_ID, wm);
 		}
 		
 		handleMessage(secinfos, header, body);
@@ -413,18 +417,23 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 		}
 		
-		processUnhandledMessage(secinf, header, body);
+		if (!handled)
+		{
+			// Switch header and message ID containment
+			WaitingMessageWrapper wm = (WaitingMessageWrapper) header.remove(MESSAGE_ID);
+			if (wm != null)
+				wm.setUserMessage(header);
+			processUnhandledMessage(secinf, wm, body);
+		}
 	}
 
 	/**
 	 *  Called for all messages without matching message handlers.
 	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
 	 */
-	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final Map<String, Object> header, final Object body)
+	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMessageId messageId, final Object body)
 	{
-		
 	}
-
 	
 	/**
 	 *  Inform the component that a stream has arrived.
@@ -601,7 +610,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  Message wrapper for messages awaiting a reply.
 	 *
 	 */
-	protected static class WaitingMessageWrapper
+	protected static class WaitingMessageWrapper implements IMessageId
 	{
 		/** The user message object */
 		protected Object usermessage;

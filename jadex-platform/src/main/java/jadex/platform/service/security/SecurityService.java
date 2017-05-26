@@ -149,6 +149,11 @@ public class SecurityService implements ISecurityService
 	/** CryptoSuite map for encryption and authentication */
 	protected Map<IComponentIdentifier, ICryptoSuite> cryptosuites;
 	
+	protected IAuthenticator defaultpasswordauthenticator;
+	
+	/** All available authenticators. */
+	protected Map<Integer, IAuthenticator> authenticators;
+	
 	//-------- setup --------
 	
 	/**
@@ -175,6 +180,9 @@ public class SecurityService implements ISecurityService
 		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms, 
 		Map<String, Set<String>> namemap, Long valdur)
 	{
+		this.defaultpasswordauthenticator = new SCryptBlake2bSymmetricAuthenticator();
+		this.authenticators = new HashMap<Integer, IAuthenticator>();
+		authenticators.put(defaultpasswordauthenticator.getAuthenticatorTypeId(), defaultpasswordauthenticator);
 		this.valdur = valdur==null? 5*65536: valdur.longValue(); // 5 min default
 		this.virtualsmap = namemap==null? new HashMap<String, Set<String>>(): namemap;
 		this.subscribers = new LinkedHashSet<SubscriptionIntermediateFuture<ChangeEvent<Object>>>();
@@ -263,11 +271,30 @@ public class SecurityService implements ISecurityService
 	{
 		Map<String, Object> authmap = new HashMap<String, Object>();
 		String localpfname = component.getComponentIdentifier().getRoot().toString();
+		byte[] localpfnamebytes = localpfname.getBytes(SUtil.UTF8);
 		
 		if (receiver != null)
 		{
 			String pfpass = platformpasses.get(receiver.getRoot());
-			
+			if (pfpass != null)
+			{
+				byte[] pfpassauth = defaultpasswordauthenticator.createAuthenticationToken(localpfnamebytes, pfpass);
+				authmap.put("platformpasswordauth", pfpassauth);
+			}
+		}
+		
+		byte[] networkauth = new byte[0];
+		if (networkpasses.size() > 0)
+		{
+			byte[][] networkauths = new byte[networkpasses.size()][];
+			int i = 0;
+			for (Map.Entry<String, String> entry : networkpasses.entrySet())
+			{
+				byte[] nwname = (localpfname + "_" + entry.getKey()).getBytes(SUtil.UTF8);
+				byte[] nwauth = defaultpasswordauthenticator.createAuthenticationToken(nwname, entry.getValue());
+				networkauths[i++] = SUtil.mergeData(nwname, nwauth);
+			}
+			networkauth = SUtil.mergeData(networkauths);
 		}
 		
 		return null;
@@ -280,6 +307,8 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<IComponentIdentifier> verifyPlatformAuthenticator(byte[] authenticator)
 	{
+		SUtil.splitData(authenticator);
+		
 		return null;
 	}
 	

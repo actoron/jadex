@@ -38,10 +38,13 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
+import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -411,6 +414,19 @@ public class Starter
 					}
 					
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());
+					
+					try
+					{
+						Class<?> serialservclass = Class.forName("jadex.platform.service.serialization.SerializationServices", true, cl);
+						ISerializationServices servs = (ISerializationServices) serialservclass.newInstance();
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERIALIZATIONSERVICES, servs);
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+					
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERIALIZATIONSERVICES, new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>());
 
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());

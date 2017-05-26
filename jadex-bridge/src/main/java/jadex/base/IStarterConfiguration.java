@@ -33,6 +33,12 @@ public interface IStarterConfiguration {
     /** The transport address book data key. */
     String DATA_ADDRESSBOOK = "addressbook";
     
+    /** The serialization services for serializing and en/decoding objects including remote reference handling. */
+    String DATA_SERIALIZATIONSERVICES = "serialservs";
+    
+    /** The transport cache used to . */
+    String DATA_TRANSPORTCACHE = "transportcache";
+    
     /** The CMS component map. */
     String DATA_COMPONENTMAP = "componentmap";
     
