@@ -3,13 +3,20 @@ package jadex.platform.service.transport;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddressBook;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.platformstate.IPlatformStateService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
@@ -90,10 +97,99 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	 *  Announce current local addresses, e.g. when the transport successfully opened a port.
 	 *  @param addresses	The address part of transport addresses, i.e., without protocol scheme.
 	 */
-	protected void	announceAddresses(String[] addresses)
+	public void	announceAddresses(String[] addresses)
 	{
 		TransportAddressBook	tab	= TransportAddressBook.getAddressBook(agent);
 		tab.addPlatformAddresses(agent.getComponentIdentifier(), getProtocolName(), addresses);
+	}
+	
+	/**
+	 *  Deliver a received message.
+	 */
+	public void	deliverMessage(final byte[] bheader, final byte[] body)
+	{
+		final Map<String, Object>	header	= (Map<String, Object>)codec.decode(agent.getClassLoader(), bheader);
+		final IComponentIdentifier	rec	= (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);
+		
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IComponentManagementService	cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
+				cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
+				{
+					@Override
+					public void resultAvailable(IExternalAccess exta)
+					{
+						exta.scheduleStep(new IComponentStep<Void>()
+						{
+							@Override
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								IMessageFeature	mf	= ia.getComponentFeature0(IMessageFeature.class);
+								if(mf instanceof IInternalMessageFeature)
+								{
+									((IInternalMessageFeature)mf).messageArrived(header, body);
+								}
+								return IFuture.DONE;
+							}
+						}).addResultListener(new IResultListener<Void>()
+						{
+							@Override
+							public void resultAvailable(Void result)
+							{
+								// NOP
+							}
+							
+							@Override
+							public void exceptionOccurred(Exception exception)
+							{
+								getLogger().warning("Could not deliver message to "+rec+": "+exception);
+							}
+						});
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						// Shouldn't happen?
+						getLogger().warning("Could not deliver message to "+rec+": "+exception);
+						exception.printStackTrace();
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(new IResultListener<Void>()
+		{
+			@Override
+			public void resultAvailable(Void result)
+			{
+				// NOP
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				getLogger().warning("Could not deliver message to "+rec+": "+exception);
+			}
+		});;
+	}
+	
+	/**
+	 *  Convenience method.
+	 */
+	public Logger	getLogger()
+	{
+		return agent.getLogger();
+	}
+	
+	/**
+	 *  Get the internal access.
+	 */
+	public IInternalAccess getAccess()
+	{
+		return agent;
 	}
 	
 	//-------- life cycle --------
@@ -267,7 +363,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	 */
 	protected IFuture<Void>	encodeAndSendMessage(final Con con, Map<String, Object> header, final byte[] body)
 	{
-		Future<Void>	ret	= new Future<Void>();
+		final Future<Void>	ret	= new Future<Void>();
 		byte[]	bheader	= codec.encode(header, agent.getClassLoader(), header);
 		
 		ISecurityService	secser	= SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM);
@@ -277,7 +373,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 			@Override
 			public void customResultAvailable(byte[] result) throws Exception
 			{
-				doSendMessage(con, result, body);
+				doSendMessage(con, result, body)
+					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		

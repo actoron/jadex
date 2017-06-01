@@ -38,7 +38,7 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 		// If port==0 -> any free port
 		if(port>=0)
 		{
-			this.selectorthread	= new TcpSelectorThread(agent);
+			this.selectorthread	= new TcpSelectorThread(this);
 			int	port	= selectorthread.openPort(this.port); 
 			
 			// Announce connection addresses.
@@ -90,7 +90,7 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 		{
 			if(selectorthread==null)
 			{
-				this.selectorthread	= new TcpSelectorThread(agent);			
+				this.selectorthread	= new TcpSelectorThread(this);			
 				selectorthread.start();
 			}
 			return selectorthread.createConnection(address);

@@ -390,37 +390,44 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		// todo: remember and cleanup timers in case of component removal.
 		
 		final Future<T> ret = new Future<T>();
-		
-		// todo: support getLocal... with proxy==false
-//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+
+		if(delay>=0)
 		{
-			public void customResultAvailable(IClockService cs)
+			// todo: support getLocal... with proxy==false
+	//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 			{
-				ITimedObject	to	= new ITimedObject()
+				public void customResultAvailable(IClockService cs)
 				{
-					public void timeEventOccurred(long currenttime)
+					ITimedObject	to	= new ITimedObject()
 					{
-//						System.out.println("step: "+step);
-						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
-					}
-					
-					public String toString()
+						public void timeEventOccurred(long currenttime)
+						{
+	//						System.out.println("step: "+step);
+							scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
+						}
+						
+						public String toString()
+						{
+							return "waitForDelay[Step]("+getComponent().getComponentIdentifier()+")";
+						}
+					};
+					if(realtime)
 					{
-						return "waitForDelay[Step]("+getComponent().getComponentIdentifier()+")";
+						cs.createRealtimeTimer(delay, to);
 					}
-				};
-				if(realtime)
-				{
-					cs.createRealtimeTimer(delay, to);
+					else
+					{
+						cs.createTimer(delay, to);					
+					}
 				}
-				else
-				{
-					cs.createTimer(delay, to);					
-				}
-			}
-		}));
+			}));
+		}
+		else
+		{
+			getComponent().getLogger().warning("WaitFor will never complete: "+step);
+		}
 		
 		return ret;
 	}

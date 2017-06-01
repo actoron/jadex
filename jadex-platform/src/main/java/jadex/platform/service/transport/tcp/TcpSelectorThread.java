@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
@@ -44,7 +43,7 @@ public class TcpSelectorThread implements Runnable
 	protected Selector	selector;
 
 	/** The transport agent, e.g. for delivering received messages. */
-	protected IInternalAccess agent;
+	protected TcpTransportAgent tcpagent;
 	
 	/** The tasks enqueued from external threads. */
 	protected List<Runnable>	tasks;
@@ -57,9 +56,9 @@ public class TcpSelectorThread implements Runnable
 	/**
 	 * Create a NIO selector thread.
 	 */
-	public TcpSelectorThread(IInternalAccess agent)
+	public TcpSelectorThread(TcpTransportAgent tcpagent)
 	{
-		this.agent	= agent;
+		this.tcpagent	= tcpagent;
 
 		this.tasks	= new ArrayList<Runnable>();
 		this.writetasks	= new LinkedHashMap<SocketChannel, List<Tuple2<List<ByteBuffer>, Future<Void>>>>();
@@ -155,7 +154,7 @@ public class TcpSelectorThread implements Runnable
 		}
 		catch(IOException e)
 		{
-			agent.getLogger().warning("Exception during NIO TCP shutdown: "+e);
+			tcpagent.getLogger().warning("Exception during NIO TCP shutdown: "+e);
 		}
 //		System.out.println("nio selector end");
 	}
@@ -240,7 +239,7 @@ public class TcpSelectorThread implements Runnable
 			ServerSocket serversocket = ssc.socket();
 			serversocket.bind(new InetSocketAddress(port));
 			port = serversocket.getLocalPort();
-			agent.getLogger().info("TCP transport listening to port: "+port);
+			tcpagent.getLogger().info("TCP transport listening to port: "+port);
 			
 			// Better be done before selector thread is started due to deadlocks, grrr: https://stackoverflow.com/questions/12822298/nio-selector-how-to-properly-register-new-channel-while-selecting
 			createSelector();
@@ -274,7 +273,7 @@ public class TcpSelectorThread implements Runnable
 		{
 			createSelector();
 		}
-		IDaemonThreadPoolService	tps	= SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IDaemonThreadPoolService	tps	= SServiceProvider.getLocalService(tcpagent.getAccess(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		tps.execute(this);
 	}
 	
@@ -317,7 +316,7 @@ public class TcpSelectorThread implements Runnable
 						sc.configureBlocking(false);
 						sc.register(selector, SelectionKey.OP_CONNECT, new TcpChannelHandler(ret));
 						sc.connect(sock);
-						agent.getLogger().info("Attempting connection to: "+address);
+						tcpagent.getLogger().info("Attempting connection to: "+address);
 					}
 					catch(Exception e)
 					{
@@ -326,7 +325,7 @@ public class TcpSelectorThread implements Runnable
 							try{sc.close();}catch(Exception ex){}
 						}
 						
-						agent.getLogger().info("Failed connection to: "+address);
+						tcpagent.getLogger().info("Failed connection to: "+address);
 						ret.setException(e);
 					}
 				}			
@@ -440,7 +439,7 @@ public class TcpSelectorThread implements Runnable
 			SelectionKey	sckey	= sc.register(selector, 0, new TcpChannelHandler(null));
 			startHandshake(sckey);
 			
-			agent.getLogger().info("Accepted connection from: "+sc.socket().getRemoteSocketAddress()+", waiting for handshake...");
+			tcpagent.getLogger().info("Accepted connection from: "+sc.socket().getRemoteSocketAddress()+", waiting for handshake...");
 		}
 		catch(Exception e)
 		{
@@ -461,7 +460,7 @@ public class TcpSelectorThread implements Runnable
 
 			startHandshake(key);
 			
-			agent.getLogger().info("Connected to: "+sc.socket().getRemoteSocketAddress()+", waiting for handshake...");
+			tcpagent.getLogger().info("Connected to: "+sc.socket().getRemoteSocketAddress()+", waiting for handshake...");
 		}
 		catch(Exception e)
 		{
@@ -480,7 +479,7 @@ public class TcpSelectorThread implements Runnable
 		
 		// Queue sending of own CID to complete bidirectional handshake.
 		sendMessage((SocketChannel)key.channel(),
-			new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
+			new byte[0], tcpagent.getAccess().getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
 	}
 	
 	/**
@@ -502,7 +501,7 @@ public class TcpSelectorThread implements Runnable
 					// Make connection available for outgoing messages.
 					handler.setOpen(true);					
 					String	remotecid	= new String(msg.getSecondEntity(), SUtil.UTF8);
-					agent.getLogger().info("Handshake completed to: "+remotecid+" at "+sc.socket().getRemoteSocketAddress());
+					tcpagent.getLogger().info("Handshake completed to: "+remotecid+" at "+sc.socket().getRemoteSocketAddress());
 					// TODO add connection to agent.
 					
 					Future<SocketChannel>	ret	= handler.getConnectionFuture();
@@ -519,8 +518,8 @@ public class TcpSelectorThread implements Runnable
 				// Read as much messages as available (if any).
 				for(Tuple2<byte[], byte[]> msg=handler.read(sc); msg!=null; msg=handler.read(sc))
 				{
-					System.out.println("Read message from: "+sc+", "+new String(msg.getSecondEntity(), SUtil.UTF8));
-//					msgservice.deliverMessage(msg);
+//					System.out.println("Read message from: "+sc+", "+new String(msg.getSecondEntity(), SUtil.UTF8));
+					tcpagent.deliverMessage(msg.getFirstEntity(), msg.getSecondEntity());
 				}
 			}
 		}
@@ -616,11 +615,11 @@ public class TcpSelectorThread implements Runnable
 		
 		if(sc instanceof SocketChannel)
 		{
-			agent.getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
+			tcpagent.getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
 		}
 		else
 		{
-			agent.getLogger().info("Error on server socket with port: "+((ServerSocketChannel)sc).socket().getLocalPort()+", "+e);			
+			tcpagent.getLogger().info("Error on server socket with port: "+((ServerSocketChannel)sc).socket().getLocalPort()+", "+e);			
 		}
 //		e.printStackTrace();
 		key.cancel();
