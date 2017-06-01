@@ -17,7 +17,7 @@ import static jadex.base.RootComponentConfiguration.CLOCK;
 import static jadex.base.RootComponentConfiguration.CONTEXT;
 import static jadex.base.RootComponentConfiguration.CONTEXTSERVICECLASS;
 import static jadex.base.RootComponentConfiguration.DF;
-import static jadex.base.RootComponentConfiguration.REGISTRY_SYNC;
+import static jadex.base.RootComponentConfiguration.SUPERPEER;
 import static jadex.base.RootComponentConfiguration.FILETRANSFER;
 import static jadex.base.RootComponentConfiguration.GUI;
 import static jadex.base.RootComponentConfiguration.JCCPLATFORMS;
@@ -107,7 +107,8 @@ import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
 import jadex.platform.service.message.MessageAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
-import jadex.platform.service.registry.RegistrySynchronizationAgent;
+import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
+import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
 import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.settings.SettingsAgent;
@@ -202,7 +203,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=REGISTRY_SYNC, clazz=boolean.class, defaultvalue="false")
+	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
@@ -242,7 +243,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
-	@ComponentType(name="registrysync", clazz=RegistrySynchronizationAgent.class),
+	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
+	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class)
 })
 
 @ProvidedServices({
@@ -356,7 +358,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	}),
 	@Configuration(name="fixed", arguments={
@@ -436,7 +439,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	})
 })

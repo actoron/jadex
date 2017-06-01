@@ -416,8 +416,14 @@ public class ServiceInvocationContext
 	{
 		assert getMethod()==null || result==null || result instanceof Throwable || SReflect.isSupertype(getMethod().getReturnType(), result.getClass()) : "Incompatible types: "+getMethod()+", "+result.getClass();
 		
-//		if(getMethod().getName().indexOf("subsc")!=-1)
+//		if(getMethod().getName().indexOf("start")!=-1)
 //			System.out.println("gotta");
+//		if(getObject() instanceof BasicService && ((BasicService)getObject()).getInterfaceType().getName().indexOf("Peer")!=-1)
+//			System.out.println("hhhhhhhhhhhhhhhhhh");
+//		if(getMethod().getName().indexOf("start")!=-1 && sid.getServiceType().getTypeName().indexOf("Peer")!=-1)
+//			System.out.println("call method start end");
+//		if(getMethod().getName().indexOf("init")!=-1 && sid.getServiceType().getTypeName().indexOf("Peer")!=-1)
+//			System.out.println("call method init");
 		this.result.set(used.size()-1, result);
 	}
 

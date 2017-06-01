@@ -36,6 +36,13 @@ public interface IServiceRegistry
 	public void removeServices(IComponentIdentifier platform);
 	
 	/**
+	 *  Remove services except from a platform from the registry.
+	 *  @param platform The platform.
+	 */
+	// write
+	public void removeServicesExcept(IComponentIdentifier platform);
+	
+	/**
 	 *  Search for services.
 	 */
 	public <T> T searchServiceSync(ServiceQuery<T> query);
@@ -57,6 +64,7 @@ public interface IServiceRegistry
 	
 	/**
 	 *  Search for services.
+	 *  Is deprecated because only used by relay.
 	 */
 //	// read
 	@Deprecated
@@ -74,14 +82,14 @@ public interface IServiceRegistry
 	 *  @param query ServiceQuery.
 	 */
 	// write
-	public <T> void removeQuery(ServiceQuery<T> query);
+	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query);
 	
 	/**
 	 *  Remove all service queries of a specific component from the registry.
 	 *  @param owner The query owner.
 	 */
 	// write
-	public void removeQueries(IComponentIdentifier owner);
+	public IFuture<Void> removeQueries(IComponentIdentifier owner);
 	
 	/**
 	 *  Get queries per type.
@@ -112,4 +120,11 @@ public interface IServiceRegistry
 	 */
 	// read
 	public boolean isIncluded(IComponentIdentifier cid, IService ser);
+	
+	/**
+	 *  Get the superpeer.
+	 *  @param force If trues forces fresh search.
+	 *  @return The superpeer.
+	 */
+	public IFuture<IComponentIdentifier> getSuperpeer(boolean force);
 }

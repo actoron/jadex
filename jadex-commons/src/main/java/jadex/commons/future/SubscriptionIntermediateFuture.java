@@ -108,9 +108,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
     	if(!(listener instanceof IIntermediateResultListener))
-    	{
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
-    	}
     	
 //    	System.out.println("adding listener: "+this+" "+listener);
     	

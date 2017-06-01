@@ -9,9 +9,9 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Starter class for distributions which dynamically loads the .jar-files
+/** 
+ *  Starter class for distributions which dynamically loads the .jar-files
  *  from the lib/ directory.
- *
  */
 public class DynamicStarter
 {

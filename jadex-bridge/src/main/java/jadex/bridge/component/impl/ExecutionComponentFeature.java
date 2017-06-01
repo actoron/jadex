@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -65,10 +66,13 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -1297,22 +1301,44 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				try
 				{
-					stepfut.addResultListener(new DelegationResultListener(step.getFuture())
+					if(step.getFuture() instanceof IntermediateFuture)
 					{
-						public void customResultAvailable(Object result)
+						stepfut.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)step.getFuture())
 						{
-							if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
-								getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+							public void customResultAvailable(Collection result)
 							{
-								getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
-									getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-									+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-								// null was step.getCause()
+								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
+									getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+								{
+									getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
+										getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+									// null was step.getCause()
+								}
+								
+								super.customResultAvailable(result);
 							}
-							
-							super.customResultAvailable(result);
-						}
-					});
+						});
+					}
+					else
+					{	
+						stepfut.addResultListener(new DelegationResultListener(step.getFuture())
+						{
+							public void customResultAvailable(Object result)
+							{
+								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
+									getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+								{
+									getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
+										getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+									// null was step.getCause()
+								}
+								
+								super.customResultAvailable(result);
+							}
+						});
+					}
 		
 					if(DEBUG && !step.getFuture().hasResultListener())
 					{

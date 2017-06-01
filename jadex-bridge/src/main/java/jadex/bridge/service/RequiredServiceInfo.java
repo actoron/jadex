@@ -296,4 +296,14 @@ public class RequiredServiceInfo
 	{
 		this.tags = tags;
 	}
+	
+	/**
+	 *  Check if the scope not remote.
+	 *  @return True, scope on the local platform.
+	 */
+	public static boolean isScopeOnLocalPlatform(String scope)
+	{
+		return !SCOPE_GLOBAL.equals(scope) && !SCOPE_GLOBAL_APPLICATION.equals(scope);
+	}
+	
 }

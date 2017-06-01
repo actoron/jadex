@@ -12,7 +12,6 @@ import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Container for persistent service queries.
- *
  */
 public class QueryInfoContainer
 {
@@ -37,26 +36,24 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Adds a query info.
-	 *  
 	 *  @param queryinfo The query info.
 	 */
 	public void addQueryInfo(ServiceQueryInfo<?> queryinfo)
 	{
 		createQueryInfoSet(queryinfo.getQuery().getOwner(), queriesbyowner).add(queryinfo);
 		createQueryInfoSet(queryinfo.getQuery().getServiceType(), queriesbyservicetype).add(queryinfo);
-		if (ServiceEvent.CLASSINFO.equals(queryinfo.getQuery().getReturnType()))
+		if(ServiceEvent.CLASSINFO.equals(queryinfo.getQuery().getReturnType()))
 			createQueryInfoSet(queryinfo.getQuery().getServiceType(), eventqueriesbyservicetype).add(queryinfo);
 	}
 	
 	/**
 	 *  Removes a query info.
-	 *  
 	 *  @param queryinfo The query info.
 	 */
 	public void removeQueryInfo(ServiceQueryInfo<?> queryinfo)
 	{
 		Set<ServiceQueryInfo<?>> set = queriesbyowner.get(queryinfo.getQuery().getOwner());
-		if (set != null)
+		if(set != null)
 		{
 			set.remove(queryinfo);
 			if (set.size() == 0)
@@ -64,7 +61,7 @@ public class QueryInfoContainer
 		}
 		
 		set = queriesbyservicetype.get(queryinfo.getQuery().getServiceType());
-		if (set != null)
+		if(set != null)
 		{
 			set.remove(queryinfo);
 			if (set.size() == 0)
@@ -72,7 +69,7 @@ public class QueryInfoContainer
 		}
 		
 		set = eventqueriesbyservicetype.get(queryinfo.getQuery().getServiceType());
-		if (set != null)
+		if(set != null)
 		{
 			set.remove(queryinfo);
 			if (set.size() == 0)
@@ -82,7 +79,6 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Removes a query.
-	 *  
 	 *  @param query The query.
 	 */
 	public ServiceQueryInfo<?> removeQuery(ServiceQuery<?> query)
@@ -104,7 +100,6 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Removes all queries of an owner.
-	 *  
 	 *  @param owner Owner of the queries.
 	 *  @return Removed query infos.
 	 */
@@ -121,7 +116,6 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Returns all queries.
-	 *  
 	 *  @return All queries.
 	 */
 	public Set<ServiceQueryInfo<?>> getAllQueries()
@@ -139,7 +133,6 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Returns all queries matching a specific service type.
-	 *  
 	 *  @param servicetype The service type.
 	 *  @return All queries matching a specific service type.
 	 */
@@ -157,7 +150,6 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Returns all event queries matching a specific service type.
-	 *  
 	 *  @param servicetype The service type.
 	 *  @return All event queries matching a specific service type.
 	 */
@@ -175,7 +167,6 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Creates an query info set for a key if needed.
-	 *  
 	 *  @param key The key.
 	 *  @param map The map to use.
 	 *  @return Created or found set.

@@ -62,6 +62,14 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
+	{
+		this(servicetype, scope, (IFilter<T>) null, null, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
 		this(servicetype, scope, (IFilter<T>) null, provider, owner);
@@ -307,16 +315,16 @@ public class ServiceQuery<T>
 	{
 		List<Tuple2<String, String[]>> ret = new ArrayList<Tuple2<String,String[]>>();
 		
-		if (platform != null)
+		if(platform != null)
 			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[] { platform.toString() }));
 		
-		if (provider != null)
+		if(provider != null)
 			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[] { provider.toString() }));
 		
-		if (servicetype != null)
+		if(servicetype != null)
 			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[] { servicetype.getGenericTypeName() }));
 		
-		if (servicetags != null && servicetags.length > 0)
+		if(servicetags != null && servicetags.length > 0)
 			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_TAGS, servicetags));
 		
 		return ret;

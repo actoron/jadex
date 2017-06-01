@@ -82,8 +82,8 @@ public interface IStarterConfiguration {
     /** The opengl disable flag argument. */
     String OPENGL = "opengl";
 
-    /** Flag to enable or disable registry service (for distributed registry management). **/
-    String REGISTRY_SYNC = "registrysync";
+    /** Flag to enable or disable the platform as superpeer. **/
+    String SUPERPEER = "superpeer";
 
 
     void setPlatformModel(IModelInfo model);

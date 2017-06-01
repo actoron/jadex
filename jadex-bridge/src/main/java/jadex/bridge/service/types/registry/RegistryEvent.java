@@ -1,15 +1,9 @@
 package jadex.bridge.service.types.registry;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 
 /**
  *  Registry event for notifications from the registry.
@@ -36,21 +30,20 @@ public class RegistryEvent implements IRegistryEvent
 	/** Flag if is delta (or full) registry content. */
 	protected boolean delta;
 	
-//	/**
-//	 *  Create a new registry event.
-//	 */
-//	public RegistryEvent()
-//	{
-//		this.timestamp = System.currentTimeMillis();
-//	}
+	/**
+	 *  Create a new registry event.
+	 */
+	public RegistryEvent()
+	{
+		this(true);
+	}
 	
 	/**
 	 *  Create a new registry event.
 	 */
 	public RegistryEvent(boolean delta)
 	{
-		this.timestamp = System.currentTimeMillis();
-		this.delta = delta;
+		this(null, null, 50, 5000, delta);
 	}
 	
 	/**
@@ -163,24 +156,11 @@ public class RegistryEvent implements IRegistryEvent
 	 */
 	public int size()
 	{
-		int	size = addedservices.size();
-		size += removedservices.size();
-//		if(addedservices!=null)
-//		{
-//			for(Map.Entry<ClassInfo, Set<IService>> entry: addedservices.entrySet())
-//			{
-//				Collection<IService> coll = entry.getValue();
-//				size += (coll != null ? coll.size() : 0);
-//			}
-//		}
-//		if(removedservices!=null)
-//		{
-//			for(Map.Entry<ClassInfo, Set<IService>> entry: removedservices.entrySet())
-//			{
-//				Collection<IService> coll = entry.getValue();
-//				size += (coll != null ? coll.size() : 0);
-//			}
-//		}
+		int	size = 0;
+		if(addedservices!=null)
+			addedservices.size();
+		if(removedservices!=null)
+			size += removedservices.size();
 		return size;
 	}
 	

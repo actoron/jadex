@@ -387,14 +387,14 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		Future<Void> ret = new Future<Void>();
 		
 		boolean ex = false;
-			if(started)
-			{
-				ex = true;
-			}
-			else
-			{
-				started = true;
-			}
+		if(started)
+		{
+			ex = true;
+		}
+		else
+		{
+			started = true;
+		}
 
 		if(ex)
 		{

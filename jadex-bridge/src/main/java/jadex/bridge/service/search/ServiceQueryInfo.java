@@ -1,5 +1,6 @@
 package jadex.bridge.service.search;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.TerminableIntermediateFuture;
 
 /**
@@ -12,6 +13,9 @@ public class ServiceQueryInfo<T>
 	
 	/** The future. */
 	protected TerminableIntermediateFuture<T> future;
+	
+	/** The superpeer on which this query was (potentially) added. */
+	protected IComponentIdentifier superpeer;
 
 	/**
 	 *  Create a new query info.
@@ -56,5 +60,23 @@ public class ServiceQueryInfo<T>
 	public void setFuture(TerminableIntermediateFuture<T> future)
 	{
 		this.future = future;
+	}
+	
+	/**
+	 *  Get the superpeer.
+	 *  @return the superpeer
+	 */
+	public IComponentIdentifier getSuperpeer()
+	{
+		return superpeer;
+	}
+
+	/**
+	 *  Set the superpeer.
+	 *  @param superpeer The superpeer to set
+	 */
+	public void setSuperpeer(IComponentIdentifier superpeer)
+	{
+		this.superpeer = superpeer;
 	}
 }

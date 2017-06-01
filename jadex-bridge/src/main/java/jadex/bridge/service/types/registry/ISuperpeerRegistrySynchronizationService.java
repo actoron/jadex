@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.registry;
 
+import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -9,7 +10,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  and following the state of the registry.
  */
 @Service
-public interface IRegistrySynchronizationService
+public interface ISuperpeerRegistrySynchronizationService
 {
 	/**
 	 *  Subscribe to change events of the registry. 

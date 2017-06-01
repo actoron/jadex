@@ -12,6 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -162,7 +163,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			if(found!=null)
 			{
-				final ServiceInvocationContext	domainsic	= new ServiceInvocationContext(sic);//sic.clone();
+				final ServiceInvocationContext	domainsic	= new ServiceInvocationContext(sic);
 				domainsic.setMethod(found);
 				domainsic.setObject(obj);
 				sic.setObject(si.getManagementService());
@@ -182,11 +183,12 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 									{
 										public void customResultAvailable(Void result)
 										{
+//											if(sic.getObject() instanceof BasicService && ((BasicService)sic.getObject()).getInterfaceType().getName().indexOf("Peer")!=-1)
+//												System.out.println("hhhhhhhhhhhhhhhhhh");
+											
 											// If domain result is future, replace finished mgmt result with potentially not yet finished domain future.
-											if(domainsic.getResult() instanceof IFuture<?>)
-											{
+											if(domainsic.getResult() instanceof IFuture<?> || domainsic.getResult() instanceof Exception)
 												sic.setResult(domainsic.getResult());
-											}
 											super.customResultAvailable(result);
 										}
 									});
