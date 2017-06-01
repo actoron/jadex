@@ -1,21 +1,14 @@
 package jadex.platform.service.transport.tcp;
 
-import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentKilled;
 import jadex.platform.service.transport.AbstractTransportAgent;
 
 public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
@@ -28,77 +21,54 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 	
 	//-------- attributes --------
 	
-	/** The selector thread for asynchronous I/O operations. */
+	/** The selector thread for asynchronous I/O operations, if any. */
 	protected TcpSelectorThread	selectorthread;
 	
 	//-------- life cycle --------
 	
 	/**
-	 *  Open server socket, if any.
+	 *  Start selector thread.
 	 */
 	@Override
-	protected void init()
+	protected void init() throws Exception
 	{
 		super.init();
-
-		ServerSocketChannel	ssc	= null;
-		try
+		
+		// Set up server, if port given.
+		// If port==0 -> any free port
+		if(port>=0)
 		{
-			// ANDROID: Selector.open() causes an exception in a 2.2
-			// emulator due to IPv6 addresses, see:
-			// http://code.google.com/p/android/issues/detail?id=9431
-			// Causes problem with maven too (only with Win firewall?)
-			// http://www.thatsjava.com/java-core-apis/28232/
-			java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
-			java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-			final Selector selector = Selector.open();
+			this.selectorthread	= new TcpSelectorThread(agent);
+			int	port	= selectorthread.openPort(this.port); 
 			
-			// Set up receiver side, if any.
-			// Better be done before selector thread is started due to deadlocks: https://stackoverflow.com/questions/12822298/nio-selector-how-to-properly-register-new-channel-while-selecting 
-			// If port==0 -> any free port
-			if(port>=0)
-			{	
-				ssc = ServerSocketChannel.open();
-				ssc.configureBlocking(false);
-				ServerSocket serversocket = ssc.socket();
-				serversocket.bind(new InetSocketAddress(port));
-				ssc.register(selector, SelectionKey.OP_ACCEPT);
-				
-				// Announce connection addresses.
-				int	port = serversocket.getLocalPort();
-				InetAddress[]	addresses	= SUtil.getNetworkAddresses();
-				String[]	saddresses	= new String[addresses.length];
-				for(int i=0; i<addresses.length; i++)
-				{
-					if(addresses[i] instanceof Inet6Address)
-					{
-						saddresses[i]	= "[" + addresses[i].getHostAddress() + "]:" + port;
-					}
-					else // if (address instanceof Inet4Address)
-					{
-						saddresses[i]	= addresses[i].getHostAddress() + ":" + port;
-					}
-				}
-				announceAddresses(saddresses);
-				agent.getLogger().info("TCP transport listening to port: "+port);
-			}
-
-			// Start selector thread for asynchronous sending and/or receiving
-			IDaemonThreadPoolService	tps	= SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			this.selectorthread	= new TcpSelectorThread(selector, agent);
-			tps.execute(selectorthread);
-		}
-		catch(Exception e)
-		{
-			if(ssc!=null)
+			// Announce connection addresses.
+			InetAddress[]	addresses	= SUtil.getNetworkAddresses();
+			String[]	saddresses	= new String[addresses.length];
+			for(int i=0; i<addresses.length; i++)
 			{
-				try
+				if(addresses[i] instanceof Inet6Address)
 				{
-					ssc.close();
-				}catch(IOException e2){}
+					saddresses[i]	= "[" + addresses[i].getHostAddress() + "]:" + port;
+				}
+				else // if (address instanceof Inet4Address)
+				{
+					saddresses[i]	= addresses[i].getHostAddress() + ":" + port;
+				}
 			}
-			throw new RuntimeException("Transport initialization error", e);
-		}			
+			announceAddresses(saddresses);
+			
+			selectorthread.start();
+		}
+	}
+	
+	@AgentKilled
+	protected void	shutdown()
+	{
+		if(selectorthread!=null)
+		{
+			selectorthread.stop();
+			selectorthread	= null;
+		}
 	}
 	
 	//-------- abstract methods to be provided by concrete transport --------
@@ -116,7 +86,19 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 	 */
 	protected IFuture<SocketChannel>	createConnection(String address)
 	{
-		return selectorthread.createConnection(address);
+		try
+		{
+			if(selectorthread==null)
+			{
+				this.selectorthread	= new TcpSelectorThread(agent);			
+				selectorthread.start();
+			}
+			return selectorthread.createConnection(address);
+		}
+		catch(Exception e)
+		{
+			return new Future<SocketChannel>(e);
+		}
 	}
 	
 	/**
@@ -132,6 +114,7 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 	 */
 	protected IFuture<Void>	doSendMessage(SocketChannel con, byte[] header, byte[] body)
 	{
+		assert selectorthread!=null:"Thread should have been created during connection establishment.";
 		return selectorthread.sendMessage(con, header, body);
 	}
 }

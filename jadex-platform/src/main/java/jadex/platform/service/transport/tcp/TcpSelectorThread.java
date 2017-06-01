@@ -2,6 +2,7 @@ package jadex.platform.service.transport.tcp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -19,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -53,16 +57,14 @@ public class TcpSelectorThread implements Runnable
 	/**
 	 * Create a NIO selector thread.
 	 */
-	public TcpSelectorThread(Selector selector, IInternalAccess agent)
+	public TcpSelectorThread(IInternalAccess agent)
 	{
-		this.running = true;
-		this.selector	= selector;
 		this.agent	= agent;
 
 		this.tasks	= new ArrayList<Runnable>();
 		this.writetasks	= new LinkedHashMap<SocketChannel, List<Tuple2<List<ByteBuffer>, Future<Void>>>>();
 	}
-
+	
 	// -------- Runnable interface --------
 
 	/**
@@ -87,7 +89,15 @@ public class TcpSelectorThread implements Runnable
 				}
 				
 				// Wait for an event one of the registered channels
-//				System.out.println("NIO selector idle");
+//				String wait	= "";
+//				for(SelectionKey key: selector.keys())
+//				{
+//					if(key.isValid())
+//					{
+//						wait += key.interestOps()+" ";
+//					}
+//				}
+//				agent.getLogger().info(agent.getComponentIdentifier()+ " selector wait: "+wait);
 				this.selector.select();
 				
 //				System.out.println("cons: "+cnt);
@@ -150,6 +160,26 @@ public class TcpSelectorThread implements Runnable
 //		System.out.println("nio selector end");
 	}
 	
+	//-------- helper methods --------
+	
+	/**
+	 *  Create the selector.
+	 */
+	protected void	createSelector()	throws Exception
+	{
+		assert selector==null;
+		
+		// ANDROID: Selector.open() causes an exception in a 2.2
+		// emulator due to IPv6 addresses, see:
+		// http://code.google.com/p/android/issues/detail?id=9431
+		// Causes problem with maven too (only with Win firewall?)
+		// http://www.thatsjava.com/java-core-apis/28232/
+		java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
+		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
+		this.selector = Selector.open();
+	}
+
+	
 	/**
 	 *  Perform close operation son a channel as identified by the given key.
 	 *  Potentially cleans up key attachments as well.
@@ -194,9 +224,64 @@ public class TcpSelectorThread implements Runnable
 	//-------- methods to be called from external --------
 	
 	/**
+	 *  Open a server socket.
+	 *  Must not be called while the thread is running.
+	 */
+	public int	openPort(int port)	throws Exception
+	{
+		assert !running;
+		assert port>=0;
+		
+		ServerSocketChannel	ssc	= null;
+		try
+		{
+			ssc = ServerSocketChannel.open();
+			ssc.configureBlocking(false);
+			ServerSocket serversocket = ssc.socket();
+			serversocket.bind(new InetSocketAddress(port));
+			port = serversocket.getLocalPort();
+			agent.getLogger().info("TCP transport listening to port: "+port);
+			
+			// Better be done before selector thread is started due to deadlocks, grrr: https://stackoverflow.com/questions/12822298/nio-selector-how-to-properly-register-new-channel-while-selecting
+			createSelector();
+			ssc.register(selector, SelectionKey.OP_ACCEPT);
+		}
+		catch(Exception e)
+		{
+			if(ssc!=null)
+			{
+				try
+				{
+					ssc.close();
+				}catch(IOException e2){}
+			}
+			throw e;
+		}
+		
+		return port;
+	}
+	
+	/**
+	 *  Start the tread.
+	 */
+	public void	start()	throws Exception
+	{
+		assert !running;
+		this.running	= true;
+		
+		// Start selector thread for asynchronous sending and/or receiving
+		if(selector==null)	// When no port has been opened, we need to create the selector here. 
+		{
+			createSelector();
+		}
+		IDaemonThreadPoolService	tps	= SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		tps.execute(this);
+	}
+	
+	/**
 	 *  Set the running flag to false to gracefully terminate the thread.
 	 */
-	public void	shutdown()
+	public void	stop()
 	{
 		this.running	= false;
 		selector.wakeup();
@@ -210,6 +295,7 @@ public class TcpSelectorThread implements Runnable
 	 */
 	public IFuture<SocketChannel>	createConnection(final String address)
 	{
+		assert running;
 		final Future<SocketChannel>	ret	= new Future<SocketChannel>();
 		
 		final InetSocketAddress	sock;
@@ -229,7 +315,7 @@ public class TcpSelectorThread implements Runnable
 						sc = SocketChannel.open();
 //						sc.socket().setSoTimeout(10);
 						sc.configureBlocking(false);
-						sc.register(selector, SelectionKey.OP_CONNECT, new TcpChannelInfo(ret));
+						sc.register(selector, SelectionKey.OP_CONNECT, new TcpChannelHandler(ret));
 						sc.connect(sock);
 						agent.getLogger().info("Attempting connection to: "+address);
 					}
@@ -268,6 +354,7 @@ public class TcpSelectorThread implements Runnable
 	 */
 	public IFuture<Void> sendMessage(final SocketChannel sc, final byte[] header, final byte[] body)
 	{
+		assert running;
 		final Future<Void>	ret	= new Future<Void>();
 		Runnable	run	= new Runnable()
 		{
@@ -350,7 +437,7 @@ public class TcpSelectorThread implements Runnable
 			sc.configureBlocking(false);
 			
 			// Add empty channel info for unsolicited connections.
-			SelectionKey	sckey	= sc.register(selector, 0, new TcpChannelInfo(null));
+			SelectionKey	sckey	= sc.register(selector, 0, new TcpChannelHandler(null));
 			startHandshake(sckey);
 			
 			agent.getLogger().info("Accepted connection from: "+sc.socket().getRemoteSocketAddress()+", waiting for handshake...");
@@ -404,21 +491,21 @@ public class TcpSelectorThread implements Runnable
 		try
 		{
 			SocketChannel sc = (SocketChannel)key.channel();
-			TcpChannelInfo	info	= (TcpChannelInfo)key.attachment();
+			TcpChannelHandler	handler	= (TcpChannelHandler)key.attachment();
 			
 			// Try to complete handshake.
-			if(!info.isOpen())
+			if(!handler.isOpen())
 			{
-				Tuple2<byte[], byte[]> msg=info.getMessageBuffer().read(sc);
+				Tuple2<byte[], byte[]> msg=handler.read(sc);
 				if(msg!=null)
 				{
 					// Make connection available for outgoing messages.
-					info.setOpen(true);					
+					handler.setOpen(true);					
 					String	remotecid	= new String(msg.getSecondEntity(), SUtil.UTF8);
 					agent.getLogger().info("Handshake completed to: "+remotecid+" at "+sc.socket().getRemoteSocketAddress());
-
+					// TODO add connection to agent.
 					
-					Future<SocketChannel>	ret	= info.getConnectionFuture();
+					Future<SocketChannel>	ret	= handler.getConnectionFuture();
 					if(ret!=null)
 					{
 						ret.setResult(sc);
@@ -426,14 +513,13 @@ public class TcpSelectorThread implements Runnable
 				}
 			}
 			
-			// Normal connection operation.
-			if(key.attachment() instanceof TcpMessageBuffer)
+			// Normal connection operation
+			if(handler.isOpen())
 			{
-				TcpMessageBuffer	buf	= (TcpMessageBuffer)key.attachment();
 				// Read as much messages as available (if any).
-				for(Tuple2<byte[], byte[]> msg=buf.read(sc); msg!=null; msg=buf.read(sc))
+				for(Tuple2<byte[], byte[]> msg=handler.read(sc); msg!=null; msg=handler.read(sc))
 				{
-					System.out.println("Read message from: "+sc);
+					System.out.println("Read message from: "+sc+", "+new String(msg.getSecondEntity(), SUtil.UTF8));
 //					msgservice.deliverMessage(msg);
 				}
 			}

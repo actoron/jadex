@@ -102,7 +102,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	 *  Agent initialization.
 	 */
 	@AgentCreated
-	protected void	init()
+	protected void	init() throws Exception
 	{
 		IPlatformStateService	plast	= SServiceProvider.getLocalService(agent, IPlatformStateService.class, Binding.SCOPE_PLATFORM);
 		codec	= plast.getSerializationServices();
