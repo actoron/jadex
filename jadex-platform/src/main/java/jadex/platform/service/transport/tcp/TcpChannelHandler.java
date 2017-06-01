@@ -71,20 +71,21 @@ public class TcpChannelHandler
 		
 		// Check, if read completes the next data array.
 		byte[]	data	= buffer.read(sc);
-		if(data!=null)
+		
+		// No header -> data is header of next message.
+		if(data!=null && header==null)
 		{
-			// No header -> data is header of next message.
-			if(header==null)
-			{
-				header	= data;
-			}
+			header	= data;
 			
-			// Header already set -> data is body corresponding to header -> message complete -> return and reset 
-			else
-			{
-				ret	= new Tuple2<byte[], byte[]>(header, data);
-				header	= null;
-			}
+			// Check if more data is available.
+			data	= buffer.read(sc);
+		}
+			
+		// Header already set -> data is the body corresponding to the header -> message complete -> return and reset 
+		if(data!=null && header!=null)
+		{
+			ret	= new Tuple2<byte[], byte[]>(header, data);
+			header	= null;
 		}
 		
 		return ret;
