@@ -237,8 +237,8 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<byte[]> encryptAndSign(Map<String, Object> header, byte[] content)
 	{
-		IComponentIdentifier receiver = (IComponentIdentifier) header.get(MessageComponentFeature.RECEIVER);
-		ICryptoSuite suite = cryptosuites.get(receiver.getRoot());
+//		IComponentIdentifier receiver = (IComponentIdentifier) header.get(MessageComponentFeature.RECEIVER);
+//		ICryptoSuite suite = cryptosuites.get(receiver.getRoot());
 		return new Future<byte[]>(content);
 //		if (suite == null)
 			// handshake

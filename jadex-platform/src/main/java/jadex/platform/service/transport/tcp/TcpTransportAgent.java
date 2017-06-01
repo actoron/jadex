@@ -1,6 +1,7 @@
 package jadex.platform.service.transport.tcp;
 
 import java.io.IOException;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -51,14 +52,9 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 			java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
 			java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
 			final Selector selector = Selector.open();
-
-			// Start receiver thread.
-			IDaemonThreadPoolService	tps	= SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			this.selectorthread	= new TcpSelectorThread(selector, agent);
-			tps.execute(selectorthread);
-			agent.getLogger().info("TCP transport listening to port: "+port);
-
-			// Set up receiver side.
+			
+			// Set up receiver side, if any.
+			// Better be done before selector thread is started due to deadlocks: https://stackoverflow.com/questions/12822298/nio-selector-how-to-properly-register-new-channel-while-selecting 
 			// If port==0 -> any free port
 			if(port>=0)
 			{	
@@ -74,11 +70,23 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 				String[]	saddresses	= new String[addresses.length];
 				for(int i=0; i<addresses.length; i++)
 				{
-					// Todo IPv6 addresses?
-					saddresses[i]	= new InetSocketAddress(addresses[i], port).toString();
+					if(addresses[i] instanceof Inet6Address)
+					{
+						saddresses[i]	= "[" + addresses[i].getHostAddress() + "]:" + port;
+					}
+					else // if (address instanceof Inet4Address)
+					{
+						saddresses[i]	= addresses[i].getHostAddress() + ":" + port;
+					}
 				}
 				announceAddresses(saddresses);
+				agent.getLogger().info("TCP transport listening to port: "+port);
 			}
+
+			// Start selector thread for asynchronous sending and/or receiving
+			IDaemonThreadPoolService	tps	= SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			this.selectorthread	= new TcpSelectorThread(selector, agent);
+			tps.execute(selectorthread);
 		}
 		catch(Exception e)
 		{

@@ -13,7 +13,6 @@ import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.serialization.SerializationServices;
@@ -28,7 +27,6 @@ import jadex.platform.service.serialization.SerializationServices;
 @ProvidedServices(
 	@ProvidedService(
 		type=IPlatformStateService.class,
-		implementation=@Implementation(proxytype=Implementation.PROXYTYPE_RAW),
 		scope=RequiredServiceInfo.SCOPE_PLATFORM
 	)
 )

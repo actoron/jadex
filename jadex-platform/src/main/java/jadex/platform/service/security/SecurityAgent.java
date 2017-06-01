@@ -23,7 +23,8 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="virtualnames", clazz=String[].class),
 	@Argument(name="validityduration", clazz=long.class)
 })
-@ProvidedServices(@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)")))
+@ProvidedServices(@ProvidedService(type=ISecurityService.class,
+	implementation=@Implementation(expression="new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)")))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent
 {

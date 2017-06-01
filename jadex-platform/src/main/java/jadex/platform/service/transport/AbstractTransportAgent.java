@@ -14,6 +14,7 @@ import jadex.bridge.service.types.platformstate.IPlatformStateService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
+import jadex.commons.Boolean3;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -28,7 +29,7 @@ import jadex.micro.annotation.Binding;
  *  Base class for transports.
  * 	@param <Con> A custom object type to hold connection information as required by the concrete transport.
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 public abstract class AbstractTransportAgent<Con> implements ITransportService
 {
 	//-------- arguments --------
@@ -91,7 +92,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	 */
 	protected void	announceAddresses(String[] addresses)
 	{
-		
+		TransportAddressBook	tab	= TransportAddressBook.getAddressBook(agent);
+		tab.addPlatformAddresses(agent.getComponentIdentifier(), getProtocolName(), addresses);
 	}
 	
 	//-------- life cycle --------

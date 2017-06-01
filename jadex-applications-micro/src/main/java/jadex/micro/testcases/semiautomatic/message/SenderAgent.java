@@ -22,7 +22,7 @@ public class SenderAgent
 	@AgentBody
 	protected void	run(IMessageFeature mf)
 	{
-		String	reply	= (String)mf.sendMessageAndWait(receiver, "Hello?").get();
-		System.out.println("Sender received: "+reply);
+		/*String	reply	= (String)*/mf.sendMessage/*AndWait*/(receiver, "Hello?").get();
+		System.out.println("Sender received: ");//+reply);
 	} 
 }

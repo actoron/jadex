@@ -10,6 +10,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.spi.AbstractSelectableChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -129,13 +130,13 @@ public class TcpSelectorThread implements Runnable
 			catch(Exception e)
 			{
 				// Key may be cancelled just after isValid() has been tested.
-//				e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 		
 		for(SelectionKey key: selector.keys())
 		{
-			closeKeyAttachment(key);
+			closeKeyChannel(key);
 		}
 		
 		try
@@ -150,11 +151,11 @@ public class TcpSelectorThread implements Runnable
 	}
 	
 	/**
-	 * 
+	 *  Perform close operation son a channel as identified by the given key.
+	 *  Potentially cleans up key attachments as well.
 	 */
-	protected void closeKeyAttachment(SelectionKey key)
+	protected void closeKeyChannel(SelectionKey key)
 	{
-		// TODO: Still needed?
 //		Object	con	= key.attachment();
 //		
 //		if(con instanceof Tuple2<?, ?>)
@@ -228,7 +229,7 @@ public class TcpSelectorThread implements Runnable
 						sc = SocketChannel.open();
 //						sc.socket().setSoTimeout(10);
 						sc.configureBlocking(false);
-						sc.register(selector, SelectionKey.OP_CONNECT, new Tuple2<InetSocketAddress, Future<SocketChannel>>(sock, ret));
+						sc.register(selector, SelectionKey.OP_CONNECT, new TcpChannelInfo(ret));
 						sc.connect(sock);
 						agent.getLogger().info("Attempting connection to: "+address);
 					}
@@ -310,7 +311,7 @@ public class TcpSelectorThread implements Runnable
 				{
 					if(key!=null)
 					{
-						closeKeyAttachment(key);
+						closeKeyChannel(key);
 					}
 					
 //					System.err.println("writetasks4: "+writetasks.get(con.getSocketChannel())+", "+e);
@@ -335,7 +336,7 @@ public class TcpSelectorThread implements Runnable
 	//-------- handler methods --------
 
 	/**
-	 *  Accept a connection request.
+	 *  Accept a connection request from a client.
 	 */
 	protected void handleAccept(SelectionKey key)
 	{
@@ -348,20 +349,51 @@ public class TcpSelectorThread implements Runnable
 			sc = ssc.accept();
 			sc.configureBlocking(false);
 			
-			// Write one byte for handshake (always works due to local network buffers).
-			sc.write(ByteBuffer.wrap(new byte[1]));
-	
-			// Register the new SocketChannel with our Selector, indicating
-			// we'd like to be notified when there's data waiting to be read
+			// Add empty channel info for unsolicited connections.
+			SelectionKey	sckey	= sc.register(selector, 0, new TcpChannelInfo(null));
+			startHandshake(sckey);
 			
-			sc.register(this.selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, null);
-			
-			agent.getLogger().info("Accepted connection from: "+sc.socket().getRemoteSocketAddress());
+			agent.getLogger().info("Accepted connection from: "+sc.socket().getRemoteSocketAddress()+", waiting for handshake...");
 		}
 		catch(Exception e)
 		{
 			connectionFailed(key, e);
 		}
+	}
+
+	/**
+	 *  Complete a connection request to a server.
+	 */
+	protected void	handleConnect(SelectionKey key)
+	{
+		SocketChannel sc = (SocketChannel)key.channel();
+		try
+		{
+			boolean	finished = sc.finishConnect();
+			assert finished;
+
+			startHandshake(key);
+			
+			agent.getLogger().info("Connected to: "+sc.socket().getRemoteSocketAddress()+", waiting for handshake...");
+		}
+		catch(Exception e)
+		{
+			connectionFailed(key, e);
+		}
+	}
+	
+	/**
+	 *  Start the hand shake on a new client or server connection.
+	 */
+	protected void	startHandshake(SelectionKey key)	throws Exception
+	{
+		// Initialize key to start reading.
+		// Will not send user messages over the connection before remote CID is received.
+		key.interestOps(SelectionKey.OP_READ);
+		
+		// Queue sending of own CID to complete bidirectional handshake.
+		sendMessage((SocketChannel)key.channel(),
+			new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
 	}
 	
 	/**
@@ -372,6 +404,27 @@ public class TcpSelectorThread implements Runnable
 		try
 		{
 			SocketChannel sc = (SocketChannel)key.channel();
+			TcpChannelInfo	info	= (TcpChannelInfo)key.attachment();
+			
+			// Try to complete handshake.
+			if(!info.isOpen())
+			{
+				Tuple2<byte[], byte[]> msg=info.getMessageBuffer().read(sc);
+				if(msg!=null)
+				{
+					// Make connection available for outgoing messages.
+					info.setOpen(true);					
+					String	remotecid	= new String(msg.getSecondEntity(), SUtil.UTF8);
+					agent.getLogger().info("Handshake completed to: "+remotecid+" at "+sc.socket().getRemoteSocketAddress());
+
+					
+					Future<SocketChannel>	ret	= info.getConnectionFuture();
+					if(ret!=null)
+					{
+						ret.setResult(sc);
+					}
+				}
+			}
 			
 			// Normal connection operation.
 			if(key.attachment() instanceof TcpMessageBuffer)
@@ -384,54 +437,6 @@ public class TcpSelectorThread implements Runnable
 //					msgservice.deliverMessage(msg);
 				}
 			}
-			
-			// Handle output handshake (read one byte to make sure that channel is working before sending).
-			else
-			{
-				// TODO: why increase buffer?
-//				try
-//				{
-//					sc.socket().setSendBufferSize(sc.socket().getSendBufferSize()<<1);
-//				}
-//				catch(Exception e)
-//				{
-//					agent.getLogger().warning("Cannot set send buffer size: "+e);
-//				}
-				
-				Tuple2<InetSocketAddress, Future<SocketChannel>> tuple = (Tuple2<InetSocketAddress, Future<SocketChannel>>)key.attachment();
-				InetSocketAddress	address	= tuple.getFirstEntity();
-				Future<SocketChannel>	ret	= tuple.getSecondEntity();
-	
-				if(sc.read(ByteBuffer.wrap(new byte[1]))!=1)
-					throw new IOException("Error receiving handshake byte.");
-					
-				agent.getLogger().info("NIOTCP connected to: "+address);
-				ret.setResult(sc);
-			}
-		}
-		catch(Exception e)
-		{
-			connectionFailed(key, e);
-		}
-	}
-
-	/**
-	 *  Finish outgoing connection establishment.
-	 */
-	protected void	handleConnect(SelectionKey key)
-	{
-		SocketChannel sc = (SocketChannel)key.channel();
-		Tuple2<InetSocketAddress, Future<SocketChannel>> tuple = (Tuple2<InetSocketAddress, Future<SocketChannel>>)key.attachment();
-		InetSocketAddress	address	= tuple.getFirstEntity();
-		Future<SocketChannel>	ret	= tuple.getSecondEntity();
-		try
-		{
-			boolean	finished = sc.finishConnect();
-			assert finished;
-			// Before connection can be used, make sure that it works by waiting for handshake byte.
-			key.interestOps(SelectionKey.OP_READ);
-			
-			agent.getLogger().info("NIOTCP connected to: "+address+", waiting for handshake...");
 		}
 		catch(Exception e)
 		{
@@ -503,7 +508,7 @@ public class TcpSelectorThread implements Runnable
 	 */
 	protected void	connectionFailed(SelectionKey key, Exception e)
 	{
-		SocketChannel sc = (SocketChannel)key.channel();
+		AbstractSelectableChannel sc = (AbstractSelectableChannel)key.channel();
 		if(sc!=null)
 		{
 			try{sc.close();}catch(Exception ex){}
@@ -511,17 +516,26 @@ public class TcpSelectorThread implements Runnable
 		
 		// Connection failure: notify all open write tasks.
 		List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)this.writetasks.get(sc);
-		for(Iterator<Tuple2<List<ByteBuffer>, Future<Void>>> it=queue.iterator(); it.hasNext(); )
+		if(queue!=null)
 		{
-			Tuple2<List<ByteBuffer>, Future<Void>>	task	= (Tuple2<List<ByteBuffer>, Future<Void>>)it.next();
-			Future<Void>	fut	= task.getSecondEntity();
-			fut.setException(e);
-			it.remove();
+			for(Iterator<Tuple2<List<ByteBuffer>, Future<Void>>> it=queue.iterator(); it.hasNext(); )
+			{
+				Tuple2<List<ByteBuffer>, Future<Void>>	task	= (Tuple2<List<ByteBuffer>, Future<Void>>)it.next();
+				Future<Void>	fut	= task.getSecondEntity();
+				fut.setException(e);
+				it.remove();
+			}
+			writetasks.remove(sc);
 		}
-		writetasks.remove(sc);
-//		System.out.println("writetasks1: "+writetasks.size());
 		
-		agent.getLogger().info("NIOTCP error on connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
+		if(sc instanceof SocketChannel)
+		{
+			agent.getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
+		}
+		else
+		{
+			agent.getLogger().info("Error on server socket with port: "+((ServerSocketChannel)sc).socket().getLocalPort()+", "+e);			
+		}
 //		e.printStackTrace();
 		key.cancel();
 	}
