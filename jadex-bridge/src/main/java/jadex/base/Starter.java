@@ -163,24 +163,7 @@ public class Starter
 //			e.printStackTrace();
 //		}
 		
-		createPlatform(args).get().scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				String remoteaddr = "tcp-mtp://"+"ec2-54-190-58-166.us-west-2.compute.amazonaws.com"+":36000";
-				String platformname = "Allie-Jadex_720F614FB6ED061A";
-				IComponentIdentifier	remotecid	= new ComponentIdentifier(platformname, new String[]{remoteaddr});
-				
-				// Create proxy for remote platform such that remote services are found
-				Map<String, Object>	args = new HashMap<String, Object>();
-				args.put("component", remotecid);
-				CreationInfo ci = new CreationInfo(args);
-				ci.setDaemon(true);
-				IComponentManagementService	cms	= SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
-				return IFuture.DONE;
-			}
-		});
+		createPlatform(args).get();
 		
 //		IExternalAccess access	= createPlatform(args).get();
 //				Runtime.getRuntime().addShutdownHook(new Thread()
@@ -393,10 +376,10 @@ public class Starter
 					final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
 						autosd!=null ? autosd.booleanValue() : false, false, false, monitoring, model.getFullName(),
 						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
-					
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
+
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getStarterConfig().getValue(StarterConfiguration.DATA_REALTIMETIMEOUT));
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getStarterConfig().getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 
 //					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
@@ -431,7 +414,7 @@ public class Starter
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(config.getValue(RootComponentConfiguration.WELCOME)))
+									if(config.getWelcome())
 									{
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");

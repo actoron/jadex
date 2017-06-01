@@ -468,6 +468,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		if(listener!=null)
 		{
     		notifyListener(listener);			
+    		listener	= null; // avoid memory leaks
 		}
 		if(listeners!=null)
 		{
@@ -475,6 +476,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    	{
 	    		notifyListener(listeners.get(i));
 	    	}
+    		listeners	= null; // avoid memory leaks
 		}
 	}
 	
