@@ -560,7 +560,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	protected IPlatformStateService getPlatformStateService()
 	{
 		if (pfstate == null)
-			SServiceProvider.getLocalService(component, IPlatformStateService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			pfstate = SServiceProvider.getLocalService(component, IPlatformStateService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		return pfstate;
 	}
 	

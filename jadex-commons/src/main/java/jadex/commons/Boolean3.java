@@ -23,4 +23,12 @@ public enum Boolean3
 			: this==FALSE ? Boolean.FALSE
 			: Boolean.TRUE;
 	}
+	
+	/**
+	 *  Check if explicitly set to true, i.e. neither FALSE nor NULL.
+	 */
+	public boolean isTrue()
+	{
+		return this==TRUE;
+	}
 }

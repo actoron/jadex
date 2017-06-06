@@ -5,12 +5,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 
 
 /**
  *  The message buffer hold state about a partially received message
- *  until header and body are complete.
+ *  until the data is complete.
  */
 public class TcpMessageBuffer
 {
@@ -27,17 +26,11 @@ public class TcpMessageBuffer
 	/** The read buffer for reading out the messages. */
 	protected ByteBuffer rb;
 	
-	/** The header. */
-	protected byte[] header;
+	/** The data buffer to be filled while reading. */
+	protected byte[] data;
 	
-	/** The body. */
-	protected byte[] body;
-	
-	/** The header pos. */
-	protected int header_pos;
-	
-	/** The header pos. */
-	protected int body_pos;
+	/** The amount of data already read. */
+	protected int pos;
 
 	//-------- constructors --------
 
@@ -53,96 +46,65 @@ public class TcpMessageBuffer
 	// -------- methods --------
 
 	/**
-	 * Read a message from the channel.
+	 *  Read data from the channel.
+	 *  Always reads the length as 4 byte int and then reads the required amount of data into an array. 
 	 * 
-	 * @return True, if a the message is complete.
-	 * @throws Exception on read error.
+	 *  @return A byte array, when the next data is complete, null as long as data is still pending.
+	 *  @throws Exception on read error.
 	 */
-	public Tuple2<byte[], byte[]>	read(SocketChannel sc) throws IOException
+	public byte[]	read(SocketChannel sc) throws IOException
 	{
-		Tuple2<byte[], byte[]>	ret = null;
+		byte[]	ret = null;
 
-		// Write data from channel into the buffer.
+		// Transfer data from channel into the buffer.
 		if(sc.read(wb) == -1)
 		{
 			throw new IOException("Channel closed: "+sc.socket().getInetAddress()+":"+sc.socket().getPort());
 		}
 
-		// First try to determine the header/body size if unknown (array==null)
-		// Read next msg header
-		// Need at least 4 size bytes
-		
-		if(header==null || header_pos==header.length && body==null)
+		// First try to determine the data size if unknown (array==null)
+		// Need at least 4 size bytes, else NOP until more bytes available.
+		if(data==null && wb.position()-rb.position()>=4)
 		{
-			if(wb.position()-rb.position()>=4)
-			{
-				byte[]	bytes	= new byte[4];
-				bytes[0]	= rb.get();
-				bytes[1]	= rb.get();
-				bytes[2]	= rb.get();
-				bytes[3]	= rb.get();
-				int	len = SUtil.bytesToInt(bytes);
-				if(header==null)
-				{
-					header	= new byte[len];
-				}
-				else
-				{
-					body	= new byte[len];
-				}
-			}
+			byte[]	bytes	= new byte[4];
+			bytes[0]	= rb.get();
+			bytes[1]	= rb.get();
+			bytes[2]	= rb.get();
+			bytes[3]	= rb.get();
+			int	len = SUtil.bytesToInt(bytes);
+			data	= new byte[len];
 		}
 
 		// Read out the buffer if enough data has been retrieved for the header or buffer is full.
-		if(header!=null && header_pos<header.length)
+		if(data!=null && pos<data.length)
 		{
-			int required	= header.length-header_pos;
+			int required	= data.length-pos;
 			int	available	= wb.position()-rb.position();
 			
 			// Read till end of header
 			if(available >= required)
 			{
-				rb.get(header, header_pos, required);
-				header_pos	= header.length;
+				rb.get(data, pos, required);
+				pos	= data.length;
 			}
 			
 			// Read full buffer when full and only part of message
 			else if(wb.remaining()==0)
 			{
-				rb.get(header, header_pos, available);
-				header_pos	+= available;
+				rb.get(data, pos, available);
+				pos	+= available;
 				rb.clear();
 				wb.clear();
 			}
 		}
 		
-		// Read out the buffer if enough data has been retrieved for the body or buffer is full.
-		if(body!=null && body_pos<body.length)
+		// Finished when body is complete.
+		if(data!=null && pos==data.length)
 		{
-			int required	= body.length-body_pos;
-			int	available	= wb.position()-rb.position();
-			
-			// Read till end of body
-			if(available >= required)
-			{
-				rb.get(body, body_pos, required);
-				body_pos	= body.length;
-			}
-			
-			// Read full buffer when full and only part of message
-			else if(wb.remaining()==0)
-			{
-				rb.get(body, body_pos, available);
-				body_pos	+= available;
-				rb.clear();
-				wb.clear();
-			}
-		}
-		
-		// Finished when bosy is complete.
-		if(body!=null && body_pos==body.length)
-		{
-			ret	= new Tuple2<byte[], byte[]>(header, body);
+			// Set result and reset internal structures.
+			ret	= data;
+			data	= null;
+			pos = 0;
 				
 			// Reset the readbuffer and compact (i.e. copy rest) the writebuffer
 			wb.limit(wb.position());
@@ -150,11 +112,6 @@ public class TcpMessageBuffer
 			wb.position(rb.position());
 			wb.compact();
 			rb.clear();
-				
-			header	= null;
-			body	= null;
-			header_pos = 0;
-			body_pos = 0;
 		}
 
 		return ret;

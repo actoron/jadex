@@ -1,16 +1,13 @@
 package jadex.bridge.service.types.address;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jadex.base.PlatformConfiguration;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 
 /**
  *  Management of transport addresses, i.e. what a platform knows about communication to other platforms.
@@ -21,13 +18,14 @@ public class TransportAddressBook
 	protected Map<IComponentIdentifier, Map<String, List<String>>> addresses = new HashMap<IComponentIdentifier, Map<String, List<String>>>();
 	
 	/**
-	 *  Set the addresses of a platform.
-	 *  @param platform The component identifier of the platform.
-	 *  @param addresses A list of addresses in the form 'transportname://address' (uses '' as transportname, if none given).
+	 *  Add addresses for a platform.
+	 *  @param platform	The component identifier of the platform.
+	 *  @param transport	The transport name used as protocol scheme, e.g. 'tcp'.
+	 *  @param addresses	A list of addresses (e.g. 'host:port').
 	 */
-	public synchronized void addPlatformAddresses(IComponentIdentifier platform, String[] addresses)
+	public synchronized void addPlatformAddresses(IComponentIdentifier platform, String transport, String[] addresses)
 	{
-		if(addresses!=null)
+		if(addresses!=null && addresses.length>0)
 		{
 			Map<String, List<String>>	platformaddresses	= this.addresses.get(platform.getRoot());
 			if(platformaddresses==null)
@@ -36,23 +34,16 @@ public class TransportAddressBook
 				this.addresses.put(platform.getRoot(), platformaddresses);
 			}
 			
+			List<String>	laddresses	= platformaddresses.get(transport);		
+			if(laddresses==null)
+			{
+				laddresses	= new ArrayList<String>();
+				platformaddresses.put(transport, laddresses);
+			}
+			
 			for(String address: addresses)
 			{
-				String	key	= "";
-				int index	= address.indexOf("://");
-				if(index!=-1)
-				{
-					key = address.substring(0, index);	
-					address	= address.substring(index+3);
-				}
-				
-				List<String>	list	= platformaddresses.get(key);
-				if(list==null)
-				{
-					list	= new ArrayList<String>();
-					platformaddresses.put(key, list);
-				}
-				list.add(address);
+				laddresses.add(address);
 			}
 		}
 	}
@@ -183,19 +174,19 @@ public class TransportAddressBook
 //		return ret;
 //	}
 //	
-//	/**
-//	 *  Get the address book from a component.
-//	 */
-//	public static TransportAddressBook getAddressBook(IComponentIdentifier platform)
-//	{
-//		return (TransportAddressBook)PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_ADDRESSBOOK);
-//	}
-//	
-//	/**
-//	 *  Get the address book from a component.
-//	 */
-//	public static TransportAddressBook getAddressBook(IInternalAccess agent)
-//	{
-//		return getAddressBook(agent.getComponentIdentifier());
-//	}
+	/**
+	 *  Get the address book from a component.
+	 */
+	public static TransportAddressBook getAddressBook(IComponentIdentifier platform)
+	{
+		return (TransportAddressBook)PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_ADDRESSBOOK);
+	}
+	
+	/**
+	 *  Get the address book from a component.
+	 */
+	public static TransportAddressBook getAddressBook(IInternalAccess agent)
+	{
+		return getAddressBook(agent.getComponentIdentifier());
+	}
 }

@@ -73,8 +73,8 @@ public class SerializationServices implements ISerializationServices
 		};
 		sendserializer = serializers[0];
 		codecs = new ICodec[]{
-			new SnappyCodec()
-			, new GZIPCodec()
+//			new SnappyCodec(),
+			new GZIPCodec()
 //			, new LZ4Codec()
 			, new XZCodec()
 		};
@@ -107,7 +107,7 @@ public class SerializationServices implements ISerializationServices
 				enc = codecs[i].encode(enc);
 		}
 		int prefixsize = getPrefixSize(codecsize);
-		byte[] ret = new byte[prefixsize];
+		byte[] ret = new byte[prefixsize+enc.length];
 		System.arraycopy(enc, 0, ret, prefixsize, enc.length);
 		enc = null;
 		SUtil.shortIntoBytes((short) prefixsize, ret, 0);
