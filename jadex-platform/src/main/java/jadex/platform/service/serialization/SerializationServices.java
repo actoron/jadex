@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import jadex.base.IStarterConfiguration;
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.fipa.SFipa;
@@ -511,5 +513,16 @@ public class SerializationServices implements ISerializationServices
 	{
 		return ((AbstractRemoteCommand)((Map<String, Object>)((IRootObjectContext)ec).getRootObject()).get(SFipa.CONTENT));
 //		return ((AbstractRemoteCommand)((MessageEnvelope)((IEncodingContext)ec).getRootObject()).getMessage().get(SFipa.CONTENT));
+	}
+	
+	/**
+	 *  Gets the serialization services.
+	 * 
+	 *  @param platform The platform ID.
+	 *  @return The serialization services.
+	 */
+	protected static final ISerializationServices getSerializationServices(IComponentIdentifier platform)
+	{
+		return (ISerializationServices) PlatformConfiguration.getPlatformValue(platform, IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
 	}
 }

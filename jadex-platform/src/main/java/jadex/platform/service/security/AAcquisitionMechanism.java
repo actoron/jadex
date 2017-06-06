@@ -14,14 +14,14 @@ public abstract class AAcquisitionMechanism
 	//-------- attributes --------
 	
 	/** The component. */
-	protected SecurityService secser;
+	protected SecurityServiceOld secser;
 
 	//-------- methods --------
 
 	/**
 	 *  Init the mechanism.
 	 */
-	public void init(SecurityService secser)
+	public void init(SecurityServiceOld secser)
 	{
 		this.secser = secser;
 	}
@@ -30,7 +30,7 @@ public abstract class AAcquisitionMechanism
 	 *  Get the security service.
 	 *  @return The security service.
 	 */
-	public SecurityService getSecurityService()
+	public SecurityServiceOld getSecurityService()
 	{
 		return secser;
 	}

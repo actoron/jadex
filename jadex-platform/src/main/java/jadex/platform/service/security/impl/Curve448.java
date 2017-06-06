@@ -53,7 +53,7 @@ THE SOFTWARE.
 
 */
 
-package jadex.commons.security;
+package jadex.platform.service.security.impl;
 
 import java.util.Arrays;
 

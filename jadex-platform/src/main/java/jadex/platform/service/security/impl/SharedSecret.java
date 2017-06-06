@@ -1,0 +1,28 @@
+package jadex.platform.service.security.impl;
+
+import jadex.platform.service.security.AbstractAuthenticationSecret;
+
+/**
+ *  Authentication based on a shared secret.
+ *
+ */
+public abstract class SharedSecret extends AbstractAuthenticationSecret
+{
+	/**
+	 *  Tests if the secret can be used for signing or, alternatively, verification only.
+	 *  @return True, if the secret can be used for signing.
+	 */
+	public boolean canSign()
+	{
+		return true;
+	}
+	
+	/**
+	 *  Derives a key from the shared secret using a salt.
+	 *  
+	 *  @param keysize The target key size in bytes to generate.
+	 *  @param salt Salt to use.
+	 *  @return Derived key.
+	 */
+	public abstract byte[] deriveKey(int keysize, byte[] salt);
+}

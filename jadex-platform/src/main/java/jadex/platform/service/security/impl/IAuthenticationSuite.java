@@ -1,13 +1,20 @@
-package jadex.platform.service.security;
+package jadex.platform.service.security.impl;
 
-public interface IAuthenticator
+import jadex.platform.service.security.AbstractAuthenticationSecret;
+
+/**
+ *  Suite for authenticating messages.
+ * @author jander
+ *
+ */
+public interface IAuthenticationSuite
 {
 	/**
-	 *  Returns the authenticator type ID.
+	 *  Gets the authentication suite ID.
 	 *  
-	 *  @return The authenticator type ID.
+	 *  @return The authentication suite ID.
 	 */
-	public int getAuthenticatorTypeId();
+	public int getId();
 	
 	/**
 	 *  Creates an authentication token for a message based on an abstract 
@@ -17,7 +24,7 @@ public interface IAuthenticator
 	 *  @param key The key used for authentication.
 	 *  @return Authentication token.
 	 */
-	public byte[] createAuthenticationToken(byte[] msg, Object key);
+	public byte[] createAuthenticationToken(byte[] msg, AbstractAuthenticationSecret key);
 	
 	/**
 	 *  Creates an authentication token for a message based on an abstract 
@@ -28,5 +35,5 @@ public interface IAuthenticator
 	 *  @param authtoken Authentication token.
 	 *  @return True if authenticated, false otherwise.
 	 */
-	public boolean verifyAuthenticationToken(byte[] msg, Object key, byte[] authtoken);
+	public boolean verifyAuthenticationToken(byte[] msg, AbstractAuthenticationSecret key, byte[] authtoken);
 }

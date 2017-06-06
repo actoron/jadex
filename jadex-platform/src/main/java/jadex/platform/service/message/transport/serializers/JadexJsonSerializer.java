@@ -22,7 +22,7 @@ import jadex.transformation.jsonserializer.processors.read.JsonReadContext;
 import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 
 /**
- *  The Jadex Binary serializer. Codec supports parallel
+ *  The Jadex JSON serializer. Codec supports parallel
  *  calls of multiple concurrent clients (no method
  *  synchronization necessary).
  *  
@@ -32,8 +32,8 @@ public class JadexJsonSerializer implements ISerializer
 {
 	//-------- constants --------
 	
-	/** The JadexBinary serializer id. */
-	public static final byte SERIALIZER_ID = 1;
+	/** The serializer id. */
+	public static final int SERIALIZER_ID = 1;
 	
 	/** The debug flag. */
 	protected boolean DEBUG = false;
@@ -58,7 +58,7 @@ public class JadexJsonSerializer implements ISerializer
 	 *  Get the serializer id.
 	 *  @return The serializer id.
 	 */
-	public byte getSerializerId()
+	public int getSerializerId()
 	{
 		return SERIALIZER_ID;
 	}

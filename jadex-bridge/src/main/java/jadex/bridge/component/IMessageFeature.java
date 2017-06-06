@@ -1,5 +1,7 @@
 package jadex.bridge.component;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 
@@ -15,6 +17,15 @@ public interface IMessageFeature
 	 *  
 	 */
 	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message);
+	
+	/**
+	 *  Send a message.
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  @param addheaderfields Additional header fields.
+	 *  
+	 */
+	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message, Map<String, Object> addheaderfields);
 	
 	/**
 	 *  Send a message and wait for a reply.
@@ -49,11 +60,19 @@ public interface IMessageFeature
 	 *  Add a message handler.
 	 *  @param  The handler.
 	 */
-	public IFuture<Void> addMessageHandler(IMessageHandler handler);
+	public void addMessageHandler(IMessageHandler handler);
 	
 	/**
 	 *  Remove a message handler.
 	 *  @param handler The handler.
 	 */
-	public IFuture<Void> removeMessageHandler(IMessageHandler handler);
+	public void removeMessageHandler(IMessageHandler handler);
+	
+	/**
+	 *  Sets whether to allow untrusted messages.
+	 *  Handlers must perform appropriate checks if set to true.
+	 *  
+	 *  @param allowuntrusted Set to true to allow untrusted messages.
+	 */
+	public void setAllowUntrusted(boolean allowuntrusted);
 }

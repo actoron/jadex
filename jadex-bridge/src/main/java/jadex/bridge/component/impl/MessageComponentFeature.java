@@ -101,7 +101,19 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param message	The message.
 	 *  
 	 */
-	public IFuture<Void> sendMessage(final IComponentIdentifier receiver, Object message)
+	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message)
+	{
+		return sendMessage(receiver, message, null);
+	}
+	
+	/**
+	 *  Send a message.
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  @param addheaderfields Additional header fields.
+	 *  
+	 */
+	public IFuture<Void> sendMessage(final IComponentIdentifier receiver, Object message, Map<String, Object> addheaderfields)
 	{
 		if (receiver == null)
 			return new Future<Void>(new IllegalArgumentException("Messages must have a receiver."));
@@ -109,6 +121,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		final Future<Void> ret = new Future<Void>();
 		
 		final Map<String, Object> header = new HashMap<String, Object>();
+		if (addheaderfields != null)
+			header.putAll(addheaderfields);
 		header.put(SENDER, component.getComponentIdentifier());
 		header.put(RECEIVER, receiver);
 		
@@ -291,28 +305,36 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  Add a message handler.
 	 *  @param  The handler.
 	 */
-	public IFuture<Void> addMessageHandler(final IMessageHandler handler)
+	public void addMessageHandler(final IMessageHandler handler)
 	{
 		if(messagehandlers==null)
 		{
 			messagehandlers	= new LinkedHashSet<IMessageHandler>();
 		}
 		messagehandlers.add(handler);
-		
-		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Remove a message handler.
 	 *  @param handler The handler.
 	 */
-	public IFuture<Void> removeMessageHandler(IMessageHandler handler)
+	public void removeMessageHandler(IMessageHandler handler)
 	{
 		if(messagehandlers!=null)
 		{
 			messagehandlers.remove(handler);
 		}
-		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Sets whether to allow untrusted messages.
+	 *  Handlers must perform appropriate checks if set to true.
+	 *  
+	 *  @param allowuntrusted Set to true to allow untrusted messages.
+	 */
+	public void setAllowUntrusted(boolean allowuntrusted)
+	{
+		this.allowuntrusted = allowuntrusted;
 	}
 	
 	//-------- IInternalMessageFeature interface --------

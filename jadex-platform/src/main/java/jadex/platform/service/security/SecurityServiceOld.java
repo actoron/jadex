@@ -42,7 +42,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
-import jadex.bridge.service.types.security.ISecurityService;
+import jadex.bridge.service.types.security.ISecurityServiceOld;
 import jadex.bridge.service.types.security.KeyStoreEntry;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.settings.ISettingsService;
@@ -62,10 +62,12 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.security.SSecurity;
+import jadex.platform.service.security.impl.Blake2bX509AuthenticationSuite;
+import jadex.platform.service.security.impl.IAuthenticationSuite;
 
 
 @Service
-public class SecurityService implements ISecurityService
+public class SecurityServiceOld implements ISecurityServiceOld
 {
 	//-------- constants --------
 	
@@ -94,11 +96,11 @@ public class SecurityService implements ISecurityService
 	/** The local password (if any). */
 	protected String	password;
 	
-	/** The stored passwords. */
-	protected Map<String, String>	platformpasses;
+	/** The secrets of other platforms. */
+	protected Map<String, AbstractAuthenticationSecret>	platformauths;
 	
-	/** The stored passwords. */
-	protected Map<String, String>	networkpasses;
+	/** The networks. */
+	protected Map<String, AbstractAuthenticationSecret>	networkauths;
 	
 	/** The trusted lan mode. */
 	protected boolean trustedlan;
@@ -149,17 +151,18 @@ public class SecurityService implements ISecurityService
 	/** CryptoSuite map for encryption and authentication */
 	protected Map<IComponentIdentifier, ICryptoSuite> cryptosuites;
 	
-	protected IAuthenticator defaultpasswordauthenticator;
+	/** The default authentication suite. */
+	protected IAuthenticationSuite defaultauthenticationsuite;
 	
-	/** All available authenticators. */
-	protected Map<Integer, IAuthenticator> authenticators;
+	/** All available authentication suites. */
+	protected List<IAuthenticationSuite> authenticationsuites;
 	
 	//-------- setup --------
 	
 	/**
 	 *  Create a security service.
 	 */
-	public SecurityService()
+	public SecurityServiceOld()
 	{
 		this(Boolean.TRUE, true, Boolean.FALSE, null, null, null, null, null);
 	}
@@ -167,7 +170,7 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Create a security service.
 	 */
-	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
+	public SecurityServiceOld(Boolean usepass, boolean printpass, Boolean trustedlan, 
 		String[] networknames, String[] networkpasses)
 	{
 		this(usepass, printpass, trustedlan, networknames, networkpasses, null, null, null);
@@ -176,12 +179,12 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Create a security service.
 	 */
-	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
+	public SecurityServiceOld(Boolean usepass, boolean printpass, Boolean trustedlan, 
 		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms, 
 		Map<String, Set<String>> namemap, Long valdur)
 	{
-		this.defaultpasswordauthenticator = new SCryptBlake2bSymmetricAuthenticator();
-		this.authenticators = new HashMap<Integer, IAuthenticator>();
+		this.defaultpasswordauthenticator = new Blake2bX509AuthenticationSuite();
+		this.authenticators = new HashMap<Integer, IAuthenticationSuite>();
 		authenticators.put(defaultpasswordauthenticator.getAuthenticatorTypeId(), defaultpasswordauthenticator);
 		this.valdur = valdur==null? 5*65536: valdur.longValue(); // 5 min default
 		this.virtualsmap = namemap==null? new HashMap<String, Set<String>>(): namemap;
@@ -608,7 +611,7 @@ public class SecurityService implements ISecurityService
 				{
 					public void customResultAvailable(Void result)
 					{
-						SecurityService.this.platformpasses	= null;
+						SecurityServiceOld.this.platformpasses	= null;
 						ret.setResult(null);
 					}
 				});
@@ -617,7 +620,7 @@ public class SecurityService implements ISecurityService
 			public void exceptionOccurred(Exception exception)
 			{
 				// No settings service: ignore.
-				SecurityService.this.platformpasses	= null;
+				SecurityServiceOld.this.platformpasses	= null;
 				ret.setResult(null);
 			}
 		});
@@ -1316,16 +1319,16 @@ public class SecurityService implements ISecurityService
 				
 				if(ks.isCertificateEntry(alias))
 				{
-					kse.setType(ISecurityService.CERTIFICATE);
+					kse.setType(ISecurityServiceOld.CERTIFICATE);
 				}
 				else if(!ks.isKeyEntry(alias) && ks.getCertificateChain(alias)!=null 
 					&& ks.getCertificateChain(alias).length!=0)
 				{
-					kse.setType(ISecurityService.TRUSTED_CERTIFICATE);
+					kse.setType(ISecurityServiceOld.TRUSTED_CERTIFICATE);
 				}
 				else 
 				{
-					kse.setType(ISecurityService.KEYPAIR);
+					kse.setType(ISecurityServiceOld.KEYPAIR);
 				}
 				
 				Certificate cert = ks.getCertificate(alias);

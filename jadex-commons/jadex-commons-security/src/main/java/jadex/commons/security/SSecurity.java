@@ -65,6 +65,8 @@ public class SSecurity
 	/** Common secure random number source. */
 	protected static volatile SecureRandom RANDOM;
 	
+	protected static volatile SecureRandom HIGHLY_SECURE_RANDOM;
+	
 	protected static volatile SecureRandom HIGHLY_SECURE_SEED_RANDOM;
 	
 	protected static volatile SecureRandom SEED_RANDOM;
@@ -86,6 +88,25 @@ public class SSecurity
 			}
 		}
 		return RANDOM;
+	}
+	
+	/**
+	 *  Gets access to the common highly secure PRNG used for key generation etc.
+	 *  @return Common secure PRNG.
+	 */
+	public static final SecureRandom getHighlySecureRandom()
+	{
+		if(HIGHLY_SECURE_RANDOM == null)
+		{
+			synchronized(SSecurity.class)
+			{
+				if(HIGHLY_SECURE_RANDOM == null)
+				{
+					HIGHLY_SECURE_RANDOM = generateHighlySecureRandom();
+				}
+			}
+		}
+		return HIGHLY_SECURE_RANDOM;
 	}
 	
 	/**
@@ -210,10 +231,13 @@ public class SSecurity
 				{
 					HIGHLY_SECURE_SEED_RANDOM = new SecureRandom()
 					{
+						SecureRandom additionalseeding = new SecureRandom();
+						
 						public synchronized void nextBytes(byte[] bytes)
 						{
 							
-							byte[] addent = SecureRandom.getSeed(bytes.length);
+							byte[] addent = new byte[bytes.length];
+							additionalseeding.nextBytes(addent);
 							getSeedRandom().nextBytes(bytes);;
 							
 							xor(bytes, addent);
