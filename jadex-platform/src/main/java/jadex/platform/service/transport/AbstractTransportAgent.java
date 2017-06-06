@@ -133,7 +133,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 					@Override
 					public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> tup)
 					{
-						if(tup.getFirstEntity().isTrustedPlatform() && tup.getSecondEntity()!=null)
+//						if(tup.getFirstEntity().isTrustedPlatform() && tup.getSecondEntity()!=null)
+						if(tup.getSecondEntity()!=null)
 						{
 							final Map<String, Object>	header	= (Map<String, Object>)codec.decode(agent.getClassLoader(), tup.getSecondEntity());
 							final IComponentIdentifier	rec	= (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);

@@ -345,7 +345,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header The message header.
 	 *  @param bodydata The encrypted message that arrived.
 	 */
-	public void messageArrived(final Map<String, Object> header, final byte[] bodydata)
+	public void messageArrived(final Map<String, Object> header, byte[] bodydata)
 	{
 		if (header != null && bodydata != null)
 		{
@@ -361,7 +361,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						// Only accept messages we trust.
 						if (secinf.isTrustedPlatform() || allowuntrusted)
 						{
-							Object body = getPlatformStateService().getSerializationServices().decode(component.getClassLoader(), bodydata);
+							Object body = getPlatformStateService().getSerializationServices().decode(component.getClassLoader(), result.getSecondEntity());
 							messageArrived(secinf, header, body);
 						}
 					}

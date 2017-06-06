@@ -131,8 +131,8 @@ public class SecurityAgent implements ISecurityService
 				return new Future<Void>(e);
 			}
 		}
-		
 		agent.getComponentFeature0(IMessageFeature.class).setAllowUntrusted(true);
+		agent.getComponentFeature0(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
 		return IFuture.DONE;
 	}
 	
@@ -218,10 +218,8 @@ public class SecurityAgent implements ISecurityService
 	{
 		final Future<Tuple2<IMsgSecurityInfos, byte[]>> ret = new Future<Tuple2<IMsgSecurityInfos,byte[]>>();
 		
-		System.out.println("Received from: " + sender);
 		if (content.length > 0 && content[0] == -1)
 		{
-			System.out.println("Received from2: " + sender);
 			// Security message
 			byte[] newcontent = new byte[content.length - 1];
 			System.arraycopy(content, 1, newcontent, 0, newcontent.length);
@@ -422,7 +420,7 @@ public class SecurityAgent implements ISecurityService
 			if (msg instanceof InitialHandshakeMessage)
 			{
 				final InitialHandshakeMessage imsg = (InitialHandshakeMessage) msg;
-				System.out.println("Got initial handshake: " + imsg);
+				System.out.println("Got initial handshake: " + imsg.getConversationId());
 				
 				final Future<ICryptoSuite> fut = new Future<ICryptoSuite>();
 				
