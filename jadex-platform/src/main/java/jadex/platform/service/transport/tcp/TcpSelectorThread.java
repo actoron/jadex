@@ -11,7 +11,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.channels.spi.AbstractSelectableChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -19,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
@@ -145,7 +145,7 @@ public class TcpSelectorThread implements Runnable
 		
 		for(SelectionKey key: selector.keys())
 		{
-			closeKeyChannel(key);
+			closeConnection(key, null);
 		}
 		
 		try
@@ -178,47 +178,66 @@ public class TcpSelectorThread implements Runnable
 		this.selector = Selector.open();
 	}
 
-	
 	/**
-	 *  Perform close operation son a channel as identified by the given key.
+	 *  Perform close operations on a channel as identified by the given key.
 	 *  Potentially cleans up key attachments as well.
+	 *  @param e	The exception, if any.
 	 */
-	protected void closeKeyChannel(SelectionKey key)
+	protected void closeConnection(SelectionKey key, Exception e)
 	{
-//		Object	con	= key.attachment();
-//		
-//		if(con instanceof Tuple2<?, ?>)
-//		{
-//			con	= ((Tuple2<?,?>)con).getSecondEntity();
-//		}
-//		
-//		if(con instanceof IFuture<?> && ((IFuture<?>)con).isDone()  && ((IFuture<?>)con).getException()==null)
-//		{
-//			con	= ((IFuture<?>)con).get();
-//		}
-//
-//		if(con instanceof Closeable)
-//		{
-//			try
-//			{
-//				((Closeable)con).close();
-////				System.out.println("closed: "+con);
-//			}
-//			catch(IOException e)
-//			{
-//			}
-//		}
+		SelectableChannel	sc	= key.channel();
 		
+		if(e!=null)
+		{
+			e.printStackTrace();
+			if(sc instanceof SocketChannel)
+			{
+				tcpagent.getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
+			}
+			else
+			{
+				tcpagent.getLogger().info("Error on server socket with port: "+((ServerSocketChannel)sc).socket().getLocalPort()+", "+e);			
+			}
+		}
+
 		try
 		{
-			SelectableChannel	sc	= key.channel();
 			sc.close();
 		}
-		catch(Exception e)
+		catch(Exception ex){}
+		
+		// Connection closed: abort all open write tasks.
+		List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)this.writetasks.get(sc);
+		if(queue!=null)
 		{
-//			e.printStackTrace();
+			for(Iterator<Tuple2<List<ByteBuffer>, Future<Void>>> it=queue.iterator(); it.hasNext(); )
+			{
+				Tuple2<List<ByteBuffer>, Future<Void>>	task	= (Tuple2<List<ByteBuffer>, Future<Void>>)it.next();
+				Future<Void>	fut	= task.getSecondEntity();
+				fut.setException(e!=null ? e : new RuntimeException("Channel closed."));
+				it.remove();
+			}
+			writetasks.remove(sc);
 		}
+
+		key.attach(null);
+		key.cancel();
 	}
+	
+
+	/**
+	 *  Schedule a task on the thread.
+	 */
+	protected void schedule(Runnable task)
+	{
+		assert running;
+		synchronized(tasks)
+		{
+			tasks.add(task);
+		}
+		selector.wakeup();
+	}
+	
 	
 	//-------- methods to be called from external --------
 	
@@ -287,14 +306,31 @@ public class TcpSelectorThread implements Runnable
 	}
 	
 	/**
-	 *  Create a connection to a given addresses.
-	 *  
-	 *  @param address	The address to connect to.
+	 *  Perform close operations on a channel.
+	 *  Potentially cleans up key attachments as well.
+	 */
+	public void closeChannel(final SelectableChannel sc)
+	{
+		schedule(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				SelectionKey	sk	= sc.keyFor(selector);
+				assert sk!=null;
+				closeConnection(sk, null);
+			}
+		});
+	}
+	
+	/**
+	 *  Create a connection to a given address.
+	 *  @param	address	The target platform's address.
+	 *  @param target	The target identifier to maybe perform authentication of the connection.
 	 *  @return A future containing the connection when succeeded.
 	 */
-	public IFuture<SocketChannel>	createConnection(final String address)
+	public IFuture<SocketChannel>	createConnection(final String address, final IComponentIdentifier target)
 	{
-		assert running;
 		final Future<SocketChannel>	ret	= new Future<SocketChannel>();
 		
 		final InetSocketAddress	sock;
@@ -304,7 +340,7 @@ public class TcpSelectorThread implements Runnable
 			URI uri = new URI("tcp://" + address);
 			sock	= new InetSocketAddress(uri.getHost(), uri.getPort());
 
-			Runnable	task	= new Runnable()
+			schedule(new Runnable()
 			{
 				public void run()
 				{
@@ -314,7 +350,7 @@ public class TcpSelectorThread implements Runnable
 						sc = SocketChannel.open();
 //						sc.socket().setSoTimeout(10);
 						sc.configureBlocking(false);
-						sc.register(selector, SelectionKey.OP_CONNECT, new TcpChannelHandler(ret));
+						sc.register(selector, SelectionKey.OP_CONNECT, new TcpChannelHandler(sc, target, ret));
 						sc.connect(sock);
 						tcpagent.getLogger().info("Attempting connection to: "+address);
 					}
@@ -329,12 +365,7 @@ public class TcpSelectorThread implements Runnable
 						ret.setException(e);
 					}
 				}			
-			};
-			synchronized(tasks)
-			{
-				tasks.add(task);
-			}
-			selector.wakeup();
+			});
 		}
 		catch(URISyntaxException ex)
 		{
@@ -353,9 +384,9 @@ public class TcpSelectorThread implements Runnable
 	 */
 	public IFuture<Void> sendMessage(final SocketChannel sc, final byte[] header, final byte[] body)
 	{
-		assert running;
 		final Future<Void>	ret	= new Future<Void>();
-		Runnable	run	= new Runnable()
+		
+		schedule(new Runnable()
 		{
 			public void run()
 			{
@@ -397,7 +428,7 @@ public class TcpSelectorThread implements Runnable
 				{
 					if(key!=null)
 					{
-						closeKeyChannel(key);
+						closeConnection(key, e);
 					}
 					
 //					System.err.println("writetasks4: "+writetasks.get(con.getSocketChannel())+", "+e);
@@ -407,13 +438,7 @@ public class TcpSelectorThread implements Runnable
 					ret.setException(e);
 				}
 			}			
-		};
-		
-		synchronized(tasks)
-		{
-			tasks.add(run);
-		}
-		selector.wakeup();
+		});
 
 		
 		return ret;
@@ -436,14 +461,14 @@ public class TcpSelectorThread implements Runnable
 			sc.configureBlocking(false);
 			
 			// Add empty channel info for unsolicited connections.
-			SelectionKey	sckey	= sc.register(selector, 0, new TcpChannelHandler(null));
+			SelectionKey	sckey	= sc.register(selector, 0, new TcpChannelHandler(sc, null, null));
 			startHandshake(sckey);
 			
 			tcpagent.getLogger().info("Accepted connection from: "+sc.socket().getRemoteSocketAddress()+", waiting for handshake...");
 		}
 		catch(Exception e)
 		{
-			connectionFailed(key, e);
+			closeConnection(key, e);
 		}
 	}
 
@@ -464,7 +489,7 @@ public class TcpSelectorThread implements Runnable
 		}
 		catch(Exception e)
 		{
-			connectionFailed(key, e);
+			closeConnection(key, e);
 		}
 	}
 	
@@ -495,20 +520,15 @@ public class TcpSelectorThread implements Runnable
 			// Try to complete handshake.
 			if(!handler.isOpen())
 			{
-				Tuple2<byte[], byte[]> msg=handler.read(sc);
+				Tuple2<byte[], byte[]> msg=handler.read();
 				if(msg!=null)
 				{
 					// Make connection available for outgoing messages.
-					handler.setOpen(true);					
 					String	remotecid	= new String(msg.getSecondEntity(), SUtil.UTF8);
 					tcpagent.getLogger().info("Handshake completed to: "+remotecid+" at "+sc.socket().getRemoteSocketAddress());
-					// TODO add connection to agent.
+					handler.handshakeComplete(remotecid);
 					
-					Future<SocketChannel>	ret	= handler.getConnectionFuture();
-					if(ret!=null)
-					{
-						ret.setResult(sc);
-					}
+//					tcpagent.addConnection(handler.getOpposite(), sc);
 				}
 			}
 			
@@ -516,16 +536,16 @@ public class TcpSelectorThread implements Runnable
 			if(handler.isOpen())
 			{
 				// Read as much messages as available (if any).
-				for(Tuple2<byte[], byte[]> msg=handler.read(sc); msg!=null; msg=handler.read(sc))
+				for(Tuple2<byte[], byte[]> msg=handler.read(); msg!=null; msg=handler.read())
 				{
 //					System.out.println("Read message from: "+sc+", "+new String(msg.getSecondEntity(), SUtil.UTF8));
-					tcpagent.deliverMessage(msg.getFirstEntity(), msg.getSecondEntity());
+					tcpagent.deliverMessage(handler.getOpposite(), msg.getFirstEntity(), msg.getSecondEntity());
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			connectionFailed(key, e);
+			closeConnection(key, e);
 		}
 	}
 	
@@ -584,44 +604,7 @@ public class TcpSelectorThread implements Runnable
 		}
 		catch(Exception e)
 		{
-			connectionFailed(key, e);
+			closeConnection(key, e);
 		}
-	}
-	
-	/**
-	 *  Cleanup for a failed connection.
-	 */
-	protected void	connectionFailed(SelectionKey key, Exception e)
-	{
-		AbstractSelectableChannel sc = (AbstractSelectableChannel)key.channel();
-		if(sc!=null)
-		{
-			try{sc.close();}catch(Exception ex){}
-		}
-		
-		// Connection failure: notify all open write tasks.
-		List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)this.writetasks.get(sc);
-		if(queue!=null)
-		{
-			for(Iterator<Tuple2<List<ByteBuffer>, Future<Void>>> it=queue.iterator(); it.hasNext(); )
-			{
-				Tuple2<List<ByteBuffer>, Future<Void>>	task	= (Tuple2<List<ByteBuffer>, Future<Void>>)it.next();
-				Future<Void>	fut	= task.getSecondEntity();
-				fut.setException(e);
-				it.remove();
-			}
-			writetasks.remove(sc);
-		}
-		
-		if(sc instanceof SocketChannel)
-		{
-			tcpagent.getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
-		}
-		else
-		{
-			tcpagent.getLogger().info("Error on server socket with port: "+((ServerSocketChannel)sc).socket().getLocalPort()+", "+e);			
-		}
-//		e.printStackTrace();
-		key.cancel();
 	}
 }

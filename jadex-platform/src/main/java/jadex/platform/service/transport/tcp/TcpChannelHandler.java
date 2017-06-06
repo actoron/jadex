@@ -3,24 +3,33 @@ package jadex.platform.service.transport.tcp;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
+import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 
 /**
- *  Struct to hold required information about a channel.
+ *  Object holding required information about a channel.
  */
 public class TcpChannelHandler
 {
 	//-------- attributes --------
 	
+	/** The socket channel (required). */
+	protected SocketChannel	sc;
+	
+	/** The intended or confirmed opposite end of the connection. */
+	protected IComponentIdentifier	opposite;
+
 	/** The future, in case somebody wants to be informed about an established connection
 	 *  (may be null for server connections). */
 	protected Future<SocketChannel>	fut;
 	
 	/** The channel state (handshake or open). */
-	protected boolean open;
+	protected boolean	open;
 	
 	/** The message buffer for intermediate results of asynchronous read operations. */
+	// TODO: shouldn't hold message buffer while idle?
 	protected TcpMessageBuffer	buffer;
 	
 	/** The current header, if any. */
@@ -30,10 +39,14 @@ public class TcpChannelHandler
 	
 	/**
 	 *  Create a channel info
+	 *  @param sc	The socket channel (required).
+	 *  @param target	The target identifier to maybe perform authentication of the connection.
 	 *  @param fut	The connection future, if any.
 	 */
-	public TcpChannelHandler(Future<SocketChannel> fut)
+	public TcpChannelHandler(SocketChannel sc, IComponentIdentifier target, Future<SocketChannel> fut)
 	{
+		this.sc	= sc;
+		this.opposite	= target;
 		this.fut	= fut;
 	}
 	
@@ -49,10 +62,26 @@ public class TcpChannelHandler
 	
 	/**
 	 *  Set after handshake is complete.
+	 *  @param o
 	 */
-	public void	setOpen(boolean open)
+	public void	handshakeComplete(String target) throws IOException
 	{
-		this.open	= open;
+		if(this.opposite==null)
+		{
+			this.opposite	= new BasicComponentIdentifier(target);
+		}
+		else if(!this.opposite.getName().equals(target))
+		{
+			throw new IOException("Handshake failed: Expected "+this.opposite+" but was "+target);
+		}
+		
+		this.open	= true;
+		
+		if(fut!=null)
+		{
+			fut.setResult(sc);
+			fut	= null;
+		}			
 	}
 	
 	/**
@@ -61,7 +90,7 @@ public class TcpChannelHandler
 	 * @return True, if a the message is complete.
 	 * @throws Exception on read error.
 	 */
-	public Tuple2<byte[], byte[]>	read(SocketChannel sc) throws IOException
+	public Tuple2<byte[], byte[]>	read() throws IOException
 	{
 		Tuple2<byte[], byte[]>	ret = null;
 		if(buffer==null)
@@ -92,10 +121,10 @@ public class TcpChannelHandler
 	}
 	
 	/**
-	 *  Get the connection future, if any.
+	 *  Get the opposite.
 	 */
-	public Future<SocketChannel>	getConnectionFuture()
+	public IComponentIdentifier	getOpposite()
 	{
-		return fut;
+		return opposite;
 	}
 }

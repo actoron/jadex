@@ -18,10 +18,12 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.platformstate.IPlatformStateService;
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.Boolean3;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -78,8 +80,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	
 	/**
 	 *  Create a connection to a given address.
+	 *  @param	address	The target platform's address.
+	 *  @param target	The target identifier to maybe perform authentication of the connection.
 	 */
-	protected abstract IFuture<Con>	createConnection(String address);
+	protected abstract IFuture<Con>	createConnection(String address, IComponentIdentifier target);
 	
 	/**
 	 *  Close a previously opened connection.
@@ -104,58 +108,83 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	}
 	
 	/**
-	 *  Deliver a received message.
+	 *  Call when an unrequested connection is established, e.g. back channel. 
 	 */
-	public void	deliverMessage(final byte[] bheader, final byte[] body)
+	public void	connectionAdded(IComponentIdentifier target, Con con)
 	{
-		final Map<String, Object>	header	= (Map<String, Object>)codec.decode(agent.getClassLoader(), bheader);
-		final IComponentIdentifier	rec	= (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);
 		
+	}
+	
+	/**
+	 *  Deliver a received message.
+	 *  @param source	The sending platform.
+	 */
+	public void	deliverMessage(final IComponentIdentifier source, final byte[] bheader, final byte[] body)
+	{
 		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IComponentManagementService	cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
-				cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
+				ISecurityService	secser	= SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM);
+				secser.decryptAndAuth(source, bheader)
+					.addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos, byte[]>>()
 				{
 					@Override
-					public void resultAvailable(IExternalAccess exta)
+					public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> tup)
 					{
-						exta.scheduleStep(new IComponentStep<Void>()
+						if(tup.getFirstEntity().isTrustedPlatform() && tup.getSecondEntity()!=null)
 						{
-							@Override
-							public IFuture<Void> execute(IInternalAccess ia)
+							final Map<String, Object>	header	= (Map<String, Object>)codec.decode(agent.getClassLoader(), tup.getSecondEntity());
+							final IComponentIdentifier	rec	= (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);
+														
+							IComponentManagementService	cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
+							cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
 							{
-								IMessageFeature	mf	= ia.getComponentFeature0(IMessageFeature.class);
-								if(mf instanceof IInternalMessageFeature)
+								@Override
+								public void resultAvailable(IExternalAccess exta)
 								{
-									((IInternalMessageFeature)mf).messageArrived(header, body);
+									exta.scheduleStep(new IComponentStep<Void>()
+									{
+										@Override
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											IMessageFeature	mf	= ia.getComponentFeature0(IMessageFeature.class);
+											if(mf instanceof IInternalMessageFeature)
+											{
+												((IInternalMessageFeature)mf).messageArrived(header, body);
+											}
+											return IFuture.DONE;
+										}
+									}).addResultListener(new IResultListener<Void>()
+									{
+										@Override
+										public void resultAvailable(Void result)
+										{
+											// NOP
+										}
+										
+										@Override
+										public void exceptionOccurred(Exception exception)
+										{
+											getLogger().warning("Could not deliver message from platform "+source+" to "+rec+": "+exception);
+										}
+									});
 								}
-								return IFuture.DONE;
-							}
-						}).addResultListener(new IResultListener<Void>()
-						{
-							@Override
-							public void resultAvailable(Void result)
-							{
-								// NOP
-							}
-							
-							@Override
-							public void exceptionOccurred(Exception exception)
-							{
-								getLogger().warning("Could not deliver message to "+rec+": "+exception);
-							}
-						});
+								
+								@Override
+								public void exceptionOccurred(Exception exception)
+								{
+									getLogger().warning("Could not deliver message from platform "+source+" to "+rec+": "+exception);
+								}
+							});
+						}
 					}
 					
 					@Override
 					public void exceptionOccurred(Exception exception)
 					{
-						// Shouldn't happen?
-						getLogger().warning("Could not deliver message to "+rec+": "+exception);
-						exception.printStackTrace();
+						getLogger().warning("Could not deliver message from platform "+source+": "+exception);
 					}
 				});
 				return IFuture.DONE;
@@ -171,9 +200,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				getLogger().warning("Could not deliver message to "+rec+": "+exception);
+				getLogger().warning("Could not deliver message from platform "+source+": "+exception);
 			}
-		});;
+		});
 	}
 	
 	/**
@@ -311,6 +340,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 				ret	= new Future<Con>();
 				final Future<Con>	fret	= ret;
 				
+				IComponentIdentifier	rec	= ((IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER)).getRoot();
+				
 				final String[] addresses = getAddresses(header);
 				if(addresses!=null && addresses.length>0)
 				{
@@ -319,7 +350,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 					
 					for(String address: addresses)
 					{
-						IFuture<Con>	fcon	= createConnection(address);
+						IFuture<Con>	fcon	= createConnection(address, rec);
 						fcon.addResultListener(new IResultListener<Con>()
 						{
 							@Override
@@ -397,9 +428,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	 */
 	protected void	setConnection(Map<String, Object> header, Con con)
 	{
+		boolean	ret;
 		IComponentIdentifier	rec	= (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);
-		assert !connections.containsKey(rec);
-		connections.put(rec, con);
+		synchronized(connections)
+		{
+			Con	prev	= connections.put(rec, con);
+		}
 	}
 
 	/**
@@ -441,7 +475,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService
 	protected String[] getAddresses(Map<String, Object> header)
 	{
 		IComponentIdentifier	rec	= (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);
-		TransportAddressBook	book	= (TransportAddressBook)PlatformConfiguration.getPlatformValue(rec, PlatformConfiguration.DATA_ADDRESSBOOK);
+		TransportAddressBook	book	= (TransportAddressBook)PlatformConfiguration
+			.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);
 		return book.getPlatformAddresses(rec, getProtocolName());
 	}
 }
