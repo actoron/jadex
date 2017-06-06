@@ -18,6 +18,7 @@ import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -33,6 +34,7 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
+import jadex.platform.service.security.handshake.HandshakeRejectionMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
 import jadex.platform.service.security.impl.Blake2bX509AuthenticationSuite;
@@ -41,7 +43,7 @@ import jadex.platform.service.security.impl.IAuthenticationSuite;
 /**
  *  Agent that provides the security service.
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Arguments({
 	@Argument(name="cryptosuites", clazz=String[].class),
 	@Argument(name="usepass", clazz=boolean.class, defaultvalue="true"),
@@ -63,8 +65,11 @@ public class SecurityAgent implements ISecurityService
 	@Agent
 	protected IInternalAccess agent;
 	
-	/** Platform authentication secrets. */
+	/** Local platform authentication secrets. */
 	protected List<AbstractAuthenticationSecret> platformsecrets;
+	
+	/** Remote platform authentication secrets. */
+	protected Map<IComponentIdentifier, AbstractAuthenticationSecret> remoteplatformsecrets;
 	
 	/** Available virtual networks. */
 	protected Map<String, AbstractAuthenticationSecret> networks;
@@ -97,6 +102,7 @@ public class SecurityAgent implements ISecurityService
 			agent.getLogger().warning("Security agent running as \"" + agent.getComponentIdentifier().getLocalName() +"\" instead of \"security\".");
 		
 		platformsecrets = new ArrayList<AbstractAuthenticationSecret>();
+		remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();
 		networks = new HashMap<String, AbstractAuthenticationSecret>();
 		
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
@@ -110,7 +116,7 @@ public class SecurityAgent implements ISecurityService
 		String[] cryptsuites = (String[]) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("cryptosuites");
 		if (cryptsuites == null)
 		{
-			cryptsuites = new String[] { "jadex.platform.service.security.impl.Ed448ChaCha20Poly1305Suite" };
+			cryptsuites = new String[] { "jadex.platform.service.security.impl.Curve448ChaCha20Poly1305Suite" };
 		}
 		allowedcryptosuites = new HashMap<String, Class<?>>();
 		for (String cryptsuite : cryptsuites)
@@ -171,6 +177,7 @@ public class SecurityAgent implements ISecurityService
 					String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getRoot().toString());
 					hstate = new HandshakeState();
 					hstate.setConversationId(convid);
+					hstate.setResultfut(new Future<ICryptoSuite>());
 					
 					initializingcryptosuites.put(rplat, hstate);
 					
@@ -211,8 +218,10 @@ public class SecurityAgent implements ISecurityService
 	{
 		final Future<Tuple2<IMsgSecurityInfos, byte[]>> ret = new Future<Tuple2<IMsgSecurityInfos,byte[]>>();
 		
+		System.out.println("Received from: " + sender);
 		if (content.length > 0 && content[0] == -1)
 		{
+			System.out.println("Received from2: " + sender);
 			// Security message
 			byte[] newcontent = new byte[content.length - 1];
 			System.arraycopy(content, 1, newcontent, 0, newcontent.length);
@@ -222,7 +231,62 @@ public class SecurityAgent implements ISecurityService
 		}
 		else
 		{
+			final IComponentIdentifier splat = sender.getRoot();
+			ICryptoSuite cs = currentcryptosuites.get(splat);
+			byte[] cleartext = null;
 			
+			if (cs != null)
+			{
+				cleartext = cs.decryptAndAuth(content);
+			}
+			
+			if (cleartext == null)
+			{
+				Tuple2<ICryptoSuite, Long> tup = expiringcryptosuites.get(splat);
+				if (tup != null)
+				{
+					cs = tup.getFirstEntity();
+					cleartext = cs.decryptAndAuth(content);
+				}
+			}
+			
+			if (cleartext == null)
+			{
+				HandshakeState hstate = initializingcryptosuites.get(splat);
+				if (hstate != null)
+				{
+					final byte[] fcontent = content;
+					hstate.getResultFuture().addResultListener(new IResultListener<ICryptoSuite>()
+					{
+						public void resultAvailable(ICryptoSuite result)
+						{
+							byte[] cleartext = result.decryptAndAuth(fcontent);
+							if (cleartext != null)
+							{
+								ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(result.getSecurityInfos(), cleartext));
+							}
+							else
+							{
+								ret.setException(new SecurityException("Could not establish secure communication with: " + splat.toString()));
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				else
+				{
+					ret.setException(new SecurityException("Could not establish secure communication with: " + splat.toString()));
+				}
+			}
+			
+			if (cleartext != null)
+			{
+				ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(cs.getSecurityInfos(), cleartext));
+			}
 		}
 		return ret;
 	}
@@ -358,6 +422,7 @@ public class SecurityAgent implements ISecurityService
 			if (msg instanceof InitialHandshakeMessage)
 			{
 				final InitialHandshakeMessage imsg = (InitialHandshakeMessage) msg;
+				System.out.println("Got initial handshake: " + imsg);
 				
 				final Future<ICryptoSuite> fut = new Future<ICryptoSuite>();
 				
@@ -428,6 +493,8 @@ public class SecurityAgent implements ISecurityService
 						}
 						else
 						{
+							HandshakeRejectionMessage hrm = new HandshakeRejectionMessage(agent.getComponentIdentifier(), rm.getConversationId());
+							sendSecurityHandshakeMessage(rm.getSender(), hrm);
 //							BasicSecurityMessage cryptohandshake = suite.handleHandshake(SecurityAgent.this, rm);
 //							sendSecurityHandshakeMessage(rm.getSender(), cryptohandshake);
 						}
@@ -440,9 +507,20 @@ public class SecurityAgent implements ISecurityService
 				HandshakeState state = initializingcryptosuites.get(secmsg.getSender().getRoot().toString());
 				if (state != null && state.getConversationId().equals(secmsg.getConversationId()) && state.getCryptoSuite() != null)
 				{
-					IComponentIdentifier receiver = secmsg.getSender();
-//					secmsg = state.getCryptoSuite().handleHandshake(secmsg);
-					sendSecurityHandshakeMessage(receiver, secmsg);
+					try
+					{
+						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
+						{
+							System.out.println("Finished handshake: " + secmsg.getSender());
+							state.getResultFuture().setResult(state.getCryptoSuite());
+						}
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+						state.getResultFuture().setException(e);
+						initializingcryptosuites.remove(secmsg.getSender().getRoot());
+					}
 				}
 			}
 		}

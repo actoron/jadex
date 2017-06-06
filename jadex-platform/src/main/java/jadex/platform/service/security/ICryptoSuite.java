@@ -1,5 +1,6 @@
 package jadex.platform.service.security;
 
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 
 public interface ICryptoSuite
@@ -19,6 +20,13 @@ public interface ICryptoSuite
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
 	public byte[] decryptAndAuth(byte[] content);
+	
+	/**
+	 *  Gets the security infos related to the authentication state.
+	 *  
+	 *  @return The security infos for decrypted messages.
+	 */
+	public IMsgSecurityInfos getSecurityInfos();
 	
 	/**
 	 *  Handles handshake messages.

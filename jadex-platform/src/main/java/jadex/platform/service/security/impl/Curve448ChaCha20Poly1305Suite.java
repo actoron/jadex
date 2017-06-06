@@ -15,6 +15,7 @@ import org.spongycastle.util.Pack;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.SUtil;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.AbstractAuthenticationSecret;
@@ -95,6 +96,16 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		if (!isValid(Pack.littleEndianToLong(content, 8)))
 			ret = null;
 		return ret;
+	}
+	
+	/**
+	 *  Gets the security infos related to the authentication state.
+	 *  
+	 *  @return The security infos for decrypted messages.
+	 */
+	public IMsgSecurityInfos getSecurityInfos()
+	{
+		return secinf;
 	}
 	
 	/**
