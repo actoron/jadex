@@ -4,6 +4,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.nio.channels.SocketChannel;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -83,8 +84,10 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 	
 	/**
 	 *  Create a connection to a given address.
+	 *  @param	address	The target platform's address.
+	 *  @param target	The target identifier to maybe perform authentication of the connection.
 	 */
-	protected IFuture<SocketChannel>	createConnection(String address)
+	protected IFuture<SocketChannel>	createConnection(String address, IComponentIdentifier target)
 	{
 		try
 		{
@@ -93,7 +96,7 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 				this.selectorthread	= new TcpSelectorThread(this);			
 				selectorthread.start();
 			}
-			return selectorthread.createConnection(address);
+			return selectorthread.createConnection(address, target);
 		}
 		catch(Exception e)
 		{
@@ -106,7 +109,7 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 	 */
 	protected void	closeConnection(SocketChannel con)
 	{
-		
+		selectorthread.closeChannel(con);
 	}
 	
 	/**

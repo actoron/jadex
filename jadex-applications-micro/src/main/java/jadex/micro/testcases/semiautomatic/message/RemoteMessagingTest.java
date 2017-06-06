@@ -24,7 +24,7 @@ public class RemoteMessagingTest
 		// Start first platform with receiver.
 		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
 		config1.setLogging(true);
-		config1.setDefaultTimeout(-1);
+//		config1.setDefaultTimeout(-1);
 		config1.setSecurity(true);
 		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
 		config1.addComponent(ReceiverAgent.class);
@@ -35,7 +35,7 @@ public class RemoteMessagingTest
 		// Start second platform
 		PlatformConfiguration	config2	= PlatformConfiguration.getMinimal();
 		config2.setLogging(true);
-		config2.setDefaultTimeout(-1);
+//		config2.setDefaultTimeout(-1);
 		config2.setSecurity(true);
 		config2.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
 		IExternalAccess	access2	= Starter.createPlatform(config2).get();
