@@ -46,6 +46,9 @@ public class RemoteMessagingTest
 		tab2.addPlatformAddresses(access1.getComponentIdentifier(), "tcp",
 			tab1.getPlatformAddresses(access1.getComponentIdentifier(), "tcp"));
 		
+		tab1.addPlatformAddresses(access2.getComponentIdentifier(), "tcp",
+				tab2.getPlatformAddresses(access2.getComponentIdentifier(), "tcp"));
+		
 		// Start sender with receiver CID on remote platform.
 		cms.createComponent(SenderAgent.class.getName()+".class",
 			new CreationInfo(Collections.singletonMap("receiver",

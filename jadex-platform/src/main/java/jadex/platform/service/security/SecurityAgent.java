@@ -455,23 +455,13 @@ public class SecurityAgent implements ISecurityService
 				
 				state = new HandshakeState();
 				state.setResultfut(fut);
-				state.setConversationId(SUtil.createUniqueId(getComponentIdentifier().toString()));
+				state.setConversationId(imsg.getConversationId());
 				initializingcryptosuites.put(imsg.getSender().toString(), state);
 				
 				
 				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite);
 				
-				sendSecurityMessage(imsg.getSender(), reply).addResultListener(new IResultListener<Void>()
-				{
-					public void exceptionOccurred(Exception exception)
-					{
-						initializingcryptosuites.remove(imsg.getSender().getRoot().toString());
-					}
-					
-					public void resultAvailable(Void result)
-					{
-					}
-				});
+				sendSecurityHandshakeMessage(imsg.getSender(), reply);
 			}
 			else if (msg instanceof InitialHandshakeReplyMessage)
 			{
@@ -491,10 +481,12 @@ public class SecurityAgent implements ISecurityService
 						}
 						else
 						{
-							HandshakeRejectionMessage hrm = new HandshakeRejectionMessage(agent.getComponentIdentifier(), rm.getConversationId());
-							sendSecurityHandshakeMessage(rm.getSender(), hrm);
-//							BasicSecurityMessage cryptohandshake = suite.handleHandshake(SecurityAgent.this, rm);
-//							sendSecurityHandshakeMessage(rm.getSender(), cryptohandshake);
+							state.setCryptoSuite(suite);
+							if (!suite.handleHandshake(SecurityAgent.this, rm))
+							{
+								System.out.println("Finished handshake: " + rm.getSender());
+								state.getResultFuture().setResult(state.getCryptoSuite());
+							}
 						}
 					}
 				}

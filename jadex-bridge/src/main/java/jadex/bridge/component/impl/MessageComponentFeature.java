@@ -497,6 +497,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		if (tup != null)
 		{
 			getPlatformStateService().getTransportCache().put(rplat, tup);
+			ret.setResult(tup.getFirstEntity());
 		}
 		else
 		{

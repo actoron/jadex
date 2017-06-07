@@ -34,7 +34,7 @@ public interface ISecurityService
 	 *  @param content The content
 	 *  @return Encrypted/signed message.
 	 */
-	public IFuture<byte[]> encryptAndSign(@Reference Map<String, Object> header, @Reference byte[] content);
+	public @Reference IFuture<byte[]> encryptAndSign(@Reference Map<String, Object> header, @Reference byte[] content);
 	
 	/**
 	 *  Decrypt and authenticates the message from a sender.
@@ -43,5 +43,5 @@ public interface ISecurityService
 	 *  @param content The content.
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
-	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(@Reference IComponentIdentifier sender, @Reference byte[] content);
+	public @Reference IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(@Reference IComponentIdentifier sender, @Reference byte[] content);
 }

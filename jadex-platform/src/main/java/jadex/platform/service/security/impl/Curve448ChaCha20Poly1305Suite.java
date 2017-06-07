@@ -47,7 +47,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	/** The remote-generated authentication challenge. */
 	protected byte[] remoteauthchallenge;
 	
-	/** Next step in the protocol. */
+	/** Next step in the handshake protocol. */
 	protected int nextstep;
 	
 	// -------------- Operational state -----------------
