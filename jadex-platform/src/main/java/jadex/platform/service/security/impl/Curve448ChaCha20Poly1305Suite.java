@@ -22,6 +22,7 @@ import jadex.platform.service.security.AbstractAuthenticationSecret;
 import jadex.platform.service.security.MsgSecurityInfos;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
+import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
 
 /**
@@ -123,7 +124,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		
 		if (nextstep == 0)
 		{
-			if (nextstep == 0 && incomingmessage instanceof InitialHandshakeReplyMessage)
+			if (incomingmessage instanceof InitialHandshakeFinalMessage)
 			{
 				StartExchangeMessage sem = new StartExchangeMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId());
 				localauthchallenge = new byte[32];
@@ -138,7 +139,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 				agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
 				nextstep = 1;
 			}
-			else if (nextstep == 0 && incomingmessage instanceof StartExchangeMessage)
+			else if (incomingmessage instanceof StartExchangeMessage)
 			{
 				StartExchangeMessage sem = (StartExchangeMessage) incomingmessage;
 				remoteauthchallenge = sem.getChallenge();
@@ -200,8 +201,8 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			secinf.setAuthplatform(secinf.isTrustedPlatform());
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
-			if (!secinf.isAuthenticatedPlatform())
-				throw new SecurityException("Platform could not be authenticated: " + incmsg.getSender().getRoot());
+//			if (!secinf.isAuthenticatedPlatform())
+//				throw new SecurityException("Platform could not be authenticated: " + incmsg.getSender().getRoot());
 			
 			ephemeralprivkey = new byte[56];
 			SSecurity.getHighlySecureRandom().nextBytes(ephemeralprivkey);
@@ -262,8 +263,8 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			secinf.setAuthplatform(secinf.isTrustedPlatform());
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
-			if (!secinf.isAuthenticatedPlatform())
-				throw new SecurityException("Platform could not be authenticated: " + incmsg.getSender().getRoot());
+//			if (!secinf.isAuthenticatedPlatform())
+//				throw new SecurityException("Platform could not be authenticated: " + incmsg.getSender().getRoot());
 			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
 			nonceprefix ^= Pack.littleEndianToInt(remoteauthchallenge, 0);

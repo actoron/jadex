@@ -34,7 +34,7 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
-import jadex.platform.service.security.handshake.HandshakeRejectionMessage;
+import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
 import jadex.platform.service.security.impl.Blake2bX509AuthenticationSuite;
@@ -456,7 +456,7 @@ public class SecurityAgent implements ISecurityService
 				state = new HandshakeState();
 				state.setResultfut(fut);
 				state.setConversationId(imsg.getConversationId());
-				initializingcryptosuites.put(imsg.getSender().toString(), state);
+				initializingcryptosuites.put(imsg.getSender().getRoot().toString(), state);
 				
 				
 				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite);
@@ -467,6 +467,7 @@ public class SecurityAgent implements ISecurityService
 			{
 				InitialHandshakeReplyMessage rm = (InitialHandshakeReplyMessage) msg;
 				HandshakeState state = initializingcryptosuites.get(rm.getSender().getRoot().toString());
+				
 				if (state != null)
 				{
 					String convid = state.getConversationId();
@@ -482,9 +483,35 @@ public class SecurityAgent implements ISecurityService
 						else
 						{
 							state.setCryptoSuite(suite);
-							if (!suite.handleHandshake(SecurityAgent.this, rm))
+							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getComponentIdentifier(), rm.getConversationId(), rm.getChosenCryptoSuite());
+							sendSecurityHandshakeMessage(rm.getSender(), fm);
+						}
+					}
+				}
+				
+			}
+			else if (msg instanceof InitialHandshakeFinalMessage)
+			{
+				InitialHandshakeFinalMessage fm = (InitialHandshakeFinalMessage) msg;
+				HandshakeState state = initializingcryptosuites.get(fm.getSender().getRoot().toString());
+				if (state != null)
+				{
+					String convid = state.getConversationId();
+					if (convid != null && convid.equals(fm.getConversationId()))
+					{
+						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite());
+						
+						if (suite == null)
+						{
+							initializingcryptosuites.remove(fm.getSender().getRoot().toString());
+							state.getResultFuture().setException(new SecurityException("Handshake with remote platform " + fm.getSender().getRoot().toString() + " failed."));
+						}
+						else
+						{
+							state.setCryptoSuite(suite);
+							if (!suite.handleHandshake(SecurityAgent.this, fm))
 							{
-								System.out.println("Finished handshake: " + rm.getSender());
+								System.out.println("Finished handshake: " + fm.getSender());
 								state.getResultFuture().setResult(state.getCryptoSuite());
 							}
 						}
