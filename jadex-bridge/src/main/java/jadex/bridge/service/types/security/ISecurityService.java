@@ -5,7 +5,6 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
-import jadex.bridge.service.annotation.Reference;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 
@@ -34,7 +33,8 @@ public interface ISecurityService
 	 *  @param content The content
 	 *  @return Encrypted/signed message.
 	 */
-	public @Reference IFuture<byte[]> encryptAndSign(@Reference Map<String, Object> header, @Reference byte[] content);
+	public IFuture<byte[]> encryptAndSign(Map<String, Object> header, byte[] content);
+//	public @Reference IFuture<byte[]> encryptAndSign(@Reference Map<String, Object> header, @Reference byte[] content);
 	
 	/**
 	 *  Decrypt and authenticates the message from a sender.
@@ -43,5 +43,5 @@ public interface ISecurityService
 	 *  @param content The content.
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
-	public @Reference IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(@Reference IComponentIdentifier sender, @Reference byte[] content);
+	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content);
 }

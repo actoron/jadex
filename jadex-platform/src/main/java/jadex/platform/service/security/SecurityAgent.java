@@ -10,6 +10,7 @@ import java.util.Set;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -18,7 +19,6 @@ import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -30,6 +30,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -37,13 +38,11 @@ import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
-import jadex.platform.service.security.impl.Blake2bX509AuthenticationSuite;
-import jadex.platform.service.security.impl.IAuthenticationSuite;
 
 /**
  *  Agent that provides the security service.
  */
-@Agent(autoprovide=Boolean3.TRUE)
+@Agent
 @Arguments({
 	@Argument(name="cryptosuites", clazz=String[].class),
 	@Argument(name="usepass", clazz=boolean.class, defaultvalue="true"),
@@ -55,6 +54,7 @@ import jadex.platform.service.security.impl.IAuthenticationSuite;
 	@Argument(name="validityduration", clazz=long.class)
 })
 @ProvidedServices(@ProvidedService(type=ISecurityService.class))
+//@ProvidedServices(@ProvidedService(type=ISecurityService.class, implementation=@Implementation(proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService
 {
@@ -87,10 +87,10 @@ public class SecurityAgent implements ISecurityService
 	protected Map<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites;
 	
 	/** The default authentication suite. */
-	protected IAuthenticationSuite defaultauthenticationsuite;
+//	protected IAuthenticationSuite defaultauthenticationsuite;
 	
 	/** Available authentication suites. */
-	protected Map<Integer, IAuthenticationSuite> authenticationsuites;
+//	protected Map<Integer, IAuthenticationSuite> authenticationsuites;
 	
 	/**
 	 *  Initializiation.
@@ -98,7 +98,7 @@ public class SecurityAgent implements ISecurityService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		if (agent.getComponentIdentifier().getLocalName() != "security")
+		if (!agent.getComponentIdentifier().getLocalName().equals("security"))
 			agent.getLogger().warning("Security agent running as \"" + agent.getComponentIdentifier().getLocalName() +"\" instead of \"security\".");
 		
 		platformsecrets = new ArrayList<AbstractAuthenticationSecret>();
@@ -109,9 +109,9 @@ public class SecurityAgent implements ISecurityService
 		currentcryptosuites = new HashMap<String, ICryptoSuite>();
 		expiringcryptosuites = new HashMap<String, Tuple2<ICryptoSuite,Long>>();
 		
-		defaultauthenticationsuite = new Blake2bX509AuthenticationSuite();
-		authenticationsuites = new HashMap<Integer, IAuthenticationSuite>();
-		authenticationsuites.put(defaultauthenticationsuite.getId(), defaultauthenticationsuite);
+//		defaultauthenticationsuite = new Blake2bX509AuthenticationSuite();
+//		authenticationsuites = new HashMap<Integer, IAuthenticationSuite>();
+//		authenticationsuites.put(defaultauthenticationsuite.getId(), defaultauthenticationsuite);
 		
 		String[] cryptsuites = (String[]) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("cryptosuites");
 		if (cryptsuites == null)
@@ -143,68 +143,74 @@ public class SecurityAgent implements ISecurityService
 	 *  @param content The content
 	 *  @return Encrypted/signed message.
 	 */
-	public IFuture<byte[]> encryptAndSign(Map<String, Object> header, final byte[] content)
+	public IFuture<byte[]> encryptAndSign(final Map<String, Object> header, final byte[] content)
 	{
-		final Future<byte[]> ret = new Future<byte[]>();
-		
-		if (isSecurityMessage(header))
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<byte[]>()
 		{
-			byte[] newcontent = new byte[content.length + 1];
-			newcontent[0] = -1;
-			System.arraycopy(content, 0, newcontent, 1, content.length);
-			ret.setResult(newcontent);
-		}
-		else
-		{
-			String rplat = ((IComponentIdentifier) header.get(MessageComponentFeature.RECEIVER)).getRoot().toString();
-			ICryptoSuite cs = currentcryptosuites.get(rplat);
-			if (cs != null)
+			public IFuture<byte[]> execute(IInternalAccess ia)
 			{
-				try
-				{
-					ret.setResult(cs.encryptAndSign(content));
-				}
-				catch (Exception e)
-				{
-					ret.setException(e);
-				}
-			}
-			else
-			{
-				HandshakeState hstate = initializingcryptosuites.get(rplat);
-				if (hstate == null)
-				{
-					String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getRoot().toString());
-					hstate = new HandshakeState();
-					hstate.setConversationId(convid);
-					hstate.setResultfut(new Future<ICryptoSuite>());
-					
-					initializingcryptosuites.put(rplat, hstate);
-					
-					String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
-					InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getComponentIdentifier(), convid, csuites);
-					BasicComponentIdentifier rsec = new BasicComponentIdentifier("security@" + rplat);
-					sendSecurityHandshakeMessage(rsec, ihm);
-				}
+				final Future<byte[]> ret = new Future<byte[]>();
 				
-				hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret)
+				if (isSecurityMessage(header))
 				{
-					public void customResultAvailable(ICryptoSuite result) throws Exception
+					byte[] newcontent = new byte[content.length + 1];
+					newcontent[0] = -1;
+					System.arraycopy(content, 0, newcontent, 1, content.length);
+					ret.setResult(newcontent);
+				}
+				else
+				{
+					String rplat = ((IComponentIdentifier) header.get(MessageComponentFeature.RECEIVER)).getRoot().toString();
+					ICryptoSuite cs = currentcryptosuites.get(rplat);
+					if (cs != null)
 					{
 						try
 						{
-							ret.setResult(result.encryptAndSign(content));
+							ret.setResult(cs.encryptAndSign(content));
 						}
 						catch (Exception e)
 						{
 							ret.setException(e);
 						}
 					}
-				});
+					else
+					{
+						HandshakeState hstate = initializingcryptosuites.get(rplat);
+						if (hstate == null)
+						{
+							String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getRoot().toString());
+							hstate = new HandshakeState();
+							hstate.setConversationId(convid);
+							hstate.setResultfut(new Future<ICryptoSuite>());
+							
+							initializingcryptosuites.put(rplat, hstate);
+							
+							String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
+							InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getComponentIdentifier(), convid, csuites);
+							BasicComponentIdentifier rsec = new BasicComponentIdentifier("security@" + rplat);
+							sendSecurityHandshakeMessage(rsec, ihm);
+						}
+						
+						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret)
+						{
+							public void customResultAvailable(ICryptoSuite result) throws Exception
+							{
+								try
+								{
+									ret.setResult(result.encryptAndSign(content));
+								}
+								catch (Exception e)
+								{
+									ret.setException(e);
+								}
+							}
+						});
+					}
+				}
+				
+				return ret;
 			}
-		}
-		
-		return ret;
+		});
 	}
 	
 	/**
@@ -214,79 +220,85 @@ public class SecurityAgent implements ISecurityService
 	 *  @param content The content.
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
-	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content)
+	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(final IComponentIdentifier sender, final byte[] content)
 	{
-		final Future<Tuple2<IMsgSecurityInfos, byte[]>> ret = new Future<Tuple2<IMsgSecurityInfos,byte[]>>();
-		
-		if (content.length > 0 && content[0] == -1)
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Tuple2<IMsgSecurityInfos,byte[]>>()
 		{
-			// Security message
-			byte[] newcontent = new byte[content.length - 1];
-			System.arraycopy(content, 1, newcontent, 0, newcontent.length);
-			MsgSecurityInfos secinfos = new MsgSecurityInfos();
-			Tuple2<IMsgSecurityInfos,byte[]> tup = new Tuple2<IMsgSecurityInfos, byte[]>(secinfos, newcontent);
-			ret.setResult(tup);
-		}
-		else
-		{
-			final IComponentIdentifier splat = sender.getRoot();
-			ICryptoSuite cs = currentcryptosuites.get(splat);
-			byte[] cleartext = null;
-			
-			if (cs != null)
+			public IFuture<Tuple2<IMsgSecurityInfos, byte[]>> execute(IInternalAccess ia)
 			{
-				cleartext = cs.decryptAndAuth(content);
-			}
-			
-			if (cleartext == null)
-			{
-				Tuple2<ICryptoSuite, Long> tup = expiringcryptosuites.get(splat);
-				if (tup != null)
+				final Future<Tuple2<IMsgSecurityInfos, byte[]>> ret = new Future<Tuple2<IMsgSecurityInfos,byte[]>>();
+				
+				if (content.length > 0 && content[0] == -1)
 				{
-					cs = tup.getFirstEntity();
-					cleartext = cs.decryptAndAuth(content);
-				}
-			}
-			
-			if (cleartext == null)
-			{
-				HandshakeState hstate = initializingcryptosuites.get(splat);
-				if (hstate != null)
-				{
-					final byte[] fcontent = content;
-					hstate.getResultFuture().addResultListener(new IResultListener<ICryptoSuite>()
-					{
-						public void resultAvailable(ICryptoSuite result)
-						{
-							byte[] cleartext = result.decryptAndAuth(fcontent);
-							if (cleartext != null)
-							{
-								ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(result.getSecurityInfos(), cleartext));
-							}
-							else
-							{
-								ret.setException(new SecurityException("Could not establish secure communication with: " + splat.toString()));
-							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
+					// Security message
+					byte[] newcontent = new byte[content.length - 1];
+					System.arraycopy(content, 1, newcontent, 0, newcontent.length);
+					MsgSecurityInfos secinfos = new MsgSecurityInfos();
+					Tuple2<IMsgSecurityInfos,byte[]> tup = new Tuple2<IMsgSecurityInfos, byte[]>(secinfos, newcontent);
+					ret.setResult(tup);
 				}
 				else
 				{
-					ret.setException(new SecurityException("Could not establish secure communication with: " + splat.toString()));
+					final IComponentIdentifier splat = sender.getRoot();
+					ICryptoSuite cs = currentcryptosuites.get(splat);
+					byte[] cleartext = null;
+					
+					if (cs != null)
+					{
+						cleartext = cs.decryptAndAuth(content);
+					}
+					
+					if (cleartext == null)
+					{
+						Tuple2<ICryptoSuite, Long> tup = expiringcryptosuites.get(splat);
+						if (tup != null)
+						{
+							cs = tup.getFirstEntity();
+							cleartext = cs.decryptAndAuth(content);
+						}
+					}
+					
+					if (cleartext == null)
+					{
+						HandshakeState hstate = initializingcryptosuites.get(splat);
+						if (hstate != null)
+						{
+							final byte[] fcontent = content;
+							hstate.getResultFuture().addResultListener(new IResultListener<ICryptoSuite>()
+							{
+								public void resultAvailable(ICryptoSuite result)
+								{
+									byte[] cleartext = result.decryptAndAuth(fcontent);
+									if (cleartext != null)
+									{
+										ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(result.getSecurityInfos(), cleartext));
+									}
+									else
+									{
+										ret.setException(new SecurityException("Could not establish secure communication with: " + splat.toString()));
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									ret.setException(exception);
+								}
+							});
+						}
+						else
+						{
+							ret.setException(new SecurityException("Could not establish secure communication with: " + splat.toString()));
+						}
+					}
+					
+					if (cleartext != null)
+					{
+						ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(cs.getSecurityInfos(), cleartext));
+					}
 				}
+				return ret;
 			}
-			
-			if (cleartext != null)
-			{
-				ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(cs.getSecurityInfos(), cleartext));
-			}
-		}
-		return ret;
+		});
 	}
 	
 	//-------- Information access -------
