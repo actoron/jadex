@@ -208,7 +208,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			SSecurity.getHighlySecureRandom().nextBytes(ephemeralprivkey);
 			key = genSharedKey(ephemeralprivkey, incmsg.getPublicKey());
 			byte[] pubkey = genPubKey(ephemeralprivkey);
-			System.out.println("Gen2: " + SUtil.hex(pubkey));
+			System.out.println("Shared Key1: " + Arrays.toString(key));
 			
 			Map<String, byte[]> networksigs = new HashMap<String, byte[]>();
 			for (String authnet : authnets)
@@ -240,7 +240,6 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		else if (nextstep == 2 && incomingmessage instanceof Curve448ExchangeMessage)
 		{
 			Curve448ExchangeMessage incmsg = (Curve448ExchangeMessage) incomingmessage;
-			System.out.println("Rec2: " + SUtil.hex(incmsg.getPublicKey()));
 			
 			List<String> authnets = new ArrayList<String>();
 			if (agent.getNetworks() != null && incmsg.getNetworkSigs() != null)
@@ -270,6 +269,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			nonceprefix ^= Pack.littleEndianToInt(remoteauthchallenge, 0);
 			nonceprefix = ~nonceprefix;
 			key = genSharedKey(ephemeralprivkey, incmsg.getPublicKey());
+			System.out.println("Shared Key2: " + Arrays.toString(key));
 			
 			// Delete handshake state
 			SSecurity.getSecureRandom().nextBytes(ephemeralprivkey);
