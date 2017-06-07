@@ -63,13 +63,16 @@ public class SSecurity
 	}
 	
 	/** Common secure random number source. */
-	protected static volatile SecureRandom RANDOM;
+	protected static volatile SecureRandom SECURE_RANDOM;
 	
+	/** Slow but conservative secure random number source for critical tasks, e.g. key generation. */
 	protected static volatile SecureRandom HIGHLY_SECURE_RANDOM;
 	
-	protected static volatile SecureRandom HIGHLY_SECURE_SEED_RANDOM;
+	/** Random number source for seeding CSPRNGS. */
+	protected static volatile SecureRandom SECURE_SEED_RANDOM;
 	
-	protected static volatile SecureRandom SEED_RANDOM;
+	/** Conservative random number source for seeding CSPRNGS, use sparingly. */
+	protected static volatile SecureRandom HIGHLY_SECURE_SEED_RANDOM;
 	
 	/**
 	 *  Gets access to the common secure PRNG.
@@ -77,17 +80,17 @@ public class SSecurity
 	 */
 	public static final SecureRandom getSecureRandom()
 	{
-		if(RANDOM == null)
+		if(SECURE_RANDOM == null)
 		{
 			synchronized(SSecurity.class)
 			{
-				if(RANDOM == null)
+				if(SECURE_RANDOM == null)
 				{
-					RANDOM = new SecureThreadedRandom();
+					SECURE_RANDOM = new SecureThreadedRandom();
 				}
 			}
 		}
-		return RANDOM;
+		return SECURE_RANDOM;
 	}
 	
 	/**
@@ -113,7 +116,7 @@ public class SSecurity
 	 *  Generates a fast secure PRNG. The setup attempts to prepare a PRNG that is fast and secure.
 	 *  @return Secure PRNG.
 	 */
-	public static final SecureRandom generateSecureRandom()
+	protected static final SecureRandom generateSecureRandom()
 	{
 		return new SecureThreadedRandom();
 	}
@@ -123,7 +126,7 @@ public class SSecurity
 	 *  on a single approach.
 	 *  @return Secure PRNG.
 	 */
-	public static final SecureRandom generateHighlySecureRandom()
+	protected static final SecureRandom generateHighlySecureRandom()
 	{
 		SecureRandom ret = null;
 		
@@ -157,16 +160,46 @@ public class SSecurity
 			}
 		};
 		
+		EntropySourceProvider nonceprovider = new EntropySourceProvider()
+		{
+			public EntropySource get(int bitsRequired)
+			{
+				// Convert to bytes.
+				int numbytes = (int) Math.ceil(bitsRequired / 8.0);
+				final byte[] fseed = new byte[numbytes];
+				getSecureRandom().nextBytes(fseed);;
+				
+				EntropySource ret = new EntropySource()
+				{
+					public boolean isPredictionResistant()
+					{
+						return true;
+					}
+					
+					public byte[] getEntropy()
+					{
+						return fseed;
+					}
+					
+					public int entropySize()
+					{
+						return fseed.length * 8;
+					}
+				};
+				return ret;
+			}
+		};
+		
 		// Combine PRNGs / paranoid
 		List<SecureRandom> prngs = new ArrayList<SecureRandom>();
 		
 		SP800SecureRandomBuilder builder = new SP800SecureRandomBuilder(esp);
 		AESFastEngine eng = new AESFastEngine();
-		prngs.add(builder.buildCTR(eng, 256, esp.get(128).getEntropy(), false));
+		prngs.add(builder.buildCTR(eng, 256, nonceprovider.get(256).getEntropy(), false));
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		Mac m = new HMac(new SHA512Digest());
-		prngs.add(builder.buildHMAC(m, esp.get(512).getEntropy(), false));
+		prngs.add(builder.buildHMAC(m, nonceprovider.get(512).getEntropy(), false));
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		prngs.add(generateSecureRandom());
@@ -231,15 +264,10 @@ public class SSecurity
 				{
 					HIGHLY_SECURE_SEED_RANDOM = new SecureRandom()
 					{
-						SecureRandom additionalseeding = new SecureRandom();
-						
 						public synchronized void nextBytes(byte[] bytes)
 						{
-							
-							byte[] addent = new byte[bytes.length];
-							additionalseeding.nextBytes(addent);
-							getSeedRandom().nextBytes(bytes);;
-							
+							byte[] addent = SecureRandom.getSeed(bytes.length);
+							getSeedRandom().nextBytes(bytes);
 							xor(bytes, addent);
 						}
 						
@@ -264,13 +292,13 @@ public class SSecurity
 	 */
 	public static SecureRandom getSeedRandom()
 	{
-		if (SEED_RANDOM == null)
+		if (SECURE_SEED_RANDOM == null)
 		{
 			synchronized (SSecurity.class)
 			{
-				if (SEED_RANDOM == null)
+				if (SECURE_SEED_RANDOM == null)
 				{
-					SEED_RANDOM = new SecureRandom()
+					SECURE_SEED_RANDOM = new SecureRandom()
 					{
 						private static final long serialVersionUID = -8238246099124227737L;
 						
@@ -340,7 +368,7 @@ public class SSecurity
 		}
 		
 		
-		return SEED_RANDOM;
+		return SECURE_SEED_RANDOM;
 	}
 	
 	/**

@@ -27,8 +27,9 @@ public class SecureThreadedRandom extends SecureRandom
 		tl <<= 2;
 		tl = Integer.numberOfTrailingZeros(Integer.highestOneBit(tl));
 		tl = Integer.bitCount(tl) != 1 ? tl << 1 : tl;
-		SecureRandom seedrandom = new SynchronizedSecureRandomWrapper(new ChaCha20Random());
 		tl = Math.min(Math.abs(tl), 31);
+		
+		SecureRandom seedrandom = new SynchronizedSecureRandomWrapper(new ChaCha20Random());
 		prngs = new SecureRandom[1 << tl];
 		this.threadingmask = prngs.length - 1;
 		for (int i = 0; i < prngs.length; ++i)

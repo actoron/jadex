@@ -14,7 +14,7 @@ import jadex.platform.service.security.ICryptoSuite;
 public abstract class AbstractCryptoSuite implements ICryptoSuite
 {
 	/** Maximum windows size. */
-	protected static final int MAX_WINDOW = 1000000;
+	protected static final int MAX_WINDOW = 100000;
 	
 	/** Time before a delayed message expires. */
 	protected long expirationdelay = StarterConfiguration.DEFAULT_LOCAL_TIMEOUT;
@@ -35,13 +35,14 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	{
 		boolean ret = false;
 		
-		if (System.currentTimeMillis() > nextcheck || (msgid - (lowid + MAX_WINDOW) > 0))
+		if (System.currentTimeMillis() > nextcheck || (msgid - (lowid + MAX_WINDOW) >= 0))
 		{
 			lowid = highid;
 			for (Iterator<Map.Entry<Long, Long>> it = missingids.entrySet().iterator(); it.hasNext(); )
 			{
 				Map.Entry<Long, Long> entry = it.next();
-				if (entry.getValue() < System.currentTimeMillis())
+				long time = System.currentTimeMillis();
+				if (entry.getValue() < time)
 					it.remove();
 				else if (lowid - entry.getKey() > 0)
 				{
@@ -60,9 +61,9 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 			}
 			else if (msgid - highid > 0)
 			{
-				for (long id = highid; id - msgid <= 0; ++id)
+				for (long id = highid; id - msgid < 0; ++id)
 					missingids.put(id, System.currentTimeMillis() + expirationdelay);
-				highid = msgid;
+				highid = msgid + 1;
 				ret = true;
 			}
 			else

@@ -94,7 +94,6 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	public byte[] decryptAndAuth(byte[] content)
 	{
 		byte[] ret = chacha20Poly1305Dec(content, key, ~nonceprefix);
-		System.out.println(Pack.littleEndianToLong(content, 8));
 		if (ret != null && !isValid(Pack.littleEndianToLong(content, 8)))
 			ret = null;
 		return ret;
@@ -123,57 +122,54 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	{
 		boolean ret = true;
 		
-		if (nextstep == 0)
+		if (nextstep == 0 && incomingmessage instanceof InitialHandshakeFinalMessage)
 		{
-			if (incomingmessage instanceof InitialHandshakeFinalMessage)
+			StartExchangeMessage sem = new StartExchangeMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId());
+			localauthchallenge = new byte[32];
+			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
+			sem.setChallenge(localauthchallenge);
+			Map<String, AbstractAuthenticationSecret> nw = agent.getNetworks();
+			if (nw != null)
 			{
-				StartExchangeMessage sem = new StartExchangeMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId());
-				localauthchallenge = new byte[32];
-				SSecurity.getSecureRandom().nextBytes(localauthchallenge);
-				sem.setChallenge(localauthchallenge);
-				Map<String, AbstractAuthenticationSecret> nw = agent.getNetworks();
-				if (nw != null)
-				{
-					String[] nwnames = nw.keySet().toArray(new String[nw.size()]);
-					sem.setNetworkNames(nwnames);
-				}
-				agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
-				nextstep = 1;
+				String[] nwnames = nw.keySet().toArray(new String[nw.size()]);
+				sem.setNetworkNames(nwnames);
 			}
-			else if (incomingmessage instanceof StartExchangeMessage)
+			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
+			nextstep = 1;
+		}
+		else if (nextstep == 0 && incomingmessage instanceof StartExchangeMessage)
+		{
+			StartExchangeMessage sem = (StartExchangeMessage) incomingmessage;
+			remoteauthchallenge = sem.getChallenge();
+			
+			ephemeralprivkey = new byte[56];
+			SSecurity.getHighlySecureRandom().nextBytes(ephemeralprivkey);
+			byte[] pubkey = genPubKey(ephemeralprivkey);
+			
+			Map<String, byte[]> networksigs = new HashMap<String, byte[]>();
+			String[] remotenw = sem.getNetworkNames();
+			if (remotenw != null && agent.getNetworks() != null)
 			{
-				StartExchangeMessage sem = (StartExchangeMessage) incomingmessage;
-				remoteauthchallenge = sem.getChallenge();
-				
-				ephemeralprivkey = new byte[56];
-				SSecurity.getHighlySecureRandom().nextBytes(ephemeralprivkey);
-				byte[] pubkey = genPubKey(ephemeralprivkey);
-				
-				Map<String, byte[]> networksigs = new HashMap<String, byte[]>();
-				String[] remotenw = sem.getNetworkNames();
-				if (remotenw != null && agent.getNetworks() != null)
+				for (String nwname : remotenw)
 				{
-					for (String nwname : remotenw)
+					AbstractAuthenticationSecret nwsecret = agent.getNetworks().get(nwname);
+					if (nwsecret != null)
 					{
-						AbstractAuthenticationSecret nwsecret = agent.getNetworks().get(nwname);
-						if (nwsecret != null)
-						{
-							networksigs.put(nwname, signKey(remoteauthchallenge, pubkey, nwsecret));
-						}
+						networksigs.put(nwname, signKey(remoteauthchallenge, pubkey, nwsecret));
 					}
 				}
-				
-				localauthchallenge = new byte[32];
-				SSecurity.getSecureRandom().nextBytes(localauthchallenge);
-				
-				Curve448ExchangeMessage em = new Curve448ExchangeMessage(agent.getComponentIdentifier(), sem.getConversationId());
-				em.setPublicKey(pubkey);
-				em.setChallenge(localauthchallenge);
-				em.setNetworkSigs(networksigs);
-				
-				agent.sendSecurityHandshakeMessage(sem.getSender(), em);
-				nextstep = 2;
 			}
+			
+			localauthchallenge = new byte[32];
+			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
+			
+			Curve448ExchangeMessage em = new Curve448ExchangeMessage(agent.getComponentIdentifier(), sem.getConversationId());
+			em.setPublicKey(pubkey);
+			em.setChallenge(localauthchallenge);
+			em.setNetworkSigs(networksigs);
+			
+			agent.sendSecurityHandshakeMessage(sem.getSender(), em);
+			nextstep = 2;
 		}
 		else if (nextstep == 1 && incomingmessage instanceof Curve448ExchangeMessage)
 		{
@@ -297,6 +293,36 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		
 		return ret;
 	}
+	
+	/**
+	 *  Destroy information.
+	 */
+	public void destroy()
+	{
+		if (ephemeralprivkey != null)
+			SSecurity.getSecureRandom().nextBytes(ephemeralprivkey);
+		ephemeralprivkey = null;
+		localauthchallenge = null;
+		remoteauthchallenge = null;
+		if (key != null)
+		{
+			byte[] raw = new byte[key.length << 2];
+			SSecurity.getSecureRandom().nextBytes(raw);
+			Pack.littleEndianToInt(raw, 0, key);
+		}
+		key = null;
+		nonceprefix = 0;
+		msgid = 0;
+		secinf = null;
+	}
+	
+	/**
+	 *  Finalize.
+	 */
+	protected void finalize() throws Throwable
+	{
+		destroy();
+	};
 	
 	/**
 	 *  Signs a key for authentication.
@@ -522,116 +548,6 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		return (size + 15) & ~15;
 	}
 	
-	public static void main(String[] args)
-	{
-		String skeya = "9a8f4925d1519f5775cf46b04b5800d4ee9ee8bae8bc5565d498c28dd9c9baf574a9419744897391006382a6f127ab1d9ac2d8c0a598726b";
-		byte[] keya = new byte[56];
-		for (int i = 0; i < skeya.length(); i = i + 2)
-		{
-			String bytestr = "0x" + skeya.substring(i, i+2);
-			int b = Integer.decode(bytestr);
-			keya[i >> 1] = (byte) b;
-		}
-		byte[] pkeya = new byte[56];
-		Curve448.eval(pkeya, 0, keya, ED448_CONST_5);
-		System.out.println(SUtil.hex(pkeya));
-		
-		String skeyb = "1c306a7ac2a0e2e0990b294470cba339e6453772b075811d8fad0d1d6927c120bb5ee8972b0d3e21374c9c921b09d1b0366f10b65173992d";
-		byte[] keyb = new byte[56];
-		for (int i = 0; i < skeyb.length(); i = i + 2)
-		{
-			String bytestr = "0x" + skeyb.substring(i, i+2);
-			int b = Integer.decode(bytestr);
-			keyb[i >> 1] = (byte) b;
-		}
-		byte[] pkeyb = new byte[56];
-		Curve448.eval(pkeyb, 0, keyb, ED448_CONST_5);
-		System.out.println(SUtil.hex(pkeyb));
-		
-		byte[] result = new byte[56];
-		Curve448.eval(result, 0, keyb, pkeya);
-		System.out.println(SUtil.hex(result));
-		
-		String teststr = "Ladies and Gentlemen of the class of '99: If I could offer you only one tip for the future, sunscreen would be it.";
-		String keystr = "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f";
-		byte[] bkey = new byte[32];
-		for (int i = 0; i < keystr.length(); i = i + 2)
-		{
-			String bytestr = "0x" + keystr.substring(i, i+2);
-			int b = Integer.decode(bytestr);
-			bkey[i >> 1] = (byte) b;
-		}
-		int[] key = new int[bkey.length >>> 2];
-		Pack.littleEndianToInt(bkey, 0, key);
-		
-		byte[] res = null;
-		
-////		byte[] test = new byte[67108864];
-//		byte[] test = new byte[1048576];
-//		long ts = System.currentTimeMillis();
-////		for (int i = 0; i < 1024; ++i)
-////			res = chacha20Poly1305Enc(test, key, 7, 0);
-//		res = chacha20Poly1305Enc(test, key, 7, 0);
-//		for (int i = 0; i < 1024; ++i)
-//			chacha20Poly1305Dec(res, key, 7);
-//		System.out.println(System.currentTimeMillis() - ts);
-		
-		res = chacha20Poly1305Enc(teststr.getBytes(SUtil.UTF8), key, 7, 14);
-		System.out.println(SUtil.hex(res));
-		System.out.println(new String(chacha20Poly1305Dec(res, key, 7), SUtil.UTF8));
-//		res[3] = 27;
-		System.out.println(chacha20Poly1305Dec(res, key, 7));
-		
-		Curve448ChaCha20Poly1305Suite s = new Curve448ChaCha20Poly1305Suite();
-		s.lowid = Long.MAX_VALUE - 1;
-		s.highid = s.lowid;
-		System.out.println(s.isValid(Long.MAX_VALUE));
-		System.out.println(s.isValid(Long.MAX_VALUE + 1));
-		System.out.println(s.isValid(Long.MAX_VALUE + 1));
-		System.out.println(s.isValid(Long.MAX_VALUE + 5));
-		System.out.println(s.isValid(Long.MAX_VALUE + 4));
-		System.out.println(s.isValid(Long.MAX_VALUE + 1));
-		
-		final BasicSecurityMessage[] msg = new BasicSecurityMessage[1];
-		SecurityAgent fakeagent = new SecurityAgent()
-		{
-			{
-				networks = new HashMap<String, AbstractAuthenticationSecret>();
-//				networks.put("test", new PasswordSecret("password:123456789012345"));
-				byte[] key = new byte[32];
-				SSecurity.getHighlySecureRandom().nextBytes(key);
-				networks.put("test", new KeySecret(key));
-			}
-			
-			public void sendSecurityHandshakeMessage(IComponentIdentifier receiver, Object message)
-			{
-				msg[0] = (BasicSecurityMessage) message;
-			}
-			
-			public IComponentIdentifier getComponentIdentifier()
-			{
-				return new BasicComponentIdentifier("TestComp");
-			}
-		};
-		InitialHandshakeReplyMessage ihr = new InitialHandshakeReplyMessage(fakeagent.getComponentIdentifier(), "1234", "");
-		
-		Curve448ChaCha20Poly1305Suite s1 = new Curve448ChaCha20Poly1305Suite();
-		Curve448ChaCha20Poly1305Suite s2 = new Curve448ChaCha20Poly1305Suite();
-		System.out.println("HS Step 1:");
-		System.out.println(s1.handleHandshake(fakeagent, ihr));
-		System.out.println("HS Step 2:");
-		System.out.println(s2.handleHandshake(fakeagent, msg[0]));
-		System.out.println("HS Step 3:");
-		System.out.println(s1.handleHandshake(fakeagent, msg[0]));
-		System.out.println("HS Step 4:");
-		System.out.println(s2.handleHandshake(fakeagent, msg[0]));
-		System.out.println("HS Step 4:");
-		System.out.println(s1.handleHandshake(fakeagent, msg[0]));
-		System.out.println("Keys:");
-		System.out.println(Arrays.toString(s1.key));
-		System.out.println(Arrays.toString(s2.key));
-	}
-	
 	/**
 	 *  Message for starting the exchange.
 	 *
@@ -807,5 +723,124 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			super(sender, conversationid);
 		}
+	}
+	
+	public static void main(String[] args)
+	{
+		String skeya = "9a8f4925d1519f5775cf46b04b5800d4ee9ee8bae8bc5565d498c28dd9c9baf574a9419744897391006382a6f127ab1d9ac2d8c0a598726b";
+		byte[] keya = new byte[56];
+		for (int i = 0; i < skeya.length(); i = i + 2)
+		{
+			String bytestr = "0x" + skeya.substring(i, i+2);
+			int b = Integer.decode(bytestr);
+			keya[i >> 1] = (byte) b;
+		}
+		byte[] pkeya = new byte[56];
+		Curve448.eval(pkeya, 0, keya, ED448_CONST_5);
+		System.out.println(SUtil.hex(pkeya));
+		
+		String skeyb = "1c306a7ac2a0e2e0990b294470cba339e6453772b075811d8fad0d1d6927c120bb5ee8972b0d3e21374c9c921b09d1b0366f10b65173992d";
+		byte[] keyb = new byte[56];
+		for (int i = 0; i < skeyb.length(); i = i + 2)
+		{
+			String bytestr = "0x" + skeyb.substring(i, i+2);
+			int b = Integer.decode(bytestr);
+			keyb[i >> 1] = (byte) b;
+		}
+		byte[] pkeyb = new byte[56];
+		Curve448.eval(pkeyb, 0, keyb, ED448_CONST_5);
+		System.out.println(SUtil.hex(pkeyb));
+		
+		byte[] result = new byte[56];
+		Curve448.eval(result, 0, keyb, pkeya);
+		System.out.println(SUtil.hex(result));
+		
+		String teststr = "Ladies and Gentlemen of the class of '99: If I could offer you only one tip for the future, sunscreen would be it.";
+		String keystr = "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f";
+		byte[] bkey = new byte[32];
+		for (int i = 0; i < keystr.length(); i = i + 2)
+		{
+			String bytestr = "0x" + keystr.substring(i, i+2);
+			int b = Integer.decode(bytestr);
+			bkey[i >> 1] = (byte) b;
+		}
+		int[] key = new int[bkey.length >>> 2];
+		Pack.littleEndianToInt(bkey, 0, key);
+		
+		byte[] res = null;
+		
+////		byte[] test = new byte[67108864];
+//		byte[] test = new byte[1048576];
+//		long ts = System.currentTimeMillis();
+////		for (int i = 0; i < 1024; ++i)
+////			res = chacha20Poly1305Enc(test, key, 7, 0);
+//		res = chacha20Poly1305Enc(test, key, 7, 0);
+//		for (int i = 0; i < 1024; ++i)
+//			chacha20Poly1305Dec(res, key, 7);
+//		System.out.println(System.currentTimeMillis() - ts);
+		
+		res = chacha20Poly1305Enc(teststr.getBytes(SUtil.UTF8), key, 7, 14);
+		System.out.println(SUtil.hex(res));
+		System.out.println(new String(chacha20Poly1305Dec(res, key, 7), SUtil.UTF8));
+//		res[3] = 27;
+		System.out.println(chacha20Poly1305Dec(res, key, 7));
+		
+		Curve448ChaCha20Poly1305Suite s = new Curve448ChaCha20Poly1305Suite();
+		System.out.println("----------------------");
+		System.out.println(s.isValid(1));
+		System.out.println(s.isValid(0));
+		System.out.println(s.isValid(1));
+		System.out.println(s.isValid(0));
+		System.out.println(s.isValid(Integer.MAX_VALUE));
+		System.out.println("----------------------");
+		
+		s = new Curve448ChaCha20Poly1305Suite();
+		s.lowid = Long.MAX_VALUE - 1;
+		s.highid = s.lowid;
+		System.out.println(s.isValid(Long.MAX_VALUE));
+		System.out.println(s.isValid(Long.MAX_VALUE + 1));
+		System.out.println(s.isValid(Long.MAX_VALUE + 1));
+		System.out.println(s.isValid(Long.MAX_VALUE + 5));
+		System.out.println(s.isValid(Long.MAX_VALUE + 4));
+		System.out.println(s.isValid(Long.MAX_VALUE + 1));
+		
+		final BasicSecurityMessage[] msg = new BasicSecurityMessage[1];
+		SecurityAgent fakeagent = new SecurityAgent()
+		{
+			{
+				networks = new HashMap<String, AbstractAuthenticationSecret>();
+//				networks.put("test", new PasswordSecret("password:123456789012345"));
+				byte[] key = new byte[32];
+				SSecurity.getHighlySecureRandom().nextBytes(key);
+				networks.put("test", new KeySecret(key));
+			}
+			
+			public void sendSecurityHandshakeMessage(IComponentIdentifier receiver, Object message)
+			{
+				msg[0] = (BasicSecurityMessage) message;
+			}
+			
+			public IComponentIdentifier getComponentIdentifier()
+			{
+				return new BasicComponentIdentifier("TestComp");
+			}
+		};
+		InitialHandshakeFinalMessage ihr = new InitialHandshakeFinalMessage(fakeagent.getComponentIdentifier(), "1234", "");
+		
+		Curve448ChaCha20Poly1305Suite s1 = new Curve448ChaCha20Poly1305Suite();
+		Curve448ChaCha20Poly1305Suite s2 = new Curve448ChaCha20Poly1305Suite();
+		System.out.println("HS Step 1:");
+		System.out.println(s1.handleHandshake(fakeagent, ihr));
+		System.out.println("HS Step 2:");
+		System.out.println(s2.handleHandshake(fakeagent, msg[0]));
+		System.out.println("HS Step 3:");
+		System.out.println(s1.handleHandshake(fakeagent, msg[0]));
+		System.out.println("HS Step 4:");
+		System.out.println(s2.handleHandshake(fakeagent, msg[0]));
+		System.out.println("HS Step 5:");
+		System.out.println(s1.handleHandshake(fakeagent, msg[0]));
+		System.out.println("Keys:");
+		System.out.println(Arrays.toString(s1.key));
+		System.out.println(Arrays.toString(s2.key));
 	}
 }
