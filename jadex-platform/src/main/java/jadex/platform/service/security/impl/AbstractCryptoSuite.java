@@ -53,14 +53,14 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		
 		if (msgid - lowid >= 0 && ((lowid + MAX_WINDOW) - msgid > 0))
 		{
-			if (msgid == highid + 1)
+			if (msgid == highid)
 			{
 				++highid;
 				ret = true;
 			}
 			else if (msgid - highid > 0)
 			{
-				for (long id = highid + 1; id - msgid <= 0; ++id)
+				for (long id = highid; id - msgid <= 0; ++id)
 					missingids.put(id, System.currentTimeMillis() + expirationdelay);
 				highid = msgid;
 				ret = true;

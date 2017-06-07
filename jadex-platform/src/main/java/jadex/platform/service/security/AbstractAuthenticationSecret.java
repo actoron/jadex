@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.platform.service.security.impl.KeySecret;
 import jadex.platform.service.security.impl.PasswordSecret;
 
 /**
@@ -18,6 +19,7 @@ public abstract class AbstractAuthenticationSecret
 	static
 	{
 		AbstractAuthenticationSecret.SECRET_TYPES.put(PasswordSecret.PREFIX, PasswordSecret.class);
+		AbstractAuthenticationSecret.SECRET_TYPES.put(KeySecret.PREFIX, KeySecret.class);
 	}
 	
 	/**

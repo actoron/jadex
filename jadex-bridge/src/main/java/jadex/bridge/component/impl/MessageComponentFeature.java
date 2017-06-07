@@ -263,7 +263,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public IFuture<Void> sendToTransports(final Map<String, Object> header, final byte[] encryptedbody)
 	{
 		final Future<Void> ret = new Future<Void>();
-		getTransportService(header).addResultListener(new ExceptionDelegationResultListener<ITransportService, Void>(ret)
+		// Transport service is platform-level shared / no required proxy: manual decoupling
+		getTransportService(header).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportService, Void>(ret)
 		{
 			public void customResultAvailable(ITransportService result) throws Exception
 			{
@@ -280,7 +281,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						IComponentIdentifier rplat = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
 						getPlatformStateService().getTransportCache().remove(rplat);
 						
-						getTransportService(header).addResultListener(new IResultListener<ITransportService>()
+						getTransportService(header).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<ITransportService>()
 						{
 							public void resultAvailable(ITransportService result)
 							{
@@ -292,11 +293,11 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							{
 								ret.setException(exception);
 							}
-						});
+						}));
 					};
 				});
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -369,6 +370,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					exception.printStackTrace();
 				}
 			});
 		}
@@ -501,7 +503,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 		else
 		{
-			final Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//			final Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			final Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 			if (coll != null && coll.size() > 0)
 			{
 				final IComponentIdentifier receiverplatform = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();

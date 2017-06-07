@@ -4,8 +4,10 @@ import java.util.logging.Logger;
 
 import org.spongycastle.crypto.digests.Blake2bDigest;
 
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
+import jadex.commons.security.SSecurity;
 
 /**
  *  Authentication secret based on a shared key.
@@ -100,5 +102,12 @@ public class KeySecret extends SharedSecret
 	public String toString()
 	{
 		return PREFIX + ":" + new String(Base64.encode(key), SUtil.UTF8);
+	}
+	
+	public static final KeySecret createRandom()
+	{
+		byte[] rawkey = new byte[32];
+		SSecurity.getHighlySecureRandom().nextBytes(rawkey);
+		return new KeySecret(rawkey);
 	}
 }

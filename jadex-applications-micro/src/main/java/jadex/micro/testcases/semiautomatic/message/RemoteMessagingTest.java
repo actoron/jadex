@@ -21,23 +21,29 @@ public class RemoteMessagingTest
 	 */
 	public static void main(String[] args)
 	{
+		String key = "key:4dkvuwzlU2fusyO53UdQx5g+R+wDECBIc+JHZETbN1E=";
+		
 		// Start first platform with receiver.
 		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
-		config1.setLogging(true);
+//		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
 		config1.setSecurity(true);
 		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
 		config1.addComponent(ReceiverAgent.class);
+		config1.setNetworkName("remotemessagetest");
+		config1.setNetworkPass(key);
 		IExternalAccess	access1	= Starter.createPlatform(config1).get();		
 		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(access1.getComponentIdentifier());
 //		System.out.println("TCP Addresses: " + Arrays.toString(tab1.getPlatformAddresses(access1.getComponentIdentifier(), "tcp")));
 		
 		// Start second platform
 		PlatformConfiguration	config2	= PlatformConfiguration.getMinimal();
-		config2.setLogging(true);
+//		config2.setLogging(true);
 //		config2.setDefaultTimeout(-1);
 		config2.setSecurity(true);
 		config2.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+		config2.setNetworkName("remotemessagetest");
+		config2.setNetworkPass(key);
 		IExternalAccess	access2	= Starter.createPlatform(config2).get();
 		IComponentManagementService	cms	= SServiceProvider.getService(access2, IComponentManagementService.class).get();
 

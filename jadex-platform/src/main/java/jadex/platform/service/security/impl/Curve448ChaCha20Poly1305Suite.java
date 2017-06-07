@@ -81,7 +81,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 */
 	public byte[] encryptAndSign(byte[] content)
 	{
-		return chacha20Poly1305Enc(content, key, nonceprefix, msgid);
+		return chacha20Poly1305Enc(content, key, nonceprefix, msgid++);
 	}
 	
 	/**
@@ -94,7 +94,8 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	public byte[] decryptAndAuth(byte[] content)
 	{
 		byte[] ret = chacha20Poly1305Dec(content, key, ~nonceprefix);
-		if (!isValid(Pack.littleEndianToLong(content, 8)))
+		System.out.println(Pack.littleEndianToLong(content, 8));
+		if (ret != null && !isValid(Pack.littleEndianToLong(content, 8)))
 			ret = null;
 		return ret;
 	}

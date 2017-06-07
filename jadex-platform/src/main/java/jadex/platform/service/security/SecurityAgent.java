@@ -48,8 +48,8 @@ import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
 	@Argument(name="usepass", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="printpass", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="trustedlan", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="networkname", clazz=String[].class),
-	@Argument(name="networkpass", clazz=String[].class),
+	@Argument(name="networkname", clazz=String.class),
+	@Argument(name="networkpass", clazz=String.class),
 	@Argument(name="virtualnames", clazz=String[].class),
 	@Argument(name="validityduration", clazz=long.class)
 })
@@ -101,9 +101,22 @@ public class SecurityAgent implements ISecurityService
 		if (!agent.getComponentIdentifier().getLocalName().equals("security"))
 			agent.getLogger().warning("Security agent running as \"" + agent.getComponentIdentifier().getLocalName() +"\" instead of \"security\".");
 		
+		IArgumentsResultsFeature argfeat = agent.getComponentFeature(IArgumentsResultsFeature.class);
+		
 		platformsecrets = new ArrayList<AbstractAuthenticationSecret>();
 		remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();
 		networks = new HashMap<String, AbstractAuthenticationSecret>();
+		try
+		{
+			String nwname = (String) argfeat.getArguments().get("networkname");
+			String nwpass = (String) argfeat.getArguments().get("networkpass");
+			if (nwname != null)
+				networks.put(nwname, AbstractAuthenticationSecret.fromString(nwpass));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 		
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
 		currentcryptosuites = new HashMap<String, ICryptoSuite>();
@@ -113,7 +126,7 @@ public class SecurityAgent implements ISecurityService
 //		authenticationsuites = new HashMap<Integer, IAuthenticationSuite>();
 //		authenticationsuites.put(defaultauthenticationsuite.getId(), defaultauthenticationsuite);
 		
-		String[] cryptsuites = (String[]) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("cryptosuites");
+		String[] cryptsuites = (String[]) argfeat.getArguments().get("cryptosuites");
 		if (cryptsuites == null)
 		{
 			cryptsuites = new String[] { "jadex.platform.service.security.impl.Curve448ChaCha20Poly1305Suite" };
@@ -239,7 +252,7 @@ public class SecurityAgent implements ISecurityService
 				}
 				else
 				{
-					final IComponentIdentifier splat = sender.getRoot();
+					final String splat = sender.getRoot().toString();
 					ICryptoSuite cs = currentcryptosuites.get(splat);
 					byte[] cleartext = null;
 					
@@ -524,7 +537,10 @@ public class SecurityAgent implements ISecurityService
 							if (!suite.handleHandshake(SecurityAgent.this, fm))
 							{
 								System.out.println("Finished handshake: " + fm.getSender());
+								currentcryptosuites.put(fm.getSender().getRoot().toString(), state.getCryptoSuite());
+								initializingcryptosuites.remove(fm.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
+								
 							}
 						}
 					}
@@ -541,6 +557,8 @@ public class SecurityAgent implements ISecurityService
 						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 						{
 							System.out.println("Finished handshake: " + secmsg.getSender());
+							currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
+							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 							state.getResultFuture().setResult(state.getCryptoSuite());
 						}
 					}
