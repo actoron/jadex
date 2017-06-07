@@ -115,7 +115,6 @@ public class SecurityAgent implements ISecurityService
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 		}
 		
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
