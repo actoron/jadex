@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 
 
 /**
@@ -26,10 +27,13 @@ public class TcpMessageBuffer
 	/** The read buffer for reading out the messages. */
 	protected ByteBuffer rb;
 	
-	/** The data buffer to be filled while reading. */
-	protected byte[] data;
+	/** The header buffer to be filled while reading. */
+	protected byte[] header;
 	
-	/** The amount of data already read. */
+	/** The body buffer to be filled while reading. */
+	protected byte[] body;
+	
+	/** The amount of data already read in the current array. */
 	protected int pos;
 
 	//-------- constructors --------
@@ -46,22 +50,62 @@ public class TcpMessageBuffer
 	// -------- methods --------
 
 	/**
-	 *  Read data from the channel.
+	 *  Read messages from the channel.
 	 *  Always reads the length as 4 byte int and then reads the required amount of data into an array. 
 	 * 
-	 *  @return A byte array, when the next data is complete, null as long as data is still pending.
+	 *  @return Two byte arrays, when the next message is complete, null as long as data is still pending.
 	 *  @throws Exception on read error.
 	 */
-	public byte[]	read(SocketChannel sc) throws IOException
+	public Tuple2<byte[], byte[]>	read(SocketChannel sc) throws IOException
 	{
-		byte[]	ret = null;
+		Tuple2<byte[], byte[]>	ret = null;
 
 		// Transfer data from channel into the buffer.
 		if(sc.read(wb) == -1)
 		{
 			throw new IOException("Channel closed: "+sc.socket().getInetAddress()+":"+sc.socket().getPort());
 		}
+		
+		// Read into header when not yet created or not yet complete -> body not created (i.e. pos still refers to header) and pos(header)<length(header)
+		if(header==null || body==null && pos<header.length)
+		{
+			header = readBytes(header);
+		}
+		
+		// Read into body, when body already created or body not created but header complete
+		if(body!=null || header!=null && pos==header.length)
+		{
+			body	= readBytes(body);
+		}
+		
+		// Finished when body is complete.
+		if(body!=null && pos==body.length)
+		{
+			// Set result and reset internal structures.
+			ret	= new Tuple2<byte[], byte[]>(header, body);
+			header	= null;
+			body	= null;
+			pos = 0;
+				
+			// Reset the readbuffer and compact (i.e. copy rest) the writebuffer
+			wb.limit(wb.position());
+//			int pos = (msg_len+prolog_len)%wb.capacity();
+			wb.position(rb.position());
+			wb.compact();
+			rb.clear();
+		}
 
+		return ret;
+	}
+	
+	/**
+	 *  Read data in to the given array, if any.
+	 *  Also adjusts the pos varaiable.
+	 *  @param data	The already read data, if any.
+	 *  @return	The maybe updated data array.
+	 */
+	protected byte[] readBytes(byte[] data)
+	{
 		// First try to determine the data size if unknown (array==null)
 		// Need at least 4 size bytes, else NOP until more bytes available.
 		if(data==null && wb.position()-rb.position()>=4)
@@ -81,7 +125,7 @@ public class TcpMessageBuffer
 			int required	= data.length-pos;
 			int	available	= wb.position()-rb.position();
 			
-			// Read till end of header
+			// Read till end of the array
 			if(available >= required)
 			{
 				rb.get(data, pos, required);
@@ -97,23 +141,6 @@ public class TcpMessageBuffer
 				wb.clear();
 			}
 		}
-		
-		// Finished when body is complete.
-		if(data!=null && pos==data.length)
-		{
-			// Set result and reset internal structures.
-			ret	= data;
-			data	= null;
-			pos = 0;
-				
-			// Reset the readbuffer and compact (i.e. copy rest) the writebuffer
-			wb.limit(wb.position());
-//			int pos = (msg_len+prolog_len)%wb.capacity();
-			wb.position(rb.position());
-			wb.compact();
-			rb.clear();
-		}
-
-		return ret;
+		return data;
 	}
 }
