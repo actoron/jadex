@@ -76,86 +76,117 @@ public class ServiceQuery<T>
 //	{
 //		this(servicetype, scope, (IFilter<T>) null, provider, owner);
 //	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(servicetype, scope, (IFilter<T>) null, provider, owner);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(Class<T> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(new ClassInfo(servicetype), scope, filter, provider, owner);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(Class<T> servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-//		this(new ClassInfo(servicetype), scope, filter, provider, owner);this.returntype = servicetype;
-		this.servicetype = new ClassInfo(servicetype);
-		this.returntype = this.servicetype;
-		// todo: what is the best place for this?
-		this.scope = scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope;
-		this.filter = filter;
-		this.provider = provider;
-		this.owner = owner;
-		
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this.returntype = servicetype;
-		this.servicetype = servicetype;
-		this.scope = scope;
-		this.filter = filter;
-		this.provider = provider;
-		this.owner = owner;
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(Class<T> returntype, Class<?> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(new ClassInfo(returntype), new ClassInfo(servicetype), scope, filter, provider, owner);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(servicetype, servicetype, scope, filter, provider, owner);
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(Class<T> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(new ClassInfo(servicetype), scope, filter, provider, owner);
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(Class<T> servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+////		this(new ClassInfo(servicetype), scope, filter, provider, owner);this.returntype = servicetype;
+//		this.servicetype = new ClassInfo(servicetype);
+//		this.returntype = this.servicetype;
+//		// todo: what is the best place for this?
+//		this.scope = scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope;
+//		this.filter = filter;
+//		this.provider = provider;
+//		this.owner = owner;
+//		
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
 //		this.returntype = servicetype;
 //		this.servicetype = servicetype;
 //		this.scope = scope;
 //		this.filter = filter;
 //		this.provider = provider;
 //		this.owner = owner;
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(Class<T> returntype, Class<?> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(new ClassInfo(returntype), new ClassInfo(servicetype), scope, filter, provider, owner);
+//	}
+	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo returntype, ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this.returntype = returntype;
+//		this.servicetype = servicetype;
+//		this.scope = scope;
+//		this.filter = filter;
+//		this.provider = provider;
+//		this.owner = owner;
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(servicetype, servicetype, scope, filter, provider, owner);
+////		this.returntype = servicetype;
+////		this.servicetype = servicetype;
+////		this.scope = scope;
+////		this.filter = filter;
+////		this.provider = provider;
+////		this.owner = owner;
+//	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter)
+	{
+		this(servicetype, scope, provider, owner, filter, null);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo returntype, ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, Class<?> returntype)
 	{
-		this.returntype = returntype;
+		this(servicetype!=null? new ClassInfo(servicetype): null, scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope,
+			provider, owner, filter, returntype!=null? new ClassInfo(returntype): null);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, ClassInfo returntype)
+	{
 		this.servicetype = servicetype;
 		this.scope = scope;
-		this.filter = filter;
 		this.provider = provider;
 		this.owner = owner;
+		this.filter = filter;
+		this.returntype = returntype;
 	}
+	
 	
 	/**
 	 *  Shallow copy constructor.

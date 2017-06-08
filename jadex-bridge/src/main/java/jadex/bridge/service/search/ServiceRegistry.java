@@ -103,7 +103,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected boolean isSuperpeer()
 	{
-		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid))!=null;
+		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null))!=null;
 	}
 	
 //	/**
@@ -338,7 +338,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected IFuture<IComponentIdentifier> searchSuperpeer()
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid))
+		searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
 			.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
@@ -1181,7 +1181,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected <T> Object wrapServiceForQuery(ServiceQuery<T> query, Object service, boolean removed)
 	{
 		Object ret = null;
-		if(ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
+		if(query.getReturnType()!=null && ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
 		{
 			ret = new ServiceEvent(service, removed ? ServiceEvent.SERVICE_REMOVED : ServiceEvent.SERVICE_ADDED);
 		}

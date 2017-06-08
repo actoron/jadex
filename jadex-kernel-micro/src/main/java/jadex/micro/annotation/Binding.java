@@ -93,7 +93,7 @@ public @interface Binding
 	/**
 	 *  The search scope.
 	 */
-	public String scope() default RequiredServiceInfo.SCOPE_APPLICATION;
+	public String scope() default "";//RequiredServiceInfo.SCOPE_APPLICATION;
 
 	/**
 	 *  The dynamic binding flag.

@@ -255,7 +255,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //							System.out.println("call method start end");
 //						if(method.getName().indexOf("init")!=-1 && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
 //							System.out.println("call method init");
-						FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+						try
+						{
+							FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 				});
 			}

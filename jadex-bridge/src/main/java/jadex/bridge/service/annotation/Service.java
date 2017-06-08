@@ -20,6 +20,10 @@ public @interface Service
 	
 	/**
 	 *  Flag if it is a system service.
+	 *  Declaring a service as system service has the following implications:
+	 *  a) with at least one system service the hosting agent is considered as system agent
+	 *     and system agents are displayed in the system view (JCC)
+	 *  c) search requests have default scope PLATFORM instead of APPLICATION 
 	 */
 	public boolean system() default false;
 }
