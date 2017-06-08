@@ -172,7 +172,6 @@ public class TcpTransport	implements ITransport<SocketChannel>
 						sc.configureBlocking(false);
 						sc.register(selector, SelectionKey.OP_CONNECT, null);
 						sc.connect(sock);
-						handler.getAccess().getLogger().info("Attempting connection to: "+address);
 					}
 					catch(Exception e)
 					{
@@ -181,7 +180,6 @@ public class TcpTransport	implements ITransport<SocketChannel>
 							try{sc.close();}catch(Exception ex){}
 						}
 						
-						handler.getAccess().getLogger().info("Failed connection to: "+address);
 						ret.setException(e);
 					}
 				}			
@@ -539,7 +537,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	{
 		SocketChannel sc = (SocketChannel)key.channel();
 		
-		List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>) writetasks!=null ? this.writetasks.get(sc) : null;
+		List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>) (writetasks!=null ? (this.writetasks.get(sc)) : null);
 
 		try
 		{

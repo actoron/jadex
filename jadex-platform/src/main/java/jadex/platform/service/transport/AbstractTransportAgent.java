@@ -121,7 +121,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			if(source==null)
 			{
 				assert header.length==0;
-				String	name	= (String)codec.decode(agent.getClassLoader(), body);
+				String	name	= new String(body, SUtil.UTF8);
 				cand.setTarget(new BasicComponentIdentifier(name));
 			}
 			else
@@ -214,9 +214,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if(agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			createConnectionCandidate(con, false);
-			
-			// Start handshake by sending id.
-			impl.sendMessage(con, new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
 		}
 		else
 		{
@@ -270,6 +267,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		IPlatformStateService	plast	= SServiceProvider.getLocalService(agent, IPlatformStateService.class, Binding.SCOPE_PLATFORM);
 		this.codec	= plast.getSerializationServices();
 		this.impl	= createTransportImpl();
+		impl.init(this);
 		
 		// Set up server, if port given.
 		// If port==0 -> any free port
@@ -278,7 +276,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			impl.openPort(port).addResultListener(new IResultListener<Integer>()
 			{
 				@Override
-				public void resultAvailable(Integer result)
+				public void resultAvailable(Integer port)
 				{
 					try
 					{
@@ -435,8 +433,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			// Counter for failed connections to know when all are failed.
 			final int[]	failed	= new int[]{0};
 			
-			for(String address: addresses)
+			for(final String address: addresses)
 			{
+				agent.getLogger().info("Attempting connection to "+getTarget(header)+" using address: "+address);
 				IFuture<Con>	fcon	= impl.createConnection(address, getTarget(header));
 				fcon.addResultListener(new IResultListener<Con>()
 				{
@@ -449,6 +448,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					@Override
 					public void exceptionOccurred(Exception exception)
 					{
+						agent.getLogger().info("Failed connection to "+getTarget(header)+" using address: "+address+": "+exception);
+						
 						// All tries failed?
 						if((failed[0]++) == addresses.length)
 						{
@@ -515,6 +516,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		ConnectionCandidate	cand	= new ConnectionCandidate(con, clientcon);
 		ConnectionCandidate	prev	= candidates.put(con, cand);
 		assert prev==null;
+		
+		// Start handshake by sending id.
+		impl.sendMessage(con, new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
+
 		return cand;
 	}
 	
@@ -743,7 +748,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		protected void	addConnection(ConnectionCandidate cand)
 		{
 			assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-			assert this.cons.isEmpty() || !this.cons.contains(cand);
+			assert this.cons==null || !this.cons.contains(cand);
 			
 			if(cons==null)
 			{
