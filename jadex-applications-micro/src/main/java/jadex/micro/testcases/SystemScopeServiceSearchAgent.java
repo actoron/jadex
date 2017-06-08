@@ -10,6 +10,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -28,6 +29,9 @@ public class SystemScopeServiceSearchAgent
 	@Agent
 	protected IInternalAccess agent;
 	
+	@AgentService
+	protected IComponentManagementService cms;
+	
 	@AgentBody
 	public void body()
 	{	
@@ -44,7 +48,7 @@ public class SystemScopeServiceSearchAgent
 		}
 		
 		
-		TestReport tr2 = new TestReport("#1", "Test if system service can be found without scope with required service def");
+		TestReport tr2 = new TestReport("#2", "Test if system service can be found without scope with required service def");
 		try
 		{
 			IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
@@ -56,8 +60,18 @@ public class SystemScopeServiceSearchAgent
 			tr2.setFailed("Not found: "+e);
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, 
-			new TestReport[]{tr1, tr2}));
+		TestReport tr3 = new TestReport("#3", "Test if system service can be found without scope with required service injection");
+		if(cms!=null)
+		{
+			tr3.setSucceeded(true);
+		}
+		else
+		{
+			tr3.setFailed("Not injected");
+		}
+		
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, 
+			new TestReport[]{tr1, tr2, tr3}));
 		
 		agent.killComponent();
 	}
