@@ -54,7 +54,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 	implementation=@Implementation(expression="$pojoagent")))
 @RequiredServices(@RequiredService(name="awa", type=IAwarenessManagementService.class))
 @Service
-@Properties(@NameValue(name="system", value="true"))
+//@Properties(@NameValue(name="system", value="true"))
 public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwarenessService
 {
 	//-------- attributes --------

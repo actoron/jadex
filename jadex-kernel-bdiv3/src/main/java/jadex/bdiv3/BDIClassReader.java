@@ -557,7 +557,7 @@ public class BDIClassReader extends MicroClassReader
 				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
 			
 			// todo: allow specifying scope
-			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null));
+			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null, false));
 		}
 		
 		// Create enhanced classes if not already present.

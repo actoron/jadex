@@ -17,7 +17,7 @@ import jadex.commons.future.IFuture;
  *  and is capable of loading component models from files
  *  as well as providing component features.
  */
-@Service
+@Service(system=true)
 public interface IComponentFactory
 {
 	/**

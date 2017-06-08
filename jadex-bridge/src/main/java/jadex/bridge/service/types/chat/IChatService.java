@@ -1,9 +1,9 @@
 package jadex.bridge.service.types.chat;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -14,6 +14,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
  *  send files and user status.
  */
 @Security(Security.UNRESTRICTED)
+@Service(system=true)
 public interface IChatService
 {
 	//-------- constants --------

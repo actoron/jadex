@@ -5,7 +5,7 @@ import jadex.bridge.service.annotation.Service;
 /**
  *  Service for peers to be distinguished from superpeers.
  */
-@Service
+@Service(system=true)
 public interface IPeerRegistrySynchronizationService
 {
 }

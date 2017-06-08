@@ -10,7 +10,7 @@ import jadex.commons.future.IFuture;
 /**
  * 
  */
-@Service
+@Service(system=true)
 public interface IWebPublishService extends IPublishService
 {
 //	/**

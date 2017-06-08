@@ -9,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.SecureTransmission;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.ChangeEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -27,6 +28,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 	@GuiClassName("jadex.tools.security.SecuritySettingsPanel"),
 	@GuiClassName("jadex.android.controlcenter.settings.SecuritySettings")
 })
+@Service(system=true)
 public interface ISecurityService
 {
 	public static final String CERTIFICATE = "certificate";

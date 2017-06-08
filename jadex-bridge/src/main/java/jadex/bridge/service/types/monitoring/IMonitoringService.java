@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.monitoring;
 
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -10,6 +11,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  sources: publishing new events
  *  consumers: subscribing for event patterns 
  */
+@Service(system=true)
 public interface IMonitoringService
 {
 	/**

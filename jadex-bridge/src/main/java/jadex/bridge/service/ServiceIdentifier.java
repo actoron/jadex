@@ -192,6 +192,46 @@ public class ServiceIdentifier implements IServiceIdentifier
 	{
 		this.scope = scope;
 	}
+	
+	/**
+	 *  Test if the service is a system service.
+	 *  Checks wether the system property is set in properties annotation.
+	 *  @param iftype The interface type. 
+	 */
+	public static boolean isSystemService(Class<?> iftype)
+	{
+		// Hack cast
+		//Class<?> itype = psi.getType().getType();
+		boolean ret = false;
+		if(iftype!=null)
+		{
+			Service[] sers = (Service[])iftype.getAnnotationsByType(Service.class);
+			for(Service ser: sers)
+			{
+				if(ser.system())
+				{
+					ret = true;
+					break;
+				}
+			}
+			
+//			Properties[] props = iftype.getAnnotationsByType(Properties.class);
+//			for(Properties ps: props)
+//			{
+//				for(NameValue nv: ps.value())
+//				{
+//					if(nv.name().equals("system"))
+//					{
+//						Boolean res = (Boolean)SJavaParser.evaluateExpression(nv.value(), null);
+//						if(res!=null)
+//							ret = res.booleanValue();
+//						break;
+//					}
+//				}
+//			}
+		}
+		return ret;
+	}
 
 	/**
 	 *  Get the hashcode.

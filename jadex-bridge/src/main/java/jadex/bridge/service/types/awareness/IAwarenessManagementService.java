@@ -4,12 +4,15 @@ import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Service for managing discovery infos.
  */
+//@Properties(@NameValue(name="system", value="true"))
+@Service(system=true)
 public interface IAwarenessManagementService
 {
 	/**

@@ -17,4 +17,9 @@ public @interface Service
 	 *  Supply the interface.
 	 */
 	public Class<?> value() default Object.class;
+	
+	/**
+	 *  Flag if it is a system service.
+	 */
+	public boolean system() default false;
 }

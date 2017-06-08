@@ -1,5 +1,6 @@
 package jadex.platform.service.filetransfer;
 
+
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.micro.annotation.Agent;
@@ -13,7 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=IFileTransferService.class, implementation=@Implementation(FileTransferService.class)))
-@Properties(value=@NameValue(name="system", value="true"))
+//@Properties(value=@NameValue(name="system", value="true"))
 public class FileTransferAgent
 {
 }

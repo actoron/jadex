@@ -59,7 +59,6 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	/** The provider id. */
 	protected IComponentIdentifier providerid;
 	
-	
 	protected Class<?> type;
 	
 	protected Class<?> impltype;

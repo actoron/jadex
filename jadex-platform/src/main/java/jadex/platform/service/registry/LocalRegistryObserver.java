@@ -181,7 +181,7 @@ public abstract class LocalRegistryObserver
 	public RegistryEvent getCurrentStateEvent()
 	{
 		IServiceRegistry reg = ServiceRegistry.getRegistry(cid);
-		ServiceQuery<IService> query = new ServiceQuery<IService>((ClassInfo) null, Binding.SCOPE_PLATFORM, null, cid);
+		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, cid);
 		RegistryEvent event = new RegistryEvent(new HashSet<IService>(reg.searchServicesSync(query)), null, eventslimit, timelimit, false);
 		return event;
 	}

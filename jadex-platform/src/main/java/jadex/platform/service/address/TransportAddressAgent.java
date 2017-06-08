@@ -13,7 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent 
 @ProvidedServices(@ProvidedService(type=ITransportAddressService.class, implementation=@Implementation(TransportAddressService.class)))
-@Properties(value=@NameValue(name="system", value="true"))
+//@Properties(value=@NameValue(name="system", value="true"))
 public class TransportAddressAgent
 {
 }

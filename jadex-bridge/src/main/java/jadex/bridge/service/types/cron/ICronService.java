@@ -1,12 +1,14 @@
 package jadex.bridge.service.types.cron;
 
 import jadex.bridge.service.annotation.CheckNotNull;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Interface for adding and removing cron jobs.
  */
+@Service(system=true)
 public interface ICronService
 {
 	/**

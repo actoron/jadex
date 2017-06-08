@@ -11,6 +11,8 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
@@ -59,21 +61,21 @@ public class ServiceQuery<T>
 	{
 	}
 	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
-	{
-		this(servicetype, scope, (IFilter<T>) null, null, owner);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(servicetype, scope, (IFilter<T>) null, provider, owner);
-	}
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
+//	{
+//		this(servicetype, scope, (IFilter<T>) null, null, owner);
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+//	}
 	
 	/**
 	 *  Create a new service query.
@@ -96,7 +98,15 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
-		this(new ClassInfo(servicetype), scope, filter, provider, owner);
+//		this(new ClassInfo(servicetype), scope, filter, provider, owner);this.returntype = servicetype;
+		this.servicetype = new ClassInfo(servicetype);
+		this.returntype = this.servicetype;
+		// todo: what is the best place for this?
+		this.scope = scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope;
+		this.filter = filter;
+		this.provider = provider;
+		this.owner = owner;
+		
 	}
 	
 	/**
@@ -125,12 +135,13 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
-		this.returntype = servicetype;
-		this.servicetype = servicetype;
-		this.scope = scope;
-		this.filter = filter;
-		this.provider = provider;
-		this.owner = owner;
+		this(servicetype, servicetype, scope, filter, provider, owner);
+//		this.returntype = servicetype;
+//		this.servicetype = servicetype;
+//		this.scope = scope;
+//		this.filter = filter;
+//		this.provider = provider;
+//		this.owner = owner;
 	}
 	
 	/**

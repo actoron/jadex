@@ -103,7 +103,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected boolean isSuperpeer()
 	{
-		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(new ClassInfo(ISuperpeerRegistrySynchronizationService.class), RequiredServiceInfo.SCOPE_PLATFORM, cid))!=null;
+		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid))!=null;
 	}
 	
 //	/**
@@ -338,7 +338,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected IFuture<IComponentIdentifier> searchSuperpeer()
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(new ClassInfo(ISuperpeerRegistrySynchronizationService.class), RequiredServiceInfo.SCOPE_GLOBAL, cid))
+		searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid))
 			.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)

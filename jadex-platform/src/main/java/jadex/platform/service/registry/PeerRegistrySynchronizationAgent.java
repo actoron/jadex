@@ -22,7 +22,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=IPeerRegistrySynchronizationService.class, implementation=@Implementation(PeerRegistrySynchronizationService.class)))
-@Properties(value=@NameValue(name="system", value="true"))
+//@Properties(value=@NameValue(name="system", value="true"))
 public class PeerRegistrySynchronizationAgent
 {
 	/** The component. */

@@ -23,6 +23,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.MethodInfo;
@@ -30,6 +31,7 @@ import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
@@ -44,7 +46,8 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 	/** The service container icon. */
 	private static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"service", SGUI.makeIcon(ProvidedServiceInfoNode.class, "/jadex/base/gui/images/provided_16.png")
+		"service", SGUI.makeIcon(ProvidedServiceInfoNode.class, "/jadex/base/gui/images/provided_16.png"),
+		"overlay_system", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_system.png")
 	});
 	
 	//-------- attributes --------
@@ -125,7 +128,10 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 	 */
 	public Icon	getSwingIcon()
 	{
-		return icons.getIcon("service");
+		Icon icon = icons.getIcon("service");
+		if(service.isSystemService())
+			icon = icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_system")}) : icons.getIcon("overlay_system");
+		return icon;
 	}
 
 	/**
