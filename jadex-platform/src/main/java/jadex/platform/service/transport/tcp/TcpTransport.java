@@ -123,7 +123,6 @@ public class TcpTransport	implements ITransport<SocketChannel>
 						ssc.register(selector, SelectionKey.OP_ACCEPT);
 						int port = serversocket.getLocalPort();
 						ret.setResult(port);
-						handler.getAccess().getLogger().info("TCP transport listening to port: "+port);
 					}
 					catch(Exception e)
 					{
@@ -170,7 +169,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 						sc = SocketChannel.open();
 //						sc.socket().setSoTimeout(10);
 						sc.configureBlocking(false);
-						sc.register(selector, SelectionKey.OP_CONNECT, null);
+						sc.register(selector, SelectionKey.OP_CONNECT, ret);
 						sc.connect(sock);
 					}
 					catch(Exception e)
@@ -295,11 +294,11 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	{
 		SocketChannel	sc	= (SocketChannel)key.channel();
 		
-		if(e!=null)
-		{
-			e.printStackTrace();
-			handler.getAccess().getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
-		}
+//		if(e!=null)
+//		{
+//			e.printStackTrace();
+//			handler.getAccess().getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
+//		}
 
 		try
 		{
@@ -493,7 +492,9 @@ public class TcpTransport	implements ITransport<SocketChannel>
 			// Initialize key to start reading.
 			key.interestOps(SelectionKey.OP_READ);
 
-			handler.connectionEstablished(sc);
+			// Remove attachment and pass result.
+			Future<SocketChannel>	fut	= (Future<SocketChannel>)key.attach(null);
+			fut.setResult(sc);
 		}
 		catch(Exception e)
 		{
