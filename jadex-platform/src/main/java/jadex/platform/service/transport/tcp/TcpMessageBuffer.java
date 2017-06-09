@@ -117,6 +117,7 @@ public class TcpMessageBuffer
 			bytes[3]	= rb.get();
 			int	len = SUtil.bytesToInt(bytes);
 			data	= new byte[len];
+			pos	= 0;
 		}
 
 		// Read out the buffer if enough data has been retrieved for the header or buffer is full.
