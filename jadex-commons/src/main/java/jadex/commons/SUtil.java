@@ -2046,6 +2046,19 @@ public class SUtil
 		return ret;
 	}
 	
+	/**
+	 *  Creates a random shared network key.
+	 * 
+	 *  @return Random shared network key.
+	 */
+	public static final String createRandomNetworkKey()
+	{
+		byte[] rawkey = new byte[32];
+		SECURE_RANDOM.nextBytes(rawkey);
+		
+		return "key:" + new String (Base64.encode(rawkey), UTF8);
+	}
+	
 	public static final Field strval;
 	static
 	{

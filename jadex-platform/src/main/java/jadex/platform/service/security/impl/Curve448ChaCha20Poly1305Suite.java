@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.spongycastle.crypto.digests.Blake2bDigest;
 import org.spongycastle.crypto.engines.ChaChaEngine;
@@ -17,13 +18,13 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.AbstractAuthenticationSecret;
 import jadex.platform.service.security.MsgSecurityInfos;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
-import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
 
 /**
  *  Crypto suite based on Ed448 and ChaCha20-Poly1305 AEAD.
@@ -50,6 +51,8 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	
 	/** Next step in the handshake protocol. */
 	protected int nextstep;
+	
+	protected Map<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> hashednetworks;
 	
 	// -------------- Operational state -----------------
 	
@@ -128,12 +131,9 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			localauthchallenge = new byte[32];
 			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
 			sem.setChallenge(localauthchallenge);
-			Map<String, AbstractAuthenticationSecret> nw = agent.getNetworks();
-			if (nw != null)
-			{
-				String[] nwnames = nw.keySet().toArray(new String[nw.size()]);
-				sem.setNetworkNames(nwnames);
-			}
+			hashednetworks = getHashedNetworks(agent.getNetworks(), localauthchallenge);
+			sem.setHashedNetworkNames(hashednetworks.keySet());
+			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
 			nextstep = 1;
 		}
@@ -142,26 +142,19 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			StartExchangeMessage sem = (StartExchangeMessage) incomingmessage;
 			remoteauthchallenge = sem.getChallenge();
 			
+			if (remoteauthchallenge.length < 16)
+				throw new SecurityException("Remote authentication challenge too short.");
+			
 			ephemeralprivkey = new byte[56];
 			SSecurity.getHighlySecureRandom().nextBytes(ephemeralprivkey);
 			byte[] pubkey = genPubKey(ephemeralprivkey);
 			
-			Map<String, byte[]> networksigs = new HashMap<String, byte[]>();
-			String[] remotenw = sem.getNetworkNames();
-			if (remotenw != null && agent.getNetworks() != null)
-			{
-				for (String nwname : remotenw)
-				{
-					AbstractAuthenticationSecret nwsecret = agent.getNetworks().get(nwname);
-					if (nwsecret != null)
-					{
-						networksigs.put(nwname, signKey(remoteauthchallenge, pubkey, nwsecret));
-					}
-				}
-			}
-			
 			localauthchallenge = new byte[32];
 			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
+			
+			hashednetworks = getHashedNetworks(agent.getNetworks(), remoteauthchallenge);
+			
+			Map<ByteArrayWrapper, byte[]> networksigs = getNetworkSignatures(pubkey, sem.getHashedNetworkNames());
 			
 			Curve448ExchangeMessage em = new Curve448ExchangeMessage(agent.getComponentIdentifier(), sem.getConversationId());
 			em.setPublicKey(pubkey);
@@ -177,21 +170,15 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			remoteauthchallenge = incmsg.getChallenge();
 			
-			List<String> authnets = new ArrayList<String>();
-			if (agent.getNetworks() != null && incmsg.getNetworkSigs() != null)
-			{
-				for (Map.Entry<String, byte[]> sigentry : incmsg.getNetworkSigs().entrySet())
-				{
-					AbstractAuthenticationSecret secret = agent.getNetworks().get(sigentry.getKey());
-					if (secret != null && incmsg.getNetworkSigs() != null && incmsg.getNetworkSigs().get(sigentry.getKey()) != null)
-					{
-						if (verifyKey(localauthchallenge, incmsg.getPublicKey(), secret, incmsg.getNetworkSigs().get(sigentry.getKey())))
-						{
-							authnets.add(sigentry.getKey());
-						}
-					}
-				}
-			}
+			ephemeralprivkey = new byte[56];
+			SSecurity.getHighlySecureRandom().nextBytes(ephemeralprivkey);
+			key = genSharedKey(ephemeralprivkey, incmsg.getPublicKey());
+			byte[] pubkey = genPubKey(ephemeralprivkey);
+			System.out.println("Shared Key1: " + Arrays.toString(key));
+			
+			Map<ByteArrayWrapper, byte[]> networksigs = getNetworkSignatures(pubkey, incmsg.getNetworkSigs().keySet());
+			
+			List<String> authnets = verifyNetworkSignatures(incmsg.getPublicKey(), incmsg.getNetworkSigs());
 			
 			secinf = new MsgSecurityInfos();
 			secinf.setTrustedPlatform(authnets.size() > 0);
@@ -201,22 +188,6 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 //			if (!secinf.isAuthenticatedPlatform())
 //				throw new SecurityException("Platform could not be authenticated: " + incmsg.getSender().getRoot());
 			
-			ephemeralprivkey = new byte[56];
-			SSecurity.getHighlySecureRandom().nextBytes(ephemeralprivkey);
-			key = genSharedKey(ephemeralprivkey, incmsg.getPublicKey());
-			byte[] pubkey = genPubKey(ephemeralprivkey);
-			System.out.println("Shared Key1: " + Arrays.toString(key));
-			
-			Map<String, byte[]> networksigs = new HashMap<String, byte[]>();
-			for (String authnet : authnets)
-			{
-				AbstractAuthenticationSecret nwsecret = agent.getNetworks().get(authnet);
-				if (nwsecret != null)
-				{
-					networksigs.put(authnet, signKey(remoteauthchallenge, pubkey, nwsecret));
-				}
-			}
-			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
 			nonceprefix ^= Pack.littleEndianToInt(remoteauthchallenge, 0);
 			
@@ -225,6 +196,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			ephemeralprivkey = null;
 			localauthchallenge = null;
 			remoteauthchallenge = null;
+			hashednetworks = null;
 			
 			Curve448ExchangeMessage exmsg = new Curve448ExchangeMessage(agent.getComponentIdentifier(), incmsg.getConversationId());
 			exmsg.setNetworkSigs(networksigs);
@@ -238,21 +210,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			Curve448ExchangeMessage incmsg = (Curve448ExchangeMessage) incomingmessage;
 			
-			List<String> authnets = new ArrayList<String>();
-			if (agent.getNetworks() != null && incmsg.getNetworkSigs() != null)
-			{
-				for (Map.Entry<String, byte[]> sigentry : incmsg.getNetworkSigs().entrySet())
-				{
-					AbstractAuthenticationSecret secret = agent.getNetworks().get(sigentry.getKey());
-					if (secret != null && incmsg.getNetworkSigs() != null && incmsg.getNetworkSigs().get(sigentry.getKey()) != null)
-					{
-						if (verifyKey(localauthchallenge, incmsg.getPublicKey(), secret, incmsg.getNetworkSigs().get(sigentry.getKey())))
-						{
-							authnets.add(sigentry.getKey());
-						}
-					}
-				}
-			}
+			List<String> authnets = verifyNetworkSignatures(incmsg.getPublicKey(), incmsg.getNetworkSigs());
 			
 			secinf = new MsgSecurityInfos();
 			secinf.setTrustedPlatform(authnets.size() > 0);
@@ -273,6 +231,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			ephemeralprivkey = null;
 			localauthchallenge = null;
 			remoteauthchallenge = null;
+			hashednetworks = null;
 			
 			nextstep = 4;
 			
@@ -317,6 +276,55 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	}
 	
 	/**
+	 *  Signs a key with network secrets.
+	 *  
+	 *  @param key The key (public key).
+	 *  @param remotehnets The hashed names of remote networks.
+	 *  @param salt Salt to use.
+	 *  
+	 *  @return Map hashed network name -> signature.
+	 */
+	protected Map<ByteArrayWrapper, byte[]> getNetworkSignatures(byte[] key, Set<ByteArrayWrapper> remotehnets)
+	{
+		Map<ByteArrayWrapper, byte[]> networksigs = new HashMap<ByteArrayWrapper, byte[]>();
+		if (remotehnets != null && hashednetworks.size() > 0)
+		{
+			for (ByteArrayWrapper hnwname : remotehnets)
+			{
+				Tuple2<String, AbstractAuthenticationSecret> tup = hashednetworks.get(hnwname);
+				if (tup != null)
+					networksigs.put(hnwname, signKey(remoteauthchallenge, key, tup.getSecondEntity()));
+			}
+		}
+		return networksigs;
+	}
+	
+	/**
+	 *  Verifies network signatures of a key.
+	 *  
+	 *  @param key The key.
+	 *  @param networksigs The signatures.
+	 *  @return List of network that authenticated the key.
+	 */
+	protected List<String> verifyNetworkSignatures(byte[] key, Map<ByteArrayWrapper, byte[]> networksigs)
+	{
+		List<String> ret = new ArrayList<String>();
+		if (networksigs != null)
+		{
+			for (Map.Entry<ByteArrayWrapper, byte[]> nwsig : networksigs.entrySet())
+			{
+				Tuple2<String, AbstractAuthenticationSecret> tup = hashednetworks.get(nwsig.getKey());
+				if (tup != null)
+				{
+					if (verifyKey(localauthchallenge, key, tup.getSecondEntity(), nwsig.getValue()))
+						ret.add(tup.getFirstEntity());
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Finalize.
 	 */
 	protected void finalize() throws Throwable
@@ -345,7 +353,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  Verifies a key for authentication.
 	 *  
 	 *  @param challenge Nonce / challenge received from remote.
-	 *  @param key The key to sign.
+	 *  @param key The key to verify.
 	 *  @param secret Secret used for authentication.
 	 *  @return Signature.
 	 */
@@ -356,6 +364,44 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		System.arraycopy(challenge, 0, sigmsg, key.length, challenge.length);
 		Blake2bX509AuthenticationSuite authsuite = new Blake2bX509AuthenticationSuite();
 		return authsuite.verifyAuthenticationToken(sigmsg, secret, authtoken);
+	}
+	
+	/**
+	 *  Hashes the network name.
+	 *  
+	 *  @param nwname The network name.
+	 *  @param salt The salt.
+	 *  @return Hashed network name.
+	 */
+	protected static final byte[] hashNetworkName(String nwname, byte[] salt)
+	{
+		Blake2bDigest dig = new Blake2bDigest(nwname.getBytes(SUtil.UTF8));
+		byte[] hnwname = new byte[dig.getDigestSize()];
+		dig.update(salt, 0, salt.length);
+		dig.doFinal(hnwname, 0);
+		return hnwname;
+	}
+	
+	/**
+	 *  Creates a reverse look-up map of hashed network names.
+	 *  
+	 *  @param networks The networks.
+	 *  @param salt Salt to use.
+	 *  @return Reverse look-up map.
+	 */
+	protected static final Map<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> getHashedNetworks(Map<String, AbstractAuthenticationSecret> networks, byte[] salt)
+	{
+		Map<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> ret = new HashMap<ByteArrayWrapper, Tuple2<String,AbstractAuthenticationSecret>>();
+		if (networks != null)
+		{
+			for (Map.Entry<String, AbstractAuthenticationSecret> nw : networks.entrySet())
+			{
+				Tuple2<String, AbstractAuthenticationSecret> tup;
+				tup = new Tuple2<String, AbstractAuthenticationSecret>(nw.getKey(), nw.getValue());
+				ret.put(new ByteArrayWrapper(hashNetworkName(nw.getKey(), salt)), tup);
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -557,8 +603,8 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		/** Challenge for the exchange authentication. */
 		protected byte[] challenge;
 		
-		/** The available network names */
-		protected String[] networknames;
+		/** The available hashed network names */
+		protected Set<ByteArrayWrapper> hashednetworknames;
 		
 		/**
 		 *  Creates the message.
@@ -600,19 +646,19 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *
 		 *  @return The network names.
 		 */
-		public String[] getNetworkNames()
+		public Set<ByteArrayWrapper> getHashedNetworkNames()
 		{
-			return networknames;
+			return hashednetworknames;
 		}
 
 		/**
-		 *  Sets the network names.
+		 *  Sets the hashed network names.
 		 *
-		 *  @param networknames The network names.
+		 *  @param hashednetworknames The hashed network names.
 		 */
-		public void setNetworkNames(String[] networknames)
+		public void setHashedNetworkNames(Set<ByteArrayWrapper> hashednetworknames)
 		{
-			this.networknames = networknames;
+			this.hashednetworknames = hashednetworknames;
 		}
 	}
 	
@@ -622,7 +668,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		public byte[] publickey;
 		
 		/** Network signatures of the public key. */
-		public Map<String, byte[]> networksigs;
+		public Map<ByteArrayWrapper, byte[]> networksigs;
 		
 		/** Challenge for the exchange authentication. */
 		protected byte[] challenge;
@@ -687,7 +733,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *  
 		 *  @return The network signatures of the public key.
 		 */
-		public Map<String, byte[]> getNetworkSigs()
+		public Map<ByteArrayWrapper, byte[]> getNetworkSigs()
 		{
 			return networksigs;
 		}
@@ -697,7 +743,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *  
 		 *  @param networksigs The network signatures of the public key.
 		 */
-		public void setNetworkSigs(Map<String, byte[]> networksigs)
+		public void setNetworkSigs(Map<ByteArrayWrapper, byte[]> networksigs)
 		{
 			this.networksigs = networksigs;
 		}
@@ -722,6 +768,83 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		public ReadyMessage(IComponentIdentifier sender, String conversationid)
 		{
 			super(sender, conversationid);
+		}
+	}
+	
+	/**
+	 *  Wrapper to allow byte arrays as hash keys.
+	 *
+	 */
+	protected static final class ByteArrayWrapper
+	{
+		/** The wrapped byte array. */
+		protected byte[] array;
+		
+		/**
+		 *  Creates the wrapper.
+		 */
+		public ByteArrayWrapper()
+		{
+		}
+		
+		/**
+		 *  Creates the wrapper.
+		 */
+		public ByteArrayWrapper(byte[] array)
+		{
+			this.array = array;
+		}
+
+		/**
+		 *  Gets the array.
+		 *
+		 *  @return The array.
+		 */
+		public byte[] getArray()
+		{
+			return array;
+		}
+
+		/**
+		 *  Sets the array.
+		 *
+		 *  @param array The array.
+		 */
+		public void setArray(byte[] array)
+		{
+			this.array = array;
+		}
+		
+		/**
+		 *  Creates a hash code.
+		 */
+		public int hashCode()
+		{
+			if (array == null)
+				return 0;
+			
+			return Arrays.hashCode(array);
+		}
+		
+		/**
+		 *  Compares two arrays.
+		 */
+		public boolean equals(Object obj)
+		{
+			boolean ret = false;
+			if (obj instanceof ByteArrayWrapper)
+			{
+				ByteArrayWrapper other = (ByteArrayWrapper) obj;
+				if (other.getArray() == null && array == null)
+				{
+					ret = true;
+				}
+				else
+				{
+					ret = Arrays.equals(array, other.getArray());
+				}
+			}
+			return ret;
 		}
 	}
 	

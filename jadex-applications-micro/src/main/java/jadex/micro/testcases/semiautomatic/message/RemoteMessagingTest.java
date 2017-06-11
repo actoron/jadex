@@ -10,6 +10,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 
 /**
  *  Test remote message sending.
@@ -21,7 +22,7 @@ public class RemoteMessagingTest
 	 */
 	public static void main(String[] args)
 	{
-		String key = "key:4dkvuwzlU2fusyO53UdQx5g+R+wDECBIc+JHZETbN1E=";
+		String key = SUtil.createRandomNetworkKey();
 		
 		// Start first platform with receiver.
 		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
