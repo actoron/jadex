@@ -1,6 +1,7 @@
 package jadex.platform.service.security.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -11,6 +12,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.spongycastle.asn1.pkcs.PrivateKeyInfo;
 import org.spongycastle.cert.X509CertificateHolder;
@@ -193,6 +196,12 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			X509CertificateHolder cert = new X509CertificateHolder(pemparser.readPemObject().getContent());
 			pemparser.close();
 			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			GZIPOutputStream gos = new GZIPOutputStream(baos);
+			gos.write(certdata);
+			gos.close();
+			certdata = baos.toByteArray();
+			
 			pemparser = new PEMParser(new InputStreamReader(pemkey, SUtil.UTF8));
 			JcaPEMKeyConverter jpkc = new JcaPEMKeyConverter();
 			Object o = null;
@@ -265,6 +274,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				return false;
 			
 			byte[] certdata = splitdata.get(0);
+			ByteArrayInputStream bais = new ByteArrayInputStream(certdata);
+			GZIPInputStream gis = new GZIPInputStream(bais);
+			certdata = SUtil.readStream(gis);
 			byte[] sig = splitdata.get(1);
 			
 			pemparser = new PEMParser(new InputStreamReader(new ByteArrayInputStream(certdata), SUtil.UTF8));
