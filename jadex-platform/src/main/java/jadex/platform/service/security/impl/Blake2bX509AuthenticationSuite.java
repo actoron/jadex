@@ -14,14 +14,12 @@ import java.util.logging.Logger;
 
 import org.spongycastle.asn1.pkcs.PrivateKeyInfo;
 import org.spongycastle.cert.X509CertificateHolder;
-import org.spongycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.spongycastle.crypto.digests.Blake2bDigest;
 import org.spongycastle.openssl.PEMKeyPair;
 import org.spongycastle.openssl.PEMParser;
 import org.spongycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.spongycastle.operator.ContentSigner;
 import org.spongycastle.operator.ContentVerifier;
-import org.spongycastle.operator.ContentVerifierProvider;
 import org.spongycastle.operator.DefaultAlgorithmNameFinder;
 import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.spongycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
@@ -197,7 +195,13 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			
 			pemparser = new PEMParser(new InputStreamReader(pemkey, SUtil.UTF8));
 			JcaPEMKeyConverter jpkc = new JcaPEMKeyConverter();
-			PrivateKey privatekey = jpkc.getPrivateKey(((PEMKeyPair) pemparser.readObject()).getPrivateKeyInfo());
+			Object o = null;
+			do
+			{
+				o = pemparser.readObject();
+			}
+			while (!(o instanceof PEMKeyPair) && o != null);
+			PrivateKey privatekey = jpkc.getPrivateKey(((PEMKeyPair) o).getPrivateKeyInfo());
 			pemparser.close();
 			
 			DefaultAlgorithmNameFinder algfinder = new DefaultAlgorithmNameFinder();
@@ -338,9 +342,11 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	{
 		byte[] tsig = signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream("/home/jander/test.pem"), new FileInputStream("/home/jander/test.key"));
 		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream("/home/jander/trusted.pem")));
+		System.out.println("TSIGLEN " + tsig.length);
 		
-		PEMParser r = new PEMParser(new FileReader("/home/jander/test.key"));
+		PEMParser r = new PEMParser(new FileReader("/home/jander/ec.key"));
 		Object object = r.readObject();
+		object = r.readObject();
 //		ASN1StreamParser p = new ASN1StreamParser(new ByteArrayInputStream(object.getContent()));
 //		DERSequenceParser dp = (DERSequenceParser) p.readObject();
 		
@@ -348,6 +354,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		PEMKeyPair keypair = (PEMKeyPair) object;
 		System.out.println("AAA" + keypair.getPublicKeyInfo());
 		PrivateKeyInfo pki = keypair.getPrivateKeyInfo();
+		System.out.println("PKI: " + pki);
 //		AsymmetricKeyParameter akp = PrivateKeyFactory.createKey(pki);
 		
 		
@@ -370,46 +377,46 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			e.printStackTrace();
 		}
 		
-		for (int i = 0; i < certchain.size() - 1; ++i)
-		{
-			X509CertificateHolder signedcert = certchain.get(i);
-			X509CertificateHolder signercert = certchain.get(i + 1);
-			
-			JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
-//			ContentVerifierProvider cvp = jcvpb.build(signercert);
-//			ContentVerifier cv = cvp.get(signercert.getSignatureAlgorithm());
-			
-			System.out.println("VerifyCert: " + signedcert.isSignatureValid(jcvpb.build(signercert)));
-		}
+//		for (int i = 0; i < certchain.size() - 1; ++i)
+//		{
+//			X509CertificateHolder signedcert = certchain.get(i);
+//			X509CertificateHolder signercert = certchain.get(i + 1);
+//			
+//			JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
+////			ContentVerifierProvider cvp = jcvpb.build(signercert);
+////			ContentVerifier cv = cvp.get(signercert.getSignatureAlgorithm());
+//			
+//			System.out.println("VerifyCert: " + signedcert.isSignatureValid(jcvpb.build(signercert)));
+//		}
 		
-		r = new PEMParser(new FileReader("/home/jander/test.pem"));
-		object = r.readPemObject();
-		X509CertificateHolder crtholder = new X509CertificateHolder(((PemObject) object).getContent());
-		System.out.println(crtholder.getIssuer());
-		System.out.println(crtholder.getSignatureAlgorithm());
-		System.out.println(crtholder.getSubject());
-		System.out.println(crtholder.getSubjectPublicKeyInfo().parsePublicKey());
-		System.out.println(crtholder.isValidOn(new Date()));
+//		r = new PEMParser(new FileReader("/home/jander/test.pem"));
+//		object = r.readPemObject();
+//		X509CertificateHolder crtholder = new X509CertificateHolder(((PemObject) object).getContent());
+//		System.out.println(crtholder.getIssuer());
+//		System.out.println(crtholder.getSignatureAlgorithm());
+//		System.out.println(crtholder.getSubject());
+//		System.out.println(crtholder.getSubjectPublicKeyInfo().parsePublicKey());
+//		System.out.println(crtholder.isValidOn(new Date()));
 		
 		String testmsg = "testmsg";
 		
-		DefaultAlgorithmNameFinder danf = new DefaultAlgorithmNameFinder();
-		JcaPEMKeyConverter jpkc = new JcaPEMKeyConverter();
-		PrivateKey pk = jpkc.getPrivateKey(pki);
-		JcaContentSignerBuilder sb = new JcaContentSignerBuilder(danf.getAlgorithmName(crtholder.getSignatureAlgorithm()));
-		sb.setSecureRandom(SSecurity.getSecureRandom());
-		ContentSigner cs = sb.build(pk);
-		System.out.println("ABC "+cs);
-		cs.getOutputStream().write(testmsg.getBytes(SUtil.UTF8));
-		cs.getOutputStream().close();
-		byte[] sig = cs.getSignature();
+//		DefaultAlgorithmNameFinder danf = new DefaultAlgorithmNameFinder();
+//		JcaPEMKeyConverter jpkc = new JcaPEMKeyConverter();
+//		PrivateKey pk = jpkc.getPrivateKey(pki);
+//		JcaContentSignerBuilder sb = new JcaContentSignerBuilder(danf.getAlgorithmName(crtholder.getSignatureAlgorithm()));
+//		sb.setSecureRandom(SSecurity.getSecureRandom());
+//		ContentSigner cs = sb.build(pk);
+//		System.out.println("ABC "+cs);
+//		cs.getOutputStream().write(testmsg.getBytes(SUtil.UTF8));
+//		cs.getOutputStream().close();
+//		byte[] sig = cs.getSignature();
 		
-		JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
-		ContentVerifierProvider cvp = jcvpb.build(crtholder);
-		ContentVerifier cv = cvp.get(crtholder.getSignatureAlgorithm());
-		cv.getOutputStream().write(testmsg.getBytes(SUtil.UTF8));
-		cv.getOutputStream().close();
-		System.out.println("Verify: " + cv.verify(sig));
+//		JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
+//		ContentVerifierProvider cvp = jcvpb.build(crtholder);
+//		ContentVerifier cv = cvp.get(crtholder.getSignatureAlgorithm());
+//		cv.getOutputStream().write(testmsg.getBytes(SUtil.UTF8));
+//		cv.getOutputStream().close();
+//		System.out.println("Verify: " + cv.verify(sig));
 		
 		
 		Blake2bX509AuthenticationSuite auth = new Blake2bX509AuthenticationSuite();
