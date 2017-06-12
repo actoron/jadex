@@ -1,10 +1,11 @@
-package jadex.platform.service.security.impl;
+package jadex.platform.service.security.auth;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import jadex.commons.SUtil;
+import jadex.platform.service.security.impl.AbstractX509PemSecret;
 
 /**
  *  Secret based on PEM-encoded X.509 certificate files and key.

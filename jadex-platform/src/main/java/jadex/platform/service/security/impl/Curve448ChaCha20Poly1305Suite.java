@@ -20,9 +20,11 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.security.SSecurity;
-import jadex.platform.service.security.AbstractAuthenticationSecret;
 import jadex.platform.service.security.MsgSecurityInfos;
 import jadex.platform.service.security.SecurityAgent;
+import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
+import jadex.platform.service.security.auth.Blake2bX509AuthenticationSuite;
+import jadex.platform.service.security.auth.KeySecret;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 

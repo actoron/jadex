@@ -1,6 +1,4 @@
-package jadex.platform.service.security.impl;
-
-import jadex.platform.service.security.AbstractAuthenticationSecret;
+package jadex.platform.service.security.auth;
 
 /**
  *  Suite for authenticating messages.

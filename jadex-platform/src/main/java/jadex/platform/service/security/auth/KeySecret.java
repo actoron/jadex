@@ -1,4 +1,4 @@
-package jadex.platform.service.security.impl;
+package jadex.platform.service.security.auth;
 
 import java.util.logging.Logger;
 

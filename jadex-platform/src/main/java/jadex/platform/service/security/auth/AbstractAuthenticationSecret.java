@@ -1,12 +1,9 @@
-package jadex.platform.service.security;
+package jadex.platform.service.security.auth;
 
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import jadex.platform.service.security.impl.KeySecret;
-import jadex.platform.service.security.impl.SCryptPasswordSecret;
 
 /**
  *  Class representing a secret used for authentication.

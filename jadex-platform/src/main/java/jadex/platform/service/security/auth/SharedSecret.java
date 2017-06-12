@@ -1,6 +1,4 @@
-package jadex.platform.service.security.impl;
-
-import jadex.platform.service.security.AbstractAuthenticationSecret;
+package jadex.platform.service.security.auth;
 
 /**
  *  Authentication based on a shared secret.

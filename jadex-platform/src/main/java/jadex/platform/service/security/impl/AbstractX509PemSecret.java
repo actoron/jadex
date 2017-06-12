@@ -2,7 +2,7 @@ package jadex.platform.service.security.impl;
 
 import java.io.InputStream;
 
-import jadex.platform.service.security.AbstractAuthenticationSecret;
+import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 
 /**
  *  Secret based on PEM-encoded X.509 certificates.

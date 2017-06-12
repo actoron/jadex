@@ -62,8 +62,9 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.security.SSecurity;
-import jadex.platform.service.security.impl.Blake2bX509AuthenticationSuite;
-import jadex.platform.service.security.impl.IAuthenticationSuite;
+import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
+import jadex.platform.service.security.auth.Blake2bX509AuthenticationSuite;
+import jadex.platform.service.security.auth.IAuthenticationSuite;
 
 
 @Service

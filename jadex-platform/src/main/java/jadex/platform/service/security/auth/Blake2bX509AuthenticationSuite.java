@@ -1,4 +1,4 @@
-package jadex.platform.service.security.impl;
+package jadex.platform.service.security.auth;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +33,7 @@ import org.spongycastle.util.io.pem.PemObject;
 
 import jadex.commons.SUtil;
 import jadex.commons.security.SSecurity;
-import jadex.platform.service.security.AbstractAuthenticationSecret;
+import jadex.platform.service.security.impl.AbstractX509PemSecret;
 
 /**
  *  Symmetric authentication based on Blake2b MACs.
