@@ -2099,7 +2099,7 @@ public class SUtil
 	 */
 	public static final String createNetworkPassword(String rawpassword)
 	{
-		return "scrypt484:" + rawpassword;
+		return "scrypt:" + rawpassword;
 	}
 	
 	/**

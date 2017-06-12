@@ -13,8 +13,7 @@ import jadex.commons.SUtil;
 public class SCryptPasswordSecret extends SharedSecret
 {
 	/** Prefix used to encode secret type as strings.*/
-	// scrypt, N=2^(10+n0)=4, R=n1=8, P=n2=4
-	public static final String PREFIX = "scrypt484";
+	public static final String PREFIX = "scrypt";
 	
 	/** Password length warning threshold. */
 	protected static final int MIN_PASSWORD_LENGTH = 12;
@@ -45,7 +44,7 @@ public class SCryptPasswordSecret extends SharedSecret
 	{
 		int ind = encodedpassword.indexOf(':');
 		String prefix = encodedpassword.substring(0, ind);
-		if (!PREFIX.equals(prefix))
+		if (!PREFIX.startsWith(prefix))
 			throw new IllegalArgumentException("Not a password secret: " + encodedpassword);
 		this.password = encodedpassword.substring(ind + 1);
 		
