@@ -2,6 +2,7 @@ package jadex.platform.service.security.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.spongycastle.asn1.pkcs.PrivateKeyInfo;
+import org.spongycastle.asn1.x509.BasicConstraints;
 import org.spongycastle.cert.X509CertificateHolder;
 import org.spongycastle.crypto.digests.Blake2bDigest;
 import org.spongycastle.openssl.PEMKeyPair;
@@ -300,12 +302,19 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				if (!signedcert.isValidOn(now) || !signercert.isValidOn(now))
 					return false;
 				
+				BasicConstraints bc = BasicConstraints.fromExtensions(signercert.getExtensions());
+				if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < i))
+					return false;
+				
 				if (!signedcert.isSignatureValid(jcvpb.build(signercert)))
 					return false;
 			}
 			
 			// Verify the last chain link is signed by trust anchor.
 			if (!certchain.get(certchain.size() - 1).isSignatureValid(jcvpb.build(trustedcrtholder)))
+				return false;
+			BasicConstraints bc = BasicConstraints.fromExtensions(trustedcrtholder.getExtensions());
+			if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < certchain.size() - 1))
 				return false;
 			
 			// Verify signature
@@ -352,13 +361,16 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		byte[] tsig = signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream("/home/jander/test.pem"), new FileInputStream("/home/jander/test.key"));
-		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream("/home/jander/trusted.pem")));
+		String home = System.getProperty("user.home") + File.separator;
+		byte[] tsig = signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream(home + "rsa.pem"), new FileInputStream(home + "rsa.key"));
+		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream(home + "rootCA.pem")));
+//		byte[] tsig = signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream(home + "test.pem"), new FileInputStream(home + "test.key"));
+//		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream(home + "trusted.pem")));
 		System.out.println("TSIGLEN " + tsig.length);
 		
-		PEMParser r = new PEMParser(new FileReader("/home/jander/ec.key"));
+		PEMParser r = new PEMParser(new FileReader(home + "rsa.key"));
 		Object object = r.readObject();
-		object = r.readObject();
+//		object = r.readObject();
 //		ASN1StreamParser p = new ASN1StreamParser(new ByteArrayInputStream(object.getContent()));
 //		DERSequenceParser dp = (DERSequenceParser) p.readObject();
 		
