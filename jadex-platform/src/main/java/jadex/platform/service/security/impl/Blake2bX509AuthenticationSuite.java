@@ -382,7 +382,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 //		AsymmetricKeyParameter akp = PrivateKeyFactory.createKey(pki);
 		
 		
-		r = new PEMParser(new FileReader("/home/jander/test.pem"));
+		r = new PEMParser(new FileReader(home + "test.pem"));
 		List<X509CertificateHolder> certchain = new ArrayList<X509CertificateHolder>();
 		try
 		{
