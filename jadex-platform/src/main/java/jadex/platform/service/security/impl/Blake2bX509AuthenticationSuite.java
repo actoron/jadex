@@ -368,8 +368,11 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 //		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream(home + "trusted.pem")));
 		System.out.println("TSIGLEN " + tsig.length);
 		
-		PEMParser r = new PEMParser(new FileReader(home + "rsa.key"));
-		Object object = r.readObject();
+		FileReader fr = new FileReader(home + "rsa.key");
+		@SuppressWarnings("resource")
+		PEMParser r = new PEMParser(fr);;
+		Object object = r.readObject();;
+		r.close();
 //		object = r.readObject();
 //		ASN1StreamParser p = new ASN1StreamParser(new ByteArrayInputStream(object.getContent()));
 //		DERSequenceParser dp = (DERSequenceParser) p.readObject();
@@ -422,7 +425,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 //		System.out.println(crtholder.getSubjectPublicKeyInfo().parsePublicKey());
 //		System.out.println(crtholder.isValidOn(new Date()));
 		
-		String testmsg = "testmsg";
+//		String testmsg = "testmsg";
 		
 //		DefaultAlgorithmNameFinder danf = new DefaultAlgorithmNameFinder();
 //		JcaPEMKeyConverter jpkc = new JcaPEMKeyConverter();
