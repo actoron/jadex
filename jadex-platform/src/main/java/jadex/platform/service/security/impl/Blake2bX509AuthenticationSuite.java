@@ -372,9 +372,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		
 		
 		Blake2bX509AuthenticationSuite auth = new Blake2bX509AuthenticationSuite();
-		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret("password:sooperdoopersecruit"));
+		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret("password:sooperdoopersecruit"));
 		System.out.println("toklen: " + token.length);
-		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret("password:sooperdoopersecruit"), token));
-		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret("password:superdupersecret"), token));
+		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret("password:sooperdoopersecruit"), token));
+		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret("password:superdupersecret"), token));
 	}
 }

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.platform.service.security.impl.KeySecret;
-import jadex.platform.service.security.impl.PasswordSecret;
+import jadex.platform.service.security.impl.SCryptPasswordSecret;
 
 /**
  *  Class representing a secret used for authentication.
@@ -18,7 +18,7 @@ public abstract class AbstractAuthenticationSecret
 	public static Map<String, Class<?>> SECRET_TYPES = Collections.synchronizedMap(new HashMap<String, Class<?>>());
 	static
 	{
-		AbstractAuthenticationSecret.SECRET_TYPES.put(PasswordSecret.PREFIX, PasswordSecret.class);
+		AbstractAuthenticationSecret.SECRET_TYPES.put(SCryptPasswordSecret.PREFIX, SCryptPasswordSecret.class);
 		AbstractAuthenticationSecret.SECRET_TYPES.put(KeySecret.PREFIX, KeySecret.class);
 	}
 	

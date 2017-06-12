@@ -27,15 +27,15 @@ import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 
 /**
- *  Crypto suite based on Ed448 and ChaCha20-Poly1305 AEAD.
+ *  Crypto suite based on Curve448 and ChaCha20-Poly1305 AEAD.
  *
  */
 public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 {
-	protected static final byte[] ED448_CONST_5 = new byte[56];
+	protected static final byte[] CURVE448_CONST_5 = new byte[56];
 	static
 	{
-		ED448_CONST_5[0] = 5;
+		CURVE448_CONST_5[0] = 5;
 	}
 	
 	//--------------- Handshake state -------------------
@@ -185,9 +185,6 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			secinf.setAuthplatform(secinf.isTrustedPlatform());
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
-//			if (!secinf.isAuthenticatedPlatform())
-//				throw new SecurityException("Platform could not be authenticated: " + incmsg.getSender().getRoot());
-			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
 			nonceprefix ^= Pack.littleEndianToInt(remoteauthchallenge, 0);
 			
@@ -216,9 +213,6 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			secinf.setTrustedPlatform(authnets.size() > 0);
 			secinf.setAuthplatform(secinf.isTrustedPlatform());
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
-			
-//			if (!secinf.isAuthenticatedPlatform())
-//				throw new SecurityException("Platform could not be authenticated: " + incmsg.getSender().getRoot());
 			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
 			nonceprefix ^= Pack.littleEndianToInt(remoteauthchallenge, 0);
@@ -412,7 +406,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	protected static final byte[] genPubKey(byte[] privkey)
 	{
 		byte[] pubkey = new byte[56];
-		Curve448.eval(pubkey, 0, privkey, ED448_CONST_5);
+		Curve448.eval(pubkey, 0, privkey, CURVE448_CONST_5);
 		
 		return pubkey;
 	}
@@ -750,7 +744,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	}
 	
 	/**
-	 *  Message signalling the handshake is done.
+	 *  Message signaling the handshake is done.
 	 *
 	 */
 	protected static final class ReadyMessage extends BasicSecurityMessage
@@ -859,7 +853,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			keya[i >> 1] = (byte) b;
 		}
 		byte[] pkeya = new byte[56];
-		Curve448.eval(pkeya, 0, keya, ED448_CONST_5);
+		Curve448.eval(pkeya, 0, keya, CURVE448_CONST_5);
 		System.out.println(SUtil.hex(pkeya));
 		
 		String skeyb = "1c306a7ac2a0e2e0990b294470cba339e6453772b075811d8fad0d1d6927c120bb5ee8972b0d3e21374c9c921b09d1b0366f10b65173992d";
@@ -871,7 +865,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			keyb[i >> 1] = (byte) b;
 		}
 		byte[] pkeyb = new byte[56];
-		Curve448.eval(pkeyb, 0, keyb, ED448_CONST_5);
+		Curve448.eval(pkeyb, 0, keyb, CURVE448_CONST_5);
 		System.out.println(SUtil.hex(pkeyb));
 		
 		byte[] result = new byte[56];

@@ -2047,36 +2047,6 @@ public class SUtil
 	}
 	
 	/**
-	 *  Creates a random shared network key.
-	 * 
-	 *  @return Random shared network key.
-	 */
-	public static final String createRandomNetworkKey()
-	{
-		byte[] rawkey = new byte[32];
-		SECURE_RANDOM.nextBytes(rawkey);
-		
-		return "key:" + new String (Base64.encode(rawkey), UTF8);
-	}
-	
-	public static final Field strval;
-	static
-	{
-		Field f = null;
-		try
-		{
-			f = String.class.getDeclaredField("value");
-			f.setAccessible(true);
-		}
-		catch (Exception e)
-		{
-			
-		}
-		
-		strval = f;
-	}
-	
-	/**
 	 * Create a globally unique conversation id.
 	 * 
 	 * @return The conversation id.
@@ -2099,14 +2069,38 @@ public class SUtil
 	 */
 	public static String createUniqueId(String name, int length)
 	{
-		UUID uuid = UUID.randomUUID();
-		String rand = uuid.toString();
-		return name + "_" + rand.substring(0, length);
+		String rand = createUniqueId(name);
+		return rand.substring(0, name.length() + length + 1);
 
 		// String rand = ""+Math.random();
 		// rand = rand.substring(2, 2+Math.min(length-2, rand.length()-2));
 		// return name+"_"+rand+(++convidcnt%100);
-	}	
+	}
+	
+	/**
+	 *  Creates a random shared network key.
+	 * 
+	 *  @return Random shared network key.
+	 */
+	public static final String createRandomNetworkKey()
+	{
+		byte[] rawkey = new byte[32];
+		SECURE_RANDOM.nextBytes(rawkey);
+		
+		return "key:" + new String (Base64.encode(rawkey), UTF8);
+	}
+	
+	/**
+	 *  Generates an encoded network password from a raw password.
+	 *  (Adds information about the key derivation function)
+	 *  
+	 *  @param rawpassword The raw password.
+	 *  @return Encoded password.
+	 */
+	public static final String createNetworkPassword(String rawpassword)
+	{
+		return "scrypt484:" + rawpassword;
+	}
 	
 	/**
 	 * 

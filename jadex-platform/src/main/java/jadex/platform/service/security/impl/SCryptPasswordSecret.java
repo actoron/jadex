@@ -7,13 +7,14 @@ import org.spongycastle.crypto.generators.SCrypt;
 import jadex.commons.SUtil;
 
 /**
- *  A secret password used for authentication.
+ *  A secret password used for authentication using the scrypt KDF.
  *
  */
-public class PasswordSecret extends SharedSecret
+public class SCryptPasswordSecret extends SharedSecret
 {
-	/** Prefix used to encode secret type as strings. */
-	public static final String PREFIX = "password";
+	/** Prefix used to encode secret type as strings.*/
+	// scrypt, N=2^(10+n0)=4, R=n1=8, P=n2=4
+	public static final String PREFIX = "scrypt484";
 	
 	/** Password length warning threshold. */
 	protected static final int MIN_PASSWORD_LENGTH = 12;
@@ -33,14 +34,14 @@ public class PasswordSecret extends SharedSecret
 	/**
 	 *  Creates the secret.
 	 */
-	public PasswordSecret()
+	public SCryptPasswordSecret()
 	{
 	}
 	
 	/**
 	 *  Creates the secret.
 	 */
-	public PasswordSecret(String encodedpassword)
+	public SCryptPasswordSecret(String encodedpassword)
 	{
 		int ind = encodedpassword.indexOf(':');
 		String prefix = encodedpassword.substring(0, ind);
