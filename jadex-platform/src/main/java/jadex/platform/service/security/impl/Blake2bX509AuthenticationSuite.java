@@ -69,26 +69,45 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 */
 	public byte[] createAuthenticationToken(byte[] msg, AbstractAuthenticationSecret secret)
 	{
-		if (!(secret instanceof SharedSecret))
-			throw new IllegalArgumentException("Authenticator cannot handle non-shared secrets: " + secret);
-		SharedSecret ssecret = (SharedSecret) secret;
-		
-		// Hash the message.
-		byte[] msghash = getMessageHash(msg);
+		byte[] ret = null;
 		
 		// Generate random salt.
 		byte[] salt = new byte[SALT_SIZE];
 		SSecurity.getSecureRandom().nextBytes(salt);
 		
-		byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
+		// Hash the message.
+		byte[] msghash = getMessageHash(msg, salt);
 		
-		// Generate MAC used for authentication.
-		Blake2bDigest blake2b = new Blake2bDigest(dk);
-		byte[] ret = new byte[SALT_SIZE + MAC_SIZE + 4];
-		Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
-		System.arraycopy(salt, 0, ret, 4, salt.length);
-		blake2b.update(msghash, 0, msghash.length);
-		blake2b.doFinal(ret, salt.length + 4);
+		if (secret instanceof SharedSecret)
+		{
+			SharedSecret ssecret = (SharedSecret) secret;
+			
+			byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
+			
+			// Generate MAC used for authentication.
+			Blake2bDigest blake2b = new Blake2bDigest(dk);
+			ret = new byte[SALT_SIZE + MAC_SIZE + 4];
+			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
+			System.arraycopy(salt, 0, ret, 4, salt.length);
+			blake2b.update(msghash, 0, msghash.length);
+			blake2b.doFinal(ret, salt.length + 4);
+		}
+		else if (secret instanceof AbstractX509PemSecret)
+		{
+			AbstractX509PemSecret aps = (AbstractX509PemSecret) secret;
+			if (!aps.canSign())
+				throw new IllegalArgumentException("Secret cannot be used to sign: " + aps);
+			
+			byte[] sig = signWithPEM(msghash, aps.openCertificate(), aps.openPrivateKey());
+			ret = new byte[sig.length + SALT_SIZE + 4];
+			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
+			System.arraycopy(salt, 0, ret, 4, salt.length);
+			System.arraycopy(sig, 0, ret, 4 + salt.length, sig.length);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Unknown secret type: " + secret);
+		}
 		
 		// Generate authenticator: Salt, MAC.
 		return ret;
@@ -105,34 +124,56 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 */
 	public boolean verifyAuthenticationToken(byte[] msg, AbstractAuthenticationSecret secret, byte[] authtoken)
 	{
-		if (!(secret instanceof SharedSecret))
-			throw new IllegalArgumentException("Authenticator cannot handle non-shared secrets: " + secret);
-		SharedSecret ssecret = (SharedSecret) secret;
+		boolean ret = false;
+		try
+		{
+			SharedSecret ssecret = (SharedSecret) secret;
+			
+			if (authtoken.length != SALT_SIZE + MAC_SIZE + 4)
+				return false;
+			
+			if (Pack.littleEndianToInt(authtoken, 0) != AUTH_SUITE_ID)
+				return false;
+			
+			// Decode token.
+			byte[] salt = new byte[SALT_SIZE];
+			System.arraycopy(authtoken, 4, salt, 0, salt.length);
+			
+			byte[] msghash = getMessageHash(msg, salt);
+			
+			if (secret instanceof SharedSecret)
+			{
+				byte[] mac = new byte[MAC_SIZE];
+				System.arraycopy(authtoken, SALT_SIZE + 4, mac, 0, mac.length);
+				
+				// Decrypt the random key.
+				byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
+				
+				// Generate MAC
+				Blake2bDigest blake2b = new Blake2bDigest(dk);
+				byte[] gmac = new byte[MAC_SIZE];
+				blake2b.update(msghash, 0, msghash.length);
+				blake2b.doFinal(gmac, 0);
+				ret = Arrays.equals(gmac, mac);
+			}
+			else if (secret instanceof AbstractX509PemSecret)
+			{
+				AbstractX509PemSecret aps = (AbstractX509PemSecret) secret;
+				byte[] sig = new byte[authtoken.length - 4 - salt.length];
+				System.arraycopy(authtoken, 4 + salt.length, sig, 0, sig.length);
+				
+				verifyWithPEM(msghash, sig, aps.openTrustAnchorCert());
+			}
+			else
+			{
+				Logger.getLogger("authentication").warning("Unknown secret type: " + secret);
+			}
+		}
+		catch (Exception e)
+		{
+		}
 		
-		if (authtoken.length != SALT_SIZE + MAC_SIZE + 4)
-			return false;
-		
-		if (Pack.littleEndianToInt(authtoken, 0) != AUTH_SUITE_ID)
-			return false;
-		
-		// Decode token.
-		byte[] salt = new byte[SALT_SIZE];
-		byte[] mac = new byte[MAC_SIZE];
-		System.arraycopy(authtoken, 4, salt, 0, salt.length);
-		System.arraycopy(authtoken, SALT_SIZE + 4, mac, 0, mac.length);
-		
-		// Decrypt the random key.
-		byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
-		
-		byte[] msghash = getMessageHash(msg);
-		
-		// Generate MAC
-		Blake2bDigest blake2b = new Blake2bDigest(dk);
-		byte[] gmac = new byte[MAC_SIZE];
-		blake2b.update(msghash, 0, msghash.length);
-		blake2b.doFinal(gmac, 0);
-		
-		return Arrays.equals(gmac, mac);
+		return ret;
 	}
 	
 	/**
@@ -280,11 +321,12 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 *  @param msg The message.
 	 *  @return Hashed message.
 	 */
-	protected static final byte[] getMessageHash(byte[] msg)
+	protected static final byte[] getMessageHash(byte[] msg, byte[] salt)
 	{
 		Blake2bDigest blake2b = new Blake2bDigest(512);
 		byte[] msghash = new byte[64];
 		blake2b.update(msg, 0, msg.length);
+		blake2b.update(salt, 0, salt.length);
 		blake2b.doFinal(msghash, 0);
 		return msghash;
 	}
@@ -294,9 +336,8 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		
 		byte[] tsig = signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream("/home/jander/test.pem"), new FileInputStream("/home/jander/test.key"));
-		System.out.println("VerifyTest: " + verifyWithPEM("TstMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream("/home/jander/trusted.pem")));
+		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream("/home/jander/trusted.pem")));
 		
 		PEMParser r = new PEMParser(new FileReader("/home/jander/test.key"));
 		Object object = r.readObject();
@@ -372,9 +413,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		
 		
 		Blake2bX509AuthenticationSuite auth = new Blake2bX509AuthenticationSuite();
-		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret("password:sooperdoopersecruit"));
+		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")));
 		System.out.println("toklen: " + token.length);
-		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret("password:sooperdoopersecruit"), token));
-		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret("password:superdupersecret"), token));
+		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")), token));
+		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret(SUtil.createNetworkPassword("superdupersecret")), token));
 	}
 }
