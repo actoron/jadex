@@ -359,7 +359,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						// Only accept messages we trust.
 						if (secinf.isTrustedPlatform() || allowuntrusted)
 						{
-							Object body = getSerializationServices(platformid).decode(component.getClassLoader(), result.getSecondEntity());
+							Object body = deserializeMessage(header, result.getSecondEntity());
 							messageArrived(secinf, header, body);
 						}
 					}
@@ -454,6 +454,18 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMessageId messageId, final Object body)
 	{
+	}
+	
+	/**
+	 *  Deserialize the message.
+	 *  
+	 *  @param header The message header.
+	 *  @param serializedmsg The serialized message.
+	 *  @return The deserialized message.
+	 */
+	protected Object deserializeMessage(Map<String, Object> header, byte[] serializedmsg)
+	{
+		return getSerializationServices(platformid).decode(component.getClassLoader(), serializedmsg);
 	}
 	
 	/**

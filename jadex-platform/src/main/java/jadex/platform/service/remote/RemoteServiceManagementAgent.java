@@ -75,6 +75,9 @@ import jadex.platform.service.remote.replacements.GetComponentFeatureMethodRepla
 @Properties(@NameValue(name="system", value="true"))
 public class RemoteServiceManagementAgent
 {
+	/** The receiver of a call in the message header. */
+	public static final String CALL_RECEIVER = "callreceiver";
+	
 	//-------- attributes --------
 	
 	/** The agent. */
