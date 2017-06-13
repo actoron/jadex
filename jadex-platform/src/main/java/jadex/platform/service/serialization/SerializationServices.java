@@ -2,6 +2,7 @@ package jadex.platform.service.serialization;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,13 +50,13 @@ public class SerializationServices implements ISerializationServices
 	protected ISerializer sendserializer;
 	
 	/** All available serializers */
-	protected ISerializer[] serializers;
+	protected Map<Integer, ISerializer> serializers;
 	
 	/** Codecs used for sending. */
 	protected ICodec[] sendcodecs;
 	
 	/** All available codecs. */
-	protected ICodec[] codecs;
+	protected Map<Integer, ICodec> codecs;
 	
 	/** Preprocessors for encoding. */
 	ITraverseProcessor[] preprocessors;
@@ -67,18 +68,22 @@ public class SerializationServices implements ISerializationServices
 	public SerializationServices()
 	{
 		rrmanagement = new RemoteReferenceManagement();
-		serializers = new ISerializer[]{
-			new JadexBinarySerializer()
-//			, new JadexJsonSerializer()
-		};
-		sendserializer = serializers[0];
-		codecs = new ICodec[]{
-//			new SnappyCodec(),
-			new GZIPCodec()
-//			, new LZ4Codec()
-			, new XZCodec()
-		};
-		sendcodecs = new ICodec[] { codecs[0] };
+		serializers = new HashMap<Integer, ISerializer>();
+		ISerializer serial = new JadexBinarySerializer();
+		serializers.put(serial.getSerializerId(), serial);
+		serial = new JadexJsonSerializer();
+		serializers.put(serial.getSerializerId(), serial);
+		sendserializer = serializers.get(0);
+		codecs = new HashMap<Integer, ICodec>();
+		ICodec codec = new SnappyCodec();
+		codecs.put(codec.getCodecId(), codec);
+		codec = new GZIPCodec();
+		codecs.put(codec.getCodecId(), codec);
+		codec = new LZ4Codec();
+		codecs.put(codec.getCodecId(), codec);
+		codec = new XZCodec();
+		codecs.put(codec.getCodecId(), codec);
+		sendcodecs = new ICodec[] { codecs.get(3) };
 		List<ITraverseProcessor> procs = createPreprocessors();
 		preprocessors = procs.toArray(new ITraverseProcessor[procs.size()]);
 		procs = createPostprocessors();
@@ -149,10 +154,9 @@ public class SerializationServices implements ISerializationServices
 					{
 						int offset = prefixsize;
 						raw = enc;
-						ICodec[] codecs = getCodecs();
 						for (int i = codecsize - 1; i >= 0; --i)
 						{
-							raw = codecs[SUtil.bytesToInt(enc, (i << 4) + 8)].decode(raw, offset, raw.length - offset);
+							raw = getCodecs().get(SUtil.bytesToInt(enc, (i << 4) + 8)).decode(raw, offset, raw.length - offset);
 							offset = 0;
 						}
 					}
@@ -162,7 +166,7 @@ public class SerializationServices implements ISerializationServices
 						System.arraycopy(enc, prefixsize, raw, 0, raw.length);
 					}
 					
-					ISerializer serial = getSerializers()[SUtil.bytesToInt(enc, 2)];
+					ISerializer serial = getSerializers().get(SUtil.bytesToInt(enc, 2));
 					ret = serial.decode(raw, cl, getPostprocessors(), null);
 				}
 			}
@@ -223,7 +227,7 @@ public class SerializationServices implements ISerializationServices
 	 *  @param platform Sending platform.
 	 *  @return Serializers.
 	 */
-	public ISerializer[] getSerializers()
+	public Map<Integer, ISerializer> getSerializers()
 	{
 		return serializers;
 	}
@@ -244,7 +248,7 @@ public class SerializationServices implements ISerializationServices
 	 *  
 	 *  @return Codecs.
 	 */
-	public ICodec[] getCodecs()
+	public Map<Integer, ICodec> getCodecs()
 	{
 		return codecs;
 	}

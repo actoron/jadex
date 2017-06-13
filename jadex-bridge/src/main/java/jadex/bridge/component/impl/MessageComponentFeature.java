@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.management.ServiceNotFoundException;
 
+import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -21,7 +22,6 @@ import jadex.bridge.component.IMessageId;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.bridge.service.types.platformstate.IPlatformStateService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
@@ -55,9 +55,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	/** The platform ID. */
 	protected IComponentIdentifier platformid;
-	
-	/** Platform state service. */
-	protected IPlatformStateService pfstate;
 	
 	/** The list of message handlers. */
 	protected Set<IMessageHandler> messagehandlers;
@@ -150,7 +147,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 		else
 		{
-			ISerializationServices serialserv = getPlatformStateService().getSerializationServices();
+			ISerializationServices serialserv = getSerializationServices(platformid);
 			byte[] body = serialserv.encode(header, component.getClassLoader(), message);
 			getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 			{
@@ -279,7 +276,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					{
 						// Flush cache, this may cause jitter due lack of synchronization, but should eventually recover.
 						IComponentIdentifier rplat = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
-						getPlatformStateService().getTransportCache().remove(rplat);
+						getTransportCache(platformid).remove(rplat);
 						
 						getTransportService(header).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<ITransportService>()
 						{
@@ -362,7 +359,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						// Only accept messages we trust.
 						if (secinf.isTrustedPlatform() || allowuntrusted)
 						{
-							Object body = getPlatformStateService().getSerializationServices().decode(component.getClassLoader(), result.getSecondEntity());
+							Object body = getSerializationServices(platformid).decode(component.getClassLoader(), result.getSecondEntity());
 							messageArrived(secinf, header, body);
 						}
 					}
@@ -495,10 +492,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		final Future<ITransportService> ret = new Future<ITransportService>();
 		IComponentIdentifier rplat = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
 		
-		Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(rplat);
+		Tuple2<ITransportService, Integer> tup = getTransportCache(platformid).get(rplat);
 		if (tup != null)
 		{
-			getPlatformStateService().getTransportCache().put(rplat, tup);
+			getTransportCache(platformid).put(rplat, tup);
 			ret.setResult(tup.getFirstEntity());
 		}
 		else
@@ -517,9 +514,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						public void resultAvailable(Integer priority)
 						{
 							ret.setResultIfUndone(tp);
-							Tuple2<ITransportService, Integer> tup = getPlatformStateService().getTransportCache().get(receiverplatform);
+							Tuple2<ITransportService, Integer> tup = getTransportCache(platformid).get(receiverplatform);
 							if (tup == null || tup.getSecondEntity() < priority)
-								getPlatformStateService().getTransportCache().put(receiverplatform, new Tuple2<ITransportService, Integer>(tp, priority));
+								getTransportCache(platformid).put(receiverplatform, new Tuple2<ITransportService, Integer>(tp, priority));
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -557,15 +554,26 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
-	 *  Returns the platform state service.
+	 *  Gets the platform serialization services.
 	 *  
-	 *  @return Platform state service.
+	 *  @param platformid The platform ID.
+	 *  @return The serialization services.
 	 */
-	protected IPlatformStateService getPlatformStateService()
+	public static final ISerializationServices getSerializationServices(IComponentIdentifier platformid)
 	{
-		if (pfstate == null)
-			pfstate = SServiceProvider.getLocalService(component, IPlatformStateService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		return pfstate;
+		return (ISerializationServices) PlatformConfiguration.getPlatformValue(platformid.getRoot(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+	}
+	
+	/**
+	 *  Gets the transport cache services.
+	 *  
+	 *  @param platformid The platform ID.
+	 *  @return The transport cache.
+	 */
+	@SuppressWarnings("unchecked")
+	public static final Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> getTransportCache(IComponentIdentifier platformid)
+	{
+		return (Map<IComponentIdentifier, Tuple2<ITransportService, Integer>>) PlatformConfiguration.getPlatformValue(platformid.getRoot(), IStarterConfiguration.DATA_TRANSPORTCACHE);
 	}
 	
 	/**

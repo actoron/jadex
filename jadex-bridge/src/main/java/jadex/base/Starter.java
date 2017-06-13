@@ -426,7 +426,7 @@ public class Starter
 						e.printStackTrace();
 					}
 					
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERIALIZATIONSERVICES, new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>());
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_TRANSPORTCACHE, new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000));
 
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());

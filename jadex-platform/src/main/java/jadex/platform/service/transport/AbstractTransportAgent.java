@@ -22,7 +22,6 @@ import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.platformstate.IPlatformStateService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
@@ -265,8 +264,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	@AgentCreated
 	protected void init() throws Exception
 	{
-		IPlatformStateService plast = SServiceProvider.getLocalService(agent, IPlatformStateService.class, Binding.SCOPE_PLATFORM);
-		this.codec = plast.getSerializationServices();
+		this.codec = MessageComponentFeature.getSerializationServices(agent.getComponentIdentifier().getRoot());
 		this.impl = createTransportImpl();
 		impl.init(this);
 

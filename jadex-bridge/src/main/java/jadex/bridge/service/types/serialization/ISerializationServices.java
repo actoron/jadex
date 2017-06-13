@@ -69,7 +69,7 @@ public interface ISerializationServices
 	 *  @param platform Sending platform.
 	 *  @return Serializers.
 	 */
-	public ISerializer[] getSerializers();
+	public Map<Integer, ISerializer> getSerializers();
 	
 	/**
 	 *  Returns the codecs for sending.
@@ -84,7 +84,7 @@ public interface ISerializationServices
 	 *  
 	 *  @return Codecs.
 	 */
-	public ICodec[] getCodecs();
+	public Map<Integer, ICodec> getCodecs();
 	
 	/**
 	 *  Gets the post-processors for decoding a received message.
